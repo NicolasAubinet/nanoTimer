@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:id="@+id/layoutTimer"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent">
+
+  <LinearLayout
+     android:id="@+id/topLayout"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:orientation="vertical">
+    <TextView
+       android:id="@+id/tvInspection"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="20dp"
+       android:textSize="20sp"
+       android:fontFamily="monospace"
+       android:gravity="center"/>
+    <TextView
+       android:id="@+id/tvTimer"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="10dp"
+       android:textSize="50sp"
+       android:fontFamily="monospace"
+       android:gravity="center"/>
+    <TextView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="10dp"
+       android:textSize="12sp"
+       android:fontFamily="monospace"
+       android:gravity="center"
+       android:text="@string/scrambleC"/>
+    <TextView
+       android:id="@+id/tvScramble"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:textSize="12sp"
+       android:fontFamily="monospace"
+       android:layout_marginTop="5dp"
+       android:gravity="center"/>
+  </LinearLayout>
+
+  <LinearLayout
+     android:id="@+id/bottomLayout"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:orientation="horizontal"
+     android:layout_alignParentBottom="true"
+     android:gravity="bottom"
+     android:layout_margin="10dp">
+    <TableLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:shrinkColumns="*"
+       android:stretchColumns="*">
+      <TableRow>
+        <TextView android:text=""/>
+        <TextView android:text="@string/average_of" android:textStyle="bold"/>
+        <TextView android:text="@string/best_of" android:textStyle="bold"/>
+      </TableRow>
+      <TableRow>
+        <TextView android:text="5" android:textStyle="bold"/>
+        <TextView android:id="@+id/tvAvgOfFive"/>
+        <TextView android:id="@+id/tvBestOfFive"/>
+      </TableRow>
+      <TableRow>
+        <TextView android:text="12" android:textStyle="bold"/>
+        <TextView android:id="@+id/tvAvgOfTwelve"/>
+        <TextView android:id="@+id/tvBestOfTwelve"/>
+      </TableRow>
+      <TableRow>
+        <TextView android:text="100" android:textStyle="bold"/>
+        <TextView android:id="@+id/tvAvgOfHundred"/>
+        <TextView android:id="@+id/tvBestOfHundred"/>
+      </TableRow>
+      <TableRow>
+        <TextView android:text="1000" android:textStyle="bold"/>
+        <TextView android:id="@+id/tvAvgOfThousand"/>
+        <TextView android:id="@+id/tvBestOfThousand"/>
+      </TableRow>
+    </TableLayout>
+  </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">nano Timer</string>
+
+  <string name="two_by_two">2x2x2</string>
+  <string name="three_by_three">3x3x3</string>
+  <string name="four_by_four">4x4x4</string>
+  <string name="five_by_five">5x5x5</string>
+  <string name="six_by_six">6x6x6</string>
+  <string name="seven_by_seven">7x7x7</string>
+  <string name="megaminx">Megaminx</string>
+  <string name="pyraminx">Pyraminx</string>
+  <string name="square1">Square-1</string>
+
+  <string name="cube_type">Cube type:</string>
+  <string name="solve_type">Solve type:</string>
+  <string name="history">History</string>
+  <string name="scramble">Scramble</string>
+  <string name="scrambleC">Scramble:</string>
+  <string name="start">Start</string>
+  <string name="def">Default</string>
+  <string name="practice">Practice</string>
+  <string name="one_handed">One-handed</string>
+  <string name="blindfolded">Blindfolded</string>
+
+  <string name="inspection">Inspection</string>
+  <string name="average_of">Average of</string>
+  <string name="best_of">Best of</string>
+</resources>

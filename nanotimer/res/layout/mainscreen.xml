@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:padding="5dp">
+
+  <LinearLayout
+     android:id="@+id/layoutCubeType"
+     android:layout_width="match_parent"
+     android:layout_height="35dp"
+     android:orientation="horizontal"
+     android:layout_alignParentTop="true">
+    <TextView
+       android:layout_width="100dp"
+       android:layout_height="wrap_content"
+       android:text="@string/cube_type"
+       style="@style/SimpleTextField"/>
+    <Button
+       android:id="@+id/buCubeType"
+       android:text="@string/three_by_three"
+       android:layout_marginLeft="10dp"
+       style="@style/CustomButton"/>
+  </LinearLayout>
+
+  <LinearLayout
+     android:id="@+id/layoutSolveType"
+     android:layout_width="match_parent"
+     android:layout_height="35dp"
+     android:orientation="horizontal"
+     android:layout_marginTop="5dp"
+     android:layout_below="@id/layoutCubeType">
+    <TextView
+       android:layout_width="100dp"
+       android:layout_height="wrap_content"
+       android:text="@string/solve_type"
+       style="@style/SimpleTextField"/>
+    <Button
+       android:id="@+id/buSolveType"
+       android:text="@string/def"
+       android:layout_marginLeft="10dp"
+       style="@style/CustomButton"/>
+  </LinearLayout>
+
+  <LinearLayout
+     android:id="@+id/layoutHistory"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:orientation="vertical"
+     android:layout_marginTop="5dp"
+     android:layout_marginBottom="5dp"
+     android:padding="8dp"
+     android:background="@drawable/layout_border"
+     android:layout_below="@id/layoutSolveType"
+     android:layout_above="@+id/buStart">
+    <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="@string/history"
+       style="@style/SimpleTextField"/>
+    <ListView
+       android:id="@+id/lvHistory"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"/>
+  </LinearLayout>
+
+  <Button
+     android:id="@+id/buStart"
+     android:text="@string/start"
+     android:layout_alignParentBottom="true"
+     style="@style/CustomButton"/>
+
+</RelativeLayout>
