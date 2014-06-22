@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">nano Timer</string>
+
+  <string name="two_by_two">2x2x2</string>
+  <string name="three_by_three">3x3x3</string>
+  <string name="four_by_four">4x4x4</string>
+  <string name="five_by_five">5x5x5</string>
+  <string name="six_by_six">6x6x6</string>
+  <string name="seven_by_seven">7x7x7</string>
+  <string name="megaminx">Megaminx</string>
+  <string name="pyraminx">Pyraminx</string>
+  <string name="square1">Square-1</string>
+
+  <string name="def">Default</string>
+</resources>

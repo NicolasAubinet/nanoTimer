@@ -12,9 +12,9 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.cube.nanotimer.CubeType;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.scrambler.ScramblerFactory;
+import com.cube.nanotimer.vo.CubeType;
 
 public class TimerActivity extends Activity {
 

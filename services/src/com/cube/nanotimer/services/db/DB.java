@@ -1,4 +1,4 @@
-package com.cube.nanotimer.services;
+package com.cube.nanotimer.services.db;
 
 public class DB {
 

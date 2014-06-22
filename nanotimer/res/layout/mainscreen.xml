@@ -18,7 +18,6 @@
        style="@style/SimpleTextField"/>
     <Button
        android:id="@+id/buCubeType"
-       android:text="@string/three_by_three"
        android:layout_marginLeft="10dp"
        style="@style/CustomButton"/>
   </LinearLayout>
@@ -37,7 +36,6 @@
        style="@style/SimpleTextField"/>
     <Button
        android:id="@+id/buSolveType"
-       android:text="@string/def"
        android:layout_marginLeft="10dp"
        style="@style/CustomButton"/>
   </LinearLayout>

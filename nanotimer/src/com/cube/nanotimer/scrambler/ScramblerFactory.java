@@ -1,6 +1,5 @@
 package com.cube.nanotimer.scrambler;
 
-import com.cube.nanotimer.CubeType;
 import com.cube.nanotimer.scrambler.impl.FiveScrambler;
 import com.cube.nanotimer.scrambler.impl.FourScrambler;
 import com.cube.nanotimer.scrambler.impl.MegaminxScrambler;
@@ -8,12 +7,13 @@ import com.cube.nanotimer.scrambler.impl.SevenScrambler;
 import com.cube.nanotimer.scrambler.impl.SixScrambler;
 import com.cube.nanotimer.scrambler.impl.ThreeScrambler;
 import com.cube.nanotimer.scrambler.impl.TwoScrambler;
+import com.cube.nanotimer.vo.CubeType;
 
 public class ScramblerFactory {
 
   public static Scrambler getScrambler(CubeType type) {
     Scrambler scrambler;
-    switch (type) {
+    switch (type.getType()) {
       case TWO_BY_TWO:
         scrambler = new TwoScrambler();
         break;
