@@ -37,10 +37,20 @@ public class ServiceProviderImpl implements ServiceProvider {
 
   @Override
   public List<SolveType> getSolveTypes(CubeType cubeType) {
-    SolveType type = new SolveType("Defaulttmp");
-    List<SolveType> l = new ArrayList<SolveType>();
-    l.add(type);
-    return l;
+    List<SolveType> solveTypes = new ArrayList<SolveType>();
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT ").append(DB.COL_SOLVETYPE_NAME);
+    q.append(" FROM ").append(DB.TABLE_SOLVETYPE);
+    q.append(" WHERE ").append(DB.COL_SOLVETYPE_CUBETYPE_ID).append(" = ?");
+    Cursor cursor = db.rawQuery(q.toString(), new String[] { String.valueOf(cubeType.getId()) });
+    if (cursor != null) {
+      for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+        SolveType st = new SolveType(cursor.getString(0));
+        solveTypes.add(st);
+      }
+      cursor.close();
+    }
+    return solveTypes;
   }
 
   @Override
