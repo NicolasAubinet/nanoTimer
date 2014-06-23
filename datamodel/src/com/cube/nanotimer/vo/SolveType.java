@@ -1,14 +1,26 @@
 package com.cube.nanotimer.vo;
 
-public class SolveType {
+import java.io.Serializable;
 
+public class SolveType implements Serializable {
+
+  private int id;
   private String name;
 
   public SolveType() {
   }
 
-  public SolveType(String name) {
+  public SolveType(int id, String name) {
+    this.id = id;
     this.name = name;
+  }
+
+  public int getId() {
+    return id;
+  }
+
+  public void setId(int id) {
+    this.id = id;
   }
 
   public String getName() {

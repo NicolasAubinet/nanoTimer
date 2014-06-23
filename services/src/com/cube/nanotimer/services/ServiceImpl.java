@@ -4,6 +4,7 @@ import android.content.Context;
 import com.cube.nanotimer.services.db.DBHelper;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 
@@ -48,7 +49,7 @@ public class ServiceImpl extends DBHelper implements Service {
   }
 
   @Override
-  public void saveTime(final SolveTime solveTime, final DataCallback<Integer> callback) {
+  public void saveTime(final SolveTime solveTime, final DataCallback<SolveAverages> callback) {
     callProvider(new Runnable() {
       @Override
       public void run() {

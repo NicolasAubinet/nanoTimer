@@ -2,27 +2,27 @@ package com.cube.nanotimer.vo;
 
 public class SolveTime {
 
-  private long timestamp;
-  private long time;
+  private float timestamp;
+  private float time;
   private String scramble;
-  private int solveType;
+  private SolveType solveType;
 
   public SolveTime() {
   }
 
-  public long getTimestamp() {
+  public float getTimestamp() {
     return timestamp;
   }
 
-  public void setTimestamp(long timestamp) {
+  public void setTimestamp(float timestamp) {
     this.timestamp = timestamp;
   }
 
-  public long getTime() {
+  public float getTime() {
     return time;
   }
 
-  public void setTime(long time) {
+  public void setTime(float time) {
     this.time = time;
   }
 
@@ -34,11 +34,11 @@ public class SolveTime {
     this.scramble = scramble;
   }
 
-  public int getSolveType() {
+  public SolveType getSolveType() {
     return solveType;
   }
 
-  public void setSolveType(int solveType) {
+  public void setSolveType(SolveType solveType) {
     this.solveType = solveType;
   }
 }

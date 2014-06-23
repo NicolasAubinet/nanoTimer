@@ -57,7 +57,8 @@ public class MainScreenActivity extends Activity implements SelectionHandler {
       @Override
       public void onClick(View view) {
         Intent i = new Intent(MainScreenActivity.this, TimerActivity.class);
-        i.putExtra("type", curCubeType);
+        i.putExtra("cubeType", curCubeType);
+        i.putExtra("solveType", curSolveType);
         startActivity(i);
       }
     });
