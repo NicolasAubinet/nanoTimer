@@ -24,7 +24,7 @@ import com.cube.nanotimer.vo.SolveType;
 
 public class TimerActivity extends Activity {
 
-  enum TimerState {STOPPED, STARTED}
+  enum TimerState { STOPPED, STARTED }
 
   private CubeType cubeType;
   private SolveType solveType;
