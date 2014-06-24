@@ -71,6 +71,9 @@ public class DBHelper extends SQLiteOpenHelper {
     insertSolveType(getString(R.string.def), insertCubeType(5, getString(R.string.six_by_six)));
     insertSolveType(getString(R.string.def), insertCubeType(6, getString(R.string.seven_by_seven)));
     insertSolveType(getString(R.string.def), insertCubeType(7, getString(R.string.megaminx)));
+
+    insertSolveType(getString(R.string.one_handed), 2);
+    insertSolveType(getString(R.string.blindfolded), 2);
   }
 
   private int insertCubeType(int id, String name) {

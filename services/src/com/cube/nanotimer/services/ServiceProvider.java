@@ -11,5 +11,7 @@ public interface ServiceProvider {
   List<CubeType> getCubeTypes();
   List<SolveType> getSolveTypes(CubeType cubeType);
   SolveAverages saveTime(SolveTime solveTime);
+  SolveAverages getSolveAverages(SolveType solveType);
   void removeTime(SolveTime solveTime);
+  List<SolveTime> getHistory(SolveType solveType);
 }

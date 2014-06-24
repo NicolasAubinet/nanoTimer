@@ -13,4 +13,6 @@
   <string name="square1">Square-1</string>
 
   <string name="def">Default</string>
+  <string name="one_handed">One-handed</string>
+  <string name="blindfolded">Blindfolded</string>
 </resources>

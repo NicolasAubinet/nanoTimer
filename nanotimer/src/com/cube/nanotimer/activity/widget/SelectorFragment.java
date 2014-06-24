@@ -16,13 +16,15 @@ import java.util.List;
 
 public class SelectorFragment extends DialogFragment {
 
+  private static final String ARG_ID = "id";
   private static final String ARG_ITEMS = "items";
 
   private SelectionHandler handler;
 
-  public static SelectorFragment newInstance(ArrayList<String> items, SelectionHandler handler) {
+  public static SelectorFragment newInstance(int id, ArrayList<String> items, SelectionHandler handler) {
     SelectorFragment f = new SelectorFragment(handler);
     Bundle bundle = new Bundle();
+    bundle.putInt(ARG_ID, id);
     bundle.putStringArrayList(ARG_ITEMS, items);
     f.setArguments(bundle);
     return f;
@@ -37,6 +39,7 @@ public class SelectorFragment extends DialogFragment {
     View v = getActivity().getLayoutInflater().inflate(R.layout.cube_type_list, null);
     ListView lvItems = (ListView) v.findViewById(R.id.lvItems);
 
+    final int id = getArguments().getInt(ARG_ID);
     List items = getArguments().getStringArrayList(ARG_ITEMS);
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.simple_list_item, items);
     lvItems.setAdapter(adapter);
@@ -46,7 +49,7 @@ public class SelectorFragment extends DialogFragment {
     lvItems.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        handler.onItemSelected(i);
+        handler.onItemSelected(id, i);
         dialog.dismiss();
       }
     });

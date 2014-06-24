@@ -16,11 +16,11 @@ import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.scrambler.ScramblerFactory;
 import com.cube.nanotimer.services.db.DataCallback;
+import com.cube.nanotimer.util.Utils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
-import util.Utils;
 
 public class TimerActivity extends Activity {
 
@@ -45,11 +45,12 @@ public class TimerActivity extends Activity {
     setContentView(R.layout.timer);
     cubeType = (CubeType) getIntent().getSerializableExtra("cubeType");
     solveType = (SolveType) getIntent().getSerializableExtra("solveType");
+    App.getService().getSolveAverages(solveType, new SolveAverageCallback());
 
     tvTimer = (TextView) findViewById(R.id.tvTimer);
     tvInspection = (TextView) findViewById(R.id.tvInspection);
-    resetTimer();
     tvScramble = (TextView) findViewById(R.id.tvScramble);
+    resetTimer();
 
     timerHandler = new Handler();
     updateTimerRunnable = new Runnable() {
@@ -110,7 +111,7 @@ public class TimerActivity extends Activity {
   }
 
   private void stopTimer(boolean save) {
-    long time = System.currentTimeMillis() - timerStartTs;
+    int time = (int)(System.currentTimeMillis() - timerStartTs);
     timerState = TimerState.STOPPED;
     // update time once more to get the ms right
     // (as all ms do not necessarily appear when timing, some are skipped due to refresh interval)
@@ -138,44 +139,27 @@ public class TimerActivity extends Activity {
     tvTimer.setText("0.00");
   }
 
-  private void saveTime(long time) {
+  private void saveTime(int time) {
     SolveTime solveTime = new SolveTime();
     solveTime.setTime(time);
     solveTime.setTimestamp(System.currentTimeMillis());
     solveTime.setSolveType(solveType);
     solveTime.setScramble(Utils.deleteLineBreaks(tvScramble.getText().toString()));
-    App.getService().saveTime(solveTime, new DataCallback<SolveAverages>() {
-      @Override
-      public void onData(final SolveAverages data) {
-        runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            ((TextView) findViewById(R.id.tvAvgOfFive)).setText(formatAvgField(data.getAvgOf5()));
-            ((TextView) findViewById(R.id.tvAvgOfTwelve)).setText(formatAvgField(data.getAvgOf12()));
-            ((TextView) findViewById(R.id.tvAvgOfHundred)).setText(formatAvgField(data.getAvgOf100()));
-            ((TextView) findViewById(R.id.tvAvgOfThousand)).setText(formatAvgField(data.getAvgOf1000()));
-            ((TextView) findViewById(R.id.tvBestOfFive)).setText(formatAvgField(data.getBestOf5()));
-            ((TextView) findViewById(R.id.tvBestOfTwelve)).setText(formatAvgField(data.getBestOf12()));
-            ((TextView) findViewById(R.id.tvBestOfHundred)).setText(formatAvgField(data.getBestOf100()));
-            ((TextView) findViewById(R.id.tvBestOfThousand)).setText(formatAvgField(data.getBestOf1000()));
-          }
-        });
-      }
-    });
+    App.getService().saveTime(solveTime, new SolveAverageCallback());
   }
 
   private String formatAvgField(Float f) {
     if (f == null) {
       return "-";
     }
-    return String.format("%.2f", f);
+    return Utils.formatTime(f);
   }
 
   private synchronized void updateTimerText(long curTime) {
     StringBuilder sb = new StringBuilder();
     int minutes = (int) curTime / 60000;
     int seconds = (int) (curTime / 1000) % 60;
-    int hundreds = (int) (curTime / 10.0) % 100;
+    int hundreds = Math.round((float) curTime / 10) % 100;
     if (minutes > 0) {
       sb.append(minutes).append(":");
       sb.append(String.format("%02d", seconds));
@@ -220,6 +204,25 @@ public class TimerActivity extends Activity {
       prevLinesCharCount += line.length() + 1;
     }
     return span;
+  }
+
+  private class SolveAverageCallback extends DataCallback<SolveAverages> {
+    @Override
+    public void onData(final SolveAverages data) {
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          ((TextView) findViewById(R.id.tvAvgOfFive)).setText(formatAvgField(data.getAvgOf5()));
+          ((TextView) findViewById(R.id.tvAvgOfTwelve)).setText(formatAvgField(data.getAvgOf12()));
+          ((TextView) findViewById(R.id.tvAvgOfHundred)).setText(formatAvgField(data.getAvgOf100()));
+          ((TextView) findViewById(R.id.tvAvgOfThousand)).setText(formatAvgField(data.getAvgOf1000()));
+          ((TextView) findViewById(R.id.tvBestOfFive)).setText(formatAvgField(data.getBestOf5()));
+          ((TextView) findViewById(R.id.tvBestOfTwelve)).setText(formatAvgField(data.getBestOf12()));
+          ((TextView) findViewById(R.id.tvBestOfHundred)).setText(formatAvgField(data.getBestOf100()));
+          ((TextView) findViewById(R.id.tvBestOfThousand)).setText(formatAvgField(data.getBestOf1000()));
+        }
+      });
+    }
   }
 
 }
