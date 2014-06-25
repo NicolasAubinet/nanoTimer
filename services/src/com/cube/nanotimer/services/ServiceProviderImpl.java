@@ -10,14 +10,17 @@ import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ServiceProviderImpl implements ServiceProvider {
 
   private SQLiteDatabase db;
 
   private SolveType currentSolveType;
-  private List<Integer> cachedSolveTimes;
+  private List<Long> cachedSolveTimes;
+  private Map<Integer, Long> cachedBestAverages;
   private final int CACHE_MAX_SIZE = 1010;
   private final int HISTORY_PAGE_SIZE = 20;
 
@@ -62,15 +65,15 @@ public class ServiceProviderImpl implements ServiceProvider {
 
   @Override
   public SolveAverages saveTime(SolveTime solveTime) {
-    syncSolveTimesCache(solveTime.getSolveType());
+    syncCaches(solveTime.getSolveType());
     cachedSolveTimes.add(0, solveTime.getTime());
     if (cachedSolveTimes.size() > CACHE_MAX_SIZE) {
       cachedSolveTimes.remove(cachedSolveTimes.size() - 1);
     }
-    Integer avg5 = getLastAvg(5);
-    Integer avg12 = getLastAvg(12);
-    Integer avg100 = getLastAvg(100);
-    Integer avg1000 = getLastAvg(1000);
+    Long avg5 = getLastAvg(5);
+    Long avg12 = getLastAvg(12);
+    Long avg100 = getLastAvg(100);
+    Long avg1000 = getLastAvg(1000);
 
     ContentValues values = new ContentValues();
     values.put(DB.COL_TIMEHISTORY_TIME, solveTime.getTime());
@@ -84,25 +87,53 @@ public class ServiceProviderImpl implements ServiceProvider {
     db.insert(DB.TABLE_TIMEHISTORY, null, values);
 
     SolveAverages solveAverages = new SolveAverages();
-    solveAverages.setAvgOf5(convertMsToSeconds(avg5));
-    solveAverages.setAvgOf12(convertMsToSeconds(avg12));
-    solveAverages.setAvgOf100(convertMsToSeconds(avg100));
-    solveAverages.setAvgOf1000(convertMsToSeconds(avg1000));
-    // TODO : best of
+    solveAverages.setAvgOf5(avg5);
+    solveAverages.setAvgOf12(avg12);
+    solveAverages.setAvgOf100(avg100);
+    solveAverages.setAvgOf1000(avg1000);
+    syncBestAveragesWithCurrent(avg5, avg12, avg100, avg1000);
+    solveAverages.setBestOf5(cachedBestAverages.get(5));
+    solveAverages.setBestOf12(cachedBestAverages.get(12));
+    solveAverages.setBestOf100(cachedBestAverages.get(100));
+    solveAverages.setBestOf1000(cachedBestAverages.get(1000));
 
     return solveAverages;
   }
 
+  private void syncBestAveragesWithCurrent(Long avg5, Long avg12, Long avg100, Long avg1000) {
+    if (isAverageBetter(cachedBestAverages.get(5), avg5)) {
+      cachedBestAverages.put(5, avg5);
+    } else if (isAverageBetter(cachedBestAverages.get(12), avg12)) {
+      cachedBestAverages.put(12, avg12);
+    } else if (isAverageBetter(cachedBestAverages.get(100), avg100)) {
+      cachedBestAverages.put(100, avg100);
+    } else if (isAverageBetter(cachedBestAverages.get(1000), avg1000)) {
+      cachedBestAverages.put(1000, avg1000);
+    }
+  }
+
+  private boolean isAverageBetter(Long oldVal, Long newVal) {
+    if (oldVal == null && newVal != null) {
+      return true;
+    } else if (oldVal != null && newVal != null && newVal < oldVal) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   @Override
   public SolveAverages getSolveAverages(SolveType solveType) {
-    syncSolveTimesCache(solveType);
-
+    syncCaches(solveType);
     SolveAverages solveAverages = new SolveAverages();
-    solveAverages.setAvgOf5(convertMsToSeconds(getLastAvg(5)));
-    solveAverages.setAvgOf12(convertMsToSeconds(getLastAvg(12)));
-    solveAverages.setAvgOf100(convertMsToSeconds(getLastAvg(100)));
-    solveAverages.setAvgOf1000(convertMsToSeconds(getLastAvg(1000)));
-    // TODO : best of
+    solveAverages.setAvgOf5(getLastAvg(5));
+    solveAverages.setAvgOf12(getLastAvg(12));
+    solveAverages.setAvgOf100(getLastAvg(100));
+    solveAverages.setAvgOf1000(getLastAvg(1000));
+    solveAverages.setBestOf5(cachedBestAverages.get(5));
+    solveAverages.setBestOf12(cachedBestAverages.get(12));
+    solveAverages.setBestOf100(cachedBestAverages.get(100));
+    solveAverages.setBestOf1000(cachedBestAverages.get(1000));
     return solveAverages;
   }
 
@@ -111,6 +142,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     // TODO : remove from cache
     // TODO : remove from DB
     // TODO : re-read if cache became < 1000
+    // TODO : search for best averages again (maybe check if the history line that was deleted belongs to the best avg, otherwise don't re-read. see if would be useful)
   }
 
   @Override
@@ -142,15 +174,16 @@ public class ServiceProviderImpl implements ServiceProvider {
     return history;
   }
 
-  private void syncSolveTimesCache(SolveType solveType) {
+  private void syncCaches(SolveType solveType) {
     if (cachedSolveTimes == null || solveType.getId() != currentSolveType.getId()) {
       currentSolveType = solveType;
       loadSolveTimes(solveType.getId());
+      loadBestAverages(solveType.getId());
     }
   }
 
-  private List<Integer> loadSolveTimes(int solveTypeId) {
-    cachedSolveTimes = new ArrayList<Integer>();
+  private List<Long> loadSolveTimes(int solveTypeId) {
+    cachedSolveTimes = new ArrayList<Long>();
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_TIMEHISTORY_TIME);
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
@@ -160,17 +193,39 @@ public class ServiceProviderImpl implements ServiceProvider {
     Cursor cursor = db.rawQuery(q.toString(), new String[] { String.valueOf(solveTypeId) });
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-        cachedSolveTimes.add(cursor.getInt(0));
+        cachedSolveTimes.add(cursor.getLong(0));
       }
       cursor.close();
     }
     return cachedSolveTimes;
   }
 
-  private Integer getLastAvg(int n) {
-    int total = 0;
+  private Map<Integer, Long> loadBestAverages(int solveTypeId) {
+    cachedBestAverages = new HashMap<Integer, Long>();
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT MIN(").append(DB.COL_TIMEHISTORY_AVG5).append(")");
+    q.append(", MIN(").append(DB.COL_TIMEHISTORY_AVG12).append(")");
+    q.append(", MIN(").append(DB.COL_TIMEHISTORY_AVG100).append(")");
+    q.append(", MIN(").append(DB.COL_TIMEHISTORY_AVG1000).append(")");
+    q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
+    q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
+    Cursor cursor = db.rawQuery(q.toString(), new String[] { String.valueOf(solveTypeId) });
+    if (cursor != null) {
+      if (cursor.moveToFirst()) {
+        cachedBestAverages.put(5, getCursorLong(cursor, 0));
+        cachedBestAverages.put(12, getCursorLong(cursor, 1));
+        cachedBestAverages.put(100, getCursorLong(cursor, 2));
+        cachedBestAverages.put(1000, getCursorLong(cursor, 3));
+      }
+      cursor.close();
+    }
+    return cachedBestAverages;
+  }
+
+  private Long getLastAvg(int n) {
+    long total = 0;
     int i = 0;
-    for (Integer t : cachedSolveTimes) {
+    for (Long t : cachedSolveTimes) {
       total += t;
       i++;
       if (i == n) {
@@ -180,8 +235,30 @@ public class ServiceProviderImpl implements ServiceProvider {
     return null;
   }
 
-  private Float convertMsToSeconds(Integer ms) {
+  private Float convertMsToSeconds(Long ms) {
     return ms == null ? null : ((float) ms / 1000);
+  }
+
+  protected Integer getCursorInteger(Cursor cursor, int ind) {
+    if (cursor == null) {
+      return null;
+    }
+    if (cursor.isNull(ind)) {
+      return null;
+    } else {
+      return cursor.getInt(ind);
+    }
+  }
+
+  protected Long getCursorLong(Cursor cursor, int ind) {
+    if (cursor == null) {
+      return null;
+    }
+    if (cursor.isNull(ind)) {
+      return null;
+    } else {
+      return cursor.getLong(ind);
+    }
   }
 
 }

@@ -93,4 +93,5 @@ public class DBHelper extends SQLiteOpenHelper {
   private String getString(int resId) {
     return context.getString(resId);
   }
+
 }

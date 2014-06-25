@@ -16,7 +16,7 @@ import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.scrambler.ScramblerFactory;
 import com.cube.nanotimer.services.db.DataCallback;
-import com.cube.nanotimer.util.Utils;
+import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
@@ -26,11 +26,13 @@ public class TimerActivity extends Activity {
 
   enum TimerState { STOPPED, STARTED }
 
-  private CubeType cubeType;
-  private SolveType solveType;
   private TextView tvTimer;
   private TextView tvInspection;
   private TextView tvScramble;
+
+  private CubeType cubeType;
+  private SolveType solveType;
+  private String[] currentScramble;
 
   private final long REFRESH_INTERVAL = 10;
   private Handler timerHandler;
@@ -45,7 +47,7 @@ public class TimerActivity extends Activity {
     setContentView(R.layout.timer);
     cubeType = (CubeType) getIntent().getSerializableExtra("cubeType");
     solveType = (SolveType) getIntent().getSerializableExtra("solveType");
-    App.getService().getSolveAverages(solveType, new SolveAverageCallback());
+    App.INSTANCE.getService().getSolveAverages(solveType, new SolveAverageCallback());
 
     tvTimer = (TextView) findViewById(R.id.tvTimer);
     tvInspection = (TextView) findViewById(R.id.tvInspection);
@@ -111,7 +113,7 @@ public class TimerActivity extends Activity {
   }
 
   private void stopTimer(boolean save) {
-    int time = (int)(System.currentTimeMillis() - timerStartTs);
+    long time = (System.currentTimeMillis() - timerStartTs);
     timerState = TimerState.STOPPED;
     // update time once more to get the ms right
     // (as all ms do not necessarily appear when timing, some are skipped due to refresh interval)
@@ -139,35 +141,21 @@ public class TimerActivity extends Activity {
     tvTimer.setText("0.00");
   }
 
-  private void saveTime(int time) {
+  private void saveTime(long time) {
     SolveTime solveTime = new SolveTime();
     solveTime.setTime(time);
     solveTime.setTimestamp(System.currentTimeMillis());
     solveTime.setSolveType(solveType);
-    solveTime.setScramble(Utils.deleteLineBreaks(tvScramble.getText().toString()));
-    App.getService().saveTime(solveTime, new SolveAverageCallback());
+    solveTime.setScramble(FormatterService.INSTANCE.formatScrambleAsSingleLine(currentScramble, cubeType));
+    App.INSTANCE.getService().saveTime(solveTime, new SolveAverageCallback());
   }
 
-  private String formatAvgField(Float f) {
-    if (f == null) {
-      return "-";
-    }
-    return Utils.formatTime(f);
+  private String formatAvgField(Long f) {
+    return FormatterService.INSTANCE.formatSolveTime(f, "-");
   }
 
   private synchronized void updateTimerText(long curTime) {
-    StringBuilder sb = new StringBuilder();
-    int minutes = (int) curTime / 60000;
-    int seconds = (int) (curTime / 1000) % 60;
-    int hundreds = Math.round((float) curTime / 10) % 100;
-    if (minutes > 0) {
-      sb.append(minutes).append(":");
-      sb.append(String.format("%02d", seconds));
-    } else {
-      sb.append(seconds);
-    }
-    sb.append(".").append(String.format("%02d", hundreds));
-    tvTimer.setText(sb.toString());
+    tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(curTime));
   }
 
   private synchronized void updateInspectionTimerText() {
@@ -177,8 +165,8 @@ public class TimerActivity extends Activity {
 
   private void generateScramble() {
     if (cubeType != null) {
-      String scramble = ScramblerFactory.getScrambler(cubeType).getNewScramble();
-      tvScramble.setText(getColoredTextSpan(scramble));
+      currentScramble = ScramblerFactory.getScrambler(cubeType).getNewScramble();
+      tvScramble.setText(getColoredTextSpan(FormatterService.INSTANCE.formatScramble(currentScramble, cubeType)));
     }
   }
 

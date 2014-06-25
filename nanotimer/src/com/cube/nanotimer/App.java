@@ -4,21 +4,22 @@ import android.content.Context;
 import com.cube.nanotimer.services.Service;
 import com.cube.nanotimer.services.ServiceImpl;
 
-public class App {
+public enum App {
+  INSTANCE;
 
-  private static Context context;
-  private static Service service;
+  private Context context;
+  private Service service;
 
-  public static Context getContext() {
+  public Context getContext() {
     return context;
   }
 
-  public static void setContext(Context context) {
-    App.context = context;
-    App.service = ServiceImpl.getInstance(context);
+  public void setContext(Context context) {
+    this.context = context;
+    this.service = ServiceImpl.getInstance(context);
   }
 
-  public static Service getService() {
+  public Service getService() {
     return service;
   }
 

@@ -4,7 +4,7 @@ public class SolveTime {
 
   private int id;
   private long timestamp;
-  private int time;
+  private long time;
   private String scramble;
   private SolveType solveType;
 
@@ -27,11 +27,11 @@ public class SolveTime {
     this.timestamp = timestamp;
   }
 
-  public int getTime() {
+  public long getTime() {
     return time;
   }
 
-  public void setTime(int time) {
+  public void setTime(long time) {
     this.time = time;
   }
 

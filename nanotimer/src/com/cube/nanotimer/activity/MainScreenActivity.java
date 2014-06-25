@@ -1,7 +1,6 @@
 package com.cube.nanotimer.activity;
 
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,15 +17,14 @@ import com.cube.nanotimer.R;
 import com.cube.nanotimer.activity.widget.SelectionHandler;
 import com.cube.nanotimer.activity.widget.SelectorFragment;
 import com.cube.nanotimer.services.db.DataCallback;
+import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.Utils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.CubeType.Type;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class MainScreenActivity extends Activity implements SelectionHandler {
@@ -50,7 +48,7 @@ public class MainScreenActivity extends Activity implements SelectionHandler {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.mainscreen);
-    App.setContext(this);
+    App.INSTANCE.setContext(this);
 
     buCubeType = (Button) findViewById(R.id.buCubeType);
     buCubeType.setOnClickListener(new OnClickListener() {
@@ -61,8 +59,8 @@ public class MainScreenActivity extends Activity implements SelectionHandler {
           for (CubeType t : cubeTypes) {
             types.add(t.getName());
           }
-          DialogFragment df = SelectorFragment.newInstance(ID_CUBETYPE, types, MainScreenActivity.this);
-          df.show(getFragmentManager(), "dialog");
+          Utils.showFragment(MainScreenActivity.this,
+              SelectorFragment.newInstance(ID_CUBETYPE, types, MainScreenActivity.this));
         }
       }
     });
@@ -76,8 +74,8 @@ public class MainScreenActivity extends Activity implements SelectionHandler {
           for (SolveType t : solveTypes) {
             types.add(t.getName());
           }
-          DialogFragment df = SelectorFragment.newInstance(ID_SOLVETYPE, types, MainScreenActivity.this);
-          df.show(getFragmentManager(), "dialog");
+          Utils.showFragment(MainScreenActivity.this,
+              SelectorFragment.newInstance(ID_SOLVETYPE, types, MainScreenActivity.this));
         }
       }
     });
@@ -98,7 +96,11 @@ public class MainScreenActivity extends Activity implements SelectionHandler {
   @Override
   protected void onResume() {
     super.onResume();
-    retrieveTypes();
+    if (cubeTypes == null) {
+      retrieveTypes();
+    } else {
+      refreshHistory();
+    }
   }
 
   @Override
@@ -119,7 +121,7 @@ public class MainScreenActivity extends Activity implements SelectionHandler {
   }
 
   private void retrieveTypes() {
-    App.getService().getCubeTypes(new DataCallback<List<CubeType>>() {
+    App.INSTANCE.getService().getCubeTypes(new DataCallback<List<CubeType>>() {
       @Override
       public void onData(List<CubeType> data) {
         cubeTypes = data;
@@ -131,12 +133,7 @@ public class MainScreenActivity extends Activity implements SelectionHandler {
               break;
             }
           }
-          runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              buCubeType.setText(curCubeType.getName());
-            }
-          });
+          refreshButtonTexts();
           refreshSolveTypes();
         }
       }
@@ -145,18 +142,13 @@ public class MainScreenActivity extends Activity implements SelectionHandler {
 
   private void refreshSolveTypes() {
     if (curCubeType != null) {
-      App.getService().getSolveTypes(curCubeType, new DataCallback<List<SolveType>>() {
+      App.INSTANCE.getService().getSolveTypes(curCubeType, new DataCallback<List<SolveType>>() {
         @Override
         public void onData(List<SolveType> data) {
           solveTypes = data;
           if (solveTypes != null && !solveTypes.isEmpty()) {
             curSolveType = solveTypes.get(0);
-            runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                buSolveType.setText(curSolveType.getName());
-              }
-            });
+            refreshButtonTexts();
             refreshHistory();
           }
         }
@@ -165,7 +157,7 @@ public class MainScreenActivity extends Activity implements SelectionHandler {
   }
 
   private void refreshHistory() {
-    App.getService().getHistory(curSolveType, new DataCallback<List<SolveTime>>() {
+    App.INSTANCE.getService().getHistory(curSolveType, new DataCallback<List<SolveTime>>() {
       @Override
       public void onData(List<SolveTime> data) {
         liHistory = data;
@@ -176,6 +168,20 @@ public class MainScreenActivity extends Activity implements SelectionHandler {
             lvHistory.setAdapter(adapter);
           }
         });
+      }
+    });
+  }
+
+  private void refreshButtonTexts() {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        if (curCubeType != null) {
+          buCubeType.setText(curCubeType.getName());
+        }
+        if (curSolveType != null) {
+          buSolveType.setText(curSolveType.getName());
+        }
       }
     });
   }
@@ -196,9 +202,8 @@ public class MainScreenActivity extends Activity implements SelectionHandler {
       if (position >= 0 && position < liHistory.size()) {
         SolveTime st = liHistory.get(position);
         if (st != null) {
-          SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy - hh:mm:ss a");
-          ((TextView) view.findViewById(R.id.tvDate)).setText(sdf.format(new Date(st.getTimestamp())));
-          ((TextView) view.findViewById(R.id.tvTime)).setText(Utils.formatTime(st.getTime()));
+          ((TextView) view.findViewById(R.id.tvDate)).setText(FormatterService.INSTANCE.formatDateTime(st.getTimestamp()));
+          ((TextView) view.findViewById(R.id.tvTime)).setText(FormatterService.INSTANCE.formatSolveTime(st.getTime()));
         }
       }
       return view;

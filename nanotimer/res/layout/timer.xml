@@ -3,7 +3,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
    android:id="@+id/layoutTimer"
    android:layout_width="match_parent"
-   android:layout_height="match_parent">
+   android:layout_height="match_parent"
+   android:keepScreenOn="true">
 
   <LinearLayout
      android:id="@+id/topLayout"

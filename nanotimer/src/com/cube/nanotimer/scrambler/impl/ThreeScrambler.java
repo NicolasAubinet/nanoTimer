@@ -15,9 +15,4 @@ public class ThreeScrambler extends AbstractCubeScrambler {
   protected int getMoveCount() {
     return 25;
   }
-
-  @Override
-  protected int getMovesPerLine() {
-    return 5;
-  }
 }

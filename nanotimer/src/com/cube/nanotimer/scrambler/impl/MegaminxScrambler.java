@@ -2,6 +2,8 @@ package com.cube.nanotimer.scrambler.impl;
 
 import com.cube.nanotimer.scrambler.Scrambler;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class MegaminxScrambler implements Scrambler {
@@ -13,28 +15,32 @@ public class MegaminxScrambler implements Scrambler {
   private String endMove = "U";
 
   @Override
-  public String getNewScramble() {
-    StringBuilder scramble = new StringBuilder();
+  public String[] getNewScramble() {
+    List<String> scramble = new ArrayList<String>();
     Random rand = new Random();
     for (int i = 0; i < LINES_COUNT; i++) {
       int firstMove = rand.nextInt(2);
       for (int j = 0; j < MOVES_PER_LINE; j++) {
-        scramble.append(mainMoves[(firstMove + j) % mainMoves.length]);
+        StringBuilder move = new StringBuilder();
+        move.append(mainMoves[(firstMove + j) % mainMoves.length]);
         if (rand.nextBoolean()) {
-          scramble.append("++ ");
+          move.append("++ ");
         } else {
-          scramble.append("-- ");
+          move.append("-- ");
         }
+        scramble.add(move.toString());
       }
-      scramble.append(endMove);
+      StringBuilder move = new StringBuilder();
+      move.append(endMove);
       if (rand.nextBoolean()) {
-        scramble.append("'");
+        move.append("'");
       } else {
-        scramble.append(" ");
+        move.append(" ");
       }
-      scramble.append("\n");
+      scramble.add(move.toString());
+      scramble.add("\n");
     }
-    return scramble.toString();
+    return scramble.toArray(new String[0]);
   }
 
 }
