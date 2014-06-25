@@ -235,21 +235,6 @@ public class ServiceProviderImpl implements ServiceProvider {
     return null;
   }
 
-  private Float convertMsToSeconds(Long ms) {
-    return ms == null ? null : ((float) ms / 1000);
-  }
-
-  protected Integer getCursorInteger(Cursor cursor, int ind) {
-    if (cursor == null) {
-      return null;
-    }
-    if (cursor.isNull(ind)) {
-      return null;
-    } else {
-      return cursor.getInt(ind);
-    }
-  }
-
   protected Long getCursorLong(Cursor cursor, int ind) {
     if (cursor == null) {
       return null;
