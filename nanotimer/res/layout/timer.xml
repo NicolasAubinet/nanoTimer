@@ -39,10 +39,8 @@
        android:id="@+id/tvScramble"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:textSize="12sp"
-       android:fontFamily="monospace"
        android:layout_marginTop="5dp"
-       android:gravity="center"/>
+       style="@style/ScrambleTextField"/>
   </LinearLayout>
 
   <LinearLayout
@@ -79,9 +77,9 @@
         <TextView android:id="@+id/tvBestOfHundred"/>
       </TableRow>
       <TableRow>
-        <TextView android:text="1000" android:textStyle="bold"/>
-        <TextView android:id="@+id/tvAvgOfThousand"/>
-        <TextView android:id="@+id/tvBestOfThousand"/>
+        <TextView android:text="@string/lifetime" android:textStyle="bold"/>
+        <TextView android:id="@+id/tvAvgOfLifetime"/>
+        <TextView android:id="@+id/tvBestOfLifetime"/>
       </TableRow>
     </TableLayout>
   </LinearLayout>

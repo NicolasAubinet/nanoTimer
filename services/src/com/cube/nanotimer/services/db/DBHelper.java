@@ -45,7 +45,6 @@ public class DBHelper extends SQLiteOpenHelper {
         DB.COL_TIMEHISTORY_AVG5 + " INTEGER, " +
         DB.COL_TIMEHISTORY_AVG12 + " INTEGER, " +
         DB.COL_TIMEHISTORY_AVG100 + " INTEGER, " +
-        DB.COL_TIMEHISTORY_AVG1000 + " INTEGER, " +
         DB.COL_TIMEHISTORY_SOLVETYPE_ID + " INTEGER, " +
         "FOREIGN KEY (" + DB.COL_TIMEHISTORY_SOLVETYPE_ID + ") REFERENCES " + DB.TABLE_SOLVETYPE + " (" + DB.COL_ID + ") " +
       ");"

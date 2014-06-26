@@ -5,12 +5,12 @@ public class SolveAverages {
   private Long avgOf5;
   private Long avgOf12;
   private Long avgOf100;
-  private Long avgOf1000;
+  private Long avgOfLifetime;
 
   private Long bestOf5;
   private Long bestOf12;
   private Long bestOf100;
-  private Long bestOf1000;
+  private Long bestOfLifetime;
 
   public SolveAverages() {
   }
@@ -39,12 +39,12 @@ public class SolveAverages {
     this.avgOf100 = avgOf100;
   }
 
-  public Long getAvgOf1000() {
-    return avgOf1000;
+  public Long getAvgOfLifetime() {
+    return avgOfLifetime;
   }
 
-  public void setAvgOf1000(Long avgOf1000) {
-    this.avgOf1000 = avgOf1000;
+  public void setAvgOfLifetime(Long avgOfLifetime) {
+    this.avgOfLifetime = avgOfLifetime;
   }
 
   public Long getBestOf5() {
@@ -71,11 +71,11 @@ public class SolveAverages {
     this.bestOf100 = bestOf100;
   }
 
-  public Long getBestOf1000() {
-    return bestOf1000;
+  public Long getBestOfLifetime() {
+    return bestOfLifetime;
   }
 
-  public void setBestOf1000(Long bestOf1000) {
-    this.bestOf1000 = bestOf1000;
+  public void setBestOfLifetime(Long bestOfLifetime) {
+    this.bestOfLifetime = bestOfLifetime;
   }
 }

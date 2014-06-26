@@ -8,12 +8,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.activity.widget.HistoryDetailFragment;
 import com.cube.nanotimer.activity.widget.SelectionHandler;
 import com.cube.nanotimer.activity.widget.SelectorFragment;
 import com.cube.nanotimer.services.db.DataCallback;
@@ -81,6 +84,12 @@ public class MainScreenActivity extends Activity implements SelectionHandler {
     });
 
     lvHistory = (ListView) findViewById(R.id.lvHistory);
+    lvHistory.setOnItemClickListener(new OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        Utils.showFragment(MainScreenActivity.this, HistoryDetailFragment.newInstance(liHistory.get(i), curCubeType));
+      }
+    });
 
     findViewById(R.id.buStart).setOnClickListener(new OnClickListener() {
       @Override

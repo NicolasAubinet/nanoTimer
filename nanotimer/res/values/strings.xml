@@ -15,4 +15,10 @@
   <string name="inspection">Inspection</string>
   <string name="average_of">Average of</string>
   <string name="best_of">Best of</string>
+  <string name="lifetime">Lifetime</string>
+
+  <string name="plus_two">+2</string>
+  <string name="DNF">DNF</string>
+  <string name="delete">Delete</string>
+  <string name="time">Time:</string>
 </resources>

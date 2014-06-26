@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:orientation="vertical"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   android:minWidth="300dp"
+   android:padding="5dp">
+
+  <LinearLayout
+     android:orientation="horizontal"
+     android:layout_width="match_parent"
+     android:layout_height="60dp"
+     android:gravity="center">
+    <TextView
+       android:id="@+id/tvPlusTwo"
+       android:text="@string/plus_two"
+       style="@style/MenuButton"/>
+    <TextView
+       android:id="@+id/tvDNF"
+       android:text="@string/DNF"
+       style="@style/MenuButton"/>
+    <TextView
+       android:id="@+id/tvDelete"
+       android:text="@string/delete"
+       style="@style/MenuButton"/>
+  </LinearLayout>
+
+  <LinearLayout
+     android:orientation="horizontal"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="10dp">
+    <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="@string/time"
+       style="@style/SimpleTextField"/>
+    <TextView
+       android:id="@+id/tvTime"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginLeft="10dp"
+       style="@style/SimpleTextField"/>
+  </LinearLayout>
+
+  <TextView
+     android:id="@+id/tvScramble"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="10dp"
+     style="@style/ScrambleTextField"/>
+
+</LinearLayout>

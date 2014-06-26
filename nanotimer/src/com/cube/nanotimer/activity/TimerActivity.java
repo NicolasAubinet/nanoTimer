@@ -1,12 +1,8 @@
 package com.cube.nanotimer.activity;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -183,32 +179,9 @@ public class TimerActivity extends Activity {
   private void generateScramble() {
     if (cubeType != null) {
       currentScramble = ScramblerFactory.getScrambler(cubeType).getNewScramble();
-      tvScramble.setText(getColoredTextSpan(FormatterService.INSTANCE.formatScramble(currentScramble, cubeType)));
+      String fScramble = FormatterService.INSTANCE.formatScramble(currentScramble, cubeType);
+      tvScramble.setText(FormatterService.INSTANCE.formatToColoredScramble(fScramble));
     }
-  }
-
-  private Spannable getColoredTextSpan(String scramble) {
-    Spannable span = new SpannableString(scramble);
-    String alternateColor = "#C0B9F9";
-    int prevLinesCharCount = 0;
-    for (String line : scramble.split("\n")) {
-      char[] cline = line.toCharArray();
-      int index = line.indexOf(" ", 0);
-      while (index != -1) {
-        int startIndex = index;
-        for (; index < cline.length && cline[index] == ' '; index++) ; // next non-space char
-        index = line.indexOf(" ", index); // next space char
-        if (index == -1) {
-          index = cline.length - 1;
-        }
-        span.setSpan(new ForegroundColorSpan(Color.parseColor(alternateColor)),
-            startIndex + prevLinesCharCount, index + prevLinesCharCount, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        for (; index < cline.length && cline[index] == ' '; index++) ; // next non-space char
-        index = line.indexOf(" ", index);
-      }
-      prevLinesCharCount += line.length() + 1;
-    }
-    return span;
   }
 
   private class SolveAverageCallback extends DataCallback<SolveAverages> {
@@ -220,11 +193,11 @@ public class TimerActivity extends Activity {
           ((TextView) findViewById(R.id.tvAvgOfFive)).setText(formatAvgField(data.getAvgOf5()));
           ((TextView) findViewById(R.id.tvAvgOfTwelve)).setText(formatAvgField(data.getAvgOf12()));
           ((TextView) findViewById(R.id.tvAvgOfHundred)).setText(formatAvgField(data.getAvgOf100()));
-          ((TextView) findViewById(R.id.tvAvgOfThousand)).setText(formatAvgField(data.getAvgOf1000()));
+          ((TextView) findViewById(R.id.tvAvgOfLifetime)).setText(formatAvgField(data.getAvgOfLifetime()));
           ((TextView) findViewById(R.id.tvBestOfFive)).setText(formatAvgField(data.getBestOf5()));
           ((TextView) findViewById(R.id.tvBestOfTwelve)).setText(formatAvgField(data.getBestOf12()));
           ((TextView) findViewById(R.id.tvBestOfHundred)).setText(formatAvgField(data.getBestOf100()));
-          ((TextView) findViewById(R.id.tvBestOfThousand)).setText(formatAvgField(data.getBestOf1000()));
+          ((TextView) findViewById(R.id.tvBestOfLifetime)).setText(formatAvgField(data.getBestOfLifetime()));
         }
       });
     }

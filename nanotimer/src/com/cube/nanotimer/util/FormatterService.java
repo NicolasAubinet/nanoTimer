@@ -1,5 +1,11 @@
 package com.cube.nanotimer.util;
 
+import android.graphics.Color;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import com.cube.nanotimer.App;
+import com.cube.nanotimer.R;
 import com.cube.nanotimer.vo.CubeType;
 
 import java.text.SimpleDateFormat;
@@ -15,6 +21,9 @@ public enum FormatterService {
   public String formatSolveTime(Long solveTime, String defaultValue) {
     if (solveTime == null) {
       return defaultValue == null ? "" : defaultValue;
+    }
+    if (solveTime == -1) {
+      return App.INSTANCE.getContext().getString(R.string.DNF);
     }
     StringBuilder sb = new StringBuilder();
     int minutes = (int) (solveTime / 60000);
@@ -36,6 +45,14 @@ public enum FormatterService {
     }
     SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy - HH:mm:ss");
     return sdf.format(new Date(ms));
+  }
+
+  public String formatScramble(String scramble, CubeType cubeType) {
+    if (getMovesPerLine(cubeType) > 0) {
+      return formatScramble(scramble.split(" "), cubeType);
+    } else {
+      return scramble;
+    }
   }
 
   /**
@@ -97,6 +114,30 @@ public enum FormatterService {
         break;
     }
     return movesPerLine;
+  }
+
+  public Spannable formatToColoredScramble(String scramble) {
+    Spannable span = new SpannableString(scramble);
+    String alternateColor = "#C0B9F9";
+    int prevLinesCharCount = 0;
+    for (String line : scramble.split("\n")) {
+      char[] cline = line.toCharArray();
+      int index = line.indexOf(" ", 0);
+      while (index != -1) {
+        int startIndex = index;
+        for (; index < cline.length && cline[index] == ' '; index++) ; // next non-space char
+        index = line.indexOf(" ", index); // next space char
+        if (index == -1) {
+          index = cline.length - 1;
+        }
+        span.setSpan(new ForegroundColorSpan(Color.parseColor(alternateColor)),
+            startIndex + prevLinesCharCount, index + prevLinesCharCount, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        for (; index < cline.length && cline[index] == ' '; index++) ; // next non-space char
+        index = line.indexOf(" ", index);
+      }
+      prevLinesCharCount += line.length() + 1;
+    }
+    return span;
   }
 
 }

@@ -1,6 +1,8 @@
 package com.cube.nanotimer.vo;
 
-public class SolveTime {
+import java.io.Serializable;
+
+public class SolveTime implements Serializable {
 
   private int id;
   private long timestamp;
