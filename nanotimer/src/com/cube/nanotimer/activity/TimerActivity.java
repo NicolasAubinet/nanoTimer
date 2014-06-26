@@ -22,6 +22,9 @@ import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class TimerActivity extends Activity {
 
   enum TimerState { STOPPED, STARTED }
@@ -34,10 +37,10 @@ public class TimerActivity extends Activity {
   private SolveType solveType;
   private String[] currentScramble;
 
-  private final long REFRESH_INTERVAL = 10;
-  private Handler timerHandler;
-  private Runnable updateTimerRunnable;
-  private Runnable updateInspecTimerRunnable;
+  private final long REFRESH_INTERVAL = 25;
+  private Timer timer;
+  private Handler timerHandler = new Handler();
+  private Object timerSync = new Object();
   private long timerStartTs;
   private volatile TimerState timerState = TimerState.STOPPED;
 
@@ -53,24 +56,6 @@ public class TimerActivity extends Activity {
     tvInspection = (TextView) findViewById(R.id.tvInspection);
     tvScramble = (TextView) findViewById(R.id.tvScramble);
     resetTimer();
-
-    timerHandler = new Handler();
-    updateTimerRunnable = new Runnable() {
-      @Override
-      public void run() {
-        if (timerState == TimerState.STARTED) {
-          timerHandler.postDelayed(this, REFRESH_INTERVAL);
-          updateTimerText(System.currentTimeMillis() - timerStartTs);
-        }
-      }
-    };
-    updateInspecTimerRunnable = new Runnable() {
-      @Override
-      public void run() {
-        timerHandler.postDelayed(this, 1000);
-        updateInspectionTimerText();
-      }
-    };
 
     final RelativeLayout layout = (RelativeLayout) findViewById(R.id.layoutTimer);
     layout.setOnTouchListener(new OnTouchListener() {
@@ -108,17 +93,34 @@ public class TimerActivity extends Activity {
 
   private void startTimer() {
     timerStartTs = System.currentTimeMillis();
+    timer = new Timer();
+    TimerTask timerTask = new TimerTask() {
+      public void run() {
+        timerHandler.post(new Runnable() {
+          public void run() {
+            synchronized (timerSync) {
+              if (timerState == TimerState.STARTED) {
+                updateTimerText(System.currentTimeMillis() - timerStartTs);
+              }
+            }
+          }
+        });
+      }
+    };
+    timer.schedule(timerTask, 1, REFRESH_INTERVAL);
     timerState = TimerState.STARTED;
-    updateTimerRunnable.run();
   }
 
   private void stopTimer(boolean save) {
     long time = (System.currentTimeMillis() - timerStartTs);
     timerState = TimerState.STOPPED;
+    if (timer != null) {
+      timer.cancel();
+      timer.purge();
+    }
     // update time once more to get the ms right
     // (as all ms do not necessarily appear when timing, some are skipped due to refresh interval)
     updateTimerText(time);
-    timerHandler.removeCallbacks(updateTimerRunnable);
     if (save) {
       saveTime(time);
     }
@@ -128,17 +130,32 @@ public class TimerActivity extends Activity {
   private void startInspectionTimer() {
     timerStartTs = System.currentTimeMillis();
     tvInspection.setText(getString(R.string.inspection) + ":");
-    updateInspecTimerRunnable.run();
+    timer = new Timer();
+    TimerTask timerTask = new TimerTask() {
+      public void run() {
+        timerHandler.post(new Runnable() {
+          public void run() {
+            updateInspectionTimerText();
+          }
+        });
+      }
+    };
+    timer.schedule(timerTask, 1, 1000);
   }
 
   private void stopInspectionTimer() {
-    timerHandler.removeCallbacks(updateInspecTimerRunnable);
+    if (timer != null) {
+      timer.cancel();
+      timer.purge();
+    }
     tvInspection.setText("");
   }
 
   private void resetTimer() {
-    timerStartTs = 0;
-    tvTimer.setText("0.00");
+    synchronized (timerSync) {
+      timerStartTs = 0;
+      tvTimer.setText("0.00");
+    }
   }
 
   private void saveTime(long time) {
