@@ -47,22 +47,69 @@ public enum FormatterService {
     return sdf.format(new Date(ms));
   }
 
-  public String formatScramble(String scramble, CubeType cubeType) {
+  /**
+   * Format the scramble to add enough spaces to align the moves vertically,
+   * to split it among multiple lines and to color it.
+   * @param scramble the scramble containing one move in each array element
+   * @param cubeType the cube type for which to format the scramble
+   * @return the formatted scramble
+   */
+  public Spannable formatToColoredScramble(String[] scramble, CubeType cubeType) {
+    String s = formatScramble(scramble, cubeType);
+    return colorFormattedScramble(s);
+  }
+
+  /**
+   * Format the scramble to add enough spaces to align the moves vertically,
+   * to split it among multiple lines and to color it.
+   * @param scramble the scramble with space-separated moves.
+   * @param cubeType the cube type for which to format the scramble
+   * @return the formatted scramble
+   */
+  public Spannable formatToColoredScramble(String scramble, CubeType cubeType) {
     if (getMovesPerLine(cubeType) > 0) {
-      return formatScramble(scramble.split(" "), cubeType);
-    } else {
-      return scramble;
+      scramble = formatScramble(scramble.split(" "), cubeType);
     }
+    return colorFormattedScramble(scramble);
+  }
+
+  /**
+   * Color a scramble that is already formatted, based on spaces.
+   * @param scramble the formatted scramble
+   * @return the colored scramble
+   */
+  private Spannable colorFormattedScramble(String scramble) {
+    Spannable span = new SpannableString(scramble);
+    String alternateColor = "#C0B9F9";
+    int prevLinesCharCount = 0;
+    for (String line : scramble.split("\n")) {
+      char[] cline = line.toCharArray();
+      int index = line.indexOf(" ", 0);
+      while (index != -1) {
+        int startIndex = index;
+        for (; index < cline.length && cline[index] == ' '; index++) ; // next non-space char
+        index = line.indexOf(" ", index); // next space char
+        if (index == -1) {
+          index = cline.length - 1;
+        }
+        span.setSpan(new ForegroundColorSpan(Color.parseColor(alternateColor)),
+            startIndex + prevLinesCharCount, index + prevLinesCharCount, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        for (; index < cline.length && cline[index] == ' '; index++) ; // next non-space char
+        index = line.indexOf(" ", index);
+      }
+      prevLinesCharCount += line.length() + 1;
+    }
+    return span;
   }
 
   /**
    * Format the scramble to add enough spaces to align the moves vertically
    * and to split it among multiple lines.
-   *
-   * @param scramble the scramble in array form
+   * @param scramble the scramble containing one move in each array element
+   * @param cubeType the cube type for which to format the scramble
    * @return the formatted scramble
    */
-  public String formatScramble(String[] scramble, CubeType cubeType) {
+  private String formatScramble(String[] scramble, CubeType cubeType) {
     int maxMoveLength = 1;
     for (String m : scramble) {
       if (m.length() > maxMoveLength) {
@@ -114,30 +161,6 @@ public enum FormatterService {
         break;
     }
     return movesPerLine;
-  }
-
-  public Spannable formatToColoredScramble(String scramble) {
-    Spannable span = new SpannableString(scramble);
-    String alternateColor = "#C0B9F9";
-    int prevLinesCharCount = 0;
-    for (String line : scramble.split("\n")) {
-      char[] cline = line.toCharArray();
-      int index = line.indexOf(" ", 0);
-      while (index != -1) {
-        int startIndex = index;
-        for (; index < cline.length && cline[index] == ' '; index++) ; // next non-space char
-        index = line.indexOf(" ", index); // next space char
-        if (index == -1) {
-          index = cline.length - 1;
-        }
-        span.setSpan(new ForegroundColorSpan(Color.parseColor(alternateColor)),
-            startIndex + prevLinesCharCount, index + prevLinesCharCount, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        for (; index < cline.length && cline[index] == ' '; index++) ; // next non-space char
-        index = line.indexOf(" ", index);
-      }
-      prevLinesCharCount += line.length() + 1;
-    }
-    return span;
   }
 
 }

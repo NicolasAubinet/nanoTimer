@@ -35,7 +35,7 @@
        android:fontFamily="monospace"
        android:gravity="center"
        android:text="@string/scrambleC"/>
-    <TextView
+    <com.cube.nanotimer.util.FontFitTextView
        android:id="@+id/tvScramble"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"

@@ -7,9 +7,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
+import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.services.db.DataCallback;
+import com.cube.nanotimer.util.FontFitTextView;
 import com.cube.nanotimer.util.FormatterService;
+import com.cube.nanotimer.util.Utils;
+import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
 
 public class HistoryDetailFragment extends DialogFragment {
@@ -39,23 +45,26 @@ public class HistoryDetailFragment extends DialogFragment {
     final CubeType cubeType = (CubeType) getArguments().getSerializable(ARG_CUBETYPE);
 
     final TextView tvTime = (TextView) v.findViewById(R.id.tvTime);
-    TextView tvScramble = (TextView) v.findViewById(R.id.tvScramble);
+    FontFitTextView tvScramble = (FontFitTextView) v.findViewById(R.id.tvScramble);
     TextView tvPlusTwo = (TextView) v.findViewById(R.id.tvPlusTwo);
     TextView tvDNF = (TextView) v.findViewById(R.id.tvDNF);
     TextView tvDelete = (TextView) v.findViewById(R.id.tvDelete);
 
-    String fScramble = FormatterService.INSTANCE.formatScramble(solveTime.getScramble(), cubeType);
-    tvScramble.setText(FormatterService.INSTANCE.formatToColoredScramble(fScramble));
+    tvScramble.setText(FormatterService.INSTANCE.formatToColoredScramble(solveTime.getScramble(), cubeType));
     refreshTime(tvTime, solveTime.getTime());
+
+    final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(v).create();
 
     tvPlusTwo.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
         if (!plusTwo) {
-          solveTime.setTime(solveTime.getTime() + 2000);
-          plusTwo = true;
-          refreshTime(tvTime, solveTime.getTime());
-          // TODO : update solveTime in DB
+          if (solveTime.getTime() > 0) {
+            solveTime.setTime(solveTime.getTime() + 2000);
+            plusTwo = true;
+            refreshTime(tvTime, solveTime.getTime());
+            saveTime(solveTime);
+          }
         }
       }
     });
@@ -65,23 +74,37 @@ public class HistoryDetailFragment extends DialogFragment {
       public void onClick(View view) {
         solveTime.setTime(-1);
         refreshTime(tvTime, solveTime.getTime());
-        // TODO : update solveTime in DB
+        saveTime(solveTime);
       }
     });
 
     tvDelete.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
-        // TODO : delete solveTime from DB
+        Utils.showYesNoConfirmation(getActivity(), R.string.delete_time_confirmation, new YesNoListener() {
+          @Override
+          public void onYes() {
+            App.INSTANCE.getService().removeTime(solveTime);
+            // TODO : call onDialogClosed (from a new interface) to refresh the history when this is closed
+            dialog.dismiss();
+          }
+        });
       }
     });
 
-    AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(v).create();
     return dialog;
   }
 
   private void refreshTime(TextView tvTime, Long time) {
     tvTime.setText(FormatterService.INSTANCE.formatSolveTime(time));
+  }
+
+  private void saveTime(SolveTime solveTime) {
+    App.INSTANCE.getService().saveTime(solveTime, new DataCallback<SolveAverages>() {
+      @Override
+      public void onData(SolveAverages data) {
+      }
+    });
   }
 
 }

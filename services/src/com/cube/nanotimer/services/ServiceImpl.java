@@ -69,6 +69,16 @@ public class ServiceImpl extends DBHelper implements Service {
   }
 
   @Override
+  public void removeTime(final SolveTime solveTime) {
+    callProvider(new Runnable() {
+      @Override
+      public void run() {
+        provider.removeTime(solveTime);
+      }
+    });
+  }
+
+  @Override
   public void getHistory(final SolveType solveType, final DataCallback<List<SolveTime>> callback) {
     callProvider(new Runnable() {
       @Override

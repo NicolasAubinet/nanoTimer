@@ -179,8 +179,7 @@ public class TimerActivity extends Activity {
   private void generateScramble() {
     if (cubeType != null) {
       currentScramble = ScramblerFactory.getScrambler(cubeType).getNewScramble();
-      String fScramble = FormatterService.INSTANCE.formatScramble(currentScramble, cubeType);
-      tvScramble.setText(FormatterService.INSTANCE.formatToColoredScramble(fScramble));
+      tvScramble.setText(FormatterService.INSTANCE.formatToColoredScramble(currentScramble, cubeType));
     }
   }
 
