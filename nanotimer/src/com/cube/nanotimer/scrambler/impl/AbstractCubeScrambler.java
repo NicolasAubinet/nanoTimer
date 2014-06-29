@@ -13,9 +13,7 @@ public abstract class AbstractCubeScrambler implements Scrambler {
     String[] scramble = new String[getMoveCount()];
     String[][] moves = getMoves();
     Random rand = new Random();
-    String prevMove = "";
     int prevSlice = -1;
-    int consecSlice = -1; // to avoid turning three times the same slice
 
     for (int i = 0; i < getMoveCount(); i++) {
       int sliceInd, sliceMoveInd;
@@ -24,17 +22,11 @@ public abstract class AbstractCubeScrambler implements Scrambler {
         sliceInd = rand.nextInt(moves.length);
         sliceMoveInd = rand.nextInt(moves[sliceInd].length);
         m = moves[sliceInd][sliceMoveInd];
-      } while (m.equals(prevMove) || sliceInd == consecSlice);
+      } while (sliceInd == prevSlice);
 
       String direction = directions[rand.nextInt(directions.length)];
       scramble[i] = (m + direction);
 
-      if (sliceInd == prevSlice) {
-        consecSlice = sliceInd;
-      } else {
-        consecSlice = -1;
-      }
-      prevMove = m;
       prevSlice = sliceInd;
     }
 
