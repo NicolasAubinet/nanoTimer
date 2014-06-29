@@ -12,7 +12,11 @@ public class DBHelper extends SQLiteOpenHelper {
   private Context context;
 
   public DBHelper(Context context) {
-    super(context, DB.DB_NAME, null, DB.DB_VERSION);
+    this(context, DB.DB_NAME);
+  }
+
+  public DBHelper(Context context, String dbName) {
+    super(context, dbName, null, DB.DB_VERSION);
     this.context = context;
     if (db == null) {
       db = getWritableDatabase();

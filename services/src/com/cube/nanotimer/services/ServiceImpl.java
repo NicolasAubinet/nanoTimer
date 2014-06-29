@@ -21,9 +21,21 @@ public class ServiceImpl extends DBHelper implements Service {
     provider = new ServiceProviderImpl(db);
   }
 
+  private ServiceImpl(Context context, String dbName) {
+    super(context, dbName);
+    provider = new ServiceProviderImpl(db);
+  }
+
   public static ServiceImpl getInstance(Context context) {
     if (instance == null) {
       instance = new ServiceImpl(context);
+    }
+    return instance;
+  }
+
+  public static ServiceImpl getInstance(Context context, String dbName) {
+    if (instance == null) {
+      instance = new ServiceImpl(context, dbName);
     }
     return instance;
   }
@@ -69,11 +81,11 @@ public class ServiceImpl extends DBHelper implements Service {
   }
 
   @Override
-  public void removeTime(final SolveTime solveTime) {
+  public void removeTime(final SolveTime solveTime, final DataCallback<SolveAverages> callback) {
     callProvider(new Runnable() {
       @Override
       public void run() {
-        provider.removeTime(solveTime);
+        callback.onData(provider.removeTime(solveTime));
       }
     });
   }

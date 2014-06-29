@@ -19,6 +19,7 @@ import com.cube.nanotimer.R;
 import com.cube.nanotimer.activity.widget.HistoryDetailFragment;
 import com.cube.nanotimer.activity.widget.SelectionHandler;
 import com.cube.nanotimer.activity.widget.SelectorFragment;
+import com.cube.nanotimer.activity.widget.TimeChangedHandler;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.Utils;
@@ -28,9 +29,10 @@ import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-public class MainScreenActivity extends Activity implements SelectionHandler {
+public class MainScreenActivity extends Activity implements SelectionHandler, TimeChangedHandler {
 
   private Button buCubeType;
   private Button buSolveType;
@@ -41,7 +43,7 @@ public class MainScreenActivity extends Activity implements SelectionHandler {
   private List<CubeType> cubeTypes;
   private List<SolveType> solveTypes;
 
-  private List<SolveTime> liHistory;
+  private List<SolveTime> liHistory = new ArrayList<SolveTime>();
   private HistoryListAdapter adapter;
 
   private static final int ID_CUBETYPE = 1;
@@ -83,11 +85,14 @@ public class MainScreenActivity extends Activity implements SelectionHandler {
       }
     });
 
+    adapter = new HistoryListAdapter(MainScreenActivity.this, R.id.lvHistory, liHistory);
     lvHistory = (ListView) findViewById(R.id.lvHistory);
+    lvHistory.setAdapter(adapter);
     lvHistory.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Utils.showFragment(MainScreenActivity.this, HistoryDetailFragment.newInstance(liHistory.get(i), curCubeType));
+        Utils.showFragment(MainScreenActivity.this,
+            HistoryDetailFragment.newInstance(liHistory.get(i), curCubeType, MainScreenActivity.this));
       }
     });
 
@@ -169,12 +174,12 @@ public class MainScreenActivity extends Activity implements SelectionHandler {
     App.INSTANCE.getService().getHistory(curSolveType, new DataCallback<List<SolveTime>>() {
       @Override
       public void onData(List<SolveTime> data) {
-        liHistory = data;
+        liHistory.clear();
+        liHistory.addAll(data);
         runOnUiThread(new Runnable() {
           @Override
           public void run() {
-            adapter = new HistoryListAdapter(MainScreenActivity.this, R.id.lvHistory, liHistory);
-            lvHistory.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
           }
         });
       }
@@ -193,6 +198,29 @@ public class MainScreenActivity extends Activity implements SelectionHandler {
         }
       }
     });
+  }
+
+  @Override
+  public void onTimeChanged(SolveTime solveTime) {
+    for (SolveTime st : liHistory) {
+      if (st.getId() == solveTime.getId()) {
+        st.setTime(solveTime.getTime());
+        adapter.notifyDataSetChanged();
+        break;
+      }
+    }
+  }
+
+  @Override
+  public void onTimeDeleted(SolveTime solveTime) {
+    for (Iterator<SolveTime> it = liHistory.iterator(); it.hasNext(); ) {
+      SolveTime st = it.next();
+      if (st.getId() == solveTime.getId()) {
+        it.remove();
+        adapter.notifyDataSetChanged();
+        break;
+      }
+    }
   }
 
   private class HistoryListAdapter extends ArrayAdapter<SolveTime> {

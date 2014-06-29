@@ -58,8 +58,8 @@
        android:stretchColumns="*">
       <TableRow>
         <TextView android:text=""/>
-        <TextView android:text="@string/average_of" android:textStyle="bold"/>
-        <TextView android:text="@string/best_of" android:textStyle="bold"/>
+        <TextView android:text="@string/last_avg_of" android:textStyle="bold"/>
+        <TextView android:text="@string/best_avg_of" android:textStyle="bold"/>
       </TableRow>
       <TableRow>
         <TextView android:text="5" android:textStyle="bold"/>

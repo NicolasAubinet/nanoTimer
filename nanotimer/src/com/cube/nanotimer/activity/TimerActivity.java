@@ -3,6 +3,8 @@ package com.cube.nanotimer.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -32,6 +34,7 @@ public class TimerActivity extends Activity {
   private CubeType cubeType;
   private SolveType solveType;
   private String[] currentScramble;
+  private SolveTime lastSolveTime;
 
   private final long REFRESH_INTERVAL = 25;
   private Timer timer;
@@ -85,6 +88,39 @@ public class TimerActivity extends Activity {
     } else {
       super.onBackPressed();
     }
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.timer_menu, menu);
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    if (lastSolveTime != null && timerState == TimerState.STOPPED) {
+      switch (item.getItemId()) {
+        case R.id.itPlusTwo:
+          if (lastSolveTime.getTime() > 0) {
+            lastSolveTime.setTime(lastSolveTime.getTime() + 2000);
+            App.INSTANCE.getService().saveTime(lastSolveTime, new SolveAverageCallback());
+            tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(lastSolveTime.getTime()));
+          }
+          break;
+        case R.id.itDNF:
+          if (lastSolveTime.getTime() > 0) {
+            lastSolveTime.setTime(-1);
+            App.INSTANCE.getService().saveTime(lastSolveTime, new SolveAverageCallback());
+            tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(lastSolveTime.getTime()));
+          }
+          break;
+        case R.id.itDelete:
+          App.INSTANCE.getService().removeTime(lastSolveTime, new SolveAverageCallback());
+          resetTimer();
+          break;
+      }
+    }
+    return true;
   }
 
   private void startTimer() {
@@ -149,6 +185,10 @@ public class TimerActivity extends Activity {
 
   private void resetTimer() {
     synchronized (timerSync) {
+      if (timerState == TimerState.STARTED && timer != null) {
+        timer.cancel();
+        timer.purge();
+      }
       timerStartTs = 0;
       tvTimer.setText("0.00");
     }
@@ -197,6 +237,7 @@ public class TimerActivity extends Activity {
           ((TextView) findViewById(R.id.tvBestOfTwelve)).setText(formatAvgField(data.getBestOf12()));
           ((TextView) findViewById(R.id.tvBestOfHundred)).setText(formatAvgField(data.getBestOf100()));
           ((TextView) findViewById(R.id.tvBestOfLifetime)).setText(formatAvgField(data.getBestOfLifetime()));
+          lastSolveTime = data.getSolveTime();
         }
       });
     }

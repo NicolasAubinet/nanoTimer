@@ -12,8 +12,6 @@ import com.cube.nanotimer.R;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FontFitTextView;
 import com.cube.nanotimer.util.FormatterService;
-import com.cube.nanotimer.util.Utils;
-import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
@@ -22,14 +20,14 @@ public class HistoryDetailFragment extends DialogFragment {
 
   private static final String ARG_SOLVETIME = "solvetime";
   private static final String ARG_CUBETYPE = "cubetype";
+  private static final String ARG_HANDLER = "handler";
 
-  private boolean plusTwo = false;
-
-  public static HistoryDetailFragment newInstance(SolveTime solveTime, CubeType cubeType) {
+  public static HistoryDetailFragment newInstance(SolveTime solveTime, CubeType cubeType, TimeChangedHandler handler) {
     HistoryDetailFragment hd = new HistoryDetailFragment();
     Bundle bundle = new Bundle();
     bundle.putSerializable(ARG_SOLVETIME, solveTime);
     bundle.putSerializable(ARG_CUBETYPE, cubeType);
+    bundle.putSerializable(ARG_HANDLER, handler);
     hd.setArguments(bundle);
     return hd;
   }
@@ -43,6 +41,7 @@ public class HistoryDetailFragment extends DialogFragment {
 
     final SolveTime solveTime = (SolveTime) getArguments().getSerializable(ARG_SOLVETIME);
     final CubeType cubeType = (CubeType) getArguments().getSerializable(ARG_CUBETYPE);
+    final TimeChangedHandler handler = (TimeChangedHandler) getArguments().getSerializable(ARG_HANDLER);
 
     final TextView tvTime = (TextView) v.findViewById(R.id.tvTime);
     FontFitTextView tvScramble = (FontFitTextView) v.findViewById(R.id.tvScramble);
@@ -51,52 +50,47 @@ public class HistoryDetailFragment extends DialogFragment {
     TextView tvDelete = (TextView) v.findViewById(R.id.tvDelete);
 
     tvScramble.setText(FormatterService.INSTANCE.formatToColoredScramble(solveTime.getScramble(), cubeType));
-    refreshTime(tvTime, solveTime.getTime());
+    tvTime.setText(FormatterService.INSTANCE.formatSolveTime(solveTime.getTime()));
 
     final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(v).create();
 
     tvPlusTwo.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
-        if (!plusTwo) {
-          if (solveTime.getTime() > 0) {
-            solveTime.setTime(solveTime.getTime() + 2000);
-            plusTwo = true;
-            refreshTime(tvTime, solveTime.getTime());
-            saveTime(solveTime);
-          }
+        if (solveTime.getTime() > 0) {
+          solveTime.setTime(solveTime.getTime() + 2000);
+          saveTime(solveTime);
+          handler.onTimeChanged(solveTime);
         }
+        dialog.dismiss();
       }
     });
 
     tvDNF.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
-        solveTime.setTime(-1);
-        refreshTime(tvTime, solveTime.getTime());
-        saveTime(solveTime);
+        if (solveTime.getTime() > 0) {
+          solveTime.setTime(-1);
+          saveTime(solveTime);
+          handler.onTimeChanged(solveTime);
+        }
+        dialog.dismiss();
       }
     });
 
     tvDelete.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
-        Utils.showYesNoConfirmation(getActivity(), R.string.delete_time_confirmation, new YesNoListener() {
-          @Override
-          public void onYes() {
-            App.INSTANCE.getService().removeTime(solveTime);
-            // TODO : call onDialogClosed (from a new interface) to refresh the history when this is closed
-            dialog.dismiss();
+        App.INSTANCE.getService().removeTime(solveTime, new DataCallback<SolveAverages>() {
+          public void onData(SolveAverages data) {
           }
         });
+        handler.onTimeDeleted(solveTime);
+        dialog.dismiss();
       }
     });
 
     return dialog;
-  }
-
-  private void refreshTime(TextView tvTime, Long time) {
-    tvTime.setText(FormatterService.INSTANCE.formatSolveTime(time));
   }
 
   private void saveTime(SolveTime solveTime) {
