@@ -25,10 +25,13 @@ public enum FormatterService {
     if (solveTime == -1) {
       return App.INSTANCE.getContext().getString(R.string.DNF);
     }
+    if (solveTime == -2) {
+      return App.INSTANCE.getContext().getString(R.string.NA);
+    }
     StringBuilder sb = new StringBuilder();
     int minutes = (int) (solveTime / 60000);
     int seconds = (int) (solveTime / 1000) % 60;
-    int hundreds = Math.round((float) solveTime / 10) % 100;
+    int hundreds = (int) (solveTime / 10) % 100;
     if (minutes > 0) {
       sb.append(minutes).append(":");
       sb.append(String.format("%02d", seconds));
