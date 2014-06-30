@@ -21,5 +21,9 @@
   <string name="DNF">DNF</string>
   <string name="delete">Delete</string>
   <string name="time">Time:</string>
-  <string name="delete_time_confirmation">Do you really want to delete this time?</string>
+  <string name="NA">N/A</string>
+
+  <string name="session">Session:</string>
+  <string name="raOf5">RA of 5:</string>
+  <string name="raOf12">RA of 12:</string>
 </resources>

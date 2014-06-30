@@ -14,4 +14,5 @@ public interface ServiceProvider {
   SolveAverages getSolveAverages(SolveType solveType);
   SolveAverages removeTime(SolveTime solveTime);
   List<SolveTime> getHistory(SolveType solveType);
+  List<Long> getSessionTimes(SolveType solveType);
 }
