@@ -49,7 +49,7 @@ public class SelectorFragment extends DialogFragment {
     lvItems.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        handler.onItemSelected(id, i);
+        handler.itemSelected(id, i);
         dialog.dismiss();
       }
     });

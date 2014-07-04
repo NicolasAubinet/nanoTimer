@@ -34,6 +34,7 @@ public class TimerActivity extends Activity {
   private TextView tvInspection;
   private TextView tvScramble;
   private TextView tvSessionTimes;
+  private TextView tvCubeType;
   private TextView tvRA5;
   private TextView tvRA12;
 
@@ -54,6 +55,8 @@ public class TimerActivity extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.timer);
+    App.INSTANCE.setContext(this);
+
     cubeType = (CubeType) getIntent().getSerializableExtra("cubeType");
     solveType = (SolveType) getIntent().getSerializableExtra("solveType");
     App.INSTANCE.getService().getSolveAverages(solveType, new SolveAverageCallback());
@@ -62,9 +65,12 @@ public class TimerActivity extends Activity {
     tvInspection = (TextView) findViewById(R.id.tvInspection);
     tvScramble = (TextView) findViewById(R.id.tvScramble);
     tvSessionTimes = (TextView) findViewById(R.id.tvSessionTimes);
+    tvCubeType = (TextView) findViewById(R.id.tvCubeType);
     tvRA5 = (TextView) findViewById(R.id.tvRA5);
     tvRA12 = (TextView) findViewById(R.id.tvRA12);
+
     resetTimer();
+    setCubeTypeText();
 
     final RelativeLayout layout = (RelativeLayout) findViewById(R.id.layoutTimer);
     layout.setOnTouchListener(new OnTouchListener() {
@@ -96,6 +102,15 @@ public class TimerActivity extends Activity {
     });
 
     generateScramble();
+  }
+
+  private void setCubeTypeText() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(cubeType.getName());
+    if (!solveType.getName().equals(getString(R.string.def))) {
+      sb.append(" (").append(solveType.getName()).append(")");
+    }
+    tvCubeType.setText(sb.toString());
   }
 
   @Override

@@ -17,9 +17,10 @@ import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.activity.widget.HistoryDetailFragment;
-import com.cube.nanotimer.activity.widget.SelectionHandler;
 import com.cube.nanotimer.activity.widget.SelectorFragment;
 import com.cube.nanotimer.activity.widget.TimeChangedHandler;
+import com.cube.nanotimer.activity.widget.list.ListEditor;
+import com.cube.nanotimer.activity.widget.list.SolveTypesListDialog;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.Utils;
@@ -32,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class MainScreenActivity extends Activity implements SelectionHandler, TimeChangedHandler {
+public class MainScreenActivity extends Activity implements TimeChangedHandler {
 
   private Button buCubeType;
   private Button buSolveType;
@@ -45,6 +46,8 @@ public class MainScreenActivity extends Activity implements SelectionHandler, Ti
 
   private List<SolveTime> liHistory = new ArrayList<SolveTime>();
   private HistoryListAdapter adapter;
+
+  private TypeListEditor typeListEditor = new TypeListEditor();
 
   private static final int ID_CUBETYPE = 1;
   private static final int ID_SOLVETYPE = 2;
@@ -65,7 +68,7 @@ public class MainScreenActivity extends Activity implements SelectionHandler, Ti
             types.add(t.getName());
           }
           Utils.showFragment(MainScreenActivity.this,
-              SelectorFragment.newInstance(ID_CUBETYPE, types, MainScreenActivity.this));
+              SelectorFragment.newInstance(ID_CUBETYPE, types, typeListEditor));
         }
       }
     });
@@ -80,7 +83,7 @@ public class MainScreenActivity extends Activity implements SelectionHandler, Ti
             types.add(t.getName());
           }
           Utils.showFragment(MainScreenActivity.this,
-              SelectorFragment.newInstance(ID_SOLVETYPE, types, MainScreenActivity.this));
+              SolveTypesListDialog.newInstance(ID_SOLVETYPE, types, typeListEditor));
         }
       }
     });
@@ -117,23 +120,6 @@ public class MainScreenActivity extends Activity implements SelectionHandler, Ti
     }
   }
 
-  @Override
-  public void onItemSelected(int id, int position) {
-    if (id == ID_CUBETYPE) {
-      if (position >= 0 && position < cubeTypes.size()) {
-        curCubeType = cubeTypes.get(position);
-        buCubeType.setText(curCubeType.getName());
-        refreshSolveTypes();
-      }
-    } else if (id == ID_SOLVETYPE) {
-      if (position >= 0 && position < solveTypes.size()) {
-        curSolveType = solveTypes.get(position);
-        buSolveType.setText(curSolveType.getName());
-        refreshHistory();
-      }
-    }
-  }
-
   private void retrieveTypes() {
     App.INSTANCE.getService().getCubeTypes(new DataCallback<List<CubeType>>() {
       @Override
@@ -161,7 +147,18 @@ public class MainScreenActivity extends Activity implements SelectionHandler, Ti
         public void onData(List<SolveType> data) {
           solveTypes = data;
           if (solveTypes != null && !solveTypes.isEmpty()) {
-            curSolveType = solveTypes.get(0);
+            boolean foundType = false;
+            if (curSolveType != null) {
+              for (SolveType st : solveTypes) {
+                if (curSolveType.getId() == st.getId()) {
+                  curSolveType = st;
+                  foundType = true;
+                }
+              }
+            }
+            if (!foundType) {
+              curSolveType = solveTypes.get(0);
+            }
             refreshButtonTexts();
             refreshHistory();
           }
@@ -219,6 +216,61 @@ public class MainScreenActivity extends Activity implements SelectionHandler, Ti
         it.remove();
         adapter.notifyDataSetChanged();
         break;
+      }
+    }
+  }
+
+  private class TypeListEditor implements ListEditor {
+    @Override
+    public void createNewItem(int id, String item) {
+      if (id == ID_SOLVETYPE) {
+        SolveType st = new SolveType(item, curCubeType.getId());
+        App.INSTANCE.getService().addSolveType(st, new DataCallback<Integer>() {
+          @Override
+          public void onData(Integer data) {
+            refreshSolveTypes();
+          }
+        });
+      }
+    }
+
+    @Override
+    public void renameItem(int id, int position, String newName) {
+      if (id == ID_SOLVETYPE) {
+        SolveType st = solveTypes.get(position);
+        st.setName(newName);
+        App.INSTANCE.getService().updateSolveType(st, new DataCallback<Void>() {
+          @Override
+          public void onData(Void data) {
+            refreshSolveTypes();
+          }
+        });
+      }
+    }
+
+    @Override
+    public void deleteItem(int id, int position) {
+      if (id == ID_SOLVETYPE) {
+        SolveType st = solveTypes.get(position);
+        App.INSTANCE.getService().deleteSolveType(st, new DataCallback<Void>() {
+          @Override
+          public void onData(Void data) {
+            refreshSolveTypes();
+          }
+        });
+      }
+    }
+
+    @Override
+    public void itemSelected(int id, int position) {
+      if (id == ID_CUBETYPE) {
+        curCubeType = cubeTypes.get(position);
+        buCubeType.setText(curCubeType.getName());
+        refreshSolveTypes();
+      } else if (id == ID_SOLVETYPE) {
+        curSolveType = solveTypes.get(position);
+        buSolveType.setText(curSolveType.getName());
+        refreshHistory();
       }
     }
   }

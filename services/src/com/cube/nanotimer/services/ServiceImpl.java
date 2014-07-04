@@ -42,7 +42,7 @@ public class ServiceImpl extends DBHelper implements Service {
 
   @Override
   public void getCubeTypes(final DataCallback<List<CubeType>> callback) {
-    callProvider(new Runnable() {
+    run(new Runnable() {
       @Override
       public void run() {
         callback.onData(provider.getCubeTypes());
@@ -52,7 +52,7 @@ public class ServiceImpl extends DBHelper implements Service {
 
   @Override
   public void getSolveTypes(final CubeType cubeType, final DataCallback<List<SolveType>> callback) {
-    callProvider(new Runnable() {
+    run(new Runnable() {
       @Override
       public void run() {
         callback.onData(provider.getSolveTypes(cubeType));
@@ -62,7 +62,7 @@ public class ServiceImpl extends DBHelper implements Service {
 
   @Override
   public void saveTime(final SolveTime solveTime, final DataCallback<SolveAverages> callback) {
-    callProvider(new Runnable() {
+    run(new Runnable() {
       @Override
       public void run() {
         callback.onData(provider.saveTime(solveTime));
@@ -72,7 +72,7 @@ public class ServiceImpl extends DBHelper implements Service {
 
   @Override
   public void getSolveAverages(final SolveType solveType, final DataCallback<SolveAverages> callback) {
-    callProvider(new Runnable() {
+    run(new Runnable() {
       @Override
       public void run() {
         callback.onData(provider.getSolveAverages(solveType));
@@ -82,7 +82,7 @@ public class ServiceImpl extends DBHelper implements Service {
 
   @Override
   public void removeTime(final SolveTime solveTime, final DataCallback<SolveAverages> callback) {
-    callProvider(new Runnable() {
+    run(new Runnable() {
       @Override
       public void run() {
         callback.onData(provider.removeTime(solveTime));
@@ -92,7 +92,7 @@ public class ServiceImpl extends DBHelper implements Service {
 
   @Override
   public void getHistory(final SolveType solveType, final DataCallback<List<SolveTime>> callback) {
-    callProvider(new Runnable() {
+    run(new Runnable() {
       @Override
       public void run() {
         callback.onData(provider.getHistory(solveType));
@@ -102,7 +102,7 @@ public class ServiceImpl extends DBHelper implements Service {
 
   @Override
   public void getSessionTimes(final SolveType solveType, final DataCallback<List<Long>> callback) {
-    callProvider(new Runnable() {
+    run(new Runnable() {
       @Override
       public void run() {
         callback.onData(provider.getSessionTimes(solveType));
@@ -110,7 +110,40 @@ public class ServiceImpl extends DBHelper implements Service {
     });
   }
 
-  private void callProvider(Runnable runnable) {
+  @Override
+  public void addSolveType(final SolveType solveType, final DataCallback<Integer> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        callback.onData(provider.addSolveType(solveType));
+      }
+    });
+  }
+
+  @Override
+  public void updateSolveType(final SolveType solveType, final DataCallback<Void> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        provider.updateSolveType(solveType);
+        callback.onData(null);
+      }
+    });
+  }
+
+  @Override
+  public void deleteSolveType(final SolveType solveType, final DataCallback<Void> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        provider.deleteSolveType(solveType);
+        callback.onData(null);
+      }
+    });
+  }
+
+  private void run(Runnable runnable) {
     new Thread(runnable).start();
   }
+
 }

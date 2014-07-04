@@ -12,6 +12,14 @@
   <string name="one_handed">One-handed</string>
   <string name="blindfolded">Blindfolded</string>
 
+  <string name="add">Add</string>
+  <string name="action">Action</string>
+  <string name="rename">Rename</string>
+  <string name="cancel">Cancel</string>
+  <string name="edit">Edit</string>
+  <string name="solveTypeAlreadyExists">A solve type with the same name already exists.</string>
+  <string name="deleteSolveTypeConfirmation">Are you sure you want to delete the solve type \'%1$s\' and all its times?</string>
+
   <string name="inspection">Inspection</string>
   <string name="last_avg_of">Last avg of</string>
   <string name="best_avg_of">Best avg of</string>

@@ -54,12 +54,13 @@ public class ServiceProviderImpl implements ServiceProvider {
     List<SolveType> solveTypes = new ArrayList<SolveType>();
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_ID).append(", ").append(DB.COL_SOLVETYPE_NAME);
+    q.append(", ").append(DB.COL_SOLVETYPE_CUBETYPE_ID);
     q.append(" FROM ").append(DB.TABLE_SOLVETYPE);
     q.append(" WHERE ").append(DB.COL_SOLVETYPE_CUBETYPE_ID).append(" = ?");
     Cursor cursor = db.rawQuery(q.toString(), new String[] { String.valueOf(cubeType.getId()) });
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-        SolveType st = new SolveType(cursor.getInt(0), cursor.getString(1));
+        SolveType st = new SolveType(cursor.getInt(0), cursor.getString(1), cursor.getInt(2));
         solveTypes.add(st);
       }
       cursor.close();
@@ -266,6 +267,26 @@ public class ServiceProviderImpl implements ServiceProvider {
       cursor.close();
     }
     return sessionTimes;
+  }
+
+  @Override
+  public int addSolveType(SolveType solveType) {
+    ContentValues values = new ContentValues();
+    values.put(DB.COL_SOLVETYPE_NAME, solveType.getName());
+    values.put(DB.COL_SOLVETYPE_CUBETYPE_ID, solveType.getCubeTypeId());
+    return (int) db.insert(DB.TABLE_SOLVETYPE, null, values);
+  }
+
+  @Override
+  public void updateSolveType(SolveType solveType) {
+    ContentValues values = new ContentValues();
+    values.put(DB.COL_SOLVETYPE_NAME, solveType.getName());
+    db.update(DB.TABLE_SOLVETYPE, values, DB.COL_ID + " = ?", new String[] { String.valueOf(solveType.getId()) });
+  }
+
+  @Override
+  public void deleteSolveType(SolveType solveType) {
+    db.delete(DB.TABLE_SOLVETYPE, DB.COL_ID + " = ?", new String[] { String.valueOf(solveType.getId()) });
   }
 
   private void recalculateAverages(long timestamp, SolveType solveType) {

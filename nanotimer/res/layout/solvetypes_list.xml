@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingRight="5dp"
+    android:paddingLeft="5dp">
+
+  <RelativeLayout android:id="@+id/addLayout"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
+
+    <EditText
+        android:id="@+id/tfName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textCapSentences"
+        android:layout_toLeftOf="@+id/btnAdd"/>
+
+    <Button
+        android:id="@id/btnAdd"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="@string/add"/>
+
+  </RelativeLayout>
+
+  <ListView
+      android:id="@+id/lvSolveTypes"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/addLayout"/>
+
+</RelativeLayout>

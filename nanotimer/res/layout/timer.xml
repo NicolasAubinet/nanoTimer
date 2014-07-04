@@ -12,28 +12,35 @@
      android:layout_height="wrap_content"
      android:orientation="vertical">
     <TextView
-       android:id="@+id/tvInspection"
-       android:layout_width="match_parent"
+       android:id="@+id/tvCubeType"
+       android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_marginTop="10dp"
+       android:layout_marginTop="8dp"
+       android:textSize="24sp"
+       android:layout_gravity="center"/>
+    <TextView
+       android:id="@+id/tvInspection"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="5dp"
        android:textSize="20sp"
        android:fontFamily="monospace"
-       android:gravity="center"/>
+       android:layout_gravity="center"/>
     <TextView
        android:id="@+id/tvTimer"
-       android:layout_width="match_parent"
+       android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_marginTop="10dp"
+       android:layout_marginTop="5dp"
        android:textSize="50sp"
        android:fontFamily="monospace"
-       android:gravity="center"/>
+       android:layout_gravity="center"/>
     <TextView
-       android:layout_width="match_parent"
+       android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:layout_marginTop="10dp"
        android:textSize="12sp"
        android:fontFamily="monospace"
-       android:gravity="center"
+       android:layout_gravity="center"
        android:text="@string/scrambleC"/>
     <com.cube.nanotimer.util.FontFitTextView
        android:id="@+id/tvScramble"

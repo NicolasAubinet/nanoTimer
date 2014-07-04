@@ -6,13 +6,20 @@ public class SolveType implements Serializable {
 
   private int id;
   private String name;
+  private int cubeTypeId;
 
   public SolveType() {
   }
 
-  public SolveType(int id, String name) {
+  public SolveType(String name, int cubeTypeId) {
+    this.name = name;
+    this.cubeTypeId = cubeTypeId;
+  }
+
+  public SolveType(int id, String name, int cubeTypeId) {
     this.id = id;
     this.name = name;
+    this.cubeTypeId = cubeTypeId;
   }
 
   public int getId() {
@@ -31,4 +38,11 @@ public class SolveType implements Serializable {
     this.name = name;
   }
 
+  public int getCubeTypeId() {
+    return cubeTypeId;
+  }
+
+  public void setCubeTypeId(int cubeTypeId) {
+    this.cubeTypeId = cubeTypeId;
+  }
 }
