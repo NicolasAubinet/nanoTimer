@@ -1,6 +1,7 @@
 package com.cube.nanotimer.activity;
 
 import android.app.Activity;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
@@ -17,6 +18,7 @@ import com.cube.nanotimer.scrambler.ScramblerFactory;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.CubeSession;
 import com.cube.nanotimer.util.FormatterService;
+import com.cube.nanotimer.util.Utils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
@@ -37,6 +39,7 @@ public class TimerActivity extends Activity {
   private TextView tvCubeType;
   private TextView tvRA5;
   private TextView tvRA12;
+  private RelativeLayout layout;
 
   private CubeType cubeType;
   private SolveType solveType;
@@ -45,6 +48,7 @@ public class TimerActivity extends Activity {
   private CubeSession cubeSession;
 
   private final long REFRESH_INTERVAL = 25;
+  private final int INSPECTION_LIMIT = 15;
   private Timer timer;
   private Handler timerHandler = new Handler();
   private Object timerSync = new Object();
@@ -56,6 +60,7 @@ public class TimerActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.timer);
     App.INSTANCE.setContext(this);
+    setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
     cubeType = (CubeType) getIntent().getSerializableExtra("cubeType");
     solveType = (SolveType) getIntent().getSerializableExtra("solveType");
@@ -72,7 +77,7 @@ public class TimerActivity extends Activity {
     resetTimer();
     setCubeTypeText();
 
-    final RelativeLayout layout = (RelativeLayout) findViewById(R.id.layoutTimer);
+    layout = (RelativeLayout) findViewById(R.id.layoutTimer);
     layout.setOnTouchListener(new OnTouchListener() {
       @Override
       public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -81,10 +86,8 @@ public class TimerActivity extends Activity {
           return false;
         } else if (timerState == TimerState.STOPPED) {
           if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-            layout.setBackgroundColor(getResources().getColor(R.color.darkblue));
             startInspectionTimer();
           } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-            layout.setBackgroundColor(getResources().getColor(R.color.black));
             stopInspectionTimer();
             startTimer();
           }
@@ -230,6 +233,7 @@ public class TimerActivity extends Activity {
 
   private void startInspectionTimer() {
     timerStartTs = System.currentTimeMillis();
+    layout.setBackgroundColor(getResources().getColor(R.color.darkblue));
     tvInspection.setText(getString(R.string.inspection) + ":");
     timer = new Timer();
     TimerTask timerTask = new TimerTask() {
@@ -249,6 +253,7 @@ public class TimerActivity extends Activity {
       timer.cancel();
       timer.purge();
     }
+    layout.setBackgroundColor(getResources().getColor(R.color.black));
     tvInspection.setText("");
   }
 
@@ -286,7 +291,14 @@ public class TimerActivity extends Activity {
 
   private synchronized void updateInspectionTimerText() {
     long curTime = System.currentTimeMillis() - timerStartTs;
-    tvTimer.setText(String.valueOf((int) (curTime / 1000) % 60));
+    int seconds = (int) (curTime / 1000) % 60;
+    tvTimer.setText(String.valueOf(seconds));
+    if (seconds == INSPECTION_LIMIT) {
+      Utils.playSound(R.raw.highbell);
+      layout.setBackgroundColor(getResources().getColor(R.color.darkred));
+    } else if (seconds >= INSPECTION_LIMIT - 3 && seconds < INSPECTION_LIMIT) {
+      Utils.playSound(R.raw.cowbell);
+    }
   }
 
   private void generateScramble() {

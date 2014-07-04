@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.media.MediaPlayer;
 import android.widget.Toast;
 import com.cube.nanotimer.App;
 
@@ -65,6 +66,11 @@ public class Utils {
         }
       }
     };
+  }
+
+  public static void playSound(int soundId) {
+    MediaPlayer mp = MediaPlayer.create(App.INSTANCE.getContext(), soundId);
+    mp.start();
   }
 
 }

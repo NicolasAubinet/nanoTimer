@@ -3,6 +3,7 @@ package com.cube.nanotimer.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,6 +58,7 @@ public class MainScreenActivity extends Activity implements TimeChangedHandler {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.mainscreen);
     App.INSTANCE.setContext(this);
+    setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
     buCubeType = (Button) findViewById(R.id.buCubeType);
     buCubeType.setOnClickListener(new OnClickListener() {
