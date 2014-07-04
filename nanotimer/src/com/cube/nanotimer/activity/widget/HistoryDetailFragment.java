@@ -20,19 +20,20 @@ public class HistoryDetailFragment extends DialogFragment {
 
   private static final String ARG_SOLVETIME = "solvetime";
   private static final String ARG_CUBETYPE = "cubetype";
-  private static final String ARG_HANDLER = "handler";
+
+  private TimeChangedHandler handler;
 
   public static HistoryDetailFragment newInstance(SolveTime solveTime, CubeType cubeType, TimeChangedHandler handler) {
-    HistoryDetailFragment hd = new HistoryDetailFragment();
+    HistoryDetailFragment hd = new HistoryDetailFragment(handler);
     Bundle bundle = new Bundle();
     bundle.putSerializable(ARG_SOLVETIME, solveTime);
     bundle.putSerializable(ARG_CUBETYPE, cubeType);
-    bundle.putSerializable(ARG_HANDLER, handler);
     hd.setArguments(bundle);
     return hd;
   }
 
-  private HistoryDetailFragment() {
+  private HistoryDetailFragment(TimeChangedHandler handler) {
+    this.handler = handler;
   }
 
   @Override
@@ -41,7 +42,6 @@ public class HistoryDetailFragment extends DialogFragment {
 
     final SolveTime solveTime = (SolveTime) getArguments().getSerializable(ARG_SOLVETIME);
     final CubeType cubeType = (CubeType) getArguments().getSerializable(ARG_CUBETYPE);
-    final TimeChangedHandler handler = (TimeChangedHandler) getArguments().getSerializable(ARG_HANDLER);
 
     final TextView tvTime = (TextView) v.findViewById(R.id.tvTime);
     FontFitTextView tvScramble = (FontFitTextView) v.findViewById(R.id.tvScramble);
