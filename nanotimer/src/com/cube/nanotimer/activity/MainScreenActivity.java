@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -49,6 +51,7 @@ public class MainScreenActivity extends Activity implements TimeChangedHandler {
   private HistoryListAdapter adapter;
 
   private TypeListEditor typeListEditor = new TypeListEditor();
+  private int previousLastItem = 0;
 
   private static final int ID_CUBETYPE = 1;
   private static final int ID_SOLVETYPE = 2;
@@ -90,6 +93,20 @@ public class MainScreenActivity extends Activity implements TimeChangedHandler {
       }
     });
 
+    initHistoryList();
+
+    findViewById(R.id.buStart).setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        Intent i = new Intent(MainScreenActivity.this, TimerActivity.class);
+        i.putExtra("cubeType", curCubeType);
+        i.putExtra("solveType", curSolveType);
+        startActivity(i);
+      }
+    });
+  }
+
+  private void initHistoryList() {
     adapter = new HistoryListAdapter(MainScreenActivity.this, R.id.lvHistory, liHistory);
     lvHistory = (ListView) findViewById(R.id.lvHistory);
     lvHistory.setAdapter(adapter);
@@ -100,14 +117,32 @@ public class MainScreenActivity extends Activity implements TimeChangedHandler {
             HistoryDetailFragment.newInstance(liHistory.get(i), curCubeType, MainScreenActivity.this));
       }
     });
-
-    findViewById(R.id.buStart).setOnClickListener(new OnClickListener() {
+    lvHistory.setOnScrollListener(new OnScrollListener() {
       @Override
-      public void onClick(View view) {
-        Intent i = new Intent(MainScreenActivity.this, TimerActivity.class);
-        i.putExtra("cubeType", curCubeType);
-        i.putExtra("solveType", curSolveType);
-        startActivity(i);
+      public void onScrollStateChanged(AbsListView view, int scrollState) {
+      }
+
+      @Override
+      public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        if (view.getId() == R.id.lvHistory && !liHistory.isEmpty()) {
+          int lastVisibleItem = firstVisibleItem + visibleItemCount;
+          if (totalItemCount == lastVisibleItem && lastVisibleItem != previousLastItem) {
+            previousLastItem = lastVisibleItem;
+            long from = liHistory.get(liHistory.size() - 1).getTimestamp();
+            App.INSTANCE.getService().getHistory(curSolveType, from, new DataCallback<List<SolveTime>>() {
+              @Override
+              public void onData(List<SolveTime> data) {
+                liHistory.addAll(data);
+                runOnUiThread(new Runnable() {
+                  @Override
+                  public void run() {
+                    adapter.notifyDataSetChanged();
+                  }
+                });
+              }
+            });
+          }
+        }
       }
     });
   }
@@ -173,12 +208,14 @@ public class MainScreenActivity extends Activity implements TimeChangedHandler {
     App.INSTANCE.getService().getHistory(curSolveType, new DataCallback<List<SolveTime>>() {
       @Override
       public void onData(List<SolveTime> data) {
+        previousLastItem = 0;
         liHistory.clear();
         liHistory.addAll(data);
         runOnUiThread(new Runnable() {
           @Override
           public void run() {
             adapter.notifyDataSetChanged();
+            lvHistory.setSelection(0);
           }
         });
       }

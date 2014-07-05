@@ -101,6 +101,16 @@ public class ServiceImpl extends DBHelper implements Service {
   }
 
   @Override
+  public void getHistory(final SolveType solveType, final long from, final DataCallback<List<SolveTime>> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        callback.onData(provider.getHistory(solveType, from));
+      }
+    });
+  }
+
+  @Override
   public void getSessionTimes(final SolveType solveType, final DataCallback<List<Long>> callback) {
     run(new Runnable() {
       @Override

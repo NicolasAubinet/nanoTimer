@@ -15,6 +15,7 @@ public interface Service {
   void removeTime(SolveTime solveTime, DataCallback<SolveAverages> callback);
   void getSolveAverages(SolveType solveType, DataCallback<SolveAverages> callback);
   void getHistory(SolveType solveType, DataCallback<List<SolveTime>> callback);
+  void getHistory(SolveType solveType, long from, DataCallback<List<SolveTime>> callback);
   void getSessionTimes(SolveType solveType, DataCallback<List<Long>> callback);
 
   void addSolveType(SolveType solveType, DataCallback<Integer> callback);

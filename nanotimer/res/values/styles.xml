@@ -9,6 +9,14 @@
     <item name="android:textSize">14sp</item>
   </style>
 
+  <style name="SessionTimeTextField">
+    <item name="android:textSize">14sp</item>
+    <item name="android:gravity">center</item>
+    <item name="android:layout_width">0dp</item>
+    <item name="android:layout_margin">1dp</item>
+    <item name="android:background">@color/black</item>
+  </style>
+
   <style name="ListViewItem">
     <item name="android:textSize">23sp</item>
     <item name="android:layout_width">match_parent</item>

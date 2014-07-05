@@ -222,7 +222,11 @@ public class ServiceProviderImpl implements ServiceProvider {
 
   @Override
   public List<SolveTime> getHistory(SolveType solveType) {
-    // TODO : allow to read more (by passing the page id, or the timestamp to start reading from)
+    return getHistory(solveType, System.currentTimeMillis());
+  }
+
+  @Override
+  public List<SolveTime> getHistory(SolveType solveType, long from) {
     List<SolveTime> history = new ArrayList<SolveTime>();
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_ID);
@@ -231,9 +235,13 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("     , ").append(DB.COL_TIMEHISTORY_SCRAMBLE);
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
+    q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
     q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC");
     q.append(" LIMIT ").append(HISTORY_PAGE_SIZE);
-    Cursor cursor = db.rawQuery(q.toString(), new String[] { String.valueOf(solveType.getId()) });
+    Cursor cursor = db.rawQuery(q.toString(), new String[] {
+        String.valueOf(solveType.getId()),
+        String.valueOf(from)
+    });
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         SolveTime st = new SolveTime();

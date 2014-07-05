@@ -22,22 +22,20 @@
        android:id="@+id/tvInspection"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_marginTop="5dp"
-       android:textSize="20sp"
+       android:textSize="14sp"
        android:fontFamily="monospace"
        android:layout_gravity="center"/>
     <TextView
        android:id="@+id/tvTimer"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_marginTop="5dp"
        android:textSize="50sp"
        android:fontFamily="monospace"
        android:layout_gravity="center"/>
     <TextView
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_marginTop="10dp"
+       android:layout_marginTop="3dp"
        android:textSize="12sp"
        android:fontFamily="monospace"
        android:layout_gravity="center"
@@ -56,24 +54,39 @@
      android:layout_height="wrap_content"
      android:layout_below="@id/topLayout"
      android:orientation="vertical"
-     android:layout_margin="10dp">
+     android:paddingTop="5dp"
+     android:layout_margin="8dp">
+    <TableLayout
+       android:id="@+id/layoutSessionTimes"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:background="@color/darkblue"
+       android:shrinkColumns="*"
+       android:stretchColumns="*">
+      <TableRow>
+        <TextView style="@style/SessionTimeTextField" android:background="@color/darkerblue"/>
+        <TextView style="@style/SessionTimeTextField"/>
+        <TextView style="@style/SessionTimeTextField" android:background="@color/darkerblue"/>
+        <TextView style="@style/SessionTimeTextField"/>
+      </TableRow>
+      <TableRow>
+        <TextView style="@style/SessionTimeTextField"/>
+        <TextView style="@style/SessionTimeTextField" android:background="@color/darkerblue"/>
+        <TextView style="@style/SessionTimeTextField"/>
+        <TextView style="@style/SessionTimeTextField" android:background="@color/darkerblue"/>
+      </TableRow>
+      <TableRow>
+        <TextView style="@style/SessionTimeTextField" android:background="@color/darkerblue"/>
+        <TextView style="@style/SessionTimeTextField"/>
+        <TextView style="@style/SessionTimeTextField" android:background="@color/darkerblue"/>
+        <TextView style="@style/SessionTimeTextField"/>
+      </TableRow>
+    </TableLayout>
     <TableLayout
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:shrinkColumns="1">
-      <TableRow android:layout_marginTop="3dp">
-        <TextView
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:text="@string/session"
-           style="@style/SmallTextField"/>
-        <TextView
-           android:id="@+id/tvSessionTimes"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_marginLeft="10dp"
-           style="@style/SmallTextField"/>
-      </TableRow>
+       android:shrinkColumns="1"
+       android:layout_marginTop="2dp">
       <TableRow android:layout_marginTop="3dp">
         <TextView
            android:layout_width="wrap_content"

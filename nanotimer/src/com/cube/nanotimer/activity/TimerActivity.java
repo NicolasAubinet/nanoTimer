@@ -11,6 +11,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.RelativeLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
@@ -35,11 +37,11 @@ public class TimerActivity extends Activity {
   private TextView tvTimer;
   private TextView tvInspection;
   private TextView tvScramble;
-  private TextView tvSessionTimes;
   private TextView tvCubeType;
   private TextView tvRA5;
   private TextView tvRA12;
   private RelativeLayout layout;
+  private TableLayout layoutSessionTimes;
 
   private CubeType cubeType;
   private SolveType solveType;
@@ -69,10 +71,10 @@ public class TimerActivity extends Activity {
     tvTimer = (TextView) findViewById(R.id.tvTimer);
     tvInspection = (TextView) findViewById(R.id.tvInspection);
     tvScramble = (TextView) findViewById(R.id.tvScramble);
-    tvSessionTimes = (TextView) findViewById(R.id.tvSessionTimes);
     tvCubeType = (TextView) findViewById(R.id.tvCubeType);
     tvRA5 = (TextView) findViewById(R.id.tvRA5);
     tvRA12 = (TextView) findViewById(R.id.tvRA12);
+    layoutSessionTimes = (TableLayout) findViewById(R.id.layoutSessionTimes);
 
     resetTimer();
     setCubeTypeText();
@@ -166,33 +168,56 @@ public class TimerActivity extends Activity {
   }
 
   private void updateSessionView() {
-    StringBuilder sbTimes = new StringBuilder();
-    List<Long> sessionTimes = cubeSession.getSessionTimes();
-    if (!sessionTimes.isEmpty()) {
-      int bestInd = (sessionTimes.size() < 5) ? -1 : cubeSession.getBestTimeInd(sessionTimes.size());
-      int worstInd = (sessionTimes.size() < 5) ? -1 : cubeSession.getWorstTimeInd(sessionTimes.size());
-      for (int i = 0; i < sessionTimes.size(); i++) {
-        String strTime = FormatterService.INSTANCE.formatSolveTime(sessionTimes.get(i));
-        if (i == bestInd) {
-          sbTimes.append("<font color='").append(getResources().getColor(R.color.green)).append("'>");
-          sbTimes.append(strTime).append("</font>");
-        } else if (i == worstInd) {
-          sbTimes.append("<font color='").append(getResources().getColor(R.color.red)).append("'>");
-          sbTimes.append(strTime).append("</font>");
-        } else {
-          sbTimes.append(strTime);
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        List<Long> sessionTimes = cubeSession.getSessionTimes();
+        clearSessionTextViews();
+        if (!sessionTimes.isEmpty()) {
+          int bestInd = (sessionTimes.size() < 5) ? -1 : cubeSession.getBestTimeInd(sessionTimes.size());
+          int worstInd = (sessionTimes.size() < 5) ? -1 : cubeSession.getWorstTimeInd(sessionTimes.size());
+          for (int i = 0; i < sessionTimes.size(); i++) {
+            String strTime = FormatterService.INSTANCE.formatSolveTime(sessionTimes.get(i));
+            StringBuilder sbTimes = new StringBuilder();
+            TextView tv = getSessionTextView(i);
+            if (i == bestInd) {
+              sbTimes.append("<font color='").append(getResources().getColor(R.color.green)).append("'>");
+              sbTimes.append(strTime).append("</font>");
+              tv.setText(Html.fromHtml(sbTimes.toString()));
+            } else if (i == worstInd) {
+              sbTimes.append("<font color='").append(getResources().getColor(R.color.red)).append("'>");
+              sbTimes.append(strTime).append("</font>");
+              tv.setText(Html.fromHtml(sbTimes.toString()));
+            } else {
+              tv.setText(strTime);
+            }
+          }
         }
-        if (i < sessionTimes.size() - 1) {
-          sbTimes.append(", ");
-        }
-        if (i == 5) { // half way to 12 (to split the times equally on two lines)
-          sbTimes.append("<br>");
-        }
+        tvRA5.setText(FormatterService.INSTANCE.formatSolveTime(cubeSession.getAverageOfFive()));
+        tvRA12.setText(FormatterService.INSTANCE.formatSolveTime(cubeSession.getAverageOfTwelve()));
+      }
+    });
+  }
+
+  private void clearSessionTextViews() {
+    for (int i = 0; i < layoutSessionTimes.getChildCount(); i++) {
+      TableRow tr = (TableRow) layoutSessionTimes.getChildAt(i);
+      for (int j = 0; j < tr.getChildCount(); j++) {
+        ((TextView) tr.getChildAt(j)).setText("");
       }
     }
-    tvSessionTimes.setText(Html.fromHtml(sbTimes.toString()));
-    tvRA5.setText(FormatterService.INSTANCE.formatSolveTime(cubeSession.getAverageOfFive()));
-    tvRA12.setText(FormatterService.INSTANCE.formatSolveTime(cubeSession.getAverageOfTwelve()));
+  }
+
+  private TextView getSessionTextView(int i) {
+    View v = null;
+    if (i >= 0 && i < 4) {
+      v = ((TableRow) layoutSessionTimes.getChildAt(0)).getChildAt(i);
+    } else if (i >= 4 && i < 8) {
+      v = ((TableRow) layoutSessionTimes.getChildAt(1)).getChildAt(i - 4);
+    } else if (i >= 8 && i < 12) {
+      v = ((TableRow) layoutSessionTimes.getChildAt(2)).getChildAt(i - 8);
+    }
+    return (TextView) v;
   }
 
   private void startTimer() {
@@ -233,7 +258,7 @@ public class TimerActivity extends Activity {
 
   private void startInspectionTimer() {
     timerStartTs = System.currentTimeMillis();
-    layout.setBackgroundColor(getResources().getColor(R.color.darkblue));
+    layout.setBackgroundColor(getResources().getColor(R.color.nightblue));
     tvInspection.setText(getString(R.string.inspection) + ":");
     timer = new Timer();
     TimerTask timerTask = new TimerTask() {
