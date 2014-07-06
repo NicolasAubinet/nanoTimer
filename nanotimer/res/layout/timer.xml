@@ -60,25 +60,25 @@
        android:id="@+id/layoutSessionTimes"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:background="@color/darkblue"
+       android:background="@color/neon"
        android:shrinkColumns="*"
        android:stretchColumns="*">
       <TableRow>
-        <TextView style="@style/SessionTimeTextField" android:background="@color/darkerblue"/>
+        <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
         <TextView style="@style/SessionTimeTextField"/>
-        <TextView style="@style/SessionTimeTextField" android:background="@color/darkerblue"/>
+        <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
         <TextView style="@style/SessionTimeTextField"/>
       </TableRow>
       <TableRow>
         <TextView style="@style/SessionTimeTextField"/>
-        <TextView style="@style/SessionTimeTextField" android:background="@color/darkerblue"/>
+        <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
         <TextView style="@style/SessionTimeTextField"/>
-        <TextView style="@style/SessionTimeTextField" android:background="@color/darkerblue"/>
+        <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
       </TableRow>
       <TableRow>
-        <TextView style="@style/SessionTimeTextField" android:background="@color/darkerblue"/>
+        <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
         <TextView style="@style/SessionTimeTextField"/>
-        <TextView style="@style/SessionTimeTextField" android:background="@color/darkerblue"/>
+        <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
         <TextView style="@style/SessionTimeTextField"/>
       </TableRow>
     </TableLayout>

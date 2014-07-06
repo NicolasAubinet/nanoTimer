@@ -2,8 +2,7 @@
 <resources>
   <color name="neon">#FF6257F6</color>
   <color name="nightblue">#FF272254</color>
-  <color name="darkblue">#FF1111AA</color>
-  <color name="darkerblue">#FF000055</color>
+  <color name="darkblue">#FF000055</color>
   <color name="white">#FFFFFFFF</color>
   <color name="black">#FF000000</color>
   <color name="red">#FFFF0000</color>

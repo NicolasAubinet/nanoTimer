@@ -3,6 +3,7 @@ package com.cube.nanotimer.activity.widget.list;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.MenuItem;
@@ -152,4 +153,12 @@ public class SolveTypesListDialog extends DialogFragment implements FieldRenamer
     }
     return false;
   }
+
+  @Override
+  public void show(FragmentManager manager, String tag) {
+    if (manager.findFragmentByTag(tag) == null) {
+      super.show(manager, tag);
+    }
+  }
+
 }
