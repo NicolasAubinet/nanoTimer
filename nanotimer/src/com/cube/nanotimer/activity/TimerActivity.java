@@ -324,10 +324,10 @@ public class TimerActivity extends Activity {
     int seconds = (int) (curTime / 1000) % 60;
     tvTimer.setText(String.valueOf(seconds));
     if (seconds == INSPECTION_LIMIT) {
-      Utils.playSound(R.raw.highbell);
+      Utils.playSound(R.raw.beep2);
       layout.setBackgroundColor(getResources().getColor(R.color.darkred));
     } else if (seconds >= INSPECTION_LIMIT - 3 && seconds < INSPECTION_LIMIT) {
-      Utils.playSound(R.raw.cowbell);
+      Utils.playSound(R.raw.beep1);
     }
   }
 
