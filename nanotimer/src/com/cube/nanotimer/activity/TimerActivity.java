@@ -139,8 +139,8 @@ public class TimerActivity extends Activity {
     if (lastSolveTime != null && timerState == TimerState.STOPPED) {
       switch (item.getItemId()) {
         case R.id.itPlusTwo:
-          if (lastSolveTime.getTime() > 0) {
-            lastSolveTime.setTime(lastSolveTime.getTime() + 2000);
+          if (lastSolveTime.getTime() > 0 && !lastSolveTime.isPlusTwo()) {
+            lastSolveTime.plusTwo();
             App.INSTANCE.getService().saveTime(lastSolveTime, new SolveAverageCallback());
             tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(lastSolveTime.getTime()));
             cubeSession.setLastAsPlusTwo();

@@ -81,6 +81,7 @@ public class ServiceProviderImpl implements ServiceProvider {
   private SolveAverages updateTime(SolveTime solveTime) {
     ContentValues values = new ContentValues();
     values.put(DB.COL_TIMEHISTORY_TIME, solveTime.getTime());
+    values.put(DB.COL_TIMEHISTORY_PLUSTWO, solveTime.isPlusTwo() ? 1 : 0);
     db.update(DB.TABLE_TIMEHISTORY, values, DB.COL_ID + " = ?", new String[] { String.valueOf(solveTime.getId()) });
     for (CachedTime ct : cachedSolveTimes) {
       if (ct.getSolveId() == solveTime.getId()) {
@@ -93,7 +94,6 @@ public class ServiceProviderImpl implements ServiceProvider {
     Long avg12 = getLastAvg(12, false);
     Long avg100 = getLastAvg(100, false);
     Long avgLifetime = getLastAvg(1000, true);
-//    syncBestAveragesWithCurrent(avg5, avg12, avg100); // useless because calling loadBestAverages after
 
     recalculateAverages(solveTime.getTimestamp(), solveTime.getSolveType());
 
@@ -124,6 +124,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     values.put(DB.COL_TIMEHISTORY_SOLVETYPE_ID, solveTime.getSolveType().getId());
     values.put(DB.COL_TIMEHISTORY_SCRAMBLE, solveTime.getScramble());
     values.put(DB.COL_TIMEHISTORY_TIMESTAMP, solveTime.getTimestamp());
+    values.put(DB.COL_TIMEHISTORY_PLUSTWO, solveTime.isPlusTwo() ? 1 : 0);
     values.put(DB.COL_TIMEHISTORY_AVG5, avg5);
     values.put(DB.COL_TIMEHISTORY_AVG12, avg12);
     values.put(DB.COL_TIMEHISTORY_AVG100, avg100);
@@ -233,6 +234,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("     , ").append(DB.COL_TIMEHISTORY_TIME);
     q.append("     , ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
     q.append("     , ").append(DB.COL_TIMEHISTORY_SCRAMBLE);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_PLUSTWO);
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
     q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
@@ -249,6 +251,7 @@ public class ServiceProviderImpl implements ServiceProvider {
         st.setTime(cursor.getInt(1));
         st.setTimestamp(cursor.getLong(2));
         st.setScramble(cursor.getString(3));
+        st.setPlusTwo(cursor.getInt(4) == 1);
         st.setSolveType(solveType);
         history.add(st);
       }

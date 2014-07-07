@@ -58,8 +58,8 @@ public class HistoryDetailFragment extends DialogFragment {
     tvPlusTwo.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
-        if (solveTime.getTime() > 0) {
-          solveTime.setTime(solveTime.getTime() + 2000);
+        if (solveTime.getTime() > 0 && !solveTime.isPlusTwo()) {
+          solveTime.plusTwo();
           saveTime(solveTime);
           handler.onTimeChanged(solveTime);
         }
