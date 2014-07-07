@@ -2,13 +2,19 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <item android:id="@+id/itPlusTwo"
-    android:title="@string/plus_two"/>
+  <group>
+    <item android:id="@+id/itPlusTwo"
+      android:title="@string/plus_two"/>
 
-  <item android:id="@+id/itDNF"
-    android:title="@string/DNF"/>
+    <item android:id="@+id/itDNF"
+      android:title="@string/DNF"/>
 
-  <item android:id="@+id/itDelete"
-    android:title="@string/delete"/>
+    <item android:id="@+id/itDelete"
+      android:title="@string/delete"/>
+  </group>
+  <group>
+    <item android:id="@+id/itNewSession"
+      android:title="@string/newSession"/>
+  </group>
 
 </menu>

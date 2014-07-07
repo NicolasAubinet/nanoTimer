@@ -162,6 +162,11 @@ public class TimerActivity extends Activity {
           updateSessionView();
           resetTimer();
           break;
+        case R.id.itNewSession:
+          App.INSTANCE.getService().startNewSession(solveType, System.currentTimeMillis(), null);
+          cubeSession.clearSession();
+          updateSessionView();
+          break;
       }
     }
     return true;

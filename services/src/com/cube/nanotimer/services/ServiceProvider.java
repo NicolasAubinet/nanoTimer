@@ -16,6 +16,7 @@ public interface ServiceProvider {
   List<SolveTime> getHistory(SolveType solveType);
   List<SolveTime> getHistory(SolveType solveType, long from);
   List<Long> getSessionTimes(SolveType solveType);
+  void startNewSession(SolveType solveType, long startTs);
 
   int addSolveType(SolveType solveType);
   void updateSolveType(SolveType solveType);

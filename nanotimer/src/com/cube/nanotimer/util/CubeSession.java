@@ -107,6 +107,12 @@ public class CubeSession {
     }
   }
 
+  public void clearSession() {
+    if (sessionTimes != null) {
+      sessionTimes.clear();
+    }
+  }
+
   public List<Long> getSessionTimes() {
     if (sessionTimes.size() > 12) {
       return sessionTimes.subList(sessionTimes.size() - 12, sessionTimes.size());

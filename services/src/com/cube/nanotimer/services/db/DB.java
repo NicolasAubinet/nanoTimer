@@ -3,7 +3,7 @@ package com.cube.nanotimer.services.db;
 public class DB {
 
   public static final String DB_NAME = "nanoTimerDB";
-  public static final int DB_VERSION = 1;
+  public static final int DB_VERSION = 3;
 
   public static final String COL_ID = "id";
 
@@ -12,6 +12,7 @@ public class DB {
 
   public static final String TABLE_SOLVETYPE = "solvetype";
   public static final String COL_SOLVETYPE_NAME = "name";
+  public static final String COL_SOLVETYPE_SESSION_START = "sessionstart";
   public static final String COL_SOLVETYPE_CUBETYPE_ID = "cubetype_id";
 
   public static final String TABLE_TIMEHISTORY = "timehistory";

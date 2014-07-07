@@ -121,6 +121,19 @@ public class ServiceImpl extends DBHelper implements Service {
   }
 
   @Override
+  public void startNewSession(final SolveType solveType, final long startTs, final DataCallback<Void> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        provider.startNewSession(solveType, startTs);
+        if (callback != null) {
+          callback.onData(null);
+        }
+      }
+    });
+  }
+
+  @Override
   public void addSolveType(final SolveType solveType, final DataCallback<Integer> callback) {
     run(new Runnable() {
       @Override
@@ -136,7 +149,9 @@ public class ServiceImpl extends DBHelper implements Service {
       @Override
       public void run() {
         provider.updateSolveType(solveType);
-        callback.onData(null);
+        if (callback != null) {
+          callback.onData(null);
+        }
       }
     });
   }
@@ -147,7 +162,9 @@ public class ServiceImpl extends DBHelper implements Service {
       @Override
       public void run() {
         provider.deleteSolveType(solveType);
-        callback.onData(null);
+        if (callback != null) {
+          callback.onData(null);
+        }
       }
     });
   }

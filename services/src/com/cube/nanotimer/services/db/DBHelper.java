@@ -26,7 +26,11 @@ public class DBHelper extends SQLiteOpenHelper {
   @Override
   public void onCreate(SQLiteDatabase db) {
     this.db = db;
+    createTables(db);
+    insertDefaultValues();
+  }
 
+  public void createTables(SQLiteDatabase db) {
     db.execSQL("CREATE TABLE " + DB.TABLE_CUBETYPE + "(" +
         DB.COL_ID + " INTEGER PRIMARY KEY, " +
         DB.COL_CUBETYPE_NAME + " TEXT NOT NULL " +
@@ -36,6 +40,7 @@ public class DBHelper extends SQLiteOpenHelper {
     db.execSQL("CREATE TABLE " + DB.TABLE_SOLVETYPE + "(" +
         DB.COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
         DB.COL_SOLVETYPE_NAME + " TEXT NOT NULL, " +
+        DB.COL_SOLVETYPE_SESSION_START + " INTEGER DEFAULT 0, " +
         DB.COL_SOLVETYPE_CUBETYPE_ID + " INTEGER, " +
         "FOREIGN KEY (" + DB.COL_SOLVETYPE_CUBETYPE_ID + ") REFERENCES " + DB.TABLE_CUBETYPE + " (" + DB.COL_ID + ") " +
       ");"
@@ -53,17 +58,63 @@ public class DBHelper extends SQLiteOpenHelper {
         "FOREIGN KEY (" + DB.COL_TIMEHISTORY_SOLVETYPE_ID + ") REFERENCES " + DB.TABLE_SOLVETYPE + " (" + DB.COL_ID + ") " +
       ");"
     );
-
-    insertDefaultValues();
   }
 
   @Override
   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    db.execSQL("DROP TABLE IF EXISTS " + DB.TABLE_TIMEHISTORY);
-    db.execSQL("DROP TABLE IF EXISTS " + DB.TABLE_SOLVETYPE);
-    db.execSQL("DROP TABLE IF EXISTS " + DB.TABLE_CUBETYPE);
+    db.execSQL("DROP TABLE IF EXISTS " + DB.TABLE_TIMEHISTORY + "_tmp");
+    db.execSQL("DROP TABLE IF EXISTS " + DB.TABLE_SOLVETYPE + "_tmp");
+    db.execSQL("DROP TABLE IF EXISTS " + DB.TABLE_CUBETYPE + "_tmp");
 
-    onCreate(db);
+    db.execSQL("ALTER TABLE " + DB.TABLE_TIMEHISTORY + " RENAME TO " + DB.TABLE_TIMEHISTORY + "_tmp");
+    db.execSQL("ALTER TABLE " + DB.TABLE_SOLVETYPE + " RENAME TO " + DB.TABLE_SOLVETYPE + "_tmp");
+    db.execSQL("ALTER TABLE " + DB.TABLE_CUBETYPE + " RENAME TO " + DB.TABLE_CUBETYPE + "_tmp");
+
+    createTables(db);
+
+    db.execSQL("INSERT INTO " + DB.TABLE_CUBETYPE + "(" +
+        DB.COL_ID + "," +
+        DB.COL_CUBETYPE_NAME + ")" +
+        " SELECT " +
+        DB.COL_ID + "," +
+        DB.COL_CUBETYPE_NAME +
+        " FROM " +
+        DB.TABLE_CUBETYPE + "_tmp"
+    );
+
+    db.execSQL("INSERT INTO " + DB.TABLE_SOLVETYPE + "(" +
+            DB.COL_ID + "," +
+            DB.COL_SOLVETYPE_NAME + "," +
+            DB.COL_SOLVETYPE_CUBETYPE_ID + ")" +
+            " SELECT " +
+            DB.COL_ID + "," +
+            DB.COL_SOLVETYPE_NAME + "," +
+            DB.COL_SOLVETYPE_CUBETYPE_ID +
+            " FROM " +
+            DB.TABLE_SOLVETYPE + "_tmp"
+    );
+
+    db.execSQL("INSERT INTO " + DB.TABLE_TIMEHISTORY + "(" +
+            DB.COL_ID + "," +
+            DB.COL_TIMEHISTORY_TIMESTAMP + "," +
+            DB.COL_TIMEHISTORY_TIME + "," +
+            DB.COL_TIMEHISTORY_SCRAMBLE + "," +
+            DB.COL_TIMEHISTORY_AVG5 + "," +
+            DB.COL_TIMEHISTORY_AVG12 + "," +
+            DB.COL_TIMEHISTORY_AVG100 + "," +
+            DB.COL_TIMEHISTORY_SOLVETYPE_ID + ")" +
+            " SELECT " +
+            DB.COL_ID + "," +
+            DB.COL_TIMEHISTORY_TIMESTAMP + "," +
+            DB.COL_TIMEHISTORY_TIME + "," +
+            DB.COL_TIMEHISTORY_SCRAMBLE + "," +
+            DB.COL_TIMEHISTORY_AVG5 + "," +
+            DB.COL_TIMEHISTORY_AVG12 + "," +
+            DB.COL_TIMEHISTORY_AVG100 + "," +
+            DB.COL_TIMEHISTORY_SOLVETYPE_ID +
+            " FROM " +
+            DB.TABLE_TIMEHISTORY + "_tmp"
+    );
   }
 
   private void insertDefaultValues() {

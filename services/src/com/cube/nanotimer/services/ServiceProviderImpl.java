@@ -259,15 +259,17 @@ public class ServiceProviderImpl implements ServiceProvider {
 
   public List<Long> getSessionTimes(SolveType solveType) {
     List<Long> sessionTimes = new ArrayList<Long>();
-    long sessionStartTs = 0; // TODO : retrieve the session start time (when implemented also on client side)
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_TIMEHISTORY_TIME);
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
-    q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" >= ?");
+    q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" >= ");
+    q.append("     (SELECT ").append(DB.COL_SOLVETYPE_SESSION_START);
+    q.append("      FROM ").append(DB.TABLE_SOLVETYPE);
+    q.append("      WHERE ").append(DB.COL_ID).append(" = ?)");
     q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC");
     q.append(" LIMIT ").append(SESSION_TIMES_COUNT);
-    Cursor cursor = db.rawQuery(q.toString(), new String[] { String.valueOf(solveType.getId()), String.valueOf(sessionStartTs) });
+    Cursor cursor = db.rawQuery(q.toString(), new String[] { String.valueOf(solveType.getId()), String.valueOf(solveType.getId()) });
     if (cursor != null) {
       for (cursor.moveToLast(); !cursor.isBeforeFirst(); cursor.moveToPrevious()) {
         sessionTimes.add(cursor.getLong(0));
@@ -275,6 +277,13 @@ public class ServiceProviderImpl implements ServiceProvider {
       cursor.close();
     }
     return sessionTimes;
+  }
+
+  @Override
+  public void startNewSession(SolveType solveType, long startTs) {
+    ContentValues values = new ContentValues();
+    values.put(DB.COL_SOLVETYPE_SESSION_START, startTs);
+    db.update(DB.TABLE_SOLVETYPE, values, DB.COL_ID + " = ?", new String[] { String.valueOf(solveType.getId()) });
   }
 
   @Override
