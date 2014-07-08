@@ -1,16 +1,18 @@
 package com.cube.nanotimer.activity;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
+import android.text.SpannedString;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.widget.RelativeLayout;
+import android.view.ViewGroup;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -40,7 +42,7 @@ public class TimerActivity extends Activity {
   private TextView tvCubeType;
   private TextView tvRA5;
   private TextView tvRA12;
-  private RelativeLayout layout;
+  private ViewGroup layout;
   private TableLayout layoutSessionTimes;
 
   private CubeType cubeType;
@@ -48,6 +50,7 @@ public class TimerActivity extends Activity {
   private String[] currentScramble;
   private SolveTime lastSolveTime;
   private CubeSession cubeSession;
+  private SolveAverages solveAverages;
 
   private final long REFRESH_INTERVAL = 25;
   private final int INSPECTION_LIMIT = 15;
@@ -68,6 +71,23 @@ public class TimerActivity extends Activity {
     solveType = (SolveType) getIntent().getSerializableExtra("solveType");
     App.INSTANCE.getService().getSolveAverages(solveType, new SolveAverageCallback());
 
+    initViews();
+
+    resetTimer();
+    setCubeTypeText();
+
+    App.INSTANCE.getService().getSessionTimes(solveType, new DataCallback<List<Long>>() {
+      @Override
+      public void onData(List<Long> data) {
+        cubeSession = new CubeSession(data);
+        refreshSessionFields();
+      }
+    });
+
+    generateScramble();
+  }
+
+  private void initViews() {
     tvTimer = (TextView) findViewById(R.id.tvTimer);
     tvInspection = (TextView) findViewById(R.id.tvInspection);
     tvScramble = (TextView) findViewById(R.id.tvScramble);
@@ -76,10 +96,7 @@ public class TimerActivity extends Activity {
     tvRA12 = (TextView) findViewById(R.id.tvRA12);
     layoutSessionTimes = (TableLayout) findViewById(R.id.layoutSessionTimes);
 
-    resetTimer();
-    setCubeTypeText();
-
-    layout = (RelativeLayout) findViewById(R.id.layoutTimer);
+    layout = (ViewGroup) findViewById(R.id.layoutTimer);
     layout.setOnTouchListener(new OnTouchListener() {
       @Override
       public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -97,16 +114,6 @@ public class TimerActivity extends Activity {
         return true;
       }
     });
-
-    App.INSTANCE.getService().getSessionTimes(solveType, new DataCallback<List<Long>>() {
-      @Override
-      public void onData(List<Long> data) {
-        cubeSession = new CubeSession(data);
-        updateSessionView();
-      }
-    });
-
-    generateScramble();
   }
 
   private void setCubeTypeText() {
@@ -144,7 +151,7 @@ public class TimerActivity extends Activity {
             App.INSTANCE.getService().saveTime(lastSolveTime, new SolveAverageCallback());
             tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(lastSolveTime.getTime()));
             cubeSession.setLastAsPlusTwo();
-            updateSessionView();
+            refreshSessionFields();
           }
           break;
         case R.id.itDNF:
@@ -153,31 +160,51 @@ public class TimerActivity extends Activity {
             App.INSTANCE.getService().saveTime(lastSolveTime, new SolveAverageCallback());
             tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(lastSolveTime.getTime()));
             cubeSession.setLastAsDNF();
-            updateSessionView();
+            refreshSessionFields();
           }
           break;
         case R.id.itDelete:
           App.INSTANCE.getService().removeTime(lastSolveTime, new SolveAverageCallback());
           cubeSession.deleteLast();
-          updateSessionView();
+          refreshSessionFields();
           resetTimer();
           break;
         case R.id.itNewSession:
           App.INSTANCE.getService().startNewSession(solveType, System.currentTimeMillis(), null);
           cubeSession.clearSession();
-          updateSessionView();
+          refreshSessionFields();
           break;
       }
     }
     return true;
   }
 
-  private void updateSessionView() {
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    String timerText = tvTimer.getText().toString();
+    SpannedString scrambleText = (SpannedString) tvScramble.getText();
+    String cubeTypeText = tvCubeType.getText().toString();
+
+    setContentView(R.layout.timer);
+    initViews();
+
+    tvTimer.setText(timerText);
+    tvScramble.setText(scrambleText);
+    tvCubeType.setText(cubeTypeText);
+    refreshSessionFields();
+    refreshAvgFields();
+  }
+
+  private void refreshSessionFields() {
     runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        List<Long> sessionTimes = cubeSession.getSessionTimes();
         clearSessionTextViews();
+        if (cubeSession == null) {
+          return;
+        }
+        List<Long> sessionTimes = cubeSession.getSessionTimes();
         if (!sessionTimes.isEmpty()) {
           int bestInd = (sessionTimes.size() < 5) ? -1 : cubeSession.getBestTimeInd(sessionTimes.size());
           int worstInd = (sessionTimes.size() < 5) ? -1 : cubeSession.getWorstTimeInd(sessionTimes.size());
@@ -307,7 +334,7 @@ public class TimerActivity extends Activity {
     App.INSTANCE.getService().saveTime(solveTime, new SolveAverageCallback());
     if (cubeSession != null) {
       cubeSession.addTime(time);
-      updateSessionView();
+      refreshSessionFields();
     }
   }
 
@@ -338,21 +365,26 @@ public class TimerActivity extends Activity {
     }
   }
 
+  private void refreshAvgFields() {
+    ((TextView) findViewById(R.id.tvAvgOfFive)).setText(formatAvgField(solveAverages.getAvgOf5()));
+    ((TextView) findViewById(R.id.tvAvgOfTwelve)).setText(formatAvgField(solveAverages.getAvgOf12()));
+    ((TextView) findViewById(R.id.tvAvgOfHundred)).setText(formatAvgField(solveAverages.getAvgOf100()));
+    ((TextView) findViewById(R.id.tvAvgOfLifetime)).setText(formatAvgField(solveAverages.getAvgOfLifetime()));
+    ((TextView) findViewById(R.id.tvBestOfFive)).setText(formatAvgField(solveAverages.getBestOf5()));
+    ((TextView) findViewById(R.id.tvBestOfTwelve)).setText(formatAvgField(solveAverages.getBestOf12()));
+    ((TextView) findViewById(R.id.tvBestOfHundred)).setText(formatAvgField(solveAverages.getBestOf100()));
+    ((TextView) findViewById(R.id.tvBestOfLifetime)).setText(formatAvgField(solveAverages.getBestOfLifetime()));
+  }
+
   private class SolveAverageCallback extends DataCallback<SolveAverages> {
     @Override
     public void onData(final SolveAverages data) {
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
-          ((TextView) findViewById(R.id.tvAvgOfFive)).setText(formatAvgField(data.getAvgOf5()));
-          ((TextView) findViewById(R.id.tvAvgOfTwelve)).setText(formatAvgField(data.getAvgOf12()));
-          ((TextView) findViewById(R.id.tvAvgOfHundred)).setText(formatAvgField(data.getAvgOf100()));
-          ((TextView) findViewById(R.id.tvAvgOfLifetime)).setText(formatAvgField(data.getAvgOfLifetime()));
-          ((TextView) findViewById(R.id.tvBestOfFive)).setText(formatAvgField(data.getBestOf5()));
-          ((TextView) findViewById(R.id.tvBestOfTwelve)).setText(formatAvgField(data.getBestOf12()));
-          ((TextView) findViewById(R.id.tvBestOfHundred)).setText(formatAvgField(data.getBestOf100()));
-          ((TextView) findViewById(R.id.tvBestOfLifetime)).setText(formatAvgField(data.getBestOfLifetime()));
+          solveAverages = data;
           lastSolveTime = data.getSolveTime();
+          refreshAvgFields();
         }
       });
     }
