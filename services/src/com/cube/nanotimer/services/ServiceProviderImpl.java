@@ -149,10 +149,6 @@ public class ServiceProviderImpl implements ServiceProvider {
     return solveAverages;
   }
 
-  public void deleteAllHistory() {
-    db.delete(DB.TABLE_TIMEHISTORY, null, null);
-  }
-
   private void syncBestAveragesWithCurrent(Long avg5, Long avg12, Long avg100) {
     if (isTimeBetter(cachedBestAverages.get(5), avg5) || avg5 == null) {
       cachedBestAverages.put(5, avg5);
@@ -258,6 +254,16 @@ public class ServiceProviderImpl implements ServiceProvider {
       cursor.close();
     }
     return history;
+  }
+
+  @Override
+  public void deleteHistory() {
+    db.delete(DB.TABLE_TIMEHISTORY, null, null);
+  }
+
+  @Override
+  public void deleteHistory(SolveType solveType) {
+    db.delete(DB.TABLE_TIMEHISTORY, DB.COL_TIMEHISTORY_SOLVETYPE_ID + " = ?", new String[] { String.valueOf(solveType.getId()) });
   }
 
   public List<Long> getSessionTimes(SolveType solveType) {

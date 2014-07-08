@@ -73,7 +73,7 @@ public class SolveTypesListDialog extends DialogFragment implements FieldRenamer
             adapter.notifyDataSetChanged();
             listEditor.createNewItem(id, itemName);
           } else {
-            Utils.showInfoMessage(getActivity(), R.string.solveTypeAlreadyExists);
+            Utils.showInfoMessage(getActivity(), R.string.solve_type_already_exists);
           }
         }
       }
@@ -124,7 +124,7 @@ public class SolveTypesListDialog extends DialogFragment implements FieldRenamer
   }
 
   private void deleteItem(final int pos) {
-    Utils.showYesNoConfirmation(getActivity(), getString(R.string.deleteSolveTypeConfirmation, items.get(pos)), new YesNoListener() {
+    Utils.showYesNoConfirmation(getActivity(), getString(R.string.delete_solve_type_confirmation, items.get(pos)), new YesNoListener() {
       @Override
       public void onYes() {
         items.remove(pos);
@@ -147,7 +147,7 @@ public class SolveTypesListDialog extends DialogFragment implements FieldRenamer
           // The name was not changed, do nothing
           return true;
         } else {
-          Utils.showInfoMessage(getActivity(), R.string.solveTypeAlreadyExists);
+          Utils.showInfoMessage(getActivity(), R.string.solve_type_already_exists);
         }
       }
     }

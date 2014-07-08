@@ -41,12 +41,12 @@ public class TestServiceProvider extends AndroidTestCase {
   @Override
   public void tearDown() throws Exception {
     super.tearDown();
-    provider.deleteAllHistory();
+    provider.deleteHistory();
   }
 
   @SmallTest
   public void testBasicAverage() {
-    provider.deleteAllHistory();
+    provider.deleteHistory();
     SolveAverages averages = provider.getSolveAverages(solveType1);
     assertAvgEquals(null, null, null, null, null, null, null, null, averages);
     saveTime(600);
@@ -84,7 +84,7 @@ public class TestServiceProvider extends AndroidTestCase {
 
   @SmallTest
   public void testTimeDeletion() {
-    provider.deleteAllHistory();
+    provider.deleteHistory();
     SolveAverages averages = saveTimes(1000, 4);
     assertAvgEquals(null, null, null, 1000, null, null, null, 1000, averages); // 1000(x4)
     averages = saveTime(1000);
@@ -143,7 +143,7 @@ public class TestServiceProvider extends AndroidTestCase {
 
   @SmallTest
   public void testTimeModification() {
-    provider.deleteAllHistory();
+    provider.deleteHistory();
     SolveAverages averages = saveTimes(1000, 5);
     assertAvgEquals(1000, null, null, 1000, 1000, null, null, 1000, averages); // 1000(x5)
 
@@ -165,7 +165,7 @@ public class TestServiceProvider extends AndroidTestCase {
 
   @SmallTest
   public void testDNF() {
-    provider.deleteAllHistory();
+    provider.deleteHistory();
     SolveAverages averages = saveTimes(1000, 5);
     assertAvgEquals(1000, null, null, 1000, 1000, null, null, 1000, averages); // 1000(x5)
 

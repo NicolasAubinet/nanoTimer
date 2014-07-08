@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -27,6 +29,7 @@ import com.cube.nanotimer.activity.widget.list.SolveTypesListDialog;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.Utils;
+import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.CubeType.Type;
 import com.cube.nanotimer.vo.SolveTime;
@@ -155,6 +158,34 @@ public class MainScreenActivity extends Activity implements TimeChangedHandler {
     } else {
       refreshHistory();
     }
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.mainscreen_menu, menu);
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case R.id.itClearHistory:
+        Utils.showYesNoConfirmation(this, R.string.clear_history_confirmation, new YesNoListener() {
+          @Override
+          public void onYes() {
+            if (curSolveType != null) {
+              App.INSTANCE.getService().deleteHistory(curSolveType, new DataCallback<Void>() {
+                @Override
+                public void onData(Void data) {
+                  refreshHistory();
+                }
+              });
+            }
+          }
+        });
+        break;
+    }
+    return true;
   }
 
   private void retrieveTypes() {

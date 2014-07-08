@@ -17,8 +17,8 @@
   <string name="rename">Rename</string>
   <string name="cancel">Cancel</string>
   <string name="edit">Edit</string>
-  <string name="solveTypeAlreadyExists">A solve type with the same name already exists.</string>
-  <string name="deleteSolveTypeConfirmation">Are you sure you want to delete the solve type \'%1$s\' and all its times?</string>
+  <string name="solve_type_already_exists">A solve type with the same name already exists.</string>
+  <string name="delete_solve_type_confirmation">Are you sure you want to delete the solve type \'%1$s\' and all its times?</string>
 
   <string name="inspection">Inspection</string>
   <string name="last_avg_of">Last avg of</string>
@@ -28,9 +28,12 @@
   <string name="plus_two">+2</string>
   <string name="DNF">DNF</string>
   <string name="delete">Delete</string>
-  <string name="newSession">New session</string>
+  <string name="new_session">New session</string>
   <string name="time">Time:</string>
   <string name="NA">N/A</string>
+
+  <string name="clear_history">Clear history</string>
+  <string name="clear_history_confirmation">Are you sure you want to delete all the times for this solve type?</string>
 
   <string name="session">Session:</string>
   <string name="raOf5">RA of 5:</string>
