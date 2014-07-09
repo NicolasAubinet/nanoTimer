@@ -1,10 +1,10 @@
 package com.cube.nanotimer.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class MainScreenActivity extends Activity implements TimeChangedHandler {
+public class MainScreenActivity extends FragmentActivity implements TimeChangedHandler {
 
   private Button buCubeType;
   private Button buSolveType;
@@ -154,7 +154,7 @@ public class MainScreenActivity extends Activity implements TimeChangedHandler {
   protected void onResume() {
     super.onResume();
     if (cubeTypes == null) {
-      retrieveTypes();
+      refreshCubeTypes();
     } else {
       refreshHistory();
     }
@@ -188,7 +188,7 @@ public class MainScreenActivity extends Activity implements TimeChangedHandler {
     return true;
   }
 
-  private void retrieveTypes() {
+  private void refreshCubeTypes() {
     App.INSTANCE.getService().getCubeTypes(new DataCallback<List<CubeType>>() {
       @Override
       public void onData(List<CubeType> data) {
@@ -201,9 +201,11 @@ public class MainScreenActivity extends Activity implements TimeChangedHandler {
               break;
             }
           }
-          refreshButtonTexts();
-          refreshSolveTypes();
+        } else {
+          curCubeType = null;
         }
+        refreshButtonTexts();
+        refreshSolveTypes();
       }
     });
   }
@@ -227,30 +229,45 @@ public class MainScreenActivity extends Activity implements TimeChangedHandler {
             if (!foundType) {
               curSolveType = solveTypes.get(0);
             }
-            refreshButtonTexts();
-            refreshHistory();
+          } else {
+            curSolveType = null;
           }
+          refreshButtonTexts();
+          refreshHistory();
         }
       });
+    } else {
+      curSolveType = null;
+      refreshButtonTexts();
+      refreshHistory();
     }
   }
 
   private void refreshHistory() {
-    App.INSTANCE.getService().getHistory(curSolveType, new DataCallback<List<SolveTime>>() {
-      @Override
-      public void onData(List<SolveTime> data) {
-        previousLastItem = 0;
-        liHistory.clear();
-        liHistory.addAll(data);
-        runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            adapter.notifyDataSetChanged();
-            lvHistory.setSelection(0);
-          }
-        });
-      }
-    });
+    previousLastItem = 0;
+    liHistory.clear();
+    if (curSolveType != null) {
+      App.INSTANCE.getService().getHistory(curSolveType, new DataCallback<List<SolveTime>>() {
+        @Override
+        public void onData(List<SolveTime> data) {
+          liHistory.addAll(data);
+          runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              adapter.notifyDataSetChanged();
+              lvHistory.setSelection(0);
+            }
+          });
+        }
+      });
+    } else {
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          adapter.notifyDataSetChanged();
+        }
+      });
+    }
   }
 
   private void refreshButtonTexts() {
@@ -259,9 +276,13 @@ public class MainScreenActivity extends Activity implements TimeChangedHandler {
       public void run() {
         if (curCubeType != null) {
           buCubeType.setText(curCubeType.getName());
+        } else {
+          buCubeType.setText("");
         }
         if (curSolveType != null) {
           buSolveType.setText(curSolveType.getName());
+        } else {
+          buSolveType.setText("");
         }
       }
     });

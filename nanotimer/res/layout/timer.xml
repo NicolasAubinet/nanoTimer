@@ -18,26 +18,17 @@
        android:layout_marginTop="8dp"
        android:textSize="24sp"
        android:layout_gravity="center"/>
-    <TextView
-       android:id="@+id/tvInspection"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:textSize="14sp"
-       android:fontFamily="monospace"
-       android:layout_gravity="center"/>
-    <TextView
+    <com.cube.nanotimer.util.MonospacedTextView
        android:id="@+id/tvTimer"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:textSize="50sp"
-       android:fontFamily="monospace"
        android:layout_gravity="center"/>
-    <TextView
+    <com.cube.nanotimer.util.MonospacedTextView
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:layout_marginTop="3dp"
        android:textSize="12sp"
-       android:fontFamily="monospace"
        android:layout_gravity="center"
        android:text="@string/scrambleC"/>
     <com.cube.nanotimer.util.FontFitTextView
@@ -54,7 +45,7 @@
      android:layout_height="wrap_content"
      android:layout_below="@id/topLayout"
      android:orientation="vertical"
-     android:paddingTop="5dp"
+     android:paddingTop="3dp"
      android:layout_margin="8dp">
     <TableLayout
        android:id="@+id/layoutSessionTimes"
@@ -82,38 +73,75 @@
         <TextView style="@style/SessionTimeTextField"/>
       </TableRow>
     </TableLayout>
-    <TableLayout
+    <LinearLayout
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:shrinkColumns="1"
-       android:layout_marginTop="2dp">
-      <TableRow android:layout_marginTop="3dp">
-        <TextView
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:text="@string/raOf5"
-           style="@style/SmallTextField"/>
-        <TextView
-           android:id="@+id/tvRA5"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_marginLeft="10dp"
-           style="@style/SmallTextField"/>
-      </TableRow>
-      <TableRow android:layout_marginTop="3dp">
-        <TextView
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:text="@string/raOf12"
-           style="@style/SmallTextField"/>
-        <TextView
-           android:id="@+id/tvRA12"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_marginLeft="10dp"
-           style="@style/SmallTextField"/>
-      </TableRow>
-    </TableLayout>
+       android:orientation="horizontal">
+      <TableLayout
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="2dp"
+         android:layout_weight="1">
+        <TableRow android:layout_marginTop="3dp">
+          <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="@string/raOf5"
+             style="@style/SmallTextField"/>
+          <TextView
+             android:id="@+id/tvRA5"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_marginLeft="10dp"
+             style="@style/SmallTextField"/>
+        </TableRow>
+        <TableRow android:layout_marginTop="3dp">
+          <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="@string/raOf12"
+             style="@style/SmallTextField"/>
+          <TextView
+             android:id="@+id/tvRA12"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_marginLeft="10dp"
+             style="@style/SmallTextField"/>
+        </TableRow>
+      </TableLayout>
+      <TableLayout
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="2dp"
+         android:layout_weight="1">
+        <TableRow android:layout_marginTop="3dp">
+          <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="@string/lifetime_avg"
+             style="@style/SmallTextField"/>
+          <TextView
+             android:id="@+id/tvLifetimeAvg"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_marginLeft="10dp"
+             style="@style/SmallTextField"/>
+        </TableRow>
+        <TableRow android:layout_marginTop="3dp">
+          <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="@string/lifetime_best"
+             style="@style/SmallTextField"/>
+          <TextView
+             android:id="@+id/tvLifetimeBest"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_marginLeft="10dp"
+             style="@style/SmallTextField"/>
+        </TableRow>
+      </TableLayout>
+    </LinearLayout>
   </LinearLayout>
 
   <LinearLayout
@@ -148,11 +176,6 @@
         <TextView android:text="100" android:textStyle="bold" style="@style/SmallTextField"/>
         <TextView android:id="@+id/tvAvgOfHundred" style="@style/SmallTextField"/>
         <TextView android:id="@+id/tvBestOfHundred" style="@style/SmallTextField"/>
-      </TableRow>
-      <TableRow>
-        <TextView android:text="@string/lifetime" android:textStyle="bold" style="@style/SmallTextField"/>
-        <TextView android:id="@+id/tvAvgOfLifetime" style="@style/SmallTextField"/>
-        <TextView android:id="@+id/tvBestOfLifetime" style="@style/SmallTextField"/>
       </TableRow>
     </TableLayout>
   </LinearLayout>

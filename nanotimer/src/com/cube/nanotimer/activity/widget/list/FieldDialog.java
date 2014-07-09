@@ -2,12 +2,11 @@ package com.cube.nanotimer.activity.widget.list;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import com.cube.nanotimer.R;
 
 public abstract class FieldDialog extends DialogFragment {
@@ -29,6 +28,7 @@ public abstract class FieldDialog extends DialogFragment {
         .setView(editTextView)
         .setPositiveButton(confirmText, new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int whichButton) {
+            onConfirm();
           }
         })
         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -36,18 +36,6 @@ public abstract class FieldDialog extends DialogFragment {
           }
         })
         .create();
-    d.setOnShowListener(new DialogInterface.OnShowListener() {
-      @Override
-      public void onShow(DialogInterface dialog) {
-        Button b = d.getButton(AlertDialog.BUTTON_POSITIVE);
-        b.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View view) {
-            onConfirm();
-          }
-        });
-      }
-    });
     showSoftKeyboard(d);
     return d;
   }

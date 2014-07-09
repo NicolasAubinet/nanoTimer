@@ -4,9 +4,8 @@ import android.content.Context;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.TypedValue;
-import android.widget.TextView;
 
-public class FontFitTextView extends TextView {
+public class FontFitTextView extends MonospacedTextView {
 
   private Paint mTestPaint;
   private float initialTextSize;

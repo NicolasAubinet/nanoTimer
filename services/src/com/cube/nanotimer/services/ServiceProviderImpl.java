@@ -38,6 +38,10 @@ public class ServiceProviderImpl implements ServiceProvider {
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_ID).append(", ").append(DB.COL_CUBETYPE_NAME);
     q.append(" FROM ").append(DB.TABLE_CUBETYPE);
+    q.append(" WHERE 0 < (");
+    q.append("     SELECT COUNT(*) FROM ").append(DB.TABLE_SOLVETYPE);
+    q.append("     WHERE ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_CUBETYPE_ID);
+    q.append("         = ").append(DB.TABLE_CUBETYPE).append(".").append(DB.COL_ID).append(")");
     Cursor cursor = db.rawQuery(q.toString(), null);
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {

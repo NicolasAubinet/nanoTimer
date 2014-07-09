@@ -2,9 +2,9 @@ package com.cube.nanotimer.activity.widget.list;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
@@ -66,7 +66,7 @@ public class SolveTypesListDialog extends DialogFragment implements FieldRenamer
       @Override
       public void onClick(View v) {
         String itemName = tfName.getText().toString();
-        if (!itemName.trim().isEmpty()) {
+        if (!"".equals(itemName.trim())) {
           if (!items.contains(itemName)) {
             tfName.setText("");
             items.add(itemName);
@@ -136,7 +136,7 @@ public class SolveTypesListDialog extends DialogFragment implements FieldRenamer
 
   @Override
   public boolean renameField(int index, String newName) {
-    if (!newName.isEmpty()) {
+    if (!"".equals(newName)) {
       if (!items.contains(newName)) {
         items.set(index, newName);
         adapter.notifyDataSetChanged();

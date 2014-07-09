@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
    package="com.cube.nanotimer">
   <uses-sdk
-     android:minSdkVersion="11"
+     android:minSdkVersion="5"
      android:targetSdkVersion="16"/>
 
   <application

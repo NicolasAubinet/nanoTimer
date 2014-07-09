@@ -37,7 +37,6 @@ public class TimerActivity extends Activity {
   enum TimerState { STOPPED, STARTED }
 
   private TextView tvTimer;
-  private TextView tvInspection;
   private TextView tvScramble;
   private TextView tvCubeType;
   private TextView tvRA5;
@@ -89,7 +88,6 @@ public class TimerActivity extends Activity {
 
   private void initViews() {
     tvTimer = (TextView) findViewById(R.id.tvTimer);
-    tvInspection = (TextView) findViewById(R.id.tvInspection);
     tvScramble = (TextView) findViewById(R.id.tvScramble);
     tvCubeType = (TextView) findViewById(R.id.tvCubeType);
     tvRA5 = (TextView) findViewById(R.id.tvRA5);
@@ -291,7 +289,7 @@ public class TimerActivity extends Activity {
   private void startInspectionTimer() {
     timerStartTs = System.currentTimeMillis();
     layout.setBackgroundColor(getResources().getColor(R.color.nightblue));
-    tvInspection.setText(getString(R.string.inspection) + ":");
+    tvCubeType.setText(getString(R.string.inspection));
     timer = new Timer();
     TimerTask timerTask = new TimerTask() {
       public void run() {
@@ -311,7 +309,7 @@ public class TimerActivity extends Activity {
       timer.purge();
     }
     layout.setBackgroundColor(getResources().getColor(R.color.black));
-    tvInspection.setText("");
+    setCubeTypeText();
   }
 
   private void resetTimer() {
@@ -369,11 +367,13 @@ public class TimerActivity extends Activity {
     ((TextView) findViewById(R.id.tvAvgOfFive)).setText(formatAvgField(solveAverages.getAvgOf5()));
     ((TextView) findViewById(R.id.tvAvgOfTwelve)).setText(formatAvgField(solveAverages.getAvgOf12()));
     ((TextView) findViewById(R.id.tvAvgOfHundred)).setText(formatAvgField(solveAverages.getAvgOf100()));
-    ((TextView) findViewById(R.id.tvAvgOfLifetime)).setText(formatAvgField(solveAverages.getAvgOfLifetime()));
     ((TextView) findViewById(R.id.tvBestOfFive)).setText(formatAvgField(solveAverages.getBestOf5()));
     ((TextView) findViewById(R.id.tvBestOfTwelve)).setText(formatAvgField(solveAverages.getBestOf12()));
     ((TextView) findViewById(R.id.tvBestOfHundred)).setText(formatAvgField(solveAverages.getBestOf100()));
-    ((TextView) findViewById(R.id.tvBestOfLifetime)).setText(formatAvgField(solveAverages.getBestOfLifetime()));
+    ((TextView) findViewById(R.id.tvLifetimeAvg)).setText(FormatterService.INSTANCE.formatSolveTime(
+        solveAverages.getAvgOfLifetime(), getString(R.string.NA)));
+    ((TextView) findViewById(R.id.tvLifetimeBest)).setText(FormatterService.INSTANCE.formatSolveTime(
+        solveAverages.getBestOfLifetime(), getString(R.string.NA)));
   }
 
   private class SolveAverageCallback extends DataCallback<SolveAverages> {

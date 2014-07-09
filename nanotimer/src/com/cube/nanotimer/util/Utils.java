@@ -1,18 +1,18 @@
 package com.cube.nanotimer.util;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.media.MediaPlayer;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
 import com.cube.nanotimer.App;
 
 public class Utils {
 
-  public static void showFragment(Activity a, DialogFragment df) {
-    df.show(a.getFragmentManager(), "dialog");
+  public static void showFragment(FragmentActivity a, DialogFragment df) {
+    df.show(a.getSupportFragmentManager(), "dialog");
   }
 
   public static String parseFloatToString(Float f) {
