@@ -2,6 +2,7 @@ package com.cube.nanotimer.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -66,6 +67,10 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
     App.INSTANCE.setContext(this);
     setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
+    initViews();
+  }
+
+  private void initViews() {
     buCubeType = (Button) findViewById(R.id.buCubeType);
     buCubeType.setOnClickListener(new OnClickListener() {
       @Override
@@ -186,6 +191,19 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
         break;
     }
     return true;
+  }
+
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    String cubeTypeText = buCubeType.getText().toString();
+    String solveTypeText = buSolveType.getText().toString();
+
+    setContentView(R.layout.mainscreen);
+    initViews();
+
+    buCubeType.setText(cubeTypeText);
+    buSolveType.setText(solveTypeText);
   }
 
   private void refreshCubeTypes() {

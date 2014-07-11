@@ -1,189 +1,196 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   android:id="@+id/layoutTimer"
-   android:layout_width="match_parent"
+<com.cube.nanotimer.util.view.ScalingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
    android:layout_height="match_parent"
-   android:orientation="horizontal"
-   android:keepScreenOn="true">
+   android:layout_width="match_parent">
 
-  <LinearLayout
-     android:id="@+id/topLayout"
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     android:id="@+id/layoutTimer"
      android:layout_width="match_parent"
      android:layout_height="match_parent"
-     android:orientation="vertical"
-     android:layout_weight="6">
-    <TextView
-       android:id="@+id/tvCubeType"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_marginTop="8dp"
-       android:textSize="24sp"
-       android:layout_gravity="center"/>
-    <com.cube.nanotimer.util.MonospacedTextView
-       android:id="@+id/tvTimer"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:textSize="50sp"
-       android:layout_gravity="center"/>
-    <TextView
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_marginTop="3dp"
-       android:textSize="12sp"
-       android:layout_gravity="center"
-       android:text="@string/scrambleC"/>
-    <com.cube.nanotimer.util.FontFitTextView
-       android:id="@+id/tvScramble"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:layout_marginTop="5dp"
-       style="@style/ScrambleTextField"/>
-  </LinearLayout>
+     android:orientation="horizontal"
+     android:keepScreenOn="true">
 
-  <RelativeLayout
-     android:layout_width="wrap_content"
-     android:layout_height="match_parent"
-     android:layout_weight="5">
     <LinearLayout
-       android:id="@+id/sessionLayout"
+       android:id="@+id/topLayout"
        android:layout_width="match_parent"
-       android:layout_height="wrap_content"
+       android:layout_height="match_parent"
        android:orientation="vertical"
-       android:paddingTop="5dp"
-       android:layout_margin="8dp">
-      <TableLayout
-         android:id="@+id/layoutSessionTimes"
+       android:layout_weight="7">
+      <TextView
+         android:id="@+id/tvCubeType"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="12px"
+         android:textSize="36px"
+         android:layout_gravity="center"
+         android:gravity="center"/>
+      <com.cube.nanotimer.util.view.MonospacedTextView
+         android:id="@+id/tvTimer"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:textSize="75px"
+         android:layout_gravity="center"/>
+      <com.cube.nanotimer.util.view.MonospacedTextView
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="5px"
+         android:textSize="18px"
+         android:layout_gravity="center"
+         android:text="@string/scrambleC"/>
+      <com.cube.nanotimer.util.view.FontFitTextView
+         android:id="@+id/tvScramble"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:background="@color/neon"
-         android:shrinkColumns="*"
-         android:stretchColumns="*">
-        <TableRow>
-          <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
-          <TextView style="@style/SessionTimeTextField"/>
-          <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
-          <TextView style="@style/SessionTimeTextField"/>
-        </TableRow>
-        <TableRow>
-          <TextView style="@style/SessionTimeTextField"/>
-          <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
-          <TextView style="@style/SessionTimeTextField"/>
-          <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
-        </TableRow>
-        <TableRow>
-          <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
-          <TextView style="@style/SessionTimeTextField"/>
-          <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
-          <TextView style="@style/SessionTimeTextField"/>
-        </TableRow>
-      </TableLayout>
+         android:layout_marginTop="8px"
+         style="@style/ScrambleTextField"/>
+    </LinearLayout>
+
+    <RelativeLayout
+       android:layout_width="wrap_content"
+       android:layout_height="match_parent"
+       android:layout_weight="5">
       <LinearLayout
+         android:id="@+id/sessionLayout"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:orientation="horizontal">
+         android:orientation="vertical"
+         android:paddingTop="8px"
+         android:layout_margin="12px">
         <TableLayout
+           android:id="@+id/layoutSessionTimes"
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
-           android:layout_marginTop="2dp"
-           android:layout_weight="1">
-          <TableRow android:layout_marginTop="3dp">
-            <TextView
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:text="@string/raOf5"
-               style="@style/SmallTextField"/>
-            <TextView
-               android:id="@+id/tvRA5"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_marginLeft="10dp"
-               style="@style/SmallTextField"/>
+           android:background="@color/neon"
+           android:shrinkColumns="*"
+           android:stretchColumns="*">
+          <TableRow>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
+            <TextView style="@style/SessionTimeTextField"/>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
+            <TextView style="@style/SessionTimeTextField"/>
           </TableRow>
-          <TableRow android:layout_marginTop="3dp">
-            <TextView
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:text="@string/raOf12"
-               style="@style/SmallTextField"/>
-            <TextView
-               android:id="@+id/tvRA12"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_marginLeft="10dp"
-               style="@style/SmallTextField"/>
+          <TableRow>
+            <TextView style="@style/SessionTimeTextField"/>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
+            <TextView style="@style/SessionTimeTextField"/>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
+          </TableRow>
+          <TableRow>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
+            <TextView style="@style/SessionTimeTextField"/>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
+            <TextView style="@style/SessionTimeTextField"/>
           </TableRow>
         </TableLayout>
-        <TableLayout
+        <LinearLayout
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
-           android:layout_marginTop="2dp"
-           android:layout_weight="1">
-          <TableRow android:layout_marginTop="3dp">
-            <TextView
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:text="@string/lifetime_avg"
-               style="@style/SmallTextField"/>
-            <TextView
-               android:id="@+id/tvLifetimeAvg"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_marginLeft="10dp"
-               style="@style/SmallTextField"/>
+           android:orientation="horizontal">
+          <TableLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginTop="3px"
+             android:layout_weight="1">
+            <TableRow android:layout_marginTop="5px">
+              <TextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="@string/raOf5"
+                 style="@style/SmallTextField"/>
+              <TextView
+                 android:id="@+id/tvRA5"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_marginLeft="8px"
+                 style="@style/SmallTextField"/>
+            </TableRow>
+            <TableRow android:layout_marginTop="5px">
+              <TextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="@string/raOf12"
+                 style="@style/SmallTextField"/>
+              <TextView
+                 android:id="@+id/tvRA12"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_marginLeft="8px"
+                 style="@style/SmallTextField"/>
+            </TableRow>
+          </TableLayout>
+          <TableLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginTop="3px"
+             android:layout_weight="1">
+            <TableRow android:layout_marginTop="5px">
+              <TextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="@string/lifetime_avg"
+                 style="@style/SmallTextField"/>
+              <TextView
+                 android:id="@+id/tvLifetimeAvg"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_marginLeft="8px"
+                 style="@style/SmallTextField"/>
+            </TableRow>
+            <TableRow android:layout_marginTop="5px">
+              <TextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="@string/lifetime_best"
+                 style="@style/SmallTextField"/>
+              <TextView
+                 android:id="@+id/tvLifetimeBest"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_marginLeft="8px"
+                 style="@style/SmallTextField"/>
+            </TableRow>
+          </TableLayout>
+        </LinearLayout>
+      </LinearLayout>
+
+      <LinearLayout
+         android:id="@+id/bottomLayout"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:orientation="horizontal"
+         android:layout_alignParentBottom="true"
+         android:gravity="bottom"
+         android:layout_margin="15px">
+        <TableLayout
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:shrinkColumns="*"
+           android:stretchColumns="*">
+          <TableRow>
+            <TextView android:text="" style="@style/SmallTextField"/>
+            <TextView android:text="@string/last_avg_of" android:textStyle="bold" style="@style/SmallTextField"/>
+            <TextView android:text="@string/best_avg_of" android:textStyle="bold" style="@style/SmallTextField"/>
           </TableRow>
-          <TableRow android:layout_marginTop="3dp">
-            <TextView
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:text="@string/lifetime_best"
-               style="@style/SmallTextField"/>
-            <TextView
-               android:id="@+id/tvLifetimeBest"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_marginLeft="10dp"
-               style="@style/SmallTextField"/>
+          <TableRow>
+            <TextView android:text="5" android:textStyle="bold" style="@style/SmallTextField"/>
+            <TextView android:id="@+id/tvAvgOfFive" style="@style/SmallTextField"/>
+            <TextView android:id="@+id/tvBestOfFive" style="@style/SmallTextField"/>
+          </TableRow>
+          <TableRow>
+            <TextView android:text="12" android:textStyle="bold" style="@style/SmallTextField"/>
+            <TextView android:id="@+id/tvAvgOfTwelve" style="@style/SmallTextField"/>
+            <TextView android:id="@+id/tvBestOfTwelve" style="@style/SmallTextField"/>
+          </TableRow>
+          <TableRow>
+            <TextView android:text="100" android:textStyle="bold" style="@style/SmallTextField"/>
+            <TextView android:id="@+id/tvAvgOfHundred" style="@style/SmallTextField"/>
+            <TextView android:id="@+id/tvBestOfHundred" style="@style/SmallTextField"/>
           </TableRow>
         </TableLayout>
       </LinearLayout>
-    </LinearLayout>
+    </RelativeLayout>
 
-    <LinearLayout
-       android:id="@+id/bottomLayout"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:orientation="horizontal"
-       android:layout_alignParentBottom="true"
-       android:gravity="bottom"
-       android:layout_margin="10dp">
-      <TableLayout
-         android:layout_width="match_parent"
-         android:layout_height="match_parent"
-         android:shrinkColumns="*"
-         android:stretchColumns="*">
-        <TableRow>
-          <TextView android:text="" style="@style/SmallTextField"/>
-          <TextView android:text="@string/last_avg_of" android:textStyle="bold" style="@style/SmallTextField"/>
-          <TextView android:text="@string/best_avg_of" android:textStyle="bold" style="@style/SmallTextField"/>
-        </TableRow>
-        <TableRow>
-          <TextView android:text="5" android:textStyle="bold" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvAvgOfFive" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvBestOfFive" style="@style/SmallTextField"/>
-        </TableRow>
-        <TableRow>
-          <TextView android:text="12" android:textStyle="bold" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvAvgOfTwelve" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvBestOfTwelve" style="@style/SmallTextField"/>
-        </TableRow>
-        <TableRow>
-          <TextView android:text="100" android:textStyle="bold" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvAvgOfHundred" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvBestOfHundred" style="@style/SmallTextField"/>
-        </TableRow>
-      </TableLayout>
-    </LinearLayout>
-  </RelativeLayout>
+  </LinearLayout>
 
-</LinearLayout>
+</com.cube.nanotimer.util.view.ScalingLinearLayout>

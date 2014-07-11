@@ -1,4 +1,4 @@
-package com.cube.nanotimer.util;
+package com.cube.nanotimer.util.view;
 
 import android.content.Context;
 import android.graphics.Paint;

@@ -4,14 +4,14 @@
    android:orientation="vertical"
    android:layout_width="match_parent"
    android:layout_height="match_parent"
-   android:minWidth="300dp">
+   android:minWidth="450px">
 
   <LinearLayout
      android:orientation="horizontal"
      android:layout_width="match_parent"
-     android:layout_height="60dp"
+     android:layout_height="90px"
      android:gravity="center"
-     android:padding="5dp">
+     android:padding="8px">
     <TextView
        android:id="@+id/tvPlusTwo"
        android:text="@string/plus_two"
@@ -30,8 +30,8 @@
      android:orientation="horizontal"
      android:layout_width="wrap_content"
      android:layout_height="wrap_content"
-     android:layout_marginTop="5dp"
-     android:padding="5dp">
+     android:layout_marginTop="8px"
+     android:padding="8px">
     <TextView
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
@@ -41,17 +41,17 @@
        android:id="@+id/tvTime"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_marginLeft="10dp"
+       android:layout_marginLeft="15px"
        style="@style/SimpleTextField"/>
   </LinearLayout>
 
-  <com.cube.nanotimer.util.FontFitTextView
+  <com.cube.nanotimer.util.view.FontFitTextView
      android:id="@+id/tvScramble"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
-     android:layout_marginTop="5dp"
-     android:layout_marginBottom="5dp"
-     android:padding="2dp"
+     android:layout_marginTop="8px"
+     android:layout_marginBottom="8px"
+     android:padding="3px"
      style="@style/ScrambleTextField"/>
 
 </LinearLayout>

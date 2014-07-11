@@ -7,7 +7,7 @@
   <RelativeLayout
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
-     android:padding="8px">
+     android:padding="5px">
 
     <TableLayout
        android:id="@+id/layoutTypes"
@@ -20,21 +20,27 @@
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:text="@string/cube_type"
+           android:textSize="20px"
            style="@style/SimpleTextField"/>
         <Button
            android:id="@+id/buCubeType"
            android:layout_marginLeft="15px"
+           android:layout_height="35px"
+           android:textSize="16px"
            style="@style/CustomButton"/>
       </TableRow>
-      <TableRow android:layout_marginTop="8px">
+      <TableRow android:layout_marginTop="4px">
         <TextView
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:text="@string/solve_type"
+           android:textSize="20px"
            style="@style/SimpleTextField"/>
         <Button
            android:id="@+id/buSolveType"
            android:layout_marginLeft="15px"
+           android:layout_height="35px"
+           android:textSize="16px"
            style="@style/CustomButton"/>
       </TableRow>
     </TableLayout>
@@ -44,8 +50,8 @@
        android:layout_width="match_parent"
        android:layout_height="match_parent"
        android:orientation="vertical"
-       android:layout_marginTop="8px"
-       android:layout_marginBottom="8px"
+       android:layout_marginTop="5px"
+       android:layout_marginBottom="5px"
        android:padding="12px"
        android:background="@drawable/layout_border"
        android:layout_below="@id/layoutTypes"
@@ -55,6 +61,7 @@
          android:layout_height="wrap_content"
          android:text="@string/history"
          android:layout_marginBottom="15px"
+         android:textSize="20px"
          style="@style/SimpleTextField"/>
       <ListView
          android:id="@+id/lvHistory"
@@ -67,6 +74,8 @@
        android:id="@+id/buStart"
        android:text="@string/start"
        android:layout_alignParentBottom="true"
+       android:layout_height="35px"
+       android:textSize="16px"
        style="@style/CustomButton"/>
 
   </RelativeLayout>

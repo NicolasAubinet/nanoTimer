@@ -3,8 +3,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingRight="5dp"
-    android:paddingLeft="5dp">
+    android:paddingRight="8px"
+    android:paddingLeft="8px">
 
   <RelativeLayout android:id="@+id/addLayout"
       android:layout_width="match_parent"
@@ -19,7 +19,7 @@
 
     <Button
         android:id="@id/btnAdd"
-        android:layout_width="60dp"
+        android:layout_width="90px"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:text="@string/add"/>

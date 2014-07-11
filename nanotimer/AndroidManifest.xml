@@ -3,7 +3,7 @@
    package="com.cube.nanotimer">
   <uses-sdk
      android:minSdkVersion="5"
-     android:targetSdkVersion="16"/>
+     android:targetSdkVersion="11"/>
 
   <application
      android:icon="@drawable/icon"
