@@ -60,7 +60,7 @@
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:text="@string/history"
-         android:layout_marginBottom="15px"
+         android:layout_marginBottom="3px"
          android:textSize="20px"
          style="@style/SimpleTextField"/>
       <ListView

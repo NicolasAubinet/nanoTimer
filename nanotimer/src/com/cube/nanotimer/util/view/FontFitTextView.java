@@ -9,6 +9,7 @@ public class FontFitTextView extends MonospacedTextView {
 
   private Paint mTestPaint;
   private float initialTextSize;
+  private int textSizeUnit = TypedValue.COMPLEX_UNIT_PX;
 
   private int previousWidth;
 
@@ -61,19 +62,7 @@ public class FontFitTextView extends MonospacedTextView {
       }
     }
     // Use lo so that we undershoot rather than overshoot
-    setTextSize(TypedValue.COMPLEX_UNIT_PX, lo);
-  }
-
-  @Override
-  protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
-    int height = getMeasuredHeight();
-    if (parentWidth != previousWidth) {
-      refitText(getText().toString(), parentWidth);
-      previousWidth = parentWidth;
-    }
-    this.setMeasuredDimension(parentWidth, height);
+    super.setTextSize(textSizeUnit, lo);
   }
 
   @Override
@@ -92,6 +81,13 @@ public class FontFitTextView extends MonospacedTextView {
   public void setTextSize(float size) {
     initialTextSize = size;
     super.setTextSize(size);
+  }
+
+  @Override
+  public void setTextSize(int unit, float size) {
+    initialTextSize = size;
+    textSizeUnit = unit;
+    super.setTextSize(unit, size);
   }
 
 }

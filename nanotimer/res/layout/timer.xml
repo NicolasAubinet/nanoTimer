@@ -173,40 +173,36 @@
       </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
+    <TableLayout
        android:id="@+id/bottomLayout"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:orientation="horizontal"
        android:layout_alignParentBottom="true"
-       android:gravity="bottom">
-      <TableLayout
-         android:layout_width="match_parent"
-         android:layout_height="match_parent"
-         android:shrinkColumns="*"
-         android:stretchColumns="*">
-        <TableRow>
-          <TextView android:text="" style="@style/SmallTextField"/>
-          <TextView android:text="@string/last_avg_of" android:textStyle="bold" style="@style/SmallTextField"/>
-          <TextView android:text="@string/best_avg_of" android:textStyle="bold" style="@style/SmallTextField"/>
-        </TableRow>
-        <TableRow>
-          <TextView android:text="5" android:textStyle="bold" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvAvgOfFive" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvBestOfFive" style="@style/SmallTextField"/>
-        </TableRow>
-        <TableRow>
-          <TextView android:text="12" android:textStyle="bold" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvAvgOfTwelve" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvBestOfTwelve" style="@style/SmallTextField"/>
-        </TableRow>
-        <TableRow>
-          <TextView android:text="100" android:textStyle="bold" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvAvgOfHundred" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvBestOfHundred" style="@style/SmallTextField"/>
-        </TableRow>
-      </TableLayout>
-    </LinearLayout>
+       android:gravity="bottom"
+       android:layout_margin="2px"
+       android:shrinkColumns="*"
+       android:stretchColumns="*">
+      <TableRow>
+        <TextView android:text="" style="@style/SmallTextField"/>
+        <TextView android:text="@string/last_avg_of" android:textStyle="bold" style="@style/SmallTextField"/>
+        <TextView android:text="@string/best_avg_of" android:textStyle="bold" style="@style/SmallTextField"/>
+      </TableRow>
+      <TableRow>
+        <TextView android:text="5" android:textStyle="bold" style="@style/SmallTextField"/>
+        <TextView android:id="@+id/tvAvgOfFive" style="@style/SmallTextField"/>
+        <TextView android:id="@+id/tvBestOfFive" style="@style/SmallTextField"/>
+      </TableRow>
+      <TableRow>
+        <TextView android:text="12" android:textStyle="bold" style="@style/SmallTextField"/>
+        <TextView android:id="@+id/tvAvgOfTwelve" style="@style/SmallTextField"/>
+        <TextView android:id="@+id/tvBestOfTwelve" style="@style/SmallTextField"/>
+      </TableRow>
+      <TableRow>
+        <TextView android:text="100" android:textStyle="bold" style="@style/SmallTextField"/>
+        <TextView android:id="@+id/tvAvgOfHundred" style="@style/SmallTextField"/>
+        <TextView android:id="@+id/tvBestOfHundred" style="@style/SmallTextField"/>
+      </TableRow>
+    </TableLayout>
 
   </RelativeLayout>
 

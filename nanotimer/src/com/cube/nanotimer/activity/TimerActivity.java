@@ -1,6 +1,7 @@
 package com.cube.nanotimer.activity;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -34,7 +35,7 @@ import java.util.TimerTask;
 
 public class TimerActivity extends Activity {
 
-  enum TimerState { STOPPED, STARTED }
+  enum TimerState { STOPPED, RUNNING, INSPECTING }
 
   private TextView tvTimer;
   private TextView tvScramble;
@@ -50,6 +51,7 @@ public class TimerActivity extends Activity {
   private SolveTime lastSolveTime;
   private CubeSession cubeSession;
   private SolveAverages solveAverages;
+  private int currentOrientation;
 
   private final long REFRESH_INTERVAL = 25;
   private final int INSPECTION_LIMIT = 15;
@@ -98,16 +100,14 @@ public class TimerActivity extends Activity {
     layout.setOnTouchListener(new OnTouchListener() {
       @Override
       public boolean onTouch(View view, MotionEvent motionEvent) {
-        if (timerState == TimerState.STARTED) {
+        if (timerState == TimerState.RUNNING) {
           stopTimer(true);
           return false;
-        } else if (timerState == TimerState.STOPPED) {
-          if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-            startInspectionTimer();
-          } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-            stopInspectionTimer();
-            startTimer();
-          }
+        } else if (timerState == TimerState.STOPPED && motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+          startInspectionTimer();
+        } else if (timerState == TimerState.INSPECTING && motionEvent.getAction() == MotionEvent.ACTION_UP) {
+          stopInspectionTimer();
+          startTimer();
         }
         return true;
       }
@@ -125,10 +125,17 @@ public class TimerActivity extends Activity {
 
   @Override
   public void onBackPressed() {
-    if (timerState == TimerState.STARTED) {
+    if (timerState == TimerState.RUNNING) {
       stopTimer(false);
       resetTimer();
+    } else if (timerState == TimerState.INSPECTING) {
+      stopInspectionTimer();
+      resetTimer();
     } else {
+      if (timer != null) {
+        timer.cancel();
+        timer.purge();
+      }
       super.onBackPressed();
     }
   }
@@ -182,18 +189,23 @@ public class TimerActivity extends Activity {
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
-    String timerText = tvTimer.getText().toString();
-    SpannedString scrambleText = (SpannedString) tvScramble.getText();
-    String cubeTypeText = tvCubeType.getText().toString();
+    if (newConfig.orientation != currentOrientation) {
+      currentOrientation = newConfig.orientation;
+      String timerText = tvTimer.getText().toString();
+      SpannedString scrambleText = (SpannedString) tvScramble.getText();
+      String cubeTypeText = tvCubeType.getText().toString();
 
-    setContentView(R.layout.timer);
-    initViews();
+      setContentView(R.layout.timer);
+      initViews();
 
-    tvTimer.setText(timerText);
-    tvScramble.setText(scrambleText);
-    tvCubeType.setText(cubeTypeText);
-    refreshSessionFields();
-    refreshAvgFields();
+      if (timerState == TimerState.STOPPED) {
+        tvTimer.setText(timerText);
+      }
+      tvScramble.setText(scrambleText);
+      tvCubeType.setText(cubeTypeText);
+      refreshSessionFields();
+      refreshAvgFields();
+    }
   }
 
   private void refreshSessionFields() {
@@ -260,7 +272,7 @@ public class TimerActivity extends Activity {
         timerHandler.post(new Runnable() {
           public void run() {
             synchronized (timerSync) {
-              if (timerState == TimerState.STARTED) {
+              if (timerState == TimerState.RUNNING) {
                 updateTimerText(System.currentTimeMillis() - timerStartTs);
               }
             }
@@ -269,7 +281,7 @@ public class TimerActivity extends Activity {
       }
     };
     timer.schedule(timerTask, 1, REFRESH_INTERVAL);
-    timerState = TimerState.STARTED;
+    timerState = TimerState.RUNNING;
   }
 
   private void stopTimer(boolean save) {
@@ -290,6 +302,8 @@ public class TimerActivity extends Activity {
 
   private void startInspectionTimer() {
     timerStartTs = System.currentTimeMillis();
+    enableScreenRotation(false);
+    timerState = TimerState.INSPECTING;
     layout.setBackgroundColor(getResources().getColor(R.color.nightblue));
     tvCubeType.setText(getString(R.string.inspection));
     timer = new Timer();
@@ -312,11 +326,13 @@ public class TimerActivity extends Activity {
     }
     layout.setBackgroundColor(getResources().getColor(R.color.black));
     setCubeTypeText();
+    timerState = TimerState.STOPPED;
+    enableScreenRotation(true);
   }
 
   private void resetTimer() {
     synchronized (timerSync) {
-      if (timerState == TimerState.STARTED && timer != null) {
+      if (timer != null) {
         timer.cancel();
         timer.purge();
       }
@@ -348,7 +364,7 @@ public class TimerActivity extends Activity {
 
   private synchronized void updateInspectionTimerText() {
     long curTime = System.currentTimeMillis() - timerStartTs;
-    int seconds = (int) (curTime / 1000) % 60;
+    int seconds = (int) (curTime / 1000);
     tvTimer.setText(String.valueOf(seconds));
     if (seconds >= INSPECTION_LIMIT - 3 && seconds <= INSPECTION_LIMIT) {
       Utils.playSound(R.raw.beep);
@@ -362,6 +378,14 @@ public class TimerActivity extends Activity {
     if (cubeType != null) {
       currentScramble = ScramblerFactory.getScrambler(cubeType).getNewScramble();
       tvScramble.setText(FormatterService.INSTANCE.formatToColoredScramble(currentScramble, cubeType));
+    }
+  }
+
+  private void enableScreenRotation(boolean enable) {
+    if (enable) {
+      setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+    } else {
+      setRequestedOrientation(currentOrientation);
     }
   }
 

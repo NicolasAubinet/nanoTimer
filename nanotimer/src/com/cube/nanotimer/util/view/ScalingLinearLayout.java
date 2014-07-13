@@ -15,40 +15,48 @@ public class ScalingLinearLayout extends LinearLayout {
   private static final int LAYOUT_WIDTH = 480;
   private static final int LAYOUT_HEIGHT = 762;
 
+  private Integer screenWidth;
+  private Integer screenHeight;
   private int previousWidth;
   private int previousHeight;
 
-	public ScalingLinearLayout(Context context) {
-		super(context);
-	}
+  public ScalingLinearLayout(Context context) {
+    super(context);
+  }
 
-	public ScalingLinearLayout(Context context, AttributeSet attributes) {
-		super(context, attributes);
-	}
+  public ScalingLinearLayout(Context context, AttributeSet attributes) {
+    super(context, attributes);
+  }
 
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    refreshScreenScale();
     super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
-    int width = windowManager.getDefaultDisplay().getWidth();
-    int height = windowManager.getDefaultDisplay().getHeight();
+  }
 
-    if (width != previousWidth || height != previousHeight) {
+  private void refreshScreenScale() {
+    if (screenWidth == null || screenHeight == null) {
+      WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+      screenWidth = windowManager.getDefaultDisplay().getWidth();
+      screenHeight = windowManager.getDefaultDisplay().getHeight();
+    }
+
+    if (screenWidth != previousWidth || screenHeight != previousHeight) {
       float xScale;
       float yScale;
       int orientation = getResources().getConfiguration().orientation;
       if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-        xScale = (float) width / LAYOUT_WIDTH;
-        yScale = (float) height / LAYOUT_HEIGHT;
+        xScale = (float) screenWidth / LAYOUT_WIDTH;
+        yScale = (float) screenHeight / LAYOUT_HEIGHT;
       } else {
-        xScale = (float) width / LAYOUT_HEIGHT;
-        yScale = (float) height / LAYOUT_WIDTH;
+        xScale = (float) screenWidth / LAYOUT_HEIGHT;
+        yScale = (float) screenHeight / LAYOUT_WIDTH;
       }
       float scale = Math.min(xScale, yScale);
       scaleViewAndChildren(this, scale, 0);
 
-      previousWidth = width;
-      previousHeight = height;
+      previousWidth = screenWidth;
+      previousHeight = screenHeight;
     }
   }
 
