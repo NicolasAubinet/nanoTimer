@@ -24,7 +24,8 @@
         <Button
            android:id="@+id/buCubeType"
            android:layout_marginLeft="15px"
-           style="@style/CustomButton"/>
+           android:layout_weight="1"
+           style="@style/CustomButton"/> <!-- weight to avoid going off-screen -->
       </TableRow>
       <TableRow android:layout_marginTop="8px">
         <TextView
@@ -35,7 +36,8 @@
         <Button
            android:id="@+id/buSolveType"
            android:layout_marginLeft="15px"
-           style="@style/CustomButton"/>
+           style="@style/CustomButton"
+           android:layout_weight="1"/>
       </TableRow>
     </TableLayout>
 

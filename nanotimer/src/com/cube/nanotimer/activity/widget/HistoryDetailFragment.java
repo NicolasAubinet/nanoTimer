@@ -54,6 +54,7 @@ public class HistoryDetailFragment extends DialogFragment {
     tvTime.setText(FormatterService.INSTANCE.formatSolveTime(solveTime.getTime()));
 
     final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(v).create();
+    dialog.setCanceledOnTouchOutside(true);
 
     tvPlusTwo.setOnClickListener(new OnClickListener() {
       @Override

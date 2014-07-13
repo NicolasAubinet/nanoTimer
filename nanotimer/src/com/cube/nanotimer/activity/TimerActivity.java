@@ -141,10 +141,10 @@ public class TimerActivity extends Activity {
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    if (lastSolveTime != null && timerState == TimerState.STOPPED) {
+    if (timerState == TimerState.STOPPED) {
       switch (item.getItemId()) {
         case R.id.itPlusTwo:
-          if (lastSolveTime.getTime() > 0 && !lastSolveTime.isPlusTwo()) {
+          if (lastSolveTime != null && lastSolveTime.getTime() > 0 && !lastSolveTime.isPlusTwo()) {
             lastSolveTime.plusTwo();
             App.INSTANCE.getService().saveTime(lastSolveTime, new SolveAverageCallback());
             tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(lastSolveTime.getTime()));
@@ -153,7 +153,7 @@ public class TimerActivity extends Activity {
           }
           break;
         case R.id.itDNF:
-          if (lastSolveTime.getTime() > 0) {
+          if (lastSolveTime != null && lastSolveTime.getTime() > 0) {
             lastSolveTime.setTime(-1);
             App.INSTANCE.getService().saveTime(lastSolveTime, new SolveAverageCallback());
             tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(lastSolveTime.getTime()));
@@ -162,10 +162,12 @@ public class TimerActivity extends Activity {
           }
           break;
         case R.id.itDelete:
-          App.INSTANCE.getService().removeTime(lastSolveTime, new SolveAverageCallback());
-          cubeSession.deleteLast();
-          refreshSessionFields();
-          resetTimer();
+          if (lastSolveTime != null) {
+            App.INSTANCE.getService().removeTime(lastSolveTime, new SolveAverageCallback());
+            cubeSession.deleteLast();
+            refreshSessionFields();
+            resetTimer();
+          }
           break;
         case R.id.itNewSession:
           App.INSTANCE.getService().startNewSession(solveType, System.currentTimeMillis(), null);
@@ -348,11 +350,11 @@ public class TimerActivity extends Activity {
     long curTime = System.currentTimeMillis() - timerStartTs;
     int seconds = (int) (curTime / 1000) % 60;
     tvTimer.setText(String.valueOf(seconds));
-    if (seconds == INSPECTION_LIMIT) {
-      Utils.playSound(R.raw.beep2);
-      layout.setBackgroundColor(getResources().getColor(R.color.darkred));
-    } else if (seconds >= INSPECTION_LIMIT - 3 && seconds < INSPECTION_LIMIT) {
-      Utils.playSound(R.raw.beep1);
+    if (seconds >= INSPECTION_LIMIT - 3 && seconds <= INSPECTION_LIMIT) {
+      Utils.playSound(R.raw.beep);
+      if (seconds == INSPECTION_LIMIT) {
+        layout.setBackgroundColor(getResources().getColor(R.color.darkred));
+      }
     }
   }
 

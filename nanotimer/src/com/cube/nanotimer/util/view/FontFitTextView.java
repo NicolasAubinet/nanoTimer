@@ -10,6 +10,8 @@ public class FontFitTextView extends MonospacedTextView {
   private Paint mTestPaint;
   private float initialTextSize;
 
+  private int previousWidth;
+
   public FontFitTextView(Context context) {
     super(context);
     initialTextSize = getTextSize();
@@ -67,7 +69,10 @@ public class FontFitTextView extends MonospacedTextView {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
     int height = getMeasuredHeight();
-    refitText(getText().toString(), parentWidth);
+    if (parentWidth != previousWidth) {
+      refitText(getText().toString(), parentWidth);
+      previousWidth = parentWidth;
+    }
     this.setMeasuredDimension(parentWidth, height);
   }
 

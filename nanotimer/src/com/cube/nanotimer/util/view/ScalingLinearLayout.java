@@ -15,8 +15,8 @@ public class ScalingLinearLayout extends LinearLayout {
   private static final int LAYOUT_WIDTH = 480;
   private static final int LAYOUT_HEIGHT = 762;
 
-  int previousWidth;
-  int previousHeight;
+  private int previousWidth;
+  private int previousHeight;
 
 	public ScalingLinearLayout(Context context) {
 		super(context);

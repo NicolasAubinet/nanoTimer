@@ -17,14 +17,25 @@
        android:layout_height="match_parent"
        android:orientation="vertical"
        android:layout_weight="7">
-      <TextView
-         android:id="@+id/tvCubeType"
-         android:layout_width="wrap_content"
+      <LinearLayout
+         android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:layout_marginTop="12px"
-         android:textSize="36px"
-         android:layout_gravity="center"
-         android:gravity="center"/>
+         android:orientation="vertical">
+        <TextView
+           android:id="@+id/tvCubeType"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:padding="2px"
+           android:textSize="36px"
+           android:layout_gravity="center"
+           android:background="@color/darkblue"
+           android:gravity="center"
+           android:singleLine="true"/>
+        <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="2dp"
+           android:background="@color/neon"/>
+      </LinearLayout>
       <com.cube.nanotimer.util.view.MonospacedTextView
          android:id="@+id/tvTimer"
          android:layout_width="wrap_content"
@@ -55,7 +66,7 @@
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
          android:orientation="vertical"
-         android:paddingTop="8px"
+         android:paddingTop="2px"
          android:layout_margin="12px">
         <TableLayout
            android:id="@+id/layoutSessionTimes"
@@ -65,22 +76,22 @@
            android:shrinkColumns="*"
            android:stretchColumns="*">
           <TableRow>
-            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
-            <TextView style="@style/SessionTimeTextField"/>
-            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
-            <TextView style="@style/SessionTimeTextField"/>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
+            <TextView style="@style/SessionTimeTextField" android:padding="3px"/>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
+            <TextView style="@style/SessionTimeTextField" android:padding="3px"/>
           </TableRow>
           <TableRow>
-            <TextView style="@style/SessionTimeTextField"/>
-            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
-            <TextView style="@style/SessionTimeTextField"/>
-            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
+            <TextView style="@style/SessionTimeTextField" android:padding="3px"/>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
+            <TextView style="@style/SessionTimeTextField" android:padding="3px"/>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
           </TableRow>
           <TableRow>
-            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
-            <TextView style="@style/SessionTimeTextField"/>
-            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
-            <TextView style="@style/SessionTimeTextField"/>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
+            <TextView style="@style/SessionTimeTextField" android:padding="3px"/>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
+            <TextView style="@style/SessionTimeTextField" android:padding="3px"/>
           </TableRow>
         </TableLayout>
         <LinearLayout
@@ -90,9 +101,9 @@
           <TableLayout
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
-             android:layout_marginTop="3px"
+             android:layout_marginTop="5px"
              android:layout_weight="1">
-            <TableRow android:layout_marginTop="5px">
+            <TableRow android:layout_marginTop="10px">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
@@ -105,7 +116,7 @@
                  android:layout_marginLeft="8px"
                  style="@style/SmallTextField"/>
             </TableRow>
-            <TableRow android:layout_marginTop="5px">
+            <TableRow android:layout_marginTop="10px">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
@@ -124,7 +135,7 @@
              android:layout_height="wrap_content"
              android:layout_marginTop="3px"
              android:layout_weight="1">
-            <TableRow android:layout_marginTop="5px">
+            <TableRow android:layout_marginTop="10px">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
@@ -137,7 +148,7 @@
                  android:layout_marginLeft="8px"
                  style="@style/SmallTextField"/>
             </TableRow>
-            <TableRow android:layout_marginTop="5px">
+            <TableRow android:layout_marginTop="10px">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
@@ -154,41 +165,35 @@
         </LinearLayout>
       </LinearLayout>
 
-      <LinearLayout
-         android:id="@+id/bottomLayout"
+      <TableLayout
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:orientation="horizontal"
          android:layout_alignParentBottom="true"
          android:gravity="bottom"
-         android:layout_margin="15px">
-        <TableLayout
-           android:layout_width="match_parent"
-           android:layout_height="match_parent"
-           android:shrinkColumns="*"
-           android:stretchColumns="*">
-          <TableRow>
-            <TextView android:text="" style="@style/SmallTextField"/>
-            <TextView android:text="@string/last_avg_of" android:textStyle="bold" style="@style/SmallTextField"/>
-            <TextView android:text="@string/best_avg_of" android:textStyle="bold" style="@style/SmallTextField"/>
-          </TableRow>
-          <TableRow>
-            <TextView android:text="5" android:textStyle="bold" style="@style/SmallTextField"/>
-            <TextView android:id="@+id/tvAvgOfFive" style="@style/SmallTextField"/>
-            <TextView android:id="@+id/tvBestOfFive" style="@style/SmallTextField"/>
-          </TableRow>
-          <TableRow>
-            <TextView android:text="12" android:textStyle="bold" style="@style/SmallTextField"/>
-            <TextView android:id="@+id/tvAvgOfTwelve" style="@style/SmallTextField"/>
-            <TextView android:id="@+id/tvBestOfTwelve" style="@style/SmallTextField"/>
-          </TableRow>
-          <TableRow>
-            <TextView android:text="100" android:textStyle="bold" style="@style/SmallTextField"/>
-            <TextView android:id="@+id/tvAvgOfHundred" style="@style/SmallTextField"/>
-            <TextView android:id="@+id/tvBestOfHundred" style="@style/SmallTextField"/>
-          </TableRow>
-        </TableLayout>
-      </LinearLayout>
+         android:layout_margin="12px"
+         android:shrinkColumns="*"
+         android:stretchColumns="*">
+        <TableRow android:padding="2px">
+          <TextView android:text="" style="@style/SmallTextField"/>
+          <TextView android:text="@string/last_avg_of" android:textStyle="bold" style="@style/SmallTextField"/>
+          <TextView android:text="@string/best_avg_of" android:textStyle="bold" style="@style/SmallTextField"/>
+        </TableRow>
+        <TableRow android:padding="2px">
+          <TextView android:text="5" android:textStyle="bold" style="@style/SmallTextField"/>
+          <TextView android:id="@+id/tvAvgOfFive" style="@style/SmallTextField"/>
+          <TextView android:id="@+id/tvBestOfFive" style="@style/SmallTextField"/>
+        </TableRow>
+        <TableRow android:padding="2px">
+          <TextView android:text="12" android:textStyle="bold" style="@style/SmallTextField"/>
+          <TextView android:id="@+id/tvAvgOfTwelve" style="@style/SmallTextField"/>
+          <TextView android:id="@+id/tvBestOfTwelve" style="@style/SmallTextField"/>
+        </TableRow>
+        <TableRow android:padding="2px">
+          <TextView android:text="100" android:textStyle="bold" style="@style/SmallTextField"/>
+          <TextView android:id="@+id/tvAvgOfHundred" style="@style/SmallTextField"/>
+          <TextView android:id="@+id/tvBestOfHundred" style="@style/SmallTextField"/>
+        </TableRow>
+      </TableLayout>
     </RelativeLayout>
 
   </LinearLayout>
