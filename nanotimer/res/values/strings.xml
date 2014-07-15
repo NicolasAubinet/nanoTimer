@@ -19,6 +19,7 @@
   <string name="edit">Edit</string>
   <string name="solve_type_already_exists">A solve type with the same name already exists.</string>
   <string name="delete_solve_type_confirmation">Are you sure you want to delete the solve type \'%1$s\' and all its times?</string>
+  <string name="new_session_confirmation">Are you sure you want to start a new session?</string>
 
   <string name="inspection">Inspection</string>
   <string name="last_avg_of">Last avg of</string>

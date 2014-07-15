@@ -24,6 +24,7 @@ import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.CubeSession;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.Utils;
+import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
@@ -180,9 +181,14 @@ public class TimerActivity extends Activity {
           }
           break;
         case R.id.itNewSession:
-          App.INSTANCE.getService().startNewSession(solveType, System.currentTimeMillis(), null);
-          cubeSession.clearSession();
-          refreshSessionFields();
+          Utils.showYesNoConfirmation(this, getString(R.string.new_session_confirmation), new YesNoListener() {
+            @Override
+            public void onYes() {
+              App.INSTANCE.getService().startNewSession(solveType, System.currentTimeMillis(), null);
+              cubeSession.clearSession();
+              refreshSessionFields();
+            }
+          });
           break;
       }
     }
