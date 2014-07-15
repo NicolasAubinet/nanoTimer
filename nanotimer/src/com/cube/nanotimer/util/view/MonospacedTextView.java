@@ -23,8 +23,10 @@ public class MonospacedTextView extends TextView {
   }
 
   public void setFont() {
-    Typeface font = Typeface.createFromAsset(getContext().getAssets(), "fonts/DroidSansMono.ttf");
-    setTypeface(font);
+    if (!isInEditMode()) {
+      Typeface font = Typeface.createFromAsset(getContext().getAssets(), "fonts/DroidSansMono.ttf");
+      setTypeface(font);
+    }
   }
 
 }

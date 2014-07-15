@@ -43,7 +43,8 @@ public class TimerActivity extends Activity {
   private TextView tvRA5;
   private TextView tvRA12;
   private ViewGroup layout;
-  private TableLayout layoutSessionTimes;
+  private TableLayout sessionTimesLayout;
+  private TableLayout averagesLayout;
 
   private CubeType cubeType;
   private SolveType solveType;
@@ -67,6 +68,7 @@ public class TimerActivity extends Activity {
     setContentView(R.layout.timer);
     App.INSTANCE.setContext(this);
     setVolumeControlStream(AudioManager.STREAM_MUSIC);
+    currentOrientation = getResources().getConfiguration().orientation;
 
     cubeType = (CubeType) getIntent().getSerializableExtra("cubeType");
     solveType = (SolveType) getIntent().getSerializableExtra("solveType");
@@ -94,7 +96,8 @@ public class TimerActivity extends Activity {
     tvCubeType = (TextView) findViewById(R.id.tvCubeType);
     tvRA5 = (TextView) findViewById(R.id.tvRA5);
     tvRA12 = (TextView) findViewById(R.id.tvRA12);
-    layoutSessionTimes = (TableLayout) findViewById(R.id.layoutSessionTimes);
+    sessionTimesLayout = (TableLayout) findViewById(R.id.sessionTimesLayout);
+    averagesLayout = (TableLayout) findViewById(R.id.averagesLayout);
 
     layout = (ViewGroup) findViewById(R.id.layoutTimer);
     layout.setOnTouchListener(new OnTouchListener() {
@@ -244,8 +247,8 @@ public class TimerActivity extends Activity {
   }
 
   private void clearSessionTextViews() {
-    for (int i = 0; i < layoutSessionTimes.getChildCount(); i++) {
-      TableRow tr = (TableRow) layoutSessionTimes.getChildAt(i);
+    for (int i = 0; i < sessionTimesLayout.getChildCount(); i++) {
+      TableRow tr = (TableRow) sessionTimesLayout.getChildAt(i);
       for (int j = 0; j < tr.getChildCount(); j++) {
         ((TextView) tr.getChildAt(j)).setText("");
       }
@@ -255,11 +258,11 @@ public class TimerActivity extends Activity {
   private TextView getSessionTextView(int i) {
     View v = null;
     if (i >= 0 && i < 4) {
-      v = ((TableRow) layoutSessionTimes.getChildAt(0)).getChildAt(i);
+      v = ((TableRow) sessionTimesLayout.getChildAt(0)).getChildAt(i);
     } else if (i >= 4 && i < 8) {
-      v = ((TableRow) layoutSessionTimes.getChildAt(1)).getChildAt(i - 4);
+      v = ((TableRow) sessionTimesLayout.getChildAt(1)).getChildAt(i - 4);
     } else if (i >= 8 && i < 12) {
-      v = ((TableRow) layoutSessionTimes.getChildAt(2)).getChildAt(i - 8);
+      v = ((TableRow) sessionTimesLayout.getChildAt(2)).getChildAt(i - 8);
     }
     return (TextView) v;
   }
@@ -304,7 +307,7 @@ public class TimerActivity extends Activity {
     timerStartTs = System.currentTimeMillis();
     enableScreenRotation(false);
     timerState = TimerState.INSPECTING;
-    layout.setBackgroundColor(getResources().getColor(R.color.nightblue));
+    layout.setBackgroundResource(R.color.nightblue);
     tvCubeType.setText(getString(R.string.inspection));
     timer = new Timer();
     TimerTask timerTask = new TimerTask() {
@@ -324,7 +327,7 @@ public class TimerActivity extends Activity {
       timer.cancel();
       timer.purge();
     }
-    layout.setBackgroundColor(getResources().getColor(R.color.black));
+    layout.setBackgroundResource(R.color.black);
     setCubeTypeText();
     timerState = TimerState.STOPPED;
     enableScreenRotation(true);
@@ -369,7 +372,7 @@ public class TimerActivity extends Activity {
     if (seconds >= INSPECTION_LIMIT - 3 && seconds <= INSPECTION_LIMIT) {
       Utils.playSound(R.raw.beep);
       if (seconds == INSPECTION_LIMIT) {
-        layout.setBackgroundColor(getResources().getColor(R.color.darkred));
+        layout.setBackgroundResource(R.color.darkred);
       }
     }
   }

@@ -13,8 +13,24 @@
     <item name="android:textSize">21px</item>
     <item name="android:gravity">center</item>
     <item name="android:layout_width">0px</item>
-    <item name="android:layout_margin">1px</item>
-    <item name="android:background">@color/black</item>
+    <item name="borderColor">@color/neon</item>
+    <item name="border">1</item>
+  </style>
+
+  <style name="AverageTableHeaderField">
+    <item name="android:textSize">21px</item>
+    <item name="android:gravity">center</item>
+    <item name="android:textStyle">bold</item>
+    <item name="android:background">@color/darkblue</item>
+    <item name="borderColor">@color/neon</item>
+    <item name="border">1</item>
+  </style>
+
+  <style name="AverageTableTextField">
+    <item name="android:textSize">21px</item>
+    <item name="android:gravity">center</item>
+    <item name="borderColor">@color/neon</item>
+    <item name="border">1</item>
   </style>
 
   <style name="ListViewItem">

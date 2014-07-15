@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <com.cube.nanotimer.util.view.ScalingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:custom="http://schemas.android.com/apk/res/com.cube.nanotimer"
    android:layout_height="match_parent"
    android:layout_width="match_parent">
 
@@ -71,29 +72,28 @@
          android:paddingTop="2px"
          android:layout_margin="12px">
         <TableLayout
-           android:id="@+id/layoutSessionTimes"
+           android:id="@+id/sessionTimesLayout"
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
-           android:background="@color/neon"
            android:shrinkColumns="*"
            android:stretchColumns="*">
           <TableRow>
-            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
-            <TextView style="@style/SessionTimeTextField" android:padding="3px"/>
-            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
-            <TextView style="@style/SessionTimeTextField" android:padding="3px"/>
+            <com.cube.nanotimer.util.view.BorderTextView custom:borderTop="2" custom:borderLeft="2" style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
+            <com.cube.nanotimer.util.view.BorderTextView custom:borderTop="2" style="@style/SessionTimeTextField" android:padding="3px"/>
+            <com.cube.nanotimer.util.view.BorderTextView custom:borderTop="2" style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
+            <com.cube.nanotimer.util.view.BorderTextView custom:borderTop="2" custom:borderRight="2" style="@style/SessionTimeTextField" android:padding="3px"/>
           </TableRow>
           <TableRow>
-            <TextView style="@style/SessionTimeTextField" android:padding="3px"/>
-            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
-            <TextView style="@style/SessionTimeTextField" android:padding="3px"/>
-            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
+            <com.cube.nanotimer.util.view.BorderTextView custom:borderLeft="2" style="@style/SessionTimeTextField" android:padding="3px"/>
+            <com.cube.nanotimer.util.view.BorderTextView style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
+            <com.cube.nanotimer.util.view.BorderTextView style="@style/SessionTimeTextField" android:padding="3px"/>
+            <com.cube.nanotimer.util.view.BorderTextView custom:borderRight="2" style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
           </TableRow>
           <TableRow>
-            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
-            <TextView style="@style/SessionTimeTextField" android:padding="3px"/>
-            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
-            <TextView style="@style/SessionTimeTextField" android:padding="3px"/>
+            <com.cube.nanotimer.util.view.BorderTextView custom:borderBottom="2" custom:borderLeft="2" style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
+            <com.cube.nanotimer.util.view.BorderTextView custom:borderBottom="2" style="@style/SessionTimeTextField" android:padding="3px"/>
+            <com.cube.nanotimer.util.view.BorderTextView custom:borderBottom="2" style="@style/SessionTimeTextField" android:background="@color/darkblue" android:padding="3px"/>
+            <com.cube.nanotimer.util.view.BorderTextView custom:borderBottom="2" custom:borderRight="2" style="@style/SessionTimeTextField" android:padding="3px"/>
           </TableRow>
         </TableLayout>
         <LinearLayout
@@ -168,6 +168,7 @@
       </LinearLayout>
 
       <TableLayout
+         android:id="@+id/averagesLayout"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
          android:layout_alignParentBottom="true"
@@ -175,25 +176,25 @@
          android:layout_margin="12px"
          android:shrinkColumns="*"
          android:stretchColumns="*">
-        <TableRow android:padding="2px">
-          <TextView android:text="" style="@style/SmallTextField"/>
-          <TextView android:text="@string/last_avg_of" android:textStyle="bold" style="@style/SmallTextField"/>
-          <TextView android:text="@string/best_avg_of" android:textStyle="bold" style="@style/SmallTextField"/>
+        <TableRow>
+          <com.cube.nanotimer.util.view.BorderTextView android:textSize="21px" custom:borderColor="@color/neon" custom:border="0" custom:borderBottom="1" custom:borderRight="1" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.BorderTextView android:text="@string/last_avg_of" custom:borderTop="2" style="@style/AverageTableHeaderField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.BorderTextView android:text="@string/best_avg_of" custom:borderTop="2" custom:borderRight="2" style="@style/AverageTableHeaderField" android:padding="2px"/>
         </TableRow>
-        <TableRow android:padding="2px">
-          <TextView android:text="5" android:textStyle="bold" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvAvgOfFive" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvBestOfFive" style="@style/SmallTextField"/>
+        <TableRow>
+          <com.cube.nanotimer.util.view.BorderTextView android:text="5" custom:borderLeft="2" style="@style/AverageTableHeaderField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvAvgOfFive" style="@style/AverageTableTextField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvBestOfFive" custom:borderRight="2" style="@style/AverageTableTextField" android:padding="2px"/>
         </TableRow>
-        <TableRow android:padding="2px">
-          <TextView android:text="12" android:textStyle="bold" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvAvgOfTwelve" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvBestOfTwelve" style="@style/SmallTextField"/>
+        <TableRow>
+          <com.cube.nanotimer.util.view.BorderTextView android:text="12" custom:borderLeft="2" style="@style/AverageTableHeaderField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvAvgOfTwelve" style="@style/AverageTableTextField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvBestOfTwelve" custom:borderRight="2" style="@style/AverageTableTextField" android:padding="2px"/>
         </TableRow>
-        <TableRow android:padding="2px">
-          <TextView android:text="100" android:textStyle="bold" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvAvgOfHundred" style="@style/SmallTextField"/>
-          <TextView android:id="@+id/tvBestOfHundred" style="@style/SmallTextField"/>
+        <TableRow>
+          <com.cube.nanotimer.util.view.BorderTextView android:text="100" custom:borderBottom="2" custom:borderLeft="2" style="@style/AverageTableHeaderField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvAvgOfHundred" custom:borderBottom="2" style="@style/AverageTableTextField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvBestOfHundred" custom:borderBottom="2" custom:borderRight="2" style="@style/AverageTableTextField" android:padding="2px"/>
         </TableRow>
       </TableLayout>
     </RelativeLayout>
