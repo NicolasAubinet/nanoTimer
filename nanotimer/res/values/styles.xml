@@ -9,6 +9,14 @@
     <item name="android:textSize">21px</item>
   </style>
 
+  <style name="SolveStepTextField">
+    <item name="android:textSize">40px</item>
+    <item name="android:layout_weight">1</item>
+    <item name="android:layout_width">0px</item>
+    <item name="android:layout_marginLeft">5px</item>
+    <item name="android:layout_marginRight">5px</item>
+  </style>
+
   <style name="SessionTimeTextField">
     <item name="android:textSize">21px</item>
     <item name="android:gravity">center</item>

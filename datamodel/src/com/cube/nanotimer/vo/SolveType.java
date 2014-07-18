@@ -7,6 +7,7 @@ public class SolveType implements Serializable {
   private int id;
   private String name;
   private int cubeTypeId;
+  private SolveTypeStep[] steps;
 
   public SolveType() {
   }
@@ -45,4 +46,17 @@ public class SolveType implements Serializable {
   public void setCubeTypeId(int cubeTypeId) {
     this.cubeTypeId = cubeTypeId;
   }
+
+  public SolveTypeStep[] getSteps() {
+    return steps;
+  }
+
+  public void setSteps(SolveTypeStep[] steps) {
+    this.steps = steps;
+  }
+
+  public boolean hasSteps() {
+    return steps != null && steps.length > 0;
+  }
+
 }

@@ -1,12 +1,16 @@
 package com.cube.nanotimer.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CubeSession {
 
   public static final int SESSION_MAX_SIZE = 13; // 12, + 1 for deletion
 
-  private List<Long> sessionTimes;
+  private List<Long> sessionTimes = new ArrayList<Long>();
+
+  public CubeSession() {
+  }
 
   public CubeSession(List<Long> sessionTimes) {
     this.sessionTimes = sessionTimes;

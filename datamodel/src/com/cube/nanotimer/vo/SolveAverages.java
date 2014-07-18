@@ -1,5 +1,7 @@
 package com.cube.nanotimer.vo;
 
+import java.util.List;
+
 public class SolveAverages {
 
   private SolveTime solveTime;
@@ -13,6 +15,10 @@ public class SolveAverages {
   private Long bestOf12;
   private Long bestOf100;
   private Long bestOfLifetime;
+
+  private List<Long> stepsAvgOf5;
+  private List<Long> stepsAvgOf12;
+  private List<Long> stepsAvgOf100;
 
   public SolveAverages() {
   }
@@ -100,6 +106,28 @@ public class SolveAverages {
     this.bestOfLifetime = bestOfLifetime;
   }
 
+  public void setStepsAvgOf(int n, List<Long> stepsAvgOf) {
+    if (n == 5) {
+      this.stepsAvgOf5 = stepsAvgOf;
+    } else if (n == 12) {
+      this.stepsAvgOf12 = stepsAvgOf;
+    } else if (n == 100) {
+      this.stepsAvgOf100 = stepsAvgOf;
+    }
+  }
+
+  public List<Long> getStepsAvgOf5() {
+    return stepsAvgOf5;
+  }
+
+  public List<Long> getStepsAvgOf12() {
+    return stepsAvgOf12;
+  }
+
+  public List<Long> getStepsAvgOf100() {
+    return stepsAvgOf100;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -146,4 +174,5 @@ public class SolveAverages {
         ", bestOfLifetime=" + bestOfLifetime +
         '}';
   }
+
 }

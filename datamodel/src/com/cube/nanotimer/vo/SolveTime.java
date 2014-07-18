@@ -1,6 +1,7 @@
 package com.cube.nanotimer.vo;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class SolveTime implements Serializable {
 
@@ -10,6 +11,7 @@ public class SolveTime implements Serializable {
   private boolean plusTwo;
   private String scramble;
   private SolveType solveType;
+  private Long[] stepsTimes;
 
   public SolveTime() {
   }
@@ -62,9 +64,29 @@ public class SolveTime implements Serializable {
     this.solveType = solveType;
   }
 
+  public Long[] getStepsTimes() {
+    return stepsTimes;
+  }
+
+  public void setStepsTimes(Long[] stepsTimes) {
+    this.stepsTimes = stepsTimes;
+  }
+
   public void plusTwo() {
     setTime(time + 2000);
     setPlusTwo(true);
+  }
+
+  public boolean hasSteps() {
+    return stepsTimes != null && stepsTimes.length > 0;
+  }
+
+  @Override
+  public String toString() {
+    return "SolveTime{" +
+        ", time=" + time +
+        ", stepsTimes=" + Arrays.toString(stepsTimes) +
+        '}';
   }
 
 }

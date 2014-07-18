@@ -3,14 +3,17 @@ package com.cube.nanotimer.services;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import com.cube.nanotimer.services.db.DB;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
+import com.cube.nanotimer.vo.SolveTypeStep;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +30,7 @@ public class ServiceProviderImpl implements ServiceProvider {
   private final int CACHE_MIN_SIZE = 1000;
   private final int HISTORY_PAGE_SIZE = 20;
   private final int SESSION_TIMES_COUNT = 12;
+  private final int MAX_AVERAGE_COUNT = 100;
 
   public ServiceProviderImpl(SQLiteDatabase db) {
     this.db = db;
@@ -65,11 +69,33 @@ public class ServiceProviderImpl implements ServiceProvider {
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         SolveType st = new SolveType(cursor.getInt(0), cursor.getString(1), cursor.getInt(2));
+        List<SolveTypeStep> steps = getSolveTypeSteps(st);
+        st.setSteps(steps.size() == 0 ? null : steps.toArray(new SolveTypeStep[0]));
         solveTypes.add(st);
       }
       cursor.close();
     }
     return solveTypes;
+  }
+
+  private List<SolveTypeStep> getSolveTypeSteps(SolveType solveType) {
+    List<SolveTypeStep> solveTypeSteps = new ArrayList<SolveTypeStep>();
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT ").append(DB.COL_ID).append(", ").append(DB.COL_SOLVETYPESTEP_NAME);
+    q.append(" FROM ").append(DB.TABLE_SOLVETYPESTEP);
+    q.append(" WHERE ").append(DB.COL_SOLVETYPESTEP_SOLVETYPE_ID).append(" = ?");
+    q.append(" ORDER BY ").append(DB.COL_SOLVETYPESTEP_POSITION);
+    Cursor cursor = db.rawQuery(q.toString(), new String[] { String.valueOf(solveType.getId()) });
+    if (cursor != null) {
+      for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+        SolveTypeStep st = new SolveTypeStep();
+        st.setId(cursor.getInt(0));
+        st.setName(cursor.getString(1));
+        solveTypeSteps.add(st);
+      }
+      cursor.close();
+    }
+    return solveTypeSteps;
   }
 
   @Override
@@ -94,17 +120,14 @@ public class ServiceProviderImpl implements ServiceProvider {
       }
     }
 
-    Long avg5 = getLastAvg(5, false);
-    Long avg12 = getLastAvg(12, false);
-    Long avg100 = getLastAvg(100, false);
-    Long avgLifetime = getLastAvg(1000, true);
-
     recalculateAverages(solveTime.getTimestamp(), solveTime.getSolveType());
 
     loadBestAverages(solveTime.getSolveType().getId());
     loadLifetimeBest(solveTime.getSolveType().getId());
+    SolveAverages solveAverages = getSolveAverages(solveTime.getSolveType());
+    solveAverages.setSolveTime(solveTime);
 
-    return getSolveAverages(solveTime, avg5, avg12, avg100, avgLifetime);
+    return solveAverages;
   }
 
   private SolveAverages createTime(SolveTime solveTime) {
@@ -116,7 +139,6 @@ public class ServiceProviderImpl implements ServiceProvider {
     Long avg5 = getLastAvg(5, false);
     Long avg12 = getLastAvg(12, false);
     Long avg100 = getLastAvg(100, false);
-    Long avgLifetime = getLastAvg(1000, true);
 
     syncBestAveragesWithCurrent(avg5, avg12, avg100);
     if (isTimeBetter(cachedLifetimeBest, solveTime.getTime())) {
@@ -132,25 +154,105 @@ public class ServiceProviderImpl implements ServiceProvider {
     values.put(DB.COL_TIMEHISTORY_AVG5, avg5);
     values.put(DB.COL_TIMEHISTORY_AVG12, avg12);
     values.put(DB.COL_TIMEHISTORY_AVG100, avg100);
-    long id = db.insert(DB.TABLE_TIMEHISTORY, null, values);
-    cachedTime.setSolveId((int) id);
-    solveTime.setId((int) id);
+    long historyId = db.insert(DB.TABLE_TIMEHISTORY, null, values);
+    if (solveTime.hasSteps()) {
+      Iterator<SolveTypeStep> stsIt = getSolveTypeSteps(solveTime.getSolveType()).iterator();
+      for (Long stepTime : solveTime.getStepsTimes()) {
+        values = new ContentValues();
+        values.put(DB.COL_TIMEHISTORYSTEP_TIME, stepTime);
+        values.put(DB.COL_TIMEHISTORYSTEP_SOLVETYPESTEP_ID, stsIt.next().getId());
+        values.put(DB.COL_TIMEHISTORYSTEP_TIMEHISTORY_ID, historyId);
+        db.insert(DB.TABLE_TIMEHISTORYSTEP, null, values);
+      }
+    }
+    cachedTime.setSolveId((int) historyId);
+    solveTime.setId((int) historyId);
 
-    return getSolveAverages(solveTime, avg5, avg12, avg100, avgLifetime);
+    SolveAverages solveAverages = getSolveAverages(solveTime.getSolveType());
+    solveAverages.setSolveTime(solveTime);
+    return solveAverages;
   }
 
-  private SolveAverages getSolveAverages(SolveTime solveTime, Long avg5, Long avg12, Long avg100, Long avgLifetime) {
+  @Override
+  public SolveAverages getSolveAverages(SolveType solveType) {
+    syncCaches(solveType);
     SolveAverages solveAverages = new SolveAverages();
-    solveAverages.setSolveTime(solveTime);
-    solveAverages.setAvgOf5(avg5);
-    solveAverages.setAvgOf12(avg12);
-    solveAverages.setAvgOf100(avg100);
-    solveAverages.setAvgOfLifetime(avgLifetime);
-    solveAverages.setBestOf5(cachedBestAverages.get(5));
-    solveAverages.setBestOf12(cachedBestAverages.get(12));
-    solveAverages.setBestOf100(cachedBestAverages.get(100));
-    solveAverages.setBestOfLifetime(cachedLifetimeBest);
+    if (!solveType.hasSteps()) {
+      solveAverages.setAvgOf5(getLastAvg(5, false));
+      solveAverages.setAvgOf12(getLastAvg(12, false));
+      solveAverages.setAvgOf100(getLastAvg(100, false));
+      solveAverages.setAvgOfLifetime(getLastAvg(1000, true));
+      solveAverages.setBestOf5(cachedBestAverages.get(5));
+      solveAverages.setBestOf12(cachedBestAverages.get(12));
+      solveAverages.setBestOf100(cachedBestAverages.get(100));
+      solveAverages.setBestOfLifetime(cachedLifetimeBest);
+    } else {
+      setStepsAverages(solveAverages, solveType);
+    }
     return solveAverages;
+  }
+
+  private void setStepsAverages(SolveAverages solveAverages, SolveType solveType) {
+    if (!solveType.hasSteps()) {
+      return;
+    }
+    List<List<Long>> stepsTimes = new ArrayList<List<Long>>();
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_ID).append(",");
+    q.append("       ").append(DB.TABLE_TIMEHISTORYSTEP).append(".").append(DB.COL_TIMEHISTORYSTEP_TIME);
+    q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
+    q.append(" JOIN ").append(DB.TABLE_TIMEHISTORYSTEP);
+    q.append("   ON ").append(DB.TABLE_TIMEHISTORYSTEP).append(".").append(DB.COL_TIMEHISTORYSTEP_TIMEHISTORY_ID);
+    q.append("    = ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_ID);
+    q.append(" JOIN ").append(DB.TABLE_SOLVETYPESTEP);
+    q.append("   ON ").append(DB.TABLE_SOLVETYPESTEP).append(".").append(DB.COL_ID);
+    q.append("    = ").append(DB.TABLE_TIMEHISTORYSTEP).append(".").append(DB.COL_TIMEHISTORYSTEP_SOLVETYPESTEP_ID);
+    q.append(" WHERE ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
+    q.append("   AND ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_TIME).append(" > 0");
+    q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC, ").append(DB.COL_SOLVETYPESTEP_POSITION);
+    q.append(" LIMIT ").append(MAX_AVERAGE_COUNT);
+    Log.i("[Steps]", "q: " + q);
+    Cursor cursor = db.rawQuery(q.toString(), new String[] { String.valueOf(solveType.getId()) });
+    if (cursor != null) {
+      int curHistoryId = -1;
+      List<Long> curSteps = new ArrayList<Long>();
+      for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+        int historyId = cursor.getInt(0);
+        if (historyId != curHistoryId) {
+          if (curSteps.size() > 0) {
+            stepsTimes.add(curSteps);
+          }
+          curSteps = new ArrayList<Long>();
+          curHistoryId = historyId;
+        }
+        curSteps.add(cursor.getLong(1));
+      }
+      if (curSteps.size() > 0) {
+        stepsTimes.add(curSteps);
+      }
+      cursor.close();
+    }
+
+//    Log.i("[Steps]", "size: " + stepsTimes.size());
+    if (stepsTimes.size() > 0) {
+      int i = 0;
+      long[] stepsSums = new long[stepsTimes.get(0).size()];
+      for (List<Long> st : stepsTimes) {
+//        Log.i("[Steps]", "st: " + Arrays.toString(st.toArray()));
+        for (int j = 0; j < st.size(); j++) {
+          stepsSums[j] += st.get(j);
+        }
+        if (i == 5-1 || i == 12-1 || i == 100-1) {
+          List<Long> avgs = new ArrayList<Long>();
+          for (Long l : stepsSums) {
+            avgs.add(l / (i+1));
+          }
+//          Log.i("[Steps]", "set avg of " + (i+1) + " to " + Arrays.toString(avgs.toArray()));
+          solveAverages.setStepsAvgOf(i + 1, avgs);
+        }
+        i++;
+      }
+    }
   }
 
   private void syncBestAveragesWithCurrent(Long avg5, Long avg12, Long avg100) {
@@ -173,21 +275,6 @@ public class ServiceProviderImpl implements ServiceProvider {
     } else {
       return false;
     }
-  }
-
-  @Override
-  public SolveAverages getSolveAverages(SolveType solveType) {
-    syncCaches(solveType);
-    SolveAverages solveAverages = new SolveAverages();
-    solveAverages.setAvgOf5(getLastAvg(5, false));
-    solveAverages.setAvgOf12(getLastAvg(12, false));
-    solveAverages.setAvgOf100(getLastAvg(100, false));
-    solveAverages.setAvgOfLifetime(getLastAvg(1000, true));
-    solveAverages.setBestOf5(cachedBestAverages.get(5));
-    solveAverages.setBestOf12(cachedBestAverages.get(12));
-    solveAverages.setBestOf100(cachedBestAverages.get(100));
-    solveAverages.setBestOfLifetime(cachedLifetimeBest);
-    return solveAverages;
   }
 
   @Override
@@ -214,11 +301,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     loadBestAverages(solveTime.getSolveType().getId());
     loadLifetimeBest(solveTime.getSolveType().getId());
 
-    Long avg5 = getLastAvg(5, false);
-    Long avg12 = getLastAvg(12, false);
-    Long avg100 = getLastAvg(100, false);
-    Long avgLifetime = getLastAvg(1000, true);
-    return getSolveAverages(null, avg5, avg12, avg100, avgLifetime);
+    return getSolveAverages(solveTime.getSolveType());
   }
 
   @Override
@@ -253,11 +336,35 @@ public class ServiceProviderImpl implements ServiceProvider {
         st.setScramble(cursor.getString(3));
         st.setPlusTwo(cursor.getInt(4) == 1);
         st.setSolveType(solveType);
+        if (solveType.hasSteps()) {
+          List<Long> stepTimes = getSolveTimeSteps(st);
+          st.setStepsTimes(stepTimes.size() == 0 ? null : stepTimes.toArray(new Long[0]));
+        }
         history.add(st);
       }
       cursor.close();
     }
     return history;
+  }
+
+  private List<Long> getSolveTimeSteps(SolveTime solveTime) {
+    List<Long> stepTimes = new ArrayList<Long>();
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT ").append(DB.COL_TIMEHISTORYSTEP_TIME);
+    q.append(" FROM ").append(DB.TABLE_TIMEHISTORYSTEP);
+    q.append(" JOIN ").append(DB.TABLE_SOLVETYPESTEP);
+    q.append("   ON ").append(DB.TABLE_SOLVETYPESTEP).append(".").append(DB.COL_ID);
+    q.append("    = ").append(DB.TABLE_TIMEHISTORYSTEP).append(".").append(DB.COL_TIMEHISTORYSTEP_SOLVETYPESTEP_ID);
+    q.append(" WHERE ").append(DB.COL_TIMEHISTORYSTEP_TIMEHISTORY_ID).append(" = ?");
+    q.append(" ORDER BY ").append(DB.COL_SOLVETYPESTEP_POSITION);
+    Cursor cursor = db.rawQuery(q.toString(), new String[] { String.valueOf(solveTime.getId()) });
+    if (cursor != null) {
+      for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+        stepTimes.add(cursor.getLong(0));
+      }
+      cursor.close();
+    }
+    return stepTimes;
   }
 
   @Override
