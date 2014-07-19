@@ -17,6 +17,8 @@ import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
 
+import java.util.Arrays;
+
 public class HistoryDetailFragment extends DialogFragment {
 
   private static final String ARG_SOLVETIME = "solvetime";
@@ -49,6 +51,13 @@ public class HistoryDetailFragment extends DialogFragment {
     TextView tvPlusTwo = (TextView) v.findViewById(R.id.tvPlusTwo);
     TextView tvDNF = (TextView) v.findViewById(R.id.tvDNF);
     TextView tvDelete = (TextView) v.findViewById(R.id.tvDelete);
+
+    if (!solveTime.hasSteps()) {
+      v.findViewById(R.id.trSteps).setVisibility(View.GONE);
+    } else {
+      ((TextView) v.findViewById(R.id.tvSteps)).setText(
+          FormatterService.INSTANCE.formatStepsTimes(Arrays.asList(solveTime.getStepsTimes())));
+    }
 
     tvScramble.setText(FormatterService.INSTANCE.formatToColoredScramble(solveTime.getScramble(), cubeType));
     tvTime.setText(FormatterService.INSTANCE.formatSolveTime(solveTime.getTime()));

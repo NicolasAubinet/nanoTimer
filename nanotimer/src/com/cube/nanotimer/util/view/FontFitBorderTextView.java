@@ -5,10 +5,9 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.widget.TextView;
 import com.cube.nanotimer.R;
 
-public class BorderTextView extends TextView {
+public class FontFitBorderTextView extends FontFitTextView {
 
   private Paint paint = new Paint();
   private Integer borderColor;
@@ -17,11 +16,11 @@ public class BorderTextView extends TextView {
   int borderLeft;
   int borderRight;
 
-  public BorderTextView(Context context) {
+  public FontFitBorderTextView(Context context) {
     super(context);
   }
 
-  public BorderTextView(Context context, AttributeSet attrs) {
+  public FontFitBorderTextView(Context context, AttributeSet attrs) {
     super(context, attrs);
     TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BorderTextView);
     if (a.hasValue(R.styleable.BorderTextView_borderColor)) {
@@ -38,25 +37,9 @@ public class BorderTextView extends TextView {
 
   @Override
   public void onDraw(Canvas canvas) {
-    drawBorders(canvas, paint, borderColor, borderTop, borderBottom, borderLeft, borderRight,
+    BorderTextView.drawBorders(canvas, paint, borderColor, borderTop, borderBottom, borderLeft, borderRight,
         getMeasuredWidth(), getMeasuredHeight());
     super.onDraw(canvas);
-  }
-
-  public static void drawBorders(Canvas canvas, Paint paint, Integer borderColor,
-                                 int borderTop, int borderBottom, int borderLeft, int borderRight,
-                                 int canvasWidth, int canvasHeight) {
-    if (borderColor != null) {
-      paint.setColor(borderColor);
-      // top
-      canvas.drawRect(0, 0, canvasWidth, borderTop, paint);
-      // left
-      canvas.drawRect(0, 0, borderLeft, canvasHeight, paint);
-      // right
-      canvas.drawRect(canvasWidth - borderRight, 0, canvasWidth, canvasHeight, paint);
-      // bottom
-      canvas.drawRect(0, canvasHeight - borderBottom, canvasWidth, canvasHeight, paint);
-    }
   }
 
 }

@@ -55,6 +55,7 @@
          android:layout_width="match_parent"
          android:layout_height="match_parent"
          android:layout_marginTop="8px"
+         custom:font="MONOSPACE"
          android:layout_gravity="top"
          android:gravity="center_horizontal"
          style="@style/ScrambleTextField"/>
@@ -175,20 +176,28 @@
          android:visibility="gone"
          android:stretchColumns="*">
         <TableRow>
-          <TextView android:id="@+id/tvHeader1" style="@style/SolveStepTextField" android:gravity="right"/>
-          <TextView android:id="@+id/tvTime1" style="@style/SolveStepTextField" android:gravity="left"/>
+          <TextView style="@style/SolveStepTextField" android:gravity="right"/>
+          <TextView style="@style/SolveStepTextField" android:gravity="left"/>
+          <TextView style="@style/SolveStepTextField" android:gravity="right"/>
+          <TextView style="@style/SolveStepTextField" android:gravity="left"/>
         </TableRow>
         <TableRow>
-          <TextView android:id="@+id/tvHeader2" style="@style/SolveStepTextField" android:gravity="right"/>
-          <TextView android:id="@+id/tvTime2" style="@style/SolveStepTextField" android:gravity="left"/>
+          <TextView style="@style/SolveStepTextField" android:gravity="right"/>
+          <TextView style="@style/SolveStepTextField" android:gravity="left"/>
+          <TextView style="@style/SolveStepTextField" android:gravity="right"/>
+          <TextView style="@style/SolveStepTextField" android:gravity="left"/>
         </TableRow>
         <TableRow>
-          <TextView android:id="@+id/tvHeader3" style="@style/SolveStepTextField" android:gravity="right"/>
-          <TextView android:id="@+id/tvTime3" style="@style/SolveStepTextField" android:gravity="left"/>
+          <TextView style="@style/SolveStepTextField" android:gravity="right"/>
+          <TextView style="@style/SolveStepTextField" android:gravity="left"/>
+          <TextView style="@style/SolveStepTextField" android:gravity="right"/>
+          <TextView style="@style/SolveStepTextField" android:gravity="left"/>
         </TableRow>
         <TableRow>
-          <TextView android:id="@+id/tvHeader4" style="@style/SolveStepTextField" android:gravity="right"/>
-          <TextView android:id="@+id/tvTime4" style="@style/SolveStepTextField" android:gravity="left"/>
+          <TextView style="@style/SolveStepTextField" android:gravity="right"/>
+          <TextView style="@style/SolveStepTextField" android:gravity="left"/>
+          <TextView style="@style/SolveStepTextField" android:gravity="right"/>
+          <TextView style="@style/SolveStepTextField" android:gravity="left"/>
         </TableRow>
       </TableLayout>
 
@@ -200,24 +209,29 @@
          android:gravity="bottom"
          android:layout_margin="12px">
         <TableRow>
-          <com.cube.nanotimer.util.view.BorderTextView android:textSize="21px" android:layout_weight="1" custom:borderColor="@color/neon" custom:border="0" custom:borderBottom="1" custom:borderRight="1" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.BorderTextView android:textSize="21px" android:minWidth="70px" custom:borderColor="@color/neon" custom:border="0" custom:borderBottom="1" custom:borderRight="1" android:padding="2px"/>
           <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvAvgOf" android:layout_weight="2" android:text="@string/last_avg_of" custom:borderTop="2" style="@style/AverageTableHeaderField" android:padding="2px"/>
           <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvBestOf" android:layout_weight="2" android:text="@string/best_avg_of" custom:borderTop="2" custom:borderRight="2" style="@style/AverageTableHeaderField" android:padding="2px"/>
         </TableRow>
         <TableRow>
-          <com.cube.nanotimer.util.view.BorderTextView android:text="5" android:layout_weight="1" custom:borderLeft="2" style="@style/AverageTableHeaderField" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvAvgOfFive" android:layout_weight="2" style="@style/AverageTableTextField" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvBestOfFive" android:layout_weight="2" custom:borderRight="2" style="@style/AverageTableTextField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitBorderTextView android:text="5" android:minWidth="70px" custom:borderLeft="2" style="@style/AverageTableHeaderField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitBorderTextView android:id="@+id/tvAvgOfFive" android:layout_weight="2" style="@style/AverageTableTextField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitBorderTextView android:id="@+id/tvBestOfFive" android:layout_weight="2" custom:borderRight="2" style="@style/AverageTableTextField" android:padding="2px"/>
         </TableRow>
         <TableRow>
-          <com.cube.nanotimer.util.view.BorderTextView android:text="12" android:layout_weight="1" custom:borderLeft="2" style="@style/AverageTableHeaderField" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvAvgOfTwelve" android:layout_weight="2" style="@style/AverageTableTextField" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvBestOfTwelve" android:layout_weight="2" custom:borderRight="2" style="@style/AverageTableTextField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitBorderTextView android:text="12" android:minWidth="70px" custom:borderLeft="2" style="@style/AverageTableHeaderField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitBorderTextView android:id="@+id/tvAvgOfTwelve" android:layout_weight="2" style="@style/AverageTableTextField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitBorderTextView android:id="@+id/tvBestOfTwelve" android:layout_weight="2" custom:borderRight="2" style="@style/AverageTableTextField" android:padding="2px"/>
         </TableRow>
         <TableRow>
-          <com.cube.nanotimer.util.view.BorderTextView android:text="100" android:layout_weight="1" custom:borderBottom="2" custom:borderLeft="2" style="@style/AverageTableHeaderField" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvAvgOfHundred" android:layout_weight="2" custom:borderBottom="2" style="@style/AverageTableTextField" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvBestOfHundred" android:layout_weight="2" custom:borderBottom="2" custom:borderRight="2" style="@style/AverageTableTextField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitBorderTextView android:text="100" android:minWidth="70px" custom:borderBottom="2" custom:borderLeft="2" style="@style/AverageTableHeaderField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitBorderTextView android:id="@+id/tvAvgOfHundred" android:layout_weight="2" custom:borderBottom="2" style="@style/AverageTableTextField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitBorderTextView android:id="@+id/tvBestOfHundred" android:layout_weight="2" custom:borderBottom="2" custom:borderRight="2" style="@style/AverageTableTextField" android:padding="2px"/>
+        </TableRow>
+        <TableRow android:id="@+id/trAvgOfLife">
+          <com.cube.nanotimer.util.view.FontFitBorderTextView android:text="@string/life" android:minWidth="70px" custom:borderBottom="2" custom:borderLeft="2" style="@style/AverageTableHeaderField"/>
+          <com.cube.nanotimer.util.view.FontFitBorderTextView android:id="@+id/tvAvgOfLife" android:layout_weight="2" custom:borderBottom="2" style="@style/AverageTableTextField"/>
+          <com.cube.nanotimer.util.view.FontFitBorderTextView android:layout_weight="2" custom:borderBottom="2" custom:borderRight="2" style="@style/AverageTableTextField"/>
         </TableRow>
       </TableLayout>
     </RelativeLayout>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:custom="http://schemas.android.com/apk/res/com.cube.nanotimer"
    android:orientation="vertical"
    android:layout_width="match_parent"
    android:layout_height="match_parent"
@@ -26,29 +27,49 @@
        style="@style/MenuButton"/>
   </LinearLayout>
 
-  <LinearLayout
-     android:orientation="horizontal"
-     android:layout_width="wrap_content"
+  <TableLayout
+     android:id="@+id/layoutTypes"
+     android:layout_width="match_parent"
      android:layout_height="wrap_content"
      android:layout_marginTop="8px"
-     android:padding="8px">
-    <TextView
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:text="@string/time"
-       style="@style/SimpleTextField"/>
-    <TextView
-       android:id="@+id/tvTime"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_marginLeft="15px"
-       style="@style/SimpleTextField"/>
-  </LinearLayout>
+     android:padding="8px"
+     android:stretchColumns="1"
+     android:layout_alignParentTop="true">
+    <TableRow>
+      <TextView
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="@string/time"
+         android:textSize="27px"/>
+      <TextView
+         android:id="@+id/tvTime"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginLeft="15px"
+         android:layout_weight="1"
+         android:textSize="27px"/>
+    </TableRow>
+    <TableRow android:id="@+id/trSteps" android:layout_marginTop="8px">
+      <TextView
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="@string/steps"
+         android:textSize="27px"/>
+      <TextView
+         android:id="@+id/tvSteps"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginLeft="15px"
+         android:layout_weight="1"
+         android:textSize="27px"/>
+    </TableRow>
+  </TableLayout>
 
   <com.cube.nanotimer.util.view.FontFitTextView
      android:id="@+id/tvScramble"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
+     custom:font="MONOSPACE"
      android:layout_marginTop="8px"
      android:layout_marginBottom="8px"
      android:padding="3px"

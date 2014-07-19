@@ -10,11 +10,12 @@
   </style>
 
   <style name="SolveStepTextField">
-    <item name="android:textSize">40px</item>
+    <item name="android:textSize">30px</item>
     <item name="android:layout_weight">1</item>
     <item name="android:layout_width">0px</item>
     <item name="android:layout_marginLeft">5px</item>
     <item name="android:layout_marginRight">5px</item>
+    <item name="android:singleLine">true</item>
   </style>
 
   <style name="SessionTimeTextField">
@@ -37,6 +38,8 @@
   <style name="AverageTableTextField">
     <item name="android:textSize">21px</item>
     <item name="android:gravity">center</item>
+    <item name="android:paddingLeft">2px</item>
+    <item name="android:paddingRight">2px</item>
     <item name="borderColor">@color/neon</item>
     <item name="border">1</item>
   </style>

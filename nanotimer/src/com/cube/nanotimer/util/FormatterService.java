@@ -10,6 +10,7 @@ import com.cube.nanotimer.vo.CubeType;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 public enum FormatterService {
   INSTANCE;
@@ -48,6 +49,24 @@ public enum FormatterService {
     }
     SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy - HH:mm:ss");
     return sdf.format(new Date(ms));
+  }
+
+  /**
+   * Format the times of different steps to a String
+   * @param times a list of times in ms
+   * @return the formatted steps times
+   */
+  public String formatStepsTimes(List<Long> times) {
+    StringBuilder sb = new StringBuilder();
+    if (times != null) {
+      for (int i = 0; i < times.size(); i++) {
+        sb.append(formatSolveTime(times.get(i)));
+        if (i < times.size() - 1) {
+          sb.append(" / ");
+        }
+      }
+    }
+    return sb.toString();
   }
 
   /**

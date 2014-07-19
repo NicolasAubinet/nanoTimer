@@ -81,47 +81,36 @@ public class DBHelper extends SQLiteOpenHelper {
 
   @Override
   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    db.execSQL("DROP TABLE IF EXISTS " + DB.TABLE_TIMEHISTORY + "_tmp");
-    db.execSQL("DROP TABLE IF EXISTS " + DB.TABLE_SOLVETYPE + "_tmp");
-    db.execSQL("DROP TABLE IF EXISTS " + DB.TABLE_CUBETYPE + "_tmp");
-
-    db.execSQL("CREATE TABLE " + DB.TABLE_SOLVETYPESTEP + "(" +
-        DB.COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-        DB.COL_SOLVETYPESTEP_NAME + " TEXT, " +
-        DB.COL_SOLVETYPESTEP_POSITION + " INTEGER NOT NULL, " +
-        DB.COL_SOLVETYPESTEP_SOLVETYPE_ID + " INTEGER, " +
-        "FOREIGN KEY (" + DB.COL_SOLVETYPESTEP_SOLVETYPE_ID + ") REFERENCES " + DB.TABLE_SOLVETYPE + " (" + DB.COL_ID + ") " +
-      ");"
-    );
-
-    db.execSQL("CREATE TABLE " + DB.TABLE_TIMEHISTORYSTEP + "(" +
-        DB.COL_TIMEHISTORYSTEP_TIME + " INTEGER, " +
-        DB.COL_TIMEHISTORYSTEP_SOLVETYPESTEP_ID + " INTEGER, " +
-        DB.COL_TIMEHISTORYSTEP_TIMEHISTORY_ID + " INTEGER, " +
-        "FOREIGN KEY (" + DB.COL_TIMEHISTORYSTEP_SOLVETYPESTEP_ID + ") REFERENCES " + DB.TABLE_SOLVETYPESTEP + " (" + DB.COL_ID + "), " +
-        "FOREIGN KEY (" + DB.COL_TIMEHISTORYSTEP_TIMEHISTORY_ID + ") REFERENCES " + DB.TABLE_TIMEHISTORY + " (" + DB.COL_ID + ") " +
-      ");"
-    );
-
-    // Insert some steps (to be able to retrieve them, before implementing the steps creation part in the options menu)
     ContentValues values = new ContentValues(); // TODO : if keeping this, use translated values (even if will only display it in english)
-    values.put(DB.COL_SOLVETYPE_NAME, "CFOP");
-    values.put(DB.COL_SOLVETYPE_CUBETYPE_ID, 2);
+    values.put(DB.COL_SOLVETYPE_NAME, "TestSteps");
+    values.put(DB.COL_SOLVETYPE_CUBETYPE_ID, 6);
     int solveTypeId = (int) db.insert(DB.TABLE_SOLVETYPE, null, values);
 
     values = new ContentValues();
     values.put(DB.COL_SOLVETYPESTEP_SOLVETYPE_ID, solveTypeId);
     values.put(DB.COL_SOLVETYPESTEP_POSITION, 1);
-    values.put(DB.COL_SOLVETYPESTEP_NAME, "Cross");
+    values.put(DB.COL_SOLVETYPESTEP_NAME, "Step1");
     db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
     values.put(DB.COL_SOLVETYPESTEP_POSITION, 2);
-    values.put(DB.COL_SOLVETYPESTEP_NAME, "F2L");
+    values.put(DB.COL_SOLVETYPESTEP_NAME, "Step2");
     db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
     values.put(DB.COL_SOLVETYPESTEP_POSITION, 3);
-    values.put(DB.COL_SOLVETYPESTEP_NAME, "OLL");
+    values.put(DB.COL_SOLVETYPESTEP_NAME, "Step3");
     db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
     values.put(DB.COL_SOLVETYPESTEP_POSITION, 4);
-    values.put(DB.COL_SOLVETYPESTEP_NAME, "PLL");
+    values.put(DB.COL_SOLVETYPESTEP_NAME, "Step4");
+    db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
+    values.put(DB.COL_SOLVETYPESTEP_POSITION, 5);
+    values.put(DB.COL_SOLVETYPESTEP_NAME, "Step5");
+    db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
+    values.put(DB.COL_SOLVETYPESTEP_POSITION, 6);
+    values.put(DB.COL_SOLVETYPESTEP_NAME, "Step6");
+    db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
+    values.put(DB.COL_SOLVETYPESTEP_POSITION, 7);
+    values.put(DB.COL_SOLVETYPESTEP_NAME, "Step7");
+    db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
+    values.put(DB.COL_SOLVETYPESTEP_POSITION, 8);
+    values.put(DB.COL_SOLVETYPESTEP_NAME, "VeryVeryLongStep8TitleToTestTheLength!");
     db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
   }
 

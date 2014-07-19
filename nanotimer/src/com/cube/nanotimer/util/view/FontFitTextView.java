@@ -1,17 +1,38 @@
 package com.cube.nanotimer.util.view;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.widget.TextView;
+import com.cube.nanotimer.R;
 
-public class FontFitTextView extends MonospacedTextView {
+public class FontFitTextView extends TextView {
 
   private Paint mTestPaint;
   private float initialTextSize;
   private int textSizeUnit = TypedValue.COMPLEX_UNIT_PX;
 
-  private int previousWidth;
+  enum Font {
+    MONOSPACE(0, "fonts/DroidSansMono.ttf");
+
+    private int id;
+    private String fontName;
+    Font(int id, String fontName) {
+      this.id = id;
+      this.fontName = fontName;
+    }
+    public static Font getFont(int id) {
+      for (Font f : values()) {
+        if (f.id == id) {
+          return f;
+        }
+      }
+      return null;
+    }
+  }
 
   public FontFitTextView(Context context) {
     super(context);
@@ -22,13 +43,25 @@ public class FontFitTextView extends MonospacedTextView {
   public FontFitTextView(Context context, AttributeSet attrs) {
     super(context, attrs);
     initialTextSize = getTextSize();
-    init();
+    init(context, attrs);
   }
 
   private void init() {
     mTestPaint = new Paint();
     mTestPaint.set(getPaint());
     // max size defaults to the initially specified text size unless it is too small
+  }
+
+  private void init(Context context, AttributeSet attrs) {
+    init();
+
+    TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FontFitTextView);
+    if (a.hasValue(R.styleable.FontFitTextView_font)) {
+      Font font = Font.getFont(a.getInt(R.styleable.FontFitTextView_font, -1));
+      if (font != null) {
+        setFont(font.fontName);
+      }
+    }
   }
 
   /*
@@ -88,6 +121,13 @@ public class FontFitTextView extends MonospacedTextView {
     initialTextSize = size;
     textSizeUnit = unit;
     super.setTextSize(unit, size);
+  }
+
+  public void setFont(String fontString) {
+    if (!isInEditMode()) {
+      Typeface font = Typeface.createFromAsset(getContext().getAssets(), fontString);
+      setTypeface(font);
+    }
   }
 
 }

@@ -19,6 +19,7 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
+import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.scrambler.ScramblerFactory;
 import com.cube.nanotimer.services.db.DataCallback;
@@ -33,6 +34,7 @@ import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.SolveTypeStep;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -118,9 +120,15 @@ public class TimerActivity extends Activity {
       findViewById(R.id.tvAvgOfFive).setLayoutParams(layoutParams);
       findViewById(R.id.tvAvgOfTwelve).setLayoutParams(layoutParams);
       findViewById(R.id.tvAvgOfHundred).setLayoutParams(layoutParams);
+      findViewById(R.id.tvAvgOfLife).setLayoutParams(layoutParams);
       timerStepsLayout.setVisibility(View.VISIBLE);
+      if (solveType.getSteps().length <= 4) {
+        timerStepsLayout.setColumnCollapsed(2, true);
+        timerStepsLayout.setColumnCollapsed(3, true);
+      }
     } else {
       timerStepsLayout.setVisibility(View.GONE);
+      findViewById(R.id.trAvgOfLife).setVisibility(View.GONE);
     }
 
     layout = (ViewGroup) findViewById(R.id.layoutTimer);
@@ -177,6 +185,9 @@ public class TimerActivity extends Activity {
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.timer_menu, menu);
+    if (solveType.hasSteps()) {
+      menu.findItem(R.id.itNewSession).setVisible(false);
+    }
     return true;
   }
 
@@ -234,13 +245,13 @@ public class TimerActivity extends Activity {
       SpannedString scrambleText = (SpannedString) tvScramble.getText();
       String cubeTypeText = tvCubeType.getText().toString();
 
-      List<String> stepsHeaders = new ArrayList<String>();
-      List<String> stepsTimes = new ArrayList<String>();
+      List<String> stepsText = new ArrayList<String>();
       if (solveType.hasSteps()) {
         for (int i = 0; i < timerStepsLayout.getChildCount(); i++) {
           TableRow tr = (TableRow) timerStepsLayout.getChildAt(i);
-          stepsHeaders.add(((TextView) tr.getChildAt(0)).getText().toString());
-          stepsTimes.add(((TextView) tr.getChildAt(1)).getText().toString());
+          for (int j = 0; j < tr.getChildCount(); j++) {
+            stepsText.add(((TextView) tr.getChildAt(j)).getText().toString());
+          }
         }
       }
 
@@ -256,10 +267,12 @@ public class TimerActivity extends Activity {
       refreshAvgFields();
 
       if (solveType.hasSteps()) {
+        Iterator<String> it = stepsText.iterator();
         for (int i = 0; i < timerStepsLayout.getChildCount(); i++) {
           TableRow tr = (TableRow) timerStepsLayout.getChildAt(i);
-          ((TextView) tr.getChildAt(0)).setText(stepsHeaders.get(i));
-          ((TextView) tr.getChildAt(1)).setText(stepsTimes.get(i));
+          for (int j = 0; j < tr.getChildCount(); j++) {
+            ((TextView) tr.getChildAt(j)).setText(it.next());
+          }
         }
       }
     }
@@ -417,9 +430,11 @@ public class TimerActivity extends Activity {
     String defaultText = "0.00";
     tvTimer.setText(defaultText);
     if (solveType.hasSteps()) {
-      for (int i = 0; i < solveType.getSteps().length; i++) { // TODO handle this to make sure that solve types length is not bigger than the number of rows
+      for (int i = 0; i < solveType.getSteps().length; i++) {
         SolveTypeStep sts = solveType.getSteps()[i];
-        ((TextView) ((TableRow) timerStepsLayout.getChildAt(i)).getChildAt(0)).setText(sts.getName() + ": ");
+        int rowInd = i % 4;
+        int colInd = (i < 4) ? 0 : 2;
+        ((TextView) ((TableRow) timerStepsLayout.getChildAt(rowInd)).getChildAt(colInd)).setText(sts.getName() + ": ");
         updateStepTimeText(i, defaultText);
       }
     }
@@ -443,26 +458,16 @@ public class TimerActivity extends Activity {
   }
 
   private void updateStepTimeText(int id, String time) {
-    if (id >= 0 && id < timerStepsLayout.getChildCount()) {
-      ((TextView) ((TableRow) timerStepsLayout.getChildAt(id)).getChildAt(1)).setText(time);
+    if (id > Options.INSTANCE.getMaxStepsCount()) {
+      id = Options.INSTANCE.getMaxStepsCount();
     }
+    int rowInd = id % 4;
+    int colInd = (id < 4) ? 1 : 3;
+    ((TextView) ((TableRow) timerStepsLayout.getChildAt(rowInd)).getChildAt(colInd)).setText(time);
   }
 
   private String formatAvgField(Long f) {
     return FormatterService.INSTANCE.formatSolveTime(f, "-");
-  }
-
-  private String formatStepsAverages(List<Long> times) {
-    StringBuilder sb = new StringBuilder();
-    if (times != null) {
-      for (int i = 0; i < times.size(); i++) {
-        sb.append(FormatterService.INSTANCE.formatSolveTime(times.get(i)));
-        if (i < times.size() - 1) {
-          sb.append(" / ");
-        }
-      }
-    }
-    return sb.toString();
   }
 
   private synchronized void updateTimerText(long curTime) {
@@ -513,9 +518,26 @@ public class TimerActivity extends Activity {
       ((TextView) findViewById(R.id.tvLifetimeBest)).setText(FormatterService.INSTANCE.formatSolveTime(
           solveAverages.getBestOfLifetime(), getString(R.string.NA)));
     } else {
-      ((TextView) findViewById(R.id.tvAvgOfFive)).setText(formatStepsAverages(solveAverages.getStepsAvgOf5()));
-      ((TextView) findViewById(R.id.tvAvgOfTwelve)).setText(formatStepsAverages(solveAverages.getStepsAvgOf12()));
-      ((TextView) findViewById(R.id.tvAvgOfHundred)).setText(formatStepsAverages(solveAverages.getStepsAvgOf100()));
+      ((TextView) findViewById(R.id.tvAvgOfFive)).setText(
+          FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf5()));
+      ((TextView) findViewById(R.id.tvAvgOfTwelve)).setText(
+          FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf12()));
+      ((TextView) findViewById(R.id.tvAvgOfHundred)).setText(
+          FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf100()));
+      ((TextView) findViewById(R.id.tvAvgOfLife)).setText(
+          FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOfLifetime()));
+
+      // Test :
+      List<Long> testTimes = new ArrayList<Long>();
+      testTimes.add(60000l);
+      testTimes.add(90000l);
+      testTimes.add(120000l);
+      testTimes.add(150000l);
+      testTimes.add(180000l);
+      testTimes.add(210000l);
+      testTimes.add(240000l);
+      testTimes.add(270000l);
+      ((TextView) findViewById(R.id.tvAvgOfHundred)).setText(FormatterService.INSTANCE.formatStepsTimes(testTimes));
     }
   }
 

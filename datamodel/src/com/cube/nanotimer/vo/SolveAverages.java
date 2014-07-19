@@ -19,6 +19,7 @@ public class SolveAverages {
   private List<Long> stepsAvgOf5;
   private List<Long> stepsAvgOf12;
   private List<Long> stepsAvgOf100;
+  private List<Long> stepsAvgOfLifetime;
 
   public SolveAverages() {
   }
@@ -126,6 +127,14 @@ public class SolveAverages {
 
   public List<Long> getStepsAvgOf100() {
     return stepsAvgOf100;
+  }
+
+  public List<Long> getStepsAvgOfLifetime() {
+    return stepsAvgOfLifetime;
+  }
+
+  public void setStepsAvgOfLifetime(List<Long> stepsAvgOfLifetime) {
+    this.stepsAvgOfLifetime = stepsAvgOfLifetime;
   }
 
   @Override

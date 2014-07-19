@@ -8,4 +8,9 @@
     <attr name="borderLeft" format="integer"/>
     <attr name="borderRight" format="integer"/>
   </declare-styleable>
+  <declare-styleable name="FontFitTextView">
+    <attr name="font">
+      <enum name="MONOSPACE" value="0"/>
+    </attr>
+  </declare-styleable>
 </resources>

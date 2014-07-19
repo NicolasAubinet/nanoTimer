@@ -3,7 +3,6 @@ package com.cube.nanotimer.services;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 import com.cube.nanotimer.services.db.DB;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveAverages;
@@ -211,7 +210,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("   AND ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_TIME).append(" > 0");
     q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC, ").append(DB.COL_SOLVETYPESTEP_POSITION);
     q.append(" LIMIT ").append(MAX_AVERAGE_COUNT);
-    Log.i("[Steps]", "q: " + q);
+//    Log.i("[Steps]", "q: " + q);
     Cursor cursor = db.rawQuery(q.toString(), new String[] { String.valueOf(solveType.getId()) });
     if (cursor != null) {
       int curHistoryId = -1;
@@ -252,6 +251,11 @@ public class ServiceProviderImpl implements ServiceProvider {
         }
         i++;
       }
+      List<Long> lifeAvgs = new ArrayList<Long>();
+      for (Long l : stepsSums) {
+        lifeAvgs.add(l / i);
+      }
+      solveAverages.setStepsAvgOfLifetime(lifeAvgs);
     }
   }
 
