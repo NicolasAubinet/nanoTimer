@@ -434,7 +434,7 @@ public class TimerActivity extends Activity {
         SolveTypeStep sts = solveType.getSteps()[i];
         int rowInd = i % 4;
         int colInd = (i < 4) ? 0 : 2;
-        ((TextView) ((TableRow) timerStepsLayout.getChildAt(rowInd)).getChildAt(colInd)).setText(sts.getName() + ": ");
+        ((TextView) ((TableRow) timerStepsLayout.getChildAt(rowInd)).getChildAt(colInd)).setText(sts.getName() + ":");
         updateStepTimeText(i, defaultText);
       }
     }
@@ -526,18 +526,6 @@ public class TimerActivity extends Activity {
           FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf100()));
       ((TextView) findViewById(R.id.tvAvgOfLife)).setText(
           FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOfLifetime()));
-
-      // Test :
-      List<Long> testTimes = new ArrayList<Long>();
-      testTimes.add(60000l);
-      testTimes.add(90000l);
-      testTimes.add(120000l);
-      testTimes.add(150000l);
-      testTimes.add(180000l);
-      testTimes.add(210000l);
-      testTimes.add(240000l);
-      testTimes.add(270000l);
-      ((TextView) findViewById(R.id.tvAvgOfHundred)).setText(FormatterService.INSTANCE.formatStepsTimes(testTimes));
     }
   }
 

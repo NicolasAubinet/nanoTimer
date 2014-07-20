@@ -19,6 +19,7 @@ public class TestServiceProvider extends AndroidTestCase {
   private CubeType cubeType1;
   private SolveType solveType1;
   private SolveType solveType2;
+  private SolveType solveTypeSteps;
   private int timeCpt = 0;
 
   @Override
@@ -34,6 +35,12 @@ public class TestServiceProvider extends AndroidTestCase {
         List<SolveType> solveTypes = provider.getSolveTypes(ct);
         solveType1 = solveTypes.get(0);
         solveType2 = solveTypes.get(1);
+        for (SolveType st : solveTypes) {
+          if ("CFOP".equals(st.getName())) {
+            solveTypeSteps = st; // TODO : create this type by calling a provider method
+            break;
+          }
+        }
       }
     }
   }
@@ -179,6 +186,36 @@ public class TestServiceProvider extends AndroidTestCase {
 
   // TODO test for lifetime avg (test before 1000 records and after)
 
+  @SmallTest
+  public void testStepsAverages() {
+    SolveAverages averages = saveStepTimes(10, 20, 30, 40);
+    assertNull(averages.getStepsAvgOf5());
+    assertNull(averages.getStepsAvgOf12());
+    assertNull(averages.getStepsAvgOf100());
+    assertStepsEquals(averages.getStepsAvgOfLifetime(), 10, 20, 30, 40);
+
+    averages = saveStepTimes(12, 22, 32, 42);
+    assertStepsEquals(averages.getStepsAvgOfLifetime(), 11, 21, 31, 41);
+
+    averages = saveStepTimes(8, 18, 28, 38);
+    assertStepsEquals(averages.getStepsAvgOfLifetime(), 10, 20, 30, 40);
+
+    averages = saveStepTimes(-1, -1, -1, -1); // to simulate a DNF (not taken into account)
+    assertStepsEquals(averages.getStepsAvgOfLifetime(), 10, 20, 30, 40);
+
+    averages = saveStepTimes(30, 40, 50, 60);
+    assertStepsEquals(averages.getStepsAvgOfLifetime(), 15, 25, 35, 45);
+    assertNull(averages.getStepsAvgOf5());
+
+    averages = saveStepTimes(10, 20, 30, 40);
+    assertStepsEquals(averages.getStepsAvgOfLifetime(), 14, 24, 34, 44);
+    assertStepsEquals(averages.getStepsAvgOf5(), 14, 24, 34, 44);
+
+    averages = saveStepTimes(50, 30, 10, 20);
+    assertStepsEquals(averages.getStepsAvgOfLifetime(), 20, 25, 30, 40);
+    assertStepsEquals(averages.getStepsAvgOf5(), 22, 26, 30, 40);
+  }
+
   private SolveAverages saveTimes(long time, int count) {
     SolveAverages averages = null;
     for (int i = 0; i < count; i++) {
@@ -197,6 +234,22 @@ public class TestServiceProvider extends AndroidTestCase {
     st.setTimestamp(100 + (timeCpt++));
     st.setSolveType(solveType);
     st.setTime(time);
+    return provider.saveTime(st);
+  }
+
+  private SolveAverages saveStepTimes(long... times) {
+    SolveTime st = new SolveTime();
+    st.setScramble(SCRAMBLE);
+    st.setTimestamp(100 + (timeCpt++));
+    st.setSolveType(solveTypeSteps);
+    long sum = 0;
+    Long[] t = new Long[times.length];
+    for (int i = 0; i < times.length; i++) {
+      t[i] = times[i];
+      sum += t[i];
+    }
+    st.setTime(sum);
+    st.setStepsTimes(t);
     return provider.saveTime(st);
   }
 
@@ -223,6 +276,14 @@ public class TestServiceProvider extends AndroidTestCase {
     Long lbest100 = (best100 == null) ? null : Long.valueOf(best100);
     Long lbestLifetime = (bestLifetime == null) ? null : Long.valueOf(bestLifetime);
     Assert.assertEquals(new SolveAverages(lavg5, lavg12, lavg100, lavgLifetime, lbest5, lbest12, lbest100, lbestLifetime), averages);
+  }
+
+  private void assertStepsEquals(List<Long> averages, long... values) {
+    assertNotNull(averages);
+    assertEquals(values.length, averages.size());
+    for (int i = 0; i < averages.size(); i++) {
+      assertEquals(values[i], averages.get(i).longValue());
+    }
   }
 
 }

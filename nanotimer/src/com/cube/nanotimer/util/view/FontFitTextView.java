@@ -85,6 +85,13 @@ public class FontFitTextView extends TextView {
     }
     mTestPaint.set(getPaint());
 
+    mTestPaint.setTextSize(initialTextSize);
+    if (mTestPaint.measureText(longestLine) < targetWidth) {
+      // Set the initial size
+      super.setTextSize(textSizeUnit, initialTextSize);
+      return;
+    }
+
     while ((hi - lo) > threshold) {
       float size = (hi+lo) / 2;
       mTestPaint.setTextSize(size);

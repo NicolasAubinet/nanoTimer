@@ -191,7 +191,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     return solveAverages;
   }
 
-  private void setStepsAverages(SolveAverages solveAverages, SolveType solveType) {
+  void setStepsAverages(SolveAverages solveAverages, SolveType solveType) {
     if (!solveType.hasSteps()) {
       return;
     }
@@ -210,7 +210,6 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("   AND ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_TIME).append(" > 0");
     q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC, ").append(DB.COL_SOLVETYPESTEP_POSITION);
     q.append(" LIMIT ").append(MAX_AVERAGE_COUNT);
-//    Log.i("[Steps]", "q: " + q);
     Cursor cursor = db.rawQuery(q.toString(), new String[] { String.valueOf(solveType.getId()) });
     if (cursor != null) {
       int curHistoryId = -1;
@@ -232,12 +231,10 @@ public class ServiceProviderImpl implements ServiceProvider {
       cursor.close();
     }
 
-//    Log.i("[Steps]", "size: " + stepsTimes.size());
     if (stepsTimes.size() > 0) {
       int i = 0;
       long[] stepsSums = new long[stepsTimes.get(0).size()];
       for (List<Long> st : stepsTimes) {
-//        Log.i("[Steps]", "st: " + Arrays.toString(st.toArray()));
         for (int j = 0; j < st.size(); j++) {
           stepsSums[j] += st.get(j);
         }
@@ -246,7 +243,6 @@ public class ServiceProviderImpl implements ServiceProvider {
           for (Long l : stepsSums) {
             avgs.add(l / (i+1));
           }
-//          Log.i("[Steps]", "set avg of " + (i+1) + " to " + Arrays.toString(avgs.toArray()));
           solveAverages.setStepsAvgOf(i + 1, avgs);
         }
         i++;

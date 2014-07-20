@@ -215,7 +215,7 @@
        android:gravity="bottom"
        android:layout_margin="2px">
       <TableRow>
-        <com.cube.nanotimer.util.view.BorderTextView android:textSize="21px" android:minWidth="70px" custom:borderColor="@color/neon" custom:border="0" custom:borderBottom="1" custom:borderRight="1"/>
+        <com.cube.nanotimer.util.view.BorderTextView android:textSize="21px" android:minWidth="70px" android:layout_height="30px" android:textStyle="bold" custom:borderColor="@color/neon" custom:border="0" custom:borderBottom="1" custom:borderRight="1"/>
         <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvAvgOf" android:text="@string/last_avg_of" android:layout_weight="2" custom:borderTop="2" style="@style/AverageTableHeaderField"/>
         <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvBestOf" android:text="@string/best_avg_of" android:layout_weight="2" custom:borderTop="2" custom:borderRight="2" style="@style/AverageTableHeaderField"/>
       </TableRow>
