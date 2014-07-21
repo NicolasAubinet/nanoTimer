@@ -116,7 +116,9 @@ public class ServiceImpl extends DBHelper implements Service {
       @Override
       public void run() {
         provider.deleteHistory();
-        callback.onData(null);
+        if (callback != null) {
+          callback.onData(null);
+        }
       }
     });
   }
@@ -127,7 +129,9 @@ public class ServiceImpl extends DBHelper implements Service {
       @Override
       public void run() {
         provider.deleteHistory(solveType);
-        callback.onData(null);
+        if (callback != null) {
+          callback.onData(null);
+        }
       }
     });
   }

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <PreferenceCategory
+     android:title="@string/inspection">
+
+    <ListPreference
+       android:key="inspection_mode"
+       android:title="@string/inspection_mode"
+       android:summary="@string/inspection_mode_summary"
+       android:entries="@array/entries_inspection_modes"
+       android:entryValues="@array/entryvalues_inspection_modes"
+       android:dialogTitle="@string/inspection_mode"
+       android:defaultValue="@integer/inspection_mode"/>
+
+    <com.cube.nanotimer.activity.widget.InspectionTimeDialog
+       android:key="inspection_time"
+       android:title="@string/inspection_time"
+       android:summary="@string/inspection_time_summary"/>
+
+  </PreferenceCategory>
+
+  <PreferenceCategory
+     android:title="@string/solve_types">
+
+    <Preference
+       android:title="@string/edit_solve_types"
+       android:summary="@string/edit_solve_types_summary">
+
+      <intent android:action="com.cube.nanotimer.activity.SolveTypesActivity"/>
+
+    </Preference>
+
+  </PreferenceCategory>
+
+  <PreferenceCategory
+     android:title="@string/history">
+
+    <com.cube.nanotimer.activity.widget.ClearHistoryDialog
+       android:title="@string/clear_history"
+       android:summary="@string/clear_all_history"
+       android:dialogMessage="@string/clear_all_history_confirmation"
+       android:positiveButtonText="@string/yes"
+       android:negativeButtonText="@string/no"/>
+
+  </PreferenceCategory>
+
+</PreferenceScreen>

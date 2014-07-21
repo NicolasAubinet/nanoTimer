@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.cube.nanotimer.util.view.ScalingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:dslv="http://schemas.android.com/apk/res/com.cube.nanotimer"
+   android:orientation="vertical"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   android:layout_margin="8px">
+
+  <Button
+     android:id="@+id/buAdd"
+     android:text="@string/add_solvetype"
+     android:layout_width="wrap_content"
+     android:paddingLeft="15px"
+     android:paddingRight="15px"
+     style="@style/CustomButton"/>
+
+  <com.mobeta.android.dslv.DragSortListView
+     android:id="@+id/lvSolveTypes"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:longClickable="true"
+     android:layout_marginTop="15px"
+     dslv:drag_handle_id="@drawable/listmove"
+     dslv:drag_enabled="true"
+     dslv:drag_scroll_start="0.33"
+     dslv:drag_start_mode="onMove"
+     dslv:float_alpha="0.6"
+     dslv:max_drag_scroll_speed="0.5"
+     dslv:remove_enabled="true"
+     dslv:sort_enabled="true"
+     dslv:track_drag_sort="false"
+     dslv:use_default_controller="true"/>
+
+</com.cube.nanotimer.util.view.ScalingLinearLayout>

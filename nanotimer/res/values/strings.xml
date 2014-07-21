@@ -12,7 +12,7 @@
   <string name="one_handed">One-handed</string>
   <string name="blindfolded">Blindfolded</string>
 
-  <string name="add">Add</string>
+  <string name="add_solvetype">Add solve type</string>
   <string name="action">Action</string>
   <string name="rename">Rename</string>
   <string name="cancel">Cancel</string>
@@ -33,11 +33,28 @@
   <string name="delete">Delete</string>
   <string name="new_session">New session</string>
   <string name="time">Time:</string>
-  <string name="steps">Steps:</string>
+  <string name="steps">Steps</string>
+  <string name="stepsC">Steps:</string>
   <string name="NA">N/A</string>
 
   <string name="clear_history">Clear history</string>
-  <string name="clear_history_confirmation">Are you sure you want to delete all the times for this solve type?</string>
+  <string name="clear_history_solve_type_confirmation">Are you sure you want to delete all the times for this solve type?</string>
+  <string name="clear_all_history_confirmation">Are you sure you want to delete the whole history?</string>
+
+  <string name="options">Options</string>
+  <string name="inspection_mode">Inspection mode</string>
+  <string name="inspection_mode_summary">Select the timer inspection mode</string>
+  <string name="hold_and_release">Hold and release</string>
+  <string name="automatic">Automatic</string>
+  <string name="inspection_time">Inspection time</string>
+  <string name="inspection_time_summary">Select the inspection time</string>
+  <string name="solve_types">Solve types</string>
+  <string name="edit_solve_types">Edit solve types</string>
+  <string name="edit_solve_types_summary">Edit, create and delete solve types</string>
+  <string name="clear_all_history">Delete all the times</string>
+  <string name="yes">Yes</string>
+  <string name="no">No</string>
+  <string name="choose_cube_type">Choose a cube type:</string>
 
   <string name="session">Session:</string>
   <string name="raOf5">RA of 5:</string>

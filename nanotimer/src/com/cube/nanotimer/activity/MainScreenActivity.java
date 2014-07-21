@@ -175,7 +175,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
       case R.id.itClearHistory:
-        Utils.showYesNoConfirmation(this, R.string.clear_history_confirmation, new YesNoListener() {
+        Utils.showYesNoConfirmation(this, R.string.clear_history_solve_type_confirmation, new YesNoListener() {
           @Override
           public void onYes() {
             if (curSolveType != null) {
@@ -188,6 +188,9 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
             }
           }
         });
+        break;
+      case R.id.itOptions:
+        startActivity(new Intent(this, OptionsActivity.class));
         break;
     }
     return true;
@@ -372,14 +375,16 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
 
     @Override
     public void itemSelected(int id, int position) {
-      if (id == ID_CUBETYPE) {
-        curCubeType = cubeTypes.get(position);
-        buCubeType.setText(curCubeType.getName());
-        refreshSolveTypes();
-      } else if (id == ID_SOLVETYPE) {
-        curSolveType = solveTypes.get(position);
-        buSolveType.setText(curSolveType.getName());
-        refreshHistory();
+      if (position >= 0) {
+        if (id == ID_CUBETYPE) {
+          curCubeType = cubeTypes.get(position);
+          buCubeType.setText(curCubeType.getName());
+          refreshSolveTypes();
+        } else if (id == ID_SOLVETYPE) {
+          curSolveType = solveTypes.get(position);
+          buSolveType.setText(curSolveType.getName());
+          refreshHistory();
+        }
       }
     }
   }

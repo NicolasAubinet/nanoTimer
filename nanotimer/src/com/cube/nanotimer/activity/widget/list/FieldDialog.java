@@ -12,12 +12,7 @@ import com.cube.nanotimer.R;
 public abstract class FieldDialog extends DialogFragment {
 
   protected Dialog dialog;
-  protected FieldRenamer fieldRenamer;
   protected View editTextView;
-
-  protected FieldDialog(FieldRenamer fieldRenamer) {
-    this.fieldRenamer = fieldRenamer;
-  }
 
   protected Dialog getDialog(int confirmText) {
     LayoutInflater factory = LayoutInflater.from(getActivity());

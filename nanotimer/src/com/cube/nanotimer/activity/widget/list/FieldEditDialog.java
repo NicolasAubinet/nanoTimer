@@ -9,6 +9,7 @@ public class FieldEditDialog extends FieldDialog {
 
   private int pos;
   private EditText tfName;
+  private FieldRenamer fieldRenamer;
 
   private static final String ARG_POS = "pos";
   private static final String ARG_DEFAULT_NAME = "defaultName";
@@ -23,7 +24,7 @@ public class FieldEditDialog extends FieldDialog {
   }
 
   private FieldEditDialog(FieldRenamer fieldRenamer) {
-    super(fieldRenamer);
+    this.fieldRenamer = fieldRenamer;
   }
 
   @Override

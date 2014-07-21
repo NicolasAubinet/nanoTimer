@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string-array name="entries_inspection_modes">
+     <item>@string/hold_and_release</item>
+     <item>@string/automatic</item>
+ </string-array>
+ <string-array name="entryvalues_inspection_modes">
+     <item>1</item>
+     <item>2</item>
+ </string-array>
+</resources>
