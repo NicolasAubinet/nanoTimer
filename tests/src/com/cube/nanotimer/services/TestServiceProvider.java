@@ -179,15 +179,91 @@ public class TestServiceProvider extends AndroidTestCase {
     SolveTime time = getLastTime();
     time.setTime(-1);
     averages = provider.saveTime(time);
-    assertAvgEquals(null, null, null, 1000, null, null, null, 1000, averages); // -1, 1000(x4)
+    assertAvgEquals(null, null, null, 1000, null, null, null, 1000, averages); // 1000(x4), -1
 
-    // TODO add more tests (specially to test the "Handle DNFs" part of recalculateAverages)
+    averages = saveTime(6000);
+    assertAvgEquals(2000, null, null, 2000, 2000, null, null, 1000, averages); // 1000(x4), -1, 6000
+
+    averages = saveTime(2000);
+    assertAvgEquals(2200, null, null, 2000, 2000, null, null, 1000, averages); // 1000(x4), -1, 6000, 2000
+
+    List<SolveTime> times = provider.getHistory(solveType1);
+    times.get(3).setTime(-1);
+    averages = provider.saveTime(times.get(3));
+    assertAvgEquals(2200, null, null, 2200, 2200, null, null, 1000, averages); // 1000(x3), -1(x2), 6000, 2000
+
+    time = getFirstTime();
+    time.setTime(-1);
+    averages = provider.saveTime(time);
+    assertAvgEquals(null, null, null, 2500, null, null, null, 1000, averages); // -1, 1000(x2), -1(x2), 6000, 2000
+
+    averages = saveTime(500);
+    assertAvgEquals(2100, null, null, 2100, 2100, null, null, 500, averages); // -1, 1000(x2), -1(x2), 6000, 2000, 500
+
+    time = getLastTime();
+    time.setTime(-1);
+    averages = provider.saveTime(time);
+    assertAvgEquals(null, null, null, 2500, null, null, null, 1000, averages); // -1, 1000(x2), -1(x2), 6000, 2000, -1
+
+    time = provider.getHistory(solveType1).get(6);
+    time.setTime(-1);
+    averages = provider.saveTime(time);
+    assertAvgEquals(null, null, null, 3000, null, null, null, 1000, averages); // -1(x2), 1000, -1(x2), 6000, 2000, -1
+
+    time = provider.getHistory(solveType1).get(5);
+    time.setTime(-1);
+    averages = provider.saveTime(time);
+    assertAvgEquals(null, null, null, 4000, null, null, null, 2000, averages); // -1(x5), 6000, 2000, -1
+
+    time = provider.getHistory(solveType1).get(1);
+    time.setTime(-1);
+    averages = provider.saveTime(time);
+    assertAvgEquals(null, null, null, 6000, null, null, null, 6000, averages); // -1(x5), 6000, -1(x2)
+
+    time = provider.getHistory(solveType1).get(2);
+    time.setTime(-1);
+    averages = provider.saveTime(time);
+    assertAvgEquals(null, null, null, null, null, null, null, null, averages); // -1(x8)
+
+    averages = saveTime(10);
+    assertAvgEquals(null, null, null, 10, null, null, null, 10, averages); // -1(x8), 10
+    averages = saveTime(30);
+    assertAvgEquals(null, null, null, 20, null, null, null, 10, averages); // -1(x8), 10, 30
+    averages = saveTime(50);
+    assertAvgEquals(null, null, null, 30, null, null, null, 10, averages); // -1(x8), 10, 30, 50
+
+    time = getLastTime();
+    time.setTime(-1);
+    averages = provider.saveTime(time);
+    assertAvgEquals(null, null, null, 20, null, null, null, 10, averages);  // -1(x8), 10, 30, -1
+
+    time = provider.getHistory(solveType1).get(2);
+    time.setTime(-1);
+    averages = provider.saveTime(time);
+    assertAvgEquals(null, null, null, 30, null, null, null, 30, averages);  // -1(x9), 30, -1
+
+    saveTime(50);
+    averages = saveTime(100);
+    assertAvgEquals(null, null, null, 60, null, null, null, 30, averages);  // -1(x9), 30, -1, 50, 100
+
+    time = getLastTime();
+    time.setTime(70);
+    averages = provider.saveTime(time);
+    assertAvgEquals(null, null, null, 50, null, null, null, 30, averages);  // -1(x9), 30, -1, 50, 70
+
+    time = provider.getHistory(solveType1).get(3);
+    time.setTime(60);
+    averages = provider.saveTime(time);
+    assertAvgEquals(null, null, null, 60, null, null, null, 50, averages);  // -1(x9), 60, -1, 50, 70
+
+    // TODO add more tests (specially to test the "Handle DNFs" part of recalculateAverages) (if not already done) (could use code coverage to check this)
   }
 
   // TODO test for lifetime avg (test before 1000 records and after)
 
   @SmallTest
   public void testStepsAverages() {
+    provider.deleteHistory();
     SolveAverages averages = saveStepTimes(10, 20, 30, 40);
     assertNull(averages.getStepsAvgOf5());
     assertNull(averages.getStepsAvgOf12());
