@@ -45,7 +45,9 @@ public class InspectionTimeDialog extends DialogPreference {
       @Override
       public void onClick(View view) {
         int val = getValue();
-        tfValue.setText(String.valueOf(val - 1));
+        if (val >= 1) {
+          tfValue.setText(String.valueOf(val - 1));
+        }
       }
     });
 

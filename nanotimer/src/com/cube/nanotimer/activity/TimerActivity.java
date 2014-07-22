@@ -20,6 +20,7 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
+import com.cube.nanotimer.Options.InspectionMode;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.scrambler.ScramblerFactory;
 import com.cube.nanotimer.services.db.DataCallback;
@@ -64,12 +65,15 @@ public class TimerActivity extends Activity {
   private long stepStartTs;
 
   private final long REFRESH_INTERVAL = 25;
-  private final int INSPECTION_LIMIT = 15;
   private Timer timer;
   private Handler timerHandler = new Handler();
   private Object timerSync = new Object();
   private long timerStartTs;
   private volatile TimerState timerState = TimerState.STOPPED;
+
+  private int inspectionTime;
+  private InspectionMode inspectionMode;
+  private boolean soundsEnabled;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +87,10 @@ public class TimerActivity extends Activity {
     solveType = (SolveType) getIntent().getSerializableExtra("solveType");
     cubeSession = new CubeSession();
     App.INSTANCE.getService().getSolveAverages(solveType, new SolveAverageCallback());
+
+    inspectionTime = Options.INSTANCE.getInspectionTime();
+    inspectionMode = Options.INSTANCE.getInspectionMode();
+    soundsEnabled = Options.INSTANCE.isInspectionSoundsEnabled();
 
     initViews();
 
@@ -135,7 +143,7 @@ public class TimerActivity extends Activity {
     layout.setOnTouchListener(new OnTouchListener() {
       @Override
       public boolean onTouch(View view, MotionEvent motionEvent) {
-        if (timerState == TimerState.RUNNING) {
+        if (timerState == TimerState.RUNNING && motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
           if (solveType.hasSteps()) {
             nextSolveStep();
             if (stepsTimes.size() == solveType.getSteps().length) {
@@ -148,8 +156,10 @@ public class TimerActivity extends Activity {
         } else if (timerState == TimerState.STOPPED && motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
           startInspectionTimer();
         } else if (timerState == TimerState.INSPECTING && motionEvent.getAction() == MotionEvent.ACTION_UP) {
-          stopInspectionTimer();
-          startTimer();
+          if (inspectionMode == InspectionMode.HOLD_AND_RELEASE) {
+            stopInspectionTimer();
+            startTimer();
+          }
         }
         return true;
       }
@@ -482,10 +492,17 @@ public class TimerActivity extends Activity {
     long curTime = System.currentTimeMillis() - timerStartTs;
     int seconds = (int) (curTime / 1000);
     tvTimer.setText(String.valueOf(seconds));
-    if (seconds >= INSPECTION_LIMIT - 3 && seconds <= INSPECTION_LIMIT) {
+    if (inspectionTime > 0 && seconds > 0 && seconds >= inspectionTime - 3 && seconds <= inspectionTime && soundsEnabled) {
       Utils.playSound(R.raw.beep);
-      if (seconds == INSPECTION_LIMIT) {
-        layout.setBackgroundResource(R.color.darkred);
+    }
+    if (seconds == inspectionTime) {
+      if (inspectionMode == InspectionMode.AUTOMATIC) {
+        stopInspectionTimer();
+        startTimer();
+      } else {
+        if (inspectionTime > 0) {
+          layout.setBackgroundResource(R.color.darkred);
+        }
       }
     }
   }

@@ -48,6 +48,8 @@
   <string name="automatic">Automatic</string>
   <string name="inspection_time">Inspection time</string>
   <string name="inspection_time_summary">Select the inspection time</string>
+  <string name="inspection_sounds">Inspection sounds</string>
+  <string name="inspection_sounds_summary">Enable / disable inspection sounds</string>
   <string name="solve_types">Solve types</string>
   <string name="edit_solve_types">Edit solve types</string>
   <string name="edit_solve_types_summary">Edit, create and delete solve types</string>

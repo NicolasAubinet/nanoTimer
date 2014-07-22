@@ -121,8 +121,8 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
         FieldDialog fieldDialog = FieldEditDialog.newInstance(this, info.position, liSolveTypes.get(info.position).getName());
         Utils.showFragment(this, fieldDialog);
       } else if (menuItem.getItemId() == ACTION_DELETE) {
-        Utils.showYesNoConfirmation(this, getString(R.string.delete_solve_type_confirmation,
-            liSolveTypes.get(info.position).getName()), new YesNoListener() {
+        Utils.showYesNoConfirmation(this, getString(R.string.delete_solve_type_confirmation, liSolveTypes.get(info.position).getName()),
+            new YesNoListener() {
           @Override
           public void onYes() {
             App.INSTANCE.getService().deleteSolveType(liSolveTypes.get(info.position), new DataCallback<Void>() {

@@ -4,23 +4,40 @@
    xmlns:dslv="http://schemas.android.com/apk/res/com.cube.nanotimer"
    android:orientation="vertical"
    android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   android:layout_margin="8px">
+   android:layout_height="match_parent">
 
-  <Button
-     android:id="@+id/buAdd"
-     android:text="@string/add_solvetype"
-     android:layout_width="wrap_content"
-     android:paddingLeft="15px"
-     android:paddingRight="15px"
-     style="@style/CustomButton"/>
+  <LinearLayout
+     android:id="@+id/topLayout"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:background="@color/darkblue"
+     android:orientation="vertical">
+
+    <Button
+       android:id="@+id/buAdd"
+       android:text="@string/add_solvetype"
+       android:layout_width="wrap_content"
+       android:paddingLeft="15px"
+       android:paddingRight="15px"
+       android:layout_margin="7px"
+       style="@style/CustomButton"/>
+
+    <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="3px"
+       android:background="@color/neon"/>
+
+  </LinearLayout>
 
   <com.mobeta.android.dslv.DragSortListView
      android:id="@+id/lvSolveTypes"
      android:layout_width="match_parent"
      android:layout_height="match_parent"
      android:longClickable="true"
-     android:layout_marginTop="15px"
+     android:layout_marginTop="5px"
+     android:layout_marginLeft="8px"
+     android:layout_marginRight="8px"
+     style="@style/DividerListView"
      dslv:drag_handle_id="@drawable/listmove"
      dslv:drag_enabled="true"
      dslv:drag_scroll_start="0.33"

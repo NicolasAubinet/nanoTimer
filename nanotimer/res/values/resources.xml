@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <integer name="inspection_mode">1</integer>
+  <string name="inspection_mode">1</string>
   <integer name="inspection_time">15</integer>
+  <bool name="inspection_sounds">true</bool>
 </resources>

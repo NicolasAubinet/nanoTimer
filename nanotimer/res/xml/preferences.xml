@@ -12,12 +12,18 @@
        android:entries="@array/entries_inspection_modes"
        android:entryValues="@array/entryvalues_inspection_modes"
        android:dialogTitle="@string/inspection_mode"
-       android:defaultValue="@integer/inspection_mode"/>
+       android:defaultValue="@string/inspection_mode"/>
 
     <com.cube.nanotimer.activity.widget.InspectionTimeDialog
        android:key="inspection_time"
        android:title="@string/inspection_time"
        android:summary="@string/inspection_time_summary"/>
+
+    <CheckBoxPreference
+       android:key="inspection_sounds"
+       android:title="@string/inspection_sounds"
+       android:summary="@string/inspection_sounds_summary"
+       android:defaultValue="@bool/inspection_sounds"/>
 
   </PreferenceCategory>
 
