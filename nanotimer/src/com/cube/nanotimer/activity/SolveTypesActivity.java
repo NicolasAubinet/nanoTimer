@@ -1,6 +1,7 @@
 package com.cube.nanotimer.activity;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.ContextMenu;
@@ -17,6 +18,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.activity.widget.CreateSolveType;
 import com.cube.nanotimer.activity.widget.SelectionHandler;
 import com.cube.nanotimer.activity.widget.SelectorFragment;
 import com.cube.nanotimer.activity.widget.list.FieldDialog;
@@ -38,9 +40,10 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
 
   private DragSortListView lvSolveTypes;
   private SolveTypeListAdapter adapter;
-  private List<SolveType> liSolveTypes;
+  private List<SolveType> liSolveTypes = new ArrayList<SolveType>();
 
   private List<CubeType> cubeTypes;
+  private CubeType curCubeType;
 
   private static final int ACTION_RENAME = 0;
   private static final int ACTION_DELETE = 1;
@@ -48,46 +51,9 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.solvetypes);
+    setContentView(R.layout.solvetypes_screen);
 
-    Button buAdd = (Button) findViewById(R.id.buAdd);
-    buAdd.setOnClickListener(new OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        showAddDialog();
-      }
-    });
-
-    lvSolveTypes = (DragSortListView) findViewById(R.id.lvSolveTypes);
-    liSolveTypes = new ArrayList<SolveType>();
-    adapter = new SolveTypeListAdapter(this, R.id.lvSolveTypes, liSolveTypes);
-    lvSolveTypes.setDropListener(new DropListener() {
-      @Override
-      public void drop(int from, int to) {
-        if (from != to) {
-          SolveType item = adapter.getItem(from);
-          // TODO : call some service method to reorder
-          liSolveTypes.remove(item);
-          liSolveTypes.add(to, item);
-          refreshList();
-        }
-      }
-    });
-    lvSolveTypes.setAdapter(adapter);
-
-    DragSortController controller = new DragSortController(lvSolveTypes);
-    controller.setDragHandleId(R.id.imgMove);
-    lvSolveTypes.setFloatViewManager(controller);
-    lvSolveTypes.setOnTouchListener(controller);
-
-    lvSolveTypes.setOnItemClickListener(new OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        registerForContextMenu(lvSolveTypes);
-        openContextMenu(view);
-        unregisterForContextMenu(lvSolveTypes);
-      }
-    });
+    initViews();
 
     App.INSTANCE.getService().getCubeTypes(new DataCallback<List<CubeType>>() {
       @Override
@@ -107,10 +73,57 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
     });
   }
 
+  private void initViews() {
+    Button buAdd = (Button) findViewById(R.id.buAdd);
+    buAdd.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        showAddDialog();
+      }
+    });
+
+    lvSolveTypes = (DragSortListView) findViewById(R.id.lvSolveTypes);
+    adapter = new SolveTypeListAdapter(this, R.id.lvSolveTypes, liSolveTypes);
+    lvSolveTypes.setDropListener(new DropListener() {
+      @Override
+      public void drop(int from, int to) {
+        if (from != to) {
+          SolveType item = adapter.getItem(from);
+          liSolveTypes.remove(item);
+          liSolveTypes.add(to, item);
+          App.INSTANCE.getService().saveSolveTypesOrder(liSolveTypes, null);
+          refreshList();
+        }
+      }
+    });
+    lvSolveTypes.setAdapter(adapter);
+
+    DragSortController controller = new DragSortController(lvSolveTypes);
+    controller.setDragHandleId(R.id.imgMove);
+    lvSolveTypes.setFloatViewManager(controller);
+    lvSolveTypes.setOnTouchListener(controller);
+
+    lvSolveTypes.setOnItemClickListener(new OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        registerForContextMenu(lvSolveTypes);
+        openContextMenu(view);
+        unregisterForContextMenu(lvSolveTypes);
+      }
+    });
+  }
+
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+
+    setContentView(R.layout.solvetypes_screen);
+    initViews();
+  }
+
   private void showAddDialog() {
-    // TODO
-//    FieldDialog fieldDialog = FieldAddDialog.newInstance(this, pos, items.get(pos));
-//    Utils.showFragment(this, fieldDialog);
+    CreateSolveType dialog = CreateSolveType.newInstance(curCubeType.getId());
+    Utils.showFragment(this, dialog);
   }
 
   @Override
@@ -155,8 +168,8 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
       finish();
       return;
     }
-    CubeType cubeType = cubeTypes.get(position);
-    App.INSTANCE.getService().getSolveTypes(cubeType, new DataCallback<List<SolveType>>() {
+    curCubeType = cubeTypes.get(position);
+    App.INSTANCE.getService().getSolveTypes(curCubeType, new DataCallback<List<SolveType>>() {
       @Override
       public void onData(List<SolveType> data) {
         liSolveTypes.clear();
@@ -168,8 +181,22 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
 
   @Override
   public boolean renameField(int index, String newName) {
+    if ("".equals(newName.trim())) {
+      return false;
+    }
+    for (int i = 0; i < liSolveTypes.size(); i++) {
+      if (liSolveTypes.get(i).getName().equals(newName)) {
+        if (i != index) {
+          Utils.showInfoMessage(this, R.string.solve_type_already_exists);
+          return false;
+        } else {
+          // The name was not changed, do nothing
+          return true;
+        }
+      }
+    }
     SolveType st = liSolveTypes.get(index);
-    st.setName(newName);
+    st.setName(newName.trim());
     App.INSTANCE.getService().updateSolveType(st, new DataCallback<Void>() {
       @Override
       public void onData(Void data) {

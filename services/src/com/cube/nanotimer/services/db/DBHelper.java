@@ -41,6 +41,7 @@ public class DBHelper extends SQLiteOpenHelper {
         DB.COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
         DB.COL_SOLVETYPE_NAME + " TEXT NOT NULL, " +
         DB.COL_SOLVETYPE_SESSION_START + " INTEGER DEFAULT 0, " +
+        DB.COL_SOLVETYPE_POSITION + " INTEGER DEFAULT 0, " +
         DB.COL_SOLVETYPE_CUBETYPE_ID + " INTEGER, " +
         "FOREIGN KEY (" + DB.COL_SOLVETYPE_CUBETYPE_ID + ") REFERENCES " + DB.TABLE_CUBETYPE + " (" + DB.COL_ID + ") " +
       ");"
@@ -81,10 +82,54 @@ public class DBHelper extends SQLiteOpenHelper {
 
   @Override
   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    /*db.execSQL("DROP TABLE IF EXISTS " + DB.TABLE_TIMEHISTORY + "_tmp");
+    db.execSQL("DROP TABLE IF EXISTS " + DB.TABLE_SOLVETYPE + "_tmp");
+    db.execSQL("DROP TABLE IF EXISTS " + DB.TABLE_CUBETYPE + "_tmp");
+
+    db.execSQL("CREATE TABLE " + DB.TABLE_SOLVETYPESTEP + "(" +
+            DB.COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            DB.COL_SOLVETYPESTEP_NAME + " TEXT, " +
+            DB.COL_SOLVETYPESTEP_POSITION + " INTEGER NOT NULL, " +
+            DB.COL_SOLVETYPESTEP_SOLVETYPE_ID + " INTEGER, " +
+            "FOREIGN KEY (" + DB.COL_SOLVETYPESTEP_SOLVETYPE_ID + ") REFERENCES " + DB.TABLE_SOLVETYPE + " (" + DB.COL_ID + ") " +
+            ");"
+    );
+
+    db.execSQL("CREATE TABLE " + DB.TABLE_TIMEHISTORYSTEP + "(" +
+            DB.COL_TIMEHISTORYSTEP_TIME + " INTEGER, " +
+            DB.COL_TIMEHISTORYSTEP_SOLVETYPESTEP_ID + " INTEGER, " +
+            DB.COL_TIMEHISTORYSTEP_TIMEHISTORY_ID + " INTEGER, " +
+            "FOREIGN KEY (" + DB.COL_TIMEHISTORYSTEP_SOLVETYPESTEP_ID + ") REFERENCES " + DB.TABLE_SOLVETYPESTEP + " (" + DB.COL_ID + "), " +
+            "FOREIGN KEY (" + DB.COL_TIMEHISTORYSTEP_TIMEHISTORY_ID + ") REFERENCES " + DB.TABLE_TIMEHISTORY + " (" + DB.COL_ID + ") " +
+            ");"
+    );
+
+    // Insert some steps (to be able to retrieve them, before implementing the steps creation part in the options menu)
     ContentValues values = new ContentValues(); // TODO : if keeping this, use translated values (even if will only display it in english)
+    values.put(DB.COL_SOLVETYPE_NAME, "CFOP");
+    values.put(DB.COL_SOLVETYPE_CUBETYPE_ID, 2);
+    int solveTypeId = (int) db.insert(DB.TABLE_SOLVETYPE, null, values);
+
+    values = new ContentValues();
+    values.put(DB.COL_SOLVETYPESTEP_SOLVETYPE_ID, solveTypeId);
+    values.put(DB.COL_SOLVETYPESTEP_POSITION, 1);
+    values.put(DB.COL_SOLVETYPESTEP_NAME, "Cross");
+    db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
+    values.put(DB.COL_SOLVETYPESTEP_POSITION, 2);
+    values.put(DB.COL_SOLVETYPESTEP_NAME, "F2L");
+    db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
+    values.put(DB.COL_SOLVETYPESTEP_POSITION, 3);
+    values.put(DB.COL_SOLVETYPESTEP_NAME, "OLL");
+    db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
+    values.put(DB.COL_SOLVETYPESTEP_POSITION, 4);
+    values.put(DB.COL_SOLVETYPESTEP_NAME, "PLL with a long title because it's cool");
+    db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
+
+
+    values = new ContentValues();
     values.put(DB.COL_SOLVETYPE_NAME, "TestSteps");
     values.put(DB.COL_SOLVETYPE_CUBETYPE_ID, 6);
-    int solveTypeId = (int) db.insert(DB.TABLE_SOLVETYPE, null, values);
+    solveTypeId = (int) db.insert(DB.TABLE_SOLVETYPE, null, values);
 
     values = new ContentValues();
     values.put(DB.COL_SOLVETYPESTEP_SOLVETYPE_ID, solveTypeId);
@@ -111,7 +156,9 @@ public class DBHelper extends SQLiteOpenHelper {
     db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
     values.put(DB.COL_SOLVETYPESTEP_POSITION, 8);
     values.put(DB.COL_SOLVETYPESTEP_NAME, "VeryVeryLongStep8TitleToTestTheLength!");
-    db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
+    db.insert(DB.TABLE_SOLVETYPESTEP, null, values);*/
+
+    db.execSQL("ALTER TABLE " + DB.TABLE_SOLVETYPE + " ADD COLUMN " + DB.COL_SOLVETYPE_POSITION + " INTEGER DEFAULT 0");
   }
 
   private void insertDefaultValues() {

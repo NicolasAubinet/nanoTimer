@@ -6,6 +6,11 @@ import android.content.DialogInterface;
 import android.media.MediaPlayer;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.Toast;
 import com.cube.nanotimer.App;
 
@@ -71,6 +76,57 @@ public class Utils {
   public static void playSound(int soundId) {
     MediaPlayer mp = MediaPlayer.create(App.INSTANCE.getContext(), soundId);
     mp.start();
+  }
+
+  public static void expandView(final LinearLayout v) {
+    v.measure(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+    final int targetHeight = v.getMeasuredHeight();
+
+    v.getLayoutParams().height = 0;
+    v.setVisibility(View.VISIBLE);
+    Animation a = new Animation() {
+      @Override
+      protected void applyTransformation(float interpolatedTime, Transformation t) {
+        v.getLayoutParams().height = interpolatedTime == 1
+            ? LayoutParams.WRAP_CONTENT
+            : (int) (targetHeight * interpolatedTime);
+        v.requestLayout();
+      }
+
+      @Override
+      public boolean willChangeBounds() {
+        return true;
+      }
+    };
+
+    // 1dp/ms
+    a.setDuration((int) (targetHeight / v.getContext().getResources().getDisplayMetrics().density));
+    v.startAnimation(a);
+  }
+
+  public static void collapseView(final View v) {
+    final int initialHeight = v.getMeasuredHeight();
+
+    Animation a = new Animation() {
+      @Override
+      protected void applyTransformation(float interpolatedTime, Transformation t) {
+        if (interpolatedTime == 1) {
+          v.setVisibility(View.GONE);
+        } else {
+          v.getLayoutParams().height = initialHeight - (int) (initialHeight * interpolatedTime);
+          v.requestLayout();
+        }
+      }
+
+      @Override
+      public boolean willChangeBounds() {
+        return true;
+      }
+    };
+
+    // 1dp/ms
+    a.setDuration((int) (initialHeight / v.getContext().getResources().getDisplayMetrics().density));
+    v.startAnimation(a);
   }
 
 }

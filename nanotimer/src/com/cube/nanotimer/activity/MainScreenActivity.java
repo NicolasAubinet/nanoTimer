@@ -23,9 +23,9 @@ import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.activity.widget.HistoryDetailFragment;
+import com.cube.nanotimer.activity.widget.SelectionHandler;
 import com.cube.nanotimer.activity.widget.SelectorFragment;
 import com.cube.nanotimer.activity.widget.TimeChangedHandler;
-import com.cube.nanotimer.activity.widget.list.ListEditor;
 import com.cube.nanotimer.activity.widget.list.SolveTypesListDialog;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class MainScreenActivity extends FragmentActivity implements TimeChangedHandler {
+public class MainScreenActivity extends FragmentActivity implements TimeChangedHandler, SelectionHandler {
 
   private Button buCubeType;
   private Button buSolveType;
@@ -54,7 +54,6 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
   private List<SolveTime> liHistory = new ArrayList<SolveTime>();
   private HistoryListAdapter adapter;
 
-  private TypeListEditor typeListEditor = new TypeListEditor();
   private int previousLastItem = 0;
 
   private static final int ID_CUBETYPE = 1;
@@ -63,7 +62,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.mainscreen);
+    setContentView(R.layout.mainscreen_screen);
     App.INSTANCE.setContext(this);
     setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
@@ -81,7 +80,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
             types.add(t.getName());
           }
           Utils.showFragment(MainScreenActivity.this,
-              SelectorFragment.newInstance(ID_CUBETYPE, types, typeListEditor));
+              SelectorFragment.newInstance(ID_CUBETYPE, types, MainScreenActivity.this));
         }
       }
     });
@@ -96,7 +95,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
             types.add(t.getName());
           }
           Utils.showFragment(MainScreenActivity.this,
-              SolveTypesListDialog.newInstance(ID_SOLVETYPE, types, typeListEditor));
+              SolveTypesListDialog.newInstance(ID_SOLVETYPE, types, MainScreenActivity.this));
         }
       }
     });
@@ -202,7 +201,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
     String cubeTypeText = buCubeType.getText().toString();
     String solveTypeText = buSolveType.getText().toString();
 
-    setContentView(R.layout.mainscreen);
+    setContentView(R.layout.mainscreen_screen);
     initViews();
 
     buCubeType.setText(cubeTypeText);
@@ -332,7 +331,22 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
     }
   }
 
-  private class TypeListEditor implements ListEditor {
+  @Override
+  public void itemSelected(int id, int position) {
+    if (position >= 0) {
+      if (id == ID_CUBETYPE) {
+        curCubeType = cubeTypes.get(position);
+        buCubeType.setText(curCubeType.getName());
+        refreshSolveTypes();
+      } else if (id == ID_SOLVETYPE) {
+        curSolveType = solveTypes.get(position);
+        buSolveType.setText(curSolveType.getName());
+        refreshHistory();
+      }
+    }
+  }
+
+  /*private class TypeListEditor implements ListEditor { // TODO : remove when the solve types creation has been implemented (might need to copy some of the below code)
     @Override
     public void createNewItem(int id, String item) {
       if (id == ID_SOLVETYPE) {
@@ -387,7 +401,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
         }
       }
     }
-  }
+  }*/
 
   private class HistoryListAdapter extends ArrayAdapter<SolveTime> {
     public HistoryListAdapter(Context context, int textViewResourceId, List<SolveTime> objects) {

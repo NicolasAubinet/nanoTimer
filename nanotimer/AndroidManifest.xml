@@ -20,7 +20,8 @@
     <activity android:name=".activity.TimerActivity"
        android:configChanges="orientation|screenSize"/>
     <activity android:name=".activity.OptionsActivity"/>
-    <activity android:name=".activity.SolveTypesActivity">
+    <activity android:name=".activity.SolveTypesActivity"
+       android:configChanges="orientation|screenSize">
       <intent-filter>
         <action android:name="com.cube.nanotimer.activity.SolveTypesActivity"/>
         <category android:name="android.intent.category.DEFAULT"/>

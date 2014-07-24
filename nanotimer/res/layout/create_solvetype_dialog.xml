@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.cube.nanotimer.util.view.ScalingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:dslv="http://schemas.android.com/apk/res/com.cube.nanotimer"
+   android:orientation="vertical"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   android:padding="8px">
+
+  <EditText
+     android:id="@+id/tfName"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_toLeftOf="@+id/buAdd"
+     style="@style/SimpleTextField"/>
+
+  <LinearLayout
+     android:id="@+id/buExpand"
+     android:orientation="horizontal"
+     android:layout_width="match_parent"
+     android:layout_height="20px"
+     android:background="@color/neon"
+     android:layout_margin="20px"/>
+
+  <LinearLayout
+     android:id="@+id/detailsLayout"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:orientation="vertical"
+     android:layout_marginTop="8px"
+     android:layout_marginBottom="8px"
+     android:padding="15px"
+     android:background="@drawable/layout_border">
+    <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="@string/steps"
+       android:layout_marginBottom="3px"
+       style="@style/SimpleTextField"/>
+
+    <RelativeLayout
+       android:orientation="horizontal"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="10px">
+      <EditText
+         android:id="@+id/tfStepName"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_toLeftOf="@+id/buAddStep"
+         style="@style/SmallTextField"/>
+      <Button
+         android:id="@+id/buAddStep"
+         android:layout_width="100px"
+         android:layout_height="wrap_content"
+         android:text="+"
+         android:layout_alignParentRight="true"
+         android:layout_marginLeft="5px"
+         android:textSize="30px"/>
+    </RelativeLayout>
+
+    <com.mobeta.android.dslv.DragSortListView
+       android:id="@+id/lvSteps"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:longClickable="true"
+       android:layout_marginTop="5px"
+       style="@style/DividerListView"
+       dslv:drag_handle_id="@drawable/listmove"
+       dslv:drag_enabled="true"
+       dslv:drag_scroll_start="0.33"
+       dslv:drag_start_mode="onMove"
+       dslv:float_alpha="0.6"
+       dslv:max_drag_scroll_speed="0.5"
+       dslv:remove_enabled="true"
+       dslv:sort_enabled="true"
+       dslv:track_drag_sort="false"
+       dslv:use_default_controller="true"/>
+  </LinearLayout>
+
+</com.cube.nanotimer.util.view.ScalingLinearLayout>

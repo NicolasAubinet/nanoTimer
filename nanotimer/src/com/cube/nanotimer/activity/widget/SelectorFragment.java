@@ -45,7 +45,7 @@ public class SelectorFragment extends DialogFragment {
 
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
-    View v = getActivity().getLayoutInflater().inflate(R.layout.cube_type_list, null);
+    View v = getActivity().getLayoutInflater().inflate(R.layout.simple_list, null);
     ListView lvItems = (ListView) v.findViewById(R.id.lvItems);
 
     id = getArguments().getInt(ARG_ID);

@@ -78,7 +78,7 @@ public class TimerActivity extends Activity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.timer);
+    setContentView(R.layout.timer_screen);
     App.INSTANCE.setContext(this);
     setVolumeControlStream(AudioManager.STREAM_MUSIC);
     currentOrientation = getResources().getConfiguration().orientation;
@@ -265,7 +265,7 @@ public class TimerActivity extends Activity {
         }
       }
 
-      setContentView(R.layout.timer);
+      setContentView(R.layout.timer_screen);
       initViews();
 
       if (timerState == TimerState.STOPPED) {

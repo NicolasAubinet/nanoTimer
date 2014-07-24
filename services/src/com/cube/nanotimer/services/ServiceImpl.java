@@ -195,6 +195,19 @@ public class ServiceImpl extends DBHelper implements Service {
     });
   }
 
+  @Override
+  public void saveSolveTypesOrder(final List<SolveType> solveTypes, final DataCallback<Void> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        provider.saveSolveTypesOrder(solveTypes);
+        if (callback != null) {
+          callback.onData(null);
+        }
+      }
+    });
+  }
+
   private void run(Runnable runnable) {
     new Thread(runnable).start();
   }

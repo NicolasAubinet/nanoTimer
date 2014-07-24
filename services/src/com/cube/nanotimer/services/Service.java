@@ -20,6 +20,7 @@ public interface Service {
   void deleteHistory(SolveType solveType, DataCallback<Void> callback);
   void getSessionTimes(SolveType solveType, DataCallback<List<Long>> callback);
   void startNewSession(SolveType solveType, long startTs, DataCallback<Void> callback);
+  void saveSolveTypesOrder(List<SolveType> solveTypes, DataCallback<Void> callback);
 
   void addSolveType(SolveType solveType, DataCallback<Integer> callback);
   void updateSolveType(SolveType solveType, DataCallback<Void> callback);
