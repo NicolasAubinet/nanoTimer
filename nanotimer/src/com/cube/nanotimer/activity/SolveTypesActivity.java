@@ -12,15 +12,19 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.activity.widget.CreateSolveType;
+import com.cube.nanotimer.activity.widget.AddStepsDialog;
 import com.cube.nanotimer.activity.widget.SelectionHandler;
-import com.cube.nanotimer.activity.widget.SelectorFragment;
+import com.cube.nanotimer.activity.widget.SelectorFragmentDialog;
+import com.cube.nanotimer.activity.widget.StepsCreator;
+import com.cube.nanotimer.activity.widget.list.FieldAddDialog;
+import com.cube.nanotimer.activity.widget.list.FieldCreator;
 import com.cube.nanotimer.activity.widget.list.FieldDialog;
 import com.cube.nanotimer.activity.widget.list.FieldEditDialog;
 import com.cube.nanotimer.activity.widget.list.FieldRenamer;
@@ -29,6 +33,7 @@ import com.cube.nanotimer.util.Utils;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveType;
+import com.cube.nanotimer.vo.SolveTypeStep;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 import com.mobeta.android.dslv.DragSortListView.DropListener;
@@ -36,7 +41,7 @@ import com.mobeta.android.dslv.DragSortListView.DropListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SolveTypesActivity extends FragmentActivity implements SelectionHandler, FieldRenamer {
+public class SolveTypesActivity extends FragmentActivity implements SelectionHandler, FieldRenamer, FieldCreator, StepsCreator {
 
   private DragSortListView lvSolveTypes;
   private SolveTypeListAdapter adapter;
@@ -47,6 +52,7 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
 
   private static final int ACTION_RENAME = 0;
   private static final int ACTION_DELETE = 1;
+  private static final int ACTION_CREATESTEPS = 2;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +61,7 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
 
     initViews();
 
-    App.INSTANCE.getService().getCubeTypes(new DataCallback<List<CubeType>>() {
+    App.INSTANCE.getService().getCubeTypes(true, new DataCallback<List<CubeType>>() {
       @Override
       public void onData(List<CubeType> data) {
         cubeTypes = data;
@@ -65,7 +71,7 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
             types.add(t.getName());
           }
           Utils.showFragment(SolveTypesActivity.this,
-              SelectorFragment.newInstance(0, types, getString(R.string.choose_cube_type), SolveTypesActivity.this));
+              SelectorFragmentDialog.newInstance(0, types, getString(R.string.choose_cube_type), SolveTypesActivity.this));
         } else {
           finish();
         }
@@ -122,14 +128,14 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
   }
 
   private void showAddDialog() {
-    CreateSolveType dialog = CreateSolveType.newInstance(curCubeType.getId());
+    FieldAddDialog dialog = FieldAddDialog.newInstance(this);
     Utils.showFragment(this, dialog);
   }
 
   @Override
   public boolean onMenuItemSelected(int featureId, MenuItem menuItem) {
     if (featureId == Window.FEATURE_CONTEXT_MENU) {
-      final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
+      final AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuItem.getMenuInfo();
       if (menuItem.getItemId() == ACTION_RENAME) {
         FieldDialog fieldDialog = FieldEditDialog.newInstance(this, info.position, liSolveTypes.get(info.position).getName());
         Utils.showFragment(this, fieldDialog);
@@ -147,6 +153,8 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
             });
           }
         });
+      } else if (menuItem.getItemId() == ACTION_CREATESTEPS) {
+        Utils.showFragment(this, AddStepsDialog.newInstance(this, info.position));
       }
     }
     return super.onMenuItemSelected(featureId, menuItem);
@@ -156,9 +164,13 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
   public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
     super.onCreateContextMenu(menu, v, menuInfo);
     if (v.getId() == R.id.lvSolveTypes) {
+      int position = ((AdapterContextMenuInfo) menuInfo).position;
       menu.setHeaderTitle(R.string.action);
       menu.add(v.getId(), ACTION_RENAME, 0, R.string.edit);
       menu.add(v.getId(), ACTION_DELETE, 0, R.string.delete);
+      if (position >= 0 && position < liSolveTypes.size() && !liSolveTypes.get(position).hasSteps()) {
+        menu.add(v.getId(), ACTION_CREATESTEPS, 0, R.string.add_steps);
+      }
     }
   }
 
@@ -181,19 +193,9 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
 
   @Override
   public boolean renameField(int index, String newName) {
-    if ("".equals(newName.trim())) {
-      return false;
-    }
-    for (int i = 0; i < liSolveTypes.size(); i++) {
-      if (liSolveTypes.get(i).getName().equals(newName)) {
-        if (i != index) {
-          Utils.showInfoMessage(this, R.string.solve_type_already_exists);
-          return false;
-        } else {
-          // The name was not changed, do nothing
-          return true;
-        }
-      }
+    boolean res = checkSolveTypeName(newName, index);
+    if (!res) {
+      return res;
     }
     SolveType st = liSolveTypes.get(index);
     st.setName(newName.trim());
@@ -204,6 +206,59 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
       }
     });
     return true;
+  }
+
+  @Override
+  public boolean createField(String name) {
+    boolean res = checkSolveTypeName(name, null);
+    if (!res) {
+      return res;
+    }
+    SolveType st = new SolveType(name, curCubeType.getId());
+    liSolveTypes.add(st);
+    App.INSTANCE.getService().addSolveType(st, new DataCallback<Integer>() {
+      @Override
+      public void onData(Integer data) {
+        refreshList();
+      }
+    });
+    return true;
+  }
+
+  private boolean checkSolveTypeName(String name, Integer index) {
+    if ("".equals(name.trim())) {
+      return false;
+    }
+    for (int i = 0; i < liSolveTypes.size(); i++) {
+      if (liSolveTypes.get(i).getName().equals(name)) {
+        if (index == null || i != index) {
+          Utils.showInfoMessage(this, R.string.solve_type_already_exists);
+          return false;
+        } else {
+          // The name was not changed, do nothing
+          return true;
+        }
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public void addSteps(List<String> stepNames, int pos) {
+    SolveTypeStep[] steps = new SolveTypeStep[stepNames.size()];
+    for (int i = 0; i < stepNames.size(); i++) {
+      SolveTypeStep step = new SolveTypeStep();
+      step.setName(stepNames.get(i));
+      steps[i] = step;
+    }
+    SolveType solveType = liSolveTypes.get(pos);
+    solveType.setSteps(steps);
+    App.INSTANCE.getService().addSolveTypeSteps(solveType, new DataCallback<Void>() {
+      @Override
+      public void onData(Void data) {
+        refreshList();
+      }
+    });
   }
 
   private void refreshList() {

@@ -85,6 +85,9 @@ public class TimerActivity extends Activity {
 
     cubeType = (CubeType) getIntent().getSerializableExtra("cubeType");
     solveType = (SolveType) getIntent().getSerializableExtra("solveType");
+    if (cubeType == null || solveType == null) {
+      finish();
+    }
     cubeSession = new CubeSession();
     App.INSTANCE.getService().getSolveAverages(solveType, new SolveAverageCallback());
 
@@ -468,12 +471,11 @@ public class TimerActivity extends Activity {
   }
 
   private void updateStepTimeText(int id, String time) {
-    if (id > Options.INSTANCE.getMaxStepsCount()) {
-      id = Options.INSTANCE.getMaxStepsCount();
+    if (id >= 0 && id < solveType.getSteps().length) {
+      int rowInd = id % 4;
+      int colInd = (id < 4) ? 1 : 3;
+      ((TextView) ((TableRow) timerStepsLayout.getChildAt(rowInd)).getChildAt(colInd)).setText(time);
     }
-    int rowInd = id % 4;
-    int colInd = (id < 4) ? 1 : 3;
-    ((TextView) ((TableRow) timerStepsLayout.getChildAt(rowInd)).getChildAt(colInd)).setText(time);
   }
 
   private String formatAvgField(Long f) {
@@ -483,8 +485,8 @@ public class TimerActivity extends Activity {
   private synchronized void updateTimerText(long curTime) {
     tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(curTime));
     if (solveType.hasSteps()) {
-      updateStepTimeText(stepsTimes.size(), FormatterService.INSTANCE.
-          formatSolveTime(System.currentTimeMillis() - stepStartTs));
+      updateStepTimeText(stepsTimes.size(),
+          FormatterService.INSTANCE.formatSolveTime(System.currentTimeMillis() - stepStartTs));
     }
   }
 

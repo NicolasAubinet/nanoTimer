@@ -41,11 +41,11 @@ public class ServiceImpl extends DBHelper implements Service {
   }
 
   @Override
-  public void getCubeTypes(final DataCallback<List<CubeType>> callback) {
+  public void getCubeTypes(final boolean getEmpty, final DataCallback<List<CubeType>> callback) {
     run(new Runnable() {
       @Override
       public void run() {
-        callback.onData(provider.getCubeTypes());
+        callback.onData(provider.getCubeTypes(getEmpty));
       }
     });
   }
@@ -165,6 +165,19 @@ public class ServiceImpl extends DBHelper implements Service {
       @Override
       public void run() {
         callback.onData(provider.addSolveType(solveType));
+      }
+    });
+  }
+
+  @Override
+  public void addSolveTypeSteps(final SolveType solveType, final DataCallback<Void> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        provider.addSolveTypeSteps(solveType);
+        if (callback != null) {
+          callback.onData(null);
+        }
       }
     });
   }

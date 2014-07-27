@@ -7,6 +7,7 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import com.cube.nanotimer.R;
 
 public abstract class FieldDialog extends DialogFragment {
@@ -23,7 +24,6 @@ public abstract class FieldDialog extends DialogFragment {
         .setView(editTextView)
         .setPositiveButton(confirmText, new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int whichButton) {
-            onConfirm();
           }
         })
         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -39,6 +39,22 @@ public abstract class FieldDialog extends DialogFragment {
 
   public void showSoftKeyboard(Dialog d) {
     d.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    // redefining to avoid closing the dialog if we don't want to
+    AlertDialog d = (AlertDialog) getDialog();
+    if (d != null) {
+      Button positiveButton = d.getButton(Dialog.BUTTON_POSITIVE);
+      positiveButton.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          onConfirm();
+        }
+      });
+    }
   }
 
 }

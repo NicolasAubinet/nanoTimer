@@ -9,7 +9,7 @@ import com.cube.nanotimer.vo.SolveType;
 import java.util.List;
 
 public interface Service {
-  void getCubeTypes(DataCallback<List<CubeType>> callback);
+  void getCubeTypes(boolean getEmpty, DataCallback<List<CubeType>> callback);
   void getSolveTypes(CubeType cubeType, DataCallback<List<SolveType>> callback);
   void saveTime(SolveTime solveTime, DataCallback<SolveAverages> callback);
   void removeTime(SolveTime solveTime, DataCallback<SolveAverages> callback);
@@ -23,6 +23,7 @@ public interface Service {
   void saveSolveTypesOrder(List<SolveType> solveTypes, DataCallback<Void> callback);
 
   void addSolveType(SolveType solveType, DataCallback<Integer> callback);
+  void addSolveTypeSteps(SolveType solveType, DataCallback<Void> callback);
   void updateSolveType(SolveType solveType, DataCallback<Void> callback);
   void deleteSolveType(SolveType solveType, DataCallback<Void> callback);
 }

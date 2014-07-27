@@ -22,9 +22,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.activity.widget.HistoryDetailFragment;
+import com.cube.nanotimer.activity.widget.HistoryDetailDialog;
 import com.cube.nanotimer.activity.widget.SelectionHandler;
-import com.cube.nanotimer.activity.widget.SelectorFragment;
+import com.cube.nanotimer.activity.widget.SelectorFragmentDialog;
 import com.cube.nanotimer.activity.widget.TimeChangedHandler;
 import com.cube.nanotimer.activity.widget.list.SolveTypesListDialog;
 import com.cube.nanotimer.services.db.DataCallback;
@@ -37,6 +37,7 @@ import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -80,7 +81,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
             types.add(t.getName());
           }
           Utils.showFragment(MainScreenActivity.this,
-              SelectorFragment.newInstance(ID_CUBETYPE, types, MainScreenActivity.this));
+              SelectorFragmentDialog.newInstance(ID_CUBETYPE, types, MainScreenActivity.this));
         }
       }
     });
@@ -121,7 +122,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
       @Override
       public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         Utils.showFragment(MainScreenActivity.this,
-            HistoryDetailFragment.newInstance(liHistory.get(i), curCubeType, MainScreenActivity.this));
+            HistoryDetailDialog.newInstance(liHistory.get(i), curCubeType, MainScreenActivity.this));
       }
     });
     lvHistory.setOnScrollListener(new OnScrollListener() {
@@ -157,11 +158,12 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
   @Override
   protected void onResume() {
     super.onResume();
-    if (cubeTypes == null) {
+    // TODO : refresh cube types and solve types (could have changed solve types in options)
+//    if (cubeTypes == null) {
       refreshCubeTypes();
-    } else {
-      refreshHistory();
-    }
+//    } else {
+//      refreshHistory();
+//    }
   }
 
   @Override
@@ -209,18 +211,22 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
   }
 
   private void refreshCubeTypes() {
-    App.INSTANCE.getService().getCubeTypes(new DataCallback<List<CubeType>>() {
+    App.INSTANCE.getService().getCubeTypes(false, new DataCallback<List<CubeType>>() {
       @Override
       public void onData(List<CubeType> data) {
         cubeTypes = data;
         if (cubeTypes != null && !cubeTypes.isEmpty()) {
-          curCubeType = cubeTypes.get(0);
+          CubeType defaultCubeType = null;
+          CubeType newCubeType = null;
           for (CubeType ct : cubeTypes) {
+            if (curCubeType != null && curCubeType.getId() == ct.getId()) {
+              newCubeType = ct;
+            }
             if (ct.getId() == Type.THREE_BY_THREE.getId()) {
-              curCubeType = ct;
-              break;
+              defaultCubeType = ct;
             }
           }
+          curCubeType = newCubeType != null ? newCubeType : defaultCubeType != null ? defaultCubeType : cubeTypes.get(0);
         } else {
           curCubeType = null;
         }
@@ -258,6 +264,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
       });
     } else {
       curSolveType = null;
+      solveTypes = Collections.EMPTY_LIST;
       refreshButtonTexts();
       refreshHistory();
     }

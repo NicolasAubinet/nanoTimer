@@ -14,6 +14,7 @@
 
   <string name="add">Add</string>
   <string name="add_solvetype">Add solve type</string>
+  <string name="save">Save</string>
   <string name="action">Action</string>
   <string name="rename">Rename</string>
   <string name="cancel">Cancel</string>
@@ -22,7 +23,10 @@
   <string name="step_already_exists">A step with the same name already exists for this solve type</string>
   <string name="delete_solve_type_confirmation">Are you sure you want to delete the solve type \'%1$s\' and all its times?</string>
   <string name="new_session_confirmation">Are you sure you want to start a new session?</string>
+  <string name="min_steps_count_not_reached">You must create at least two steps</string>
   <string name="max_steps_count_reached">The steps count limit has been reached</string>
+  <string name="add_step">Add step</string>
+  <string name="add_steps">Add steps</string>
 
   <string name="inspection">Inspection</string>
   <string name="last_avg_of">Last avg of</string>

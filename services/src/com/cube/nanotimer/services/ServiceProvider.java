@@ -8,7 +8,7 @@ import com.cube.nanotimer.vo.SolveType;
 import java.util.List;
 
 public interface ServiceProvider {
-  List<CubeType> getCubeTypes();
+  List<CubeType> getCubeTypes(boolean getEmpty);
   List<SolveType> getSolveTypes(CubeType cubeType);
   SolveAverages saveTime(SolveTime solveTime);
   SolveAverages getSolveAverages(SolveType solveType);
@@ -22,6 +22,7 @@ public interface ServiceProvider {
   void saveSolveTypesOrder(List<SolveType> solveTypes);
 
   int addSolveType(SolveType solveType);
+  void addSolveTypeSteps(SolveType solveType);
   void updateSolveType(SolveType solveType);
   void deleteSolveType(SolveType solveType);
 }

@@ -7,7 +7,7 @@ public class SolveType implements Serializable {
   private int id;
   private String name;
   private int cubeTypeId;
-  private SolveTypeStep[] steps;
+  private SolveTypeStep[] steps = new SolveTypeStep[0];
 
   public SolveType() {
   }

@@ -19,15 +19,15 @@ import com.cube.nanotimer.vo.SolveTime;
 
 import java.util.Arrays;
 
-public class HistoryDetailFragment extends DialogFragment {
+public class HistoryDetailDialog extends DialogFragment {
 
   private static final String ARG_SOLVETIME = "solvetime";
   private static final String ARG_CUBETYPE = "cubetype";
 
   private TimeChangedHandler handler;
 
-  public static HistoryDetailFragment newInstance(SolveTime solveTime, CubeType cubeType, TimeChangedHandler handler) {
-    HistoryDetailFragment hd = new HistoryDetailFragment(handler);
+  public static HistoryDetailDialog newInstance(SolveTime solveTime, CubeType cubeType, TimeChangedHandler handler) {
+    HistoryDetailDialog hd = new HistoryDetailDialog(handler);
     Bundle bundle = new Bundle();
     bundle.putSerializable(ARG_SOLVETIME, solveTime);
     bundle.putSerializable(ARG_CUBETYPE, cubeType);
@@ -35,13 +35,13 @@ public class HistoryDetailFragment extends DialogFragment {
     return hd;
   }
 
-  private HistoryDetailFragment(TimeChangedHandler handler) {
+  private HistoryDetailDialog(TimeChangedHandler handler) {
     this.handler = handler;
   }
 
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
-    View v = getActivity().getLayoutInflater().inflate(R.layout.historydetail, null);
+    View v = getActivity().getLayoutInflater().inflate(R.layout.historydetail_dialog, null);
 
     final SolveTime solveTime = (SolveTime) getArguments().getSerializable(ARG_SOLVETIME);
     final CubeType cubeType = (CubeType) getArguments().getSerializable(ARG_CUBETYPE);

@@ -36,15 +36,17 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   @Override
-  public List<CubeType> getCubeTypes() {
+  public List<CubeType> getCubeTypes(boolean getEmpty) {
     List<CubeType> cubeTypes = new ArrayList<CubeType>();
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_ID).append(", ").append(DB.COL_CUBETYPE_NAME);
     q.append(" FROM ").append(DB.TABLE_CUBETYPE);
-    q.append(" WHERE 0 < (");
-    q.append("     SELECT COUNT(*) FROM ").append(DB.TABLE_SOLVETYPE);
-    q.append("     WHERE ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_CUBETYPE_ID);
-    q.append("         = ").append(DB.TABLE_CUBETYPE).append(".").append(DB.COL_ID).append(")");
+    if (!getEmpty) {
+      q.append(" WHERE 0 < (");
+      q.append("     SELECT COUNT(*) FROM ").append(DB.TABLE_SOLVETYPE);
+      q.append("     WHERE ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_CUBETYPE_ID);
+      q.append("         = ").append(DB.TABLE_CUBETYPE).append(".").append(DB.COL_ID).append(")");
+    }
     Cursor cursor = db.rawQuery(q.toString(), null);
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
@@ -69,8 +71,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         SolveType st = new SolveType(cursor.getInt(0), cursor.getString(1), cursor.getInt(2));
-        List<SolveTypeStep> steps = getSolveTypeSteps(st);
-        st.setSteps(steps.size() == 0 ? null : steps.toArray(new SolveTypeStep[0]));
+        st.setSteps(getSolveTypeSteps(st).toArray(new SolveTypeStep[0]));
         solveTypes.add(st);
       }
       cursor.close();
@@ -429,18 +430,30 @@ public class ServiceProviderImpl implements ServiceProvider {
     values.put(DB.COL_SOLVETYPE_POSITION, position);
     values.put(DB.COL_SOLVETYPE_CUBETYPE_ID, solveType.getCubeTypeId());
     int id = (int) db.insert(DB.TABLE_SOLVETYPE, null, values);
+    solveType.setId(id);
 
+    if (solveType.hasSteps()) {
+      addSolveTypeSteps(solveType);
+    }
+    return id;
+  }
+
+  @Override
+  public void addSolveTypeSteps(SolveType solveType) {
+    // only add steps if it does not already have some (we can't edit the steps because it would mess up the times)
+    if (solveType.getId() == 0 || getSolveTypeSteps(solveType).size() > 0) {
+      return;
+    }
     int i = 1;
     for (SolveTypeStep step : solveType.getSteps()) {
-      values = new ContentValues();
+      ContentValues values = new ContentValues();
       values.put(DB.COL_SOLVETYPESTEP_NAME, step.getName());
       values.put(DB.COL_SOLVETYPESTEP_POSITION, i);
-      values.put(DB.COL_SOLVETYPESTEP_SOLVETYPE_ID, id);
+      values.put(DB.COL_SOLVETYPESTEP_SOLVETYPE_ID, solveType.getId());
       int stepId = (int) db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
       step.setId(stepId);
       i++;
     }
-    return id;
   }
 
   @Override

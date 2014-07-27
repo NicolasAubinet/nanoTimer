@@ -1,18 +1,21 @@
 package com.cube.nanotimer.activity.widget.list;
 
-public class FieldAddDialog {
+import android.app.Dialog;
+import android.os.Bundle;
+import android.widget.EditText;
+import com.cube.nanotimer.R;
 
-  /*private FieldEditor fieldEditor;
+public class FieldAddDialog extends FieldDialog {
 
-  public static FieldAddDialog newInstance(FieldEditor fieldEditor) {
-    FieldAddDialog frag = new FieldAddDialog(fieldEditor);
-    Bundle args = new Bundle();
-    frag.setArguments(args);
+  private FieldCreator fieldCreator;
+
+  public static FieldAddDialog newInstance(FieldCreator fieldCreator) {
+    FieldAddDialog frag = new FieldAddDialog(fieldCreator);
     return frag;
   }
 
-  private FieldAddDialog(FieldEditor fieldEditor) {
-    this.fieldEditor = fieldEditor;
+  private FieldAddDialog(FieldCreator fieldCreator) {
+    this.fieldCreator = fieldCreator;
   }
 
   @Override
@@ -24,9 +27,9 @@ public class FieldAddDialog {
   @Override
   protected void onConfirm() {
     EditText tfName = (EditText) editTextView.findViewById(R.id.tfName);
-    if (fieldEditor.createNewField(tfName.getText().toString())) {
+    if (fieldCreator.createField(tfName.getText().toString())) {
       dialog.dismiss();
     }
-  }*/
+  }
 
 }

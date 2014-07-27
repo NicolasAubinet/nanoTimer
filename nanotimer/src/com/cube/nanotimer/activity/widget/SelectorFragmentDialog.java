@@ -16,7 +16,7 @@ import com.cube.nanotimer.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelectorFragment extends DialogFragment {
+public class SelectorFragmentDialog extends DialogFragment {
 
   private static final String ARG_ID = "id";
   private static final String ARG_TITLE = "title";
@@ -25,12 +25,12 @@ public class SelectorFragment extends DialogFragment {
   private SelectionHandler handler;
   private int id;
 
-  public static SelectorFragment newInstance(int id, ArrayList<String> items, SelectionHandler handler) {
+  public static SelectorFragmentDialog newInstance(int id, ArrayList<String> items, SelectionHandler handler) {
     return newInstance(id, items, null, handler);
   }
 
-  public static SelectorFragment newInstance(int id, ArrayList<String> items, String title, SelectionHandler handler) {
-    SelectorFragment f = new SelectorFragment(handler);
+  public static SelectorFragmentDialog newInstance(int id, ArrayList<String> items, String title, SelectionHandler handler) {
+    SelectorFragmentDialog f = new SelectorFragmentDialog(handler);
     Bundle bundle = new Bundle();
     bundle.putInt(ARG_ID, id);
     bundle.putString(ARG_TITLE, title);
@@ -39,7 +39,7 @@ public class SelectorFragment extends DialogFragment {
     return f;
   }
 
-  private SelectorFragment(SelectionHandler handler) {
+  private SelectorFragmentDialog(SelectionHandler handler) {
     this.handler = handler;
   }
 

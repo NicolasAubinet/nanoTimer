@@ -29,7 +29,7 @@ public class Utils {
   }
 
   public static void showInfoMessage(Context context, String message) {
-    Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
   }
 
   public static void showInfoMessage(int messageId) {
@@ -37,7 +37,7 @@ public class Utils {
   }
 
   public static void showInfoMessage(Context context, int messageId) {
-    Toast.makeText(context, messageId, Toast.LENGTH_SHORT).show();
+    Toast.makeText(context, messageId, Toast.LENGTH_LONG).show();
   }
 
   public static void showYesNoConfirmation(Context context, String message, final YesNoListener listener) {
