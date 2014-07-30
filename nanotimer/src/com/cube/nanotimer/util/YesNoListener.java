@@ -1,9 +1,8 @@
 package com.cube.nanotimer.util;
 
-public class YesNoListener {
+public abstract class YesNoListener {
 
-  public void onYes() {
-  }
+  public abstract void onYes();
 
   public void onNo() {
   }

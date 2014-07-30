@@ -23,6 +23,7 @@
   <string name="step_already_exists">A step with the same name already exists for this solve type</string>
   <string name="delete_solve_type_confirmation">Are you sure you want to delete the solve type \'%1$s\' and all its times?</string>
   <string name="new_session_confirmation">Are you sure you want to start a new session?</string>
+  <string name="solvetype_has_times_addsteps">This solve type contains some times. Adding steps will delete them. Are you sure you want to continue?</string>
   <string name="min_steps_count_not_reached">You must create at least two steps</string>
   <string name="max_steps_count_reached">The steps count limit has been reached</string>
   <string name="add_step">Add step</string>
@@ -68,4 +69,5 @@
   <string name="session">Session:</string>
   <string name="raOf5">RA of 5:</string>
   <string name="raOf12">RA of 12:</string>
+  <string name="new_record">New record!</string>
 </resources>

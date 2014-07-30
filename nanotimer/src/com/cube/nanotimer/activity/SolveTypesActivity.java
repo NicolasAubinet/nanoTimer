@@ -32,6 +32,7 @@ import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.Utils;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.SolveTypeStep;
 import com.mobeta.android.dslv.DragSortController;
@@ -135,26 +136,45 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
   @Override
   public boolean onMenuItemSelected(int featureId, MenuItem menuItem) {
     if (featureId == Window.FEATURE_CONTEXT_MENU) {
-      final AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuItem.getMenuInfo();
+      final int position = ((AdapterContextMenuInfo) menuItem.getMenuInfo()).position;
       if (menuItem.getItemId() == ACTION_RENAME) {
-        FieldDialog fieldDialog = FieldEditDialog.newInstance(this, info.position, liSolveTypes.get(info.position).getName());
+        FieldDialog fieldDialog = FieldEditDialog.newInstance(this, position, liSolveTypes.get(position).getName());
         Utils.showFragment(this, fieldDialog);
       } else if (menuItem.getItemId() == ACTION_DELETE) {
-        Utils.showYesNoConfirmation(this, getString(R.string.delete_solve_type_confirmation, liSolveTypes.get(info.position).getName()),
+        Utils.showYesNoConfirmation(this, getString(R.string.delete_solve_type_confirmation, liSolveTypes.get(position).getName()),
             new YesNoListener() {
           @Override
           public void onYes() {
-            App.INSTANCE.getService().deleteSolveType(liSolveTypes.get(info.position), new DataCallback<Void>() {
+            App.INSTANCE.getService().deleteSolveType(liSolveTypes.get(position), new DataCallback<Void>() {
               @Override
               public void onData(Void data) {
-                liSolveTypes.remove(info.position);
+                liSolveTypes.remove(position);
                 refreshList();
               }
             });
           }
         });
       } else if (menuItem.getItemId() == ACTION_CREATESTEPS) {
-        Utils.showFragment(this, AddStepsDialog.newInstance(this, info.position));
+        App.INSTANCE.getService().getHistory(liSolveTypes.get(position), new DataCallback<List<SolveTime>>() {
+          @Override
+          public void onData(final List<SolveTime> data) {
+            runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                if (data.isEmpty()) {
+                  Utils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
+                } else {
+                  Utils.showYesNoConfirmation(SolveTypesActivity.this, R.string.solvetype_has_times_addsteps, new YesNoListener() {
+                    @Override
+                    public void onYes() {
+                      Utils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
+                    }
+                  });
+                }
+              }
+            });
+          }
+        });
       }
     }
     return super.onMenuItemSelected(featureId, menuItem);
@@ -244,19 +264,25 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
   }
 
   @Override
-  public void addSteps(List<String> stepNames, int pos) {
-    SolveTypeStep[] steps = new SolveTypeStep[stepNames.size()];
-    for (int i = 0; i < stepNames.size(); i++) {
-      SolveTypeStep step = new SolveTypeStep();
-      step.setName(stepNames.get(i));
-      steps[i] = step;
-    }
-    SolveType solveType = liSolveTypes.get(pos);
-    solveType.setSteps(steps);
-    App.INSTANCE.getService().addSolveTypeSteps(solveType, new DataCallback<Void>() {
+  public void addSteps(final List<String> stepNames, final int pos) {
+    // delete existing times (if there are some) before adding the steps
+    App.INSTANCE.getService().deleteHistory(liSolveTypes.get(pos), new DataCallback<Void>() {
       @Override
       public void onData(Void data) {
-        refreshList();
+        SolveTypeStep[] steps = new SolveTypeStep[stepNames.size()];
+        for (int i = 0; i < stepNames.size(); i++) {
+          SolveTypeStep step = new SolveTypeStep();
+          step.setName(stepNames.get(i));
+          steps[i] = step;
+        }
+        SolveType solveType = liSolveTypes.get(pos);
+        solveType.setSteps(steps);
+        App.INSTANCE.getService().addSolveTypeSteps(solveType, new DataCallback<Void>() {
+          @Override
+          public void onData(Void data) {
+            refreshList();
+          }
+        });
       }
     });
   }

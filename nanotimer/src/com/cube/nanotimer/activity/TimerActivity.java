@@ -2,6 +2,7 @@ package com.cube.nanotimer.activity;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -46,7 +47,7 @@ public class TimerActivity extends Activity {
 
   private TextView tvTimer;
   private TextView tvScramble;
-  private TextView tvCubeType;
+  private TextView tvBanner;
   private TextView tvRA5;
   private TextView tvRA12;
   private ViewGroup layout;
@@ -59,10 +60,15 @@ public class TimerActivity extends Activity {
   private String[] currentScramble;
   private SolveTime lastSolveTime;
   private CubeSession cubeSession;
+  private SolveAverages prevSolveAverages;
   private SolveAverages solveAverages;
   private int currentOrientation;
   private List<Long> stepsTimes;
   private long stepStartTs;
+
+  private int historyTimesCount;
+  private ColorStateList defaultTextColor;
+  private static final int MIN_TIMES_FOR_RECORD_NOTIFICATION = 12;
 
   private final long REFRESH_INTERVAL = 25;
   private Timer timer;
@@ -98,7 +104,8 @@ public class TimerActivity extends Activity {
     initViews();
 
     resetTimer();
-    setCubeTypeText();
+    setDefaultBannerText();
+    defaultTextColor = tvRA5.getTextColors();
 
     if (!solveType.hasSteps()) {
       App.INSTANCE.getService().getSessionTimes(solveType, new DataCallback<List<Long>>() {
@@ -106,6 +113,12 @@ public class TimerActivity extends Activity {
         public void onData(List<Long> data) {
           cubeSession = new CubeSession(data);
           refreshSessionFields();
+        }
+      });
+      App.INSTANCE.getService().getHistory(solveType, new DataCallback<List<SolveTime>>() {
+        @Override
+        public void onData(List<SolveTime> data) {
+          historyTimesCount = data.size(); // has a maximum of 20 times, but it's enough for this
         }
       });
     }
@@ -116,7 +129,7 @@ public class TimerActivity extends Activity {
   private void initViews() {
     tvTimer = (TextView) findViewById(R.id.tvTimer);
     tvScramble = (TextView) findViewById(R.id.tvScramble);
-    tvCubeType = (TextView) findViewById(R.id.tvCubeType);
+    tvBanner = (TextView) findViewById(R.id.tvBanner);
     tvRA5 = (TextView) findViewById(R.id.tvRA5);
     tvRA12 = (TextView) findViewById(R.id.tvRA12);
     sessionTimesLayout = (TableLayout) findViewById(R.id.sessionTimesLayout);
@@ -169,13 +182,13 @@ public class TimerActivity extends Activity {
     });
   }
 
-  private void setCubeTypeText() {
+  private void setDefaultBannerText() {
     StringBuilder sb = new StringBuilder();
     sb.append(cubeType.getName());
     if (!solveType.getName().equals(getString(R.string.def))) {
       sb.append(" (").append(solveType.getName()).append(")");
     }
-    tvCubeType.setText(sb.toString());
+    tvBanner.setText(sb.toString());
   }
 
   @Override
@@ -230,6 +243,7 @@ public class TimerActivity extends Activity {
           if (lastSolveTime != null) {
             App.INSTANCE.getService().removeTime(lastSolveTime, new SolveAverageCallback());
             cubeSession.deleteLast();
+            historyTimesCount--;
             refreshSessionFields();
             resetTimer();
           }
@@ -256,7 +270,7 @@ public class TimerActivity extends Activity {
       currentOrientation = newConfig.orientation;
       String timerText = tvTimer.getText().toString();
       SpannedString scrambleText = (SpannedString) tvScramble.getText();
-      String cubeTypeText = tvCubeType.getText().toString();
+      String cubeTypeText = tvBanner.getText().toString();
 
       List<String> stepsText = new ArrayList<String>();
       if (solveType.hasSteps()) {
@@ -275,7 +289,7 @@ public class TimerActivity extends Activity {
         tvTimer.setText(timerText);
       }
       tvScramble.setText(scrambleText);
-      tvCubeType.setText(cubeTypeText);
+      tvBanner.setText(cubeTypeText);
       refreshSessionFields();
       refreshAvgFields();
 
@@ -393,7 +407,7 @@ public class TimerActivity extends Activity {
     resetTimerText();
     timerState = TimerState.INSPECTING;
     layout.setBackgroundResource(R.color.nightblue);
-    tvCubeType.setText(getString(R.string.inspection));
+    tvBanner.setText(getString(R.string.inspection));
     timer = new Timer();
     TimerTask timerTask = new TimerTask() {
       public void run() {
@@ -413,7 +427,7 @@ public class TimerActivity extends Activity {
       timer.purge();
     }
     layout.setBackgroundResource(R.color.black);
-    setCubeTypeText();
+    setDefaultBannerText();
     timerState = TimerState.STOPPED;
     enableScreenRotation(true);
   }
@@ -463,11 +477,12 @@ public class TimerActivity extends Activity {
       solveTime.setStepsTimes(stepsTimes.toArray(new Long[0]));
     }
 
-    App.INSTANCE.getService().saveTime(solveTime, new SolveAverageCallback());
     if (cubeSession != null) {
       cubeSession.addTime(time);
       refreshSessionFields();
+      historyTimesCount++;
     }
+    App.INSTANCE.getService().saveTime(solveTime, new SolveAverageCallback());
   }
 
   private void updateStepTimeText(int id, String time) {
@@ -476,10 +491,6 @@ public class TimerActivity extends Activity {
       int colInd = (id < 4) ? 1 : 3;
       ((TextView) ((TableRow) timerStepsLayout.getChildAt(rowInd)).getChildAt(colInd)).setText(time);
     }
-  }
-
-  private String formatAvgField(Long f) {
-    return FormatterService.INSTANCE.formatSolveTime(f, "-");
   }
 
   private synchronized void updateTimerText(long curTime) {
@@ -526,16 +537,19 @@ public class TimerActivity extends Activity {
 
   private void refreshAvgFields() {
     if (!solveType.hasSteps()) {
-      ((TextView) findViewById(R.id.tvAvgOfFive)).setText(formatAvgField(solveAverages.getAvgOf5()));
-      ((TextView) findViewById(R.id.tvAvgOfTwelve)).setText(formatAvgField(solveAverages.getAvgOf12()));
-      ((TextView) findViewById(R.id.tvAvgOfHundred)).setText(formatAvgField(solveAverages.getAvgOf100()));
-      ((TextView) findViewById(R.id.tvBestOfFive)).setText(formatAvgField(solveAverages.getBestOf5()));
-      ((TextView) findViewById(R.id.tvBestOfTwelve)).setText(formatAvgField(solveAverages.getBestOf12()));
-      ((TextView) findViewById(R.id.tvBestOfHundred)).setText(formatAvgField(solveAverages.getBestOf100()));
-      ((TextView) findViewById(R.id.tvLifetimeAvg)).setText(FormatterService.INSTANCE.formatSolveTime(
-          solveAverages.getAvgOfLifetime(), getString(R.string.NA)));
-      ((TextView) findViewById(R.id.tvLifetimeBest)).setText(FormatterService.INSTANCE.formatSolveTime(
-          solveAverages.getBestOfLifetime(), getString(R.string.NA)));
+      refreshAvgField(R.id.tvAvgOfFive, solveAverages.getAvgOf5(), "-");
+      refreshAvgField(R.id.tvAvgOfTwelve, solveAverages.getAvgOf12(), "-");
+      refreshAvgField(R.id.tvAvgOfHundred, solveAverages.getAvgOf100(), "-");
+      refreshAvgField(R.id.tvLifetimeAvg, solveAverages.getAvgOfLifetime(), getString(R.string.NA));
+
+      refreshAvgFieldWithRecord(R.id.tvBestOfFive, solveAverages.getBestOf5(),
+          (prevSolveAverages != null ? prevSolveAverages.getBestOf5() : null), "-");
+      refreshAvgFieldWithRecord(R.id.tvBestOfTwelve, solveAverages.getBestOf12(),
+          (prevSolveAverages != null ? prevSolveAverages.getBestOf12() : null), "-");
+      refreshAvgFieldWithRecord(R.id.tvBestOfHundred, solveAverages.getBestOf100(),
+          (prevSolveAverages != null ? prevSolveAverages.getBestOf100() : null), "-");
+      refreshAvgFieldWithRecord(R.id.tvLifetimeBest, solveAverages.getBestOfLifetime(),
+          (prevSolveAverages != null ? prevSolveAverages.getBestOfLifetime() : null), getString(R.string.NA));
     } else {
       ((TextView) findViewById(R.id.tvAvgOfFive)).setText(
           FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf5()));
@@ -548,12 +562,45 @@ public class TimerActivity extends Activity {
     }
   }
 
+  private String formatAvgField(Long f, String defaultValue) {
+    return FormatterService.INSTANCE.formatSolveTime(f, defaultValue);
+  }
+
+  private void refreshAvgField(int fieldId, Long value, String defaultValue) {
+    TextView tv = (TextView) findViewById(fieldId);
+    tv.setText(formatAvgField(value, defaultValue));
+    tv.setTextColor(defaultTextColor);
+  }
+
+  private void refreshAvgFieldWithRecord(int fieldId, Long value, Long previousValue, String defaultValue) {
+    refreshAvgField(fieldId, value, defaultValue);
+    if (historyTimesCount >= MIN_TIMES_FOR_RECORD_NOTIFICATION && previousValue != null && value != null && value < previousValue) {
+      TextView tv = (TextView) findViewById(fieldId);
+      tv.setTextColor(getResources().getColor(R.color.green)); // TODO : animate
+
+      tvBanner.setText(R.string.new_record); // TODO : avoid doing the below stuff if calling from an orientation change (only do it in case of new times)
+      final Handler bannerHandler = new Handler();
+      Timer bannerTimer = new Timer();
+      TimerTask bannerTimerTask = new TimerTask() {
+        public void run() {
+          bannerHandler.post(new Runnable() {
+            public void run() {
+              setDefaultBannerText();
+            }
+          });
+        }
+      };
+      bannerTimer.schedule(bannerTimerTask, 3000);
+    }
+  }
+
   private class SolveAverageCallback extends DataCallback<SolveAverages> {
     @Override
     public void onData(final SolveAverages data) {
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
+          prevSolveAverages = solveAverages;
           solveAverages = data;
           lastSolveTime = data.getSolveTime();
           refreshAvgFields();

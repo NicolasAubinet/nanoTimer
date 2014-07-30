@@ -373,6 +373,9 @@ public class ServiceProviderImpl implements ServiceProvider {
 
   @Override
   public void deleteHistory(SolveType solveType) {
+    for (SolveTypeStep step : solveType.getSteps()) {
+      db.delete(DB.TABLE_TIMEHISTORYSTEP, DB.COL_TIMEHISTORYSTEP_SOLVETYPESTEP_ID + " = ?", getStringArray(step.getId()));
+    }
     db.delete(DB.TABLE_TIMEHISTORY, DB.COL_TIMEHISTORY_SOLVETYPE_ID + " = ?", getStringArray(solveType.getId()));
   }
 
