@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
+import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +16,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
@@ -60,8 +63,9 @@ public class TimerActivity extends Activity {
   private String[] currentScramble;
   private SolveTime lastSolveTime;
   private CubeSession cubeSession;
-  private SolveAverages prevSolveAverages;
   private SolveAverages solveAverages;
+  private SolveAverages prevSolveAverages;
+  private SolveAverages lastDisplayedAverages;
   private int currentOrientation;
   private List<Long> stepsTimes;
   private long stepStartTs;
@@ -291,7 +295,7 @@ public class TimerActivity extends Activity {
       tvScramble.setText(scrambleText);
       tvBanner.setText(cubeTypeText);
       refreshSessionFields();
-      refreshAvgFields();
+      refreshAvgFields(false);
 
       if (solveType.hasSteps()) {
         Iterator<String> it = stepsText.iterator();
@@ -535,7 +539,7 @@ public class TimerActivity extends Activity {
     }
   }
 
-  private void refreshAvgFields() {
+  private void refreshAvgFields(boolean showNotifications) {
     if (!solveType.hasSteps()) {
       refreshAvgField(R.id.tvAvgOfFive, solveAverages.getAvgOf5(), "-");
       refreshAvgField(R.id.tvAvgOfTwelve, solveAverages.getAvgOf12(), "-");
@@ -543,13 +547,13 @@ public class TimerActivity extends Activity {
       refreshAvgField(R.id.tvLifetimeAvg, solveAverages.getAvgOfLifetime(), getString(R.string.NA));
 
       refreshAvgFieldWithRecord(R.id.tvBestOfFive, solveAverages.getBestOf5(),
-          (prevSolveAverages != null ? prevSolveAverages.getBestOf5() : null), "-");
+          (prevSolveAverages != null ? prevSolveAverages.getBestOf5() : null), "-", showNotifications);
       refreshAvgFieldWithRecord(R.id.tvBestOfTwelve, solveAverages.getBestOf12(),
-          (prevSolveAverages != null ? prevSolveAverages.getBestOf12() : null), "-");
+          (prevSolveAverages != null ? prevSolveAverages.getBestOf12() : null), "-", showNotifications);
       refreshAvgFieldWithRecord(R.id.tvBestOfHundred, solveAverages.getBestOf100(),
-          (prevSolveAverages != null ? prevSolveAverages.getBestOf100() : null), "-");
+          (prevSolveAverages != null ? prevSolveAverages.getBestOf100() : null), "-", showNotifications);
       refreshAvgFieldWithRecord(R.id.tvLifetimeBest, solveAverages.getBestOfLifetime(),
-          (prevSolveAverages != null ? prevSolveAverages.getBestOfLifetime() : null), getString(R.string.NA));
+          (prevSolveAverages != null ? prevSolveAverages.getBestOfLifetime() : null), getString(R.string.NA), showNotifications);
     } else {
       ((TextView) findViewById(R.id.tvAvgOfFive)).setText(
           FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf5()));
@@ -560,6 +564,7 @@ public class TimerActivity extends Activity {
       ((TextView) findViewById(R.id.tvAvgOfLife)).setText(
           FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOfLifetime()));
     }
+    lastDisplayedAverages = solveAverages;
   }
 
   private String formatAvgField(Long f, String defaultValue) {
@@ -570,27 +575,58 @@ public class TimerActivity extends Activity {
     TextView tv = (TextView) findViewById(fieldId);
     tv.setText(formatAvgField(value, defaultValue));
     tv.setTextColor(defaultTextColor);
+    tv.setTypeface(null, Typeface.NORMAL);
   }
 
-  private void refreshAvgFieldWithRecord(int fieldId, Long value, Long previousValue, String defaultValue) {
+  private void refreshAvgFieldWithRecord(int fieldId, Long value, Long previousValue, String defaultValue, boolean showNotifications) {
     refreshAvgField(fieldId, value, defaultValue);
     if (historyTimesCount >= MIN_TIMES_FOR_RECORD_NOTIFICATION && previousValue != null && value != null && value < previousValue) {
-      TextView tv = (TextView) findViewById(fieldId);
-      tv.setTextColor(getResources().getColor(R.color.green)); // TODO : animate
+      final TextView tv = (TextView) findViewById(fieldId);
 
-      tvBanner.setText(R.string.new_record); // TODO : avoid doing the below stuff if calling from an orientation change (only do it in case of new times)
-      final Handler bannerHandler = new Handler();
-      Timer bannerTimer = new Timer();
-      TimerTask bannerTimerTask = new TimerTask() {
-        public void run() {
-          bannerHandler.post(new Runnable() {
-            public void run() {
-              setDefaultBannerText();
+      if (showNotifications) {
+        final int defaultColor = defaultTextColor.getDefaultColor();
+        final int recordColor = getResources().getColor(R.color.new_record);
+
+        tvBanner.setText(R.string.new_record);
+        tvBanner.setTextColor(recordColor);
+        final Handler bannerHandler = new Handler();
+        Timer bannerTimer = new Timer();
+        TimerTask bannerTimerTask = new TimerTask() {
+          public void run() {
+            bannerHandler.post(new Runnable() {
+              public void run() {
+                setDefaultBannerText();
+                tvBanner.setTextColor(defaultTextColor);
+              }
+            });
+          }
+        };
+        bannerTimer.schedule(bannerTimerTask, 3000);
+
+        tv.setTypeface(null, Typeface.BOLD);
+        // animate text view color
+        Animation a = new Animation() {
+          private int animationTimes = 3;
+          private int animationStepsCounts = (animationTimes * 2) - 1;
+          private int stepDurationMs = 1000 / animationStepsCounts;
+          @Override
+          protected void applyTransformation(float interpolatedTime, Transformation t) {
+            int interpolatedTimeMs = (int) (interpolatedTime * 1000);
+            int curStep = interpolatedTimeMs / stepDurationMs;
+            int timeInStepMs = interpolatedTimeMs % stepDurationMs;
+            float stepProgression = (float) timeInStepMs / stepDurationMs; // the +1 is to avoid division by 0
+            if (curStep % 2 == 0) { // default to yellow
+              tv.setTextColor(Utils.getColorCodeBetween(defaultColor, recordColor, stepProgression));
+            } else { // yellow to default
+              tv.setTextColor(Utils.getColorCodeBetween(recordColor, defaultColor, stepProgression));
             }
-          });
-        }
-      };
-      bannerTimer.schedule(bannerTimerTask, 3000);
+          }
+        };
+        a.setDuration(5000);
+        tv.startAnimation(a);
+      } else {
+        tv.setTextColor(getResources().getColor(R.color.new_record));
+      }
     }
   }
 
@@ -603,7 +639,7 @@ public class TimerActivity extends Activity {
           prevSolveAverages = solveAverages;
           solveAverages = data;
           lastSolveTime = data.getSolveTime();
-          refreshAvgFields();
+          refreshAvgFields(true);
         }
       });
     }

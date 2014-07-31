@@ -129,4 +129,25 @@ public class Utils {
     v.startAnimation(a);
   }
 
+  public static int getColorCodeBetween(int color1, int color2, float stepProgression) {
+    int a1 = (color1 >> 24) & 0xFF;
+    int r1 = (color1 >> 16) & 0xFF;
+    int g1 = (color1 >> 8) & 0xFF;
+    int b1 = (color1) & 0xFF;
+    int a2 = (color2 >> 24) & 0xFF;
+    int r2 = (color2 >> 16) & 0xFF;
+    int g2 = (color2 >> 8) & 0xFF;
+    int b2 = (color2) & 0xFF;
+    int a = (int) ((a2 - a1) * stepProgression) + a1;
+    int r = (int) ((r2 - r1) * stepProgression) + r1;
+    int g = (int) ((g2 - g1) * stepProgression) + g1;
+    int b = (int) ((b2 - b1) * stepProgression) + b1;
+
+    int res = a << 24;
+    res |= r << 16;
+    res |= g << 8;
+    res |= b;
+    return res;
+  }
+
 }
