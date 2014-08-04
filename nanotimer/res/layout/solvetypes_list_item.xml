@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.cube.nanotimer.util.view.ScalingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
    android:orientation="vertical"
    android:layout_width="match_parent"
    android:layout_height="wrap_content">
@@ -8,7 +8,7 @@
   <RelativeLayout
      android:layout_width="match_parent"
      android:layout_height="match_parent"
-     android:padding="12px">
+     android:padding="8dp">
 
     <TextView
        android:id="@+id/tvSolveType"
@@ -27,20 +27,20 @@
        android:layout_toLeftOf="@+id/imgMove"
        android:layout_centerVertical="true"
        android:singleLine="true"
-       android:layout_marginLeft="10px"
-       android:layout_marginRight="10px"
+       android:layout_marginLeft="7dp"
+       android:layout_marginRight="7dp"
        style="@style/SmallTextField"/>
 
     <ImageView
        android:id="@+id/imgMove"
        android:src="@drawable/listmove"
-       android:layout_width="50px"
-       android:layout_height="50px"
+       android:layout_width="40dp"
+       android:layout_height="40dp"
        android:layout_centerVertical="true"
        android:layout_alignParentRight="true"
-       android:layout_marginRight="7px"
+       android:layout_marginRight="5dp"
        android:focusable="false"/>
 
   </RelativeLayout>
 
-</com.cube.nanotimer.util.view.ScalingLinearLayout>
+</LinearLayout>

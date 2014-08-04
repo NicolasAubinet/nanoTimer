@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.cube.nanotimer.util.view.ScalingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
    xmlns:dslv="http://schemas.android.com/apk/res/com.cube.nanotimer"
    android:orientation="vertical"
    android:layout_width="match_parent"
@@ -17,14 +17,14 @@
        android:id="@+id/buAdd"
        android:text="@string/add_solvetype"
        android:layout_width="wrap_content"
-       android:paddingLeft="15px"
-       android:paddingRight="15px"
-       android:layout_margin="7px"
+       android:paddingLeft="10dp"
+       android:paddingRight="10dp"
+       android:layout_margin="5dp"
        style="@style/CustomButton"/>
 
     <LinearLayout
        android:layout_width="match_parent"
-       android:layout_height="3px"
+       android:layout_height="2dp"
        android:background="@color/neon"/>
 
   </LinearLayout>
@@ -34,9 +34,9 @@
      android:layout_width="match_parent"
      android:layout_height="match_parent"
      android:longClickable="true"
-     android:layout_marginTop="5px"
-     android:layout_marginLeft="8px"
-     android:layout_marginRight="8px"
+     android:layout_marginTop="3dp"
+     android:layout_marginLeft="6dp"
+     android:layout_marginRight="6dp"
      style="@style/DividerListView"
      dslv:drag_handle_id="@drawable/listmove"
      dslv:drag_enabled="true"
@@ -49,4 +49,4 @@
      dslv:track_drag_sort="false"
      dslv:use_default_controller="true"/>
 
-</com.cube.nanotimer.util.view.ScalingLinearLayout>
+</LinearLayout>

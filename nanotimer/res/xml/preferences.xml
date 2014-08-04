@@ -12,7 +12,7 @@
        android:entries="@array/entries_inspection_modes"
        android:entryValues="@array/entryvalues_inspection_modes"
        android:dialogTitle="@string/inspection_mode"
-       android:defaultValue="@string/inspection_mode"/>
+       android:defaultValue="1"/>
 
     <com.cube.nanotimer.activity.widget.InspectionTimeDialog
        android:key="inspection_time"

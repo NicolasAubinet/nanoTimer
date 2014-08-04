@@ -65,7 +65,6 @@ public class TimerActivity extends Activity {
   private CubeSession cubeSession;
   private SolveAverages solveAverages;
   private SolveAverages prevSolveAverages;
-  private SolveAverages lastDisplayedAverages;
   private int currentOrientation;
   private List<Long> stepsTimes;
   private long stepStartTs;
@@ -74,7 +73,7 @@ public class TimerActivity extends Activity {
   private ColorStateList defaultTextColor;
   private static final int MIN_TIMES_FOR_RECORD_NOTIFICATION = 12;
 
-  private final long REFRESH_INTERVAL = 25;
+  private final long REFRESH_INTERVAL = 30;
   private Timer timer;
   private Handler timerHandler = new Handler();
   private Object timerSync = new Object();
@@ -461,12 +460,17 @@ public class TimerActivity extends Activity {
     String defaultText = "0.00";
     tvTimer.setText(defaultText);
     if (solveType.hasSteps()) {
-      for (int i = 0; i < solveType.getSteps().length; i++) {
-        SolveTypeStep sts = solveType.getSteps()[i];
+      for (int i = 0; i < Options.INSTANCE.getMaxStepsCount(); i++) {
         int rowInd = i % 4;
         int colInd = (i < 4) ? 0 : 2;
-        ((TextView) ((TableRow) timerStepsLayout.getChildAt(rowInd)).getChildAt(colInd)).setText(sts.getName() + ":");
-        updateStepTimeText(i, defaultText);
+        if (i < solveType.getSteps().length) {
+          SolveTypeStep sts = solveType.getSteps()[i];
+          ((TextView) ((TableRow) timerStepsLayout.getChildAt(rowInd)).getChildAt(colInd)).setText(sts.getName() + ":");
+          updateStepTimeText(i, defaultText);
+        } else {
+          (((TableRow) timerStepsLayout.getChildAt(rowInd)).getChildAt(colInd)).setVisibility(View.GONE);
+          (((TableRow) timerStepsLayout.getChildAt(rowInd)).getChildAt(colInd + 1)).setVisibility(View.GONE);
+        }
       }
     }
   }
@@ -547,13 +551,13 @@ public class TimerActivity extends Activity {
       refreshAvgField(R.id.tvLifetimeAvg, solveAverages.getAvgOfLifetime(), getString(R.string.NA));
 
       refreshAvgFieldWithRecord(R.id.tvBestOfFive, solveAverages.getBestOf5(),
-          (prevSolveAverages != null ? prevSolveAverages.getBestOf5() : null), "-", showNotifications);
+          (prevSolveAverages != null ? prevSolveAverages.getBestOf5() : null), "-", showNotifications, false);
       refreshAvgFieldWithRecord(R.id.tvBestOfTwelve, solveAverages.getBestOf12(),
-          (prevSolveAverages != null ? prevSolveAverages.getBestOf12() : null), "-", showNotifications);
+          (prevSolveAverages != null ? prevSolveAverages.getBestOf12() : null), "-", showNotifications, false);
       refreshAvgFieldWithRecord(R.id.tvBestOfHundred, solveAverages.getBestOf100(),
-          (prevSolveAverages != null ? prevSolveAverages.getBestOf100() : null), "-", showNotifications);
+          (prevSolveAverages != null ? prevSolveAverages.getBestOf100() : null), "-", showNotifications, false);
       refreshAvgFieldWithRecord(R.id.tvLifetimeBest, solveAverages.getBestOfLifetime(),
-          (prevSolveAverages != null ? prevSolveAverages.getBestOfLifetime() : null), getString(R.string.NA), showNotifications);
+          (prevSolveAverages != null ? prevSolveAverages.getBestOfLifetime() : null), getString(R.string.NA), showNotifications, true);
     } else {
       ((TextView) findViewById(R.id.tvAvgOfFive)).setText(
           FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf5()));
@@ -564,7 +568,6 @@ public class TimerActivity extends Activity {
       ((TextView) findViewById(R.id.tvAvgOfLife)).setText(
           FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOfLifetime()));
     }
-    lastDisplayedAverages = solveAverages;
   }
 
   private String formatAvgField(Long f, String defaultValue) {
@@ -578,30 +581,33 @@ public class TimerActivity extends Activity {
     tv.setTypeface(null, Typeface.NORMAL);
   }
 
-  private void refreshAvgFieldWithRecord(int fieldId, Long value, Long previousValue, String defaultValue, boolean showNotifications) {
+  private void refreshAvgFieldWithRecord(int fieldId, Long value, Long previousValue, String defaultValue,
+                                         boolean showNotifications, boolean showBanner) {
     refreshAvgField(fieldId, value, defaultValue);
-    if (historyTimesCount >= MIN_TIMES_FOR_RECORD_NOTIFICATION && previousValue != null && value != null && value < previousValue) {
+    if (historyTimesCount > MIN_TIMES_FOR_RECORD_NOTIFICATION && previousValue != null && value != null && value < previousValue) {
       final TextView tv = (TextView) findViewById(fieldId);
 
       if (showNotifications) {
         final int defaultColor = defaultTextColor.getDefaultColor();
         final int recordColor = getResources().getColor(R.color.new_record);
 
-        tvBanner.setText(R.string.new_record);
-        tvBanner.setTextColor(recordColor);
-        final Handler bannerHandler = new Handler();
-        Timer bannerTimer = new Timer();
-        TimerTask bannerTimerTask = new TimerTask() {
-          public void run() {
-            bannerHandler.post(new Runnable() {
-              public void run() {
-                setDefaultBannerText();
-                tvBanner.setTextColor(defaultTextColor);
-              }
-            });
-          }
-        };
-        bannerTimer.schedule(bannerTimerTask, 3000);
+        if (showBanner) {
+          tvBanner.setText(R.string.new_record);
+          tvBanner.setTextColor(recordColor);
+          final Handler bannerHandler = new Handler();
+          Timer bannerTimer = new Timer();
+          TimerTask bannerTimerTask = new TimerTask() {
+            public void run() {
+              bannerHandler.post(new Runnable() {
+                public void run() {
+                  setDefaultBannerText();
+                  tvBanner.setTextColor(defaultTextColor);
+                }
+              });
+            }
+          };
+          bannerTimer.schedule(bannerTimerTask, 3000);
+        }
 
         tv.setTypeface(null, Typeface.BOLD);
         // animate text view color

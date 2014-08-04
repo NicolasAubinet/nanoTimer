@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.cube.nanotimer.util.view.ScalingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
    xmlns:dslv="http://schemas.android.com/apk/res/com.cube.nanotimer"
    android:orientation="vertical"
    android:layout_width="match_parent"
    android:layout_height="match_parent"
-   android:padding="8px">
+   android:padding="6dp">
 
   <RelativeLayout
      android:orientation="horizontal"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
-     android:layout_marginTop="10px">
+     android:layout_marginTop="6dp">
 
     <EditText
        android:id="@+id/tfStepName"
@@ -23,12 +23,12 @@
 
     <Button
        android:id="@+id/buAddStep"
-       android:layout_width="100px"
+       android:layout_width="70dp"
        android:layout_height="wrap_content"
        android:text="+"
        android:layout_alignParentRight="true"
-       android:layout_marginLeft="5px"
-       android:textSize="30px"/>
+       android:layout_marginLeft="3dp"
+       android:textSize="20sp"/>
 
   </RelativeLayout>
 
@@ -37,7 +37,7 @@
        android:layout_width="match_parent"
        android:layout_height="match_parent"
        android:longClickable="true"
-       android:layout_marginTop="5px"
+       android:layout_marginTop="3dp"
        style="@style/DividerListView"
        dslv:drag_handle_id="@drawable/listmove"
        dslv:drag_enabled="true"
@@ -50,4 +50,4 @@
        dslv:track_drag_sort="false"
        dslv:use_default_controller="true"/>
 
-</com.cube.nanotimer.util.view.ScalingLinearLayout>
+</LinearLayout>

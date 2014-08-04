@@ -28,7 +28,7 @@ public class TestServiceProvider extends AndroidTestCase {
     service = ServiceImpl.getInstance(getContext(), "testDB");
     provider = new ServiceProviderImpl(service.getWritableDatabase());
 
-    List<CubeType> cubeTypes = provider.getCubeTypes();
+    List<CubeType> cubeTypes = provider.getCubeTypes(true);
     for (CubeType ct : cubeTypes) {
       if ("3x3x3".equals(ct.getName())) {
         cubeType1 = ct;

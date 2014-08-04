@@ -64,9 +64,9 @@ public class CubeSession {
     if (times.size() >= n) {
       int bestInd = getBestTimeInd(n);
       int worstInd = getWorstTimeInd(n);
+      int validTimesCount = 0;
+      long avg = 0;
       if (bestInd >= 0 && worstInd >= 0) {
-        long avg = 0;
-        int validTimesCount = 0;
         for (int i = times.size() - 1; i >= times.size() - n; i--) {
           if (i != bestInd && i != worstInd) {
             if (times.get(i) > 0) {
@@ -75,11 +75,11 @@ public class CubeSession {
             }
           }
         }
-        if (validTimesCount >= (n - 2)) { // -2 because of best/worst times not used
-          return (avg / (n - 2));
-        } else {
-          return -1;
-        }
+      }
+      if (validTimesCount >= (n - 2)) { // -2 because of best/worst times not used
+        return (avg / (n - 2));
+      } else {
+        return -1;
       }
     }
     return -2;

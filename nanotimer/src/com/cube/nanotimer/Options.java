@@ -23,8 +23,7 @@ public enum Options {
   }
 
   public InspectionMode getInspectionMode() {
-    String defaultValue = context.getResources().getString(R.string.inspection_mode);
-    int mode = Integer.parseInt(sharedPreferences.getString(INSPECTION_MODE_KEY, defaultValue));
+    int mode = Integer.parseInt(sharedPreferences.getString(INSPECTION_MODE_KEY, "-1"));
     switch (mode) {
       case 1:
         return InspectionMode.HOLD_AND_RELEASE;

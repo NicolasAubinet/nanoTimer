@@ -171,7 +171,22 @@ public class DBHelper extends SQLiteOpenHelper {
     insertSolveType(getString(R.string.def), insertCubeType(7, getString(R.string.megaminx)));
 
     insertSolveType(getString(R.string.one_handed), 2);
-    insertSolveType(getString(R.string.blindfolded), 2);
+
+    int solveTypeId = insertSolveType(getString(R.string.CFOP), 2);
+    ContentValues values = new ContentValues();
+    values.put(DB.COL_SOLVETYPESTEP_SOLVETYPE_ID, solveTypeId);
+    values.put(DB.COL_SOLVETYPESTEP_POSITION, 1);
+    values.put(DB.COL_SOLVETYPESTEP_NAME, "Cross");
+    db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
+    values.put(DB.COL_SOLVETYPESTEP_POSITION, 2);
+    values.put(DB.COL_SOLVETYPESTEP_NAME, "F2L");
+    db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
+    values.put(DB.COL_SOLVETYPESTEP_POSITION, 3);
+    values.put(DB.COL_SOLVETYPESTEP_NAME, "OLL");
+    db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
+    values.put(DB.COL_SOLVETYPESTEP_POSITION, 4);
+    values.put(DB.COL_SOLVETYPESTEP_NAME, "PLL");
+    db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
   }
 
   private int insertCubeType(int id, String name) {

@@ -10,7 +10,7 @@
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
      android:text="+"
-     android:textSize="20dp"/>
+     android:textSize="20sp"/>
 
   <EditText
      android:id="@+id/tfValue"
@@ -18,13 +18,13 @@
      android:layout_height="wrap_content"
      android:numeric="integer"
      android:gravity="center"
-     android:textSize="20dp"/>
+     android:textSize="20sp"/>
 
   <Button
      android:id="@+id/buMinus"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
      android:text="-"
-     android:textSize="20dp"/>
+     android:textSize="20sp"/>
 
 </LinearLayout>

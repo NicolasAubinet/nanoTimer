@@ -186,7 +186,7 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
     if (v.getId() == R.id.lvSolveTypes) {
       int position = ((AdapterContextMenuInfo) menuInfo).position;
       menu.setHeaderTitle(R.string.action);
-      menu.add(v.getId(), ACTION_RENAME, 0, R.string.edit);
+      menu.add(v.getId(), ACTION_RENAME, 0, R.string.rename);
       menu.add(v.getId(), ACTION_DELETE, 0, R.string.delete);
       if (position >= 0 && position < liSolveTypes.size() && !liSolveTypes.get(position).hasSteps()) {
         menu.add(v.getId(), ACTION_CREATESTEPS, 0, R.string.add_steps);
