@@ -23,8 +23,6 @@
     <item name="android:gravity">center</item>
     <item name="android:layout_width">0px</item>
     <item name="android:layout_margin">2px</item>
-    <item name="borderColor">@color/neon</item>
-    <item name="border">1</item>
   </style>
 
   <style name="AverageTableHeaderField">
@@ -36,8 +34,6 @@
     <item name="android:paddingLeft">5px</item>
     <item name="android:paddingRight">5px</item>
     <item name="android:layout_margin">2px</item>
-    <item name="borderColor">@color/neon</item>
-    <item name="border">1</item>
   </style>
 
   <style name="AverageTableTextField">
@@ -47,8 +43,6 @@
     <item name="android:paddingLeft">2px</item>
     <item name="android:paddingRight">2px</item>
     <item name="android:layout_margin">2px</item>
-    <item name="borderColor">@color/neon</item>
-    <item name="border">1</item>
   </style>
 
   <style name="ListViewItem">

@@ -116,7 +116,9 @@
            android:layout_height="wrap_content"
            android:padding="1px"
            android:shrinkColumns="*"
-           android:stretchColumns="*">
+           android:stretchColumns="*"
+           custom:borderSize="2"
+           custom:borderColor="@color/neon">
           <TableRow>
             <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
             <TextView style="@style/SessionTimeTextField"/>
@@ -214,7 +216,9 @@
        android:layout_height="wrap_content"
        android:layout_alignParentBottom="true"
        android:gravity="bottom"
-       android:layout_margin="2px">
+       android:layout_margin="2px"
+       custom:borderSize="2"
+       custom:borderColor="@color/neon">
       <TableRow>
         <TextView android:textSize="21px" android:textStyle="bold" android:layout_margin="1px" android:tag="noborder"/>
         <TextView android:id="@+id/tvAvgOf" android:text="@string/last_avg_of" android:layout_weight="2" style="@style/AverageTableHeaderField"/>
