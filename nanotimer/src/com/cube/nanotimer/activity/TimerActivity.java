@@ -20,7 +20,6 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
@@ -142,17 +141,12 @@ public class TimerActivity extends Activity {
     if (solveType.hasSteps()) {
       findViewById(R.id.sessionLayout).setVisibility(View.GONE);
       averagesLayout.setColumnCollapsed(2, true);
-      LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 4f);
-      findViewById(R.id.tvAvgOf).setLayoutParams(layoutParams);
-      findViewById(R.id.tvAvgOfFive).setLayoutParams(layoutParams);
-      findViewById(R.id.tvAvgOfTwelve).setLayoutParams(layoutParams);
-      findViewById(R.id.tvAvgOfHundred).setLayoutParams(layoutParams);
-      findViewById(R.id.tvAvgOfLife).setLayoutParams(layoutParams);
       timerStepsLayout.setVisibility(View.VISIBLE);
       if (solveType.getSteps().length <= 4) {
         timerStepsLayout.setColumnCollapsed(2, true);
         timerStepsLayout.setColumnCollapsed(3, true);
       }
+      findViewById(R.id.trAvgOfLife).setVisibility(View.VISIBLE);
     } else {
       timerStepsLayout.setVisibility(View.GONE);
       findViewById(R.id.trAvgOfLife).setVisibility(View.GONE);

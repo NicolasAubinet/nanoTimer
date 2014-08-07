@@ -110,31 +110,32 @@
          android:gravity="top"
          android:paddingTop="5px"
          android:layout_margin="2px">
-        <TableLayout
+        <com.cube.nanotimer.util.view.BorderTableLayout
            android:id="@+id/sessionTimesLayout"
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
+           android:padding="1px"
            android:shrinkColumns="*"
            android:stretchColumns="*">
           <TableRow>
-            <com.cube.nanotimer.util.view.BorderTextView custom:borderTop="2" custom:borderLeft="2" style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
-            <com.cube.nanotimer.util.view.BorderTextView custom:borderTop="2" style="@style/SessionTimeTextField"/>
-            <com.cube.nanotimer.util.view.BorderTextView custom:borderTop="2" style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
-            <com.cube.nanotimer.util.view.BorderTextView custom:borderTop="2" custom:borderRight="2" style="@style/SessionTimeTextField"/>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
+            <TextView style="@style/SessionTimeTextField"/>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
+            <TextView style="@style/SessionTimeTextField"/>
           </TableRow>
           <TableRow>
-            <com.cube.nanotimer.util.view.BorderTextView custom:borderLeft="2" style="@style/SessionTimeTextField"/>
-            <com.cube.nanotimer.util.view.BorderTextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
-            <com.cube.nanotimer.util.view.BorderTextView style="@style/SessionTimeTextField"/>
-            <com.cube.nanotimer.util.view.BorderTextView custom:borderRight="2" style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
+            <TextView style="@style/SessionTimeTextField"/>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
+            <TextView style="@style/SessionTimeTextField"/>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
           </TableRow>
           <TableRow>
-            <com.cube.nanotimer.util.view.BorderTextView custom:borderBottom="2" custom:borderLeft="2" style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
-            <com.cube.nanotimer.util.view.BorderTextView custom:borderBottom="2" style="@style/SessionTimeTextField"/>
-            <com.cube.nanotimer.util.view.BorderTextView custom:borderBottom="2" style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
-            <com.cube.nanotimer.util.view.BorderTextView custom:borderBottom="2" custom:borderRight="2" style="@style/SessionTimeTextField"/>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
+            <TextView style="@style/SessionTimeTextField"/>
+            <TextView style="@style/SessionTimeTextField" android:background="@color/darkblue"/>
+            <TextView style="@style/SessionTimeTextField"/>
           </TableRow>
-        </TableLayout>
+        </com.cube.nanotimer.util.view.BorderTableLayout>
         <LinearLayout
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
@@ -207,7 +208,7 @@
       </LinearLayout>
     </LinearLayout>
 
-    <TableLayout
+    <com.cube.nanotimer.util.view.BorderTableLayout
        android:id="@+id/averagesLayout"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
@@ -215,31 +216,31 @@
        android:gravity="bottom"
        android:layout_margin="2px">
       <TableRow>
-        <com.cube.nanotimer.util.view.BorderTextView android:textSize="21px" android:minWidth="70px" android:layout_height="30px" android:textStyle="bold" custom:borderColor="@color/neon" custom:border="0" custom:borderBottom="1" custom:borderRight="1"/>
-        <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvAvgOf" android:text="@string/last_avg_of" android:layout_weight="2" custom:borderTop="2" style="@style/AverageTableHeaderField"/>
-        <com.cube.nanotimer.util.view.BorderTextView android:id="@+id/tvBestOf" android:text="@string/best_avg_of" android:layout_weight="2" custom:borderTop="2" custom:borderRight="2" style="@style/AverageTableHeaderField"/>
+        <TextView android:textSize="21px" android:textStyle="bold" android:layout_margin="1px" android:tag="noborder"/>
+        <TextView android:id="@+id/tvAvgOf" android:text="@string/last_avg_of" android:layout_weight="2" style="@style/AverageTableHeaderField"/>
+        <TextView android:id="@+id/tvBestOf" android:text="@string/best_avg_of" android:layout_weight="2" style="@style/AverageTableHeaderField"/>
       </TableRow>
       <TableRow>
-        <com.cube.nanotimer.util.view.FontFitBorderTextView android:text="5" android:minWidth="70px" custom:borderLeft="2" style="@style/AverageTableHeaderField"/>
-        <com.cube.nanotimer.util.view.FontFitBorderTextView android:id="@+id/tvAvgOfFive" android:layout_weight="2" style="@style/AverageTableTextField"/>
-        <com.cube.nanotimer.util.view.FontFitBorderTextView android:id="@+id/tvBestOfFive" android:layout_weight="2" custom:borderRight="2" style="@style/AverageTableTextField"/>
+        <TextView android:text="5" style="@style/AverageTableHeaderField"/>
+        <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFive" android:layout_weight="2" style="@style/AverageTableTextField"/>
+        <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFive" android:layout_weight="2" style="@style/AverageTableTextField"/>
       </TableRow>
       <TableRow>
-        <com.cube.nanotimer.util.view.FontFitBorderTextView android:text="12" android:minWidth="70px" custom:borderLeft="2" style="@style/AverageTableHeaderField"/>
-        <com.cube.nanotimer.util.view.FontFitBorderTextView android:id="@+id/tvAvgOfTwelve" android:layout_weight="2" style="@style/AverageTableTextField"/>
-        <com.cube.nanotimer.util.view.FontFitBorderTextView android:id="@+id/tvBestOfTwelve" android:layout_weight="2" custom:borderRight="2" style="@style/AverageTableTextField"/>
+        <TextView android:text="12" style="@style/AverageTableHeaderField"/>
+        <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfTwelve" android:layout_weight="2" style="@style/AverageTableTextField"/>
+        <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfTwelve" android:layout_weight="2" style="@style/AverageTableTextField"/>
       </TableRow>
       <TableRow>
-        <com.cube.nanotimer.util.view.FontFitBorderTextView android:text="100" android:minWidth="70px" custom:borderBottom="2" custom:borderLeft="2" style="@style/AverageTableHeaderField"/>
-        <com.cube.nanotimer.util.view.FontFitBorderTextView android:id="@+id/tvAvgOfHundred" android:layout_weight="2" custom:borderBottom="2" style="@style/AverageTableTextField"/>
-        <com.cube.nanotimer.util.view.FontFitBorderTextView android:id="@+id/tvBestOfHundred" android:layout_weight="2" custom:borderBottom="2" custom:borderRight="2" style="@style/AverageTableTextField"/>
+        <TextView android:text="100" style="@style/AverageTableHeaderField"/>
+        <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfHundred" android:layout_weight="2" style="@style/AverageTableTextField"/>
+        <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfHundred" android:layout_weight="2" style="@style/AverageTableTextField"/>
       </TableRow>
-      <TableRow android:id="@+id/trAvgOfLife">
-        <com.cube.nanotimer.util.view.FontFitBorderTextView android:text="@string/life" android:minWidth="70px" custom:borderBottom="2" custom:borderLeft="2" style="@style/AverageTableHeaderField"/>
-        <com.cube.nanotimer.util.view.FontFitBorderTextView android:id="@+id/tvAvgOfLife" android:layout_weight="2" custom:borderBottom="2" style="@style/AverageTableTextField"/>
-        <com.cube.nanotimer.util.view.FontFitBorderTextView android:layout_weight="2" custom:borderBottom="2" custom:borderRight="2" style="@style/AverageTableTextField"/>
+      <TableRow android:id="@+id/trAvgOfLife" android:visibility="gone">
+        <TextView android:text="@string/life" style="@style/AverageTableHeaderField"/>
+        <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfLife" android:layout_weight="2" style="@style/AverageTableTextField"/>
+        <com.cube.nanotimer.util.view.FontFitTextView android:layout_weight="2" style="@style/AverageTableTextField"/>
       </TableRow>
-    </TableLayout>
+    </com.cube.nanotimer.util.view.BorderTableLayout>
 
   </RelativeLayout>
 

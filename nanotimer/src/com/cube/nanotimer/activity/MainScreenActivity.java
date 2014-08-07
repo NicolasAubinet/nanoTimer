@@ -139,11 +139,11 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
             long from = liHistory.get(liHistory.size() - 1).getTimestamp();
             App.INSTANCE.getService().getHistory(curSolveType, from, new DataCallback<List<SolveTime>>() {
               @Override
-              public void onData(List<SolveTime> data) {
-                liHistory.addAll(data);
+              public void onData(final List<SolveTime> data) {
                 runOnUiThread(new Runnable() {
                   @Override
                   public void run() {
+                    liHistory.addAll(data);
                     adapter.notifyDataSetChanged();
                   }
                 });
@@ -158,12 +158,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
   @Override
   protected void onResume() {
     super.onResume();
-    // TODO : refresh cube types and solve types (could have changed solve types in options)
-//    if (cubeTypes == null) {
-      refreshCubeTypes();
-//    } else {
-//      refreshHistory();
-//    }
+    refreshCubeTypes();
   }
 
   @Override
@@ -272,15 +267,15 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
 
   private void refreshHistory() {
     previousLastItem = 0;
-    liHistory.clear();
     if (curSolveType != null) {
       App.INSTANCE.getService().getHistory(curSolveType, new DataCallback<List<SolveTime>>() {
         @Override
-        public void onData(List<SolveTime> data) {
-          liHistory.addAll(data);
+        public void onData(final List<SolveTime> data) {
           runOnUiThread(new Runnable() {
             @Override
             public void run() {
+              liHistory.clear();
+              liHistory.addAll(data);
               adapter.notifyDataSetChanged();
               lvHistory.setSelection(0);
             }
@@ -291,6 +286,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
+          liHistory.clear();
           adapter.notifyDataSetChanged();
         }
       });
@@ -352,63 +348,6 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
       }
     }
   }
-
-  /*private class TypeListEditor implements ListEditor { // TODO : remove when the solve types creation has been implemented (might need to copy some of the below code)
-    @Override
-    public void createNewItem(int id, String item) {
-      if (id == ID_SOLVETYPE) {
-        SolveType st = new SolveType(item, curCubeType.getId());
-        App.INSTANCE.getService().addSolveType(st, new DataCallback<Integer>() {
-          @Override
-          public void onData(Integer data) {
-            refreshSolveTypes();
-          }
-        });
-      }
-    }
-
-    @Override
-    public void renameItem(int id, int position, String newName) {
-      if (id == ID_SOLVETYPE) {
-        SolveType st = solveTypes.get(position);
-        st.setName(newName);
-        App.INSTANCE.getService().updateSolveType(st, new DataCallback<Void>() {
-          @Override
-          public void onData(Void data) {
-            refreshSolveTypes();
-          }
-        });
-      }
-    }
-
-    @Override
-    public void deleteItem(int id, int position) {
-      if (id == ID_SOLVETYPE) {
-        SolveType st = solveTypes.get(position);
-        App.INSTANCE.getService().deleteSolveType(st, new DataCallback<Void>() {
-          @Override
-          public void onData(Void data) {
-            refreshSolveTypes();
-          }
-        });
-      }
-    }
-
-    @Override
-    public void itemSelected(int id, int position) {
-      if (position >= 0) {
-        if (id == ID_CUBETYPE) {
-          curCubeType = cubeTypes.get(position);
-          buCubeType.setText(curCubeType.getName());
-          refreshSolveTypes();
-        } else if (id == ID_SOLVETYPE) {
-          curSolveType = solveTypes.get(position);
-          buSolveType.setText(curSolveType.getName());
-          refreshHistory();
-        }
-      }
-    }
-  }*/
 
   private class HistoryListAdapter extends ArrayAdapter<SolveTime> {
     public HistoryListAdapter(Context context, int textViewResourceId, List<SolveTime> objects) {

@@ -22,26 +22,31 @@
     <item name="android:textSize">21px</item>
     <item name="android:gravity">center</item>
     <item name="android:layout_width">0px</item>
+    <item name="android:layout_margin">2px</item>
     <item name="borderColor">@color/neon</item>
     <item name="border">1</item>
   </style>
 
   <style name="AverageTableHeaderField">
     <item name="android:textSize">21px</item>
-    <item name="android:layout_height">30px</item>
+    <item name="android:layout_height">32px</item>
     <item name="android:gravity">center</item>
     <item name="android:textStyle">bold</item>
     <item name="android:background">@color/darkblue</item>
+    <item name="android:paddingLeft">5px</item>
+    <item name="android:paddingRight">5px</item>
+    <item name="android:layout_margin">2px</item>
     <item name="borderColor">@color/neon</item>
     <item name="border">1</item>
   </style>
 
   <style name="AverageTableTextField">
     <item name="android:textSize">21px</item>
-    <item name="android:layout_height">30px</item>
+    <item name="android:layout_height">32px</item>
     <item name="android:gravity">center</item>
     <item name="android:paddingLeft">2px</item>
     <item name="android:paddingRight">2px</item>
+    <item name="android:layout_margin">2px</item>
     <item name="borderColor">@color/neon</item>
     <item name="border">1</item>
   </style>
@@ -56,7 +61,7 @@
   </style>
 
   <style name="SmallListViewItem">
-    <item name="android:textSize">27px</item>
+    <item name="android:textSize">24px</item>
     <item name="android:layout_width">match_parent</item>
     <item name="android:layout_height">wrap_content</item>
     <item name="android:padding">9px</item>
