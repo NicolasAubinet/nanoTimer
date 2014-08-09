@@ -69,11 +69,8 @@ public class AddStepsDialog extends DialogFragment implements FieldRenamer {
   }
 
   private Dialog getCreationDialog() {
-    LayoutInflater factory = LayoutInflater.from(getActivity());
-    View view = factory.inflate(R.layout.add_steps_dialog, null);
-    final AlertDialog d;
-
-    d = new AlertDialog.Builder(getActivity())
+    View view = getActivity().getLayoutInflater().inflate(R.layout.add_steps_dialog, null);
+    final AlertDialog d = new AlertDialog.Builder(getActivity())
         .setView(view)
         .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int whichButton) {
