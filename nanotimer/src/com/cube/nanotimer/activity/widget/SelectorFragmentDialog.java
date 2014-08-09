@@ -2,15 +2,19 @@ package com.cube.nanotimer.activity.widget;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import com.cube.nanotimer.R;
 
 import java.util.ArrayList;
@@ -24,6 +28,7 @@ public class SelectorFragmentDialog extends DialogFragment {
 
   private SelectionHandler handler;
   private int id;
+  private List<String> liItems;
 
   public static SelectorFragmentDialog newInstance(int id, ArrayList<String> items, SelectionHandler handler) {
     return newInstance(id, items, null, handler);
@@ -50,8 +55,8 @@ public class SelectorFragmentDialog extends DialogFragment {
 
     id = getArguments().getInt(ARG_ID);
     String title = getArguments().getString(ARG_TITLE);
-    List items = getArguments().getStringArrayList(ARG_ITEMS);
-    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.simple_list_item, items);
+    liItems = getArguments().getStringArrayList(ARG_ITEMS);
+    CustomAdapter adapter = new CustomAdapter(getActivity(), R.layout.resizable_simple_list_item, liItems);
     lvItems.setAdapter(adapter);
 
     final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(v).create();
@@ -81,6 +86,29 @@ public class SelectorFragmentDialog extends DialogFragment {
   public void onCancel(DialogInterface dialog) {
     super.onCancel(dialog);
     handler.itemSelected(id, -1);
+  }
+
+  private class CustomAdapter extends ArrayAdapter<String> {
+    public CustomAdapter(Context context, int id, List<String> list) {
+      super(context, id, list);
+    }
+
+    public View getView(final int position, View convertView, ViewGroup parent) {
+      View view = convertView;
+      if (view == null) {
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        view = inflater.inflate(R.layout.resizable_simple_list_item, null);
+      }
+
+      if (position >= 0 && position < liItems.size()) {
+        String item = liItems.get(position);
+        if (item != null) {
+          TextView tvName = (TextView) view.findViewById(R.id.tvItem);
+          tvName.setText(item);
+        }
+      }
+      return view;
+    }
   }
 
 }

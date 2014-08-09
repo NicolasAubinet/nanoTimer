@@ -26,7 +26,6 @@ import com.cube.nanotimer.activity.widget.HistoryDetailDialog;
 import com.cube.nanotimer.activity.widget.SelectionHandler;
 import com.cube.nanotimer.activity.widget.SelectorFragmentDialog;
 import com.cube.nanotimer.activity.widget.TimeChangedHandler;
-import com.cube.nanotimer.activity.widget.list.SolveTypesListDialog;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.Utils;
@@ -96,7 +95,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
             types.add(t.getName());
           }
           Utils.showFragment(MainScreenActivity.this,
-              SolveTypesListDialog.newInstance(ID_SOLVETYPE, types, MainScreenActivity.this));
+              SelectorFragmentDialog.newInstance(ID_SOLVETYPE, types, MainScreenActivity.this));
         }
       }
     });
