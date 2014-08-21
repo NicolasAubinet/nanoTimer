@@ -3,6 +3,7 @@
   <declare-styleable name="BorderTableLayout">
     <attr name="borderColor" format="color"/>
     <attr name="borderSize" format="integer"/>
+    <attr name="scaleBorders" format="boolean"/>
   </declare-styleable>
   <declare-styleable name="FontFitTextView">
     <attr name="font">

@@ -1,19 +1,15 @@
 package com.cube.nanotimer.util.view;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.cube.nanotimer.util.ScaleUtils;
 
 public class ScalingLinearLayout extends LinearLayout {
-
-  private static final int LAYOUT_WIDTH = 480;
-  private static final int LAYOUT_HEIGHT = 762;
 
   private Integer screenWidth;
   private Integer screenHeight;
@@ -36,22 +32,13 @@ public class ScalingLinearLayout extends LinearLayout {
 
   private void refreshScreenScale() {
     if (screenWidth == null || screenHeight == null) {
-      WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
-      screenWidth = windowManager.getDefaultDisplay().getWidth();
-      screenHeight = windowManager.getDefaultDisplay().getHeight();
+      screenWidth = ScaleUtils.getScreenWidth(getContext());
+      screenHeight = ScaleUtils.getScreenHeight(getContext());
     }
 
     if (screenWidth != previousWidth || screenHeight != previousHeight) {
-      float xScale;
-      float yScale;
-      int orientation = getResources().getConfiguration().orientation;
-      if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-        xScale = (float) screenWidth / LAYOUT_WIDTH;
-        yScale = (float) screenHeight / LAYOUT_HEIGHT;
-      } else {
-        xScale = (float) screenWidth / LAYOUT_HEIGHT;
-        yScale = (float) screenHeight / LAYOUT_WIDTH;
-      }
+      float xScale = ScaleUtils.getXScale(getContext());
+      float yScale = ScaleUtils.getYScale(getContext());
       float scale = Math.min(xScale, yScale);
       scaleViewAndChildren(this, scale, 0);
 
