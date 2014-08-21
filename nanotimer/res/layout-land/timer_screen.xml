@@ -43,8 +43,8 @@
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:textSize="75px"
-         android:layout_marginTop="60px"
-         android:layout_marginBottom="25px"
+         android:layout_marginTop="35px"
+         android:layout_marginBottom="15px"
          android:layout_gravity="center"/>
       <com.cube.nanotimer.util.view.MonospacedTextView
          android:layout_width="match_parent"
