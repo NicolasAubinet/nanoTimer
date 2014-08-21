@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.cube.nanotimer.util.view.ScalingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <RelativeLayout
+     android:layout_width="match_parent"
+     android:layout_height="match_parent">
+
+    <TextView
+       android:id="@+id/tvDate"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentLeft="true"
+       android:textSize="18px"
+       android:padding="6px"/>
+
+    <TextView
+       android:id="@+id/tvTime"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentRight="true"
+       android:textSize="18px"
+       android:padding="6px"/>
+
+  </RelativeLayout>
+
+</com.cube.nanotimer.util.view.ScalingLinearLayout>

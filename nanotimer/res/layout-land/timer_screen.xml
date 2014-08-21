@@ -35,28 +35,29 @@
     <LinearLayout
        android:id="@+id/topLayout"
        android:layout_width="match_parent"
-       android:layout_height="wrap_content"
+       android:layout_height="match_parent"
        android:orientation="vertical"
-       android:layout_gravity="center_vertical"
-       android:layout_weight="7"
-       android:layout_marginBottom="20px">
+       android:layout_weight="7">
       <com.cube.nanotimer.util.view.MonospacedTextView
          android:id="@+id/tvTimer"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:textSize="75px"
-         android:layout_marginBottom="30px"
+         android:layout_marginTop="60px"
+         android:layout_marginBottom="25px"
          android:layout_gravity="center"/>
       <com.cube.nanotimer.util.view.MonospacedTextView
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:layout_marginBottom="8px"
          android:text="@string/scrambleC"
          style="@style/ScrambleTextField"/>
-      <com.cube.nanotimer.util.view.MonospacedTextView
+      <com.cube.nanotimer.util.view.FontFitTextView
          android:id="@+id/tvScramble"
          android:layout_width="match_parent"
-         android:layout_height="wrap_content"
+         android:layout_height="match_parent"
+         android:layout_marginTop="8px"
+         android:gravity="center_horizontal"
+         custom:font="MONOSPACE"
          style="@style/ScrambleTextField"/>
     </LinearLayout>
 
@@ -69,7 +70,7 @@
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
          android:orientation="vertical"
-         android:paddingTop="10px"
+         android:paddingTop="20px"
          android:layout_margin="12px">
         <com.cube.nanotimer.util.view.BorderTableLayout
            android:id="@+id/sessionTimesLayout"
@@ -173,8 +174,9 @@
       <TableLayout
          android:id="@+id/timerStepsLayout"
          android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_gravity="center"
+         android:layout_height="match_parent"
+         android:layout_above="@+id/averagesLayout"
+         android:gravity="center"
          android:paddingTop="15px"
          android:visibility="gone"
          android:stretchColumns="*">
@@ -211,32 +213,33 @@
          android:layout_alignParentBottom="true"
          android:gravity="bottom"
          android:layout_margin="12px"
+         android:layout_marginBottom="24px"
          custom:borderSize="2"
          custom:borderColor="@color/neon">
         <TableRow>
-          <TextView android:textSize="21px" android:textStyle="bold" android:tag="noborder"/>
-          <TextView android:id="@+id/tvAvgOf" android:text="@string/last_avg_of" android:layout_weight="2" style="@style/AverageTableHeaderField"/>
-          <TextView android:id="@+id/tvBestOf" android:text="@string/best_avg_of" android:layout_weight="2" style="@style/AverageTableHeaderField"/>
+          <TextView android:textSize="21px" android:textStyle="bold" android:tag="noborder" android:padding="2px"/>
+          <TextView android:id="@+id/tvAvgOf" android:text="@string/last_avg_of" android:layout_weight="2" style="@style/AverageTableHeaderField" android:padding="2px"/>
+          <TextView android:id="@+id/tvBestOf" android:text="@string/best_avg_of" android:layout_weight="2" style="@style/AverageTableHeaderField" android:padding="2px"/>
         </TableRow>
         <TableRow>
-          <TextView android:text="5" style="@style/AverageTableHeaderField"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFive" android:layout_weight="2" style="@style/AverageTableTextField"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFive" android:layout_weight="2" style="@style/AverageTableTextField"/>
+          <TextView android:text="5" style="@style/AverageTableHeaderField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFive" android:layout_weight="2" style="@style/AverageTableTextField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFive" android:layout_weight="2" style="@style/AverageTableTextField" android:padding="2px"/>
         </TableRow>
         <TableRow>
-          <TextView android:text="12" style="@style/AverageTableHeaderField"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfTwelve" android:layout_weight="2" style="@style/AverageTableTextField"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfTwelve" android:layout_weight="2" style="@style/AverageTableTextField"/>
+          <TextView android:text="12" style="@style/AverageTableHeaderField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfTwelve" android:layout_weight="2" style="@style/AverageTableTextField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfTwelve" android:layout_weight="2" style="@style/AverageTableTextField" android:padding="2px"/>
         </TableRow>
         <TableRow>
-          <TextView android:text="100" style="@style/AverageTableHeaderField"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfHundred" android:layout_weight="2" style="@style/AverageTableTextField"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfHundred" android:layout_weight="2" style="@style/AverageTableTextField"/>
+          <TextView android:text="100" style="@style/AverageTableHeaderField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfHundred" android:layout_weight="2" style="@style/AverageTableTextField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfHundred" android:layout_weight="2" style="@style/AverageTableTextField" android:padding="2px"/>
         </TableRow>
         <TableRow android:id="@+id/trAvgOfLife" android:visibility="gone">
-          <TextView android:text="@string/life" style="@style/AverageTableHeaderField"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfLife" android:layout_weight="2" style="@style/AverageTableTextField"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:layout_weight="2" style="@style/AverageTableTextField"/>
+          <TextView android:text="@string/life" style="@style/AverageTableHeaderField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfLife" android:layout_weight="2" style="@style/AverageTableTextField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:layout_weight="2" style="@style/AverageTableTextField" android:padding="2px"/>
         </TableRow>
       </com.cube.nanotimer.util.view.BorderTableLayout>
     </RelativeLayout>

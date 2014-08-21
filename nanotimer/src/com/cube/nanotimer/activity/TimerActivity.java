@@ -147,6 +147,7 @@ public class TimerActivity extends Activity {
         timerStepsLayout.setColumnCollapsed(3, true);
       }
       findViewById(R.id.trAvgOfLife).setVisibility(View.VISIBLE);
+      hideUnneededStepFields();
     } else {
       timerStepsLayout.setVisibility(View.GONE);
       findViewById(R.id.trAvgOfLife).setVisibility(View.GONE);
@@ -461,10 +462,19 @@ public class TimerActivity extends Activity {
           SolveTypeStep sts = solveType.getSteps()[i];
           ((TextView) ((TableRow) timerStepsLayout.getChildAt(rowInd)).getChildAt(colInd)).setText(sts.getName() + ":");
           updateStepTimeText(i, defaultText);
-        } else {
-          (((TableRow) timerStepsLayout.getChildAt(rowInd)).getChildAt(colInd)).setVisibility(View.GONE);
-          (((TableRow) timerStepsLayout.getChildAt(rowInd)).getChildAt(colInd + 1)).setVisibility(View.GONE);
         }
+      }
+    }
+  }
+
+  private void hideUnneededStepFields() {
+    // hide fields to center steps vertically
+    if (solveType.getSteps().length < 4) {
+      for (int i = solveType.getSteps().length; i < Options.INSTANCE.getMaxStepsCount(); i++) {
+        int rowInd = i % 4;
+        int colInd = (i < 4) ? 0 : 2;
+        (((TableRow) timerStepsLayout.getChildAt(rowInd)).getChildAt(colInd)).setVisibility(View.GONE);
+        (((TableRow) timerStepsLayout.getChildAt(rowInd)).getChildAt(colInd + 1)).setVisibility(View.GONE);
       }
     }
   }

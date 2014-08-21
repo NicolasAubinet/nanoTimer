@@ -80,7 +80,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
             types.add(t.getName());
           }
           Utils.showFragment(MainScreenActivity.this,
-              SelectorFragmentDialog.newInstance(ID_CUBETYPE, types, MainScreenActivity.this));
+              SelectorFragmentDialog.newInstance(ID_CUBETYPE, types, true, MainScreenActivity.this));
         }
       }
     });
@@ -95,7 +95,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
             types.add(t.getName());
           }
           Utils.showFragment(MainScreenActivity.this,
-              SelectorFragmentDialog.newInstance(ID_SOLVETYPE, types, MainScreenActivity.this));
+              SelectorFragmentDialog.newInstance(ID_SOLVETYPE, types, true, MainScreenActivity.this));
         }
       }
     });

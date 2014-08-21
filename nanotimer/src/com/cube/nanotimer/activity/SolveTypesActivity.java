@@ -72,7 +72,7 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
             types.add(t.getName());
           }
           Utils.showFragment(SolveTypesActivity.this,
-              SelectorFragmentDialog.newInstance(0, types, getString(R.string.choose_cube_type), SolveTypesActivity.this));
+              SelectorFragmentDialog.newInstance(0, types, getString(R.string.choose_cube_type), false, SolveTypesActivity.this));
         } else {
           finish();
         }

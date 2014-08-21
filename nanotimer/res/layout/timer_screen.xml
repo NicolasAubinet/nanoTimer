@@ -89,14 +89,14 @@
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:layout_marginTop="5px"
-           android:textSize="18px"
-           android:layout_gravity="center"
-           android:text="@string/scrambleC"/>
-        <com.cube.nanotimer.util.view.MonospacedTextView
+           android:text="@string/scrambleC"
+           style="@style/ScrambleTextField"/>
+        <com.cube.nanotimer.util.view.FontFitTextView
            android:id="@+id/tvScramble"
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
            android:layout_marginTop="8px"
+           custom:font="MONOSPACE"
            style="@style/ScrambleTextField"/>
       </LinearLayout>
 

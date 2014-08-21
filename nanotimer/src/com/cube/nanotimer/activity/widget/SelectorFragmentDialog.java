@@ -24,21 +24,23 @@ public class SelectorFragmentDialog extends DialogFragment {
 
   private static final String ARG_ID = "id";
   private static final String ARG_TITLE = "title";
+  private static final String ARG_TOUCHOUT = "touchout";
   private static final String ARG_ITEMS = "items";
 
   private SelectionHandler handler;
   private int id;
   private List<String> liItems;
 
-  public static SelectorFragmentDialog newInstance(int id, ArrayList<String> items, SelectionHandler handler) {
-    return newInstance(id, items, null, handler);
+  public static SelectorFragmentDialog newInstance(int id, ArrayList<String> items, boolean cancelTouchOutside, SelectionHandler handler) {
+    return newInstance(id, items, null, cancelTouchOutside, handler);
   }
 
-  public static SelectorFragmentDialog newInstance(int id, ArrayList<String> items, String title, SelectionHandler handler) {
+  public static SelectorFragmentDialog newInstance(int id, ArrayList<String> items, String title, boolean cancelTouchOutside, SelectionHandler handler) {
     SelectorFragmentDialog f = new SelectorFragmentDialog(handler);
     Bundle bundle = new Bundle();
     bundle.putInt(ARG_ID, id);
     bundle.putString(ARG_TITLE, title);
+    bundle.putBoolean(ARG_TOUCHOUT, cancelTouchOutside);
     bundle.putStringArrayList(ARG_ITEMS, items);
     f.setArguments(bundle);
     return f;
@@ -55,11 +57,13 @@ public class SelectorFragmentDialog extends DialogFragment {
 
     id = getArguments().getInt(ARG_ID);
     String title = getArguments().getString(ARG_TITLE);
+    boolean cancelOnTouchOutside = getArguments().getBoolean(ARG_TOUCHOUT);
     liItems = getArguments().getStringArrayList(ARG_ITEMS);
     CustomAdapter adapter = new CustomAdapter(getActivity(), R.layout.resizable_simple_list_item, liItems);
     lvItems.setAdapter(adapter);
 
     final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(v).create();
+    dialog.setCanceledOnTouchOutside(cancelOnTouchOutside);
     if (title != null) {
       dialog.setTitle(title);
     }
