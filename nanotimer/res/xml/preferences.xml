@@ -3,7 +3,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
   <PreferenceCategory
-     android:title="@string/inspection">
+     android:title="@string/timer_screen">
 
     <ListPreference
        android:key="inspection_mode"
@@ -24,6 +24,12 @@
        android:title="@string/inspection_sounds"
        android:summary="@string/inspection_sounds_summary"
        android:defaultValue="@bool/inspection_sounds"/>
+
+    <CheckBoxPreference
+       android:key="keep_timer_screen_on"
+       android:title="@string/keep_screen_on"
+       android:summary="@string/keep_screen_on_summary"
+       android:defaultValue="@bool/keep_timer_screen_on"/>
 
   </PreferenceCategory>
 

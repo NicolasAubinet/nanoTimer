@@ -3,4 +3,5 @@
   <string name="inspection_mode">1</string>
   <integer name="inspection_time">15</integer>
   <bool name="inspection_sounds">true</bool>
+  <bool name="keep_timer_screen_on">true</bool>
 </resources>

@@ -15,6 +15,7 @@ public enum Options {
   private static final String INSPECTION_MODE_KEY = "inspection_mode";
   private static final String INSPECTION_TIME_KEY = "inspection_time";
   private static final String INSPECTION_SOUNDS_KEY = "inspection_sounds";
+  private static final String KEEP_TIMER_SCREEN_ON_KEY = "keep_timer_screen_on";
 
   private static final int MAX_STEPS_COUNT = 8;
 
@@ -42,6 +43,11 @@ public enum Options {
   public boolean isInspectionSoundsEnabled() {
     Boolean defaultValue = context.getResources().getBoolean(R.bool.inspection_sounds);
     return sharedPreferences.getBoolean(INSPECTION_SOUNDS_KEY, defaultValue);
+  }
+
+  public boolean isKeepTimerScreenOnWhenTimerOff() {
+    Boolean defaultValue = context.getResources().getBoolean(R.bool.keep_timer_screen_on);
+    return sharedPreferences.getBoolean(KEEP_TIMER_SCREEN_ON_KEY, defaultValue);
   }
 
   public void setContext(Context context) {

@@ -29,8 +29,7 @@
      android:id="@+id/layoutTimer"
      android:layout_width="match_parent"
      android:layout_height="match_parent"
-     android:orientation="horizontal"
-     android:keepScreenOn="true">
+     android:orientation="horizontal">
 
     <LinearLayout
        android:id="@+id/topLayout"

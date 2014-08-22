@@ -82,6 +82,7 @@ public class TimerActivity extends Activity {
   private int inspectionTime;
   private InspectionMode inspectionMode;
   private boolean soundsEnabled;
+  private boolean keepScreenOnWhenTimerOff;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +103,8 @@ public class TimerActivity extends Activity {
     inspectionTime = Options.INSTANCE.getInspectionTime();
     inspectionMode = Options.INSTANCE.getInspectionMode();
     soundsEnabled = Options.INSTANCE.isInspectionSoundsEnabled();
+    keepScreenOnWhenTimerOff = Options.INSTANCE.isKeepTimerScreenOnWhenTimerOff();
+    setKeepScreenOn(keepScreenOnWhenTimerOff);
 
     initViews();
 
@@ -365,6 +368,7 @@ public class TimerActivity extends Activity {
       stepsTimes = new ArrayList<Long>();
       stepStartTs = timerStartTs;
     }
+    setKeepScreenOn(true);
     timer = new Timer();
     TimerTask timerTask = new TimerTask() {
       public void run() {
@@ -390,6 +394,7 @@ public class TimerActivity extends Activity {
       timer.cancel();
       timer.purge();
     }
+    setKeepScreenOn(keepScreenOnWhenTimerOff);
     // update time once more to get the ms right
     // (as all ms do not necessarily appear when timing, some are skipped due to refresh interval)
     updateTimerText(time);
@@ -402,6 +407,7 @@ public class TimerActivity extends Activity {
   private void startInspectionTimer() {
     timerStartTs = System.currentTimeMillis();
     enableScreenRotation(false);
+    setKeepScreenOn(true);
     resetTimerText();
     timerState = TimerState.INSPECTING;
     layout.setBackgroundResource(R.color.nightblue);
@@ -428,6 +434,7 @@ public class TimerActivity extends Activity {
     setDefaultBannerText();
     timerState = TimerState.STOPPED;
     enableScreenRotation(true);
+    setKeepScreenOn(keepScreenOnWhenTimerOff);
   }
 
   private void nextSolveStep() {
@@ -545,6 +552,10 @@ public class TimerActivity extends Activity {
     } else {
       setRequestedOrientation(currentOrientation);
     }
+  }
+
+  private void setKeepScreenOn(boolean keepOn) {
+    findViewById(R.id.timerLayout).setKeepScreenOn(keepOn);
   }
 
   private void refreshAvgFields(boolean showNotifications) {
