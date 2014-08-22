@@ -173,6 +173,8 @@ public enum FormatterService {
     int movesPerLine;
     switch (cubeType.getType()) {
       case THREE_BY_THREE:
+      case PYRAMINX:
+      case SKEWB:
         movesPerLine = 5;
         break;
       case MEGAMINX:

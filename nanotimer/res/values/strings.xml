@@ -5,7 +5,7 @@
   <string name="app_description">Rubik\'s Cube timer for Android</string>
   <string name="feedback_message">If you encounter a bug or have any suggestions or comments, don\'t hesitate to send an email to the address below.</string>
   <string name="dev_name">Nicolas Aubinet</string>
-  <string name="email">nanotimer@gmail.com</string>
+  <string name="email">nanoTimerCube@gmail.com</string>
   <string name="about">About</string>
   <string name="backspace_exit">Press back again to exit</string>
 
