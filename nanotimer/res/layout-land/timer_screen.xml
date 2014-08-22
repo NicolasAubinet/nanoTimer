@@ -26,22 +26,21 @@
   </LinearLayout>
 
   <LinearLayout
-     android:id="@+id/layoutTimer"
+     android:id="@+id/mainLayout"
      android:layout_width="match_parent"
      android:layout_height="match_parent"
      android:orientation="horizontal">
 
     <LinearLayout
-       android:id="@+id/topLayout"
        android:layout_width="match_parent"
        android:layout_height="match_parent"
        android:orientation="vertical"
        android:layout_weight="7">
-      <com.cube.nanotimer.util.view.MonospacedTextView
+      <com.cube.nanotimer.util.view.DigitalTextView
          android:id="@+id/tvTimer"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:textSize="75px"
+         android:textSize="70px"
          android:layout_marginTop="35px"
          android:layout_marginBottom="15px"
          android:layout_gravity="center"/>

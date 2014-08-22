@@ -7,6 +7,7 @@
   <string name="dev_name">Nicolas Aubinet</string>
   <string name="email">nanotimer@gmail.com</string>
   <string name="about">About</string>
+  <string name="backspace_exit">Press back again to exit</string>
 
   <string name="cube_type">Cube type:</string>
   <string name="solve_type">Solve type:</string>

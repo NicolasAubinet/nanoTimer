@@ -104,10 +104,10 @@ public class TimerActivity extends Activity {
     inspectionMode = Options.INSTANCE.getInspectionMode();
     soundsEnabled = Options.INSTANCE.isInspectionSoundsEnabled();
     keepScreenOnWhenTimerOff = Options.INSTANCE.isKeepTimerScreenOnWhenTimerOff();
-    setKeepScreenOn(keepScreenOnWhenTimerOff);
 
     initViews();
 
+    setKeepScreenOn(keepScreenOnWhenTimerOff);
     resetTimer();
     setDefaultBannerText();
     defaultTextColor = tvRA5.getTextColors();
@@ -156,7 +156,7 @@ public class TimerActivity extends Activity {
       findViewById(R.id.trAvgOfLife).setVisibility(View.GONE);
     }
 
-    layout = (ViewGroup) findViewById(R.id.layoutTimer);
+    layout = (ViewGroup) findViewById(R.id.mainLayout);
     layout.setOnTouchListener(new OnTouchListener() {
       @Override
       public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -555,7 +555,7 @@ public class TimerActivity extends Activity {
   }
 
   private void setKeepScreenOn(boolean keepOn) {
-    findViewById(R.id.timerLayout).setKeepScreenOn(keepOn);
+    layout.setKeepScreenOn(keepOn);
   }
 
   private void refreshAvgFields(boolean showNotifications) {

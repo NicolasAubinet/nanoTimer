@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.activity.widget.AboutDialog;
@@ -56,6 +58,10 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
   private HistoryListAdapter adapter;
 
   private int previousLastItem = 0;
+
+  private Toast quitMessage;
+  private boolean inQuitMode;
+  private static final long QUIT_MODE_DELAY = 3000;
 
   private static final int ID_CUBETYPE = 1;
   private static final int ID_SOLVETYPE = 2;
@@ -159,6 +165,28 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
   protected void onResume() {
     super.onResume();
     refreshCubeTypes();
+  }
+
+  @Override
+  public void onBackPressed() {
+    if (inQuitMode) {
+      if (quitMessage != null) {
+        quitMessage.cancel();
+      }
+      super.onBackPressed();
+    } else {
+      quitMessage = Toast.makeText(this, R.string.backspace_exit, Toast.LENGTH_LONG);
+      quitMessage.show();
+      inQuitMode = true;
+      Handler handler = new Handler();
+      handler.postDelayed(new Runnable() {
+        @Override
+        public void run() {
+          quitMessage.cancel();
+          inQuitMode = false;
+        }
+      }, QUIT_MODE_DELAY);
+    }
   }
 
   @Override

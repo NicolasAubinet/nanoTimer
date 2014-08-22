@@ -11,6 +11,7 @@ import com.cube.nanotimer.vo.CubeType;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public enum FormatterService {
   INSTANCE;
@@ -47,7 +48,7 @@ public enum FormatterService {
     if (ms == null) {
       return "";
     }
-    SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy - HH:mm:ss");
+    SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy - HH:mm:ss", Locale.ENGLISH);
     return sdf.format(new Date(ms));
   }
 
