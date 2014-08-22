@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:orientation="vertical"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   android:padding="8dp"
+   android:gravity="center">
+
+  <TextView
+     android:id="@+id/tvAppName"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:text="@string/app_name"
+     android:textSize="17sp"
+     android:textStyle="bold"/>
+
+  <TextView
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="3dp"
+     android:textSize="14sp"
+     android:text="@string/app_name_copyright"/>
+
+  <TextView
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="25dp"
+     android:textSize="14sp"
+     android:text="@string/app_description"/>
+
+  <TextView
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="10dp"
+     android:gravity="center"
+     android:textSize="14sp"
+     android:text="@string/feedback_message"/>
+
+  <TextView
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="25dp"
+     android:textSize="14sp"
+     android:text="@string/dev_name"/>
+
+  <TextView
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:textSize="14sp"
+     android:text="@string/email"/>
+
+</LinearLayout>

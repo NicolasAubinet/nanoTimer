@@ -22,6 +22,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.activity.widget.AboutDialog;
 import com.cube.nanotimer.activity.widget.HistoryDetailDialog;
 import com.cube.nanotimer.activity.widget.SelectionHandler;
 import com.cube.nanotimer.activity.widget.SelectorFragmentDialog;
@@ -186,6 +187,9 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
         break;
       case R.id.itOptions:
         startActivity(new Intent(this, OptionsActivity.class));
+        break;
+      case R.id.itAbout:
+        Utils.showFragment(this, AboutDialog.newInstance());
         break;
     }
     return true;
