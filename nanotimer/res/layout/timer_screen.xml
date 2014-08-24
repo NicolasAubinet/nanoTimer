@@ -150,7 +150,7 @@
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:text="@string/raOf5"
+                 android:text="@string/meanOf5"
                  style="@style/SmallTextField"/>
               <TextView
                  android:id="@+id/tvRA5"
@@ -163,7 +163,7 @@
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:text="@string/raOf12"
+                 android:text="@string/meanOf12"
                  style="@style/SmallTextField"/>
               <TextView
                  android:id="@+id/tvRA12"
