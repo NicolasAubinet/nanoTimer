@@ -72,6 +72,10 @@ public class SolveTime implements Serializable {
     this.stepsTimes = stepsTimes;
   }
 
+  public boolean isDNF() {
+    return time < 0;
+  }
+
   public void plusTwo() {
     setTime(time + 2000);
     setPlusTwo(true);

@@ -223,7 +223,7 @@ public class TimerActivity extends Activity {
     if (timerState == TimerState.STOPPED) {
       switch (item.getItemId()) {
         case R.id.itPlusTwo:
-          if (lastSolveTime != null && lastSolveTime.getTime() > 0 && !lastSolveTime.isPlusTwo()) {
+          if (lastSolveTime != null && !lastSolveTime.isDNF() && !lastSolveTime.isPlusTwo()) {
             lastSolveTime.plusTwo();
             App.INSTANCE.getService().saveTime(lastSolveTime, new SolveAverageCallback());
             tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(lastSolveTime.getTime()));
@@ -232,7 +232,7 @@ public class TimerActivity extends Activity {
           }
           break;
         case R.id.itDNF:
-          if (lastSolveTime != null && lastSolveTime.getTime() > 0) {
+          if (lastSolveTime != null && !lastSolveTime.isDNF()) {
             lastSolveTime.setTime(-1);
             App.INSTANCE.getService().saveTime(lastSolveTime, new SolveAverageCallback());
             tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(lastSolveTime.getTime()));

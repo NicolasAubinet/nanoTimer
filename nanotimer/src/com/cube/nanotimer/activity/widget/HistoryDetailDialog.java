@@ -7,6 +7,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
@@ -48,9 +49,9 @@ public class HistoryDetailDialog extends DialogFragment {
 
     final TextView tvTime = (TextView) v.findViewById(R.id.tvTime);
     FontFitTextView tvScramble = (FontFitTextView) v.findViewById(R.id.tvScramble);
-    TextView tvPlusTwo = (TextView) v.findViewById(R.id.tvPlusTwo);
-    TextView tvDNF = (TextView) v.findViewById(R.id.tvDNF);
-    TextView tvDelete = (TextView) v.findViewById(R.id.tvDelete);
+    Button buPlusTwo = (Button) v.findViewById(R.id.buPlusTwo);
+    Button buDNF = (Button) v.findViewById(R.id.buDNF);
+    Button buDelete = (Button) v.findViewById(R.id.buDelete);
 
     if (!solveTime.hasSteps()) {
       v.findViewById(R.id.trSteps).setVisibility(View.GONE);
@@ -59,16 +60,24 @@ public class HistoryDetailDialog extends DialogFragment {
           FormatterService.INSTANCE.formatStepsTimes(Arrays.asList(solveTime.getStepsTimes())));
     }
 
+    if (solveTime.isPlusTwo()) {
+      buPlusTwo.setEnabled(false);
+    }
+    if (solveTime.isDNF()) {
+      buDNF.setEnabled(false);
+      buPlusTwo.setEnabled(false);
+    }
+
     tvScramble.setText(FormatterService.INSTANCE.formatToColoredScramble(solveTime.getScramble(), cubeType));
     tvTime.setText(FormatterService.INSTANCE.formatSolveTime(solveTime.getTime()));
 
     final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(v).create();
     dialog.setCanceledOnTouchOutside(true);
 
-    tvPlusTwo.setOnClickListener(new OnClickListener() {
+    buPlusTwo.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
-        if (solveTime.getTime() > 0 && !solveTime.isPlusTwo()) {
+        if (!solveTime.isDNF() && !solveTime.isPlusTwo()) {
           solveTime.plusTwo();
           saveTime(solveTime);
           handler.onTimeChanged(solveTime);
@@ -77,10 +86,10 @@ public class HistoryDetailDialog extends DialogFragment {
       }
     });
 
-    tvDNF.setOnClickListener(new OnClickListener() {
+    buDNF.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
-        if (solveTime.getTime() > 0) {
+        if (!solveTime.isDNF()) {
           solveTime.setTime(-1);
           saveTime(solveTime);
           handler.onTimeChanged(solveTime);
@@ -89,7 +98,7 @@ public class HistoryDetailDialog extends DialogFragment {
       }
     });
 
-    tvDelete.setOnClickListener(new OnClickListener() {
+    buDelete.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
         App.INSTANCE.getService().removeTime(solveTime, new DataCallback<SolveAverages>() {

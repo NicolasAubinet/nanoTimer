@@ -10,20 +10,25 @@
   <LinearLayout
      android:orientation="horizontal"
      android:layout_width="match_parent"
-     android:layout_height="90px"
+     android:layout_height="50px"
      android:gravity="center"
-     android:padding="8px">
-    <TextView
-       android:id="@+id/tvPlusTwo"
+     android:layout_marginLeft="7px"
+     android:layout_marginRight="7px">
+    <Button
+       android:id="@+id/buPlusTwo"
        android:text="@string/plus_two"
+       android:layout_marginRight="4px"
        style="@style/MenuButton"/>
-    <TextView
-       android:id="@+id/tvDNF"
+    <Button
+       android:id="@+id/buDNF"
        android:text="@string/DNF"
+       android:layout_marginLeft="4px"
+       android:layout_marginRight="4px"
        style="@style/MenuButton"/>
-    <TextView
-       android:id="@+id/tvDelete"
+    <Button
+       android:id="@+id/buDelete"
        android:text="@string/delete"
+       android:layout_marginLeft="4px"
        style="@style/MenuButton"/>
   </LinearLayout>
 
@@ -40,28 +45,28 @@
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:text="@string/time"
-         android:textSize="27px"/>
+         android:textSize="22px"/>
       <TextView
          android:id="@+id/tvTime"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:layout_marginLeft="15px"
          android:layout_weight="1"
-         android:textSize="27px"/>
+         android:textSize="22px"/>
     </TableRow>
     <TableRow android:id="@+id/trSteps" android:layout_marginTop="8px">
       <TextView
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:text="@string/stepsC"
-         android:textSize="27px"/>
+         android:textSize="22px"/>
       <TextView
          android:id="@+id/tvSteps"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:layout_marginLeft="15px"
          android:layout_weight="1"
-         android:textSize="27px"/>
+         android:textSize="22px"/>
     </TableRow>
   </TableLayout>
 
