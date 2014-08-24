@@ -172,11 +172,14 @@ public class TimerActivity extends Activity {
           return false;
         } else if (timerState == TimerState.STOPPED && motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
           startInspectionTimer();
-        } else if (timerState == TimerState.INSPECTING && motionEvent.getAction() == MotionEvent.ACTION_UP) {
-          if (inspectionMode == InspectionMode.HOLD_AND_RELEASE) {
-            stopInspectionTimer();
-            startTimer();
-          }
+        } else if (timerState == TimerState.INSPECTING && motionEvent.getAction() == MotionEvent.ACTION_UP
+            && inspectionMode == InspectionMode.HOLD_AND_RELEASE) {
+          stopInspectionTimer();
+          startTimer();
+        } else if (timerState == TimerState.INSPECTING && motionEvent.getAction() == MotionEvent.ACTION_DOWN
+            && inspectionMode == InspectionMode.AUTOMATIC) {
+          stopInspectionTimer();
+          startTimer();
         }
         return true;
       }
