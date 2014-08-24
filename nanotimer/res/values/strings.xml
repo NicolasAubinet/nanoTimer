@@ -78,4 +78,12 @@
   <string name="raOf5">RA of 5:</string>
   <string name="raOf12">RA of 12:</string>
   <string name="new_record">New record!</string>
+
+  <string name="rate_message">If you like nano Timer, please take a moment to rate it.\nThanks for your support.</string>
+  <string name="rate">Rate</string>
+  <string name="rate_now">Rate now</string>
+  <string name="ask_later">Ask later</string>
+  <string name="dont_ask_again">Never</string>
+  <string name="could_not_find_market">Could not find the market app</string>
+  <string name="could_not_launch_market">Could not launch the market</string>
 </resources>

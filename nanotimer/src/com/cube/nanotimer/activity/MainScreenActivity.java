@@ -173,6 +173,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
       if (quitMessage != null) {
         quitMessage.cancel();
       }
+      // TODO : should maybe close the app completely (see if better to keep it in background or to kill it)
       super.onBackPressed();
     } else {
       quitMessage = Toast.makeText(this, R.string.backspace_exit, Toast.LENGTH_LONG);

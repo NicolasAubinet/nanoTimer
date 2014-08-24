@@ -72,11 +72,12 @@
   <style name="MenuButton">
     <item name="android:textSize">22px</item>
     <item name="android:layout_width">fill_parent</item>
-    <item name="android:layout_height">fill_parent</item>
-    <item name="android:layout_weight">1</item>
+    <item name="android:layout_height">50px</item>
+    <item name="android:padding">3px</item>
     <item name="android:textColor">@color/white</item>
     <item name="android:background">@drawable/button_custom</item>
     <item name="android:gravity">center</item>
+    <item name="android:singleLine">true</item>
   </style>
 
   <style name="ScrambleTextField">

@@ -10,7 +10,7 @@
   <LinearLayout
      android:orientation="horizontal"
      android:layout_width="match_parent"
-     android:layout_height="50px"
+     android:layout_height="wrap_content"
      android:gravity="center"
      android:layout_marginLeft="7px"
      android:layout_marginRight="7px">
@@ -18,17 +18,20 @@
        android:id="@+id/buPlusTwo"
        android:text="@string/plus_two"
        android:layout_marginRight="4px"
+       android:layout_weight="1"
        style="@style/MenuButton"/>
     <Button
        android:id="@+id/buDNF"
        android:text="@string/DNF"
        android:layout_marginLeft="4px"
        android:layout_marginRight="4px"
+       android:layout_weight="1"
        style="@style/MenuButton"/>
     <Button
        android:id="@+id/buDelete"
        android:text="@string/delete"
        android:layout_marginLeft="4px"
+       android:layout_weight="1"
        style="@style/MenuButton"/>
   </LinearLayout>
 
