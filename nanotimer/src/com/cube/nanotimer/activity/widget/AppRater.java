@@ -70,20 +70,10 @@ public class AppRater {
     Button buRateNow = (Button) v.findViewById(R.id.buRateNow);
     buRateNow.setOnClickListener(new OnClickListener() {
       public void onClick(View v) {
-        // TODO : handle amazon store in addition to play store
-        final Intent rateAppIntent = new Intent(Intent.ACTION_VIEW,
-            Uri.parse("market://details?id=" + context.getPackageName()));
-        if (context.getPackageManager().queryIntentActivities(rateAppIntent, 0).size() > 0) {
-          try {
-            context.startActivity(rateAppIntent);
-            // avoid asking again if the user rated the app (there's no way to know for sure if he actually rated it)
-            editor.putBoolean("dontshowagain", true);
-            editor.commit();
-          } catch (ActivityNotFoundException e) {
-            Utils.showInfoMessage(R.string.could_not_launch_market);
-          }
-        } else {
-          Utils.showInfoMessage(R.string.could_not_find_market);
+        if (openStoreForRating(context)) {
+          // avoid asking again if the user rated the app (there's no way to know for sure if he actually rated it)
+          editor.putBoolean("dontshowagain", true);
+          editor.commit();
         }
         dialog.dismiss();
       }
@@ -114,6 +104,34 @@ public class AppRater {
     });
 
     dialog.show();
+  }
+
+  private static boolean openStoreForRating(Context context) {
+    Intent rateAppIntent;
+    String storePackage = context.getPackageManager().getInstallerPackageName(context.getPackageName());
+    if (storePackage == null) {
+      Utils.showInfoMessage(R.string.could_not_find_market);
+      return false;
+    } else if (storePackage.equals("com.android.vending")) { // google
+      rateAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + context.getPackageName()));
+    } else if (storePackage.equals("com.amazon.venezia")) { // amazon
+      rateAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("amzn://apps/android?p=" + context.getPackageName()));
+    } else {
+      Utils.showInfoMessage(R.string.could_not_find_market);
+      return false;
+    }
+
+    if (context.getPackageManager().queryIntentActivities(rateAppIntent, 0).size() > 0) {
+      try {
+        context.startActivity(rateAppIntent);
+        return true;
+      } catch (ActivityNotFoundException e) {
+        Utils.showInfoMessage(R.string.could_not_launch_market);
+      }
+    } else {
+      Utils.showInfoMessage(R.string.could_not_find_market);
+    }
+    return false;
   }
 
   private static long daysToMs(int days) {
