@@ -259,7 +259,23 @@ public class TestServiceProvider extends AndroidTestCase {
     // TODO add more tests (specially to test the "Handle DNFs" part of recalculateAverages) (if not already done) (could use code coverage to check this)
   }
 
-  // TODO test for lifetime avg (test before 1000 records and after)
+  @SmallTest
+  public void testLifetimeAverage() {
+    provider.deleteHistory();
+    saveTime(1000);
+    SolveAverages averages = saveTimes(5000, 999);
+    assertAvgEquals(5000, 5000, 5000, 4996, 4200, 4666, 4960, 1000, averages); // 1000, 5000(x999)
+
+    averages = saveTime(5000);
+    assertAvgEquals(5000, 5000, 5000, 5000, 4200, 4666, 4960, 1000, averages); // 1000, 5000(x1000)
+
+    averages = saveTime(5000);
+    assertAvgEquals(5000, 5000, 5000, 5000, 4200, 4666, 4960, 1000, averages); // 1000, 5000(x1001)
+
+    provider.removeTime(getLastTime());
+    averages = provider.removeTime(getLastTime());
+    assertAvgEquals(5000, 5000, 5000, 4996, 4200, 4666, 4960, 1000, averages); // 1000, 5000(x999)
+  }
 
   @SmallTest
   public void testStepsAverages() {
