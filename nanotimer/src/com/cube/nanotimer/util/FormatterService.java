@@ -109,7 +109,7 @@ public enum FormatterService {
     for (String line : scramble.split("\n")) {
       int prevSpaceInd = prevLinesCharCount;
       int colorInd = 0;
-      char prevChar = '#'; // could be any char
+      char prevChar = '#'; // could be any non-space char
       for (int i = 0; i < line.length(); i++) {
         char c = line.charAt(i);
         if (c == ' ' && prevChar != ' ') {
