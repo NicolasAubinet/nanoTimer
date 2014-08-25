@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <color name="neon">#FF6257F6</color>
+  <color name="scramblealternate">#FFC0B9F9</color>
   <color name="nightblue">#FF272254</color>
   <color name="darkblue">#FF000055</color>
   <color name="darkgray">#FF333333</color>

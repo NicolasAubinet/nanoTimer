@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -49,6 +50,7 @@ public class HistoryDetailDialog extends DialogFragment {
 
     final TextView tvTime = (TextView) v.findViewById(R.id.tvTime);
     FontFitTextView tvScramble = (FontFitTextView) v.findViewById(R.id.tvScramble);
+    tvScramble.setMovementMethod(new ScrollingMovementMethod());
     Button buPlusTwo = (Button) v.findViewById(R.id.buPlusTwo);
     Button buDNF = (Button) v.findViewById(R.id.buDNF);
     Button buDelete = (Button) v.findViewById(R.id.buDelete);

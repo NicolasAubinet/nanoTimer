@@ -1,9 +1,9 @@
 package com.cube.nanotimer.util;
 
-import android.graphics.Color;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.vo.CubeType;
@@ -103,26 +103,31 @@ public enum FormatterService {
    */
   private Spannable colorFormattedScramble(String scramble) {
     Spannable span = new SpannableString(scramble);
-    String alternateColor = "#C0B9F9";
+    int defaultColor = getDefaultTextColor();
+    int alternateColor = App.INSTANCE.getContext().getResources().getColor(R.color.scramblealternate);
     int prevLinesCharCount = 0;
     for (String line : scramble.split("\n")) {
-      char[] cline = line.toCharArray();
-      int index = line.indexOf(" ", 0);
-      while (index != -1) {
-        int startIndex = index;
-        for (; index < cline.length && cline[index] == ' '; index++) ; // next non-space char
-        index = line.indexOf(" ", index); // next space char
-        if (index == -1) {
-          index = cline.length - 1;
+      int prevSpaceInd = prevLinesCharCount;
+      int colorInd = 0;
+      char prevChar = '#'; // could be any char
+      for (int i = 0; i < line.length(); i++) {
+        char c = line.charAt(i);
+        if (c == ' ' && prevChar != ' ') {
+          span.setSpan(new ForegroundColorSpan((colorInd % 2 == 0) ? defaultColor : alternateColor),
+              prevSpaceInd, prevLinesCharCount + i, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+          prevSpaceInd = prevLinesCharCount + i;
+          colorInd++;
         }
-        span.setSpan(new ForegroundColorSpan(Color.parseColor(alternateColor)),
-            startIndex + prevLinesCharCount, index + prevLinesCharCount, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        for (; index < cline.length && cline[index] == ' '; index++) ; // next non-space char
-        index = line.indexOf(" ", index);
+        prevChar = c;
       }
       prevLinesCharCount += line.length() + 1;
     }
     return span;
+  }
+
+  private int getDefaultTextColor() {
+    TextView tv = new TextView(App.INSTANCE.getContext());
+    return tv.getCurrentTextColor();
   }
 
   /**
