@@ -200,7 +200,7 @@ public class TimerActivity extends Activity {
     if (timerState == TimerState.RUNNING) {
       stopTimer(false);
       resetTimer();
-    } else if (timerState == TimerState.INSPECTING) {
+    } else if (timerState == TimerState.INSPECTING) { // for automatic inspection mode
       stopInspectionTimer();
       resetTimer();
     } else {
@@ -456,6 +456,7 @@ public class TimerActivity extends Activity {
         timer.cancel();
         timer.purge();
       }
+      lastSolveTime = null;
       timerStartTs = 0;
       resetTimerText();
     }
