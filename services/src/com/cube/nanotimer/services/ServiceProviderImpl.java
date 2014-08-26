@@ -22,8 +22,10 @@ public class ServiceProviderImpl implements ServiceProvider {
 
   private SolveType currentSolveType;
   private List<CachedTime> cachedSolveTimes;
-  private Map<Integer, Long> cachedBestAverages;
+  private Map<Integer, Long> cachedBestAverages = new HashMap<Integer, Long>();
   private Long cachedLifetimeBest;
+
+  private Object cacheSyncHelper = new Object();
 
   private final int CACHE_MAX_SIZE = 1010;
   private final int CACHE_MIN_SIZE = 1000;
@@ -114,10 +116,12 @@ public class ServiceProviderImpl implements ServiceProvider {
     values.put(DB.COL_TIMEHISTORY_TIME, solveTime.getTime());
     values.put(DB.COL_TIMEHISTORY_PLUSTWO, solveTime.isPlusTwo() ? 1 : 0);
     db.update(DB.TABLE_TIMEHISTORY, values, DB.COL_ID + " = ?", getStringArray(solveTime.getId()));
-    for (CachedTime ct : cachedSolveTimes) {
-      if (ct.getSolveId() == solveTime.getId()) {
-        ct.setTime(solveTime.getTime());
-        break;
+    synchronized (cacheSyncHelper) {
+      for (CachedTime ct : cachedSolveTimes) {
+        if (ct.getSolveId() == solveTime.getId()) {
+          ct.setTime(solveTime.getTime());
+          break;
+        }
       }
     }
 
@@ -133,9 +137,11 @@ public class ServiceProviderImpl implements ServiceProvider {
 
   private SolveAverages createTime(SolveTime solveTime) {
     CachedTime cachedTime = new CachedTime(solveTime);
-    cachedSolveTimes.add(0, cachedTime);
-    if (cachedSolveTimes.size() > CACHE_MAX_SIZE) {
-      cachedSolveTimes.remove(cachedSolveTimes.size() - 1);
+    synchronized (cacheSyncHelper) {
+      cachedSolveTimes.add(0, cachedTime);
+      if (cachedSolveTimes.size() > CACHE_MAX_SIZE) {
+        cachedSolveTimes.remove(cachedSolveTimes.size() - 1);
+      }
     }
     Long avg5 = getLastAvg(5, false);
     Long avg12 = getLastAvg(12, false);
@@ -284,12 +290,14 @@ public class ServiceProviderImpl implements ServiceProvider {
     int i = 0;
     syncCaches(solveTime.getSolveType());
     // remove from cache
-    for (CachedTime ct : cachedSolveTimes) {
-      if (ct.getSolveId() == solveTime.getId()) {
-        cachedSolveTimes.remove(i);
-        break;
+    synchronized (cacheSyncHelper) {
+      for (CachedTime ct : cachedSolveTimes) {
+        if (ct.getSolveId() == solveTime.getId()) {
+          cachedSolveTimes.remove(i);
+          break;
+        }
+        i++;
       }
-      i++;
     }
 
     // remove from DB
@@ -610,7 +618,7 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   private void syncCaches(SolveType solveType) {
-    if (cachedSolveTimes == null || solveType.getId() != currentSolveType.getId()) {
+    if (cachedSolveTimes == null || currentSolveType == null || solveType.getId() != currentSolveType.getId()) {
       currentSolveType = solveType;
       loadSolveTimes(solveType.getId());
       loadBestAverages(solveType.getId());
@@ -619,21 +627,23 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   private List<CachedTime> loadSolveTimes(int solveTypeId) {
-    cachedSolveTimes = new ArrayList<CachedTime>();
-    StringBuilder q = new StringBuilder();
-    q.append("SELECT ").append(DB.COL_ID).append(", ").append(DB.COL_TIMEHISTORY_TIME);
-    q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
-    q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
-    q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC");
-    q.append(" LIMIT ").append(CACHE_MAX_SIZE);
-    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTypeId));
-    if (cursor != null) {
-      for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-        cachedSolveTimes.add(new CachedTime(cursor.getInt(0), cursor.getLong(1)));
+    synchronized (cacheSyncHelper) {
+      cachedSolveTimes = new ArrayList<CachedTime>();
+      StringBuilder q = new StringBuilder();
+      q.append("SELECT ").append(DB.COL_ID).append(", ").append(DB.COL_TIMEHISTORY_TIME);
+      q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
+      q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
+      q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC");
+      q.append(" LIMIT ").append(CACHE_MAX_SIZE);
+      Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTypeId));
+      if (cursor != null) {
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+          cachedSolveTimes.add(new CachedTime(cursor.getInt(0), cursor.getLong(1)));
+        }
+        cursor.close();
       }
-      cursor.close();
+      return cachedSolveTimes;
     }
-    return cachedSolveTimes;
   }
 
   private Map<Integer, Long> loadBestAverages(int solveTypeId) {
@@ -684,13 +694,15 @@ public class ServiceProviderImpl implements ServiceProvider {
   private Long getLastAvg(int n, boolean calculateAll) {
     long total = 0;
     int i = 0;
-    for (CachedTime ct : cachedSolveTimes) {
-      long t = ct.getTime();
-      if (t > 0) { // if not a DNF
-        total += t;
-        i++;
-        if (i == n) {
-          return total / n;
+    synchronized (cacheSyncHelper) {
+      for (CachedTime ct : cachedSolveTimes) {
+        long t = ct.getTime();
+        if (t > 0) { // if not a DNF
+          total += t;
+          i++;
+          if (i == n) {
+            return total / n;
+          }
         }
       }
     }
