@@ -82,25 +82,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
   @Override
   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    ContentValues values = new ContentValues();
-    values.put(DB.COL_ID, 8);
-    values.put(DB.COL_CUBETYPE_NAME, getString(R.string.pyraminx));
-    int cubeId = (int) db.insert(DB.TABLE_CUBETYPE, null, values);
-
-    values = new ContentValues();
-    values.put(DB.COL_SOLVETYPE_NAME, getString(R.string.def));
-    values.put(DB.COL_SOLVETYPE_CUBETYPE_ID, cubeId);
-    db.insert(DB.TABLE_SOLVETYPE, null, values);
-
-    values = new ContentValues();
-    values.put(DB.COL_ID, 9);
-    values.put(DB.COL_CUBETYPE_NAME, getString(R.string.skewb));
-    cubeId = (int) db.insert(DB.TABLE_CUBETYPE, null, values);
-
-    values = new ContentValues();
-    values.put(DB.COL_SOLVETYPE_NAME, getString(R.string.def));
-    values.put(DB.COL_SOLVETYPE_CUBETYPE_ID, cubeId);
-    db.insert(DB.TABLE_SOLVETYPE, null, values);
   }
 
   private void insertDefaultValues() {
