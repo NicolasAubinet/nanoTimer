@@ -38,7 +38,6 @@
        android:layout_height="36px"
        android:layout_centerVertical="true"
        android:layout_alignParentRight="true"
-       android:layout_marginRight="6px"
        android:focusable="false"/>
 
   </RelativeLayout>
