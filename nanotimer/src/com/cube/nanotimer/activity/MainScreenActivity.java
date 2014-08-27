@@ -107,6 +107,9 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
       }
     });
 
+//    LinearLayout adLayout = (LinearLayout) findViewById(R.id.adLayout);
+//    adLayout.addView(AdProvider.getAdView(this));
+
     initHistoryList();
 
     findViewById(R.id.buStart).setOnClickListener(new OnClickListener() {
