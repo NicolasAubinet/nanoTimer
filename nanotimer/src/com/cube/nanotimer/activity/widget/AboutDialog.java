@@ -13,8 +13,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
-import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.util.Utils;
 
 public class AboutDialog extends DialogFragment {
 
@@ -27,7 +27,7 @@ public class AboutDialog extends DialogFragment {
     View v = getActivity().getLayoutInflater().inflate(R.layout.about_dialog, null);
 
     TextView tvAppName = (TextView) v.findViewById(R.id.tvAppName);
-    tvAppName.setText(tvAppName.getText().toString() + " v" + App.VERSION);
+    tvAppName.setText(tvAppName.getText().toString() + " v" + Utils.getAppVersion());
 
     final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(v).create();
     dialog.setCanceledOnTouchOutside(true);

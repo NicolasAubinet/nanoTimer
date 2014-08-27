@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="app_name">nano Timer</string>
-  <string name="app_name_copyright">&#169; 2014 nano Timer</string>
+  <string name="app_name">Nano Timer</string>
+  <string name="app_name_copyright">&#169; 2014 Nano Timer</string>
   <string name="app_description">Rubik\'s Cube timer for Android</string>
   <string name="feedback_message">If you encounter a bug or have any suggestions or comments, don\'t hesitate to send an email to the address below.</string>
   <string name="dev_name">Nicolas Aubinet</string>
-  <string name="email">nanoTimerCube@gmail.com</string>
+  <string name="email">NanoTimerCube@gmail.com</string>
   <string name="about">About</string>
   <string name="backspace_exit">Press back again to exit</string>
 
@@ -79,7 +79,7 @@
   <string name="meanOf12">Mean of 12:</string>
   <string name="new_record">New record!</string>
 
-  <string name="rate_message">If you like nano Timer, please take a moment to rate it.\nThanks for your support.</string>
+  <string name="rate_message">If you like Nano Timer, please take a moment to rate it.\nThanks for your support.</string>
   <string name="rate">Rate</string>
   <string name="rate_now">Rate now</string>
   <string name="ask_later">Ask later</string>

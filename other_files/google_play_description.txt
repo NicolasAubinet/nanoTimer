@@ -1,16 +1,17 @@
-﻿Nano Timer is a Rubik's Cube timer app developed for speedcubers. Get this timer on your device to be able to solve cubes anywhere and anytime while keeping track of your progression, your averages, your best times, and a lot more.
+﻿Nano Timer is a Rubik's Cube timer app developed for speedcubers.
+Get this timer on your device to be able to solve cubes anywhere and anytime while keeping track of your progression, your averages, your best times, and a lot more.
 
 Features:
 - Scramble generation for many cube types
 - History tracking
 - Customizable inspection timer
 - Easy access to functionalities like +2 and DNF
-- A new "Solve type" functionality allowing you to have a separate history for a same cube type, giving the possibility to practice with new methods, with one-hand or even blindfolded without affecting your normal averages
+- Scrambles saving
+- A new "Solve type" functionality allowing you to have a separate history for a same cube type, giving you the possibility to practice with new methods, with one-hand or even blindfolded without affecting your normal averages
 - Define your own solve types to exactly suit your needs
-- Multiple-steps timer to be able to see exactly where you are spending most of your time, allowing you to know where you should focus your practice
-- Scrambles saving to be able to reconstruct your best solves
+- Multiple-steps timer to be able to see where you are spending most of your time, allowing you to know where you should focus your practice
 - Keep track of your averages, your best times, and your best averages
 
 All of this in an easy to use and good-looking timer.
 
-Give a new breath to your Rubik's cube solves and start improving like never before with nano timer!
+Give a new breath to your Rubik's cube solves and start improving like never before with Nano Timer!

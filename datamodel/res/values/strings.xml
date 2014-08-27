@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="app_name">nano Timer</string>
-
   <string name="two_by_two">2x2x2</string>
   <string name="three_by_three">3x3x3</string>
   <string name="four_by_four">4x4x4</string>

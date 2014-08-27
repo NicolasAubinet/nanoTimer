@@ -8,8 +8,6 @@ import com.cube.nanotimer.services.ServiceImpl;
 public enum App {
   INSTANCE;
 
-  public static String VERSION = "1.0";
-
   private Context context;
   private Service service;
 
