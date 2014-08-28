@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-   android:versionCode="3"
+   android:versionCode="4"
    android:versionName="1.0"
    package="com.cube.nanotimer">
 
@@ -9,14 +9,35 @@
      android:targetSdkVersion="9"/>
 
   <!-- Permissions for ads -->
-  <uses-permission android:name="android.permission.INTERNET" />
+  <!-- Airpush ads -->
+  <!--<uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <uses-permission android:name="android.permission.READ_PHONE_STATE" />
   <uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS" />
   <uses-permission android:name="android.permission.GET_ACCOUNTS" />
   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />-->
+
+  <!-- adience adboost -->
+  <!--<uses-permission android:name="android.permission.INTERNET" />-->
+  <!--<uses-permission android:name="android.permission.WAKE_LOCK" />-->
+  <!--<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />-->
+  <!--<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />-->
+
+  <!-- avocarrot -->
+  <!--<uses-permission android:name="android.permission.INTERNET" />-->
+  <!--<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />-->
+  <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
+  <!--<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />-->
+
+  <!-- startapp -->
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+  <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+  <uses-permission android:name="android.permission.GET_TASKS"/>
 
   <application
      android:icon="@drawable/icon"
@@ -45,9 +66,32 @@
     </activity>
 
     <!-- For ads -->
+    <!-- <meta-data android:name="com.google.android.gms.version" android:value="4030500"/> -->
+
+    <!-- startapp -->
+    <!--<activity-->
+       <!--android:name="com.startapp.android.eula.EULAActivity"-->
+       <!--android:theme="@android:style/Theme.Translucent"-->
+       <!--android:configChanges="keyboard|keyboardHidden|orientation"/>-->
+
+    <!-- <activity
+       android:name="com.startapp.android.publish.list3d.List3DActivity"
+       android:taskAffinity="com.cube.nanotimer.AppWall"
+       android:theme="@android:style/Theme"/>
+
+    <activity
+       android:name="com.startapp.android.publish.AppWallActivity"
+       android:theme="@android:style/Theme.Translucent"
+       android:taskAffinity="com.cube.nanotimer.AppWall"
+       android:configChanges="orientation|keyboardHidden"/> -->
+
+    <meta-data android:name="com.startapp.android.DEV_ID" android:value="108845167"/>
+    <meta-data android:name="com.startapp.android.APP_ID" android:value="208524420"/>
+
+    <!-- Airpush -->
     <!-- <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/> -->
     <!-- <meta-data android:name="com.google.android.gms.version" android:value="5089000"/> -->
-    <meta-data android:name="com.google.android.gms.version" android:value="4030500" />
+    <!--<meta-data android:name="com.google.android.gms.version" android:value="4030500" />
     <meta-data android:name="com.pfaey.opypm200398.APPID" android:value="235358"/>
     <meta-data android:name="com.pfaey.opypm200398.APIKEY" android:value="android*1408738404200398455"/>
 
@@ -75,7 +119,7 @@
       <intent-filter>
         <action android:name="android.intent.action.BOOT_COMPLETED"/>
       </intent-filter>
-    </receiver>
+    </receiver>-->
 
   </application>
 </manifest>

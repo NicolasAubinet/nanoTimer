@@ -18,9 +18,25 @@
     <orderEntry type="module" module-name="datamodel" />
     <orderEntry type="module" module-name="services" />
     <orderEntry type="module" module-name="drag-sort-listview" />
-    <orderEntry type="module" module-name="google-play-services_lib" />
     <orderEntry type="library" name="android-support-v4" level="project" />
-    <orderEntry type="library" name="com-pfaey-opypm200398" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/libs/google-play-services.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/libs/StartAppInApp-2.4.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 
