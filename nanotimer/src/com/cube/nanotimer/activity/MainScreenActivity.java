@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +30,7 @@ import com.cube.nanotimer.activity.widget.HistoryDetailDialog;
 import com.cube.nanotimer.activity.widget.SelectionHandler;
 import com.cube.nanotimer.activity.widget.SelectorFragmentDialog;
 import com.cube.nanotimer.activity.widget.TimeChangedHandler;
+import com.cube.nanotimer.activity.widget.ads.AdProvider;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.Utils;
@@ -107,8 +109,8 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
       }
     });
 
-//    LinearLayout adLayout = (LinearLayout) findViewById(R.id.adLayout);
-//    adLayout.addView(AdProvider.getAdView(this));
+    LinearLayout adLayout = (LinearLayout) findViewById(R.id.adLayout);
+    adLayout.addView(AdProvider.getAdView(this));
 
     initHistoryList();
 

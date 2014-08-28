@@ -1,4 +1,7 @@
-﻿Nano Timer is a Rubik's Cube timer app developed for speedcubers.
+﻿Speedcubing timer app to keep track of your times and averages everywhere
+
+
+Nano Timer is a Rubik's Cube timer app developed for speedcubers.
 Get this timer on your device to be able to solve cubes anywhere and anytime while keeping track of your progression, your averages, your best times, and a lot more.
 
 Features:
