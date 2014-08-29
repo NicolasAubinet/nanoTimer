@@ -111,7 +111,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
     });
 
     LinearLayout adLayout = (LinearLayout) findViewById(R.id.mainLayout);
-    adLayout.addView(AdProvider.getBannerAdView(this), 0);
+    adLayout.addView(AdProvider.getBannerAdView(), 0);
 
     initHistoryList();
 
@@ -170,11 +170,22 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
   @Override
   protected void onResume() {
     super.onResume();
+    AdProvider.resume();
     refreshCubeTypes();
+  }
+  
+  @Override
+  protected void onPause() {
+    super.onPause();
+    AdProvider.pause();
   }
 
   @Override
   public void onBackPressed() {
+    if (AdProvider.hideInterstitial()) {
+      // an app was displayed and is now closed
+      return;
+    }
     if (inQuitMode) {
       if (quitMessage != null) {
         quitMessage.cancel();

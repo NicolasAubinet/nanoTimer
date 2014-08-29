@@ -208,6 +208,7 @@ public class TimerActivity extends Activity {
         timer.cancel();
         timer.purge();
       }
+//      AdProvider.showInterstitial();
       super.onBackPressed();
     }
   }
