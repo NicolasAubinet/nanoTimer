@@ -8,33 +8,10 @@
      android:minSdkVersion="8"
      android:targetSdkVersion="10"/>
 
-  <!-- Permissions for ads -->
-  <!-- startapp -->
+  <!-- Permissions for startapp ads -->
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
   <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-
-  <!-- Airpush ads -->
-  <!--<uses-permission android:name="android.permission.INTERNET" />
-  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-  <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-  <uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS" />
-  <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />-->
-
-  <!-- adience adboost -->
-  <!--<uses-permission android:name="android.permission.INTERNET" />-->
-  <!--<uses-permission android:name="android.permission.WAKE_LOCK" />-->
-  <!--<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />-->
-  <!--<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />-->
-
-  <!-- avocarrot -->
-  <!--<uses-permission android:name="android.permission.INTERNET" />-->
-  <!--<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />-->
-  <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
-  <!--<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />-->
 
   <application
      android:icon="@drawable/icon"
@@ -62,10 +39,7 @@
       </intent-filter>
     </activity>
 
-    <!-- For ads -->
-    <!-- <meta-data android:name="com.google.android.gms.version" android:value="4030500"/> -->
-
-    <!-- startapp -->
+    <!-- for startapp -->
     <activity
        android:name="com.startapp.android.publish.list3d.List3DActivity"
        android:theme="@android:style/Theme"/>
@@ -74,39 +48,6 @@
        android:name="com.startapp.android.publish.AppWallActivity"
        android:theme="@android:style/Theme.Translucent"
        android:configChanges="orientation|keyboardHidden|screenSize"/>
-
-    <!-- Airpush -->
-    <!-- <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/> -->
-    <!-- <meta-data android:name="com.google.android.gms.version" android:value="5089000"/> -->
-    <!--<meta-data android:name="com.google.android.gms.version" android:value="4030500" />
-    <meta-data android:name="com.pfaey.opypm200398.APPID" android:value="235358"/>
-    <meta-data android:name="com.pfaey.opypm200398.APIKEY" android:value="android*1408738404200398455"/>
-
-    <activity
-       android:exported="false"
-       android:name="com.pfaey.opypm200398.AdActivity"
-       android:configChanges="orientation|screenSize"
-       android:theme="@android:style/Theme.Translucent"/>
-    <activity
-       android:name="com.pfaey.opypm200398.BrowserActivity"
-       android:configChanges="orientation|screenSize"/>
-    <activity
-       android:name="com.pfaey.opypm200398.VActivity"
-       android:configChanges="orientation|screenSize"
-       android:screenOrientation="landscape"
-       android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
-    </activity>
-
-    <service
-       android:name="com.pfaey.opypm200398.LService"
-       android:exported="false"/>
-    <receiver
-       android:name="com.pfaey.opypm200398.BootReceiver"
-       android:exported="true">
-      <intent-filter>
-        <action android:name="android.intent.action.BOOT_COMPLETED"/>
-      </intent-filter>
-    </receiver>-->
 
   </application>
 </manifest>
