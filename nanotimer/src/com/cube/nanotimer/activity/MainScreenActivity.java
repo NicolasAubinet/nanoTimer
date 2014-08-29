@@ -112,7 +112,6 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
 
     LinearLayout adLayout = (LinearLayout) findViewById(R.id.mainLayout);
     adLayout.addView(AdProvider.getBannerAdView(this), 0);
-//    AdProvider.showInterstitial(this); // TODO : do in onResume(). pbly add an option to select whether to use banners or interstitial ads
 
     initHistoryList();
 

@@ -2,38 +2,51 @@ package com.cube.nanotimer.activity.widget.ads;
 
 import android.app.Activity;
 import android.view.View;
+import com.startapp.android.publish.SDKAdPreferences;
+import com.startapp.android.publish.SDKAdPreferences.Gender;
+import com.startapp.android.publish.StartAppAd;
+import com.startapp.android.publish.StartAppSDK;
 import com.startapp.android.publish.banner.Banner;
 
 public class AdProvider {
 
 //	private static AvocarrotInterstitial myAd;
+	private static StartAppAd startAppAd;
 
   public static void init(Activity a) {
     // Initialize Avocarrot
 //    Avocarrot.initWithKey(a.getApplicationContext(), "529fd76c53416ba1939dc035ac9123a2a937b60a");
 //    Avocarrot.setSandbox(true);
-
-    // Pre-load Ad
+    // Pre-load Avocarrot Ad
 //    myAd = new AvocarrotInterstitial();
 //    myAd.loadAdForPlacement("default");
+  	
+  	// Startapp
+  	StartAppSDK.init(a, "108845167", "208524420",
+  			new SDKAdPreferences()
+  				.setAge(20)
+  				.setGender(Gender.MALE));
+  	startAppAd = new StartAppAd(a);
   }
 
   public static void showInterstitial(Activity a) {
+  	// Avocarrot
 //    myAd.showAd(a, "default");
+  	// Startapp
+  	startAppAd.showAd();
+  	startAppAd.loadAd();
   }
 
   public static View getBannerAdView(Activity a) {
     // Startapp
     return new Banner(a);
-//    return new BannerStandard(a);
-//    return new Banner3D(a);
 
     // Airpush
 //    AdView adView = new AdView(a, AdView.BANNER_TYPE_IN_APP_AD, AdView.PLACEMENT_TYPE_INTERSTITIAL, false, false, AdView.ANIMATION_TYPE_LEFT_TO_RIGHT);
 //    AdView adView = new AdView(a, AdView.BANNER_TYPE_IN_APP_AD, AdView.PLACEMENT_TYPE_INTERSTITIAL, true, false, AdView.ANIMATION_TYPE_LEFT_TO_RIGHT); // test mode
 //    return adView;
 
-    // Load ads
+    // Avocarrot
     /*AvocarrotCustom myAd = new AvocarrotCustom();
     myAd.loadAdForPlacement(a, "default");
 
@@ -61,7 +74,7 @@ public class AdProvider {
           imgView.setImageBitmap(ad.getImage());
 
         // Bind view
-        ad.bindView(layout); // TODO might be needed
+        ad.bindView(layout);
 
         // Set click listener
 //          myButton.setOnClickListener(new View.OnClickListener() {
@@ -99,6 +112,14 @@ public class AdProvider {
     });
 
     return layout;*/
+  }
+  
+  public static void resume() {
+  	startAppAd.onResume();
+  }
+  
+  public static void pause() {
+  	startAppAd.onPause();
   }
 
 }
