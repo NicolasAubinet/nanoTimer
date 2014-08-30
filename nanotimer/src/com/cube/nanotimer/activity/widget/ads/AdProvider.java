@@ -1,7 +1,6 @@
 package com.cube.nanotimer.activity.widget.ads;
 
 import android.app.Activity;
-import android.view.View;
 import com.appnext.appnextsdk.Appnext;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.Options.AdsStyle;
@@ -9,7 +8,6 @@ import com.startapp.android.publish.SDKAdPreferences;
 import com.startapp.android.publish.SDKAdPreferences.Gender;
 import com.startapp.android.publish.StartAppAd;
 import com.startapp.android.publish.StartAppSDK;
-import com.startapp.android.publish.banner.Banner;
 
 import java.util.Random;
 
@@ -17,7 +15,6 @@ public class AdProvider {
 
 	private static StartAppAd startAppAd;
   private static Appnext appnext;
-  private static Banner banner;
   private static boolean interstitialShown; // true if the last call to showInterstitial did display an ad
 
   public static void init(Activity a) {
@@ -27,7 +24,6 @@ public class AdProvider {
   			new SDKAdPreferences()
   				.setAge(20)
   				.setGender(Gender.MALE));
-  	banner = new Banner(a);
   	// interstitial
   	startAppAd = new StartAppAd(a);
   	startAppAd.loadAd();
@@ -37,10 +33,6 @@ public class AdProvider {
   	appnext = new Appnext(a);
     appnext.setAppID("dd009c3e-f718-4fbe-8897-b8f560e6eace");
     appnext.cacheAd();
-  }
-
-  public static View getBannerAdView() {
-    return banner;
   }
 
   public static void showInterstitial() {

@@ -19,7 +19,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -77,8 +76,8 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.mainscreen_screen);
     AdProvider.init(this);
+    setContentView(R.layout.mainscreen_screen);
     App.INSTANCE.setContext(this);
     setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
@@ -172,14 +171,12 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
 
   @Override
   protected void onResume() {
-    removeBannerAd();
-
     super.onResume();
     AdProvider.resume();
     refreshCubeTypes();
 
     mixedAdBannerChance = new Random().nextInt(10) < 2; // 20% chance to not show banner in mixed mode
-    addBannerAdIfNeeded();
+    showHideBannerAd();
   }
   
   @Override
@@ -258,10 +255,8 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
     String cubeTypeText = buCubeType.getText().toString();
     String solveTypeText = buSolveType.getText().toString();
 
-    removeBannerAd();
     setContentView(R.layout.mainscreen_screen);
     initViews();
-    addBannerAdIfNeeded();
 
     buCubeType.setText(cubeTypeText);
     buSolveType.setText(solveTypeText);
@@ -411,20 +406,16 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
     }
   }
 
-  private void addBannerAdIfNeeded() {
+  private void showHideBannerAd() {
     AdsStyle adsStyle = Options.INSTANCE.getAdsStyle();
+    View bannerAd = findViewById(R.id.bannerAd);
     if (adsStyle == AdsStyle.BANNER || (adsStyle == AdsStyle.MIXED && !AdProvider.wasInterstitialShown() && !mixedAdBannerChance)) {
       // Show banner add if the "banner" option is selected,
       // or if "mixed" is selected and that an interstitial was not shown when coming back here, + 20% chances to not show anything
-      LinearLayout adLayout = (LinearLayout) findViewById(R.id.mainLayout);
-      adLayout.removeView(AdProvider.getBannerAdView());
-      adLayout.addView(AdProvider.getBannerAdView(), 0);
+      bannerAd.setVisibility(View.VISIBLE);
+    } else {
+      bannerAd.setVisibility(View.GONE);
     }
-  }
-
-  private void removeBannerAd() {
-    LinearLayout adLayout = (LinearLayout) findViewById(R.id.mainLayout);
-    adLayout.removeView(AdProvider.getBannerAdView());
   }
 
   private class HistoryListAdapter extends ArrayAdapter<SolveTime> {
