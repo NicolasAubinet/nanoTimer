@@ -24,6 +24,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.cube.nanotimer.App;
+import com.cube.nanotimer.Options;
+import com.cube.nanotimer.Options.AdsStyle;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.activity.widget.AboutDialog;
 import com.cube.nanotimer.activity.widget.HistoryDetailDialog;
@@ -44,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 public class MainScreenActivity extends FragmentActivity implements TimeChangedHandler, SelectionHandler {
 
@@ -64,6 +67,9 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
   private Toast quitMessage;
   private boolean inQuitMode;
   private static final long QUIT_MODE_DELAY = 3000;
+
+  private boolean mixedAdBannerChance; // chance to not display banner if in mixed ad mode
+                                       // used to avoid displaying/hiding the banner by changing the screen orientation
 
   private static final int ID_CUBETYPE = 1;
   private static final int ID_SOLVETYPE = 2;
@@ -109,9 +115,6 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
         }
       }
     });
-
-    LinearLayout adLayout = (LinearLayout) findViewById(R.id.mainLayout);
-    adLayout.addView(AdProvider.getBannerAdView(), 0);
 
     initHistoryList();
 
@@ -169,9 +172,14 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
 
   @Override
   protected void onResume() {
+    removeBannerAd();
+
     super.onResume();
     AdProvider.resume();
     refreshCubeTypes();
+
+    mixedAdBannerChance = new Random().nextInt(10) < 2; // 20% chance to not show banner in mixed mode
+    addBannerAdIfNeeded();
   }
   
   @Override
@@ -182,8 +190,11 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
 
   @Override
   public void onBackPressed() {
-    if (AdProvider.hideInterstitial()) {
-      // an app was displayed and is now closed
+    if (AdProvider.isInterstialAppnextDisplayed()) {
+      // pressing backspace on appnext ad does not hide it by default.
+      // using this to "force" the user to click on the close button, otherwise he could select the "interstitial" option
+      // and just push 2 times on backspace to never really see the ads.
+      // with this condition, he can't do it as it would close the app.
       return;
     }
     if (inQuitMode) {
@@ -247,8 +258,10 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
     String cubeTypeText = buCubeType.getText().toString();
     String solveTypeText = buSolveType.getText().toString();
 
+    removeBannerAd();
     setContentView(R.layout.mainscreen_screen);
     initViews();
+    addBannerAdIfNeeded();
 
     buCubeType.setText(cubeTypeText);
     buSolveType.setText(solveTypeText);
@@ -396,6 +409,22 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
         refreshHistory();
       }
     }
+  }
+
+  private void addBannerAdIfNeeded() {
+    AdsStyle adsStyle = Options.INSTANCE.getAdsStyle();
+    if (adsStyle == AdsStyle.BANNER || (adsStyle == AdsStyle.MIXED && !AdProvider.wasInterstitialShown() && !mixedAdBannerChance)) {
+      // Show banner add if the "banner" option is selected,
+      // or if "mixed" is selected and that an interstitial was not shown when coming back here, + 20% chances to not show anything
+      LinearLayout adLayout = (LinearLayout) findViewById(R.id.mainLayout);
+      adLayout.removeView(AdProvider.getBannerAdView());
+      adLayout.addView(AdProvider.getBannerAdView(), 0);
+    }
+  }
+
+  private void removeBannerAd() {
+    LinearLayout adLayout = (LinearLayout) findViewById(R.id.mainLayout);
+    adLayout.removeView(AdProvider.getBannerAdView());
   }
 
   private class HistoryListAdapter extends ArrayAdapter<SolveTime> {

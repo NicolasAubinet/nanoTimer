@@ -23,8 +23,10 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
+import com.cube.nanotimer.Options.AdsStyle;
 import com.cube.nanotimer.Options.InspectionMode;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.activity.widget.ads.AdProvider;
 import com.cube.nanotimer.scrambler.ScramblerFactory;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.CubeSession;
@@ -208,7 +210,10 @@ public class TimerActivity extends Activity {
         timer.cancel();
         timer.purge();
       }
-//      AdProvider.showInterstitial();
+      AdsStyle adsStyle = Options.INSTANCE.getAdsStyle();
+      if (adsStyle == AdsStyle.INTERSTITIAL || adsStyle == AdsStyle.MIXED) {
+        AdProvider.showInterstitial();
+      }
       super.onBackPressed();
     }
   }

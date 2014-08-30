@@ -8,4 +8,14 @@
     <item>1</item>
     <item>2</item>
   </string-array>
+  <string-array name="entries_ads_style">
+    <item>@string/banner</item>
+    <item>@string/interstitial</item>
+    <item>@string/mixed</item>
+  </string-array>
+  <string-array name="entryvalues_ads_style">
+    <item>1</item>
+    <item>2</item>
+    <item>3</item>
+  </string-array>
 </resources>

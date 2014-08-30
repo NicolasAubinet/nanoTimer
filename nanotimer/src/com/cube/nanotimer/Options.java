@@ -8,6 +8,7 @@ public enum Options {
   INSTANCE;
 
   public enum InspectionMode { HOLD_AND_RELEASE, AUTOMATIC }
+  public enum AdsStyle { BANNER, INTERSTITIAL, MIXED }
 
   private Context context;
   private SharedPreferences sharedPreferences;
@@ -16,6 +17,7 @@ public enum Options {
   private static final String INSPECTION_TIME_KEY = "inspection_time";
   private static final String INSPECTION_SOUNDS_KEY = "inspection_sounds";
   private static final String KEEP_TIMER_SCREEN_ON_KEY = "keep_timer_screen_on";
+  private static final String ADS_STYLE_KEY = "ads_style";
 
   private static final int MAX_STEPS_COUNT = 8;
 
@@ -48,6 +50,20 @@ public enum Options {
   public boolean isKeepTimerScreenOnWhenTimerOff() {
     Boolean defaultValue = context.getResources().getBoolean(R.bool.keep_timer_screen_on);
     return sharedPreferences.getBoolean(KEEP_TIMER_SCREEN_ON_KEY, defaultValue);
+  }
+
+  public AdsStyle getAdsStyle() {
+    int style = Integer.parseInt(sharedPreferences.getString(ADS_STYLE_KEY, "-1"));
+    switch (style) {
+      case 1:
+        return AdsStyle.BANNER;
+      case 2:
+        return AdsStyle.INTERSTITIAL;
+      case 3:
+        return AdsStyle.MIXED;
+      default:
+        return AdsStyle.MIXED;
+    }
   }
 
   public void setContext(Context context) {
