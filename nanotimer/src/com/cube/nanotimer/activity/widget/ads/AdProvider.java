@@ -2,6 +2,7 @@ package com.cube.nanotimer.activity.widget.ads;
 
 import android.app.Activity;
 import com.appnext.appnextsdk.Appnext;
+import com.appnext.appnextsdk.PopupClosedInterface;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.Options.AdsStyle;
 import com.startapp.android.publish.SDKAdPreferences;
@@ -33,6 +34,12 @@ public class AdProvider {
   	appnext = new Appnext(a);
     appnext.setAppID("dd009c3e-f718-4fbe-8897-b8f560e6eace");
     appnext.cacheAd();
+    appnext.setPopupClosedCallback(new PopupClosedInterface() {
+      @Override
+      public void popupClosed() {
+        appnext.cacheAd();
+      }
+    });
   }
 
   public static void showInterstitial() {
@@ -65,7 +72,6 @@ public class AdProvider {
     } else if (adChoice == 1) {
     	// appnext
       appnext.showBubble();
-      appnext.cacheAd();
     }
     interstitialShown = true;
     return;

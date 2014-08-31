@@ -40,6 +40,7 @@ import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.CubeType.Type;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
+import com.startapp.android.publish.banner.Banner;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -260,6 +261,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
 
     buCubeType.setText(cubeTypeText);
     buSolveType.setText(solveTypeText);
+    showHideBannerAd();
   }
 
   private void refreshCubeTypes() {
@@ -408,13 +410,13 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
 
   private void showHideBannerAd() {
     AdsStyle adsStyle = Options.INSTANCE.getAdsStyle();
-    View bannerAd = findViewById(R.id.bannerAd);
+    Banner bannerAd = (Banner) findViewById(R.id.bannerAd);
     if (adsStyle == AdsStyle.BANNER || (adsStyle == AdsStyle.MIXED && !AdProvider.wasInterstitialShown() && !mixedAdBannerChance)) {
       // Show banner add if the "banner" option is selected,
       // or if "mixed" is selected and that an interstitial was not shown when coming back here, + 20% chances to not show anything
-      bannerAd.setVisibility(View.VISIBLE);
+      bannerAd.showBanner();
     } else {
-      bannerAd.setVisibility(View.GONE);
+      bannerAd.hideBanner();
     }
   }
 
