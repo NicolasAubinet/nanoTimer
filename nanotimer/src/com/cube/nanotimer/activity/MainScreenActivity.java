@@ -411,7 +411,9 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
   private void showHideBannerAd() {
     AdsStyle adsStyle = Options.INSTANCE.getAdsStyle();
     Banner bannerAd = (Banner) findViewById(R.id.bannerAd);
-    if (adsStyle == AdsStyle.BANNER || (adsStyle == AdsStyle.MIXED && !AdProvider.wasInterstitialShown() && !mixedAdBannerChance)) {
+    if (Options.INSTANCE.isAdsEnabled() &&
+        (adsStyle == AdsStyle.BANNER ||
+        (adsStyle == AdsStyle.MIXED && !AdProvider.wasInterstitialShown() && !mixedAdBannerChance))) {
       // Show banner add if the "banner" option is selected,
       // or if "mixed" is selected and that an interstitial was not shown when coming back here, + 20% chances to not show anything
       bannerAd.showBanner();

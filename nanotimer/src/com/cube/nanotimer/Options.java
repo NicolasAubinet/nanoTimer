@@ -66,6 +66,10 @@ public enum Options {
     }
   }
 
+  public boolean isAdsEnabled() {
+    return true;
+  }
+
   public void setContext(Context context) {
     this.context = context;
     this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);

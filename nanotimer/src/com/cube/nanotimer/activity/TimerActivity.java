@@ -211,7 +211,7 @@ public class TimerActivity extends Activity {
         timer.purge();
       }
       AdsStyle adsStyle = Options.INSTANCE.getAdsStyle();
-      if (adsStyle == AdsStyle.INTERSTITIAL || adsStyle == AdsStyle.MIXED) {
+      if (Options.INSTANCE.isAdsEnabled() && (adsStyle == AdsStyle.INTERSTITIAL || adsStyle == AdsStyle.MIXED)) {
         AdProvider.showInterstitial();
       }
       super.onBackPressed();
