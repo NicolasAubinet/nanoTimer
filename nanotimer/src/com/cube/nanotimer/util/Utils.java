@@ -151,8 +151,7 @@ public class Utils {
     return res;
   }
 
-  public static String getAppVersion() {
-    Context c = App.INSTANCE.getContext();
+  public static String getAppVersion(Context c) {
     try {
       return c.getPackageManager().getPackageInfo(c.getPackageName(), 0).versionName;
     } catch (NameNotFoundException e) {

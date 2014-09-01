@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class SkewbScrambler implements Scrambler {
 
-  private static final int MOVES_COUNT = 25;
+  private static final int MOVES_COUNT = 20;
 
   protected String[] moves = { "F", "R", "B", "L" };
 

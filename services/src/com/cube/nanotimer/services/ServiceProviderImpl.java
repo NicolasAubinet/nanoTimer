@@ -401,7 +401,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append(" LIMIT ").append(SESSION_TIMES_COUNT);
     Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId(), solveType.getId()));
     if (cursor != null) {
-      for (cursor.moveToLast(); !cursor.isBeforeFirst(); cursor.moveToPrevious()) {
+      for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         sessionTimes.add(cursor.getLong(0));
       }
       cursor.close();

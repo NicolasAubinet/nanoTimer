@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class PyraminxScrambler implements Scrambler {
 
-  private static final int MOVES_COUNT = 25;
+  private static final int MOVES_COUNT = 20;
 
   protected String[] vertexMoves = { "l", "r", "b", "u" };
   protected String[] mainMoves = { "L", "R", "B", "U" };
@@ -17,29 +17,31 @@ public class PyraminxScrambler implements Scrambler {
   public String[] getNewScramble() {
     String[] scramble = new String[MOVES_COUNT];
     int prevSlice = -1;
-    int i = 0;
+    int vMovesCount = 0; // vertex moves count
 
-    for (int corInd = 0; corInd < 4; corInd++) { // vertex (corner) moves
+    for (int vInd = vertexMoves.length - 1; vInd >= 0; vInd--) { // vertex (corner) moves
+      // fill vertex moves from the end (should be at the end of the scramble)
       if (rand.nextBoolean()) {
-        scramble[i] = vertexMoves[corInd];
-        scramble[i] += getRandDirection(scramble[i]);
-        i++;
+        scramble[scramble.length - 1 - vMovesCount] = vertexMoves[vInd];
+        scramble[scramble.length - 1 - vMovesCount] += getRandDirection();
+        vMovesCount++;
       }
     }
-    if (i == 0) { // must have at least one corner turn
-      scramble[i] = vertexMoves[rand.nextInt(4)];
-      scramble[i] += getRandDirection(scramble[i]);
-      i++;
+    if (vMovesCount == 0) { // must have at least one corner turn
+      scramble[scramble.length - 1] = vertexMoves[rand.nextInt(vertexMoves.length)];
+      scramble[scramble.length - 1] += getRandDirection();
+      vMovesCount++;
     }
 
-    for (; i < MOVES_COUNT; i++) {
+    // fill in main moves
+    for (int i = 0; i < MOVES_COUNT - vMovesCount; i++) {
       int sliceInd;
       do {
         sliceInd = rand.nextInt(mainMoves.length);
       } while (sliceInd == prevSlice);
 
       scramble[i] = mainMoves[sliceInd];
-      scramble[i] += getRandDirection(scramble[i]);
+      scramble[i] += getRandDirection();
 
       prevSlice = sliceInd;
     }
@@ -47,7 +49,7 @@ public class PyraminxScrambler implements Scrambler {
     return scramble;
   }
 
-  private String getRandDirection(String move) {
+  private String getRandDirection() {
     if (rand.nextBoolean()) {
       return "'";
     }

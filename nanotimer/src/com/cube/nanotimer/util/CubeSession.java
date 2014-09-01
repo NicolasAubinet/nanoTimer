@@ -1,19 +1,19 @@
 package com.cube.nanotimer.util;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class CubeSession {
 
   public static final int SESSION_MAX_SIZE = 13; // 12, + 1 for deletion
 
-  private List<Long> sessionTimes = new ArrayList<Long>();
+  private LinkedList<Long> sessionTimes = new LinkedList<Long>(); // most recent time is in position 0
 
   public CubeSession() {
   }
 
   public CubeSession(List<Long> sessionTimes) {
-    this.sessionTimes = sessionTimes;
+    this.sessionTimes = new LinkedList<Long>(sessionTimes);
   }
 
   public int getBestTimeInd(int count) {
@@ -21,7 +21,7 @@ public class CubeSession {
     List<Long> times = getSessionTimes();
     if (times.size() >= count) {
       Long best = (long) 0;
-      for (int i = times.size() - 1; i >= times.size() - count; i--) {
+      for (int i = 0; i < count; i++) {
         long t = times.get(i);
         if (t > 0 && (t < best || best == 0)) {
           best = t;
@@ -37,7 +37,7 @@ public class CubeSession {
     List<Long> times = getSessionTimes();
     if (times.size() >= count) {
       Long worst = (long) 0;
-      for (int i = times.size() - 1; i >= times.size() - count; i--) {
+      for (int i = 0; i < count; i++) {
         long t = times.get(i);
         if (t > worst || t == -1) {
           worst = t;
@@ -67,7 +67,7 @@ public class CubeSession {
       int validTimesCount = 0;
       long avg = 0;
       if (bestInd >= 0 && worstInd >= 0) {
-        for (int i = times.size() - 1; i >= times.size() - n; i--) {
+        for (int i = 0; i < n; i++) {
           if (i != bestInd && i != worstInd) {
             if (times.get(i) > 0) {
               avg += times.get(i);
@@ -86,28 +86,30 @@ public class CubeSession {
   }
 
   public void addTime(long time) {
-    sessionTimes.add(time);
+    sessionTimes.addFirst(time);
     if (sessionTimes.size() > SESSION_MAX_SIZE) {
-      sessionTimes.remove(0);
+      sessionTimes.removeLast();
     }
   }
 
   public void setLastAsDNF() {
     if (!sessionTimes.isEmpty()) {
-      sessionTimes.set(sessionTimes.size() - 1, (long) -1);
+      sessionTimes.set(0, (long) -1);
     }
   }
 
   public void setLastAsPlusTwo() {
     if (!sessionTimes.isEmpty()) {
-      long curLastTime = sessionTimes.get(sessionTimes.size() - 1);
-      sessionTimes.set(sessionTimes.size() - 1, curLastTime + 2000);
+      long curLastTime = sessionTimes.get(0);
+      if (curLastTime > 0) {
+        sessionTimes.set(0, curLastTime + 2000);
+      }
     }
   }
 
   public void deleteLast() {
     if (!sessionTimes.isEmpty()) {
-      sessionTimes.remove(sessionTimes.size() - 1);
+      sessionTimes.removeFirst();
     }
   }
 
@@ -119,13 +121,13 @@ public class CubeSession {
 
   public List<Long> getSessionTimes() {
     if (sessionTimes.size() > 12) {
-      return sessionTimes.subList(sessionTimes.size() - 12, sessionTimes.size());
+      return sessionTimes.subList(0, 12);
     } else {
       return sessionTimes;
     }
   }
 
-  public void setSessionTimes(List<Long> sessionTimes) {
+  public void setSessionTimes(LinkedList<Long> sessionTimes) {
     this.sessionTimes = sessionTimes;
   }
 

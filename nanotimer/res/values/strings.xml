@@ -92,4 +92,6 @@
   <string name="dont_ask_again">Never</string>
   <string name="could_not_find_market">Could not find the market app</string>
   <string name="could_not_launch_market">Could not launch the market</string>
+  <string name="release_notes">Release notes</string>
+  <string name="close">Close</string>
 </resources>

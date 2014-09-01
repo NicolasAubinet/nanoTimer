@@ -27,7 +27,7 @@ public class AboutDialog extends DialogFragment {
     View v = getActivity().getLayoutInflater().inflate(R.layout.about_dialog, null);
 
     TextView tvAppName = (TextView) v.findViewById(R.id.tvAppName);
-    tvAppName.setText(tvAppName.getText().toString() + " v" + Utils.getAppVersion());
+    tvAppName.setText(tvAppName.getText().toString() + " v" + Utils.getAppVersion(getActivity()));
 
     final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(v).create();
     dialog.setCanceledOnTouchOutside(true);
