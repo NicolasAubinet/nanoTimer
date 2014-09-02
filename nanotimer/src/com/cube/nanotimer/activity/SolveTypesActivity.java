@@ -118,6 +118,11 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
         unregisterForContextMenu(lvSolveTypes);
       }
     });
+
+    if (curCubeType != null) {
+      TextView tvCubeType = (TextView) findViewById(R.id.tvCubeType);
+      tvCubeType.setText(curCubeType.getName());
+    }
   }
 
   @Override
@@ -209,6 +214,10 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
         refreshList();
       }
     });
+    if (curCubeType != null) {
+      TextView tvCubeType = (TextView) findViewById(R.id.tvCubeType);
+      tvCubeType.setText(curCubeType.getName());
+    }
   }
 
   @Override

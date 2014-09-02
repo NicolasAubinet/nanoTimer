@@ -6,30 +6,39 @@
    android:layout_width="match_parent"
    android:layout_height="match_parent">
 
-  <LinearLayout
-     android:id="@+id/topLayout"
+  <RelativeLayout
      android:layout_width="match_parent"
-     android:layout_height="wrap_content"
+     android:layout_height="50px"
      android:background="@color/darkblue"
-     android:orientation="vertical">
+     android:padding="5px">
 
     <Button
        android:id="@+id/buAdd"
        android:text="@string/add_solvetype"
        android:layout_width="wrap_content"
-       android:layout_height="40px"
+       android:layout_height="match_parent"
        android:textSize="20px"
        android:paddingLeft="13px"
        android:paddingRight="13px"
-       android:layout_margin="7px"
        style="@style/CustomButton"/>
 
-    <LinearLayout
-       android:layout_width="match_parent"
-       android:layout_height="3px"
-       android:background="@color/neon"/>
+    <TextView
+       android:id="@+id/tvCubeType"
+       android:layout_width="wrap_content"
+       android:layout_height="match_parent"
+       android:layout_alignParentRight="true"
+       android:layout_marginRight="15px"
+       android:textSize="24px"
+       android:gravity="center_vertical"
+       android:textStyle="bold"
+       android:singleLine="true"/>
 
-  </LinearLayout>
+  </RelativeLayout>
+
+  <LinearLayout
+     android:layout_width="match_parent"
+     android:layout_height="3px"
+     android:background="@color/neon"/>
 
   <com.mobeta.android.dslv.DragSortListView
      android:id="@+id/lvSolveTypes"
