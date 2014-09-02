@@ -40,6 +40,7 @@ public class ReleaseNotes {
 
     final AlertDialog dialog = new AlertDialog.Builder(context).setView(v).create();
     dialog.setTitle(context.getString(R.string.release_notes));
+    dialog.setCanceledOnTouchOutside(true);
 
     WebView tvInfo = (WebView) v.findViewById(R.id.tvInfo);
     tvInfo.setBackgroundColor(context.getResources().getColor(R.color.black));
