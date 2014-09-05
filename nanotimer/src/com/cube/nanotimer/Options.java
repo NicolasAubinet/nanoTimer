@@ -67,7 +67,7 @@ public enum Options {
   }
 
   public boolean isAdsEnabled() {
-    return false;
+    return true;
   }
 
   public void setContext(Context context) {
