@@ -1,4 +1,4 @@
-package com.cube.nanotimer.activity.widget;
+package com.cube.nanotimer.gui.widget;
 
 import com.cube.nanotimer.vo.SolveTime;
 

@@ -1,11 +1,11 @@
-package com.cube.nanotimer.activity;
+package com.cube.nanotimer.gui;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.activity.widget.ReleaseNotes;
+import com.cube.nanotimer.gui.widget.ReleaseNotes;
 
 public class OptionsActivity extends PreferenceActivity {
 

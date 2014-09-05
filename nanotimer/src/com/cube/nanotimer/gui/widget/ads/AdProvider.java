@@ -1,4 +1,4 @@
-package com.cube.nanotimer.activity.widget.ads;
+package com.cube.nanotimer.gui.widget.ads;
 
 import android.app.Activity;
 import com.appnext.appnextsdk.Appnext;

@@ -1,4 +1,4 @@
-package com.cube.nanotimer.activity.widget;
+package com.cube.nanotimer.gui.widget;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -24,9 +24,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.activity.widget.list.FieldDialog;
-import com.cube.nanotimer.activity.widget.list.FieldEditDialog;
-import com.cube.nanotimer.activity.widget.list.FieldRenamer;
+import com.cube.nanotimer.gui.widget.list.FieldDialog;
+import com.cube.nanotimer.gui.widget.list.FieldEditDialog;
+import com.cube.nanotimer.gui.widget.list.FieldRenamer;
 import com.cube.nanotimer.util.Utils;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;

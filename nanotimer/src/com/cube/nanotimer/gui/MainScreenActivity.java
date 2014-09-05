@@ -1,4 +1,4 @@
-package com.cube.nanotimer.activity;
+package com.cube.nanotimer.gui;
 
 import android.content.Context;
 import android.content.Intent;
@@ -26,12 +26,12 @@ import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.Options.AdsStyle;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.activity.widget.AboutDialog;
-import com.cube.nanotimer.activity.widget.HistoryDetailDialog;
-import com.cube.nanotimer.activity.widget.SelectionHandler;
-import com.cube.nanotimer.activity.widget.SelectorFragmentDialog;
-import com.cube.nanotimer.activity.widget.TimeChangedHandler;
-import com.cube.nanotimer.activity.widget.ads.AdProvider;
+import com.cube.nanotimer.gui.widget.AboutDialog;
+import com.cube.nanotimer.gui.widget.HistoryDetailDialog;
+import com.cube.nanotimer.gui.widget.SelectionHandler;
+import com.cube.nanotimer.gui.widget.SelectorFragmentDialog;
+import com.cube.nanotimer.gui.widget.TimeChangedHandler;
+import com.cube.nanotimer.gui.widget.ads.AdProvider;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.Utils;

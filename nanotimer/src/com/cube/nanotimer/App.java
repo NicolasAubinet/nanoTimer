@@ -1,8 +1,8 @@
 package com.cube.nanotimer;
 
 import android.content.Context;
-import com.cube.nanotimer.activity.widget.AppRater;
-import com.cube.nanotimer.activity.widget.ReleaseNotes;
+import com.cube.nanotimer.gui.widget.AppRater;
+import com.cube.nanotimer.gui.widget.ReleaseNotes;
 import com.cube.nanotimer.services.Service;
 import com.cube.nanotimer.services.ServiceImpl;
 

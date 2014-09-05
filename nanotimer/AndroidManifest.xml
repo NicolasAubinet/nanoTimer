@@ -21,7 +21,7 @@
      android:theme="@android:style/Theme.NoTitleBar">
 
     <activity
-       android:name=".activity.MainScreenActivity"
+       android:name=".gui.MainScreenActivity"
        android:configChanges="orientation|screenSize|keyboard|keyboardHidden">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
@@ -29,11 +29,11 @@
       </intent-filter>
     </activity>
     <activity
-       android:name=".activity.TimerActivity"
+       android:name=".gui.TimerActivity"
        android:configChanges="orientation|screenSize|keyboard|keyboardHidden"/>
-    <activity android:name=".activity.OptionsActivity"/>
+    <activity android:name=".gui.OptionsActivity"/>
     <activity
-       android:name=".activity.SolveTypesActivity"
+       android:name=".gui.SolveTypesActivity"
        android:configChanges="orientation|screenSize|keyboard|keyboardHidden">
       <intent-filter>
         <action android:name="com.cube.nanotimer.activity.SolveTypesActivity"/>

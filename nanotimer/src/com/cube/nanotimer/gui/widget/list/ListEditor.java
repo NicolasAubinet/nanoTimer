@@ -1,6 +1,6 @@
-package com.cube.nanotimer.activity.widget.list;
+package com.cube.nanotimer.gui.widget.list;
 
-import com.cube.nanotimer.activity.widget.SelectionHandler;
+import com.cube.nanotimer.gui.widget.SelectionHandler;
 
 public interface ListEditor extends SelectionHandler {
   void createNewItem(int id, String item);

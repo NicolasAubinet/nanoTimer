@@ -1,4 +1,4 @@
-package com.cube.nanotimer.activity;
+package com.cube.nanotimer.gui;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
@@ -26,7 +26,7 @@ import com.cube.nanotimer.Options;
 import com.cube.nanotimer.Options.AdsStyle;
 import com.cube.nanotimer.Options.InspectionMode;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.activity.widget.ads.AdProvider;
+import com.cube.nanotimer.gui.widget.ads.AdProvider;
 import com.cube.nanotimer.scrambler.ScramblerFactory;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.CubeSession;

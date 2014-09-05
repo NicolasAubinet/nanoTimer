@@ -1,4 +1,4 @@
-package com.cube.nanotimer.activity.widget.list;
+package com.cube.nanotimer.gui.widget.list;
 
 public interface FieldRenamer {
   boolean renameField(int index, String newName);
