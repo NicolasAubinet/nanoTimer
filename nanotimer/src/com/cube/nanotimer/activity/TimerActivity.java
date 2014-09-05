@@ -31,6 +31,7 @@ import com.cube.nanotimer.scrambler.ScramblerFactory;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.CubeSession;
 import com.cube.nanotimer.util.FormatterService;
+import com.cube.nanotimer.util.ScrambleFormatterService;
 import com.cube.nanotimer.util.Utils;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.vo.CubeType;
@@ -501,7 +502,7 @@ public class TimerActivity extends Activity {
     solveTime.setTime(time);
     solveTime.setTimestamp(System.currentTimeMillis());
     solveTime.setSolveType(solveType);
-    solveTime.setScramble(FormatterService.INSTANCE.formatScrambleAsSingleLine(currentScramble, cubeType));
+    solveTime.setScramble(ScrambleFormatterService.INSTANCE.formatScrambleAsSingleLine(currentScramble, cubeType));
     if (solveType.hasSteps()) {
       solveTime.setStepsTimes(stepsTimes.toArray(new Long[0]));
     }
@@ -552,7 +553,7 @@ public class TimerActivity extends Activity {
   private void generateScramble() {
     if (cubeType != null) {
       currentScramble = ScramblerFactory.getScrambler(cubeType).getNewScramble();
-      tvScramble.setText(FormatterService.INSTANCE.formatToColoredScramble(currentScramble, cubeType));
+      tvScramble.setText(ScrambleFormatterService.INSTANCE.formatToColoredScramble(currentScramble, cubeType));
     }
   }
 

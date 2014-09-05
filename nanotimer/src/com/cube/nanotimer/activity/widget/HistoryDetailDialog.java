@@ -14,6 +14,7 @@ import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
+import com.cube.nanotimer.util.ScrambleFormatterService;
 import com.cube.nanotimer.util.view.FontFitTextView;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveAverages;
@@ -70,7 +71,7 @@ public class HistoryDetailDialog extends DialogFragment {
       buPlusTwo.setEnabled(false);
     }
 
-    tvScramble.setText(FormatterService.INSTANCE.formatToColoredScramble(solveTime.getScramble(), cubeType));
+    tvScramble.setText(ScrambleFormatterService.INSTANCE.formatToColoredScramble(solveTime.getScramble(), cubeType));
     tvTime.setText(FormatterService.INSTANCE.formatSolveTime(solveTime.getTime()));
 
     final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(v).create();

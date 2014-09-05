@@ -2,6 +2,8 @@ package com.cube.nanotimer.scrambler.impl;
 
 import com.cube.nanotimer.scrambler.Scrambler;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Square1Scrambler implements Scrambler {
@@ -18,10 +20,11 @@ public class Square1Scrambler implements Scrambler {
   @Override
   public String[] getNewScramble() {
     Random r = new Random();
-    String[] moves = new String[MOVES_COUNT_MIN + r.nextInt(MOVES_COUNT_DELTA)];
+    int movesCount = MOVES_COUNT_MIN + r.nextInt(MOVES_COUNT_DELTA);
+    List<String> moves = new ArrayList<String>();
     Square1 s = new Square1();
 
-    for (int i = 0; i < moves.length;) {
+    for (int i = 0; i < movesCount;) {
       Move move = new Move((short) (r.nextInt(12) - 5), (short) (r.nextInt(12) - 5));
       if (move.top == 0 && move.bottom == 0) {
         continue;
@@ -29,13 +32,16 @@ public class Square1Scrambler implements Scrambler {
       Square1 afterMove = new Square1(s.corners); // tmp copy to check if the move is valid
       afterMove.executeMove(move);
       if (afterMove.canTurn()) {
-        moves[i] = move.toString();
+        moves.add(move.toString() + " ");
         s = afterMove;
         s.turn();
         i++;
+        if (i % 4 == 0) {
+          moves.add("\n");
+        }
       }
     }
-    return moves;
+    return moves.toArray(new String[0]);
   }
 
   private class Square1 {
