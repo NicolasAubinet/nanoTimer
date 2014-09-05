@@ -73,8 +73,8 @@
   <string name="yes">Yes</string>
   <string name="no">No</string>
   <string name="choose_cube_type">Choose a cube type:</string>
-  <string name="ads">Ads</string>
-  <string name="ads_style">Ads style</string>
+  <string name="ads">Advertisements</string>
+  <string name="ads_style">Advertisements style</string>
   <string name="ads_style_summary">Choose between banner, interstitial or mixed</string>
   <string name="banner">Banner</string>
   <string name="interstitial">Interstitial</string>

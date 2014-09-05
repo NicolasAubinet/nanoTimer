@@ -7,6 +7,7 @@ import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.CubeType.Type;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -79,7 +80,11 @@ public enum FormatterService {
    */
   public Spannable formatToColoredScramble(String[] scramble, CubeType cubeType) {
     String s = formatScramble(scramble, cubeType);
-    return colorFormattedScramble(s);
+    if (cubeType.getType() != Type.SQUARE1) {
+      return colorFormattedScramble(s);
+    } else {
+      return new SpannableString(s);
+    }
   }
 
   /**
@@ -93,7 +98,11 @@ public enum FormatterService {
     if (getMovesPerLine(cubeType) > 0) {
       scramble = formatScramble(scramble.split(" "), cubeType);
     }
-    return colorFormattedScramble(scramble);
+    if (cubeType.getType() != Type.SQUARE1) {
+      return colorFormattedScramble(scramble);
+    } else {
+      return new SpannableString(scramble);
+    }
   }
 
   /**
@@ -185,6 +194,9 @@ public enum FormatterService {
       case MEGAMINX:
         // don't add line breaks for this, as this a special kind of scramble that is already formatted
         movesPerLine = 0;
+        break;
+      case SQUARE1:
+        movesPerLine = 4;
         break;
       default:
         movesPerLine = 10;

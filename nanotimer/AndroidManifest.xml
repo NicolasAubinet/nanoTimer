@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-   android:versionCode="8"
-   android:versionName="1.0.1"
+   android:versionCode="9"
+   android:versionName="1.0.2"
    package="com.cube.nanotimer">
 
   <uses-sdk
@@ -22,7 +22,7 @@
 
     <activity
        android:name=".activity.MainScreenActivity"
-       android:configChanges="orientation|screenSize">
+       android:configChanges="orientation|screenSize|keyboard|keyboardHidden">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
         <category android:name="android.intent.category.LAUNCHER"/>
@@ -30,11 +30,11 @@
     </activity>
     <activity
        android:name=".activity.TimerActivity"
-       android:configChanges="orientation|screenSize"/>
+       android:configChanges="orientation|screenSize|keyboard|keyboardHidden"/>
     <activity android:name=".activity.OptionsActivity"/>
     <activity
        android:name=".activity.SolveTypesActivity"
-       android:configChanges="orientation|screenSize">
+       android:configChanges="orientation|screenSize|keyboard|keyboardHidden">
       <intent-filter>
         <action android:name="com.cube.nanotimer.activity.SolveTypesActivity"/>
         <category android:name="android.intent.category.DEFAULT"/>

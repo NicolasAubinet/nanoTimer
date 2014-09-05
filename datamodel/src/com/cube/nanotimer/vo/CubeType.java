@@ -13,8 +13,8 @@ public class CubeType implements Serializable {
     SEVEN_BY_SEVEN(6),
     MEGAMINX(7),
     PYRAMINX(8),
-    SKEWB(9);
-//    SQUARE1(10);
+    SKEWB(9),
+    SQUARE1(10);
 
     private int id;
     Type(int id) {

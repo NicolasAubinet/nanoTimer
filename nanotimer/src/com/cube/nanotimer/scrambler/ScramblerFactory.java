@@ -7,6 +7,7 @@ import com.cube.nanotimer.scrambler.impl.PyraminxScrambler;
 import com.cube.nanotimer.scrambler.impl.SevenScrambler;
 import com.cube.nanotimer.scrambler.impl.SixScrambler;
 import com.cube.nanotimer.scrambler.impl.SkewbScrambler;
+import com.cube.nanotimer.scrambler.impl.Square1Scrambler;
 import com.cube.nanotimer.scrambler.impl.ThreeScrambler;
 import com.cube.nanotimer.scrambler.impl.TwoScrambler;
 import com.cube.nanotimer.vo.CubeType;
@@ -43,9 +44,9 @@ public class ScramblerFactory {
       case SKEWB:
         scrambler = new SkewbScrambler();
         break;
-//      case SQUARE1:
-//        scrambler = new Square1Scrambler();
-//        break;
+      case SQUARE1:
+        scrambler = new Square1Scrambler();
+        break;
       default:
         throw new RuntimeException("Could not find timer type " + type.getName());
     }

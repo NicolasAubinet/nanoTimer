@@ -18,7 +18,6 @@
     <orderEntry type="module" module-name="datamodel" />
     <orderEntry type="module" module-name="services" />
     <orderEntry type="module" module-name="drag-sort-listview" />
-    <orderEntry type="library" name="android-support-v4" level="project" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -37,6 +36,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="android-support-v4" level="project" />
   </component>
 </module>
 

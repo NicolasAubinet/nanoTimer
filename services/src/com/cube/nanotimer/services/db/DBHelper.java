@@ -82,6 +82,12 @@ public class DBHelper extends SQLiteOpenHelper {
 
   @Override
   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    if (DBHelper.db == null) {
+      DBHelper.db = db;
+    }
+    if (oldVersion < 9) {
+      insertSolveType(getString(R.string.def), insertCubeType(10, getString(R.string.square1)));
+    }
   }
 
   private void insertDefaultValues() {
@@ -94,7 +100,7 @@ public class DBHelper extends SQLiteOpenHelper {
     insertSolveType(getString(R.string.def), insertCubeType(7, getString(R.string.megaminx)));
     insertSolveType(getString(R.string.def), insertCubeType(8, getString(R.string.pyraminx)));
     insertSolveType(getString(R.string.def), insertCubeType(9, getString(R.string.skewb)));
-//    insertSolveType(getString(R.string.def), insertCubeType(10, getString(R.string.square1)));
+    insertSolveType(getString(R.string.def), insertCubeType(10, getString(R.string.square1)));
 
     insertSolveType(getString(R.string.one_handed), 2);
 

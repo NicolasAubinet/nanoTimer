@@ -7,7 +7,7 @@ import junit.framework.Assert;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestCubeSession extends AndroidTestCase {
+public class CubeSessionTest extends AndroidTestCase {
 
   @SmallTest
   public void testBestWorst() {
