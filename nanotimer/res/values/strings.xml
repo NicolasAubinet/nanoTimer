@@ -81,8 +81,8 @@
   <string name="mixed">Mixed</string>
 
   <string name="session">Session:</string>
-  <string name="meanOf5">Mean of 5:</string>
-  <string name="meanOf12">Mean of 12:</string>
+  <string name="raOf5">RA of 5:</string>
+  <string name="raOf12">RA of 12:</string>
   <string name="new_record">New record!</string>
 
   <string name="rate_message">If you like Nano Timer, please take a moment to rate it.\nThanks for your support.</string>

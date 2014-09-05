@@ -35,6 +35,7 @@
        android:layout_width="match_parent"
        android:layout_height="match_parent"
        android:orientation="vertical"
+       android:layout_marginLeft="3px"
        android:layout_weight="7">
       <com.cube.nanotimer.util.view.DigitalTextView
          android:id="@+id/tvTimer"
@@ -111,7 +112,7 @@
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:text="@string/meanOf5"
+                 android:text="@string/raOf5"
                  style="@style/SmallTextField"/>
               <TextView
                  android:id="@+id/tvRA5"
@@ -124,7 +125,7 @@
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:text="@string/meanOf12"
+                 android:text="@string/raOf12"
                  style="@style/SmallTextField"/>
               <TextView
                  android:id="@+id/tvRA12"

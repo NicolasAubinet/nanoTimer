@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
 import android.text.SpannedString;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -144,6 +145,11 @@ public class TimerActivity extends Activity {
     averagesLayout = (TableLayout) findViewById(R.id.averagesLayout);
     timerStepsLayout = (TableLayout) findViewById(R.id.timerStepsLayout);
 
+    Integer scrambleTextSize = getCubeTypeScrambleTextSize();
+    if (scrambleTextSize != null) {
+      tvScramble.setTextSize(TypedValue.COMPLEX_UNIT_PX, scrambleTextSize);
+    }
+
     if (solveType.hasSteps()) {
       findViewById(R.id.sessionLayout).setVisibility(View.GONE);
       averagesLayout.setColumnCollapsed(2, true);
@@ -187,6 +193,27 @@ public class TimerActivity extends Activity {
         return true;
       }
     });
+  }
+
+  private Integer getCubeTypeScrambleTextSize() {
+    switch (cubeType.getType()) {
+      case TWO_BY_TWO:
+        return 24;
+      case PYRAMINX:
+      case SKEWB:
+        return 22;
+      case THREE_BY_THREE:
+      case FOUR_BY_FOUR:
+      case FIVE_BY_FIVE:
+      case SQUARE1:
+        return 21;
+      case SIX_BY_SIX:
+      case SEVEN_BY_SEVEN:
+      case MEGAMINX:
+        return 18;
+      default:
+        return null;
+    }
   }
 
   private void setDefaultBannerText() {
