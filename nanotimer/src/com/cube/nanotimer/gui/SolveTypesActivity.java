@@ -62,22 +62,27 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
 
     initViews();
 
-    App.INSTANCE.getService().getCubeTypes(true, new DataCallback<List<CubeType>>() {
-      @Override
-      public void onData(List<CubeType> data) {
-        cubeTypes = data;
-        if (cubeTypes != null) {
-          ArrayList<String> types = new ArrayList<String>();
-          for (CubeType t : cubeTypes) {
-            types.add(t.getName());
+    CubeType cubeType = (CubeType) getIntent().getSerializableExtra("cubeType");
+    if (cubeType != null) {
+      setCubeType(cubeType);
+    } else {
+      App.INSTANCE.getService().getCubeTypes(true, new DataCallback<List<CubeType>>() {
+        @Override
+        public void onData(List<CubeType> data) {
+          cubeTypes = data;
+          if (cubeTypes != null) {
+            ArrayList<String> types = new ArrayList<String>();
+            for (CubeType t : cubeTypes) {
+              types.add(t.getName());
+            }
+            Utils.showFragment(SolveTypesActivity.this,
+                SelectorFragmentDialog.newInstance(0, types, getString(R.string.choose_cube_type), false, SolveTypesActivity.this));
+          } else {
+            finish();
           }
-          Utils.showFragment(SolveTypesActivity.this,
-              SelectorFragmentDialog.newInstance(0, types, getString(R.string.choose_cube_type), false, SolveTypesActivity.this));
-        } else {
-          finish();
         }
-      }
-    });
+      });
+    }
   }
 
   private void initViews() {
@@ -205,7 +210,11 @@ public class SolveTypesActivity extends FragmentActivity implements SelectionHan
       finish();
       return;
     }
-    curCubeType = cubeTypes.get(position);
+    setCubeType(cubeTypes.get(position));
+  }
+
+  private void setCubeType(CubeType cubeType) {
+    curCubeType = cubeType;
     App.INSTANCE.getService().getSolveTypes(curCubeType, new DataCallback<List<SolveType>>() {
       @Override
       public void onData(List<SolveType> data) {

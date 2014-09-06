@@ -22,14 +22,15 @@ import java.util.List;
 
 public class SelectorFragmentDialog extends DialogFragment {
 
-  private static final String ARG_ID = "id";
-  private static final String ARG_TITLE = "title";
-  private static final String ARG_TOUCHOUT = "touchout";
-  private static final String ARG_ITEMS = "items";
+  protected static final String ARG_ID = "id";
+  protected static final String ARG_TITLE = "title";
+  protected static final String ARG_TOUCHOUT = "touchout";
+  protected static final String ARG_ITEMS = "items";
 
-  private SelectionHandler handler;
-  private int id;
-  private List<String> liItems;
+  protected SelectionHandler handler;
+  protected int id;
+  protected List<String> liItems;
+  protected ArrayAdapter<String> adapter;
 
   public static SelectorFragmentDialog newInstance(int id, ArrayList<String> items, boolean cancelTouchOutside, SelectionHandler handler) {
     return newInstance(id, items, null, cancelTouchOutside, handler);
@@ -46,7 +47,7 @@ public class SelectorFragmentDialog extends DialogFragment {
     return f;
   }
 
-  private SelectorFragmentDialog(SelectionHandler handler) {
+  protected SelectorFragmentDialog(SelectionHandler handler) {
     this.handler = handler;
   }
 
@@ -59,7 +60,7 @@ public class SelectorFragmentDialog extends DialogFragment {
     String title = getArguments().getString(ARG_TITLE);
     boolean cancelOnTouchOutside = getArguments().getBoolean(ARG_TOUCHOUT);
     liItems = getArguments().getStringArrayList(ARG_ITEMS);
-    CustomAdapter adapter = new CustomAdapter(getActivity(), R.layout.resizable_simple_list_item, liItems);
+    adapter = getNewAdapter();
     lvItems.setAdapter(adapter);
 
     final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(v).create();
@@ -92,17 +93,18 @@ public class SelectorFragmentDialog extends DialogFragment {
     handler.itemSelected(id, -1);
   }
 
-  private class CustomAdapter extends ArrayAdapter<String> {
+  protected ArrayAdapter<String> getNewAdapter() {
+    return new CustomAdapter(getActivity(), R.layout.resizable_simple_list_item, liItems);
+  }
+
+  protected class CustomAdapter extends ArrayAdapter<String> {
     public CustomAdapter(Context context, int id, List<String> list) {
       super(context, id, list);
     }
 
     public View getView(final int position, View convertView, ViewGroup parent) {
-      View view = convertView;
-      if (view == null) {
-        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        view = inflater.inflate(R.layout.resizable_simple_list_item, null);
-      }
+      LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+      View view = inflater.inflate(R.layout.resizable_simple_list_item, null);
 
       if (position >= 0 && position < liItems.size()) {
         String item = liItems.get(position);

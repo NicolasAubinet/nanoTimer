@@ -94,4 +94,8 @@
   <string name="could_not_launch_market">Could not launch the market</string>
   <string name="release_notes">Release notes</string>
   <string name="close">Close</string>
+
+  <string name="add_more_solve_types">Add more solve types&#8230;</string>
+  <string name="solve_types_shortcut">Solve types shortcut</string>
+  <string name="solve_types_shortcut_summary">Show \"Add more solve types\" in list</string>
 </resources>

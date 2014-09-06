@@ -18,8 +18,14 @@ public enum Options {
   private static final String INSPECTION_SOUNDS_KEY = "inspection_sounds";
   private static final String KEEP_TIMER_SCREEN_ON_KEY = "keep_timer_screen_on";
   private static final String ADS_STYLE_KEY = "ads_style";
+  private static final String SOLVE_TYPES_SHORTCUT = "solve_types_shortcut";
 
   private static final int MAX_STEPS_COUNT = 8;
+
+  public void setContext(Context context) {
+    this.context = context;
+    this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+  }
 
   public int getMaxStepsCount() {
     return MAX_STEPS_COUNT;
@@ -70,9 +76,9 @@ public enum Options {
     return true;
   }
 
-  public void setContext(Context context) {
-    this.context = context;
-    this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+  public boolean isSolveTypesShortcutEnabled() {
+    Boolean defaultValue = context.getResources().getBoolean(R.bool.solve_types_shortcut);
+    return sharedPreferences.getBoolean(SOLVE_TYPES_SHORTCUT, defaultValue);
   }
 
 }

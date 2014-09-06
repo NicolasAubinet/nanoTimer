@@ -30,6 +30,7 @@ import com.cube.nanotimer.gui.widget.AboutDialog;
 import com.cube.nanotimer.gui.widget.HistoryDetailDialog;
 import com.cube.nanotimer.gui.widget.SelectionHandler;
 import com.cube.nanotimer.gui.widget.SelectorFragmentDialog;
+import com.cube.nanotimer.gui.widget.SolveTypesFragmentDialog;
 import com.cube.nanotimer.gui.widget.TimeChangedHandler;
 import com.cube.nanotimer.gui.widget.ads.AdProvider;
 import com.cube.nanotimer.services.db.DataCallback;
@@ -111,7 +112,8 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
             types.add(t.getName());
           }
           Utils.showFragment(MainScreenActivity.this,
-              SelectorFragmentDialog.newInstance(ID_SOLVETYPE, types, true, MainScreenActivity.this));
+              SolveTypesFragmentDialog.newInstance(ID_SOLVETYPE, types, true, MainScreenActivity.this,
+                  Options.INSTANCE.isSolveTypesShortcutEnabled()));
         }
       }
     });
@@ -401,9 +403,16 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
         buCubeType.setText(curCubeType.getName());
         refreshSolveTypes();
       } else if (id == ID_SOLVETYPE) {
-        curSolveType = solveTypes.get(position);
-        buSolveType.setText(curSolveType.getName());
-        refreshHistory();
+        if (position >= 0 && position < solveTypes.size()) {
+          curSolveType = solveTypes.get(position);
+          buSolveType.setText(curSolveType.getName());
+          refreshHistory();
+        } else {
+          // solve types shortcut
+          Intent i = new Intent(this, SolveTypesActivity.class);
+          i.putExtra("cubeType", curCubeType);
+          startActivity(i);
+        }
       }
     }
   }

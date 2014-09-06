@@ -44,6 +44,12 @@
 
     </Preference>
 
+    <CheckBoxPreference
+       android:key="solve_types_shortcut"
+       android:title="@string/solve_types_shortcut"
+       android:summary="@string/solve_types_shortcut_summary"
+       android:defaultValue="@bool/solve_types_shortcut"/>
+
   </PreferenceCategory>
 
 
