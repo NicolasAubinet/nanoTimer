@@ -83,6 +83,9 @@ public class TimerActivity extends Activity {
   private long timerStartTs;
   private volatile TimerState timerState = TimerState.STOPPED;
 
+  private long lastTimerStopTs;
+  private final long STOP_START_DELAY = 500; // to avoid starting timer too quickly after a stop
+
   private int inspectionTime;
   private InspectionMode inspectionMode;
   private boolean soundsEnabled;
@@ -400,7 +403,11 @@ public class TimerActivity extends Activity {
   }
 
   private void startTimer() {
-    timerStartTs = System.currentTimeMillis();
+    long curTime = System.currentTimeMillis();
+    if (curTime - lastTimerStopTs < STOP_START_DELAY) {
+      return;
+    }
+    timerStartTs = curTime;
     if (solveType.hasSteps()) {
       stepsTimes = new ArrayList<Long>();
       stepStartTs = timerStartTs;
@@ -426,6 +433,7 @@ public class TimerActivity extends Activity {
 
   private void stopTimer(boolean save) {
     long time = (System.currentTimeMillis() - timerStartTs);
+    lastTimerStopTs = System.currentTimeMillis();
     timerState = TimerState.STOPPED;
     if (timer != null) {
       timer.cancel();
@@ -442,7 +450,11 @@ public class TimerActivity extends Activity {
   }
 
   private void startInspectionTimer() {
-    timerStartTs = System.currentTimeMillis();
+    long curTime = System.currentTimeMillis();
+    if (curTime - lastTimerStopTs < STOP_START_DELAY) {
+      return;
+    }
+    timerStartTs = curTime;
     enableScreenRotation(false);
     setKeepScreenOn(true);
     resetTimerText();
