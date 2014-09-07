@@ -328,6 +328,10 @@ public class ServiceProviderImpl implements ServiceProvider {
 
   @Override
   public List<SolveTime> getHistory(SolveType solveType, long from) {
+    return getHistory(solveType, from, HISTORY_PAGE_SIZE);
+  }
+
+  public List<SolveTime> getHistory(SolveType solveType, long from, Integer pageSize) {
     List<SolveTime> history = new ArrayList<SolveTime>();
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_ID);
@@ -339,7 +343,9 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
     q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
     q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC");
-    q.append(" LIMIT ").append(HISTORY_PAGE_SIZE);
+    if (pageSize != null) {
+      q.append(" LIMIT ").append(HISTORY_PAGE_SIZE);
+    }
     Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId(), from));
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {

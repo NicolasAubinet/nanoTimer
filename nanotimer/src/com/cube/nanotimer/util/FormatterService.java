@@ -61,6 +61,8 @@ public enum FormatterService {
           sb.append(" / ");
         }
       }
+    } else {
+      sb.append("-");
     }
     return sb.toString();
   }
