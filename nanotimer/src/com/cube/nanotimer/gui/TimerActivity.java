@@ -209,8 +209,9 @@ public class TimerActivity extends Activity {
       case FOUR_BY_FOUR:
       case FIVE_BY_FIVE:
       case SQUARE1:
-      case CLOCK:
         return 21;
+      case CLOCK:
+        return 20;
       case SIX_BY_SIX:
       case MEGAMINX:
         return 18;
