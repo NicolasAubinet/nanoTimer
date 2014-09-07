@@ -73,16 +73,67 @@
     </TableRow>
   </TableLayout>
 
-  <com.cube.nanotimer.util.view.FontFitTextView
-     android:id="@+id/tvScramble"
-     android:layout_gravity="center"
+  <ScrollView
      android:layout_width="match_parent"
-     android:layout_height="wrap_content"
-     custom:font="MONOSPACE"
-     android:scrollbars="vertical"
-     android:layout_marginTop="8px"
-     android:layout_marginBottom="8px"
-     android:padding="3px"
-     style="@style/ScrambleTextField"/>
+     android:layout_height="wrap_content">
+
+    <LinearLayout
+       android:orientation="vertical"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content">
+
+      <com.cube.nanotimer.util.view.FontFitTextView
+         android:id="@+id/tvScramble"
+         android:layout_gravity="center"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         custom:font="MONOSPACE"
+         android:layout_marginTop="8px"
+         android:layout_marginBottom="8px"
+         android:padding="3px"
+         style="@style/ScrambleTextField"/>
+
+      <LinearLayout
+         android:id="@+id/averagesTable"
+         android:orientation="vertical"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="8px">
+
+        <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_gravity="center"
+           android:text="@string/averages"
+           android:textSize="22px"/>
+
+        <com.cube.nanotimer.util.view.BorderTableLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_margin="3px"
+           android:padding="1px"
+           android:shrinkColumns="*"
+           android:stretchColumns="*"
+           custom:borderSize="2"
+           custom:borderColor="@color/neon">
+          <TableRow android:layout_margin="2px">
+            <TextView style="@style/SessionTimeTextField" android:text="5" android:background="@color/darkblue"/>
+            <TextView style="@style/SessionTimeTextField" android:text="12" android:background="@color/darkblue"/>
+            <TextView style="@style/SessionTimeTextField" android:text="50" android:background="@color/darkblue"/>
+            <TextView style="@style/SessionTimeTextField" android:text="100" android:background="@color/darkblue"/>
+          </TableRow>
+          <TableRow android:layout_margin="2px">
+            <TextView android:id="@+id/tvAvgOfFive" style="@style/SessionTimeTextField"/>
+            <TextView android:id="@+id/tvAvgOfTwelve" style="@style/SessionTimeTextField"/>
+            <TextView android:id="@+id/tvAvgOfFifty" style="@style/SessionTimeTextField"/>
+            <TextView android:id="@+id/tvAvgOfHundred" style="@style/SessionTimeTextField"/>
+          </TableRow>
+        </com.cube.nanotimer.util.view.BorderTableLayout>
+
+      </LinearLayout>
+
+    </LinearLayout>
+
+  </ScrollView>
 
 </com.cube.nanotimer.util.view.ScalingLinearLayout>

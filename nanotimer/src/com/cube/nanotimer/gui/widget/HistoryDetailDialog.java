@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
-import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -19,6 +18,7 @@ import com.cube.nanotimer.util.view.FontFitTextView;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
+import com.cube.nanotimer.vo.SolveTimeAverages;
 
 import java.util.Arrays;
 
@@ -44,14 +44,29 @@ public class HistoryDetailDialog extends DialogFragment {
 
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
-    View v = getActivity().getLayoutInflater().inflate(R.layout.historydetail_dialog, null);
+    final View v = getActivity().getLayoutInflater().inflate(R.layout.historydetail_dialog, null);
 
     final SolveTime solveTime = (SolveTime) getArguments().getSerializable(ARG_SOLVETIME);
     final CubeType cubeType = (CubeType) getArguments().getSerializable(ARG_CUBETYPE);
+    if (solveTime.hasSteps()) {
+      v.findViewById(R.id.averagesTable).setVisibility(View.GONE);
+      // TODO : see if could not display steps averages (maybe format the table differently)
+    } else {
+      App.INSTANCE.getService().getSolveTimeAverages(solveTime, new DataCallback<SolveTimeAverages>() {
+        @Override
+        public void onData(SolveTimeAverages data) {
+          if (data != null) {
+            ((TextView) v.findViewById(R.id.tvAvgOfFive)).setText(FormatterService.INSTANCE.formatSolveTime(data.getAvgOf5(), "-"));
+            ((TextView) v.findViewById(R.id.tvAvgOfTwelve)).setText(FormatterService.INSTANCE.formatSolveTime(data.getAvgOf12(), "-"));
+            ((TextView) v.findViewById(R.id.tvAvgOfFifty)).setText(FormatterService.INSTANCE.formatSolveTime(data.getAvgOf50(), "-"));
+            ((TextView) v.findViewById(R.id.tvAvgOfHundred)).setText(FormatterService.INSTANCE.formatSolveTime(data.getAvgOf100(), "-"));
+          }
+        }
+      });
+    }
 
     final TextView tvTime = (TextView) v.findViewById(R.id.tvTime);
     FontFitTextView tvScramble = (FontFitTextView) v.findViewById(R.id.tvScramble);
-    tvScramble.setMovementMethod(new ScrollingMovementMethod());
     Button buPlusTwo = (Button) v.findViewById(R.id.buPlusTwo);
     Button buDNF = (Button) v.findViewById(R.id.buDNF);
     Button buDelete = (Button) v.findViewById(R.id.buDelete);

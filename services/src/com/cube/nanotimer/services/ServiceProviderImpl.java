@@ -7,6 +7,7 @@ import com.cube.nanotimer.services.db.DB;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
+import com.cube.nanotimer.vo.SolveTimeAverages;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.SolveTypeStep;
 
@@ -508,6 +509,46 @@ public class ServiceProviderImpl implements ServiceProvider {
     }
   }
 
+  @Override
+  public SolveTimeAverages getSolveTimeAverages(SolveTime solveTime) {
+    SolveTimeAverages sta = null;
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT ").append(DB.COL_ID);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_TIME);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_SCRAMBLE);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_PLUSTWO);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_AVG5);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_AVG12);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_AVG50);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_AVG100);
+    q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
+    q.append(" WHERE ").append(DB.COL_ID).append(" = ?");
+    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTime.getId()));
+    if (cursor != null) {
+      cursor.moveToFirst();
+      if (!cursor.isAfterLast()) {
+        sta = new SolveTimeAverages();
+        sta.setId(cursor.getInt(0));
+        sta.setTime(cursor.getInt(1));
+        sta.setTimestamp(cursor.getLong(2));
+        sta.setScramble(cursor.getString(3));
+        sta.setPlusTwo(cursor.getInt(4) == 1);
+        sta.setAvgOf5(getCursorLong(cursor, 5));
+        sta.setAvgOf12(getCursorLong(cursor, 6));
+        sta.setAvgOf50(getCursorLong(cursor, 7));
+        sta.setAvgOf100(getCursorLong(cursor, 8));
+        sta.setSolveType(solveTime.getSolveType());
+//        if (solveTime.getSolveType().hasSteps()) {
+//          List<Long> stepTimes = getSolveTimeSteps(st);
+//          st.setStepsTimes(stepTimes.size() == 0 ? null : stepTimes.toArray(new Long[0]));
+//        }
+      }
+      cursor.close();
+    }
+    return sta;
+  }
+
   private void recalculateAverages(long timestamp, SolveType solveType) {
     long total5 = 0, total12 = 0, total50 = 0, total100 = 0;
     List<CachedTime> allTimes = getTimesAroundTs(timestamp, solveType, true);
@@ -792,7 +833,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     }
   }
 
-  class SolveAverage {
+  private class SolveAverage {
     private int id;
     private long time;
     private Long avg5;

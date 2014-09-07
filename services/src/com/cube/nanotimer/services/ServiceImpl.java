@@ -6,6 +6,7 @@ import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
+import com.cube.nanotimer.vo.SolveTimeAverages;
 import com.cube.nanotimer.vo.SolveType;
 
 import java.util.List;
@@ -216,6 +217,19 @@ public class ServiceImpl extends DBHelper implements Service {
         provider.saveSolveTypesOrder(solveTypes);
         if (callback != null) {
           callback.onData(null);
+        }
+      }
+    });
+  }
+
+  @Override
+  public void getSolveTimeAverages(final SolveTime solveTime, final DataCallback<SolveTimeAverages> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        SolveTimeAverages sta = provider.getSolveTimeAverages(solveTime);
+        if (callback != null) {
+          callback.onData(sta);
         }
       }
     });

@@ -3,6 +3,7 @@ package com.cube.nanotimer.services;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
+import com.cube.nanotimer.vo.SolveTimeAverages;
 import com.cube.nanotimer.vo.SolveType;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public interface ServiceProvider {
   List<Long> getSessionTimes(SolveType solveType);
   void startNewSession(SolveType solveType, long startTs);
   void saveSolveTypesOrder(List<SolveType> solveTypes);
+  SolveTimeAverages getSolveTimeAverages(SolveTime solveTime);
 
   int addSolveType(SolveType solveType);
   void addSolveTypeSteps(SolveType solveType);

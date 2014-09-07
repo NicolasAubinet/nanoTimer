@@ -46,6 +46,7 @@
   <string name="delete">Delete</string>
   <string name="new_session">New session</string>
   <string name="time">Time:</string>
+  <string name="averages">Averages</string>
   <string name="steps">Steps</string>
   <string name="stepsC">Steps:</string>
   <string name="NA">N/A</string>
