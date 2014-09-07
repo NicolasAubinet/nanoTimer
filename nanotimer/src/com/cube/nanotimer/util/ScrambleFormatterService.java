@@ -46,7 +46,12 @@ public enum ScrambleFormatterService {
    */
   private Spannable colorFormattedScramble(String scramble, CubeType cubeType) {
     Spannable span = new SpannableString(scramble);
-    final char separator = (cubeType.getType() == Type.SQUARE1 ? '(' : ' ');
+    final char separator;
+    if (cubeType.getType() == Type.SQUARE1 || cubeType.getType() == Type.CLOCK) {
+      separator = '(';
+    } else {
+      separator = ' ';
+    }
     int defaultColor = getDefaultTextColor();
     int alternateColor = App.INSTANCE.getContext().getResources().getColor(R.color.scramblealternate);
     int prevLinesCharCount = 0;
@@ -128,6 +133,7 @@ public enum ScrambleFormatterService {
         break;
       case MEGAMINX:
       case SQUARE1:
+      case CLOCK:
         // don't add line breaks for this, as this a special kind of scramble that is already formatted
         movesPerLine = 0;
         break;

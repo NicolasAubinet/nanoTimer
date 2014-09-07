@@ -54,6 +54,7 @@ public class DBHelper extends SQLiteOpenHelper {
         DB.COL_TIMEHISTORY_SCRAMBLE + " TEXT, " +
         DB.COL_TIMEHISTORY_AVG5 + " INTEGER, " +
         DB.COL_TIMEHISTORY_AVG12 + " INTEGER, " +
+        DB.COL_TIMEHISTORY_AVG50 + " INTEGER, " +
         DB.COL_TIMEHISTORY_AVG100 + " INTEGER, " +
         DB.COL_TIMEHISTORY_PLUSTWO + " INTEGER DEFAULT 0, " +
         DB.COL_TIMEHISTORY_SOLVETYPE_ID + " INTEGER, " +
@@ -86,7 +87,12 @@ public class DBHelper extends SQLiteOpenHelper {
       DBHelper.db = db;
     }
     if (oldVersion < 9) {
+      // Add Square-1 and Clock
       insertSolveType(getString(R.string.def), insertCubeType(10, getString(R.string.square1)));
+      insertSolveType(getString(R.string.def), insertCubeType(11, getString(R.string.clock)));
+      // Add avg50 column and calculate values for it
+      db.execSQL("ALTER TABLE " + DB.TABLE_TIMEHISTORY + " ADD COLUMN " + DB.COL_TIMEHISTORY_AVG50 + " INTEGER");
+      DBUpgradeScripts.calculateAndUpdateAvg50(db);
     }
   }
 
@@ -101,6 +107,7 @@ public class DBHelper extends SQLiteOpenHelper {
     insertSolveType(getString(R.string.def), insertCubeType(8, getString(R.string.pyraminx)));
     insertSolveType(getString(R.string.def), insertCubeType(9, getString(R.string.skewb)));
     insertSolveType(getString(R.string.def), insertCubeType(10, getString(R.string.square1)));
+    insertSolveType(getString(R.string.def), insertCubeType(11, getString(R.string.clock)));
 
     insertSolveType(getString(R.string.one_handed), 2);
 

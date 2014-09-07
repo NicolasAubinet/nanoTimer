@@ -231,6 +231,11 @@
           <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfTwelve" android:layout_weight="2" style="@style/AverageTableTextField" android:padding="2px"/>
         </TableRow>
         <TableRow>
+          <TextView android:text="50" style="@style/AverageTableHeaderField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFifty" android:layout_weight="2" style="@style/AverageTableTextField" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFifty" android:layout_weight="2" style="@style/AverageTableTextField" android:padding="2px"/>
+        </TableRow>
+        <TableRow>
           <TextView android:text="100" style="@style/AverageTableHeaderField" android:padding="2px"/>
           <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfHundred" android:layout_weight="2" style="@style/AverageTableTextField" android:padding="2px"/>
           <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfHundred" android:layout_weight="2" style="@style/AverageTableTextField" android:padding="2px"/>

@@ -8,29 +8,34 @@ public class SolveAverages {
 
   private Long avgOf5;
   private Long avgOf12;
+  private Long avgOf50;
   private Long avgOf100;
   private Long avgOfLifetime;
 
   private Long bestOf5;
   private Long bestOf12;
+  private Long bestOf50;
   private Long bestOf100;
   private Long bestOfLifetime;
 
   private List<Long> stepsAvgOf5;
   private List<Long> stepsAvgOf12;
+  private List<Long> stepsAvgOf50;
   private List<Long> stepsAvgOf100;
   private List<Long> stepsAvgOfLifetime;
 
   public SolveAverages() {
   }
 
-  public SolveAverages(Long avgOf5, Long avgOf12, Long avgOf100, Long avgOfLifetime, Long bestOf5, Long bestOf12, Long bestOf100, Long bestOfLifetime) {
+  public SolveAverages(Long avgOf5, Long avgOf12, Long avgOf50, Long avgOf100, Long avgOfLifetime, Long bestOf5, Long bestOf12, Long bestOf50, Long bestOf100, Long bestOfLifetime) {
     this.avgOf5 = avgOf5;
     this.avgOf12 = avgOf12;
+    this.avgOf50 = avgOf50;
     this.avgOf100 = avgOf100;
     this.avgOfLifetime = avgOfLifetime;
     this.bestOf5 = bestOf5;
     this.bestOf12 = bestOf12;
+    this.bestOf50 = bestOf50;
     this.bestOf100 = bestOf100;
     this.bestOfLifetime = bestOfLifetime;
   }
@@ -57,6 +62,14 @@ public class SolveAverages {
 
   public void setAvgOf12(Long avgOf12) {
     this.avgOf12 = avgOf12;
+  }
+
+  public Long getAvgOf50() {
+    return avgOf50;
+  }
+
+  public void setAvgOf50(Long avgOf50) {
+    this.avgOf50 = avgOf50;
   }
 
   public Long getAvgOf100() {
@@ -91,6 +104,14 @@ public class SolveAverages {
     this.bestOf12 = bestOf12;
   }
 
+  public Long getBestOf50() {
+    return bestOf50;
+  }
+
+  public void setBestOf50(Long bestOf50) {
+    this.bestOf50 = bestOf50;
+  }
+
   public Long getBestOf100() {
     return bestOf100;
   }
@@ -112,6 +133,8 @@ public class SolveAverages {
       this.stepsAvgOf5 = stepsAvgOf;
     } else if (n == 12) {
       this.stepsAvgOf12 = stepsAvgOf;
+    } else if (n == 50) {
+      this.stepsAvgOf50 = stepsAvgOf;
     } else if (n == 100) {
       this.stepsAvgOf100 = stepsAvgOf;
     }
@@ -123,6 +146,10 @@ public class SolveAverages {
 
   public List<Long> getStepsAvgOf12() {
     return stepsAvgOf12;
+  }
+
+  public List<Long> getStepsAvgOf50() {
+    return stepsAvgOf50;
   }
 
   public List<Long> getStepsAvgOf100() {
@@ -145,10 +172,12 @@ public class SolveAverages {
     SolveAverages that = (SolveAverages) o;
 
     if (avgOf100 != null ? !avgOf100.equals(that.avgOf100) : that.avgOf100 != null) return false;
+    if (avgOf50 != null ? !avgOf50.equals(that.avgOf50) : that.avgOf50 != null) return false;
     if (avgOf12 != null ? !avgOf12.equals(that.avgOf12) : that.avgOf12 != null) return false;
     if (avgOf5 != null ? !avgOf5.equals(that.avgOf5) : that.avgOf5 != null) return false;
     if (avgOfLifetime != null ? !avgOfLifetime.equals(that.avgOfLifetime) : that.avgOfLifetime != null) return false;
     if (bestOf100 != null ? !bestOf100.equals(that.bestOf100) : that.bestOf100 != null) return false;
+    if (bestOf50 != null ? !bestOf50.equals(that.bestOf50) : that.bestOf50 != null) return false;
     if (bestOf12 != null ? !bestOf12.equals(that.bestOf12) : that.bestOf12 != null) return false;
     if (bestOf5 != null ? !bestOf5.equals(that.bestOf5) : that.bestOf5 != null) return false;
     if (bestOfLifetime != null ? !bestOfLifetime.equals(that.bestOfLifetime) : that.bestOfLifetime != null)
@@ -161,10 +190,12 @@ public class SolveAverages {
   public int hashCode() {
     int result = avgOf5 != null ? avgOf5.hashCode() : 0;
     result = 31 * result + (avgOf12 != null ? avgOf12.hashCode() : 0);
+    result = 31 * result + (avgOf50 != null ? avgOf50.hashCode() : 0);
     result = 31 * result + (avgOf100 != null ? avgOf100.hashCode() : 0);
     result = 31 * result + (avgOfLifetime != null ? avgOfLifetime.hashCode() : 0);
     result = 31 * result + (bestOf5 != null ? bestOf5.hashCode() : 0);
     result = 31 * result + (bestOf12 != null ? bestOf12.hashCode() : 0);
+    result = 31 * result + (bestOf50 != null ? bestOf50.hashCode() : 0);
     result = 31 * result + (bestOf100 != null ? bestOf100.hashCode() : 0);
     result = 31 * result + (bestOfLifetime != null ? bestOfLifetime.hashCode() : 0);
     return result;
@@ -175,10 +206,12 @@ public class SolveAverages {
     return "SolveAverages{" +
         "avgOf5=" + avgOf5 +
         ", avgOf12=" + avgOf12 +
+        ", avgOf50=" + avgOf50 +
         ", avgOf100=" + avgOf100 +
         ", avgOfLifetime=" + avgOfLifetime +
         ", bestOf5=" + bestOf5 +
         ", bestOf12=" + bestOf12 +
+        ", bestOf50=" + bestOf50 +
         ", bestOf100=" + bestOf100 +
         ", bestOfLifetime=" + bestOfLifetime +
         '}';

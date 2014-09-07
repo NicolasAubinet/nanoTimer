@@ -22,6 +22,7 @@ public class DB {
   public static final String COL_TIMEHISTORY_SCRAMBLE = "scramble";
   public static final String COL_TIMEHISTORY_AVG5 = "avg5";
   public static final String COL_TIMEHISTORY_AVG12 = "avg12";
+  public static final String COL_TIMEHISTORY_AVG50 = "avg50";
   public static final String COL_TIMEHISTORY_AVG100 = "avg100";
   public static final String COL_TIMEHISTORY_PLUSTWO = "plustwo";
   public static final String COL_TIMEHISTORY_SOLVETYPE_ID = "solvetype_id";

@@ -1,5 +1,6 @@
 package com.cube.nanotimer.scrambler;
 
+import com.cube.nanotimer.scrambler.impl.ClockScrambler;
 import com.cube.nanotimer.scrambler.impl.FiveScrambler;
 import com.cube.nanotimer.scrambler.impl.FourScrambler;
 import com.cube.nanotimer.scrambler.impl.MegaminxScrambler;
@@ -46,6 +47,9 @@ public class ScramblerFactory {
         break;
       case SQUARE1:
         scrambler = new Square1Scrambler();
+        break;
+      case CLOCK:
+        scrambler = new ClockScrambler();
         break;
       default:
         throw new RuntimeException("Could not find timer type " + type.getName());
