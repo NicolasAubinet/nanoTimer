@@ -614,6 +614,7 @@ public class TimerActivity extends Activity {
     if (!solveType.hasSteps()) {
       refreshAvgField(R.id.tvAvgOfFive, solveAverages.getAvgOf5(), "-");
       refreshAvgField(R.id.tvAvgOfTwelve, solveAverages.getAvgOf12(), "-");
+      refreshAvgField(R.id.tvAvgOfFifty, solveAverages.getAvgOf50(), "-");
       refreshAvgField(R.id.tvAvgOfHundred, solveAverages.getAvgOf100(), "-");
       refreshAvgField(R.id.tvLifetimeAvg, solveAverages.getAvgOfLifetime(), getString(R.string.NA));
 
@@ -621,6 +622,8 @@ public class TimerActivity extends Activity {
           (prevSolveAverages != null ? prevSolveAverages.getBestOf5() : null), "-", showNotifications, false);
       refreshAvgFieldWithRecord(R.id.tvBestOfTwelve, solveAverages.getBestOf12(),
           (prevSolveAverages != null ? prevSolveAverages.getBestOf12() : null), "-", showNotifications, false);
+      refreshAvgFieldWithRecord(R.id.tvBestOfFifty, solveAverages.getBestOf50(),
+          (prevSolveAverages != null ? prevSolveAverages.getBestOf50() : null), "-", showNotifications, false);
       refreshAvgFieldWithRecord(R.id.tvBestOfHundred, solveAverages.getBestOf100(),
           (prevSolveAverages != null ? prevSolveAverages.getBestOf100() : null), "-", showNotifications, false);
       refreshAvgFieldWithRecord(R.id.tvLifetimeBest, solveAverages.getBestOfLifetime(),
@@ -630,6 +633,8 @@ public class TimerActivity extends Activity {
           FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf5()));
       ((TextView) findViewById(R.id.tvAvgOfTwelve)).setText(
           FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf12()));
+      ((TextView) findViewById(R.id.tvAvgOfFifty)).setText(
+          FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf50()));
       ((TextView) findViewById(R.id.tvAvgOfHundred)).setText(
           FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf100()));
       ((TextView) findViewById(R.id.tvAvgOfLife)).setText(
