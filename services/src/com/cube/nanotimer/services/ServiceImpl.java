@@ -82,11 +82,11 @@ public class ServiceImpl extends DBHelper implements Service {
   }
 
   @Override
-  public void removeTime(final SolveTime solveTime, final DataCallback<SolveAverages> callback) {
+  public void deleteTime(final SolveTime solveTime, final DataCallback<SolveAverages> callback) {
     run(new Runnable() {
       @Override
       public void run() {
-        callback.onData(provider.removeTime(solveTime));
+        callback.onData(provider.deleteTime(solveTime));
       }
     });
   }

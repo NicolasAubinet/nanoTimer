@@ -285,7 +285,7 @@ public class TimerActivity extends Activity {
           break;
         case R.id.itDelete:
           if (lastSolveTime != null) {
-            App.INSTANCE.getService().removeTime(lastSolveTime, new SolveAverageCallback());
+            App.INSTANCE.getService().deleteTime(lastSolveTime, new SolveAverageCallback());
             cubeSession.deleteLast();
             historyTimesCount--;
             refreshSessionFields();

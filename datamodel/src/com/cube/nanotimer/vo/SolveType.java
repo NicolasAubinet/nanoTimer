@@ -1,6 +1,7 @@
 package com.cube.nanotimer.vo;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class SolveType implements Serializable {
 
@@ -59,4 +60,12 @@ public class SolveType implements Serializable {
     return steps != null && steps.length > 0;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof SolveType)) {
+      return false;
+    }
+    SolveType st = (SolveType) o;
+    return this.id == st.id && this.name.equals(st.name) && this.cubeTypeId == st.cubeTypeId && Arrays.equals(this.steps, st.steps);
+  }
 }

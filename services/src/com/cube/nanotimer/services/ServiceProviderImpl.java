@@ -294,7 +294,7 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   @Override
-  public SolveAverages removeTime(SolveTime solveTime) {
+  public SolveAverages deleteTime(SolveTime solveTime) {
     int i = 0;
     syncCaches(solveTime.getSolveType());
     // remove from cache
@@ -391,6 +391,7 @@ public class ServiceProviderImpl implements ServiceProvider {
   @Override
   public void deleteHistory() {
     db.delete(DB.TABLE_TIMEHISTORY, null, null);
+    clearCaches();
   }
 
   @Override
@@ -399,6 +400,9 @@ public class ServiceProviderImpl implements ServiceProvider {
       db.delete(DB.TABLE_TIMEHISTORYSTEP, DB.COL_TIMEHISTORYSTEP_SOLVETYPESTEP_ID + " = ?", getStringArray(step.getId()));
     }
     db.delete(DB.TABLE_TIMEHISTORY, DB.COL_TIMEHISTORY_SOLVETYPE_ID + " = ?", getStringArray(solveType.getId()));
+    if (solveType.equals(currentSolveType)) {
+      clearCaches();
+    }
   }
 
   public List<Long> getSessionTimes(SolveType solveType) {
@@ -496,6 +500,9 @@ public class ServiceProviderImpl implements ServiceProvider {
     db.delete(DB.TABLE_TIMEHISTORY, DB.COL_TIMEHISTORY_SOLVETYPE_ID + " = ?", getStringArray(solveType.getId()));
     db.delete(DB.TABLE_SOLVETYPESTEP, DB.COL_SOLVETYPESTEP_SOLVETYPE_ID + " = ?", getStringArray(solveType.getId()));
     db.delete(DB.TABLE_SOLVETYPE, DB.COL_ID + " = ?", getStringArray(solveType.getId()));
+    if (solveType.equals(currentSolveType)) {
+      clearCaches();
+    }
   }
 
   @Override
@@ -609,11 +616,15 @@ public class ServiceProviderImpl implements ServiceProvider {
     }
 
     // Handle DNFs
-    Long lastAvg5 = (inAfter && i >= 5) ? total5 / 5 : null;
-    Long lastAvg12 = (inAfter && i >= 12) ? total12 / 12 : null;
-    Long lastAvg50 = (inAfter && i >= 50) ? total50 / 50 : null;
-    Long lastAvg100 = (inAfter && i >= 100) ? total100 / 100 : null;
     List<SolveAverage> solveAverages = getAveragesTimesAfter(timestamp, solveType);
+    SolveAverage lastNonDNFAvg = null;
+    if (solveAverages.size() > 0 && solveAverages.get(0).getTimestamp() < timestamp) {
+      lastNonDNFAvg = solveAverages.get(0);
+    }
+    Long lastAvg5 = (lastNonDNFAvg == null) ? null : lastNonDNFAvg.getAvg5();
+    Long lastAvg12 = (lastNonDNFAvg == null) ? null : lastNonDNFAvg.getAvg12();
+    Long lastAvg50 = (lastNonDNFAvg == null) ? null : lastNonDNFAvg.getAvg50();
+    Long lastAvg100 = (lastNonDNFAvg == null) ? null : lastNonDNFAvg.getAvg100();
     int nonDNFCount = 0;
     for (SolveAverage sa : solveAverages) {
       if (sa.getTime() == -1) { // DNF
@@ -630,7 +641,7 @@ public class ServiceProviderImpl implements ServiceProvider {
         lastAvg100 = sa.getAvg100();
         nonDNFCount++;
       }
-      if (nonDNFCount > 100) {
+      if (nonDNFCount > 101) {
         break;
       }
     }
@@ -661,24 +672,44 @@ public class ServiceProviderImpl implements ServiceProvider {
     return times;
   }
 
+  /**
+   * Get the averages for all times after timestamp, and for the latest non-DNF time before timestamp.
+   * @param timestamp the timestamp to search
+   * @param solveType the solve type
+   * @return list of solve averages
+   */
   private List<SolveAverage> getAveragesTimesAfter(long timestamp, SolveType solveType) {
     List<SolveAverage> times = new ArrayList<SolveAverage>();
+    StringBuilder select = new StringBuilder();
+    select.append("SELECT ").append(DB.COL_ID);
+    select.append("     , ").append(DB.COL_TIMEHISTORY_TIME);
+    select.append("     , ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
+    select.append("     , ").append(DB.COL_TIMEHISTORY_AVG5);
+    select.append("     , ").append(DB.COL_TIMEHISTORY_AVG12);
+    select.append("     , ").append(DB.COL_TIMEHISTORY_AVG50);
+    select.append("     , ").append(DB.COL_TIMEHISTORY_AVG100);
     StringBuilder q = new StringBuilder();
-    q.append("SELECT ").append(DB.COL_ID);
-    q.append("     , ").append(DB.COL_TIMEHISTORY_TIME);
-    q.append("     , ").append(DB.COL_TIMEHISTORY_AVG5);
-    q.append("     , ").append(DB.COL_TIMEHISTORY_AVG12);
-    q.append("     , ").append(DB.COL_TIMEHISTORY_AVG50);
-    q.append("     , ").append(DB.COL_TIMEHISTORY_AVG100);
+    q.append(select);
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
     q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" >= ?");
-    q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC");
-    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId(), timestamp));
+    q.append(" UNION ");
+    q.append(select);
+    q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
+    q.append(" WHERE ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" = ");
+    q.append("   ( ");
+    q.append("    SELECT MAX(").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(") ");
+    q.append("    FROM ").append(DB.TABLE_TIMEHISTORY);
+    q.append("    WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
+    q.append("      AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
+    q.append("      AND ").append(DB.COL_TIMEHISTORY_TIME).append(" > 0");
+    q.append("   ) ");
+    q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
+    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId(), timestamp, solveType.getId(), timestamp));
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-        times.add(new SolveAverage(cursor.getInt(0), cursor.getInt(1), getCursorLong(cursor, 2),
-            getCursorLong(cursor, 3), getCursorLong(cursor, 4), getCursorLong(cursor, 5)));
+        times.add(new SolveAverage(cursor.getInt(0), cursor.getInt(1), cursor.getLong(2), getCursorLong(cursor, 3),
+            getCursorLong(cursor, 4), getCursorLong(cursor, 5), getCursorLong(cursor, 6)));
       }
       cursor.close();
     }
@@ -737,6 +768,7 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   private Long loadLifetimeBest(int solveTypeId) {
+    cachedLifetimeBest = -2l; // N/A
     StringBuilder q = new StringBuilder();
     q.append("SELECT MIN(").append(DB.COL_TIMEHISTORY_TIME).append(")");
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
@@ -752,6 +784,12 @@ public class ServiceProviderImpl implements ServiceProvider {
       cursor.close();
     }
     return cachedLifetimeBest;
+  }
+
+  private void clearCaches() {
+    cachedSolveTimes = null;
+    cachedBestAverages = new HashMap<Integer, Long>();
+    cachedLifetimeBest = -2l;
   }
 
   /**
@@ -836,12 +874,13 @@ public class ServiceProviderImpl implements ServiceProvider {
   private class SolveAverage {
     private int id;
     private long time;
+    private long timestamp;
     private Long avg5;
     private Long avg12;
     private Long avg50;
     private Long avg100;
 
-    public SolveAverage(int id, long time, Long avg5, Long avg12, Long avg50, Long avg100) {
+    public SolveAverage(int id, long time, long timestamp, Long avg5, Long avg12, Long avg50, Long avg100) {
       this.id = id;
       this.time = time;
       this.avg5 = avg5;
@@ -856,6 +895,10 @@ public class ServiceProviderImpl implements ServiceProvider {
 
     public long getTime() {
       return time;
+    }
+
+    public long getTimestamp() {
+      return timestamp;
     }
 
     public Long getAvg5() {

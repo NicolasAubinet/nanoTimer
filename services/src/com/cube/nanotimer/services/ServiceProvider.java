@@ -13,7 +13,7 @@ public interface ServiceProvider {
   List<SolveType> getSolveTypes(CubeType cubeType);
   SolveAverages saveTime(SolveTime solveTime);
   SolveAverages getSolveAverages(SolveType solveType);
-  SolveAverages removeTime(SolveTime solveTime);
+  SolveAverages deleteTime(SolveTime solveTime);
   List<SolveTime> getHistory(SolveType solveType);
   List<SolveTime> getHistory(SolveType solveType, long from);
   void deleteHistory();

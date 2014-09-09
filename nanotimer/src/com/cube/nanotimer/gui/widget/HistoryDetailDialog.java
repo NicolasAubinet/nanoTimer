@@ -50,7 +50,6 @@ public class HistoryDetailDialog extends DialogFragment {
     final CubeType cubeType = (CubeType) getArguments().getSerializable(ARG_CUBETYPE);
     if (solveTime.hasSteps()) {
       v.findViewById(R.id.averagesTable).setVisibility(View.GONE);
-      // TODO : see if could not display steps averages (maybe format the table differently)
     } else {
       App.INSTANCE.getService().getSolveTimeAverages(solveTime, new DataCallback<SolveTimeAverages>() {
         @Override
@@ -119,7 +118,7 @@ public class HistoryDetailDialog extends DialogFragment {
     buDelete.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
-        App.INSTANCE.getService().removeTime(solveTime, new DataCallback<SolveAverages>() {
+        App.INSTANCE.getService().deleteTime(solveTime, new DataCallback<SolveAverages>() {
           public void onData(SolveAverages data) {
           }
         });
