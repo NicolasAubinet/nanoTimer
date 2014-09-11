@@ -1,4 +1,4 @@
-package com.cube.nanotimer.scrambler.impl;
+package com.cube.nanotimer.scrambler.basic;
 
 import com.cube.nanotimer.scrambler.Scrambler;
 

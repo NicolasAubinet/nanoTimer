@@ -1,4 +1,4 @@
-package com.cube.nanotimer.scrambler.impl;
+package com.cube.nanotimer.scrambler.basic;
 
 public class TwoScrambler extends AbstractCubeScrambler {
 

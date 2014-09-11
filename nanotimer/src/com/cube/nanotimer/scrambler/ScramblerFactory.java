@@ -1,16 +1,16 @@
 package com.cube.nanotimer.scrambler;
 
-import com.cube.nanotimer.scrambler.impl.ClockScrambler;
-import com.cube.nanotimer.scrambler.impl.FiveScrambler;
-import com.cube.nanotimer.scrambler.impl.FourScrambler;
-import com.cube.nanotimer.scrambler.impl.MegaminxScrambler;
-import com.cube.nanotimer.scrambler.impl.PyraminxScrambler;
-import com.cube.nanotimer.scrambler.impl.SevenScrambler;
-import com.cube.nanotimer.scrambler.impl.SixScrambler;
-import com.cube.nanotimer.scrambler.impl.SkewbScrambler;
-import com.cube.nanotimer.scrambler.impl.Square1Scrambler;
-import com.cube.nanotimer.scrambler.impl.ThreeScrambler;
-import com.cube.nanotimer.scrambler.impl.TwoScrambler;
+import com.cube.nanotimer.scrambler.basic.ClockScrambler;
+import com.cube.nanotimer.scrambler.basic.FiveScrambler;
+import com.cube.nanotimer.scrambler.basic.FourScrambler;
+import com.cube.nanotimer.scrambler.basic.MegaminxScrambler;
+import com.cube.nanotimer.scrambler.basic.PyraminxScrambler;
+import com.cube.nanotimer.scrambler.basic.SevenScrambler;
+import com.cube.nanotimer.scrambler.basic.SixScrambler;
+import com.cube.nanotimer.scrambler.basic.SkewbScrambler;
+import com.cube.nanotimer.scrambler.basic.Square1Scrambler;
+import com.cube.nanotimer.scrambler.basic.ThreeScrambler;
+import com.cube.nanotimer.scrambler.basic.TwoScrambler;
 import com.cube.nanotimer.vo.CubeType;
 
 public class ScramblerFactory {
@@ -22,6 +22,7 @@ public class ScramblerFactory {
         scrambler = new TwoScrambler();
         break;
       case THREE_BY_THREE:
+//        scrambler = new RSThreeScrambler();
         scrambler = new ThreeScrambler();
         break;
       case FOUR_BY_FOUR:

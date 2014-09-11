@@ -1,6 +1,6 @@
-package com.cube.nanotimer.scrambler.impl;
+package com.cube.nanotimer.scrambler.basic;
 
-public class FourScrambler extends AbstractCubeScrambler {
+public class FiveScrambler extends AbstractCubeScrambler {
 
   @Override
   protected String[][] getMoves() {
@@ -13,6 +13,6 @@ public class FourScrambler extends AbstractCubeScrambler {
 
   @Override
   protected int getMoveCount() {
-    return 40;
+    return 60;
   }
 }
