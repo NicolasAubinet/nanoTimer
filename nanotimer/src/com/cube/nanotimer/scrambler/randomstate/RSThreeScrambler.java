@@ -31,6 +31,7 @@ public class RSThreeScrambler implements Scrambler {
     }
 
     // edges
+    // TODO : make sure that edge position is possible (based on corner positions) and that all positions still have equal probabilities
     for (byte i = 1; i < 13; i++) {
       positions.add(i);
     }
