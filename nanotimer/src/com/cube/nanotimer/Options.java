@@ -9,6 +9,7 @@ public enum Options {
 
   public enum InspectionMode { HOLD_AND_RELEASE, AUTOMATIC }
   public enum AdsStyle { BANNER, INTERSTITIAL, MIXED }
+  public enum BigCubesNotation { RUF, RWUWFW }
 
   private Context context;
   private SharedPreferences sharedPreferences;
@@ -17,6 +18,7 @@ public enum Options {
   private static final String INSPECTION_TIME_KEY = "inspection_time";
   private static final String INSPECTION_SOUNDS_KEY = "inspection_sounds";
   private static final String KEEP_TIMER_SCREEN_ON_KEY = "keep_timer_screen_on";
+  private static final String BIG_CUBES_NOTATION_KEY = "big_cubes_notation";
   private static final String ADS_STYLE_KEY = "ads_style";
   private static final String SOLVE_TYPES_SHORTCUT = "solve_types_shortcut";
 
@@ -56,6 +58,18 @@ public enum Options {
   public boolean isKeepTimerScreenOnWhenTimerOff() {
     Boolean defaultValue = context.getResources().getBoolean(R.bool.keep_timer_screen_on);
     return sharedPreferences.getBoolean(KEEP_TIMER_SCREEN_ON_KEY, defaultValue);
+  }
+
+  public BigCubesNotation getBigCubesNotation() {
+    int notation = Integer.parseInt(sharedPreferences.getString(BIG_CUBES_NOTATION_KEY, "-1"));
+    switch (notation) {
+      case 1:
+        return BigCubesNotation.RUF;
+      case 2:
+        return BigCubesNotation.RWUWFW;
+      default:
+        return BigCubesNotation.RUF;
+    }
   }
 
   public AdsStyle getAdsStyle() {

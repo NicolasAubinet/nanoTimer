@@ -52,6 +52,19 @@
 
   </PreferenceCategory>
 
+  <PreferenceCategory
+     android:title="@string/scrambles">
+
+    <ListPreference
+       android:key="big_cubes_notation"
+       android:title="@string/big_cubes_notation"
+       android:summary="@string/big_cubes_notation_summary"
+       android:entries="@array/entries_big_cubes_notation"
+       android:entryValues="@array/entryvalues_big_cubes_notation"
+       android:dialogTitle="@string/big_cubes_notation"
+       android:defaultValue="1"/>
+
+  </PreferenceCategory>
 
   <PreferenceCategory
      android:title="@string/ads">

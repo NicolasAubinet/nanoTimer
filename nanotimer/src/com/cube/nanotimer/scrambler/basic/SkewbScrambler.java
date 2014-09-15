@@ -8,7 +8,7 @@ public class SkewbScrambler implements Scrambler {
 
   private static final int MOVES_COUNT = 20;
 
-  protected String[] moves = { "F", "R", "B", "L" };
+  protected String[] moves = { "U", "R", "B", "L" };
 
   private Random rand = new Random();
 

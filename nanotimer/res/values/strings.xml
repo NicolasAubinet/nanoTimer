@@ -74,6 +74,11 @@
   <string name="yes">Yes</string>
   <string name="no">No</string>
   <string name="choose_cube_type">Choose a cube type:</string>
+  <string name="scrambles">Scrambles</string>
+  <string name="big_cubes_notation">Big cubes notation</string>
+  <string name="big_cubes_notation_summary">Choose the big cubes notation system</string>
+  <string name="r_u_f">r u f</string>
+  <string name="rw_uw_fw">Rw Uw Fw</string>
   <string name="ads">Advertisements</string>
   <string name="ads_style">Advertisements style</string>
   <string name="ads_style_summary">Choose between banner, interstitial or mixed</string>

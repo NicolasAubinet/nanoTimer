@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.Options.AdsStyle;
+import com.cube.nanotimer.Options.BigCubesNotation;
 import com.cube.nanotimer.Options.InspectionMode;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.ads.AdProvider;
@@ -36,6 +37,7 @@ import com.cube.nanotimer.util.ScrambleFormatterService;
 import com.cube.nanotimer.util.Utils;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.CubeType.Type;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
@@ -199,27 +201,46 @@ public class TimerActivity extends Activity {
   }
 
   private Integer getCubeTypeScrambleTextSize() {
-    switch (cubeType.getType()) {
+    Integer size;
+    Type type = cubeType.getType();
+    switch (type) {
       case TWO_BY_TWO:
-        return 24;
+        size = 24;
+        break;
       case PYRAMINX:
       case SKEWB:
-        return 22;
+        size = 22;
+        break;
       case THREE_BY_THREE:
       case FOUR_BY_FOUR:
       case FIVE_BY_FIVE:
       case SQUARE1:
-        return 21;
+        size = 21;
+        break;
       case CLOCK:
-        return 20;
+        size = 20;
+        break;
       case SIX_BY_SIX:
       case MEGAMINX:
-        return 18;
+        size = 18;
+        break;
       case SEVEN_BY_SEVEN:
-        return 16;
+        size = 16;
+        break;
       default:
-        return null;
+        size = null;
+        break;
     }
+    if (Options.INSTANCE.getBigCubesNotation() == BigCubesNotation.RWUWFW &&
+        (type == Type.FOUR_BY_FOUR || type == Type.FIVE_BY_FIVE || type == Type.SIX_BY_SIX || type == Type.SEVEN_BY_SEVEN)) {
+      // adjust size otherwise it is too large, and causes a bug when going from landscape mode to portrait mode
+      if (type == Type.SEVEN_BY_SEVEN) {
+        size -= 2; // because already smaller (in case of steps, to not take too much room)
+      } else {
+        size -= 3;
+      }
+    }
+    return size;
   }
 
   private void setDefaultBannerText() {
