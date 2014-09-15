@@ -14,12 +14,12 @@ public class ThreeSolver {
   // #############  #############  #############
 
   static enum Move {
-    U(new byte[] { 2, 3, 4, 1, 5, 6, 7 }, new byte[] { 0, 0, 0, 0, 0, 0, 0 }, new byte[] { 2, 3, 4, 1, 5, 6, 7, 8, 9, 10, 11 },  new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
-    D(new byte[] { 1, 2, 3, 4, 8, 5, 6 }, new byte[] { 0, 0, 0, 0, 0, 0, 0 }, new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 12, 9, 10 },  new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
-    R(new byte[] { 1, 2, 7, 3, 5, 6, 8 }, new byte[] { 0, 0, 2, 1, 0, 0, 1 }, new byte[] { 1, 5, 3, 4, 10, 2, 7, 8, 9, 6, 11 },  new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
-    L(new byte[] { 5, 1, 3, 4, 5, 2, 7 }, new byte[] { 2, 1, 0, 0, 1, 2, 0 }, new byte[] { 1, 2, 3, 7, 5, 6, 12, 4, 9, 10, 11 }, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
-    F(new byte[] { 1, 6, 2, 4, 5, 7, 3 }, new byte[] { 0, 2, 1, 0, 0, 1, 2 }, new byte[] { 8, 2, 3, 4, 1, 6, 7, 9, 5, 10, 11 },  new byte[] { 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0 }),
-    B(new byte[] { 4, 2, 3, 8, 1, 6, 7 }, new byte[] { 1, 0, 0, 2, 2, 0, 0 }, new byte[] { 1, 2, 6, 4, 5, 11, 3, 8, 9, 10, 7 },  new byte[] { 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1 });
+    U(new byte[] { 2, 3, 4, 1, 5, 6, 7, 8 }, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }, new byte[] { 2, 3, 4, 1, 5, 6, 7, 8, 9, 10, 11, 12 }, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
+    D(new byte[] { 1, 2, 3, 4, 8, 5, 6, 7 }, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }, new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 12, 9, 10, 11 }, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
+    R(new byte[] { 1, 2, 7, 3, 5, 6, 8, 4 }, new byte[] { 0, 0, 2, 1, 0, 0, 1, 2 }, new byte[] { 1, 5, 3, 4, 10, 2, 7, 8, 9, 6, 11, 12 }, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
+    L(new byte[] { 5, 1, 3, 4, 5, 2, 7, 8 }, new byte[] { 2, 1, 0, 0, 1, 2, 0, 0 }, new byte[] { 1, 2, 3, 7, 5, 6, 12, 4, 9, 10, 11, 8 }, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
+    F(new byte[] { 1, 6, 2, 4, 5, 7, 3, 8 }, new byte[] { 0, 2, 1, 0, 0, 1, 2, 0 }, new byte[] { 8, 2, 3, 4, 1, 6, 7, 9, 5, 10, 11, 12 }, new byte[] { 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0 }),
+    B(new byte[] { 4, 2, 3, 8, 1, 6, 7, 5 }, new byte[] { 1, 0, 0, 2, 2, 0, 0, 1 }, new byte[] { 1, 2, 6, 4, 5, 11, 3, 8, 9, 10, 7, 12 }, new byte[] { 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0 });
 
     Move (byte[] corPerm, byte[] corOrient, byte[] edgPerm, byte[] edgOrient) {
       this.corPerm = corPerm;
@@ -57,10 +57,10 @@ public class ThreeSolver {
   private static int[][] transitEdgeOrientation;
 
   static class CubeState {
-    public byte[] cornerPermutations = new byte[7];
-    public byte[] cornerOrientations = new byte[7];
-    public byte[] edgePermutations = new byte[11];
-    public byte[] edgeOrientations = new byte[11];
+    public byte[] cornerPermutations = new byte[8];
+    public byte[] cornerOrientations = new byte[8];
+    public byte[] edgePermutations = new byte[12];
+    public byte[] edgeOrientations = new byte[12];
   }
 
   static {
@@ -104,14 +104,58 @@ public class ThreeSolver {
 
     // Phase 2
     transitCornerPermutation = new int[N_CORNER_PERMUTATIONS][moves.length];
+    for (int i = 0; i < transitCornerPermutation.length; i++) {
+      byte[] state = IndexConvertor.unpackCornerPermutation(i);
+      for (int j = 0; j < moves.length; j++) {
+        transitCornerPermutation[i][j] = IndexConvertor.packCornerPermutation(getPermResult(state, moves[j].corPerm));
+      }
+    }
+
     transitEEdgePermutation = new int[N_E_EDGE_PERMUTATIONS][moves.length];
+    for (int i = 0; i < transitEEdgePermutation.length; i++) {
+      byte[] state = IndexConvertor.unpackEEdgePermutation(i);
+      byte[] edges = new byte[12];
+      for (byte j = 0; j < edges.length; j++) {
+        edges[j] = (j >= 4 && j < 8) ? state[j] : j;
+      }
+
+      for (int j = 0; j < moves.length; j++) {
+        byte[] res = getPermResult(state, moves[j].edgPerm);
+        byte[] eEdges = new byte[4];
+        for (int k = 0; k < eEdges.length; k++) {
+          eEdges[k] = res[k + 4];
+        }
+        transitEEdgePermutation[i][j] = IndexConvertor.packEdgePermutation(eEdges);
+      }
+    }
+
     transitUDEdgePermutation = new int[N_U_D_EDGE_PERMUTATIONS][moves.length];
+    for (int i = 0; i < transitUDEdgePermutation.length; i++) {
+      byte[] state = IndexConvertor.unpackUDEdgePermutation(i);
+      byte[] edges = new byte[12];
+      for (byte j = 0; j < edges.length; j++) {
+        edges[j] = (j >= 4 && j < 8) ? j : state[j];
+      }
+
+      for (int j = 0; j < moves.length; j++) {
+        byte[] res = getPermResult(state, moves[j].edgPerm);
+        byte[] udEdges = new byte[8];
+        for (byte k = 0; k < udEdges.length; k++) {
+          if (k < 4) {
+            udEdges[k] = res[k];
+          } else {
+            udEdges[k] = res[k + 4];
+          }
+        }
+        transitEEdgePermutation[i][j] = IndexConvertor.packEdgePermutation(udEdges);
+      }
+    }
   }
 
   private static byte[] getPermResult(byte[] state, byte[] permIndices) {
     byte[] result = new byte[state.length];
     for (int i = 0; i < result.length; i++) {
-      result[i] = state[permIndices[i]];
+      result[i] = state[permIndices[i] - 1];
     }
     return result;
   }

@@ -21,21 +21,23 @@ public class RSThreeScrambler implements Scrambler {
     Random r = new Random();
     List<Byte> positions = new ArrayList<Byte>();
 
+    // TODO : could use Collections.shuffle instead of remove r.nextInt (see puzzleTimer RubiksCubeRandomScrmabler)
+
     // corners
-    for (byte i = 1; i < 9; i++) {
+    for (byte i = 1; i <= 8; i++) {
       positions.add(i);
     }
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 8; i++) {
       cubeState.cornerPermutations[i] = positions.remove((byte) r.nextInt(positions.size()));
       cubeState.cornerOrientations[i] = (byte) r.nextInt(3);
     }
 
     // edges
     // TODO : make sure that edge position is possible (based on corner positions) and that all positions still have equal probabilities
-    for (byte i = 1; i < 13; i++) {
+    for (byte i = 1; i <= 12; i++) {
       positions.add(i);
     }
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 12; i++) {
       cubeState.edgePermutations[i] = positions.remove((byte) r.nextInt(positions.size()));
       cubeState.edgeOrientations[i] = (byte) r.nextInt(2);
     }

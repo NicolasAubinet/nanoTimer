@@ -32,24 +32,28 @@ public class IndexConvertor {
 
 
   public static byte[] unpackCornerPermutation(int permInd) {
-    return unpackPermutation(permInd, (byte) 7);
+    return unpackPermutation(permInd, (byte) 8);
   }
 
   public static byte[] unpackCornerOrientation(int permInd) {
-    return unpackOrientation(permInd, (byte) 3, (byte) 7);
+    return unpackOrientation(permInd, (byte) 3, (byte) 8);
   }
 
-  public static byte[] unpackEdgePermutation(int permInd) {
-    return unpackPermutation(permInd, (byte) 11);
+  public static byte[] unpackEEdgePermutation(int permInd) {
+    return unpackPermutation(permInd, (byte) 4);
+  }
+
+  public static byte[] unpackUDEdgePermutation(int permInd) {
+    return unpackPermutation(permInd, (byte) 8);
   }
 
   public static byte[] unpackEdgeOrientation(int permInd) {
-    return unpackOrientation(permInd, (byte) 2, (byte) 11);
+    return unpackOrientation(permInd, (byte) 2, (byte) 12);
   }
 
 
   private static int packPermutation(byte[] perm) {
-    int nDifferentValues = perm.length + 1; // +1 because the perm array is missing the last element
+    int nDifferentValues = perm.length;
     int permInd = 0;
     for (int i = 0; i < perm.length; i++) {
       int curInd = perm[i] - 1; // -1 because positions start at 1
@@ -72,7 +76,7 @@ public class IndexConvertor {
   }
 
   private static byte[] unpackPermutation(int permInd, byte length) {
-    int nDifferentValues = length + 1; // +1 because the perm array is missing the last element
+    int nDifferentValues = length;
     byte[] perm = new byte[length];
     // TODO : could maybe merge the loops for improved performance
     for (int i = perm.length - 1; i >= 0; i--) {
