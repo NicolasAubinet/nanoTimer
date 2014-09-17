@@ -9,7 +9,6 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
-import android.text.SpannedString;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -60,7 +59,6 @@ public class TimerActivity extends Activity {
   private TextView tvRA12;
   private ViewGroup layout;
   private TableLayout sessionTimesLayout;
-  private TableLayout averagesLayout;
   private TableLayout timerStepsLayout;
 
   private CubeType cubeType;
@@ -73,6 +71,7 @@ public class TimerActivity extends Activity {
   private int currentOrientation;
   private List<Long> stepsTimes;
   private long stepStartTs;
+  private List<Animation> animations = new ArrayList<Animation>();
 
   private int historyTimesCount;
   private ColorStateList defaultTextColor;
@@ -116,7 +115,6 @@ public class TimerActivity extends Activity {
 
     initViews();
 
-    setKeepScreenOn(keepScreenOnWhenTimerOff);
     resetTimer();
     setDefaultBannerText();
     defaultTextColor = tvRA5.getTextColors();
@@ -147,7 +145,7 @@ public class TimerActivity extends Activity {
     tvRA5 = (TextView) findViewById(R.id.tvRA5);
     tvRA12 = (TextView) findViewById(R.id.tvRA12);
     sessionTimesLayout = (TableLayout) findViewById(R.id.sessionTimesLayout);
-    averagesLayout = (TableLayout) findViewById(R.id.averagesLayout);
+    TableLayout averagesLayout = (TableLayout) findViewById(R.id.averagesLayout);
     timerStepsLayout = (TableLayout) findViewById(R.id.timerStepsLayout);
 
     Integer scrambleTextSize = getCubeTypeScrambleTextSize();
@@ -171,6 +169,7 @@ public class TimerActivity extends Activity {
     }
 
     layout = (ViewGroup) findViewById(R.id.mainLayout);
+    setKeepScreenOn(keepScreenOnWhenTimerOff);
     layout.setOnTouchListener(new OnTouchListener() {
       @Override
       public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -334,7 +333,6 @@ public class TimerActivity extends Activity {
     if (newConfig.orientation != currentOrientation) {
       currentOrientation = newConfig.orientation;
       String timerText = tvTimer.getText().toString();
-      SpannedString scrambleText = (SpannedString) tvScramble.getText();
       String cubeTypeText = tvBanner.getText().toString();
 
       List<String> stepsText = new ArrayList<String>();
@@ -353,7 +351,8 @@ public class TimerActivity extends Activity {
       if (timerState == TimerState.STOPPED) {
         tvTimer.setText(timerText);
       }
-      tvScramble.setText(scrambleText);
+      tvScramble.setText(ScrambleFormatterService.INSTANCE.formatToColoredScramble(currentScramble, cubeType, currentOrientation));
+
       tvBanner.setText(cubeTypeText);
       refreshSessionFields();
       refreshAvgFields(false);
@@ -616,7 +615,7 @@ public class TimerActivity extends Activity {
   private void generateScramble() {
     if (cubeType != null) {
       currentScramble = ScramblerFactory.getScrambler(cubeType).getNewScramble();
-      tvScramble.setText(ScrambleFormatterService.INSTANCE.formatToColoredScramble(currentScramble, cubeType));
+      tvScramble.setText(ScrambleFormatterService.INSTANCE.formatToColoredScramble(currentScramble, cubeType, currentOrientation));
     }
   }
 
@@ -639,6 +638,11 @@ public class TimerActivity extends Activity {
       refreshAvgField(R.id.tvAvgOfFifty, solveAverages.getAvgOf50(), "-");
       refreshAvgField(R.id.tvAvgOfHundred, solveAverages.getAvgOf100(), "-");
       refreshAvgField(R.id.tvLifetimeAvg, solveAverages.getAvgOfLifetime(), getString(R.string.NA));
+
+      for (Animation a : animations) {
+        a.cancel();
+      }
+      animations = new ArrayList<Animation>();
 
       refreshAvgFieldWithRecord(R.id.tvBestOfFive, solveAverages.getBestOf5(),
           (prevSolveAverages != null ? prevSolveAverages.getBestOf5() : null), "-", showNotifications, false);
@@ -724,6 +728,7 @@ public class TimerActivity extends Activity {
         };
         a.setDuration(5000);
         tv.startAnimation(a);
+        animations.add(a);
       } else {
         tv.setTextColor(getResources().getColor(R.color.new_record));
       }

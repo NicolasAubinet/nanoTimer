@@ -13,8 +13,8 @@ public class ClockScrambler implements Scrambler {
   @Override
   public String[] getNewScramble() {
     List<ClockMove> clockMoves = new ArrayList<ClockMove>();
-    List<String> strMoves = new ArrayList<String>();
-    for (int i = 0; i < MOVES_COUNT; ) {
+    String[] moves = new String[MOVES_COUNT];
+    for (int i = 0; i < moves.length; ) {
       ClockMove cm = ClockMove.getRandomMove();
       boolean cancelMove = false;
       for (int j = 0; j < i; j++) {
@@ -26,13 +26,10 @@ public class ClockScrambler implements Scrambler {
         continue;
       }
       clockMoves.add(cm);
-      strMoves.add(cm.toString() + " ");
+      moves[i] = cm.toString();
       i++;
-      if (i % 3 == 0) {
-        strMoves.add("\n");
-      }
     }
-    return strMoves.toArray(new String[0]);
+    return moves;
   }
 
   private static class ClockMove {
