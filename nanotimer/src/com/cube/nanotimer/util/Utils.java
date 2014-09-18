@@ -12,6 +12,7 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.cube.nanotimer.App;
 
@@ -72,6 +73,15 @@ public class Utils {
         }
       }
     };
+  }
+
+  public static AlertDialog showLoadingIndicator(Context context) {
+    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+    ProgressBar pbar = new ProgressBar(context);
+    pbar.setIndeterminate(true);
+    AlertDialog dialog = builder.setView(pbar).create();
+    dialog.show();
+    return dialog;
   }
 
   public static void playSound(int soundId) {
