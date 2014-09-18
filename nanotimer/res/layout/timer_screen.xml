@@ -90,7 +90,7 @@
         <com.cube.nanotimer.util.view.MonospacedTextView
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           android:layout_marginTop="15px"
+           android:layout_marginTop="12px"
            android:text="@string/scrambleC"
            style="@style/ScrambleTextField"/>
         <com.cube.nanotimer.util.view.FontFitTextView
@@ -109,7 +109,6 @@
          android:orientation="vertical"
          android:layout_weight="1"
          android:gravity="top"
-         android:paddingTop="5px"
          android:layout_margin="2px">
         <com.cube.nanotimer.util.view.BorderTableLayout
            android:id="@+id/sessionTimesLayout"
@@ -148,7 +147,7 @@
              android:layout_height="wrap_content"
              android:layout_marginTop="3px"
              android:layout_weight="1">
-            <TableRow android:layout_marginTop="5px">
+            <TableRow android:layout_marginTop="3px">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
@@ -158,10 +157,10 @@
                  android:id="@+id/tvRA5"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:layout_marginLeft="7px"
+                 android:layout_marginLeft="6px"
                  style="@style/SmallTextField"/>
             </TableRow>
-            <TableRow android:layout_marginTop="5px">
+            <TableRow android:layout_marginTop="3px">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
@@ -171,7 +170,7 @@
                  android:id="@+id/tvRA12"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:layout_marginLeft="8px"
+                 android:layout_marginLeft="6px"
                  style="@style/SmallTextField"/>
             </TableRow>
           </TableLayout>
@@ -180,7 +179,7 @@
              android:layout_height="wrap_content"
              android:layout_marginTop="3px"
              android:layout_weight="1">
-            <TableRow android:layout_marginTop="5px">
+            <TableRow android:layout_marginTop="3px">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
@@ -190,10 +189,10 @@
                  android:id="@+id/tvLifetimeBest"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:layout_marginLeft="8px"
+                 android:layout_marginLeft="6px"
                  style="@style/SmallTextField"/>
             </TableRow>
-            <TableRow android:layout_marginTop="5px">
+            <TableRow android:layout_marginTop="3px">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
@@ -203,7 +202,7 @@
                  android:id="@+id/tvLifetimeAvg"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:layout_marginLeft="8px"
+                 android:layout_marginLeft="6px"
                  style="@style/SmallTextField"/>
             </TableRow>
           </TableLayout>
