@@ -6,6 +6,8 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
+import com.cube.nanotimer.Options;
+import com.cube.nanotimer.Options.BigCubesNotation;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.vo.CubeType;
 
@@ -177,11 +179,22 @@ public enum ScrambleFormatterService {
       case SQUARE1:
         movesPerLine = 4;
         break;
-      case FOUR_BY_FOUR:
-        movesPerLine = (orientation == Configuration.ORIENTATION_PORTRAIT) ? 10 : 8;
-        break;
       case CLOCK:
         movesPerLine = (orientation == Configuration.ORIENTATION_PORTRAIT) ? 3 : 2;
+        break;
+      case FOUR_BY_FOUR:
+        if (Options.INSTANCE.getBigCubesNotation() == BigCubesNotation.RUF && orientation == Configuration.ORIENTATION_PORTRAIT) {
+          movesPerLine = 10;
+        } else {
+          movesPerLine = 8;
+        }
+        break;
+      case SIX_BY_SIX:
+        if (Options.INSTANCE.getBigCubesNotation() == BigCubesNotation.RUF) {
+          movesPerLine = 10;
+        } else {
+          movesPerLine = 8;
+        }
         break;
       default:
         movesPerLine = 10;

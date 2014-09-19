@@ -55,6 +55,18 @@ public class ReleaseNotes {
     sb.append("<html><body>");
     sb.append("<font color=\"white\">");
 
+    sb.append("<u><b>v1.0.2</b></u>");
+    sb.append("<ul>");
+    sb.append("<li>Scrambles for Square-1 and Clock</li>");
+    sb.append("<li>Average of 50</li>");
+    sb.append("<li>Shortcut to solve types editing from solve types list</li>");
+    sb.append("<li>Improved scrambles format based on type and orientation</li>");
+    sb.append("<li>Displayed averages in history details</li>");
+    sb.append("<li>Option to choose big cubes notation system</li>");
+    sb.append("<li>Set Skewb and Pyraminx scramble sizes to 15</li>");
+    sb.append("<li>Minor bug fixes and improvements</li>");
+    sb.append("</ul>");
+
     sb.append("<u><b>v1.0.1</b></u>");
     sb.append("<ul>");
     sb.append("<li>Changed session times grid order (the latest time is now in the top-left cell)</li>");

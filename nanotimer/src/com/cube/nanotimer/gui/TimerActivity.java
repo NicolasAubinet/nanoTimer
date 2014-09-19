@@ -230,13 +230,14 @@ public class TimerActivity extends Activity {
         size = null;
         break;
     }
-    if (Options.INSTANCE.getBigCubesNotation() == BigCubesNotation.RWUWFW &&
-        (type == Type.FOUR_BY_FOUR || type == Type.FIVE_BY_FIVE || type == Type.SIX_BY_SIX || type == Type.SEVEN_BY_SEVEN)) {
+    if (Options.INSTANCE.getBigCubesNotation() == BigCubesNotation.RWUWFW) {
       // adjust size otherwise it is too large, and causes a bug when going from landscape mode to portrait mode
-      if (type == Type.SEVEN_BY_SEVEN) {
-        size -= 2; // because already smaller (in case of steps, to not take too much room)
-      } else {
-        size -= 3;
+      switch (type) {
+        case FOUR_BY_FOUR:
+        case FIVE_BY_FIVE:
+        case SIX_BY_SIX:
+        case SEVEN_BY_SEVEN:
+          size -= 2;
       }
     }
     return size;

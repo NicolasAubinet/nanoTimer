@@ -6,7 +6,7 @@
      android:title="@string/clear_history"/>
 
   <item android:id="@+id/itOptions"
-     android:title="@string/options"/>
+     android:title="@string/settings"/>
 
   <item android:id="@+id/itAbout"
      android:title="@string/about"/>

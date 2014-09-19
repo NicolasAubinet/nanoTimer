@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class PyraminxScrambler implements Scrambler {
 
-  private static final int MOVES_COUNT = 20;
+  private static final int MOVES_COUNT = 15;
 
   protected String[] vertexMoves = { "l", "r", "b", "u" };
   protected String[] mainMoves = { "L", "R", "B", "U" };
