@@ -1,11 +1,14 @@
 package com.cube.nanotimer.gui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.media.AudioManager;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
@@ -13,9 +16,11 @@ import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.TableLayout;
@@ -50,7 +55,7 @@ import java.util.TimerTask;
 
 public class TimerActivity extends Activity {
 
-  enum TimerState { STOPPED, RUNNING, INSPECTING }
+  enum TimerState {STOPPED, RUNNING, INSPECTING}
 
   private TextView tvTimer;
   private TextView tvScramble;
@@ -620,11 +625,43 @@ public class TimerActivity extends Activity {
     }
   }
 
+  /**
+   * Enables or disables screen rotation changes.
+   * This is used to fix a problem in the way android handles its views, when the layout is clicked during "Hold and release" inspection.
+   * When the orientation changes, the views are re-created and the layout is no longer considered as clicked.
+   * This is the reason why the orientation should not be allowed to change during orientation.
+   * @param enable enable or disable screen rotations
+   */
   private void enableScreenRotation(boolean enable) {
     if (enable) {
       setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
     } else {
-      setRequestedOrientation(currentOrientation);
+      if (VERSION.SDK_INT < VERSION_CODES.GINGERBREAD) {
+        // API prior to 9 does not allow to set reverse orientations
+        // There's still a bug here if switching from horizontal to vertical, but it's only for 2.2 in this specific case.
+        setRequestedOrientation(currentOrientation);
+      } else {
+        int rotation = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
+        int orientation;
+        switch (rotation) {
+          case Surface.ROTATION_0:
+            orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+            break;
+          case Surface.ROTATION_90:
+            orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+            break;
+          case Surface.ROTATION_180:
+            orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
+            break;
+          case Surface.ROTATION_270:
+            orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
+            break;
+          default:
+            orientation = currentOrientation;
+            break;
+        }
+        setRequestedOrientation(orientation);
+      }
     }
   }
 
