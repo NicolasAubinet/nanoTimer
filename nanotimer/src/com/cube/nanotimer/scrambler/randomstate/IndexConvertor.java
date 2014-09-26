@@ -1,58 +1,8 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class IndexConvertor {
 
-  private static List<Byte> available;
-
-  static {
-    available = new ArrayList<Byte>();
-    for (byte i = 1; i <= 12; i++) {
-      available.add(i);
-    }
-  }
-
-  public static int packCornerPermutation(byte[] perm) {
-    return packPermutation(perm);
-  }
-
-  public static int packCornerOrientation(byte[] perm) {
-    return packOrientation(perm, (byte) 3);
-  }
-
-  public static int packEdgePermutation(byte[] perm) {
-    return packPermutation(perm);
-  }
-
-  public static int packEdgeOrientation(byte[] perm) {
-    return packOrientation(perm, (byte) 2);
-  }
-
-
-  public static byte[] unpackCornerPermutation(int permInd) {
-    return unpackPermutation(permInd, (byte) 8);
-  }
-
-  public static byte[] unpackCornerOrientation(int permInd) {
-    return unpackOrientation(permInd, (byte) 3, (byte) 8);
-  }
-
-  public static byte[] unpackEEdgePermutation(int permInd) {
-    return unpackPermutation(permInd, (byte) 4);
-  }
-
-  public static byte[] unpackUDEdgePermutation(int permInd) {
-    return unpackPermutation(permInd, (byte) 8);
-  }
-
-  public static byte[] unpackEdgeOrientation(int permInd) {
-    return unpackOrientation(permInd, (byte) 2, (byte) 12);
-  }
-
-
-  private static int packPermutation(byte[] perm) {
+  public static int packPermutation(byte[] perm) {
     int nDifferentValues = perm.length;
     int permInd = 0;
     for (int i = 0; i < perm.length; i++) {
@@ -67,36 +17,77 @@ public class IndexConvertor {
     return permInd;
   }
 
-  private static int packOrientation(byte[] orient, byte nDifferentValues) {
+  public static int packOrientation(byte[] orient, int nDifferentValues) {
     int orientInd = 0;
-    for (byte p : orient) {
-      orientInd = orientInd * nDifferentValues + p;
+    for (int i = 0; i < orient.length - 1; i++) {
+      orientInd = orientInd * nDifferentValues + orient[i];
     }
     return orientInd;
   }
 
-  private static byte[] unpackPermutation(int permInd, byte length) {
-    int nDifferentValues = length;
+  public static byte[] unpackPermutation(int permInd, int length) {
     byte[] perm = new byte[length];
-    // TODO : could maybe merge the loops for improved performance
-    for (int i = perm.length - 1; i >= 0; i--) {
-      perm[i] = (byte) (permInd % (nDifferentValues - i));
-      permInd /= (nDifferentValues - i);
-    }
-    List<Byte> avail = new ArrayList<Byte>(available.subList(0, nDifferentValues));
-    for (int i = 0; i < perm.length; i++) {
-      perm[i] = avail.remove(perm[i]);
+    perm[length - 1] = 1;
+    for (int i = perm.length - 2; i >= 0; i--) {
+      perm[i] = (byte) ((permInd % (length - i)) + 1);
+      permInd /= (length - i);
+      for (int j = i + 1; j < length; j++) {
+        if (perm[j] >= perm[i]) {
+          perm[j]++;
+        }
+      }
     }
     return perm;
   }
 
-  private static byte[] unpackOrientation(int orientInd, byte nDifferentValues, byte length) {
+  public static byte[] unpackOrientation(int orientInd, int nDifferentValues, int length) {
     byte[] orient = new byte[length];
-    for (int i = orient.length - 1; i >= 0; i--) {
+    orient[orient.length - 1] = 0;
+    for (int i = orient.length - 2; i >= 0; i--) {
       orient[i] = (byte) (orientInd % nDifferentValues);
       orientInd /= nDifferentValues;
+      orient[orient.length - 1] += orient[i];
     }
+    orient[length - 1] = (byte) ((nDifferentValues - orient[orient.length - 1] % nDifferentValues) % nDifferentValues);
     return orient;
+  }
+
+  // combinations
+  private static int nChooseK(int n, int k) {
+    int value = 1;
+
+    for (int i = 0; i < k; i++) {
+      value *= n - i;
+    }
+
+    for (int i = 0; i < k; i++) {
+      value /= k - i;
+    }
+
+    return value;
+  }
+
+  public static int packCombination(boolean[] combination, int k) {
+    int index = 0;
+    for (int i = combination.length - 1; i >= 0 && k > 0; i--) {
+      if (combination[i]) {
+        index += nChooseK(i, k--);
+      }
+    }
+    return index;
+  }
+
+  public static boolean[] unpackCombination(int index, int k, int length) {
+    boolean[] combination = new boolean[length];
+    for (int i = length - 1; i >= 0 && k >= 0; i--) {
+      int nk = nChooseK(i, k);
+      if (index >= nk) {
+        combination[i] = true;
+        index -= nk;
+        k--;
+      }
+    }
+    return combination;
   }
 
 }
