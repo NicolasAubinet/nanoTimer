@@ -28,35 +28,58 @@ public class ThreeSolverTest extends AndroidTestCase {
     Assert.assertTrue(Arrays.equals(new byte[] { 10, 2, 8, 3, 6, 4, 7, 11, 12, 5, 1, 9 }, state.edgePermutations));
     Assert.assertTrue(Arrays.equals(new byte[] { 2, 2, 2, 0, 2, 0, 0, 1 }, state.cornerOrientations));
     Assert.assertTrue(Arrays.equals(new byte[] { 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0 }, state.edgeOrientations));
+
+    applyMove(state, Move.RP);
+    applyMove(state, Move.UP);
+    applyMove(state, Move.L);
+    applyMove(state, Move.DP);
+    applyMove(state, Move.B2);
+    applyMove(state, Move.F);
+    Assert.assertTrue(Arrays.equals(new byte[] { 7, 2, 6, 4, 8, 3, 1, 5 }, state.cornerPermutations));
+    Assert.assertTrue(Arrays.equals(new byte[] { 11, 9, 5, 10, 7, 6, 3, 8, 4, 1, 2, 12 }, state.edgePermutations));
+    Assert.assertTrue(Arrays.equals(new byte[] { 1, 2, 1, 1, 2, 0, 1, 1 }, state.cornerOrientations));
+    Assert.assertTrue(Arrays.equals(new byte[] { 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0 }, state.edgeOrientations));
+
+    applyMove(state, Move.LP);
+    applyMove(state, Move.U2);
+    applyMove(state, Move.R2);
+    applyMove(state, Move.BP);
+    applyMove(state, Move.FP);
+    applyMove(state, Move.D2);
+    Assert.assertTrue(Arrays.equals(new byte[] { 7, 5, 3, 6, 8, 1, 2, 4 }, state.cornerPermutations));
+    Assert.assertTrue(Arrays.equals(new byte[] { 4, 7, 2, 3, 9, 1, 8, 6, 11, 5, 12, 10 }, state.edgePermutations));
+    Assert.assertTrue(Arrays.equals(new byte[] { 0, 0, 2, 0, 0, 2, 0, 2 }, state.cornerOrientations));
+    Assert.assertTrue(Arrays.equals(new byte[] { 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1 }, state.edgeOrientations));
   }
 
   @SmallTest
   public void testCornerOrientPruning() {
     byte[][] pruningCornerOrientation = ThreeSolver.pruningCornerOrientation;
-    for (int i = 0; i < pruningCornerOrientation.length; i++) {
-      for (int j = 0; j < pruningCornerOrientation[i].length; j++) {
-        Assert.assertTrue(pruningCornerOrientation[i][j] >= 0);
-      }
-    }
+//    for (int i = 0; i < pruningCornerOrientation.length; i++) {
+//      for (int j = 0; j < pruningCornerOrientation[i].length; j++) {
+//        Assert.assertTrue(pruningCornerOrientation[i][j] >= 0);
+//      }
+//    }
     Assert.assertEquals(0, pruningCornerOrientation[0][0]);
     // R
     Assert.assertEquals(1, pruningCornerOrientation
-        [IndexConvertor.packOrientation(new byte[] { 0, 0, 2, 1, 0, 0, 1, 2 }, 8)]
+        [IndexConvertor.packOrientation(new byte[] { 0, 0, 2, 1, 0, 0, 1, 2 }, 3)]
         [IndexConvertor.packCombination(new boolean[] { false, false, true, true, false, true, false, false, false, true, false, false }, 4)]);
     // F
     Assert.assertEquals(1, pruningCornerOrientation
-        [IndexConvertor.packOrientation(new byte[] { 0, 2, 1, 0, 0, 1, 2, 0 }, 8)]
+        [IndexConvertor.packOrientation(new byte[] { 0, 2, 1, 0, 0, 1, 2, 0 }, 3)]
         [IndexConvertor.packCombination(new boolean[] { false, true, true, false, true, false, false, false, true, false, false, false }, 4)]);
+    // U
+    Assert.assertEquals(0, pruningCornerOrientation
+        [IndexConvertor.packOrientation(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }, 3)]
+        [IndexConvertor.packCombination(new boolean[] { true, true, true, true, false, false, false, false, false, false, false, false }, 4)]);
   }
 
   private void applyMove(CubeState state, Move move) {
     state.edgePermutations = ThreeSolver.getPermResult(state.edgePermutations, move.edgPerm);
     state.cornerPermutations = ThreeSolver.getPermResult(state.cornerPermutations, move.corPerm);
-//    state.edgeOrientations = ThreeSolver.getPermResult(state.edgeOrientations, move.edgPerm);
-//    state.cornerOrientations = ThreeSolver.getPermResult(state.cornerOrientations, move.corPerm);
-    // TODO : F and B moves also change the orientation... see how to handle that
-    state.edgeOrientations = ThreeSolver.getOrientResult(state.edgeOrientations, move.edgOrient, 2);
-    state.cornerOrientations = ThreeSolver.getOrientResult(state.cornerOrientations, move.corOrient, 3);
+    state.edgeOrientations = ThreeSolver.getOrientResult(state.edgeOrientations, move.edgPerm, move.edgOrient, 2);
+    state.cornerOrientations = ThreeSolver.getOrientResult(state.cornerOrientations, move.corPerm, move.corOrient, 3);
   }
 
 }

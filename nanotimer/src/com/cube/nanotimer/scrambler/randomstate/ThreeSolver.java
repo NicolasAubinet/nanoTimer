@@ -25,7 +25,7 @@ public class ThreeSolver {
     R ("R",  new byte[] { 1, 2, 7, 3, 5, 6, 8, 4 }, new byte[] { 0, 0, 2, 1, 0, 0, 1, 2 }, new byte[] { 10, 6, 3, 4, 5, 1, 7, 8, 9, 2, 11, 12 }, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
     R2("R2", new byte[] { 1, 2, 8, 7, 5, 6, 4, 3 }, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }, new byte[] { 2, 1, 3, 4, 5, 10, 7, 8, 9, 6, 11, 12 }, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
     RP("R'", new byte[] { 1, 2, 4, 8, 5, 6, 3, 7 }, new byte[] { 0, 0, 2, 1, 0, 0, 1, 2 }, new byte[] { 6, 10, 3, 4, 5, 2, 7, 8, 9, 1, 11, 12 }, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
-    L ("L",  new byte[] { 5, 1, 3, 4, 5, 2, 7, 8 }, new byte[] { 2, 1, 0, 0, 1, 2, 0, 0 }, new byte[] { 1, 2, 12, 8, 5, 6, 7, 3, 9, 10, 11, 4 }, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
+    L ("L",  new byte[] { 5, 1, 3, 4, 6, 2, 7, 8 }, new byte[] { 2, 1, 0, 0, 1, 2, 0, 0 }, new byte[] { 1, 2, 12, 8, 5, 6, 7, 3, 9, 10, 11, 4 }, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
     L2("L2", new byte[] { 6, 5, 3, 4, 2, 1, 7, 8 }, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }, new byte[] { 1, 2, 4, 3, 5, 6, 7, 12, 9, 10, 11, 8 }, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
     LP("L'", new byte[] { 2, 6, 3, 4, 1, 5, 7, 8 }, new byte[] { 2, 1, 0, 0, 1, 2, 0, 0 }, new byte[] { 1, 2, 8, 12, 5, 6, 7, 4, 9, 10, 11, 3 }, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
     F ("F",  new byte[] { 1, 6, 2, 4, 5, 7, 3, 8 }, new byte[] { 0, 2, 1, 0, 0, 1, 2, 0 }, new byte[] { 5, 2, 3, 9, 4, 6, 7, 8, 1, 10, 11, 12 }, new byte[] { 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0 }),
@@ -83,6 +83,9 @@ public class ThreeSolver {
   private static byte[][] pruningCornerPermutation;
   private static byte[][] pruningUDEdgePermutation;
 
+  // TODO : remove following variables (test):
+  static int maxDistance = 0;
+  static int totVisited = 0;
   static {
     long ts = System.currentTimeMillis();
     moves1 = new Move[] {
@@ -111,7 +114,7 @@ public class ThreeSolver {
     for (int i = 0; i < transitCornerOrientation.length; i++) {
       byte[] state = IndexConvertor.unpackOrientation(i, 3, 8);
       for (int j = 0; j < moves1.length; j++) {
-        transitCornerOrientation[i][j] = IndexConvertor.packOrientation(getOrientResult(state, moves1[j].corOrient, 3), 3);
+        transitCornerOrientation[i][j] = IndexConvertor.packOrientation(getOrientResult(state, moves1[j].corPerm, moves1[j].corOrient, 3), 3);
       }
     }
 
@@ -119,7 +122,7 @@ public class ThreeSolver {
     for (int i = 0; i < transitEdgeOrientation.length; i++) {
       byte[] state = IndexConvertor.unpackOrientation(i, 2, 12);
       for (int j = 0; j < moves1.length; j++) {
-        transitEdgeOrientation[i][j] = IndexConvertor.packOrientation(getOrientResult(state, moves1[j].edgOrient, 2), 2);
+        transitEdgeOrientation[i][j] = IndexConvertor.packOrientation(getOrientResult(state, moves1[j].edgPerm, moves1[j].edgOrient, 2), 2);
       }
     }
 
@@ -178,8 +181,8 @@ public class ThreeSolver {
     // ##################
 
     // --> Phase 1
-    int distance = 0;
-    int visited = 1;
+//    int distance = 0;
+//    int visited = 1;
     pruningCornerOrientation = new byte[N_CORNER_ORIENTATIONS][N_E_EDGE_COMBINATIONS];
     for (int i = 0; i < N_CORNER_ORIENTATIONS; i++) {
       for (int j = 0; j < N_E_EDGE_COMBINATIONS; j++) {
@@ -187,6 +190,10 @@ public class ThreeSolver {
       }
     }
     pruningCornerOrientation[0][0] = 0;
+    long tsPrun = System.currentTimeMillis();
+    genPruningCornerOrientation(0, 0, -1, 0);
+    Log.i("[NanoTimer]", "tot visited: " + totVisited + ". pruning time: " + (System.currentTimeMillis() - tsPrun));
+    // TODO : try recursive method again. if goes too deep, could limit distance and check if everything is filled in after
     /*while (visited < N_CORNER_ORIENTATIONS * N_E_EDGE_COMBINATIONS) {
       for (int i = 0; i < N_CORNER_ORIENTATIONS; i++) {
         for (int j = 0; j < N_E_EDGE_COMBINATIONS; j++) {
@@ -213,16 +220,28 @@ public class ThreeSolver {
     Log.i("[NanoTimerPerf]", "time to generate static stuff: " + (System.currentTimeMillis() - ts));
   }
 
-  /*private static void genPruningCornerOrientation(int corInd, int edgInd, int distance) {
+  private static void genPruningCornerOrientation(int corInd, int edgInd, int lastMoveInd, int distance) {
+    if (distance > maxDistance) {
+      maxDistance = distance;
+      Log.i("[NanoTimer]", "new max distance: " + maxDistance);
+    }
+    // TODO : test fails when condition is (distance > 11) ?
+    if (distance > 12) {
+      return;
+    }
     for (int i = 0; i < moves1.length; i++) {
+      if (i / 3 == lastMoveInd / 3) {
+        continue;
+      }
       int orientRes = transitCornerOrientation[corInd][i];
       int edgComb = transitEEdgeCombination[edgInd][i];
       if (pruningCornerOrientation[orientRes][edgComb] < 0) {
         pruningCornerOrientation[orientRes][edgComb] = (byte) (distance + 1);
-        genPruningCornerOrientation(orientRes, edgComb, distance + 1);
+        genPruningCornerOrientation(orientRes, edgComb, i, distance + 1);
+        totVisited++;
       }
     }
-  }*/
+  }
 
   static byte[] getPermResult(byte[] state, byte[] permIndices) {
     byte[] result = new byte[state.length];
@@ -240,10 +259,10 @@ public class ThreeSolver {
     return result;
   }
 
-  static byte[] getOrientResult(byte[] state, byte[] orientIndices, int nDifferentValues) {
+  static byte[] getOrientResult(byte[] state, byte[] permIndices, byte[] orientIndices, int nDifferentValues) {
     byte[] result = new byte[state.length];
     for (int i = 0; i < state.length; i++) {
-      result[i] = (byte) ((state[i] + orientIndices[i]) % nDifferentValues);
+      result[i] = (byte) ((state[permIndices[i] - 1] + orientIndices[i]) % nDifferentValues);
     }
     return result;
   }
