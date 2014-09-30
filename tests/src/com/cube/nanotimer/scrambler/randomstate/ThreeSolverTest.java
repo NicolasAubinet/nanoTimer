@@ -54,25 +54,27 @@ public class ThreeSolverTest extends AndroidTestCase {
 
   @SmallTest
   public void testCornerOrientPruning() {
-    byte[][] pruningCornerOrientation = ThreeSolver.pruningCornerOrientation;
+    ThreeSolver.initTables();
+//    byte[][] pruningCornerOrientation = ThreeSolver.pruningCornerOrientation;
+    byte[] pruningCornerOrientation = ThreeSolver.pruningCornerOrientation;
 //    for (int i = 0; i < pruningCornerOrientation.length; i++) {
 //      for (int j = 0; j < pruningCornerOrientation[i].length; j++) {
 //        Assert.assertTrue(pruningCornerOrientation[i][j] >= 0);
 //      }
 //    }
-    Assert.assertEquals(0, pruningCornerOrientation[0][0]);
+    Assert.assertEquals(0, pruningCornerOrientation[0]);
     // R
     Assert.assertEquals(1, pruningCornerOrientation
-        [IndexConvertor.packOrientation(new byte[] { 0, 0, 2, 1, 0, 0, 1, 2 }, 3)]
-        [IndexConvertor.packCombination(new boolean[] { false, false, true, true, false, true, false, false, false, true, false, false }, 4)]);
+        [IndexConvertor.packOrientation(new byte[] { 0, 0, 2, 1, 0, 0, 1, 2 }, 3)]);
+//        [IndexConvertor.packCombination(new boolean[] { false, false, true, true, false, true, false, false, false, true, false, false }, 4)]);
     // F
     Assert.assertEquals(1, pruningCornerOrientation
-        [IndexConvertor.packOrientation(new byte[] { 0, 2, 1, 0, 0, 1, 2, 0 }, 3)]
-        [IndexConvertor.packCombination(new boolean[] { false, true, true, false, true, false, false, false, true, false, false, false }, 4)]);
+        [IndexConvertor.packOrientation(new byte[] { 0, 2, 1, 0, 0, 1, 2, 0 }, 3)]);
+//        [IndexConvertor.packCombination(new boolean[] { false, true, true, false, true, false, false, false, true, false, false, false }, 4)]);
     // U
     Assert.assertEquals(0, pruningCornerOrientation
-        [IndexConvertor.packOrientation(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }, 3)]
-        [IndexConvertor.packCombination(new boolean[] { true, true, true, true, false, false, false, false, false, false, false, false }, 4)]);
+        [IndexConvertor.packOrientation(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }, 3)]);
+//        [IndexConvertor.packCombination(new boolean[] { true, true, true, true, false, false, false, false, false, false, false, false }, 4)]);
   }
 
   private void applyMove(CubeState state, Move move) {

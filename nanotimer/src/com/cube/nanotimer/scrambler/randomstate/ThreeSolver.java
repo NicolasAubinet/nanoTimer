@@ -2,6 +2,10 @@ package com.cube.nanotimer.scrambler.randomstate;
 
 import android.util.Log;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class ThreeSolver {
 
   // Cubies numbering:
@@ -78,15 +82,21 @@ public class ThreeSolver {
   private static int[][] transitEdgeOrientation;
 
   // Pruning tables
-  static byte[][] pruningCornerOrientation; // TODO : put back to private (used for unit test)
+//  static byte[][] pruningCornerOrientation; // TODO : put back to private (used for unit test)
+  static byte[] pruningCornerOrientation; // TODO : put back to private (used for unit test)
   private static byte[][] pruningEdgeOrientation;
   private static byte[][] pruningCornerPermutation;
   private static byte[][] pruningUDEdgePermutation;
 
   // TODO : remove following variables (test):
   static int maxDistance = 0;
-  static int totVisited = 0;
-  static {
+  static int nSmallest = 0;
+  static int maxListSize = 0;
+  static int[] distCounts;
+  public static void initTables() {
+    if (moves1 != null) {
+      return;
+    }
     long ts = System.currentTimeMillis();
     moves1 = new Move[] {
         Move.U, Move.U2, Move.UP,
@@ -183,34 +193,63 @@ public class ThreeSolver {
     // --> Phase 1
 //    int distance = 0;
 //    int visited = 1;
-    pruningCornerOrientation = new byte[N_CORNER_ORIENTATIONS][N_E_EDGE_COMBINATIONS];
-    for (int i = 0; i < N_CORNER_ORIENTATIONS; i++) {
-      for (int j = 0; j < N_E_EDGE_COMBINATIONS; j++) {
-        pruningCornerOrientation[i][j] = -1;
-      }
-    }
-    pruningCornerOrientation[0][0] = 0;
+//    distCounts = new int[13];
+//    Arrays.fill(distCounts, 0);
+    // TODO : couldn't have two separate arrays?
+//    pruningCornerOrientation = new byte[N_CORNER_ORIENTATIONS][N_E_EDGE_COMBINATIONS];
+    pruningCornerOrientation = new byte[N_CORNER_ORIENTATIONS];
+//    for (int i = 0; i < N_CORNER_ORIENTATIONS; i++) {
+//      for (int j = 0; j < N_E_EDGE_COMBINATIONS; j++) {
+//        pruningCornerOrientation[i][j] = -1;
+//      }
+//    }
+    Arrays.fill(pruningCornerOrientation, (byte) -1);
+//    pruningCornerOrientation[0][0] = 0;
+//    pruningCornerOrientation[0] = 0;
     long tsPrun = System.currentTimeMillis();
-    genPruningCornerOrientation(0, 0, -1, 0);
-    Log.i("[NanoTimer]", "tot visited: " + totVisited + ". pruning time: " + (System.currentTimeMillis() - tsPrun));
-    // TODO : try recursive method again. if goes too deep, could limit distance and check if everything is filled in after
-    /*while (visited < N_CORNER_ORIENTATIONS * N_E_EDGE_COMBINATIONS) {
-      for (int i = 0; i < N_CORNER_ORIENTATIONS; i++) {
-        for (int j = 0; j < N_E_EDGE_COMBINATIONS; j++) {
-          if (pruningCornerOrientation[i][j] == distance) {
-            for (int k = 0; k < moves1.length; k++) {
-              int orientRes = transitCornerOrientation[i][k];
-              int edgComb = transitEEdgeCombination[j][k];
-              if (pruningCornerOrientation[orientRes][edgComb] < 0) {
-                pruningCornerOrientation[orientRes][edgComb] = (byte) (distance + 1);
-                visited++;
-              }
-            }
-          }
-        }
-      }
-      distance++;
-    }*/
+//    genPruningCornerOrientation(0, 0, -1, 1);
+//    try {
+//      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//      ObjectOutputStream oos = new ObjectOutputStream(baos);
+//      oos.writeObject(new PruningState(1, 1, (short) 1));
+//      oos.close();
+//      Log.i("[NanoTimer]", "pruningstate size: " + baos.size());
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    }
+//    Log.i("[NanoTimer]", "total memory: " + Runtime.getRuntime().totalMemory() + " free: " + Runtime.getRuntime().freeMemory());
+    genPruningCornerOrientation();
+    Log.i("[NanoTimer]", "nSmallest: " + nSmallest + " maxListSize: " + maxListSize);
+    Log.i("[NanoTimer]", "pruning time: " + (System.currentTimeMillis() - tsPrun));
+//    while (visited < N_CORNER_ORIENTATIONS * N_E_EDGE_COMBINATIONS && distance < 12) {
+//      for (int i = 0; i < N_CORNER_ORIENTATIONS; i++) {
+//        for (int j = 0; j < N_E_EDGE_COMBINATIONS; j++) {
+//          if (pruningCornerOrientation[i][j] == distance) {
+//            for (int k = 0; k < moves1.length; k++) {
+//              int orientRes = transitCornerOrientation[i][k];
+//              int edgComb = transitEEdgeCombination[j][k];
+//              if (pruningCornerOrientation[orientRes][edgComb] < 0) {
+//                pruningCornerOrientation[orientRes][edgComb] = (byte) (distance + 1);
+//                visited++;
+//              }
+//            }
+//          }
+//        }
+//      }
+//      distance++;
+//    }
+//    Log.i("[NanoTimer]", "distance: " + distance);
+//    Log.i("[NanoTimer]", "visited: " + visited + ". pruning time: " + (System.currentTimeMillis() - tsPrun) + " distCounts: " + Arrays.toString(distCounts));
+
+//    for (int i = 0; i < N_CORNER_ORIENTATIONS; i++) {
+//      for (int j = 0; j < N_E_EDGE_COMBINATIONS; j++) {
+//        int d = pruningCornerOrientation[i][j];
+//        if (d >= 0) {
+//          distCounts[d]++;
+//        }
+//      }
+//    }
+//    Log.i("[NanoTimer]", "distCounts: " + Arrays.toString(distCounts));
 
     pruningEdgeOrientation = new byte[N_EDGE_ORIENTATIONS][N_E_EDGE_COMBINATIONS];
 
@@ -220,25 +259,53 @@ public class ThreeSolver {
     Log.i("[NanoTimerPerf]", "time to generate static stuff: " + (System.currentTimeMillis() - ts));
   }
 
-  private static void genPruningCornerOrientation(int corInd, int edgInd, int lastMoveInd, int distance) {
-    if (distance > maxDistance) {
-      maxDistance = distance;
-      Log.i("[NanoTimer]", "new max distance: " + maxDistance);
-    }
-    // TODO : test fails when condition is (distance > 11) ?
-    if (distance > 12) {
-      return;
-    }
+  /*private static void genPruningCornerOrientation(int corInd, int edgInd, int lastMoveInd, int distance) {
     for (int i = 0; i < moves1.length; i++) {
       if (i / 3 == lastMoveInd / 3) {
         continue;
       }
       int orientRes = transitCornerOrientation[corInd][i];
       int edgComb = transitEEdgeCombination[edgInd][i];
-      if (pruningCornerOrientation[orientRes][edgComb] < 0) {
-        pruningCornerOrientation[orientRes][edgComb] = (byte) (distance + 1);
-        genPruningCornerOrientation(orientRes, edgComb, i, distance + 1);
-        totVisited++;
+      if (pruningCornerOrientation[orientRes][edgComb] < 0 || distance < pruningCornerOrientation[orientRes][edgComb]) {
+//        if (distance < pruningCornerOrientation[orientRes][edgComb]) {
+//          nSmallest++;
+//        }
+        pruningCornerOrientation[orientRes][edgComb] = (byte) distance;
+        if (distance < 12) {
+          genPruningCornerOrientation(orientRes, edgComb, i, distance + 1);
+        }
+      }
+    }
+  }
+
+  private static void genPruningCornerOrientation() {
+    Queue<PruningState> corList = new LinkedList<PruningState>();
+    corList.add(new PruningState(0, 0, (short) 1));
+    // TODO : check memory usage. list size can reach 593789. Up to 50Mb??
+    while (!corList.isEmpty()) {
+      PruningState prunState = corList.remove();
+      for (int i = 0; i < moves1.length; i++) {
+        int orientRes = transitCornerOrientation[prunState.ind1][i];
+        int edgComb = transitEEdgeCombination[prunState.ind2][i];
+        if (pruningCornerOrientation[orientRes][edgComb] < 0) {
+          pruningCornerOrientation[orientRes][edgComb] = (byte) prunState.distance;
+          corList.add(new PruningState(orientRes, edgComb, (short) (prunState.distance + 1)));
+        }
+      }
+    }
+  }*/
+
+  private static void genPruningCornerOrientation() {
+    Queue<PruningState> corList = new LinkedList<PruningState>();
+    corList.add(new PruningState(0, (short) 1));
+    while (!corList.isEmpty()) {
+      PruningState prunState = corList.remove();
+      for (int i = 0; i < moves1.length; i++) {
+        int orientRes = transitCornerOrientation[prunState.ind][i];
+        if (pruningCornerOrientation[orientRes] < 0) {
+          pruningCornerOrientation[orientRes] = (byte) prunState.distance;
+          corList.add(new PruningState(orientRes, (short) (prunState.distance + 1)));
+        }
       }
     }
   }
@@ -269,6 +336,24 @@ public class ThreeSolver {
 
   public String[] getSolution(CubeState cubeState) {
     return null;
+  }
+
+  static class PruningState {
+    int ind;
+//    int ind1;
+//    int ind2;
+    short distance;
+
+    PruningState(int ind, short distance) {
+      this.ind = ind;
+      this.distance = distance;
+    }
+
+//    PruningState(int ind1, int ind2, short distance) {
+//      this.ind1 = ind1;
+//      this.ind2 = ind2;
+//      this.distance = distance;
+//    }
   }
 
 }
