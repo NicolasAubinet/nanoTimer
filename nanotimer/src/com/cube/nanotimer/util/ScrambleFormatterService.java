@@ -66,8 +66,8 @@ public enum ScrambleFormatterService {
   private Spannable colorFormattedScramble(String scramble, CubeType cubeType) {
     Spannable span = new SpannableString(scramble);
     final char delimiter = getScrambleDelimiter(cubeType);
-    int defaultColor = getDefaultTextColor();
-    int alternateColor = App.INSTANCE.getContext().getResources().getColor(R.color.scramblealternate);
+    int defaultColor = App.INSTANCE.getContext().getResources().getColor(R.color.white);
+    int alternateColor = App.INSTANCE.getContext().getResources().getColor(R.color.lightblue);
     int prevLinesCharCount = 0;
     String[] lines = scramble.split("\n");
 

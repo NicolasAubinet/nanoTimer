@@ -488,7 +488,7 @@ public class TimerActivity extends Activity {
     setKeepScreenOn(true);
     resetTimerText();
     timerState = TimerState.INSPECTING;
-    layout.setBackgroundResource(R.color.nightblue);
+    layout.setBackgroundResource(R.color.lightgraybg);
     tvBanner.setText(getString(R.string.inspection));
     timer = new Timer();
     TimerTask timerTask = new TimerTask() {
@@ -508,7 +508,7 @@ public class TimerActivity extends Activity {
       timer.cancel();
       timer.purge();
     }
-    layout.setBackgroundResource(R.color.black);
+    layout.setBackgroundResource(R.color.graybg);
     setDefaultBannerText();
     timerState = TimerState.STOPPED;
     enableScreenRotation(true);

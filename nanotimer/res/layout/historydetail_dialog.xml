@@ -115,16 +115,16 @@
            custom:borderSize="2"
            custom:borderColor="@color/neon">
           <TableRow android:layout_margin="2px">
-            <TextView style="@style/SessionTimeTextField" android:text="5" android:background="@color/darkblue"/>
-            <TextView style="@style/SessionTimeTextField" android:text="12" android:background="@color/darkblue"/>
-            <TextView style="@style/SessionTimeTextField" android:text="50" android:background="@color/darkblue"/>
-            <TextView style="@style/SessionTimeTextField" android:text="100" android:background="@color/darkblue"/>
+            <TextView style="@style/TableCell" android:text="5" android:background="@color/darkblue"/>
+            <TextView style="@style/TableCell" android:text="12" android:background="@color/darkblue"/>
+            <TextView style="@style/TableCell" android:text="50" android:background="@color/darkblue"/>
+            <TextView style="@style/TableCell" android:text="100" android:background="@color/darkblue"/>
           </TableRow>
           <TableRow android:layout_margin="2px">
-            <TextView android:id="@+id/tvAvgOfFive" style="@style/SessionTimeTextField"/>
-            <TextView android:id="@+id/tvAvgOfTwelve" style="@style/SessionTimeTextField"/>
-            <TextView android:id="@+id/tvAvgOfFifty" style="@style/SessionTimeTextField"/>
-            <TextView android:id="@+id/tvAvgOfHundred" style="@style/SessionTimeTextField"/>
+            <TextView android:id="@+id/tvAvgOfFive" style="@style/TableCell"/>
+            <TextView android:id="@+id/tvAvgOfTwelve" style="@style/TableCell"/>
+            <TextView android:id="@+id/tvAvgOfFifty" style="@style/TableCell"/>
+            <TextView android:id="@+id/tvAvgOfHundred" style="@style/TableCell"/>
           </TableRow>
         </com.cube.nanotimer.util.view.BorderTableLayout>
 

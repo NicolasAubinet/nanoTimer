@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="64px"
+   height="64px"
+   id="svg4894"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="avg_graph.svg">
+  <defs
+     id="defs4896" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="15.556349"
+     inkscape:cx="26.40919"
+     inkscape:cy="29.493685"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:document-units="px"
+     inkscape:grid-bbox="true"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="1920"
+     inkscape:window-height="1080"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0">
+    <sodipodi:guide
+       orientation="0,1"
+       position="35.676751,3.985511"
+       id="guide5418" />
+    <sodipodi:guide
+       orientation="1,0"
+       position="3.7283812,17.709811"
+       id="guide5420" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="-1.2213663,57.982756"
+       id="guide5422" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="17.741952,54.061528"
+       id="guide5424" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="34.969644,16.006326"
+       id="guide5426" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="-11.699403,28.027142"
+       id="guide5428" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="21.020356,40.047957"
+       id="guide5430" />
+    <sodipodi:guide
+       orientation="1,0"
+       position="59.075557,24.81302"
+       id="guide5435" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata4899">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer">
+    <rect
+       style="fill:#212121;fill-opacity:1;stroke:none"
+       id="rect4902"
+       width="64.090912"
+       height="58.059711"
+       x="-0.090909094"
+       y="6.0311952"
+       inkscape:export-filename="/home/nico/documents/progra/java/android/nanoTimer/other_files/images/avg_graph.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:none"
+       id="rect5437"
+       width="55.148323"
+       height="1"
+       x="3.9272332"
+       y="23.402021"
+       inkscape:export-filename="/home/nico/documents/progra/java/android/nanoTimer/other_files/images/avg_graph.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       y="35.487118"
+       x="3.7283812"
+       height="1"
+       width="55.148323"
+       id="rect5439"
+       style="fill:#ffffff;fill-opacity:1;stroke:none"
+       inkscape:export-filename="/home/nico/documents/progra/java/android/nanoTimer/other_files/images/avg_graph.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:none"
+       id="rect5441"
+       width="55.148323"
+       height="1"
+       x="3.7625239"
+       y="47.475792"
+       inkscape:export-filename="/home/nico/documents/progra/java/android/nanoTimer/other_files/images/avg_graph.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       y="9.4527321"
+       x="3.8609493"
+       height="1"
+       width="55.148323"
+       id="rect5443"
+       style="fill:#ffffff;fill-opacity:1;stroke:none"
+       inkscape:export-filename="/home/nico/documents/progra/java/android/nanoTimer/other_files/images/avg_graph.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 5.5925718,49.665017 c 0,0 6.1503302,0.58009 9.5138002,-9.128106 2.828427,-8.163869 4.049794,-9.706647 6.235396,-11.377991 2.58866,-1.979565 4.984555,-2.336699 10.349472,3.021274 2.006074,2.003477 4.287881,5.662661 7.778175,8.67813 2.543288,2.197295 5.612528,1.623789 7.713892,0.321412 2.158239,-1.337627 5.978267,-8.613846 10.092342,-19.927555"
+       id="path5445"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="csssssc"
+       inkscape:export-filename="/home/nico/documents/progra/java/android/nanoTimer/other_files/images/avg_graph.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/nico/documents/progra/java/android/nanoTimer/other_files/images/avg_graph.png"
+       y="59.56089"
+       x="3.9553711"
+       height="1"
+       width="55.148323"
+       id="rect5466"
+       style="fill:#ffffff;fill-opacity:1;stroke:none" />
+  </g>
+</svg>
