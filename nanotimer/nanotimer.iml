@@ -37,6 +37,16 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="android-support-v4" level="project" />
+    <orderEntry type="module" module-name="android-support-v7-appcompat" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/adt/sdk/extras/android/support/v7/appcompat/libs/android-support-v7-appcompat.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 

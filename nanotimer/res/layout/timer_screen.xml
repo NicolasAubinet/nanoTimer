@@ -12,32 +12,9 @@
      android:background="@color/graybg">
 
     <LinearLayout
-       android:id="@+id/topLayout"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:orientation="vertical">
-      <TextView
-         android:id="@+id/tvBanner"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:padding="2px"
-         android:textSize="36px"
-         android:layout_gravity="center"
-         android:background="@color/gray850"
-         android:textColor="@color/white"
-         android:gravity="center"
-         android:singleLine="true"/>
-      <LinearLayout
-         android:layout_width="match_parent"
-         android:layout_height="3px"
-         android:background="@color/iceblue"/>
-    </LinearLayout>
-
-    <LinearLayout
        android:id="@+id/centerLayout"
        android:layout_width="match_parent"
        android:layout_height="match_parent"
-       android:layout_below="@+id/topLayout"
        android:layout_above="@+id/averagesLayout"
        android:orientation="vertical">
       <LinearLayout
@@ -116,7 +93,6 @@
          android:layout_margin="2px">
 
         <TextView style="@style/DividerRow"
-           android:layout_marginBottom="1px"
            android:layout_marginLeft="3px"
            android:layout_marginRight="1px"/>
 
@@ -147,8 +123,7 @@
         </TableLayout>
 
         <TextView style="@style/DividerRow"
-           android:layout_margin="2px"
-           android:layout_marginLeft="3px"/>
+           android:layout_margin="2px"/>
 
         <LinearLayout
            android:layout_width="match_parent"

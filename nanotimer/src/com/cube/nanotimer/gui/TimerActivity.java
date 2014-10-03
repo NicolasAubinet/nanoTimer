@@ -1,6 +1,5 @@
 package com.cube.nanotimer.gui;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
@@ -11,8 +10,11 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -23,6 +25,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -53,16 +56,16 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class TimerActivity extends Activity {
+public class TimerActivity extends ActionBarActivity {
 
   enum TimerState {STOPPED, RUNNING, INSPECTING}
 
   private TextView tvTimer;
   private TextView tvScramble;
-  private TextView tvBanner;
   private TextView tvRA5;
   private TextView tvRA12;
   private ViewGroup layout;
+  private LinearLayout actionBarLayout;
   private TableLayout sessionTimesLayout;
   private TableLayout timerStepsLayout;
 
@@ -113,6 +116,9 @@ public class TimerActivity extends Activity {
     cubeSession = new CubeSession();
     App.INSTANCE.getService().getSolveAverages(solveType, new SolveAverageCallback());
 
+    getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+    getSupportActionBar().setCustomView(R.layout.textcentered_actionbar);
+
     inspectionTime = Options.INSTANCE.getInspectionTime();
     inspectionMode = Options.INSTANCE.getInspectionMode();
     soundsEnabled = Options.INSTANCE.isInspectionSoundsEnabled();
@@ -146,7 +152,6 @@ public class TimerActivity extends Activity {
   private void initViews() {
     tvTimer = (TextView) findViewById(R.id.tvTimer);
     tvScramble = (TextView) findViewById(R.id.tvScramble);
-    tvBanner = (TextView) findViewById(R.id.tvBanner);
     tvRA5 = (TextView) findViewById(R.id.tvRA5);
     tvRA12 = (TextView) findViewById(R.id.tvRA12);
     sessionTimesLayout = (TableLayout) findViewById(R.id.sessionTimesLayout);
@@ -173,35 +178,12 @@ public class TimerActivity extends Activity {
       findViewById(R.id.trAvgOfLife).setVisibility(View.GONE);
     }
 
+    actionBarLayout = (LinearLayout) findViewById(R.id.actionbarLayout);
+    actionBarLayout.setOnTouchListener(layoutTouchListener);
+
     layout = (ViewGroup) findViewById(R.id.mainLayout);
     setKeepScreenOn(keepScreenOnWhenTimerOff);
-    layout.setOnTouchListener(new OnTouchListener() {
-      @Override
-      public boolean onTouch(View view, MotionEvent motionEvent) {
-        if (timerState == TimerState.RUNNING && motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-          if (solveType.hasSteps()) {
-            nextSolveStep();
-            if (stepsTimes.size() == solveType.getSteps().length) {
-              stopTimer(true);
-            }
-          } else {
-            stopTimer(true);
-          }
-          return false;
-        } else if (timerState == TimerState.STOPPED && motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-          startInspectionTimer();
-        } else if (timerState == TimerState.INSPECTING && motionEvent.getAction() == MotionEvent.ACTION_UP
-            && inspectionMode == InspectionMode.HOLD_AND_RELEASE) {
-          stopInspectionTimer();
-          startTimer();
-        } else if (timerState == TimerState.INSPECTING && motionEvent.getAction() == MotionEvent.ACTION_DOWN
-            && inspectionMode == InspectionMode.AUTOMATIC) {
-          stopInspectionTimer();
-          startTimer();
-        }
-        return true;
-      }
-    });
+    layout.setOnTouchListener(layoutTouchListener);
   }
 
   private Integer getCubeTypeScrambleTextSize() {
@@ -254,7 +236,20 @@ public class TimerActivity extends Activity {
     if (!solveType.getName().equals(getString(R.string.def))) {
       sb.append(" (").append(solveType.getName()).append(")");
     }
-    tvBanner.setText(sb.toString());
+    setTitle(sb.toString());
+  }
+
+  public void setTitle(String s) {
+    ((TextView) findViewById(R.id.tvTitle)).setText(s);
+  }
+
+  public void setTitle(int res) {
+    ((TextView) findViewById(R.id.tvTitle)).setText(res);
+  }
+
+  @Override
+  public void setTitleColor(int textColor) {
+    ((TextView) findViewById(R.id.tvTitle)).setTextColor(textColor);
   }
 
   @Override
@@ -286,6 +281,22 @@ public class TimerActivity extends Activity {
     }
     return true;
   }
+
+  /*private void showMenu() {
+    PopupMenu popupMenu = new PopupMenu(TimerActivity.this, buMenu);
+    popupMenu.getMenuInflater().inflate(R.menu.timer_menu, popupMenu.getMenu());
+    if (solveType.hasSteps()) {
+      popupMenu.getMenu().findItem(R.id.itNewSession).setVisible(false);
+    }
+
+    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+      public boolean onMenuItemClick(MenuItem item) {
+        menuItemSelected(item);
+        return true;
+      }
+    });
+    popupMenu.show();
+  }*/
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
@@ -339,7 +350,6 @@ public class TimerActivity extends Activity {
     if (newConfig.orientation != currentOrientation) {
       currentOrientation = newConfig.orientation;
       String timerText = tvTimer.getText().toString();
-      String cubeTypeText = tvBanner.getText().toString();
 
       List<String> stepsText = new ArrayList<String>();
       if (solveType.hasSteps()) {
@@ -359,7 +369,6 @@ public class TimerActivity extends Activity {
       }
       tvScramble.setText(ScrambleFormatterService.INSTANCE.formatToColoredScramble(currentScramble, cubeType, currentOrientation));
 
-      tvBanner.setText(cubeTypeText);
       refreshSessionFields();
       refreshAvgFields(false);
 
@@ -373,6 +382,14 @@ public class TimerActivity extends Activity {
         }
       }
     }
+  }
+
+  public boolean onKeyDown(int keyCode, KeyEvent event) {
+    if (keyCode == KeyEvent.KEYCODE_MENU) {
+      openOptionsMenu();
+      return true;
+    }
+    return super.onKeyDown(keyCode, event);
   }
 
   private void refreshSessionFields() {
@@ -489,7 +506,7 @@ public class TimerActivity extends Activity {
     resetTimerText();
     timerState = TimerState.INSPECTING;
     layout.setBackgroundResource(R.color.lightgraybg);
-    tvBanner.setText(getString(R.string.inspection));
+    setTitle(R.string.inspection);
     timer = new Timer();
     TimerTask timerTask = new TimerTask() {
       public void run() {
@@ -630,6 +647,7 @@ public class TimerActivity extends Activity {
    * This is used to fix a problem in the way android handles its views, when the layout is clicked during "Hold and release" inspection.
    * When the orientation changes, the views are re-created and the layout is no longer considered as clicked.
    * This is the reason why the orientation should not be allowed to change during orientation.
+   *
    * @param enable enable or disable screen rotations
    */
   private void enableScreenRotation(boolean enable) {
@@ -728,8 +746,8 @@ public class TimerActivity extends Activity {
         final int recordColor = getResources().getColor(R.color.new_record);
 
         if (showBanner) {
-          tvBanner.setText(R.string.new_record);
-          tvBanner.setTextColor(recordColor);
+          setTitle(R.string.new_record);
+          setTitleColor(recordColor);
           final Handler bannerHandler = new Handler();
           Timer bannerTimer = new Timer();
           TimerTask bannerTimerTask = new TimerTask() {
@@ -737,7 +755,7 @@ public class TimerActivity extends Activity {
               bannerHandler.post(new Runnable() {
                 public void run() {
                   setDefaultBannerText();
-                  tvBanner.setTextColor(defaultTextColor);
+                  setTitleColor(defaultColor);
                 }
               });
             }
@@ -751,6 +769,7 @@ public class TimerActivity extends Activity {
           private int animationTimes = 3;
           private int animationStepsCounts = (animationTimes * 2) - 1;
           private int stepDurationMs = 1000 / animationStepsCounts;
+
           @Override
           protected void applyTransformation(float interpolatedTime, Transformation t) {
             int interpolatedTimeMs = (int) (interpolatedTime * 1000);
@@ -774,6 +793,7 @@ public class TimerActivity extends Activity {
   }
 
   private class SolveAverageCallback extends DataCallback<SolveAverages> {
+
     @Override
     public void onData(final SolveAverages data) {
       runOnUiThread(new Runnable() {
@@ -787,5 +807,33 @@ public class TimerActivity extends Activity {
       });
     }
   }
+
+  private OnTouchListener layoutTouchListener = new OnTouchListener() {
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+      if (timerState == TimerState.RUNNING && motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+        if (solveType.hasSteps()) {
+          nextSolveStep();
+          if (stepsTimes.size() == solveType.getSteps().length) {
+            stopTimer(true);
+          }
+        } else {
+          stopTimer(true);
+        }
+        return false;
+      } else if (timerState == TimerState.STOPPED && motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+        startInspectionTimer();
+      } else if (timerState == TimerState.INSPECTING && motionEvent.getAction() == MotionEvent.ACTION_UP
+          && inspectionMode == InspectionMode.HOLD_AND_RELEASE) {
+        stopInspectionTimer();
+        startTimer();
+      } else if (timerState == TimerState.INSPECTING && motionEvent.getAction() == MotionEvent.ACTION_DOWN
+          && inspectionMode == InspectionMode.AUTOMATIC) {
+        stopInspectionTimer();
+        startTimer();
+      }
+      return true;
+    }
+  };
 
 }
