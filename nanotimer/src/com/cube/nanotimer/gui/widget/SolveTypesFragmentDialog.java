@@ -51,7 +51,7 @@ public class SolveTypesFragmentDialog extends SelectorFragmentDialog {
       View view = super.getView(position, convertView, parent);
       if (getArguments().getBoolean(ARG_SHORTCUT) && position == liItems.size() - 1) {
         TextView tvName = (TextView) view.findViewById(R.id.tvItem);
-        tvName.setTextColor(getResources().getColor(R.color.gray));
+        tvName.setTextColor(getResources().getColor(R.color.gray600));
       }
       return view;
     }

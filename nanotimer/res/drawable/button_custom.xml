@@ -2,8 +2,20 @@
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <item android:drawable="@drawable/button_bg_pressed" android:state_pressed="true"/>
-  <item android:drawable="@drawable/button_bg_disabled" android:state_enabled="false"/>
-  <item android:drawable="@drawable/button_bg"/>
+  <item android:state_pressed="true">
+    <shape android:shape="rectangle">
+      <solid android:color="@color/button_pressed"/>
+    </shape>
+  </item>
+  <item android:state_enabled="false">
+    <shape android:shape="rectangle">
+      <solid android:color="@color/button_disabled"/>
+    </shape>
+  </item>
+  <item>
+    <shape android:shape="rectangle">
+      <solid android:color="@color/gray800"/>
+    </shape>
+  </item>
 
 </selector>

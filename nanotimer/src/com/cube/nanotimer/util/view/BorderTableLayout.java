@@ -30,7 +30,7 @@ public class BorderTableLayout extends TableLayout {
     TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BorderTableLayout);
     if (a.hasValue(R.styleable.BorderTableLayout_borderColor)) {
       // Cell has a border
-      borderColor = a.getColor(R.styleable.BorderTableLayout_borderColor, R.color.neon);
+      borderColor = a.getColor(R.styleable.BorderTableLayout_borderColor, R.color.iceblue);
       borderSize = a.getInt(R.styleable.BorderTableLayout_borderSize, 2);
       scaleBorders = a.getBoolean(R.styleable.BorderTableLayout_scaleBorders, true);
     }

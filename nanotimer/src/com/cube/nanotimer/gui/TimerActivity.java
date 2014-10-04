@@ -68,6 +68,7 @@ public class TimerActivity extends ActionBarActivity {
   private LinearLayout actionBarLayout;
   private TableLayout sessionTimesLayout;
   private TableLayout timerStepsLayout;
+  private Menu menu;
 
   private CubeType cubeType;
   private SolveType solveType;
@@ -182,8 +183,12 @@ public class TimerActivity extends ActionBarActivity {
     actionBarLayout.setOnTouchListener(layoutTouchListener);
 
     layout = (ViewGroup) findViewById(R.id.mainLayout);
-    setKeepScreenOn(keepScreenOnWhenTimerOff);
     layout.setOnTouchListener(layoutTouchListener);
+    if (timerState == TimerState.STOPPED) {
+      setKeepScreenOn(keepScreenOnWhenTimerOff);
+    } else {
+      setKeepScreenOn(true);
+    }
   }
 
   private Integer getCubeTypeScrambleTextSize() {
@@ -275,6 +280,7 @@ public class TimerActivity extends ActionBarActivity {
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
+    this.menu = menu;
     getMenuInflater().inflate(R.menu.timer_menu, menu);
     if (solveType.hasSteps()) {
       menu.findItem(R.id.itNewSession).setVisible(false);
@@ -282,21 +288,17 @@ public class TimerActivity extends ActionBarActivity {
     return true;
   }
 
-  /*private void showMenu() {
-    PopupMenu popupMenu = new PopupMenu(TimerActivity.this, buMenu);
-    popupMenu.getMenuInflater().inflate(R.menu.timer_menu, popupMenu.getMenu());
-    if (solveType.hasSteps()) {
-      popupMenu.getMenu().findItem(R.id.itNewSession).setVisible(false);
-    }
-
-    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-      public boolean onMenuItemClick(MenuItem item) {
-        menuItemSelected(item);
-        return true;
+  private void showMenuButton(boolean show) {
+    if (menu != null) {
+      // TODO : could animate the setVisible
+      for (int i = 0; i < menu.size(); i++) {
+        menu.getItem(i).setVisible(show);
       }
-    });
-    popupMenu.show();
-  }*/
+      if (solveType.hasSteps()) {
+        menu.findItem(R.id.itNewSession).setVisible(false);
+      }
+    }
+  }
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
@@ -458,7 +460,7 @@ public class TimerActivity extends ActionBarActivity {
       stepsTimes = new ArrayList<Long>();
       stepStartTs = timerStartTs;
     }
-    setKeepScreenOn(true);
+    timerStarted();
     timer = new Timer();
     TimerTask timerTask = new TimerTask() {
       public void run() {
@@ -485,7 +487,7 @@ public class TimerActivity extends ActionBarActivity {
       timer.cancel();
       timer.purge();
     }
-    setKeepScreenOn(keepScreenOnWhenTimerOff);
+    timerStopped();
     // update time once more to get the ms right
     // (as all ms do not necessarily appear when timing, some are skipped due to refresh interval)
     updateTimerText(time);
@@ -502,7 +504,7 @@ public class TimerActivity extends ActionBarActivity {
     }
     timerStartTs = curTime;
     enableScreenRotation(false);
-    setKeepScreenOn(true);
+    timerStarted();
     resetTimerText();
     timerState = TimerState.INSPECTING;
     layout.setBackgroundResource(R.color.lightgraybg);
@@ -529,7 +531,7 @@ public class TimerActivity extends ActionBarActivity {
     setDefaultBannerText();
     timerState = TimerState.STOPPED;
     enableScreenRotation(true);
-    setKeepScreenOn(keepScreenOnWhenTimerOff);
+    timerStopped();
   }
 
   private void nextSolveStep() {
@@ -681,6 +683,16 @@ public class TimerActivity extends ActionBarActivity {
         setRequestedOrientation(orientation);
       }
     }
+  }
+
+  private void timerStarted() {
+    setKeepScreenOn(true);
+    showMenuButton(false);
+  }
+
+  private void timerStopped() {
+    setKeepScreenOn(keepScreenOnWhenTimerOff);
+    showMenuButton(true);
   }
 
   private void setKeepScreenOn(boolean keepOn) {

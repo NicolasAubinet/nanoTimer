@@ -5,13 +5,13 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.util.Utils;
@@ -47,21 +47,22 @@ public class AboutDialog extends DialogFragment {
     LinearLayout view = new LinearLayout(getActivity());
     view.setOrientation(LinearLayout.VERTICAL);
 
-    RelativeLayout titleLayout = new RelativeLayout(getActivity());
-    titleLayout.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT, 150));
-    titleLayout.setPadding(10, 10, 10, 10);
+    LinearLayout titleLayout = new LinearLayout(getActivity());
+    titleLayout.setOrientation(LinearLayout.HORIZONTAL);
+    titleLayout.setPadding(8, 8, 8, 8);
     titleLayout.setGravity(Gravity.CENTER_VERTICAL);
     titleLayout.setBackgroundColor(getResources().getColor(R.color.graybg));
 
-    ImageView imgIcon = new ImageView(getActivity());
-    imgIcon.setImageResource(R.drawable.icon);
+    ImageView img = new ImageView(getActivity());
+    img.setImageResource(R.drawable.icon);
 
-    ImageView imgTitle = new ImageView(getActivity());
-    imgTitle.setImageResource(R.drawable.nanotimer);
-    imgTitle.setPadding(0, 10, 10, 10);
+    TextView tvTitle = new TextView(getActivity());
+    tvTitle.setPadding(30, 0, 0, 0);
+    tvTitle.setText(R.string.app_name);
+    tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
 
-    titleLayout.addView(imgIcon);
-    titleLayout.addView(imgTitle);
+    titleLayout.addView(img);
+    titleLayout.addView(tvTitle);
 
     LinearLayout separator = new LinearLayout(getActivity());
     separator.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 3));

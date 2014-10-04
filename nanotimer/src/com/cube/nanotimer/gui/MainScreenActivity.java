@@ -101,6 +101,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
         }
       }
     });
+    buCubeType.setShadowLayer(1, 3f, 3f, getResources().getColor(R.color.black));
 
     buSolveType = (Button) findViewById(R.id.buSolveType);
     buSolveType.setOnClickListener(new OnClickListener() {
@@ -117,10 +118,13 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
         }
       }
     });
+    buSolveType.setShadowLayer(1, 3f, 3f, getResources().getColor(R.color.black));
 
     initHistoryList();
 
-    findViewById(R.id.buStart).setOnClickListener(new OnClickListener() {
+    Button buStart = (Button) findViewById(R.id.buStart);
+    buStart.setShadowLayer(1, 3f, 3f, getResources().getColor(R.color.black));
+    buStart.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
         Intent i = new Intent(MainScreenActivity.this, TimerActivity.class);

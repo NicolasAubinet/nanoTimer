@@ -40,7 +40,6 @@
        android:layout_height="match_parent"
        android:longClickable="true"
        android:layout_marginTop="5px"
-       style="@style/DividerListView"
        dslv:drag_handle_id="@drawable/listmove"
        dslv:drag_enabled="true"
        dslv:drag_scroll_start="0.33"

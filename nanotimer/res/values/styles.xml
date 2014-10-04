@@ -76,19 +76,10 @@
     <item name="android:gravity">center</item>
   </style>
 
-  <style name="DividerListView">
-    <item name="android:divider">@color/neon</item>
-    <item name="android:dividerHeight">1dp</item>
-  </style>
-
   <style name="DividerRow">
     <item name="android:layout_width">match_parent</item>
     <item name="android:layout_height">3px</item>
     <item name="android:background">@color/iceblue</item>
   </style>
-
-
-
-
 
 </resources>

@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <color name="neon">#FF6257F6</color>
   <color name="scramblealternate">#FFC0B9F9</color>
-  <color name="nightblue">#FF272254</color>
-  <color name="darkblue">#FF000055</color>
   <color name="white">#FFFFFFFF</color>
   <color name="black">#FF000000</color>
   <color name="red">#FFFF0000</color>
@@ -11,7 +8,6 @@
   <color name="green">#FF00CC00</color>
   <color name="new_record">#FFEEDD00</color>
 
-  <color name="gray">#FF9E9E9E</color>
   <color name="gray200">#FFEEEEEE</color>
   <color name="gray400">#FFBDBDBD</color>
   <color name="gray600">#FF757575</color>
@@ -20,9 +16,11 @@
   <color name="gray900">#FF212121</color>
   <color name="gray950">#FF101010</color>
   <color name="darkgray">#FF333333</color>
-  <!--<color name="barcolor">#FF383B3D</color>-->
   <color name="lightblue">#FF6CCCEC</color>
-  <color name="iceblue">#FF0883AC</color> <!-- TODO : use the same color than the default appcompat action bar (see if change or not) -->
+  <color name="iceblue">#FF0883AC</color>
   <color name="graybg">#FF1C1E20</color>
   <color name="lightgraybg">#FF2C2C33</color>
+
+  <color name="button_pressed">#FF1976D2</color>
+  <color name="button_disabled">@color/gray900</color>
 </resources>

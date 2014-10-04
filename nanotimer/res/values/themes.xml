@@ -2,39 +2,30 @@
 <resources>
 
   <style name="NanoTimerTheme" parent="@style/Theme.AppCompat">
-    <item name="android:actionBarStyle">@style/MyActionBar</item>
-    <item name="actionBarStyle">@style/MyActionBar</item>
-    <!--<item name="actionBarTabTextStyle">@style/MyActionBarTabText</item>-->
-    <!--<item name="actionMenuTextColor">@color/white</item>-->
+    <item name="android:actionBarStyle">@style/NanoTimerActionBar</item>
+    <item name="actionBarStyle">@style/NanoTimerActionBar</item>
   </style>
 
-  <!-- ActionBar styles -->
-  <style name="MyActionBar" parent="@style/Widget.AppCompat.ActionBar">
+  <style name="NanoTimerActionBar" parent="@style/Widget.AppCompat.ActionBar">
     <!--<item name="android:titleTextStyle">@style/ActionBarTitleText</item>-->
     <!--<item name="titleTextStyle">@style/ActionBarTitleText</item>-->
 
     <item name="android:background">@drawable/actionbar_bg</item>
     <item name="background">@drawable/actionbar_bg</item>
 
-    <item name="android:displayOptions">showHome|useLogo</item>
-    <item name="displayOptions">showHome|useLogo</item>
+    <!--<item name="android:displayOptions">showHome|useLogo</item>-->
+    <!--<item name="displayOptions">showHome|useLogo</item>-->
 
-    <item name="android:icon">@drawable/nanotimer</item>
-    <item name="icon">@drawable/nanotimer</item>
+    <!--<item name="android:icon">@drawable/icon</item>-->
+    <!--<item name="icon">@drawable/icon</item>-->
+    <!--<item name="android:icon">@android:color/transparent</item>-->
   </style>
 
-  <!-- ActionBar title text -->
   <style name="ActionBarTitleText" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
     <!--<item name="android:actionMenuTextColor">@color/white</item>-->
     <!--<item name="actionMenuTextColor">@color/white</item>-->
     <!--<item name="android:textColor">@color/white</item>-->
-
-    <item name="android:textSize">25sp</item>
-    <item name="android:textAlignment">center</item>
-
-    <item name="android:gravity">center</item>
-    <item name="android:layout_gravity">center</item>
+    <!--<item name="android:textSize">25sp</item>-->
   </style>
-
 
 </resources>
