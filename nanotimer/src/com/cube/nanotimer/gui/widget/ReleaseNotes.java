@@ -43,7 +43,7 @@ public class ReleaseNotes {
     dialog.setCanceledOnTouchOutside(true);
 
     WebView tvInfo = (WebView) v.findViewById(R.id.tvInfo);
-    tvInfo.setBackgroundColor(context.getResources().getColor(R.color.black));
+    tvInfo.setBackgroundColor(context.getResources().getColor(R.color.graybg));
     tvInfo.loadData(getReleaseNotesHTMLString(), "text/html", "utf-8");
 
     dialog.show();

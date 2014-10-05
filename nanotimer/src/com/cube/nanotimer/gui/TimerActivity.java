@@ -92,6 +92,7 @@ public class TimerActivity extends ActionBarActivity {
   private Object timerSync = new Object();
   private long timerStartTs;
   private volatile TimerState timerState = TimerState.STOPPED;
+  private boolean showMenu = true;
 
   private long lastTimerStopTs;
   private final long STOP_START_DELAY = 500; // to avoid starting timer too quickly after a stop
@@ -282,6 +283,9 @@ public class TimerActivity extends ActionBarActivity {
   public boolean onCreateOptionsMenu(Menu menu) {
     this.menu = menu;
     getMenuInflater().inflate(R.menu.timer_menu, menu);
+    for (int i = 0; i < menu.size(); i++) {
+      menu.getItem(i).setVisible(showMenu);
+    }
     if (solveType.hasSteps()) {
       menu.findItem(R.id.itNewSession).setVisible(false);
     }
@@ -289,15 +293,8 @@ public class TimerActivity extends ActionBarActivity {
   }
 
   private void showMenuButton(boolean show) {
-    if (menu != null) {
-      // TODO : could animate the setVisible
-      for (int i = 0; i < menu.size(); i++) {
-        menu.getItem(i).setVisible(show);
-      }
-      if (solveType.hasSteps()) {
-        menu.findItem(R.id.itNewSession).setVisible(false);
-      }
-    }
+    this.showMenu = show;
+    supportInvalidateOptionsMenu();
   }
 
   @Override
