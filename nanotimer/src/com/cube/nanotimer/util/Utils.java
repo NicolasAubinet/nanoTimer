@@ -16,6 +16,9 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.cube.nanotimer.App;
 
+import java.security.SecureRandom;
+import java.util.Random;
+
 public class Utils {
 
   public static void showFragment(FragmentActivity a, DialogFragment df) {
@@ -168,6 +171,10 @@ public class Utils {
       e.printStackTrace();
     }
     return "";
+  }
+
+  public static Random getRandom() {
+    return new SecureRandom();
   }
 
 }

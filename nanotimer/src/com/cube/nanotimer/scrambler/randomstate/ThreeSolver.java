@@ -3,6 +3,7 @@ package com.cube.nanotimer.scrambler.randomstate;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ThreeSolver {
@@ -22,16 +23,35 @@ public class ThreeSolver {
       System.arraycopy(cubeState.edgePermutations, 0, this.edgePermutations, 0, 12);
       System.arraycopy(cubeState.edgeOrientations, 0, this.edgeOrientations, 0, 12);
     }
+
+    public String toString() {
+      StringBuilder sb = new StringBuilder();
+      sb.append("Corner permutations: ").append(Arrays.toString(cornerPermutations)).append("\n");
+      sb.append("Corner orientations: ").append(Arrays.toString(cornerOrientations)).append("\n");
+      sb.append("Edge permutations: ").append(Arrays.toString(edgePermutations)).append("\n");
+      sb.append("Edge orientations: ").append(Arrays.toString(edgeOrientations));
+      return sb.toString();
+    }
   }
 
-  private static final int PHASE1_MAX_DISTANCE = 12;
-  private static final int PHASE2_MAX_DISTANCE = 18;
+  private static final int MAX_SOLUTION_LENGTH = 23;
+//  private static final int MAX_SOLUTION_LENGTH = 22;
+  private static final int MAX_PHASE2_SOLUTION_LENGTH = 12;
+//  private static final int MAX_SEARCH_TIME = 10; // in seconds. will stop after that time if a solution was found, even if it is not optimal
+  private static final int SAFE_PHASE1_ITERATIONS_LIMIT = 30;
+  // TODO : could maybe reduce this (but test on slow devices)
+  private static final int SEARCH_TIME_MIN = 100; // time in ms during which to search for a best solution
+
+  // TODO : there seems to be a lot or phase 2 moves in the solution. see if normal
+
+  public static final boolean SHOW_PHASE_SEPARATOR = true; // for debug
 
   private CubeState initialState;
   private List<Integer> solution1;
   private List<Integer> solution2;
   private List<Integer> bestSolution1;
   private List<Integer> bestSolution2;
+  private long searchStartTs;
 
   static Move[] moves1;
   static Move[] moves2;
@@ -96,39 +116,51 @@ public class ThreeSolver {
     opposites[5] = 4;
   }
 
-  private void phase1(int cornerOrientation, int edgeOrientation, int eEdgeCombination, int depth) {
+  private boolean phase1(int cornerOrientation, int edgeOrientation, int eEdgeCombination, int depth) {
+    boolean foundSolution = false;
     if (depth == 0) {
       if (cornerOrientation == 0 && edgeOrientation == 0 && eEdgeCombination == 0) {
-//      if (bestSolution1.isEmpty() || solution1.size() < bestSolution1.size()) {
-        bestSolution1 = new ArrayList<Integer>(solution1.size()); // TODO : these lines will pbly move somewhere in phase2
-        for (Integer i : solution1) {
-          bestSolution1.add(i);
+        // check that last move is not a phase 2 move
+        // TODO : should make sure that two different enum instances of same type are equal (otherwise should compare name, or an id or something like that)
+        if (!solution1.isEmpty()) {
+          Move m = moves1[solution1.get(solution1.size() - 1)];
+          for (int i = 0; i < moves2.length; i++) {
+            if (moves2[i] == m) {
+              return false;
+            }
+          }
         }
-//      }
+        // generate phase 2 state
+        CubeState state = new CubeState(initialState);
+        applyMoves(state, solution1);
 
-      /*CubeState state = new CubeState(initialState);
-      applyMoves(state, solution1);
+        byte[] udEdgePermutation = new byte[8];
+        byte[] eEdgePermutation = new byte[4];
+        for (int i = 0; i < state.edgePermutations.length; i++) {
+          if (i < 4) {
+            eEdgePermutation[i] = state.edgePermutations[i];
+          } else {
+            udEdgePermutation[i - 4] = (byte) (state.edgePermutations[i] - 4);
+          }
+        }
 
-      byte[] udEdgePermutation = new byte[8];
-      byte[] eEdgePermutation = new byte[4];
-      for (int i = 0; i < state.edgePermutations.length; i++) {
-        if (i < 4) {
-          eEdgePermutation[i] = state.edgePermutations[i];
-        } else {
-          udEdgePermutation[i - 4] = (byte) (state.edgePermutations[i] - 4);
+        // search for phase 2 solution
+        int maxDepth = Math.min(MAX_PHASE2_SOLUTION_LENGTH, MAX_SOLUTION_LENGTH - solution1.size());
+        for (int i = 0; i < maxDepth && !foundSolution; i++) {
+          foundSolution |= phase2(IndexConvertor.packPermutation(state.cornerPermutations),
+              IndexConvertor.packPermutation(udEdgePermutation),
+              IndexConvertor.packPermutation(eEdgePermutation), i);
         }
       }
-      phase2(IndexConvertor.packPermutation(state.cornerPermutations),
-          IndexConvertor.packPermutation(udEdgePermutation),
-          IndexConvertor.packPermutation(eEdgePermutation));*/
-      }
-      return;
+      return foundSolution;
+    }
+    if (bestSolution1 != null && System.currentTimeMillis() > searchStartTs + SEARCH_TIME_MIN) {
+      return false;
     }
 
-    if (pruningCornerOrientation[cornerOrientation][eEdgeCombination] <= depth && // TODO : find correct value to compare to (change '0')
+    if (pruningCornerOrientation[cornerOrientation][eEdgeCombination] <= depth &&
         pruningEdgeOrientation[edgeOrientation][eEdgeCombination] <= depth) {
-    int curSolutionSize = solution1.size();
-//    if (curSolutionSize < PHASE1_MAX_DISTANCE) {
+      int curSolutionSize = solution1.size();
       int[] lastMoves = new int[] {
           curSolutionSize > 0 ? solution1.get(curSolutionSize - 1) : -1,
           curSolutionSize > 1 ? solution1.get(curSolutionSize - 2) : -1
@@ -139,16 +171,64 @@ public class ThreeSolver {
           continue;
         }
         solution1.add(i);
-        phase1(transitCornerOrientation[cornerOrientation][i],
+        foundSolution |= phase1(transitCornerOrientation[cornerOrientation][i],
             transitEdgeOrientation[edgeOrientation][i],
             transitEEdgeCombination[eEdgeCombination][i], depth - 1);
         solution1.remove(curSolutionSize);
       }
-//    }
     }
+    return foundSolution;
   }
 
-  private void phase2(int cornerPermutation, int udEdgePermutation, int eEdgePermutation) {
+  private boolean phase2(int cornerPermutation, int udEdgePermutation, int eEdgePermutation, int depth) {
+    if (depth == 0) {
+      if (cornerPermutation == 0 && udEdgePermutation == 0 && eEdgePermutation == 0) {
+        Log.i("[NanoTimer]", "tmp solution: " + Arrays.toString(solution1.toArray()) + " . " + Arrays.toString(solution2.toArray()));
+        if (bestSolution1 == null || solution1.size() + solution2.size() < bestSolution1.size() + bestSolution2.size()) {
+          Log.i("[NanoTimer]", "replacing solution");
+          bestSolution1 = new ArrayList<Integer>(solution1.size());
+          for (Integer m : solution1) {
+            bestSolution1.add(m);
+          }
+          bestSolution2 = new ArrayList<Integer>(solution2.size());
+          for (Integer m : solution2) {
+            bestSolution2.add(m);
+          }
+        }
+        solution2 = new ArrayList<Integer>();
+        return true;
+      }
+      return false;
+    }
+
+    if (pruningCornerPermutation[cornerPermutation][eEdgePermutation] <= depth &&
+        pruningUDEdgePermutation[udEdgePermutation][eEdgePermutation] <= depth) {
+      int curSolutionSize = solution2.size();
+      int[] lastMoves = new int[] {
+          curSolutionSize > 0 ? solution2.get(curSolutionSize - 1) : -1,
+          curSolutionSize > 1 ? solution2.get(curSolutionSize - 2) : -1
+      };
+      for (int i = 0; i < moves2.length; i++) {
+        if (curSolutionSize == 0) {
+          // avoid turning the same face twice in a row
+          if ((solution1.size() > 0 && slices2[i] == slices1[solution1.get(solution1.size() - 1)]) ||
+              solution1.size() > 1 && opposites[slices2[i]] == slices1[solution1.get(solution1.size() - 1)] && opposites[slices1[solution1.get(solution1.size() - 1)]] == slices1[solution1.get(solution1.size() - 2)]) {
+            continue;
+          }
+        } else if ((curSolutionSize > 0 && slices2[i] == slices2[lastMoves[0]]) || // same face twice in a row
+            (curSolutionSize > 1 && opposites[slices2[i]] == slices2[lastMoves[0]] && opposites[slices2[lastMoves[0]]] == slices2[lastMoves[1]])) { // opposite faces 3 times in a row
+          continue;
+        }
+        solution2.add(i);
+        if (phase2(transitCornerPermutation[cornerPermutation][i],
+            transitUDEdgePermutation[udEdgePermutation][i],
+            transitEEdgePermutation[eEdgePermutation][i], depth - 1)) {
+          return true;
+        }
+        solution2.remove(curSolutionSize);
+      }
+    }
+    return false;
   }
 
   public String[] getSolution(CubeState cubeState) {
@@ -156,13 +236,13 @@ public class ThreeSolver {
       // TODO : gen tables when app loads, if random-state option is enabled
       getTables();
     }
-    long ts = System.currentTimeMillis();
+    searchStartTs = System.currentTimeMillis();
 
     initialState = cubeState;
     solution1 = new ArrayList<Integer>();
     solution2 = new ArrayList<Integer>();
-    bestSolution1 = new ArrayList<Integer>();
-    bestSolution2 = new ArrayList<Integer>();
+    bestSolution1 = null;
+    bestSolution2 = null;
 
     int cornerOrientation = IndexConvertor.packOrientation(cubeState.cornerOrientations, 3);
     int edgeOrientation = IndexConvertor.packOrientation(cubeState.edgeOrientations, 2);
@@ -172,22 +252,34 @@ public class ThreeSolver {
     }
     int eEdgeCombination = IndexConvertor.packCombination(combinations, 4);
 
-    for (int i = 0; i < PHASE1_MAX_DISTANCE; i++) {
-      phase1(cornerOrientation, edgeOrientation, eEdgeCombination, i);
-      if (!bestSolution1.isEmpty()) { // TODO : tmp for tests
-        break;
+    // TODO : could test phases loops with breadth-first search (to avoid calculating the same nodes so many times). check memory usage and compare speeds
+    for (int i = 0; i < SAFE_PHASE1_ITERATIONS_LIMIT && (bestSolution1 == null || System.currentTimeMillis() < searchStartTs + SEARCH_TIME_MIN); i++) {
+      if (phase1(cornerOrientation, edgeOrientation, eEdgeCombination, i)) {
+        solution1 = new ArrayList<Integer>();
+        solution2 = new ArrayList<Integer>();
       }
     }
 
-    String[] solution = new String[bestSolution1.size() + bestSolution2.size()];
-    int i = 0;
-    for (Integer m : bestSolution1) {
-      solution[i++] = moves1[m].name;
+    String[] solution = null;
+    if (bestSolution1 != null) {
+      int length = bestSolution1.size() + bestSolution2.size();
+      if (SHOW_PHASE_SEPARATOR) {
+        length++;
+      }
+      solution = new String[length];
+      int i = 0;
+      for (Integer m : bestSolution1) {
+        solution[i++] = moves1[m].name;
+      }
+      if (SHOW_PHASE_SEPARATOR) {
+        solution[i++] = ".";
+      }
+      for (Integer m : bestSolution2) {
+        solution[i++] = moves2[m].name;
+      }
     }
-    for (Integer m : bestSolution2) {
-      solution[i++] = moves2[m].name;
-    }
-    Log.i("[NanoTimer]", "solution time: " + (System.currentTimeMillis() - ts));
+    Log.i("[NanoTimer]", "solution time: " + (System.currentTimeMillis() - searchStartTs));
+
     return solution;
   }
 

@@ -10,8 +10,11 @@ import java.util.Arrays;
 
 public class ThreeSolverTest extends AndroidTestCase {
 
+  // TODO : test with a solved cube (scramble should be empty, but not null)
+  // TODO : could also test a non-solvable configuration to see how long it takes to return null
+
   @SmallTest
-  public void testPhase1VeryEasy() {
+  public void testVeryEasy() {
     CubeState cubeState = new CubeState();
     //  F
     cubeState.cornerPermutations = new byte[] { 1, 6, 2, 4, 5, 7, 3, 8 };
@@ -25,8 +28,10 @@ public class ThreeSolverTest extends AndroidTestCase {
     Assert.assertTrue(scramble.length > 0);
   }
 
+  // TODO : pass something that's already orientated and combined
+
   @SmallTest
-  public void testPhase1Easy() {
+  public void testEasy() {
     CubeState cubeState = new CubeState();
     //  F L2 R' D2
     cubeState.cornerPermutations = new byte[] { 7, 5, 4, 8, 2, 3, 6, 1 };
@@ -41,7 +46,22 @@ public class ThreeSolverTest extends AndroidTestCase {
   }
 
   @SmallTest
-  public void testPhase1() {
+  public void testEasyWithLastPhase1Move() {
+    CubeState cubeState = new CubeState();
+    //  D2 R B2 F
+//    cubeState.cornerPermutations = new byte[] { 7, 5, 4, 8, 2, 3, 6, 1 };
+//    cubeState.edgePermutations = new byte[] { 6, 10, 9, 3, 4, 2, 7, 12, 11, 8, 1, 5 };
+//    cubeState.cornerOrientations = new byte[] { 1, 0, 2, 1, 2, 1, 2, 0 };
+//    cubeState.edgeOrientations = new byte[] { 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1 };
+
+    ThreeSolver solver = new ThreeSolver();
+    String[] scramble = solver.getSolution(cubeState);
+    Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
+    Assert.assertTrue(scramble.length > 0);
+  }
+
+  @SmallTest
+  public void testRealScramble() {
     CubeState cubeState = new CubeState();
     //  F L2 R' D2 R2 D' U' R D' B2 U2 F' U2 L2 D L R' U' F2 L R D2 B R' U2
     cubeState.cornerPermutations = new byte[] { 4, 1, 5, 2, 7, 3, 6, 8 };
@@ -51,7 +71,7 @@ public class ThreeSolverTest extends AndroidTestCase {
 
     ThreeSolver solver = new ThreeSolver();
     String[] scramble = solver.getSolution(cubeState);
-    Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
+    Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble) + " (length: " + scramble.length + ")");
   }
 
 }
