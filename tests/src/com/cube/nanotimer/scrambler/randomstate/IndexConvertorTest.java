@@ -94,6 +94,92 @@ public class IndexConvertorTest extends AndroidTestCase {
   }
 
   @SmallTest
+  public void testRelativePermutationConversion() {
+    // TODO : see if need to adapt StateTables : getPermResult
+    byte[] state = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+    Assert.assertEquals(0, IndexConvertor.packRelPermutation(state));
+    assertArrayEquals(state, unpackCornerPermutation(IndexConvertor.packRelPermutation(state)));
+    state = new byte[] { 3, 4, 1, 2, 7, 8, 5, 6 };
+    Assert.assertEquals(0, IndexConvertor.packRelPermutation(state));
+    state = new byte[] { 4, 1, 2, 3, 8, 5, 6, 7 };
+    Assert.assertEquals(0, IndexConvertor.packRelPermutation(state));
+    state = new byte[] { 7, 8, 5, 6, 3, 4, 1, 2 };
+    Assert.assertEquals(0, IndexConvertor.packRelPermutation(state));
+    state = new byte[] { 1, 8, 7, 6, 5, 4, 3, 2 };
+    Assert.assertEquals(5039, IndexConvertor.packRelPermutation(state));
+    state = new byte[] { 1, 2, 3, 4, 5, 6, 8, 7 };
+    assertArrayEquals(state, unpackCornerPermutation(IndexConvertor.packRelPermutation(state)));
+    state = new byte[] { 1, 2, 3, 4, 5, 7, 6, 8 };
+    assertArrayEquals(state, unpackCornerPermutation(IndexConvertor.packRelPermutation(state)));
+    state = new byte[] { 1, 2, 3, 4, 6, 7, 5, 8 };
+    assertArrayEquals(state, unpackCornerPermutation(IndexConvertor.packRelPermutation(state)));
+    state = new byte[] { 8, 7, 6, 5, 4, 2, 3, 1 };
+    byte[] state2 = new byte[] { 1, 4, 2, 3, 5, 8, 7, 6 };
+    Assert.assertEquals(IndexConvertor.packRelPermutation(state2), IndexConvertor.packRelPermutation(state));
+    state = new byte[] { 8, 7, 6, 5, 4, 3, 1, 2 };
+    state2 = new byte[] { 1, 2, 4, 3, 6, 5, 8, 7 };
+    Assert.assertEquals(IndexConvertor.packRelPermutation(state2), IndexConvertor.packRelPermutation(state));
+    state = new byte[] { 8, 7, 6, 5, 4, 3, 2, 1 };
+    state2 = new byte[] { 1, 4, 3, 2, 5, 8, 7, 6 };
+    Assert.assertEquals(IndexConvertor.packRelPermutation(state2), IndexConvertor.packRelPermutation(state));
+    state = new byte[] { 6, 4, 1, 2, 7, 5, 8, 3 };
+    state2 = new byte[] { 1, 2, 6, 4, 8, 3, 7, 5 };
+    Assert.assertEquals(IndexConvertor.packRelPermutation(state2), IndexConvertor.packRelPermutation(state));
+    state = new byte[] { 5, 4, 1, 2, 8, 6, 7, 3 };
+    state2 = new byte[] { 1, 2, 5, 4, 7, 3, 8, 6 };
+    Assert.assertEquals(IndexConvertor.packRelPermutation(state2), IndexConvertor.packRelPermutation(state));
+    state = new byte[] { 4, 1, 3, 7, 2, 8, 6, 5 };
+    state2 = new byte[] { 1, 3, 7, 4, 8, 6, 5, 2 };
+    Assert.assertEquals(IndexConvertor.packRelPermutation(state2), IndexConvertor.packRelPermutation(state));
+    state = new byte[] { 5, 2, 8, 7, 1, 3, 6, 4 };
+    state2 = new byte[] { 1, 3, 6, 4, 5, 2, 8, 7 };
+    Assert.assertEquals(IndexConvertor.packRelPermutation(state2), IndexConvertor.packRelPermutation(state));
+  }
+
+  @SmallTest
+  public void testRelIndices() {
+    assertArrayEquals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 }, IndexConvertor.relPermIndices[0]);
+    assertArrayEquals(new byte[] { 3, 0, 1, 2, 7, 4, 5, 6 }, IndexConvertor.relPermIndices[1]);
+    assertArrayEquals(new byte[] { 2, 3, 0, 1, 6, 7, 4, 5 }, IndexConvertor.relPermIndices[2]);
+    assertArrayEquals(new byte[] { 7, 4, 5, 6, 3, 0, 1, 2 }, IndexConvertor.relPermIndices[5]);
+    assertArrayEquals(new byte[] { 5, 6, 7, 4, 1, 2, 3, 0 }, IndexConvertor.relPermIndices[7]);
+//    assertArrayEquals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 }, IndexConvertor.relPermIndices[0]);
+//    assertArrayEquals(new byte[] { 1, 2, 3, 0, 5, 6, 7, 4 }, IndexConvertor.relPermIndices[1]);
+//    assertArrayEquals(new byte[] { 2, 3, 0, 1, 6, 7, 4, 5 }, IndexConvertor.relPermIndices[2]);
+//    assertArrayEquals(new byte[] { 5, 6, 7, 4, 1, 2, 3, 0 }, IndexConvertor.relPermIndices[5]);
+//    assertArrayEquals(new byte[] { 7, 4, 5, 6, 3, 0, 1, 2 }, IndexConvertor.relPermIndices[7]);
+  }
+
+  @SmallTest
+  public void testComparePermutations() {
+    Random r = new Random();
+    List<Byte> available;
+    byte[] state;
+    long normalTs = 0;
+    long relativeTs = 0;
+    long ts;
+    for (int i = 0; i < 50000; i++) {
+      state = new byte[8];
+      available = new ArrayList<Byte>();
+      for (byte j = 1; j <= 8; j++) { available.add(j); }
+      Collections.shuffle(available, r);
+      for (int j = 0; j < 8; j++) {
+        state[j] = available.remove(0);
+      }
+
+      ts = System.currentTimeMillis();
+      IndexConvertor.packPermutation(state);
+      normalTs += (System.currentTimeMillis() - ts);
+
+      ts = System.currentTimeMillis();
+      IndexConvertor.packRelPermutation(state);
+      relativeTs += (System.currentTimeMillis() - ts);
+    }
+    Log.i("[NanoTimer]", "normalTs  : " + normalTs);
+    Log.i("[NanoTimer]", "relativeTs: " + relativeTs);
+  }
+
+  @SmallTest
   public void testRandomConversion() {
     Random r = new Random();
     byte[] state;

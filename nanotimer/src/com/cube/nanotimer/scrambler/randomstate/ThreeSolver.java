@@ -47,17 +47,20 @@ public class ThreeSolver {
   public static final boolean SHOW_PHASE_SEPARATOR = true; // for debug
 
   private CubeState initialState;
-  private List<Integer> solution1;
-  private List<Integer> solution2;
-  private List<Integer> bestSolution1;
-  private List<Integer> bestSolution2;
+  private List<Byte> solution1;
+  private List<Byte> solution2;
+  private List<Byte> bestSolution1;
+  private List<Byte> bestSolution2;
   private long searchStartTs;
 
+  static Move[] moves;
   static Move[] moves1;
   static Move[] moves2;
-  private static int[] slices1;
-  private static int[] slices2;
-  private static int[] opposites;
+  static Move[] allMoves2;
+  private static byte[] slices;
+  //private static int[] slices1;
+  //private static int[] slices2;
+  private static byte[] opposites;
 
   // Transition tables
   private static int[][] transitCornerPermutation;
@@ -75,7 +78,7 @@ public class ThreeSolver {
 
   static {
     // Moves
-    moves1 = new Move[] {
+    moves = new Move[] {
         Move.U, Move.U2, Move.UP,
         Move.D, Move.D2, Move.DP,
         Move.R, Move.R2, Move.RP,
@@ -83,7 +86,23 @@ public class ThreeSolver {
         Move.F, Move.F2, Move.FP,
         Move.B, Move.B2, Move.BP
     };
+    moves1 = new Move[] {
+        Move.U,
+        Move.D,
+        Move.R,
+        Move.L,
+        Move.F,
+        Move.B
+    };
     moves2 = new Move[] {
+        Move.U,
+        Move.D,
+        Move.R2,
+        Move.L2,
+        Move.F2,
+        Move.B2
+    };
+    allMoves2 = new Move[] {
         Move.U, Move.U2, Move.UP,
         Move.D, Move.D2, Move.DP,
         Move.R2,
@@ -93,7 +112,11 @@ public class ThreeSolver {
     };
 
     // Slices
-    slices1 = new int[moves1.length];
+    slices = new byte[moves.length];
+    for (int i = 0; i < moves.length; i++) {
+      slices[i] = (byte) (i / 3);
+    }
+    /*slices1 = new int[moves1.length];
     for (int i = 0; i < moves1.length; i++) {
       slices1[i] = i / 3;
     }
@@ -104,10 +127,10 @@ public class ThreeSolver {
     slices2[6] = 2;
     slices2[7] = 3;
     slices2[8] = 4;
-    slices2[9] = 5;
+    slices2[9] = 5;*/
 
     // Opposites
-    opposites = new int[6];
+    opposites = new byte[6];
     opposites[0] = 1;
     opposites[1] = 0;
     opposites[2] = 3;
@@ -116,16 +139,16 @@ public class ThreeSolver {
     opposites[5] = 4;
   }
 
-  private boolean phase1(int cornerOrientation, int edgeOrientation, int eEdgeCombination, int depth) {
+  private boolean phase1(int cornerOrientation, int edgeOrientation, int eEdgeCombination, int depth, byte lastMove, byte oldLastMove) {
     boolean foundSolution = false;
     if (depth == 0) {
       if (cornerOrientation == 0 && edgeOrientation == 0 && eEdgeCombination == 0) {
         // check that last move is not a phase 2 move
         // TODO : should make sure that two different enum instances of same type are equal (otherwise should compare name, or an id or something like that)
-        if (!solution1.isEmpty()) {
-          Move m = moves1[solution1.get(solution1.size() - 1)];
-          for (int i = 0; i < moves2.length; i++) {
-            if (moves2[i] == m) {
+        if (lastMove >= 0) {
+          Move m = moves[lastMove];
+          for (int i = 0; i < allMoves2.length; i++) {
+            if (allMoves2[i] == m) {
               return false;
             }
           }
@@ -149,7 +172,7 @@ public class ThreeSolver {
         for (int i = 0; i < maxDepth && !foundSolution; i++) {
           foundSolution |= phase2(IndexConvertor.packPermutation(state.cornerPermutations),
               IndexConvertor.packPermutation(udEdgePermutation),
-              IndexConvertor.packPermutation(eEdgePermutation), i);
+              IndexConvertor.packPermutation(eEdgePermutation), i, lastMove, oldLastMove);
         }
       }
       return foundSolution;
@@ -161,41 +184,44 @@ public class ThreeSolver {
     if (pruningCornerOrientation[cornerOrientation][eEdgeCombination] <= depth &&
         pruningEdgeOrientation[edgeOrientation][eEdgeCombination] <= depth) {
       int curSolutionSize = solution1.size();
-      int[] lastMoves = new int[] {
-          curSolutionSize > 0 ? solution1.get(curSolutionSize - 1) : -1,
-          curSolutionSize > 1 ? solution1.get(curSolutionSize - 2) : -1
-      };
       for (int i = 0; i < moves1.length; i++) {
-        if ((curSolutionSize > 0 && slices1[i] == slices1[lastMoves[0]]) || // same face twice in a row
-            (curSolutionSize > 1 && opposites[slices1[i]] == slices1[lastMoves[0]] && opposites[slices1[lastMoves[0]]] == slices1[lastMoves[1]])) { // opposite faces 3 times in a row
+        if ((lastMove >= 0 && (byte) i == slices[lastMove]) || // same face twice in a row
+            (oldLastMove > 1 && opposites[i] == slices[lastMove] && opposites[slices[lastMove]] == slices[oldLastMove])) { // opposite faces 3 times in a row
           continue;
         }
-        solution1.add(i);
-        foundSolution |= phase1(transitCornerOrientation[cornerOrientation][i],
-            transitEdgeOrientation[edgeOrientation][i],
-            transitEEdgeCombination[eEdgeCombination][i], depth - 1);
-        solution1.remove(curSolutionSize);
+        int corOri = cornerOrientation;
+        int edgOri = edgeOrientation;
+        int edgCom = eEdgeCombination;
+        for (int j = 0; j < 3; j++) {
+          corOri = transitCornerOrientation[corOri][i];
+          edgOri = transitEdgeOrientation[edgOri][i];
+          edgCom = transitEEdgeCombination[edgCom][i];
+          byte nextMove = (byte) (i * 3 + j);
+          solution1.add(nextMove);
+          foundSolution |= phase1(corOri, edgOri, edgCom, depth - 1, nextMove, lastMove);
+          solution1.remove(curSolutionSize);
+        }
       }
     }
     return foundSolution;
   }
 
-  private boolean phase2(int cornerPermutation, int udEdgePermutation, int eEdgePermutation, int depth) {
+  private boolean phase2(int cornerPermutation, int udEdgePermutation, int eEdgePermutation, int depth, byte lastMove, byte oldLastMove) {
     if (depth == 0) {
       if (cornerPermutation == 0 && udEdgePermutation == 0 && eEdgePermutation == 0) {
-        Log.i("[NanoTimer]", "tmp solution: " + Arrays.toString(solution1.toArray()) + " . " + Arrays.toString(solution2.toArray()));
+        //Log.i("[NanoTimer]", "tmp solution: " + Arrays.toString(solution1.toArray()) + " . " + Arrays.toString(solution2.toArray()));
         if (bestSolution1 == null || solution1.size() + solution2.size() < bestSolution1.size() + bestSolution2.size()) {
-          Log.i("[NanoTimer]", "replacing solution");
-          bestSolution1 = new ArrayList<Integer>(solution1.size());
-          for (Integer m : solution1) {
+          //Log.i("[NanoTimer]", "replacing solution");
+          bestSolution1 = new ArrayList<Byte>(solution1.size());
+          for (Byte m : solution1) {
             bestSolution1.add(m);
           }
-          bestSolution2 = new ArrayList<Integer>(solution2.size());
-          for (Integer m : solution2) {
+          bestSolution2 = new ArrayList<Byte>(solution2.size());
+          for (Byte m : solution2) {
             bestSolution2.add(m);
           }
         }
-        solution2 = new ArrayList<Integer>();
+        solution2 = new ArrayList<Byte>();
         return true;
       }
       return false;
@@ -204,28 +230,26 @@ public class ThreeSolver {
     if (pruningCornerPermutation[cornerPermutation][eEdgePermutation] <= depth &&
         pruningUDEdgePermutation[udEdgePermutation][eEdgePermutation] <= depth) {
       int curSolutionSize = solution2.size();
-      int[] lastMoves = new int[] {
-          curSolutionSize > 0 ? solution2.get(curSolutionSize - 1) : -1,
-          curSolutionSize > 1 ? solution2.get(curSolutionSize - 2) : -1
-      };
       for (int i = 0; i < moves2.length; i++) {
-        if (curSolutionSize == 0) {
-          // avoid turning the same face twice in a row
-          if ((solution1.size() > 0 && slices2[i] == slices1[solution1.get(solution1.size() - 1)]) ||
-              solution1.size() > 1 && opposites[slices2[i]] == slices1[solution1.get(solution1.size() - 1)] && opposites[slices1[solution1.get(solution1.size() - 1)]] == slices1[solution1.get(solution1.size() - 2)]) {
-            continue;
-          }
-        } else if ((curSolutionSize > 0 && slices2[i] == slices2[lastMoves[0]]) || // same face twice in a row
-            (curSolutionSize > 1 && opposites[slices2[i]] == slices2[lastMoves[0]] && opposites[slices2[lastMoves[0]]] == slices2[lastMoves[1]])) { // opposite faces 3 times in a row
+        if ((lastMove >= 0 && (byte) i == slices[lastMove]) || // same face twice in a row
+            (oldLastMove > 1 && opposites[i] == slices[lastMove] && opposites[slices[lastMove]] == slices[oldLastMove])) { // opposite faces 3 times in a row
           continue;
         }
-        solution2.add(i);
-        if (phase2(transitCornerPermutation[cornerPermutation][i],
-            transitUDEdgePermutation[udEdgePermutation][i],
-            transitEEdgePermutation[eEdgePermutation][i], depth - 1)) {
-          return true;
+        int corPerm = cornerPermutation;
+        int udEdgPerm = udEdgePermutation;
+        int eEdgPerm = eEdgePermutation;
+        int nSubMoves = (i < 2) ? 3 : 1;
+        for (int j = 0; j < nSubMoves; j++) {
+          corPerm = transitCornerPermutation[corPerm][i];
+          udEdgPerm = transitUDEdgePermutation[udEdgPerm][i];
+          eEdgPerm = transitEEdgePermutation[eEdgPerm][i];
+          byte nextMove = (byte) (i * 3 + j);
+          solution2.add(nextMove);
+          if (phase2(corPerm, udEdgPerm, eEdgPerm, depth - 1, nextMove, lastMove)) {
+            return true;
+          }
+          solution2.remove(curSolutionSize);
         }
-        solution2.remove(curSolutionSize);
       }
     }
     return false;
@@ -239,8 +263,8 @@ public class ThreeSolver {
     searchStartTs = System.currentTimeMillis();
 
     initialState = cubeState;
-    solution1 = new ArrayList<Integer>();
-    solution2 = new ArrayList<Integer>();
+    solution1 = new ArrayList<Byte>();
+    solution2 = new ArrayList<Byte>();
     bestSolution1 = null;
     bestSolution2 = null;
 
@@ -254,28 +278,25 @@ public class ThreeSolver {
 
     // TODO : could test phases loops with breadth-first search (to avoid calculating the same nodes so many times). check memory usage and compare speeds
     for (int i = 0; i < SAFE_PHASE1_ITERATIONS_LIMIT && (bestSolution1 == null || System.currentTimeMillis() < searchStartTs + SEARCH_TIME_MIN); i++) {
-      if (phase1(cornerOrientation, edgeOrientation, eEdgeCombination, i)) {
-        solution1 = new ArrayList<Integer>();
-        solution2 = new ArrayList<Integer>();
+      if (phase1(cornerOrientation, edgeOrientation, eEdgeCombination, i, (byte) -1, (byte) -1)) {
+        solution1 = new ArrayList<Byte>();
+        solution2 = new ArrayList<Byte>();
       }
     }
 
     String[] solution = null;
     if (bestSolution1 != null) {
-      int length = bestSolution1.size() + bestSolution2.size();
-      if (SHOW_PHASE_SEPARATOR) {
-        length++;
-      }
+      int length = bestSolution1.size() + bestSolution2.size() + (SHOW_PHASE_SEPARATOR ? 1 : 0);
       solution = new String[length];
       int i = 0;
-      for (Integer m : bestSolution1) {
-        solution[i++] = moves1[m].name;
+      for (Byte m : bestSolution1) {
+        solution[i++] = moves[m].name;
       }
       if (SHOW_PHASE_SEPARATOR) {
         solution[i++] = ".";
       }
-      for (Integer m : bestSolution2) {
-        solution[i++] = moves2[m].name;
+      for (Byte m : bestSolution2) {
+        solution[i++] = moves[m].name;
       }
     }
     Log.i("[NanoTimer]", "solution time: " + (System.currentTimeMillis() - searchStartTs));
@@ -298,10 +319,9 @@ public class ThreeSolver {
     pruningUDEdgePermutation = StateTables.pruningUDEdgePermutation;
   }
 
-  private void applyMoves(CubeState state, List<Integer> moves) {
-    for (Integer m : moves) {
-      // TODO : handle moves2
-      Move move = moves1[m];
+  private void applyMoves(CubeState state, List<Byte> moves) {
+    for (Byte m : moves) {
+      Move move = ThreeSolver.moves[m];
       state.edgePermutations = StateTables.getPermResult(state.edgePermutations, move.edgPerm);
       state.cornerPermutations = StateTables.getPermResult(state.cornerPermutations, move.corPerm);
       state.edgeOrientations = StateTables.getOrientResult(state.edgeOrientations, move.edgPerm, move.edgOrient, 2);
