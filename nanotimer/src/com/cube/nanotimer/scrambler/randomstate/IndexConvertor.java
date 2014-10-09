@@ -2,23 +2,9 @@ package com.cube.nanotimer.scrambler.randomstate;
 
 public class IndexConvertor {
 
-  public static int packPermutation(byte[] perm) {
-    int nDifferentValues = perm.length;
-    int permInd = 0;
-    for (int i = 0; i < perm.length; i++) {
-      int curInd = perm[i] - 1; // -1 because positions start at 1
-      for (int j = 0; j < i; j++) {
-        if (perm[j] < perm[i]) {
-          curInd--;
-        }
-      }
-      permInd = permInd * (nDifferentValues - i) + curInd;
-    }
-    return permInd;
-  }
-
   private static final byte MAX_RELATIVE_PERM_SIZE = 8;
-  static byte[][] relPermIndices;
+  private static byte[][] relPermIndices;
+
   static {
     relPermIndices = new byte[MAX_RELATIVE_PERM_SIZE][MAX_RELATIVE_PERM_SIZE];
     int nPerFace = MAX_RELATIVE_PERM_SIZE / 2;
@@ -37,6 +23,21 @@ public class IndexConvertor {
     }
   }
 
+  public static int packPermutation(byte[] perm) {
+    int nDifferentValues = perm.length;
+    int permInd = 0;
+    for (int i = 0; i < perm.length; i++) {
+      int curInd = perm[i];
+      for (int j = 0; j < i; j++) {
+        if (perm[j] < perm[i]) {
+          curInd--;
+        }
+      }
+      permInd = permInd * (nDifferentValues - i) + curInd;
+    }
+    return permInd;
+  }
+
   // Pack a permutation with positions relative to each other.
   // Used to reduce the memory impact. 1, 2, 3, 4, 5, 6, 7, 8 is then equal for example to 3, 4, 1, 2, 7, 8, 5, 6.
   // This method can only be used for 8 elements permutations (optimized for performance)
@@ -47,13 +48,13 @@ public class IndexConvertor {
     byte i = 0;
     // TODO : see if could optimize a bit more (still takes ~17% more time than regular perm pack)
     while (i < nDifferentValues) {
-      if (startInd >= 0 || perm[i] == 1) {
+      if (startInd >= 0 || perm[i] == 0) {
         if (startInd < 0) {
           startInd = i;
           i = 0;
         }
         byte cur = perm[relPermIndices[startInd][i]];
-        byte curInd = (byte) (cur - 1); // -1 because positions start at 1
+        byte curInd = cur;
         for (byte j = 0; j < i; j++) {
           if (perm[relPermIndices[startInd][j]] < cur) {
             curInd--;
@@ -75,10 +76,11 @@ public class IndexConvertor {
   }
 
   public static byte[] unpackPermutation(int permInd, int length) {
+    // TODO : takes much longer than packPermutation (pbly due to array creation). See if can improve
     byte[] perm = new byte[length];
-    perm[length - 1] = 1;
+    perm[length - 1] = 0;
     for (int i = perm.length - 2; i >= 0; i--) {
-      perm[i] = (byte) ((permInd % (length - i)) + 1);
+      perm[i] = (byte) (permInd % (length - i));
       permInd /= (length - i);
       for (int j = i + 1; j < length; j++) {
         if (perm[j] >= perm[i]) {

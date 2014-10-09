@@ -17,8 +17,8 @@ public class ThreeSolverTest extends AndroidTestCase {
   public void testVeryEasy() {
     CubeState cubeState = new CubeState();
     //  F
-    cubeState.cornerPermutations = new byte[] { 1, 6, 2, 4, 5, 7, 3, 8 };
-    cubeState.edgePermutations = new byte[] { 5, 2, 3, 9, 4, 6, 7, 8, 1, 10, 11, 12 };
+    cubeState.cornerPermutations = new byte[] { 0, 5, 1, 3, 4, 6, 2, 7 };
+    cubeState.edgePermutations = new byte[] { 4, 1, 2, 8, 3, 5, 6, 7, 0, 9, 10, 11 };
     cubeState.cornerOrientations = new byte[] { 0, 2, 1, 0, 0, 1, 2, 0 };
     cubeState.edgeOrientations = new byte[] { 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0 };
 
@@ -34,8 +34,8 @@ public class ThreeSolverTest extends AndroidTestCase {
   public void testEasy() {
     CubeState cubeState = new CubeState();
     //  F L2 R' D2
-    cubeState.cornerPermutations = new byte[] { 7, 5, 4, 8, 2, 3, 6, 1 };
-    cubeState.edgePermutations = new byte[] { 6, 10, 9, 3, 4, 2, 7, 12, 11, 8, 1, 5 };
+    cubeState.cornerPermutations = new byte[] { 6, 4, 3, 7, 1, 2, 5, 0 };
+    cubeState.edgePermutations = new byte[] { 5, 9, 8, 2, 3, 1, 6, 11, 10, 7, 0, 4 };
     cubeState.cornerOrientations = new byte[] { 1, 0, 2, 1, 2, 1, 2, 0 };
     cubeState.edgeOrientations = new byte[] { 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1 };
 
@@ -49,8 +49,8 @@ public class ThreeSolverTest extends AndroidTestCase {
   public void testEasyWithLastPhase1Move() {
     CubeState cubeState = new CubeState();
     //  D2 R B2 F
-//    cubeState.cornerPermutations = new byte[] { 7, 5, 4, 8, 2, 3, 6, 1 };
-//    cubeState.edgePermutations = new byte[] { 6, 10, 9, 3, 4, 2, 7, 12, 11, 8, 1, 5 };
+//    cubeState.cornerPermutations = new byte[] { 6, 4, 3, 7, 1, 2, 5, 0 };
+//    cubeState.edgePermutations = new byte[] { 5, 9, 8, 2, 3, 1, 6, 11, 10, 7, 0, 4 };
 //    cubeState.cornerOrientations = new byte[] { 1, 0, 2, 1, 2, 1, 2, 0 };
 //    cubeState.edgeOrientations = new byte[] { 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1 };
 
@@ -64,8 +64,8 @@ public class ThreeSolverTest extends AndroidTestCase {
   public void testRealScramble() {
     CubeState cubeState = new CubeState();
     //  F L2 R' D2 R2 D' U' R D' B2 U2 F' U2 L2 D L R' U' F2 L R D2 B R' U2
-    cubeState.cornerPermutations = new byte[] { 4, 1, 5, 2, 7, 3, 6, 8 };
-    cubeState.edgePermutations = new byte[] { 2, 10, 9, 1, 12, 8, 7, 11, 5, 6, 4, 3 };
+    cubeState.cornerPermutations = new byte[] { 3, 0, 4, 1, 6, 2, 5, 7 };
+    cubeState.edgePermutations = new byte[] { 1, 9, 8, 0, 11, 7, 6, 10, 4, 5, 3, 2 };
     cubeState.cornerOrientations = new byte[] { 2, 2, 2, 1, 0, 1, 1, 0 };
     cubeState.edgeOrientations = new byte[] { 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1 };
 

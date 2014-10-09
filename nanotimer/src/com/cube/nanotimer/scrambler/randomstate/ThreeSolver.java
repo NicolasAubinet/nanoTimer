@@ -63,12 +63,12 @@ public class ThreeSolver {
   private static byte[] opposites;
 
   // Transition tables
-  private static int[][] transitCornerPermutation;
-  private static int[][] transitCornerOrientation;
-  private static int[][] transitEEdgeCombination;
-  private static int[][] transitEEdgePermutation;
-  private static int[][] transitUDEdgePermutation;
-  private static int[][] transitEdgeOrientation;
+  private static short[][] transitCornerPermutation;
+  private static short[][] transitCornerOrientation;
+  private static short[][] transitEEdgeCombination;
+  private static short[][] transitEEdgePermutation;
+  private static short[][] transitUDEdgePermutation;
+  private static short[][] transitEdgeOrientation;
 
   // Pruning tables
   private static byte[][] pruningCornerOrientation;
@@ -169,10 +169,11 @@ public class ThreeSolver {
 
         // search for phase 2 solution
         int maxDepth = Math.min(MAX_PHASE2_SOLUTION_LENGTH, MAX_SOLUTION_LENGTH - solution1.size());
+        int corPerm = IndexConvertor.packRel8Permutation(state.cornerPermutations);
+        int udEdgPerm = IndexConvertor.packRel8Permutation(udEdgePermutation);
+        int eEdgPerm = IndexConvertor.packPermutation(eEdgePermutation);
         for (int i = 0; i < maxDepth && !foundSolution; i++) {
-          foundSolution |= phase2(IndexConvertor.packPermutation(state.cornerPermutations),
-              IndexConvertor.packPermutation(udEdgePermutation),
-              IndexConvertor.packPermutation(eEdgePermutation), i, lastMove, oldLastMove);
+          foundSolution |= phase2(corPerm, udEdgPerm, eEdgPerm, i, lastMove, oldLastMove);
         }
       }
       return foundSolution;
@@ -322,6 +323,7 @@ public class ThreeSolver {
   private void applyMoves(CubeState state, List<Byte> moves) {
     for (Byte m : moves) {
       Move move = ThreeSolver.moves[m];
+      // TODO : using half turn safe stuff here, see if really needed, or if could use the optimized getPerm/OrientResult
       state.edgePermutations = StateTables.getPermResult(state.edgePermutations, move.edgPerm);
       state.cornerPermutations = StateTables.getPermResult(state.cornerPermutations, move.corPerm);
       state.edgeOrientations = StateTables.getOrientResult(state.edgeOrientations, move.edgPerm, move.edgOrient, 2);

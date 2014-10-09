@@ -9,13 +9,13 @@ public class StateTables {
 
   // TODO : make positions start at 0 (everywhere, starting from Move class, IndexConvertor, tests etc)
 
-  private static final int N_CORNER_PERMUTATIONS = 40320;
+  private static final int N_CORNER_PERMUTATIONS = 5040;
   private static final int N_CORNER_ORIENTATIONS = 2187;
   private static final int N_E_EDGE_COMBINATIONS = 495;
 
   private static final int N_EDGE_PERMUTATIONS = 479001600;
   private static final int N_E_EDGE_PERMUTATIONS = 24;
-  private static final int N_U_D_EDGE_PERMUTATIONS = 40320;
+  private static final int N_U_D_EDGE_PERMUTATIONS = 5040;
   private static final int N_EDGE_ORIENTATIONS = 2048;
 
   // TODO : transit optimization:
@@ -28,12 +28,12 @@ public class StateTables {
   //          could pbly also do it for other tables (already now)
 
   // Transition tables
-  static int[][] transitCornerPermutation;
-  static int[][] transitCornerOrientation;
-  static int[][] transitEEdgeCombination;
-  static int[][] transitEEdgePermutation;
-  static int[][] transitUDEdgePermutation;
-  static int[][] transitEdgeOrientation;
+  static short[][] transitCornerPermutation;
+  static short[][] transitCornerOrientation;
+  static short[][] transitEEdgeCombination;
+  static short[][] transitEEdgePermutation;
+  static short[][] transitUDEdgePermutation;
+  static short[][] transitEdgeOrientation;
 
   // TODO : pruning optimization:
   //        switch to backward search when getting close to the end (compare with / without)
@@ -57,49 +57,50 @@ public class StateTables {
 
     // --> Phase 1
     long stepTs = System.currentTimeMillis();
-    transitCornerOrientation = new int[N_CORNER_ORIENTATIONS][moves1.length];
+    transitCornerOrientation = new short[N_CORNER_ORIENTATIONS][moves1.length];
     for (int i = 0; i < transitCornerOrientation.length; i++) {
       byte[] state = IndexConvertor.unpackOrientation(i, 3, 8);
       for (int j = 0; j < moves1.length; j++) {
-        transitCornerOrientation[i][j] = IndexConvertor.packOrientation(getOrientResult(state, moves1[j].corPerm, moves1[j].corOrient, 3), 3);
+        transitCornerOrientation[i][j] = (short) IndexConvertor.packOrientation(getOrientResult(state, moves1[j].corPerm, moves1[j].corOrient, 3), 3);
       }
     }
     logTimeDifference(stepTs, "trCorOri");
 
     stepTs = System.currentTimeMillis();
-    transitEdgeOrientation = new int[N_EDGE_ORIENTATIONS][moves1.length];
+    transitEdgeOrientation = new short[N_EDGE_ORIENTATIONS][moves1.length];
     for (int i = 0; i < transitEdgeOrientation.length; i++) {
       byte[] state = IndexConvertor.unpackOrientation(i, 2, 12);
       for (int j = 0; j < moves1.length; j++) {
-        transitEdgeOrientation[i][j] = IndexConvertor.packOrientation(getOrientResult(state, moves1[j].edgPerm, moves1[j].edgOrient, 2), 2);
+        transitEdgeOrientation[i][j] = (short) IndexConvertor.packOrientation(getOrientResult(state, moves1[j].edgPerm, moves1[j].edgOrient, 2), 2);
       }
     }
     logTimeDifference(stepTs, "trEdgOri");
 
     stepTs = System.currentTimeMillis();
-    transitEEdgeCombination = new int[N_E_EDGE_COMBINATIONS][moves1.length];
+    transitEEdgeCombination = new short[N_E_EDGE_COMBINATIONS][moves1.length];
     for (int i = 0; i < transitEEdgeCombination.length; i++) {
       boolean[] state = IndexConvertor.unpackCombination(i, 4, 12);
       for (int j = 0; j < moves1.length; j++) {
-        transitEEdgeCombination[i][j] = IndexConvertor.packCombination(getPermResult(state, moves1[j].edgPerm), 4);
+        transitEEdgeCombination[i][j] = (short) IndexConvertor.packCombination(getPermResult(state, moves1[j].edgPerm), 4);
       }
     }
     logTimeDifference(stepTs, "trEEdgComb");
 
     // --> Phase 2
     stepTs = System.currentTimeMillis();
-    transitCornerPermutation = new int[N_CORNER_PERMUTATIONS][moves2.length];
+    transitCornerPermutation = new short[N_CORNER_PERMUTATIONS][moves2.length];
     for (int i = 0; i < transitCornerPermutation.length; i++) {
       byte[] state = IndexConvertor.unpackPermutation(i, 8);
       for (int j = 0; j < moves2.length; j++) {
-        transitCornerPermutation[i][j] = IndexConvertor.packPermutation(getPermResult(state, moves2[j].corPerm));
+        byte[] res = getPermResult(state, moves2[j].corPerm);
+        transitCornerPermutation[i][j] = (short) IndexConvertor.packRel8Permutation(res);
       }
     }
     logTimeDifference(stepTs, "trCorPerm");
 
     // E and UD edges stay on the same layers as phase 2 moves can not interchange them
     stepTs = System.currentTimeMillis();
-    transitEEdgePermutation = new int[N_E_EDGE_PERMUTATIONS][moves2.length];
+    transitEEdgePermutation = new short[N_E_EDGE_PERMUTATIONS][moves2.length];
     for (int i = 0; i < transitEEdgePermutation.length; i++) {
       byte[] state = IndexConvertor.unpackPermutation(i, 4);
       byte[] edges = new byte[12];
@@ -111,13 +112,13 @@ public class StateTables {
         byte[] res = getPermResult(edges, moves2[j].edgPerm);
         byte[] eEdges = new byte[4];
         System.arraycopy(res, 0, eEdges, 0, eEdges.length);
-        transitEEdgePermutation[i][j] = IndexConvertor.packPermutation(eEdges);
+        transitEEdgePermutation[i][j] = (short) IndexConvertor.packPermutation(eEdges);
       }
     }
     logTimeDifference(stepTs, "trEEdgPerm");
 
     stepTs = System.currentTimeMillis();
-    transitUDEdgePermutation = new int[N_U_D_EDGE_PERMUTATIONS][moves2.length];
+    transitUDEdgePermutation = new short[N_U_D_EDGE_PERMUTATIONS][moves2.length];
     for (int i = 0; i < transitUDEdgePermutation.length; i++) {
       byte[] state = IndexConvertor.unpackPermutation(i, 8);
       byte[] edges = new byte[12];
@@ -129,7 +130,7 @@ public class StateTables {
         byte[] res = getPermResult(edges, moves2[j].edgPerm);
         byte[] udEdges = new byte[8];
         System.arraycopy(res, 4, udEdges, 0, udEdges.length);
-        transitUDEdgePermutation[i][j] = IndexConvertor.packPermutation(udEdges);
+        transitUDEdgePermutation[i][j] = (short) IndexConvertor.packRel8Permutation(udEdges);
       }
     }
     logTimeDifference(stepTs, "trUDEdgPerm");
@@ -167,7 +168,7 @@ public class StateTables {
     logTimeDifference(ts, "time to generate static stuff");
   }
 
-  private static void genPruning(byte[][] pruningTable, int[][] transit1, int[][] transit2, int phase) {
+  private static void genPruning(byte[][] pruningTable, short[][] transit1, short[][] transit2, int phase) {
     for (int i = 0; i < pruningTable.length; i++) {
       for (int j = 0; j < pruningTable[i].length; j++) {
         pruningTable[i][j] = -1;
@@ -194,48 +195,143 @@ public class StateTables {
     }
   }
 
-  static byte[] getPermResult(byte[] state, byte[] permIndices) {
-    // New way (speed-optimized and with 0-based index)
-    /*byte permStart = -1;
-    byte prevInd;
-    byte tmp;
-    for (byte i = 0; i < state.length; i++) {
+  // Attempt to optimize getPermResult. But this modifies state so the result array has to be recreated before calling this...
+  // Note: can only handle one cycling permutation (does not handle multiple permutations like for half turns)
+  /*static byte[] getPermResult(byte[] state, byte[] permIndices) {
+    byte permStart = -1;
+    byte tmp = 0;
+    byte i = 0;
+    while (i < state.length) {
       if (i != permIndices[i]) {
         if (permStart < 0) { // start of permutation
           permStart = i;
-          prevInd = i;
           tmp = state[i];
         } else if (permIndices[i] == permStart) { // end of permutation
           state[i] = tmp;
           break;
         }
-        state[prevInd] = state[permIndices[i];
-        prevInd = permIndices[i];
+        state[i] = state[permIndices[i]];
+        i = permIndices[i];
+      } else {
+        i++;
       }
     }
-    return state;*/
-    // Old way (array creation, takes some time)
+    return state;
+  }*/
+
+  // Slowest version of getPermResult, but can directly handle half turns (containing multiple permutations cycles)
+  static byte[] getPermResult(byte[] state, byte[] permIndices) {
+    // TODO : optimize these methods, see if possible to avoid creating a new array
     byte[] result = new byte[state.length];
     for (int i = 0; i < result.length; i++) {
-      result[i] = state[permIndices[i] - 1];
+      result[i] = state[permIndices[i]];
     }
     return result;
   }
 
   static boolean[] getPermResult(boolean[] state, byte[] permIndices) {
-    // TODO : use the need way (no array creation, see method above)
     boolean[] result = new boolean[state.length];
     for (int i = 0; i < result.length; i++) {
-      result[i] = state[permIndices[i] - 1];
+      result[i] = state[permIndices[i]];
     }
     return result;
   }
 
+  // getPermResult with handling up to 2 different permutations (like for half turns), but with performance penalty (could probably improve code to make it faster)
+  /*static byte[] getPermResult(byte[] state, byte[] permIndices) {
+    // New way (speed-optimized and with 0-based index)
+    byte permStart = -1;
+    byte prevPermStart = -1;
+    byte tmp = 0;
+    byte i = 0;
+    while (i < state.length) {
+      if (i != permIndices[i]) {
+        if (permStart < 0) { // start of permutation
+          permStart = i;
+          tmp = state[i];
+        } else if (permIndices[i] == permStart) { // end of permutation
+          state[i] = tmp;
+          // look to see if there is an other perm to process (like for half turn moves)
+          boolean foundOtherPerm = false;
+          for (byte j = (byte) (permStart + 1); j < state.length; j++) {
+            if (j != permIndices[j]) { // an other permutation?
+              int k = j;
+              do {
+                k = permIndices[k];
+              } while (k != j && k != permStart && k != prevPermStart);
+              if (k == j) { // new permutation
+                foundOtherPerm = true;
+                i = j;
+                break;
+              }
+            }
+          }
+          if (foundOtherPerm) {
+            prevPermStart = permStart;
+            permStart = -1;
+            continue;
+          } else {
+            break;
+          }
+        }
+        state[i] = state[permIndices[i]];
+        i = permIndices[i];
+      } else {
+        i++;
+      }
+    }
+    return state;
+  }*/
+
+  /*static boolean[] getPermResult(boolean[] state, byte[] permIndices) {
+    byte permStart = -1;
+    boolean tmp = false;
+    byte i = 0;
+    while (i < state.length) {
+      if (i != permIndices[i]) {
+        if (permStart < 0) { // start of permutation
+          permStart = i;
+          tmp = state[i];
+        } else if (permIndices[i] == permStart) { // end of permutation
+          state[i] = tmp;
+          break;
+        }
+        state[i] = state[permIndices[i]];
+        i = permIndices[i];
+      } else {
+        i++;
+      }
+    }
+    return state;
+  }
+
   static byte[] getOrientResult(byte[] state, byte[] permIndices, byte[] orientIndices, int nDifferentValues) {
-    // TODO : avoid creating a new array
+    byte permStart = -1;
+    byte tmp = 0;
+    byte i = 0;
+    while (i < state.length) {
+      if (i != permIndices[i]) {
+        if (permStart < 0) { // start of permutation
+          permStart = i;
+          tmp = state[i];
+        } else if (permIndices[i] == permStart) { // end of permutation
+          state[i] = (byte) ((tmp + orientIndices[i]) % nDifferentValues);
+          break;
+        }
+        state[i] = (byte) ((state[permIndices[i]] + orientIndices[i]) % nDifferentValues);
+        i = permIndices[i];
+      } else {
+        i++;
+      }
+    }
+    return state;
+  }*/
+
+  // Slowest version of getOrientResult, but can directly handle half turns (containing multiple permutations cycles)
+  static byte[] getOrientResult(byte[] state, byte[] permIndices, byte[] orientIndices, int nDifferentValues) {
     byte[] result = new byte[state.length];
     for (int i = 0; i < state.length; i++) {
-      result[i] = (byte) ((state[permIndices[i] - 1] + orientIndices[i]) % nDifferentValues);
+      result[i] = (byte) ((state[permIndices[i]] + orientIndices[i]) % nDifferentValues);
     }
     return result;
   }

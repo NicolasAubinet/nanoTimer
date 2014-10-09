@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
+import java.util.Random;
 
 public class StateTablesTest extends AndroidTestCase {
 
@@ -21,39 +22,77 @@ public class StateTablesTest extends AndroidTestCase {
     state.edgeOrientations = IndexConvertor.unpackOrientation(0, 2, 12);
     state.cornerOrientations = IndexConvertor.unpackOrientation(0, 3, 8);
 
-    applyMove(state, Move.F2);
+    applyMove(state, Move.F); // F2
+    applyMove(state, Move.F);
     applyMove(state, Move.U);
     applyMove(state, Move.R);
     applyMove(state, Move.D);
-    applyMove(state, Move.L2);
+    applyMove(state, Move.L); // L2
+    applyMove(state, Move.L);
     applyMove(state, Move.B);
-    Assert.assertTrue(Arrays.equals(new byte[] { 4, 1, 2, 8, 5, 7, 3, 6 }, state.cornerPermutations));
-    Assert.assertTrue(Arrays.equals(new byte[] { 10, 2, 8, 3, 6, 4, 7, 11, 12, 5, 1, 9 }, state.edgePermutations));
+    Assert.assertTrue(Arrays.equals(new byte[] { 3, 0, 1, 7, 4, 6, 2, 5 }, state.cornerPermutations));
+    Assert.assertTrue(Arrays.equals(new byte[] { 9, 1, 7, 2, 5, 3, 6, 10, 11, 4, 0, 8 }, state.edgePermutations));
     Assert.assertTrue(Arrays.equals(new byte[] { 2, 2, 2, 0, 2, 0, 0, 1 }, state.cornerOrientations));
     Assert.assertTrue(Arrays.equals(new byte[] { 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0 }, state.edgeOrientations));
 
-    applyMove(state, Move.RP);
-    applyMove(state, Move.UP);
+    applyMove(state, Move.R); // R'
+    applyMove(state, Move.R);
+    applyMove(state, Move.R);
+    applyMove(state, Move.U); // U'
+    applyMove(state, Move.U);
+    applyMove(state, Move.U);
     applyMove(state, Move.L);
-    applyMove(state, Move.DP);
-    applyMove(state, Move.B2);
+    applyMove(state, Move.D); // D'
+    applyMove(state, Move.D);
+    applyMove(state, Move.D);
+    applyMove(state, Move.B); // B
+    applyMove(state, Move.B);
     applyMove(state, Move.F);
-    Assert.assertTrue(Arrays.equals(new byte[] { 7, 2, 6, 4, 8, 3, 1, 5 }, state.cornerPermutations));
-    Assert.assertTrue(Arrays.equals(new byte[] { 11, 9, 5, 10, 7, 6, 3, 8, 4, 1, 2, 12 }, state.edgePermutations));
+    Assert.assertTrue(Arrays.equals(new byte[] { 6, 1, 5, 3, 7, 2, 0, 4 }, state.cornerPermutations));
+    Assert.assertTrue(Arrays.equals(new byte[] { 10, 8, 4, 9, 6, 5, 2, 7, 3, 0, 1, 11 }, state.edgePermutations));
     Assert.assertTrue(Arrays.equals(new byte[] { 1, 2, 1, 1, 2, 0, 1, 1 }, state.cornerOrientations));
     Assert.assertTrue(Arrays.equals(new byte[] { 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0 }, state.edgeOrientations));
 
-    applyMove(state, Move.LP);
-    applyMove(state, Move.U2);
-    applyMove(state, Move.R2);
-    applyMove(state, Move.BP);
-    applyMove(state, Move.FP);
-    applyMove(state, Move.D2);
-    Assert.assertTrue(Arrays.equals(new byte[] { 7, 5, 3, 6, 8, 1, 2, 4 }, state.cornerPermutations));
-    Assert.assertTrue(Arrays.equals(new byte[] { 4, 7, 2, 3, 9, 1, 8, 6, 11, 5, 12, 10 }, state.edgePermutations));
+    applyMove(state, Move.L); // L'
+    applyMove(state, Move.L);
+    applyMove(state, Move.L);
+    applyMove(state, Move.U); // U2
+    applyMove(state, Move.U);
+    applyMove(state, Move.R); // R2
+    applyMove(state, Move.R);
+    applyMove(state, Move.B); // B'
+    applyMove(state, Move.B);
+    applyMove(state, Move.B);
+    applyMove(state, Move.F); // F'
+    applyMove(state, Move.F);
+    applyMove(state, Move.F);
+    applyMove(state, Move.D); // D2
+    applyMove(state, Move.D);
+    Assert.assertTrue(Arrays.equals(new byte[] { 6, 4, 2, 5, 7, 0, 1, 3 }, state.cornerPermutations));
+    Assert.assertTrue(Arrays.equals(new byte[] { 3, 6, 1, 2, 8, 0, 7, 5, 10, 4, 11, 9 }, state.edgePermutations));
     Assert.assertTrue(Arrays.equals(new byte[] { 0, 0, 2, 0, 0, 2, 0, 2 }, state.cornerOrientations));
     Assert.assertTrue(Arrays.equals(new byte[] { 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1 }, state.edgeOrientations));
   }
+
+  /*@SmallTest
+  public void testTransit() {
+    Move[] moves1 = new Move[] {
+        Move.U,
+        Move.D,
+        Move.R,
+        Move.L,
+        Move.F,
+        Move.B
+    };
+
+    short[][] transitCornerOrientation = new short[2187][6];
+    for (int i = 0; i < transitCornerOrientation.length; i++) {
+      for (int j = 0; j < moves1.length; j++) {
+        byte[] state = IndexConvertor.unpackOrientation(i, 3, 8);
+        transitCornerOrientation[i][j] = (short) IndexConvertor.packOrientation(StateTables.getOrientResult(state, moves1[j].corPerm, moves1[j].corOrient, 3), 3);
+      }
+    }
+  }*/
 
   @SmallTest
   public void testPrunings() {
@@ -134,17 +173,17 @@ public class StateTablesTest extends AndroidTestCase {
     }
     Assert.assertEquals(0, pruningCornerPermutation[0][0]);
     Assert.assertEquals(1, pruningCornerPermutation
-        [IndexConvertor.packPermutation(new byte[] { 1, 7, 6, 4, 5, 3, 2, 8 })]
-        [IndexConvertor.packPermutation(new byte[] { 4, 2, 3, 1 })]); // F2
+        [IndexConvertor.packRel8Permutation(new byte[] { 0, 6, 5, 3, 4, 2, 1, 7 })]
+        [IndexConvertor.packPermutation(new byte[] { 3, 1, 2, 0 })]); // F2
     Assert.assertEquals(2, pruningCornerPermutation
-        [IndexConvertor.packPermutation(new byte[] { 2, 8, 7, 1, 5, 6, 4, 3 })]
-        [IndexConvertor.packPermutation(new byte[] { 2, 1, 3, 4 })]); // R2 U
+        [IndexConvertor.packRel8Permutation(new byte[] { 1, 7, 6, 0, 4, 5, 3, 2 })]
+        [IndexConvertor.packPermutation(new byte[] { 1, 0, 2, 3 })]); // R2 U
     Assert.assertEquals(3, pruningCornerPermutation
-        [IndexConvertor.packPermutation(new byte[] { 2, 5, 3, 1, 4, 7, 8, 6 })]
-        [IndexConvertor.packPermutation(new byte[] { 1, 4, 2, 3 })]); // L2 D' B2
+        [IndexConvertor.packRel8Permutation(new byte[] { 1, 4, 2, 0, 3, 6, 7, 5 })]
+        [IndexConvertor.packPermutation(new byte[] { 0, 3, 1, 2 })]); // L2 D' B2
     Assert.assertEquals(4, pruningCornerPermutation
-        [IndexConvertor.packPermutation(new byte[] { 1, 2, 8, 7, 4, 3, 5, 6 })]
-        [IndexConvertor.packPermutation(new byte[] { 2, 1, 4, 3 })]); // U2 R2 D2 L2
+        [IndexConvertor.packRel8Permutation(new byte[] { 0, 1, 7, 6, 3, 2, 4, 5 })]
+        [IndexConvertor.packPermutation(new byte[] { 1, 0, 3, 2 })]); // U2 R2 D2 L2
 
     byte[][] pruningUDEdgePermutation = StateTables.pruningUDEdgePermutation;
     for (int i = 0; i < pruningUDEdgePermutation.length; i++) {
@@ -154,17 +193,17 @@ public class StateTablesTest extends AndroidTestCase {
     }
     Assert.assertEquals(0, pruningUDEdgePermutation[0][0]);
     Assert.assertEquals(1, pruningUDEdgePermutation
-        [IndexConvertor.packPermutation(new byte[] { 5, 2, 3, 4, 1, 6, 7, 8 })]
-        [IndexConvertor.packPermutation(new byte[] { 4, 2, 3, 1 })]); // F2
-    Assert.assertEquals(2, pruningUDEdgePermutation
-        [IndexConvertor.packPermutation(new byte[] { 6, 3, 4, 1, 5, 2, 7, 8 })]
-        [IndexConvertor.packPermutation(new byte[] { 2, 1, 3, 4 })]); // R2 U
+        [IndexConvertor.packRel8Permutation(new byte[] { 4, 1, 2, 3, 0, 5, 6, 7 })]
+        [IndexConvertor.packPermutation(new byte[] { 3, 1, 2, 0 })]); // F1
+    Assert.assertEquals(1, pruningUDEdgePermutation
+        [IndexConvertor.packRel8Permutation(new byte[] { 5, 2, 3, 0, 4, 1, 6, 7 })]
+        [IndexConvertor.packPermutation(new byte[] { 1, 0, 2, 3 })]); // R1 U
     Assert.assertEquals(3, pruningUDEdgePermutation
-        [IndexConvertor.packPermutation(new byte[] { 1, 2, 4, 8, 6, 7, 3, 5 })]
-        [IndexConvertor.packPermutation(new byte[] { 1, 4, 2, 3 })]); // L2 D' B2
-    Assert.assertEquals(4, pruningUDEdgePermutation
-        [IndexConvertor.packPermutation(new byte[] { 3, 6, 1, 4, 7, 8, 5, 2 })]
-        [IndexConvertor.packPermutation(new byte[] { 2, 1, 4, 3 })]); // U2 R2 D2 L2
+        [IndexConvertor.packRel8Permutation(new byte[] { 0, 1, 3, 7, 5, 6, 2, 4 })]
+        [IndexConvertor.packPermutation(new byte[] { 0, 3, 1, 2 })]); // L1 D' B1
+    Assert.assertEquals(3, pruningUDEdgePermutation
+        [IndexConvertor.packRel8Permutation(new byte[] { 2, 5, 0, 3, 6, 7, 4, 1 })]
+        [IndexConvertor.packPermutation(new byte[] { 1, 0, 3, 2 })]); // U1 R1 D1 L1
   }
 
   /*public void testCreateFile() throws IOException {
@@ -205,6 +244,23 @@ public class StateTablesTest extends AndroidTestCase {
     Log.i("[NanoTimer]", "prEOri size: " + getSize(StateTables.pruningEdgeOrientation));
     Log.i("[NanoTimer]", "prCorPerm size: " + getSize(StateTables.pruningCornerPermutation));
     Log.i("[NanoTimer]", "prUDEPerm size: " + getSize(StateTables.pruningUDEdgePermutation));
+  }
+
+  @SmallTest
+  public void testPermPerformance() {
+    Random r = new Random();
+    byte[] state;
+    byte[] perms;
+    long tsTotal = 0;
+    for (int i = 0; i < 50000; i++) {
+      int n = r.nextInt(40320);
+      state = IndexConvertor.unpackPermutation(n, 8);
+      perms = Move.values()[r.nextInt(18)].corPerm;
+      long ts = System.currentTimeMillis();
+      StateTables.getPermResult(state, perms);
+      tsTotal += (System.currentTimeMillis() - ts);
+    }
+    Log.i("[NanoTimer]", "corner perm time: " + tsTotal);
   }
 
   private int getSize(Object obj) {

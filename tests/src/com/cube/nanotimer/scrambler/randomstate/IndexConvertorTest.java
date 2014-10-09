@@ -26,26 +26,26 @@ public class IndexConvertorTest extends AndroidTestCase {
     assertArrayEquals(state, unpackCornerOrientation(packCornerOrientation(state)));
 
     // Corner permutation
-    state = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+    state = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
     Assert.assertEquals(0, packCornerPermutation(state));
     assertArrayEquals(state, unpackCornerPermutation(packCornerPermutation(state)));
-    state = new byte[] { 1, 2, 3, 4, 5, 6, 8, 7 };
+    state = new byte[] { 0, 1, 2, 3, 4, 5, 7, 6 };
     assertArrayEquals(state, unpackCornerPermutation(packCornerPermutation(state)));
-    state = new byte[] { 1, 2, 3, 4, 5, 7, 6, 8 };
+    state = new byte[] { 0, 1, 2, 3, 4, 6, 5, 7 };
     assertArrayEquals(state, unpackCornerPermutation(packCornerPermutation(state)));
-    state = new byte[] { 1, 2, 3, 4, 6, 7, 5, 8 };
+    state = new byte[] { 0, 1, 2, 3, 5, 6, 4, 7 };
     assertArrayEquals(state, unpackCornerPermutation(packCornerPermutation(state)));
-    state = new byte[] { 8, 7, 6, 5, 4, 2, 3, 1 };
+    state = new byte[] { 7, 6, 5, 4, 3, 1, 2, 0 };
     assertArrayEquals(state, unpackCornerPermutation(packCornerPermutation(state)));
-    state = new byte[] { 8, 7, 6, 5, 4, 3, 1, 2 };
+    state = new byte[] { 7, 6, 5, 4, 3, 2, 0, 1 };
     assertArrayEquals(state, unpackCornerPermutation(packCornerPermutation(state)));
-    state = new byte[] { 8, 7, 6, 5, 4, 3, 2, 1 };
+    state = new byte[] { 7, 6, 5, 4, 3, 2, 1, 0 };
     assertArrayEquals(state, unpackCornerPermutation(packCornerPermutation(state)));
-    state = new byte[] { 6, 4, 1, 2, 7, 5, 8, 3 };
+    state = new byte[] { 5, 3, 0, 1, 6, 4, 7, 2 };
     assertArrayEquals(state, unpackCornerPermutation(packCornerPermutation(state)));
-    state = new byte[] { 5, 4, 1, 2, 8, 6, 7, 3 };
+    state = new byte[] { 4, 3, 0, 1, 7, 5, 6, 2 };
     assertArrayEquals(state, unpackCornerPermutation(packCornerPermutation(state)));
-    state = new byte[] { 4, 1, 3, 7, 2, 8, 6, 5 };
+    state = new byte[] { 3, 0, 2, 6, 1, 7, 5, 4 };
     assertArrayEquals(state, unpackCornerPermutation(packCornerPermutation(state)));
 
     // Edge orientation
@@ -60,27 +60,27 @@ public class IndexConvertorTest extends AndroidTestCase {
     assertArrayEquals(state, unpackEdgeOrientation(packEdgeOrientation(state)));
 
     // Edge permutation
-    state = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+    state = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
     Assert.assertEquals(0, packEdgePermutation(state));
     assertArrayEquals(state, unpackUDEdgePermutation(packEdgePermutation(state)));
-    state = new byte[] { 1, 2, 3, 4 };
+    state = new byte[] { 0, 1, 2, 3 };
     Assert.assertEquals(0, packEdgePermutation(state));
     assertArrayEquals(state, unpackEEdgePermutation(packEdgePermutation(state)));
-    state = new byte[] { 8, 7, 6, 5, 4, 3, 2, 1 };
+    state = new byte[] { 7, 6, 5, 4, 3, 2, 1, 0 };
     assertArrayEquals(state, unpackUDEdgePermutation(packEdgePermutation(state)));
-    state = new byte[] { 4, 3, 2, 1 };
+    state = new byte[] { 3, 2, 1, 0 };
     assertArrayEquals(state, unpackEEdgePermutation(packEdgePermutation(state)));
-    state = new byte[] { 1, 7, 6, 5, 4, 3, 2, 8 };
+    state = new byte[] { 0, 6, 5, 4, 3, 2, 1, 7 };
     assertArrayEquals(state, unpackUDEdgePermutation(packEdgePermutation(state)));
-    state = new byte[] { 2, 3, 1, 4 };
+    state = new byte[] { 1, 2, 0, 3 };
     assertArrayEquals(state, unpackEEdgePermutation(packEdgePermutation(state)));
-    state = new byte[] { 5, 4, 8, 1, 6, 3, 7, 2 };
+    state = new byte[] { 4, 3, 7, 0, 5, 2, 6, 1 };
     assertArrayEquals(state, unpackUDEdgePermutation(packEdgePermutation(state)));
-    state = new byte[] { 4, 3, 1, 2 };
+    state = new byte[] { 3, 2, 0, 1 };
     assertArrayEquals(state, unpackEEdgePermutation(packEdgePermutation(state)));
-    state = new byte[] { 4, 1, 5, 2, 7, 8, 3, 6 };
+    state = new byte[] { 3, 0, 4, 1, 6, 7, 2, 5 };
     assertArrayEquals(state, unpackUDEdgePermutation(packEdgePermutation(state)));
-    state = new byte[] { 2, 4, 3, 1 };
+    state = new byte[] { 1, 3, 2, 0 };
     assertArrayEquals(state, unpackEEdgePermutation(packEdgePermutation(state)));
 
     // Edge combinations
@@ -96,56 +96,59 @@ public class IndexConvertorTest extends AndroidTestCase {
   @SmallTest
   public void testRelativePermutationConversion() {
     // TODO : see if need to adapt StateTables : getPermResult
-    byte[] state = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+    byte[] state = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
     Assert.assertEquals(0, IndexConvertor.packRel8Permutation(state));
     assertArrayEquals(state, unpackCornerPermutation(IndexConvertor.packRel8Permutation(state)));
-    state = new byte[] { 3, 4, 1, 2, 7, 8, 5, 6 };
+    state = new byte[] { 2, 3, 0, 1, 6, 7, 4, 5 };
     Assert.assertEquals(0, IndexConvertor.packRel8Permutation(state));
-    state = new byte[] { 4, 1, 2, 3, 8, 5, 6, 7 };
+    state = new byte[] { 3, 0, 1, 2, 7, 4, 5, 6 };
     Assert.assertEquals(0, IndexConvertor.packRel8Permutation(state));
-    state = new byte[] { 7, 8, 5, 6, 3, 4, 1, 2 };
+    state = new byte[] { 6, 7, 4, 5, 2, 3, 0, 1 };
     Assert.assertEquals(0, IndexConvertor.packRel8Permutation(state));
-    state = new byte[] { 1, 8, 7, 6, 5, 4, 3, 2 };
+    state = new byte[] { 0, 7, 6, 5, 4, 3, 2, 1 };
     Assert.assertEquals(5039, IndexConvertor.packRel8Permutation(state));
-    state = new byte[] { 1, 2, 3, 4, 5, 6, 8, 7 };
+    state = new byte[] { 0, 1, 2, 3, 4, 5, 7, 6 };
     assertArrayEquals(state, unpackCornerPermutation(IndexConvertor.packRel8Permutation(state)));
-    state = new byte[] { 1, 2, 3, 4, 5, 7, 6, 8 };
+    state = new byte[] { 0, 1, 2, 3, 4, 6, 5, 7 };
     assertArrayEquals(state, unpackCornerPermutation(IndexConvertor.packRel8Permutation(state)));
-    state = new byte[] { 1, 2, 3, 4, 6, 7, 5, 8 };
+    state = new byte[] { 0, 1, 2, 3, 5, 6, 4, 7 };
     assertArrayEquals(state, unpackCornerPermutation(IndexConvertor.packRel8Permutation(state)));
-    state = new byte[] { 8, 7, 6, 5, 4, 2, 3, 1 };
-    byte[] state2 = new byte[] { 1, 4, 2, 3, 5, 8, 7, 6 };
+    state = new byte[] { 7, 6, 5, 4, 3, 1, 2, 0 };
+    byte[] state2 = new byte[] { 0, 3, 1, 2, 4, 7, 6, 5 };
     Assert.assertEquals(IndexConvertor.packRel8Permutation(state2), IndexConvertor.packRel8Permutation(state));
-    state = new byte[] { 8, 7, 6, 5, 4, 3, 1, 2 };
-    state2 = new byte[] { 1, 2, 4, 3, 6, 5, 8, 7 };
+    state = new byte[] { 7, 6, 5, 4, 3, 2, 0, 1 };
+    state2 = new byte[] { 0, 1, 3, 2, 5, 4, 7, 6 };
     Assert.assertEquals(IndexConvertor.packRel8Permutation(state2), IndexConvertor.packRel8Permutation(state));
-    state = new byte[] { 8, 7, 6, 5, 4, 3, 2, 1 };
-    state2 = new byte[] { 1, 4, 3, 2, 5, 8, 7, 6 };
+    state = new byte[] { 7, 6, 5, 4, 3, 2, 1, 0 };
+    state2 = new byte[] { 0, 3, 2, 1, 4, 7, 6, 5 };
     Assert.assertEquals(IndexConvertor.packRel8Permutation(state2), IndexConvertor.packRel8Permutation(state));
-    state = new byte[] { 6, 4, 1, 2, 7, 5, 8, 3 };
-    state2 = new byte[] { 1, 2, 6, 4, 8, 3, 7, 5 };
+    state = new byte[] { 5, 3, 0, 1, 6, 4, 7, 2 };
+    state2 = new byte[] { 0, 1, 5, 3, 7, 2, 6, 4 };
     Assert.assertEquals(IndexConvertor.packRel8Permutation(state2), IndexConvertor.packRel8Permutation(state));
-    state = new byte[] { 5, 4, 1, 2, 8, 6, 7, 3 };
-    state2 = new byte[] { 1, 2, 5, 4, 7, 3, 8, 6 };
+    state = new byte[] { 4, 3, 0, 1, 7, 5, 6, 2 };
+    state2 = new byte[] { 0, 1, 4, 3, 6, 2, 7, 5 };
     Assert.assertEquals(IndexConvertor.packRel8Permutation(state2), IndexConvertor.packRel8Permutation(state));
-    state = new byte[] { 4, 1, 3, 7, 2, 8, 6, 5 };
-    state2 = new byte[] { 1, 3, 7, 4, 8, 6, 5, 2 };
+    state = new byte[] { 3, 0, 2, 6, 1, 7, 5, 4 };
+    state2 = new byte[] { 0, 2, 6, 3, 7, 5, 4, 1 };
     Assert.assertEquals(IndexConvertor.packRel8Permutation(state2), IndexConvertor.packRel8Permutation(state));
-    state = new byte[] { 5, 2, 8, 7, 1, 3, 6, 4 };
-    state2 = new byte[] { 1, 3, 6, 4, 5, 2, 8, 7 };
+    state = new byte[] { 4, 1, 7, 6, 0, 2, 5, 3 };
+    state2 = new byte[] { 0, 2, 5, 3, 4, 1, 7, 6 };
     Assert.assertEquals(IndexConvertor.packRel8Permutation(state2), IndexConvertor.packRel8Permutation(state));
 
-    // TODO : test with random values and make sure that index is always >= 0 && < 5040
+    for (int i = 0; i < 5040; i++) {
+      int res = IndexConvertor.packRel8Permutation(IndexConvertor.unpackPermutation(i, 8));
+      Assert.assertTrue(res >= 0 && res < 5040);
+    }
   }
 
-  @SmallTest
+  /*@SmallTest
   public void testRelIndices() {
     assertArrayEquals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 }, IndexConvertor.relPermIndices[0]);
     assertArrayEquals(new byte[] { 1, 2, 3, 0, 5, 6, 7, 4 }, IndexConvertor.relPermIndices[1]);
     assertArrayEquals(new byte[] { 2, 3, 0, 1, 6, 7, 4, 5 }, IndexConvertor.relPermIndices[2]);
     assertArrayEquals(new byte[] { 5, 6, 7, 4, 1, 2, 3, 0 }, IndexConvertor.relPermIndices[5]);
     assertArrayEquals(new byte[] { 7, 4, 5, 6, 3, 0, 1, 2 }, IndexConvertor.relPermIndices[7]);
-  }
+  }*/
 
   @SmallTest
   public void testComparePermutations() {
@@ -155,11 +158,12 @@ public class IndexConvertorTest extends AndroidTestCase {
     long normalTs = 0;
     long relativeTs = 0;
     long ts;
-    Assert.assertEquals(8, IndexConvertor.relPermIndices.length);
+    //Assert.assertEquals(8, IndexConvertor.relPermIndices.length);
     for (int i = 0; i < 50000; i++) {
       state = new byte[8];
       available = new ArrayList<Byte>();
-      for (byte j = 1; j <= 8; j++) { available.add(j); }
+      // TODO : could generate an int and unpack it instead
+      for (byte j = 0; j < 8; j++) { available.add(j); }
       Collections.shuffle(available, r);
       for (int j = 0; j < 8; j++) {
         state[j] = available.remove(0);
@@ -196,7 +200,7 @@ public class IndexConvertorTest extends AndroidTestCase {
       // Corner permutation
       state = new byte[8];
       available = new ArrayList<Byte>();
-      for (byte j = 1; j <= 8; j++) { available.add(j); }
+      for (byte j = 0; j < 8; j++) { available.add(j); }
       Collections.shuffle(available, r);
       for (int j = 0; j < 8; j++) {
         state[j] = available.remove(0);
@@ -216,7 +220,7 @@ public class IndexConvertorTest extends AndroidTestCase {
       // Edge permutation
       state = new byte[4];
       available = new ArrayList<Byte>();
-      for (byte j = 1; j <= 4; j++) { available.add(j); }
+      for (byte j = 0; j < 4; j++) { available.add(j); }
       Collections.shuffle(available, r);
       for (int j = 0; j < 4; j++) {
         state[j] = available.remove(0);
@@ -225,7 +229,7 @@ public class IndexConvertorTest extends AndroidTestCase {
 
       state = new byte[8];
       available = new ArrayList<Byte>();
-      for (byte j = 1; j <= 8; j++) { available.add(j); }
+      for (byte j = 0; j < 8; j++) { available.add(j); }
       Collections.shuffle(available, r);
       for (int j = 0; j < 8; j++) {
         state[j] = available.remove(0);

@@ -29,6 +29,9 @@ public class RSThreeScrambler implements Scrambler {
     CubeState cubeState;
     Random r = Utils.getRandom();
 
+    // TODO : could also generate a simple random int for each, and unpack it!
+    //   (base index is now 0)
+
     do {
       cubeState = new CubeState();
       // corners
@@ -78,13 +81,13 @@ public class RSThreeScrambler implements Scrambler {
         nextInd = available.get(0);
       }
       available.remove((byte) nextInd);
-      nextInd = permutation[nextInd] - 1;
+      nextInd = permutation[nextInd];
 
       if (!available.contains((byte) nextInd)) {
         nextInd = available.get(0);
       }
       available.remove((byte) nextInd);
-      nextInd = permutation[nextInd] - 1;
+      nextInd = permutation[nextInd];
     }
     return available.size() == 1;
   }
