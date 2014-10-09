@@ -17,9 +17,6 @@ public class IndexConvertor {
     return permInd;
   }
 
-  // Pack a permutation with positions relative to each other.
-  // Used to reduce the memory impact. 1, 2, 3, 4, 5, 6, 7, 8 is then equal for example to 3, 4, 1, 2, 7, 8, 5, 6.
-  // This method should only be used for symmetric shapes with two opposite faces like a cube, and with the same number of pieces per face (like 4 on top layer and 4 on bottom layer)
   private static final byte MAX_RELATIVE_PERM_SIZE = 8;
   static byte[][] relPermIndices;
   static {
@@ -29,7 +26,7 @@ public class IndexConvertor {
       byte found = 0;
       byte i = startInd;
       while (found < MAX_RELATIVE_PERM_SIZE) {
-        relPermIndices[startInd][i] = found;
+        relPermIndices[startInd][found] = i;
         found++;
         if (startInd < nPerFace) {
           i = (found < nPerFace) ? (byte) ((i + 1) % nPerFace) : (byte) ((((startInd + nPerFace + (found - nPerFace))) % nPerFace) + nPerFace);
@@ -40,36 +37,31 @@ public class IndexConvertor {
     }
   }
 
-  public static int packRelPermutation(byte[] perm) {
-    // TODO : make sure that perm.length isn't bigger than MAX_RELATIVE_PERM_SIZE (maybe even has to be exactly that size?)
-    int nDifferentValues = perm.length;
+  // Pack a permutation with positions relative to each other.
+  // Used to reduce the memory impact. 1, 2, 3, 4, 5, 6, 7, 8 is then equal for example to 3, 4, 1, 2, 7, 8, 5, 6.
+  // This method can only be used for 8 elements permutations (optimized for performance)
+  public static int packRel8Permutation(byte[] perm) {
+    byte nDifferentValues = (byte) perm.length;
     int permInd = 0;
-    int startInd = -1;
-    int i = 0;
-    int found = 0;
-    while (found < nDifferentValues) {
+    byte startInd = -1;
+    byte i = 0;
+    // TODO : see if could optimize a bit more (still takes ~17% more time than regular perm pack)
+    while (i < nDifferentValues) {
       if (startInd >= 0 || perm[i] == 1) {
         if (startInd < 0) {
           startInd = i;
+          i = 0;
         }
-        i = relPermIndices[startInd][found];
-        int curInd = perm[i] - 1; // -1 because positions start at 1
-        for (int j = 0; j < found; j++) {
-          if (perm[relPermIndices[startInd][j]] < perm[i]) {
+        byte cur = perm[relPermIndices[startInd][i]];
+        byte curInd = (byte) (cur - 1); // -1 because positions start at 1
+        for (byte j = 0; j < i; j++) {
+          if (perm[relPermIndices[startInd][j]] < cur) {
             curInd--;
           }
         }
         permInd = permInd * (nDifferentValues - i) + curInd;
-
-        found++;
-//        if (startInd < nPerFace) {
-//          i = (found < nPerFace) ? ((i + 1) % nPerFace) : ((((startInd + nPerFace + (found - nPerFace))) % nPerFace) + nPerFace);
-//        } else {
-//          i = (found < nPerFace) ? (((i + 1) % nPerFace) + nPerFace) : (((startInd - nPerFace + (found - nPerFace))) % nPerFace);
-//        }
-      } else {
-        i++;
       }
+      i++;
     }
     return permInd;
   }

@@ -195,7 +195,26 @@ public class StateTables {
   }
 
   static byte[] getPermResult(byte[] state, byte[] permIndices) {
-    // TODO : see if possible to do it without "new" (same for other similar methods) (see how done in min2phase)
+    // New way (speed-optimized and with 0-based index)
+    /*byte permStart = -1;
+    byte prevInd;
+    byte tmp;
+    for (byte i = 0; i < state.length; i++) {
+      if (i != permIndices[i]) {
+        if (permStart < 0) { // start of permutation
+          permStart = i;
+          prevInd = i;
+          tmp = state[i];
+        } else if (permIndices[i] == permStart) { // end of permutation
+          state[i] = tmp;
+          break;
+        }
+        state[prevInd] = state[permIndices[i];
+        prevInd = permIndices[i];
+      }
+    }
+    return state;*/
+    // Old way (array creation, takes some time)
     byte[] result = new byte[state.length];
     for (int i = 0; i < result.length; i++) {
       result[i] = state[permIndices[i] - 1];
@@ -204,6 +223,7 @@ public class StateTables {
   }
 
   static boolean[] getPermResult(boolean[] state, byte[] permIndices) {
+    // TODO : use the need way (no array creation, see method above)
     boolean[] result = new boolean[state.length];
     for (int i = 0; i < result.length; i++) {
       result[i] = state[permIndices[i] - 1];
@@ -212,6 +232,7 @@ public class StateTables {
   }
 
   static byte[] getOrientResult(byte[] state, byte[] permIndices, byte[] orientIndices, int nDifferentValues) {
+    // TODO : avoid creating a new array
     byte[] result = new byte[state.length];
     for (int i = 0; i < state.length; i++) {
       result[i] = (byte) ((state[permIndices[i] - 1] + orientIndices[i]) % nDifferentValues);
