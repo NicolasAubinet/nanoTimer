@@ -22,5 +22,5 @@
   <color name="lightgraybg">#FF2C2C33</color>
 
   <color name="button_pressed">#FF1976D2</color>
-  <color name="button_disabled">@color/gray900</color>
+  <color name="button_disabled">@color/gray850</color>
 </resources>

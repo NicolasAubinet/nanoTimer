@@ -1,21 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-
-  <item android:state_pressed="true">
-    <shape android:shape="rectangle">
-      <solid android:color="@color/button_pressed"/>
-    </shape>
-  </item>
+  <item android:state_pressed="true" android:drawable="@drawable/button_image_hi"/>
   <item android:state_enabled="false">
     <shape android:shape="rectangle">
       <solid android:color="@color/button_disabled"/>
     </shape>
   </item>
-  <item>
-    <shape android:shape="rectangle">
-      <solid android:color="@color/gray800"/>
-    </shape>
-  </item>
-
+  <item android:drawable="@drawable/button_image"/>
 </selector>
