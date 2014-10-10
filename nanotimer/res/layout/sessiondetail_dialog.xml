@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.cube.nanotimer.util.view.ScalingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:orientation="vertical"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   android:background="@color/graybg"
+   android:padding="7px"
+   android:minWidth="450px">
+
+  <LinearLayout
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:orientation="horizontal">
+    <TableLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="3px"
+       android:layout_weight="1">
+      <TableRow android:layout_marginTop="3px">
+        <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="@string/session_ra"
+           style="@style/SmallTextField"/>
+        <TextView
+           android:id="@+id/tvSessionRA"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="6px"
+           android:layout_marginRight="10px"
+           android:textColor="@color/white"
+           style="@style/SmallTextField"/>
+      </TableRow>
+      <TableRow android:layout_marginTop="3px">
+        <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="@string/session_mean"
+           style="@style/SmallTextField"/>
+        <TextView
+           android:id="@+id/tvSessionMean"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="6px"
+           android:layout_marginRight="10px"
+           android:textColor="@color/white"
+           style="@style/SmallTextField"/>
+      </TableRow>
+    </TableLayout>
+    <TableLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="3px"
+       android:layout_weight="1">
+      <TableRow android:layout_marginTop="3px">
+        <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="10px"
+           android:text="@string/session_solves"
+           style="@style/SmallTextField"/>
+        <TextView
+           android:id="@+id/tvSessionSolves"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="6px"
+           android:textColor="@color/white"
+           style="@style/SmallTextField"/>
+      </TableRow>
+      <TableRow android:layout_marginTop="3px">
+        <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="10px"
+           android:text="@string/total_solves"
+           style="@style/SmallTextField"/>
+        <TextView
+           android:id="@+id/tvTotalSolves"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="6px"
+           android:textColor="@color/white"
+           style="@style/SmallTextField"/>
+      </TableRow>
+    </TableLayout>
+  </LinearLayout>
+
+  <LinearLayout
+     android:orientation="vertical"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content">
+
+    <TextView style="@style/DividerRow"
+       android:layout_marginTop="12px"
+       android:layout_marginLeft="3px"
+       android:layout_marginRight="1px"/>
+
+    <TableLayout
+       android:id="@+id/sessionTimesLayout"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:shrinkColumns="*"
+       android:stretchColumns="*">
+    </TableLayout>
+
+    <TextView style="@style/DividerRow"
+       android:layout_marginTop="5px"
+       android:layout_margin="2px"/>
+
+  </LinearLayout>
+
+</com.cube.nanotimer.util.view.ScalingLinearLayout>

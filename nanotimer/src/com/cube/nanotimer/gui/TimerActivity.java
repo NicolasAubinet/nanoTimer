@@ -35,6 +35,7 @@ import com.cube.nanotimer.Options.AdsStyle;
 import com.cube.nanotimer.Options.BigCubesNotation;
 import com.cube.nanotimer.Options.InspectionMode;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.gui.widget.SessionDialog;
 import com.cube.nanotimer.gui.widget.ads.AdProvider;
 import com.cube.nanotimer.scrambler.ScramblerFactory;
 import com.cube.nanotimer.services.db.DataCallback;
@@ -68,7 +69,6 @@ public class TimerActivity extends ActionBarActivity {
   private LinearLayout actionBarLayout;
   private TableLayout sessionTimesLayout;
   private TableLayout timerStepsLayout;
-  private Menu menu;
 
   private CubeType cubeType;
   private SolveType solveType;
@@ -281,7 +281,6 @@ public class TimerActivity extends ActionBarActivity {
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
-    this.menu = menu;
     getMenuInflater().inflate(R.menu.timer_menu, menu);
     for (int i = 0; i < menu.size(); i++) {
       menu.getItem(i).setVisible(showMenu);
@@ -327,6 +326,9 @@ public class TimerActivity extends ActionBarActivity {
             refreshSessionFields();
             resetTimer();
           }
+          break;
+        case R.id.itSession:
+          Utils.showFragment(this, SessionDialog.newInstance(solveType));
           break;
         case R.id.itNewSession:
           Utils.showYesNoConfirmation(this, getString(R.string.new_session_confirmation), new YesNoListener() {

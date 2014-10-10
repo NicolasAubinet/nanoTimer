@@ -4,11 +4,13 @@ import android.content.Context;
 import com.cube.nanotimer.services.db.DBHelper;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveTimeAverages;
 import com.cube.nanotimer.vo.SolveType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ServiceImpl extends DBHelper implements Service {
@@ -233,6 +235,30 @@ public class ServiceImpl extends DBHelper implements Service {
         }
       }
     });
+  }
+
+  @Override
+  public void getSessionDetails(SolveType solveType, DataCallback<SessionDetails> callback) {
+    // TODO (must have a limit for solves count, like 100 or 500)
+    // mock:
+    SessionDetails sessionDetails = new SessionDetails();
+    sessionDetails.setRA(7587);
+    sessionDetails.setMean(7843);
+    sessionDetails.setSessionSolvesCount(10);
+    sessionDetails.setTotalSolvesCount(120);
+    List<Long> times = new ArrayList<Long>();
+    times.add(7210l);
+    times.add(7840l);
+    times.add(8612l);
+    times.add(7101l);
+    times.add(7350l);
+    times.add(7888l);
+    times.add(6980l);
+    times.add(8010l);
+    times.add(8101l);
+    times.add(7671l);
+    sessionDetails.setSessionTimes(times);
+    callback.onData(sessionDetails);
   }
 
   private void run(Runnable runnable) {

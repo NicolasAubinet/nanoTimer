@@ -11,6 +11,9 @@
   <item android:id="@+id/itDelete"
     android:title="@string/delete"/>
 
+  <item android:id="@+id/itSession"
+     android:title="@string/session_details"/>
+
   <item android:id="@+id/itNewSession"
     android:title="@string/new_session"/>
 

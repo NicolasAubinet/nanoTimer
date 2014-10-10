@@ -44,12 +44,18 @@
   <string name="plus_two">+2</string>
   <string name="DNF">DNF</string>
   <string name="delete">Delete</string>
+  <string name="session_details">Session details</string>
   <string name="new_session">New session</string>
   <string name="time">Time:</string>
   <string name="averages">Averages</string>
   <string name="steps">Steps</string>
   <string name="stepsC">Steps:</string>
   <string name="NA">N/A</string>
+
+  <string name="session_ra">Rolling average:</string>
+  <string name="session_mean">Mean:</string>
+  <string name="session_solves">Session solves:</string>
+  <string name="total_solves">Total solves:</string>
 
   <string name="clear_history">Clear history</string>
   <string name="clear_history_solve_type_confirmation">Are you sure you want to delete all the times for this solve type?</string>

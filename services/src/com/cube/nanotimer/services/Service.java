@@ -2,6 +2,7 @@ package com.cube.nanotimer.services;
 
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveTimeAverages;
@@ -23,6 +24,7 @@ public interface Service {
   void startNewSession(SolveType solveType, long startTs, DataCallback<Void> callback);
   void saveSolveTypesOrder(List<SolveType> solveTypes, DataCallback<Void> callback);
   void getSolveTimeAverages(SolveTime solveTime, DataCallback<SolveTimeAverages> callback);
+  void getSessionDetails(SolveType solveType, DataCallback<SessionDetails> callback);
 
   void addSolveType(SolveType solveType, DataCallback<Integer> callback);
   void addSolveTypeSteps(SolveType solveType, DataCallback<Void> callback);
