@@ -74,25 +74,115 @@ public class StateTablesTest extends AndroidTestCase {
     Assert.assertTrue(Arrays.equals(new byte[] { 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1 }, state.edgeOrientations));
   }
 
-  /*@SmallTest
+  @SmallTest
   public void testTransit() {
-    Move[] moves1 = new Move[] {
-        Move.U,
-        Move.D,
-        Move.R,
-        Move.L,
-        Move.F,
-        Move.B
-    };
+    StateTables.generateTables(ThreeSolver.moves1, ThreeSolver.moves2);
 
-    short[][] transitCornerOrientation = new short[2187][6];
-    for (int i = 0; i < transitCornerOrientation.length; i++) {
-      for (int j = 0; j < moves1.length; j++) {
-        byte[] state = IndexConvertor.unpackOrientation(i, 3, 8);
-        transitCornerOrientation[i][j] = (short) IndexConvertor.packOrientation(StateTables.getOrientResult(state, moves1[j].corPerm, moves1[j].corOrient, 3), 3);
+    // Edge combinations
+
+    short[][] edgeCombinations = StateTables.transitEEdgeCombination;
+    for (int i = 0; i < edgeCombinations.length; i++) {
+      for (int j = 0; j < edgeCombinations[i].length; j++) {
+        short val = edgeCombinations[i][j];
+        Assert.assertTrue(val >= 0 && val < 495);
       }
     }
-  }*/
+    Assert.assertEquals(0, edgeCombinations[0][0]); // U
+    Assert.assertEquals(0, edgeCombinations[0][1]); // D
+    Assert.assertEquals(0, edgeCombinations[365][3]);
+
+    // Test combinations after F L2 R' D2
+    Assert.assertEquals(IndexConvertor.packCombination(new boolean[] { true, true, true, true, false, false, false, false, false, false, false, false }, 4), edgeCombinations[0][0]);
+
+    int ind = IndexConvertor.packCombination(new boolean[] { false, false, false, true, true, true, false, false, false, false, true, false }, 4);
+    byte[] edgePermutations = new byte[] { 5, 9, 8, 2, 3, 1, 6, 11, 10, 7, 0, 4 };
+    boolean[] combinations = new boolean[edgePermutations.length];
+    for (int i = 0; i < edgePermutations.length; i++) {
+      combinations[i] = (edgePermutations[i] < 4);
+    }
+    Assert.assertEquals(ind, IndexConvertor.packCombination(combinations, 4));
+
+    // From ThreeSolverTest testEasy() state, the following moves give 0, but it shouldn't:
+    // 11 4  6 14 11 5 9
+    // L' D2 R F' L' D' L
+    ind = edgeCombinations[ind][3]; // L (same than L')
+    Assert.assertEquals(IndexConvertor.packCombination(new boolean[] { false, false, false, false, true, true, false, false, false, false, true, true }, 4), ind);
+
+    ind = edgeCombinations[ind][1]; // D
+    Assert.assertEquals(IndexConvertor.packCombination(new boolean[] { false, false, false, false, true, true, false, false, true, false, false, true }, 4), ind);
+    ind = edgeCombinations[ind][1]; // D (to make D2)
+    Assert.assertEquals(IndexConvertor.packCombination(new boolean[] { false, false, false, false, true, true, false, false, true, true, false, false }, 4), ind);
+
+    ind = edgeCombinations[ind][2]; // R
+    Assert.assertEquals(IndexConvertor.packCombination(new boolean[] { true, true, false, false, true, false, false, false, true, false, false, false }, 4), ind);
+
+    // Corner permutations
+    int[][] cornerPermutations = StateTables.transitCornerPermutation;
+    ind = cornerPermutations[0][0]; // U
+    int state1 = ind;
+    ind = cornerPermutations[ind][2]; // R
+    ind = cornerPermutations[ind][2]; // R
+    ind = cornerPermutations[ind][2]; // R
+    ind = cornerPermutations[ind][2]; // R
+    Assert.assertEquals(state1, ind);
+    ind = cornerPermutations[ind][0]; // U
+    ind = cornerPermutations[ind][0]; // U
+    ind = cornerPermutations[ind][0]; // U
+    Assert.assertEquals(0, ind); // back to solved state
+
+    ind = cornerPermutations[0][2]; // R
+    ind = cornerPermutations[ind][0]; // U
+    ind = cornerPermutations[ind][0]; // U
+    ind = cornerPermutations[ind][0]; // U
+    ind = cornerPermutations[ind][0]; // U
+    ind = cornerPermutations[ind][2]; // R
+    ind = cornerPermutations[ind][2]; // R
+    ind = cornerPermutations[ind][2]; // R
+    Assert.assertEquals(0, ind); // back to solved state
+
+    // R U R' U'
+    for (int i = 0; i < 6; i++) {
+      ind = cornerPermutations[0][2]; // R
+      ind = cornerPermutations[ind][0]; // U
+      ind = cornerPermutations[ind][0]; // R
+      ind = cornerPermutations[ind][0]; // R
+      ind = cornerPermutations[ind][0]; // R
+      ind = cornerPermutations[ind][0]; // U
+      ind = cornerPermutations[ind][0]; // U
+      ind = cornerPermutations[ind][0]; // U
+    }
+    Assert.assertEquals(0, ind); // back to solved state
+
+    ind = cornerPermutations[0][2]; // R
+    ind = cornerPermutations[ind][1]; // D
+    ind = cornerPermutations[ind][1]; // D
+    ind = cornerPermutations[ind][3]; // L
+    ind = cornerPermutations[ind][0]; // U
+    ind = cornerPermutations[ind][2]; // R
+    ind = cornerPermutations[ind][4]; // F
+    ind = cornerPermutations[ind][5]; // B
+    ind = cornerPermutations[ind][5]; // B
+    ind = cornerPermutations[ind][5]; // B
+    ind = cornerPermutations[ind][5]; // B
+    ind = cornerPermutations[ind][4]; // F
+    ind = cornerPermutations[ind][4]; // F
+    ind = cornerPermutations[ind][4]; // F
+    ind = cornerPermutations[ind][2]; // R
+    ind = cornerPermutations[ind][2]; // R
+    ind = cornerPermutations[ind][2]; // R
+    ind = cornerPermutations[ind][0]; // U
+    ind = cornerPermutations[ind][0]; // U
+    ind = cornerPermutations[ind][0]; // U
+    ind = cornerPermutations[ind][3]; // L
+    ind = cornerPermutations[ind][3]; // L
+    ind = cornerPermutations[ind][3]; // L
+    ind = cornerPermutations[ind][1]; // D
+    ind = cornerPermutations[ind][1]; // D
+    ind = cornerPermutations[ind][2]; // R
+    ind = cornerPermutations[ind][2]; // R
+    ind = cornerPermutations[ind][2]; // R
+    Assert.assertEquals(0, ind); // back to solved state
+  }
 
   @SmallTest
   public void testPrunings() {
@@ -175,14 +265,29 @@ public class StateTablesTest extends AndroidTestCase {
     Assert.assertEquals(1, pruningCornerPermutation
         [IndexConvertor.packRel8Permutation(new byte[] { 0, 6, 5, 3, 4, 2, 1, 7 })]
         [IndexConvertor.packPermutation(new byte[] { 3, 1, 2, 0 })]); // F2
+    Assert.assertEquals(1, pruningCornerPermutation
+        [IndexConvertor.packRel8Permutation(new byte[] { 1, 2, 3, 0, 4, 5, 6, 7 })]
+        [IndexConvertor.packPermutation(new byte[] { 0, 1, 2, 3 })]); // U
+    Assert.assertEquals(1, pruningCornerPermutation
+        [IndexConvertor.packRel8Permutation(new byte[] { 0, 1, 2, 3, 5, 6, 7, 4 })]
+        [IndexConvertor.packPermutation(new byte[] { 0, 1, 2, 3 })]); // D'
+    Assert.assertEquals(1, pruningCornerPermutation
+        [IndexConvertor.packRel8Permutation(new byte[] { 2, 3, 0, 1, 4, 5, 6, 7 })] // relative -> 0 1 2 3 6 7 4 5
+        [IndexConvertor.packPermutation(new byte[] { 0, 1, 2, 3 })]); // U2
+    Assert.assertEquals(2, pruningCornerPermutation
+        [IndexConvertor.packRel8Permutation(new byte[] { 0, 1, 5, 4, 6, 7, 3, 2 })]
+        [IndexConvertor.packPermutation(new byte[] { 1, 0, 2, 3 })]); // U2 R2
     Assert.assertEquals(2, pruningCornerPermutation
         [IndexConvertor.packRel8Permutation(new byte[] { 1, 7, 6, 0, 4, 5, 3, 2 })]
         [IndexConvertor.packPermutation(new byte[] { 1, 0, 2, 3 })]); // R2 U
     Assert.assertEquals(3, pruningCornerPermutation
         [IndexConvertor.packRel8Permutation(new byte[] { 1, 4, 2, 0, 3, 6, 7, 5 })]
         [IndexConvertor.packPermutation(new byte[] { 0, 3, 1, 2 })]); // L2 D' B2
+    Assert.assertEquals(3, pruningCornerPermutation
+        [IndexConvertor.packRel8Permutation(new byte[] { 0, 1, 5, 4, 3, 2, 6, 7 })]
+        [IndexConvertor.packPermutation(new byte[] { 1, 0, 2, 3 })]); // U2 R2 D2
     Assert.assertEquals(4, pruningCornerPermutation
-        [IndexConvertor.packRel8Permutation(new byte[] { 0, 1, 7, 6, 3, 2, 4, 5 })]
+        [IndexConvertor.packRel8Permutation(new byte[] { 2, 3, 5, 4, 1, 0, 6, 7 })]
         [IndexConvertor.packPermutation(new byte[] { 1, 0, 3, 2 })]); // U2 R2 D2 L2
 
     byte[][] pruningUDEdgePermutation = StateTables.pruningUDEdgePermutation;
@@ -194,16 +299,25 @@ public class StateTablesTest extends AndroidTestCase {
     Assert.assertEquals(0, pruningUDEdgePermutation[0][0]);
     Assert.assertEquals(1, pruningUDEdgePermutation
         [IndexConvertor.packRel8Permutation(new byte[] { 4, 1, 2, 3, 0, 5, 6, 7 })]
-        [IndexConvertor.packPermutation(new byte[] { 3, 1, 2, 0 })]); // F1
+        [IndexConvertor.packPermutation(new byte[] { 3, 1, 2, 0 })]); // F2
     Assert.assertEquals(1, pruningUDEdgePermutation
+        [IndexConvertor.packRel8Permutation(new byte[] { 2, 3, 0, 1, 4, 5, 6, 7 })] // relative -> 0 1 2 3 6 7 4 5
+        [IndexConvertor.packPermutation(new byte[] { 0, 1, 2, 3 })]); // U2
+    Assert.assertEquals(2, pruningUDEdgePermutation
         [IndexConvertor.packRel8Permutation(new byte[] { 5, 2, 3, 0, 4, 1, 6, 7 })]
-        [IndexConvertor.packPermutation(new byte[] { 1, 0, 2, 3 })]); // R1 U
+        [IndexConvertor.packPermutation(new byte[] { 1, 0, 2, 3 })]); // R2 U
+    Assert.assertEquals(2, pruningUDEdgePermutation
+        [IndexConvertor.packRel8Permutation(new byte[] { 0, 7, 2, 3, 6, 1, 4, 5 })]
+        [IndexConvertor.packPermutation(new byte[] { 1, 0, 2, 3 })]); // U2 R2
+    Assert.assertEquals(2, pruningUDEdgePermutation
+        [IndexConvertor.packRel8Permutation(new byte[] { 0, 1, 2, 5, 6, 7, 4, 3 })]
+        [IndexConvertor.packPermutation(new byte[] { 0, 1, 3, 2 })]); // U2 L2
     Assert.assertEquals(3, pruningUDEdgePermutation
         [IndexConvertor.packRel8Permutation(new byte[] { 0, 1, 3, 7, 5, 6, 2, 4 })]
-        [IndexConvertor.packPermutation(new byte[] { 0, 3, 1, 2 })]); // L1 D' B1
-    Assert.assertEquals(3, pruningUDEdgePermutation
-        [IndexConvertor.packRel8Permutation(new byte[] { 2, 5, 0, 3, 6, 7, 4, 1 })]
-        [IndexConvertor.packPermutation(new byte[] { 1, 0, 3, 2 })]); // U1 R1 D1 L1
+        [IndexConvertor.packPermutation(new byte[] { 0, 3, 1, 2 })]); // L2 D' B2
+    Assert.assertEquals(4, pruningUDEdgePermutation
+        [IndexConvertor.packRel8Permutation(new byte[] { 0, 7, 2, 1, 4, 5, 6, 3 })]
+        [IndexConvertor.packPermutation(new byte[] { 1, 0, 3, 2 })]); // U2 R2 D2 L2
   }
 
   /*public void testCreateFile() throws IOException {
@@ -251,16 +365,18 @@ public class StateTablesTest extends AndroidTestCase {
     Random r = new Random();
     byte[] state;
     byte[] perms;
-    long tsTotal = 0;
+    byte[][] allStates = new byte[50000][8];
     for (int i = 0; i < 50000; i++) {
       int n = r.nextInt(40320);
       state = IndexConvertor.unpackPermutation(n, 8);
-      perms = Move.values()[r.nextInt(18)].corPerm;
-      long ts = System.currentTimeMillis();
-      StateTables.getPermResult(state, perms);
-      tsTotal += (System.currentTimeMillis() - ts);
+      allStates[i] = state;
     }
-    Log.i("[NanoTimer]", "corner perm time: " + tsTotal);
+    long ts = System.currentTimeMillis();
+    for (int i = 0; i < 50000; i++) {
+      perms = Move.values()[r.nextInt(18)].corPerm;
+      StateTables.getPermResult(allStates[i], perms);
+    }
+    Log.i("[NanoTimer]", "corner perm time: " + (System.currentTimeMillis() - ts));
   }
 
   private int getSize(Object obj) {

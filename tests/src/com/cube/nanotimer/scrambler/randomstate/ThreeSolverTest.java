@@ -28,7 +28,7 @@ public class ThreeSolverTest extends AndroidTestCase {
     Assert.assertTrue(scramble.length > 0);
   }
 
-  // TODO : pass something that's already orientated and combined
+  // TODO : pass something that's already oriented and combined
 
   @SmallTest
   public void testEasy() {
@@ -72,6 +72,7 @@ public class ThreeSolverTest extends AndroidTestCase {
     ThreeSolver solver = new ThreeSolver();
     String[] scramble = solver.getSolution(cubeState);
     Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble) + " (length: " + scramble.length + ")");
+    //  found: [U, D', L, F, R', B', R2, F2, D2, R', F', ., D, F2, U', L2, D', R2, L2, F2, D2, F2, D2]
   }
 
 }

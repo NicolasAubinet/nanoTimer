@@ -9,30 +9,35 @@ public class StateTables {
 
   // TODO : make positions start at 0 (everywhere, starting from Move class, IndexConvertor, tests etc)
 
-  private static final int N_CORNER_PERMUTATIONS = 5040;
+  private static final int N_CORNER_PERMUTATIONS = 40320;
+//  private static final int N_CORNER_PERMUTATIONS = 5040;
   private static final int N_CORNER_ORIENTATIONS = 2187;
   private static final int N_E_EDGE_COMBINATIONS = 495;
 
-  private static final int N_EDGE_PERMUTATIONS = 479001600;
   private static final int N_E_EDGE_PERMUTATIONS = 24;
-  private static final int N_U_D_EDGE_PERMUTATIONS = 5040;
+  private static final int N_U_D_EDGE_PERMUTATIONS = 40320;
+//  private static final int N_U_D_EDGE_PERMUTATIONS = 5040;
   private static final int N_EDGE_ORIENTATIONS = 2048;
+
+  // RELATIVE PERMUTATIONS are wrooooong! Don't know how to do a R after a U...
+  // TODO : see if there is a way to make it work
+  // TODO : else, could see if possible to drop the last piece (have 7 corners and 7 UD edges and figure the last one out) to keep 5040 elements instead of 40320
 
   // TODO : transit optimization:
   //v       only have 1 move per face (so 2nd index max would be 6 instead of 18) and apply same moves multiple times (R R R in a row instead of R U2 R')
   //v         would pbly have a sub-loop during solution search when looping between moves
-  //        change permutations (corner and UD edges) to relative positions (1 2 3 4 5 6 7 8 = 3 4 5 6 7 8 1 2)
+  //v       change permutations (corner and UD edges) to relative positions (1 2 3 4 5 6 7 8 = 3 4 5 6 7 8 1 2)
   //          keep the 1st corner and 1st UD edge positions in variables and apply permutation[pos-1] after every move during solution search
   //          phase will be solved if permutationInd == 0 && cornerpos/udedgepos == 0
-  //        should be able to change from int to short (b/c n_corner_permutations going down from 40320 to 5040)
+  //        should be able to change from int to short (b/c N_CORNER_PERMUTATIONS going down from 40320 to 5040)
   //          could pbly also do it for other tables (already now)
 
   // Transition tables
-  static short[][] transitCornerPermutation;
+  static int[][] transitCornerPermutation;
   static short[][] transitCornerOrientation;
   static short[][] transitEEdgeCombination;
   static short[][] transitEEdgePermutation;
-  static short[][] transitUDEdgePermutation;
+  static int[][] transitUDEdgePermutation;
   static short[][] transitEdgeOrientation;
 
   // TODO : pruning optimization:
@@ -88,17 +93,17 @@ public class StateTables {
 
     // --> Phase 2
     stepTs = System.currentTimeMillis();
-    transitCornerPermutation = new short[N_CORNER_PERMUTATIONS][moves2.length];
+    transitCornerPermutation = new int[N_CORNER_PERMUTATIONS][moves2.length];
     for (int i = 0; i < transitCornerPermutation.length; i++) {
       byte[] state = IndexConvertor.unpackPermutation(i, 8);
       for (int j = 0; j < moves2.length; j++) {
-        byte[] res = getPermResult(state, moves2[j].corPerm);
-        transitCornerPermutation[i][j] = (short) IndexConvertor.packRel8Permutation(res);
+//        transitCornerPermutation[i][j] = (short) IndexConvertor.packRel8Permutation(getPermResult(state, moves2[j].corPerm));
+        transitCornerPermutation[i][j] = IndexConvertor.packPermutation(getPermResult(state, moves2[j].corPerm));
       }
     }
     logTimeDifference(stepTs, "trCorPerm");
 
-    // E and UD edges stay on the same layers as phase 2 moves can not interchange them
+    // E and UD edges stay on the same slice/layers as phase 2 moves can only interchange them
     stepTs = System.currentTimeMillis();
     transitEEdgePermutation = new short[N_E_EDGE_PERMUTATIONS][moves2.length];
     for (int i = 0; i < transitEEdgePermutation.length; i++) {
@@ -118,7 +123,7 @@ public class StateTables {
     logTimeDifference(stepTs, "trEEdgPerm");
 
     stepTs = System.currentTimeMillis();
-    transitUDEdgePermutation = new short[N_U_D_EDGE_PERMUTATIONS][moves2.length];
+    transitUDEdgePermutation = new int[N_U_D_EDGE_PERMUTATIONS][moves2.length];
     for (int i = 0; i < transitUDEdgePermutation.length; i++) {
       byte[] state = IndexConvertor.unpackPermutation(i, 8);
       byte[] edges = new byte[12];
@@ -130,7 +135,8 @@ public class StateTables {
         byte[] res = getPermResult(edges, moves2[j].edgPerm);
         byte[] udEdges = new byte[8];
         System.arraycopy(res, 4, udEdges, 0, udEdges.length);
-        transitUDEdgePermutation[i][j] = (short) IndexConvertor.packRel8Permutation(udEdges);
+//        transitUDEdgePermutation[i][j] = (short) IndexConvertor.packRel8Permutation(udEdges);
+        transitUDEdgePermutation[i][j] = IndexConvertor.packPermutation(udEdges);
       }
     }
     logTimeDifference(stepTs, "trUDEdgPerm");
@@ -169,6 +175,16 @@ public class StateTables {
   }
 
   private static void genPruning(byte[][] pruningTable, short[][] transit1, short[][] transit2, int phase) {
+    int[][] tr = new int[transit1.length][transit1[0].length];
+    for (int i = 0; i < transit1.length; i++) {
+      for (int j = 0; j < transit1[i].length; j++) {
+        tr[i][j] = transit1[i][j];
+      }
+    }
+    genPruning(pruningTable, tr, transit2, phase);
+  }
+
+  private static void genPruning(byte[][] pruningTable, int[][] transit1, short[][] transit2, int phase) {
     for (int i = 0; i < pruningTable.length; i++) {
       for (int j = 0; j < pruningTable[i].length; j++) {
         pruningTable[i][j] = -1;
@@ -195,31 +211,6 @@ public class StateTables {
     }
   }
 
-  // Attempt to optimize getPermResult. But this modifies state so the result array has to be recreated before calling this...
-  // Note: can only handle one cycling permutation (does not handle multiple permutations like for half turns)
-  /*static byte[] getPermResult(byte[] state, byte[] permIndices) {
-    byte permStart = -1;
-    byte tmp = 0;
-    byte i = 0;
-    while (i < state.length) {
-      if (i != permIndices[i]) {
-        if (permStart < 0) { // start of permutation
-          permStart = i;
-          tmp = state[i];
-        } else if (permIndices[i] == permStart) { // end of permutation
-          state[i] = tmp;
-          break;
-        }
-        state[i] = state[permIndices[i]];
-        i = permIndices[i];
-      } else {
-        i++;
-      }
-    }
-    return state;
-  }*/
-
-  // Slowest version of getPermResult, but can directly handle half turns (containing multiple permutations cycles)
   static byte[] getPermResult(byte[] state, byte[] permIndices) {
     // TODO : optimize these methods, see if possible to avoid creating a new array
     byte[] result = new byte[state.length];
@@ -237,97 +228,6 @@ public class StateTables {
     return result;
   }
 
-  // getPermResult with handling up to 2 different permutations (like for half turns), but with performance penalty (could probably improve code to make it faster)
-  /*static byte[] getPermResult(byte[] state, byte[] permIndices) {
-    // New way (speed-optimized and with 0-based index)
-    byte permStart = -1;
-    byte prevPermStart = -1;
-    byte tmp = 0;
-    byte i = 0;
-    while (i < state.length) {
-      if (i != permIndices[i]) {
-        if (permStart < 0) { // start of permutation
-          permStart = i;
-          tmp = state[i];
-        } else if (permIndices[i] == permStart) { // end of permutation
-          state[i] = tmp;
-          // look to see if there is an other perm to process (like for half turn moves)
-          boolean foundOtherPerm = false;
-          for (byte j = (byte) (permStart + 1); j < state.length; j++) {
-            if (j != permIndices[j]) { // an other permutation?
-              int k = j;
-              do {
-                k = permIndices[k];
-              } while (k != j && k != permStart && k != prevPermStart);
-              if (k == j) { // new permutation
-                foundOtherPerm = true;
-                i = j;
-                break;
-              }
-            }
-          }
-          if (foundOtherPerm) {
-            prevPermStart = permStart;
-            permStart = -1;
-            continue;
-          } else {
-            break;
-          }
-        }
-        state[i] = state[permIndices[i]];
-        i = permIndices[i];
-      } else {
-        i++;
-      }
-    }
-    return state;
-  }*/
-
-  /*static boolean[] getPermResult(boolean[] state, byte[] permIndices) {
-    byte permStart = -1;
-    boolean tmp = false;
-    byte i = 0;
-    while (i < state.length) {
-      if (i != permIndices[i]) {
-        if (permStart < 0) { // start of permutation
-          permStart = i;
-          tmp = state[i];
-        } else if (permIndices[i] == permStart) { // end of permutation
-          state[i] = tmp;
-          break;
-        }
-        state[i] = state[permIndices[i]];
-        i = permIndices[i];
-      } else {
-        i++;
-      }
-    }
-    return state;
-  }
-
-  static byte[] getOrientResult(byte[] state, byte[] permIndices, byte[] orientIndices, int nDifferentValues) {
-    byte permStart = -1;
-    byte tmp = 0;
-    byte i = 0;
-    while (i < state.length) {
-      if (i != permIndices[i]) {
-        if (permStart < 0) { // start of permutation
-          permStart = i;
-          tmp = state[i];
-        } else if (permIndices[i] == permStart) { // end of permutation
-          state[i] = (byte) ((tmp + orientIndices[i]) % nDifferentValues);
-          break;
-        }
-        state[i] = (byte) ((state[permIndices[i]] + orientIndices[i]) % nDifferentValues);
-        i = permIndices[i];
-      } else {
-        i++;
-      }
-    }
-    return state;
-  }*/
-
-  // Slowest version of getOrientResult, but can directly handle half turns (containing multiple permutations cycles)
   static byte[] getOrientResult(byte[] state, byte[] permIndices, byte[] orientIndices, int nDifferentValues) {
     byte[] result = new byte[state.length];
     for (int i = 0; i < state.length; i++) {

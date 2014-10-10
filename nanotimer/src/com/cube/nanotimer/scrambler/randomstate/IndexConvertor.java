@@ -39,7 +39,7 @@ public class IndexConvertor {
   }
 
   // Pack a permutation with positions relative to each other.
-  // Used to reduce the memory impact. 1, 2, 3, 4, 5, 6, 7, 8 is then equal for example to 3, 4, 1, 2, 7, 8, 5, 6.
+  // Used to reduce the memory impact. 0, 1, 2, 3, 4, 5, 6, 7 is then equal for example to 2, 3, 0, 1, 6, 7, 4, 5.
   // This method can only be used for 8 elements permutations (optimized for performance)
   public static int packRel8Permutation(byte[] perm) {
     byte nDifferentValues = (byte) perm.length;
@@ -66,6 +66,33 @@ public class IndexConvertor {
     }
     return permInd;
   }
+
+  // Permutes and packs a permutation at the same time. Faster than permuting and then packing (avoids new array creation)
+  // TODO : see if worth the trouble (see how complicated it would be). Also, it can not handle half turn moves, so it complicates the calls (sometimes would have to call perm and pack separately, sometimes not)
+  // TODO : do the same for other needed (like for orientation, those who take a lot of time)
+  // Note: can only handle one cycling permutation (does not handle multiple permutations like for half turns)
+  /*static static int packRel8PermResult(byte[] state, byte[] permIndices) {
+    byte permStart = -1;
+    byte tmp = 0;
+    byte i = 0;
+    while (i < state.length) {
+      if (i != permIndices[i]) {
+        if (permStart < 0) { // start of permutation
+          permStart = i;
+          tmp = state[i];
+        } else if (permIndices[i] == permStart) { // end of permutation
+          state[i] = tmp;
+          break;
+        }
+        state[i] = state[permIndices[i]];
+        i = permIndices[i];
+      } else {
+        i++;
+      }
+    }
+    return state;
+  }*/
+
 
   public static int packOrientation(byte[] orient, int nDifferentValues) {
     int orientInd = 0;

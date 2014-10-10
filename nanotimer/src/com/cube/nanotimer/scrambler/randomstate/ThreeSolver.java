@@ -40,7 +40,7 @@ public class ThreeSolver {
 //  private static final int MAX_SEARCH_TIME = 10; // in seconds. will stop after that time if a solution was found, even if it is not optimal
   private static final int SAFE_PHASE1_ITERATIONS_LIMIT = 30;
   // TODO : could maybe reduce this (but test on slow devices)
-  private static final int SEARCH_TIME_MIN = 100; // time in ms during which to search for a best solution
+  private static final int SEARCH_TIME_MIN = 100; // time in ms during which to search for a better solution
 
   // TODO : there seems to be a lot or phase 2 moves in the solution. see if normal
 
@@ -52,22 +52,23 @@ public class ThreeSolver {
   private List<Byte> bestSolution1;
   private List<Byte> bestSolution2;
   private long searchStartTs;
+  // these first cubies are used to keep track of index 0 corner and edge, because corner and UD edge positions are only relative to each other.
+//  private byte firstCorPos;
+//  private byte firstEdgPos;
 
   static Move[] moves;
   static Move[] moves1;
   static Move[] moves2;
   static Move[] allMoves2;
   private static byte[] slices;
-  //private static int[] slices1;
-  //private static int[] slices2;
   private static byte[] opposites;
 
   // Transition tables
-  private static short[][] transitCornerPermutation;
+  private static int[][] transitCornerPermutation;
   private static short[][] transitCornerOrientation;
   private static short[][] transitEEdgeCombination;
   private static short[][] transitEEdgePermutation;
-  private static short[][] transitUDEdgePermutation;
+  private static int[][] transitUDEdgePermutation;
   private static short[][] transitEdgeOrientation;
 
   // Pruning tables
@@ -116,18 +117,6 @@ public class ThreeSolver {
     for (int i = 0; i < moves.length; i++) {
       slices[i] = (byte) (i / 3);
     }
-    /*slices1 = new int[moves1.length];
-    for (int i = 0; i < moves1.length; i++) {
-      slices1[i] = i / 3;
-    }
-    slices2 = new int[moves2.length];
-    for (int i = 0; i < 6; i++) {
-      slices2[i] = i / 3;
-    }
-    slices2[6] = 2;
-    slices2[7] = 3;
-    slices2[8] = 4;
-    slices2[9] = 5;*/
 
     // Opposites
     opposites = new byte[6];
@@ -169,12 +158,15 @@ public class ThreeSolver {
 
         // search for phase 2 solution
         int maxDepth = Math.min(MAX_PHASE2_SOLUTION_LENGTH, MAX_SOLUTION_LENGTH - solution1.size());
-        int corPerm = IndexConvertor.packRel8Permutation(state.cornerPermutations);
-        int udEdgPerm = IndexConvertor.packRel8Permutation(udEdgePermutation);
+//        int corPerm = IndexConvertor.packRel8Permutation(state.cornerPermutations);
+//        int udEdgPerm = IndexConvertor.packRel8Permutation(udEdgePermutation);
+        int corPerm = IndexConvertor.packPermutation(state.cornerPermutations);
+        int udEdgPerm = IndexConvertor.packPermutation(udEdgePermutation);
         int eEdgPerm = IndexConvertor.packPermutation(eEdgePermutation);
         for (int i = 0; i < maxDepth && !foundSolution; i++) {
           foundSolution |= phase2(corPerm, udEdgPerm, eEdgPerm, i, lastMove, oldLastMove);
         }
+//        setFirstCubiesFromInitialState();
       }
       return foundSolution;
     }
@@ -244,7 +236,10 @@ public class ThreeSolver {
           corPerm = transitCornerPermutation[corPerm][i];
           udEdgPerm = transitUDEdgePermutation[udEdgPerm][i];
           eEdgPerm = transitEEdgePermutation[eEdgPerm][i];
-          byte nextMove = (byte) (i * 3 + j);
+          byte nextMove = (byte) (i * 3 + j + ((i < 2) ? 0 : 1));
+
+//          applyMoveToFirstCubies(nextMove);
+
           solution2.add(nextMove);
           if (phase2(corPerm, udEdgPerm, eEdgPerm, depth - 1, nextMove, lastMove)) {
             return true;
@@ -268,12 +263,13 @@ public class ThreeSolver {
     solution2 = new ArrayList<Byte>();
     bestSolution1 = null;
     bestSolution2 = null;
+//    setFirstCubiesFromInitialState();
 
     int cornerOrientation = IndexConvertor.packOrientation(cubeState.cornerOrientations, 3);
     int edgeOrientation = IndexConvertor.packOrientation(cubeState.edgeOrientations, 2);
     boolean[] combinations = new boolean[cubeState.edgePermutations.length];
     for (int i = 0; i < cubeState.edgePermutations.length; i++) {
-      combinations[i] = (cubeState.edgePermutations[i] <= 4);
+      combinations[i] = (cubeState.edgePermutations[i] < 4);
     }
     int eEdgeCombination = IndexConvertor.packCombination(combinations, 4);
 
@@ -320,15 +316,36 @@ public class ThreeSolver {
     pruningUDEdgePermutation = StateTables.pruningUDEdgePermutation;
   }
 
+  /*private void setFirstCubiesFromInitialState() {
+    for (byte i = 0; i < initialState.cornerPermutations.length; i++) {
+      if (initialState.cornerPermutations[i] == 0) {
+        firstCorPos = i;
+        break;
+      }
+    }
+    for (byte i = 0; i < initialState.edgePermutations.length; i++) {
+      if (initialState.edgePermutations[i] == 0) {
+        firstEdgPos = i;
+      }
+    }
+  }*/
+
+  // Performs moves on a cube state, and also modifies the first cubies positions
   private void applyMoves(CubeState state, List<Byte> moves) {
     for (Byte m : moves) {
       Move move = ThreeSolver.moves[m];
-      // TODO : using half turn safe stuff here, see if really needed, or if could use the optimized getPerm/OrientResult
       state.edgePermutations = StateTables.getPermResult(state.edgePermutations, move.edgPerm);
       state.cornerPermutations = StateTables.getPermResult(state.cornerPermutations, move.corPerm);
       state.edgeOrientations = StateTables.getOrientResult(state.edgeOrientations, move.edgPerm, move.edgOrient, 2);
       state.cornerOrientations = StateTables.getOrientResult(state.cornerOrientations, move.corPerm, move.corOrient, 3);
+//      applyMoveToFirstCubies(m);
     }
   }
+
+  /*private void applyMoveToFirstCubies(byte moveInd) {
+    Move move = ThreeSolver.moves[moveInd];
+    firstCorPos = move.corPerm[firstCorPos];
+    firstEdgPos = move.edgPerm[firstEdgPos];
+  }*/
 
 }
