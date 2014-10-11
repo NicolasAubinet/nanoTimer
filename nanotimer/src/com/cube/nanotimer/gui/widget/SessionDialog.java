@@ -19,7 +19,6 @@ import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.CubeBaseSession;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.Utils;
-import com.cube.nanotimer.util.view.ScalingLinearLayout;
 import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveType;
 
@@ -31,7 +30,6 @@ public class SessionDialog extends DialogFragment {
   private static final int TIMES_PER_LINE = 4;
   private static final String ARG_SOLVETYPE = "solvetype";
 
-  private ScalingLinearLayout mainLayout;
   private LayoutInflater inflater;
   private LinearLayout sessionTimesLayout;
   private Button buMore;
@@ -75,7 +73,6 @@ public class SessionDialog extends DialogFragment {
     ((TextView) v.findViewById(R.id.tvSessionMean)).setText(FormatterService.INSTANCE.formatSolveTime(session.getMean()));
     ((TextView) v.findViewById(R.id.tvSessionSolves)).setText(String.valueOf(sessionTimes.size()));
     ((TextView) v.findViewById(R.id.tvTotalSolves)).setText(String.valueOf(sessionDetails.getTotalSolvesCount()));
-    mainLayout = (ScalingLinearLayout) v.findViewById(R.id.mainLayout);
     sessionTimesLayout = (LinearLayout) v.findViewById(R.id.sessionTimesLayout);
 
     inflater = getActivity().getLayoutInflater();
