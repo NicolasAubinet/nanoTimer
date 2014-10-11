@@ -56,6 +56,7 @@
   <string name="session_mean">Mean:</string>
   <string name="session_solves">Solves:</string>
   <string name="total_solves">Total solves:</string>
+  <string name="more">More</string>
 
   <string name="clear_history">Clear history</string>
   <string name="clear_history_solve_type_confirmation">Are you sure you want to delete all the times for this solve type?</string>

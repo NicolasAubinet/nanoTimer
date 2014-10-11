@@ -1,114 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.cube.nanotimer.util.view.ScalingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
    android:orientation="vertical"
    android:layout_width="match_parent"
    android:layout_height="match_parent"
    android:background="@color/graybg"
-   android:padding="7px"
-   android:minWidth="450px">
+   android:padding="5dp"
+   android:minWidth="300dp">
 
   <LinearLayout
+     android:baselineAligned="false"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
      android:orientation="horizontal">
     <TableLayout
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_marginTop="3px"
+       android:layout_marginTop="2dp"
        android:layout_weight="1">
-      <TableRow android:layout_marginTop="3px">
+      <TableRow android:layout_marginTop="2dp">
         <TextView
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:text="@string/session_ra"
-           style="@style/SmallTextField"/>
+           android:textSize="16sp"/>
         <TextView
            android:id="@+id/tvSessionRA"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           android:layout_marginLeft="6px"
-           android:layout_marginRight="10px"
+           android:layout_marginStart="4dp"
+           android:layout_marginEnd="7dp"
+           android:layout_marginLeft="4dp"
+           android:layout_marginRight="7dp"
            android:textColor="@color/white"
-           style="@style/SmallTextField"/>
+           android:textSize="16sp"/>
       </TableRow>
-      <TableRow android:layout_marginTop="3px">
+      <TableRow android:layout_marginTop="2dp">
         <TextView
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:text="@string/session_mean"
-           style="@style/SmallTextField"/>
+           android:textSize="16sp"/>
         <TextView
            android:id="@+id/tvSessionMean"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           android:layout_marginLeft="6px"
-           android:layout_marginRight="10px"
+           android:layout_marginStart="4dp"
+           android:layout_marginEnd="7dp"
+           android:layout_marginLeft="4dp"
+           android:layout_marginRight="7dp"
            android:textColor="@color/white"
-           style="@style/SmallTextField"/>
+           android:textSize="16sp"/>
       </TableRow>
     </TableLayout>
     <TableLayout
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_marginTop="3px"
+       android:layout_marginTop="2dp"
        android:layout_weight="1">
-      <TableRow android:layout_marginTop="3px">
+      <TableRow android:layout_marginTop="2dp">
         <TextView
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           android:layout_marginLeft="10px"
+           android:layout_marginStart="8dp"
+           android:layout_marginLeft="8dp"
            android:text="@string/session_solves"
-           style="@style/SmallTextField"/>
+           android:textSize="16sp"/>
         <TextView
            android:id="@+id/tvSessionSolves"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           android:layout_marginLeft="6px"
+           android:layout_marginStart="5dp"
+           android:layout_marginLeft="5dp"
            android:textColor="@color/white"
-           style="@style/SmallTextField"/>
+           android:textSize="16sp"/>
       </TableRow>
-      <TableRow android:layout_marginTop="3px">
+      <TableRow android:layout_marginTop="2dp">
         <TextView
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           android:layout_marginLeft="10px"
+           android:layout_marginStart="8dp"
+           android:layout_marginLeft="8dp"
            android:text="@string/total_solves"
-           style="@style/SmallTextField"/>
+           android:textSize="16sp"/>
         <TextView
            android:id="@+id/tvTotalSolves"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           android:layout_marginLeft="6px"
+           android:layout_marginStart="5dp"
+           android:layout_marginLeft="5dp"
            android:textColor="@color/white"
-           style="@style/SmallTextField"/>
+           android:textSize="16sp"/>
       </TableRow>
     </TableLayout>
   </LinearLayout>
 
-  <LinearLayout
-     android:orientation="vertical"
+  <ScrollView
      android:layout_width="match_parent"
      android:layout_height="wrap_content">
 
-    <TextView style="@style/DividerRow"
-       android:layout_marginTop="12px"
-       android:layout_marginLeft="3px"
-       android:layout_marginRight="1px"/>
-
-    <TableLayout
-       android:id="@+id/sessionTimesLayout"
+    <LinearLayout
+       android:orientation="vertical"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:shrinkColumns="*"
-       android:stretchColumns="*">
-    </TableLayout>
+       android:layout_marginBottom="7dp">
 
-    <TextView style="@style/DividerRow"
-       android:layout_marginTop="3px"
-       android:layout_marginLeft="3px"
-       android:layout_marginRight="1px"/>
+      <TextView style="@style/DividerRow"
+         android:layout_height="2dp"
+         android:layout_marginTop="8dp"
+         android:layout_marginStart="2dp"
+         android:layout_marginLeft="2dp"
+         android:layout_marginEnd="1dp"
+         android:layout_marginRight="1dp"/>
 
-  </LinearLayout>
+      <TableLayout
+         android:id="@+id/sessionTimesLayout"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:shrinkColumns="*"
+         android:stretchColumns="*">
+      </TableLayout>
 
-</com.cube.nanotimer.util.view.ScalingLinearLayout>
+      <TextView style="@style/DividerRow"
+         android:layout_height="2dp"
+         android:layout_marginTop="2dp"
+         android:layout_marginStart="2dp"
+         android:layout_marginLeft="2dp"
+         android:layout_marginEnd="1dp"
+         android:layout_marginRight="1dp"/>
+
+      <Button
+         android:id="@+id/buMore"
+         android:layout_width="80dp"
+         android:layout_height="28dp"
+         android:layout_marginTop="7dp"
+         android:layout_gravity="center"
+         android:text="@string/more"
+         android:textSize="16sp"
+         android:visibility="gone"
+         style="@style/CustomButton"/>
+
+    </LinearLayout>
+
+  </ScrollView>
+
+</LinearLayout>

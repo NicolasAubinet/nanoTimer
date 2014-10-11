@@ -4,8 +4,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TableRow;
@@ -16,6 +19,7 @@ import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.CubeBaseSession;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.Utils;
+import com.cube.nanotimer.util.view.ScalingLinearLayout;
 import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveType;
 
@@ -23,9 +27,18 @@ import java.util.List;
 
 public class SessionDialog extends DialogFragment {
 
+  private static final int PAGE_LINES_COUNT = 25; // 100 solve times
+  private static final int TIMES_PER_LINE = 4;
   private static final String ARG_SOLVETYPE = "solvetype";
 
+  private ScalingLinearLayout mainLayout;
   private LayoutInflater inflater;
+  private LinearLayout sessionTimesLayout;
+  private Button buMore;
+  private List<Long> sessionTimes;
+  private int bestInd;
+  private int worstInd;
+  private int curPageInd = 0;
 
   public static SessionDialog newInstance(SolveType solveType) {
     SessionDialog sessionDialog = new SessionDialog();
@@ -52,27 +65,29 @@ public class SessionDialog extends DialogFragment {
   }
 
   private void displaySessionDetails(View v, SessionDetails sessionDetails) {
-    List<Long> sessionTimes = sessionDetails.getSessionTimes();
+    sessionTimes = sessionDetails.getSessionTimes();
     CubeBaseSession session = new CubeBaseSession(sessionTimes);
-    int bestInd = (sessionTimes.size() < 5) ? -1 : session.getBestTimeInd(sessionTimes.size());
-    int worstInd = (sessionTimes.size() < 5) ? -1 : session.getWorstTimeInd(sessionTimes.size());
+    bestInd = (sessionTimes.size() < 5) ? -1 : session.getBestTimeInd(sessionTimes.size());
+    worstInd = (sessionTimes.size() < 5) ? -1 : session.getWorstTimeInd(sessionTimes.size());
+    buMore = (Button) v.findViewById(R.id.buMore);
 
     ((TextView) v.findViewById(R.id.tvSessionRA)).setText(FormatterService.INSTANCE.formatSolveTime(session.getRAOf(Math.max(5, sessionTimes.size()))));
     ((TextView) v.findViewById(R.id.tvSessionMean)).setText(FormatterService.INSTANCE.formatSolveTime(session.getMean()));
     ((TextView) v.findViewById(R.id.tvSessionSolves)).setText(String.valueOf(sessionTimes.size()));
     ((TextView) v.findViewById(R.id.tvTotalSolves)).setText(String.valueOf(sessionDetails.getTotalSolvesCount()));
-    LinearLayout sessionTimesLayout = (LinearLayout) v.findViewById(R.id.sessionTimesLayout);
+    mainLayout = (ScalingLinearLayout) v.findViewById(R.id.mainLayout);
+    sessionTimesLayout = (LinearLayout) v.findViewById(R.id.sessionTimesLayout);
 
     inflater = getActivity().getLayoutInflater();
     int sessionTimesCount = sessionTimes.size();
     if (sessionTimesCount == 0) {
       TableRow tr = new TableRow(getActivity());
-      for (int i = 0; i < 4; i++) {
+      for (int i = 0; i < TIMES_PER_LINE; i++) {
         TextView tv = getNewSolveTimeTextView();
         tr.addView(tv);
       }
       sessionTimesLayout.addView(tr);
-    } else if (sessionTimesCount < 4) {
+    } else if (sessionTimesCount < TIMES_PER_LINE) {
       TableRow tr = new TableRow(getActivity());
       for (Long time : sessionTimes) {
         TextView tv = getNewSolveTimeTextView();
@@ -81,37 +96,61 @@ public class SessionDialog extends DialogFragment {
       }
       sessionTimesLayout.addView(tr);
     } else {
-      TableRow tr = new TableRow(getActivity());
-      // TODO : limit the number of solves to display
-      // TODO : if solves count > limit, display a button at the bottom to show more
-      // TODO : add scrollbar to layout
-      for (int i = 0; i < sessionTimesCount; i++) {
-        TextView tv = getNewSolveTimeTextView();
-        Utils.setSessionTimeCellText(tv, sessionTimes.get(i), i, bestInd, worstInd);
-        tr.addView(tv);
-        if (i % 4 == 3) {
-          sessionTimesLayout.addView(tr);
-          tr = new TableRow(getActivity());
-        }
+      addSolveTimesPage();
+    }
+
+    adjustSessionTimesLayoutParams();
+
+    buMore.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        addSolveTimesPage();
       }
-      if (sessionTimesCount % 4 != 0) {
+    });
+  }
+
+  private void addSolveTimesPage() {
+    TableRow tr = new TableRow(getActivity());
+    int sessionTimesCount = sessionTimes.size();
+    int timesPerPage = PAGE_LINES_COUNT * TIMES_PER_LINE;
+    int pageStartInd = curPageInd * timesPerPage;
+    int pageEndInd = Math.min(sessionTimesCount, pageStartInd + timesPerPage);
+    for (int i = pageStartInd; i < pageEndInd; i++) {
+      TextView tv = getNewSolveTimeTextView();
+      Utils.setSessionTimeCellText(tv, sessionTimes.get(i), i, bestInd, worstInd);
+      tr.addView(tv);
+      if (i % TIMES_PER_LINE == 3) {
         sessionTimesLayout.addView(tr);
-        for (int i = 0; i < 4 - (sessionTimesCount % 4); i++) {
+        tr = new TableRow(getActivity());
+      }
+    }
+    if (pageEndInd < sessionTimesCount) { // some more times remain
+      buMore.setVisibility(View.VISIBLE);
+    } else { // all times are displayed
+      buMore.setVisibility(View.GONE);
+      // add remaining cells to have the same cells count than above lines
+      if (sessionTimesCount % TIMES_PER_LINE != 0) {
+        sessionTimesLayout.addView(tr);
+        for (int i = 0; i < TIMES_PER_LINE - (sessionTimesCount % TIMES_PER_LINE); i++) {
           TextView tv = getNewSolveTimeTextView();
           tr.addView(tv);
         }
       }
     }
+    adjustSessionTimesLayoutParams();
+    curPageInd++;
+  }
 
-    // adjust session times layout parameters
-    for (int i = 0; i < sessionTimesLayout.getChildCount(); i++) {
+  private void adjustSessionTimesLayoutParams() {
+    int startInd = curPageInd * PAGE_LINES_COUNT;
+    for (int i = startInd; i < sessionTimesLayout.getChildCount(); i++) {
       if (sessionTimesLayout.getChildAt(i) instanceof TableRow) {
         TableRow tr = (TableRow) sessionTimesLayout.getChildAt(i);
         for (int j = 0; j < tr.getChildCount(); j++) {
           TextView tv = (TextView) tr.getChildAt(j);
           LayoutParams params = (LayoutParams) tv.getLayoutParams();
-          params.setMargins(2, 2, 2, 2);
-          params.height = 32;
+          params.setMargins(3, 3, 3, 3);
+          params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 26, getResources().getDisplayMetrics());
           tv.setLayoutParams(params);
         }
       }
@@ -119,7 +158,9 @@ public class SessionDialog extends DialogFragment {
   }
 
   private TextView getNewSolveTimeTextView() {
-    return (TextView) inflater.inflate(R.layout.timecell_textview, null);
+    TextView tv = (TextView) inflater.inflate(R.layout.timecell_textview, null);
+    tv.setTextSize(15);
+    return tv;
   }
 
 }
