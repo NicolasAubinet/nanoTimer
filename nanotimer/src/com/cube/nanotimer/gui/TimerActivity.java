@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.text.Html;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -406,24 +405,12 @@ public class TimerActivity extends ActionBarActivity {
           int bestInd = (sessionTimes.size() < 5) ? -1 : cubeSession.getBestTimeInd(sessionTimes.size());
           int worstInd = (sessionTimes.size() < 5) ? -1 : cubeSession.getWorstTimeInd(sessionTimes.size());
           for (int i = 0; i < sessionTimes.size(); i++) {
-            String strTime = FormatterService.INSTANCE.formatSolveTime(sessionTimes.get(i));
-            StringBuilder sbTimes = new StringBuilder();
             TextView tv = getSessionTextView(i);
-            if (i == bestInd) {
-              sbTimes.append("<font color='").append(getResources().getColor(R.color.green)).append("'>");
-              sbTimes.append(strTime).append("</font>");
-              tv.setText(Html.fromHtml(sbTimes.toString()));
-            } else if (i == worstInd) {
-              sbTimes.append("<font color='").append(getResources().getColor(R.color.red)).append("'>");
-              sbTimes.append(strTime).append("</font>");
-              tv.setText(Html.fromHtml(sbTimes.toString()));
-            } else {
-              tv.setText(strTime);
-            }
+            Utils.setSessionTimeCellText(tv, sessionTimes.get(i), i, bestInd, worstInd);
           }
         }
-        tvRA5.setText(FormatterService.INSTANCE.formatSolveTime(cubeSession.getAverageOfFive()));
-        tvRA12.setText(FormatterService.INSTANCE.formatSolveTime(cubeSession.getAverageOfTwelve()));
+        tvRA5.setText(FormatterService.INSTANCE.formatSolveTime(cubeSession.getRAOfFive()));
+        tvRA12.setText(FormatterService.INSTANCE.formatSolveTime(cubeSession.getRAOfTwelve()));
       }
     });
   }

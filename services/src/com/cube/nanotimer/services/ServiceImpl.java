@@ -237,27 +237,34 @@ public class ServiceImpl extends DBHelper implements Service {
     });
   }
 
+  int cpt = 0;
   @Override
   public void getSessionDetails(SolveType solveType, DataCallback<SessionDetails> callback) {
-    // TODO (must have a limit for solves count, like 100 or 500)
+    // TODO (only return times if a new session was created for that solve type)
     // mock:
     SessionDetails sessionDetails = new SessionDetails();
-    sessionDetails.setRA(7587);
-    sessionDetails.setMean(7843);
-    sessionDetails.setSessionSolvesCount(10);
-    sessionDetails.setTotalSolvesCount(120);
+    sessionDetails.setSessionStartTime(System.currentTimeMillis() - 60 * 60 * 1000);
+    sessionDetails.setTotalSolvesCount(10250);
     List<Long> times = new ArrayList<Long>();
-    times.add(7210l);
-    times.add(7840l);
-    times.add(8612l);
-    times.add(7101l);
+    times.add(620587l);
+    times.add(630843l);
+    times.add(20888l);
+    times.add(8980l);
+    times.add(610101l);
     times.add(7350l);
-    times.add(7888l);
-    times.add(6980l);
     times.add(8010l);
+    times.add(640612l);
     times.add(8101l);
     times.add(7671l);
-    sessionDetails.setSessionTimes(times);
+
+    List<Long> realTimes = new ArrayList<Long>();
+    for (int i = 0; i < cpt; i++) {
+      if (i < times.size()) {
+        realTimes.add(times.get(i));
+      }
+    }
+    sessionDetails.setSessionTimes(realTimes);
+    cpt++;
     callback.onData(sessionDetails);
   }
 

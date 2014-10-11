@@ -52,9 +52,9 @@
   <string name="stepsC">Steps:</string>
   <string name="NA">N/A</string>
 
-  <string name="session_ra">Rolling average:</string>
+  <string name="session_ra">Rolling avg:</string>
   <string name="session_mean">Mean:</string>
-  <string name="session_solves">Session solves:</string>
+  <string name="session_solves">Solves:</string>
   <string name="total_solves">Total solves:</string>
 
   <string name="clear_history">Clear history</string>

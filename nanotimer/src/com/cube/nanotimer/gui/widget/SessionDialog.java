@@ -13,9 +13,13 @@ import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.services.db.DataCallback;
+import com.cube.nanotimer.util.CubeBaseSession;
 import com.cube.nanotimer.util.FormatterService;
+import com.cube.nanotimer.util.Utils;
 import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveType;
+
+import java.util.List;
 
 public class SessionDialog extends DialogFragment {
 
@@ -48,36 +52,43 @@ public class SessionDialog extends DialogFragment {
   }
 
   private void displaySessionDetails(View v, SessionDetails sessionDetails) {
-    ((TextView) v.findViewById(R.id.tvSessionRA)).setText(FormatterService.INSTANCE.formatSolveTime(sessionDetails.getRA()));
-    ((TextView) v.findViewById(R.id.tvSessionMean)).setText(FormatterService.INSTANCE.formatSolveTime(sessionDetails.getMean()));
-    ((TextView) v.findViewById(R.id.tvSessionSolves)).setText(String.valueOf(sessionDetails.getSessionSolvesCount()));
+    List<Long> sessionTimes = sessionDetails.getSessionTimes();
+    CubeBaseSession session = new CubeBaseSession(sessionTimes);
+    int bestInd = (sessionTimes.size() < 5) ? -1 : session.getBestTimeInd(sessionTimes.size());
+    int worstInd = (sessionTimes.size() < 5) ? -1 : session.getWorstTimeInd(sessionTimes.size());
+
+    ((TextView) v.findViewById(R.id.tvSessionRA)).setText(FormatterService.INSTANCE.formatSolveTime(session.getRAOf(Math.max(5, sessionTimes.size()))));
+    ((TextView) v.findViewById(R.id.tvSessionMean)).setText(FormatterService.INSTANCE.formatSolveTime(session.getMean()));
+    ((TextView) v.findViewById(R.id.tvSessionSolves)).setText(String.valueOf(sessionTimes.size()));
     ((TextView) v.findViewById(R.id.tvTotalSolves)).setText(String.valueOf(sessionDetails.getTotalSolvesCount()));
     LinearLayout sessionTimesLayout = (LinearLayout) v.findViewById(R.id.sessionTimesLayout);
 
     inflater = getActivity().getLayoutInflater();
-    int sessionTimesCount = sessionDetails.getSessionTimes().size();
+    int sessionTimesCount = sessionTimes.size();
     if (sessionTimesCount == 0) {
       TableRow tr = new TableRow(getActivity());
       for (int i = 0; i < 4; i++) {
-        TextView tv = getSolveTimeTextView();
+        TextView tv = getNewSolveTimeTextView();
         tr.addView(tv);
       }
       sessionTimesLayout.addView(tr);
     } else if (sessionTimesCount < 4) {
       TableRow tr = new TableRow(getActivity());
-      for (Long time : sessionDetails.getSessionTimes()) {
-        TextView tv = getSolveTimeTextView();
+      for (Long time : sessionTimes) {
+        TextView tv = getNewSolveTimeTextView();
         tv.setText(FormatterService.INSTANCE.formatSolveTime(time));
         tr.addView(tv);
       }
       sessionTimesLayout.addView(tr);
     } else {
       TableRow tr = new TableRow(getActivity());
+      // TODO : limit the number of solves to display
+      // TODO : if solves count > limit, display a button at the bottom to show more
+      // TODO : add scrollbar to layout
       for (int i = 0; i < sessionTimesCount; i++) {
-        TextView tv = getSolveTimeTextView();
-        tv.setText(FormatterService.INSTANCE.formatSolveTime(sessionDetails.getSessionTimes().get(i)));
+        TextView tv = getNewSolveTimeTextView();
+        Utils.setSessionTimeCellText(tv, sessionTimes.get(i), i, bestInd, worstInd);
         tr.addView(tv);
-
         if (i % 4 == 3) {
           sessionTimesLayout.addView(tr);
           tr = new TableRow(getActivity());
@@ -86,7 +97,7 @@ public class SessionDialog extends DialogFragment {
       if (sessionTimesCount % 4 != 0) {
         sessionTimesLayout.addView(tr);
         for (int i = 0; i < 4 - (sessionTimesCount % 4); i++) {
-          TextView tv = getSolveTimeTextView();
+          TextView tv = getNewSolveTimeTextView();
           tr.addView(tv);
         }
       }
@@ -107,7 +118,7 @@ public class SessionDialog extends DialogFragment {
     }
   }
 
-  private TextView getSolveTimeTextView() {
+  private TextView getNewSolveTimeTextView() {
     return (TextView) inflater.inflate(R.layout.timecell_textview, null);
   }
 

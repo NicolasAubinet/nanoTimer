@@ -7,14 +7,17 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.media.MediaPlayer;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.text.Html;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.cube.nanotimer.App;
+import com.cube.nanotimer.R;
 
 import java.security.SecureRandom;
 import java.util.Random;
@@ -175,6 +178,22 @@ public class Utils {
 
   public static Random getRandom() {
     return new SecureRandom();
+  }
+
+  public static void setSessionTimeCellText(TextView tv, long time, int timeInd, int bestInd, int worstInd) {
+    String strTime = FormatterService.INSTANCE.formatSolveTime(time);
+    StringBuilder sbTimes = new StringBuilder();
+    if (timeInd == bestInd) {
+      sbTimes.append("<font color='").append(tv.getContext().getResources().getColor(R.color.green)).append("'>");
+      sbTimes.append(strTime).append("</font>");
+      tv.setText(Html.fromHtml(sbTimes.toString()));
+    } else if (timeInd == worstInd) {
+      sbTimes.append("<font color='").append(tv.getContext().getResources().getColor(R.color.red)).append("'>");
+      sbTimes.append(strTime).append("</font>");
+      tv.setText(Html.fromHtml(sbTimes.toString()));
+    } else {
+      tv.setText(strTime);
+    }
   }
 
 }

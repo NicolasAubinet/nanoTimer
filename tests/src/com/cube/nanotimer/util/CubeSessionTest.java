@@ -189,52 +189,52 @@ public class CubeSessionTest extends AndroidTestCase {
     sessionTimes.add(3l);
     sessionTimes.add(5l);
     CubeSession cs = new CubeSession(sessionTimes);
-    Assert.assertEquals(5, cs.getAverageOfFive());
-    Assert.assertEquals(-2, cs.getAverageOfTwelve()); // N/A
+    Assert.assertEquals(5, cs.getRAOfFive());
+    Assert.assertEquals(-2, cs.getRAOfTwelve()); // N/A
     cs.addTime(8);
-    Assert.assertEquals(6, cs.getAverageOfFive());
-    Assert.assertEquals(-2, cs.getAverageOfTwelve());
+    Assert.assertEquals(6, cs.getRAOfFive());
+    Assert.assertEquals(-2, cs.getRAOfTwelve());
     cs.addTime(-1); // DNF
-    Assert.assertEquals(8, cs.getAverageOfFive());
-    Assert.assertEquals(-2, cs.getAverageOfTwelve());
+    Assert.assertEquals(8, cs.getRAOfFive());
+    Assert.assertEquals(-2, cs.getRAOfTwelve());
     cs.addTime(-1);
-    Assert.assertEquals(-1, cs.getAverageOfFive());
-    Assert.assertEquals(-2, cs.getAverageOfTwelve());
+    Assert.assertEquals(-1, cs.getRAOfFive());
+    Assert.assertEquals(-2, cs.getRAOfTwelve());
     cs.addTime(12);
-    Assert.assertEquals(-1, cs.getAverageOfFive());
-    Assert.assertEquals(-2, cs.getAverageOfTwelve());
+    Assert.assertEquals(-1, cs.getRAOfFive());
+    Assert.assertEquals(-2, cs.getRAOfTwelve());
     cs.addTime(2);
-    Assert.assertEquals(-1, cs.getAverageOfFive());
-    Assert.assertEquals(-2, cs.getAverageOfTwelve());
+    Assert.assertEquals(-1, cs.getRAOfFive());
+    Assert.assertEquals(-2, cs.getRAOfTwelve());
     cs.addTime(4);
-    Assert.assertEquals(-1, cs.getAverageOfFive());
-    Assert.assertEquals(-2, cs.getAverageOfTwelve());
+    Assert.assertEquals(-1, cs.getRAOfFive());
+    Assert.assertEquals(-2, cs.getRAOfTwelve());
     cs.addTime(5);
-    Assert.assertEquals(7, cs.getAverageOfFive());
-    Assert.assertEquals(-1, cs.getAverageOfTwelve()); // DNF
+    Assert.assertEquals(7, cs.getRAOfFive());
+    Assert.assertEquals(-1, cs.getRAOfTwelve()); // DNF
     cs.addTime(9);
-    Assert.assertEquals(6, cs.getAverageOfFive());
-    Assert.assertEquals(-1, cs.getAverageOfTwelve());
+    Assert.assertEquals(6, cs.getRAOfFive());
+    Assert.assertEquals(-1, cs.getRAOfTwelve());
     cs.addTime(10);
     cs.addTime(6);
     cs.addTime(5);
     cs.addTime(10);
     cs.addTime(8);
     cs.addTime(11);
-    Assert.assertEquals(8, cs.getAverageOfFive());
-    Assert.assertEquals(8, cs.getAverageOfTwelve());
+    Assert.assertEquals(8, cs.getRAOfFive());
+    Assert.assertEquals(8, cs.getRAOfTwelve());
     cs.deleteLast();
-    Assert.assertEquals(8, cs.getAverageOfFive());
-    Assert.assertEquals(-1, cs.getAverageOfTwelve());
+    Assert.assertEquals(8, cs.getRAOfFive());
+    Assert.assertEquals(-1, cs.getRAOfTwelve());
     cs.addTime(11);
-    Assert.assertEquals(8, cs.getAverageOfFive());
-    Assert.assertEquals(8, cs.getAverageOfTwelve());
+    Assert.assertEquals(8, cs.getRAOfFive());
+    Assert.assertEquals(8, cs.getRAOfTwelve());
     cs.setLastAsDNF();
-    Assert.assertEquals(8, cs.getAverageOfFive());
-    Assert.assertEquals(-1, cs.getAverageOfTwelve());
+    Assert.assertEquals(8, cs.getRAOfFive());
+    Assert.assertEquals(-1, cs.getRAOfTwelve());
     cs.addTime(9);
-    Assert.assertEquals(9, cs.getAverageOfFive());
-    Assert.assertEquals(7, cs.getAverageOfTwelve()); // 7.??? (not an int)
+    Assert.assertEquals(9, cs.getRAOfFive());
+    Assert.assertEquals(7, cs.getRAOfTwelve()); // 7.??? (not an int)
   }
 
   @SmallTest
@@ -253,8 +253,8 @@ public class CubeSessionTest extends AndroidTestCase {
     cs.addTime(-1);
     cs.addTime(-1);
     cs.addTime(-1);
-    Assert.assertEquals(-1, cs.getAverageOfFive());
-    Assert.assertEquals(-1, cs.getAverageOfTwelve());
+    Assert.assertEquals(-1, cs.getRAOfFive());
+    Assert.assertEquals(-1, cs.getRAOfTwelve());
   }
 
 }

@@ -105,8 +105,9 @@
     </TableLayout>
 
     <TextView style="@style/DividerRow"
-       android:layout_marginTop="5px"
-       android:layout_margin="2px"/>
+       android:layout_marginTop="3px"
+       android:layout_marginLeft="3px"
+       android:layout_marginRight="1px"/>
 
   </LinearLayout>
 
