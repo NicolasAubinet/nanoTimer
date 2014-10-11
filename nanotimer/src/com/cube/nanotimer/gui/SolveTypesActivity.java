@@ -30,7 +30,7 @@ import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.Utils;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.vo.CubeType;
-import com.cube.nanotimer.vo.SolveTime;
+import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.SolveTypeStep;
 import com.mobeta.android.dslv.DragSortController;
@@ -154,13 +154,13 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
             }
           });
     } else if (menuItem.getItemId() == ACTION_CREATESTEPS) {
-      App.INSTANCE.getService().getHistory(liSolveTypes.get(position), new DataCallback<List<SolveTime>>() {
+      App.INSTANCE.getService().getHistory(liSolveTypes.get(position), new DataCallback<SolveHistory>() {
         @Override
-        public void onData(final List<SolveTime> data) {
+        public void onData(final SolveHistory data) {
           runOnUiThread(new Runnable() {
             @Override
             public void run() {
-              if (data.isEmpty()) {
+              if (data.getSolveTimes().isEmpty()) {
                 Utils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
               } else {
                 Utils.showYesNoConfirmation(SolveTypesActivity.this, R.string.solvetype_has_times_addsteps, new YesNoListener() {

@@ -26,7 +26,7 @@ import java.util.List;
 
 public class SessionDialog extends DialogFragment {
 
-  private static final int PAGE_LINES_COUNT = 25; // 100 solve times
+  private static final int PAGE_LINES_COUNT = 10;
   private static final int TIMES_PER_LINE = 4;
   private static final String ARG_SOLVETYPE = "solvetype";
 
@@ -52,8 +52,13 @@ public class SessionDialog extends DialogFragment {
     final SolveType solveType = (SolveType) getArguments().getSerializable(ARG_SOLVETYPE);
     App.INSTANCE.getService().getSessionDetails(solveType, new DataCallback<SessionDetails>() {
       @Override
-      public void onData(SessionDetails data) {
-        displaySessionDetails(v, data);
+      public void onData(final SessionDetails data) {
+        getActivity().runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            displaySessionDetails(v, data);
+          }
+        });
       }
     });
 
@@ -70,8 +75,8 @@ public class SessionDialog extends DialogFragment {
     buMore = (Button) v.findViewById(R.id.buMore);
 
     ((TextView) v.findViewById(R.id.tvSessionRA)).setText(FormatterService.INSTANCE.formatSolveTime(session.getRAOf(Math.max(5, sessionTimes.size()))));
-    ((TextView) v.findViewById(R.id.tvSessionMean)).setText(FormatterService.INSTANCE.formatSolveTime(session.getMean()));
-    ((TextView) v.findViewById(R.id.tvSessionSolves)).setText(String.valueOf(sessionTimes.size()));
+    ((TextView) v.findViewById(R.id.tvSessionMean)).setText(FormatterService.INSTANCE.formatSolveTime(Utils.getMeanOf(session.getSessionTimes())));
+    ((TextView) v.findViewById(R.id.tvSessionSolves)).setText(String.valueOf(sessionDetails.getSessionSolvesCount()));
     ((TextView) v.findViewById(R.id.tvTotalSolves)).setText(String.valueOf(sessionDetails.getTotalSolvesCount()));
     sessionTimesLayout = (LinearLayout) v.findViewById(R.id.sessionTimesLayout);
 

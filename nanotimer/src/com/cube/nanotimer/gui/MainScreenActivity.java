@@ -39,6 +39,7 @@ import com.cube.nanotimer.util.Utils;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.CubeType.Type;
+import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 import com.startapp.android.publish.banner.Banner;
@@ -54,11 +55,13 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
   private Button buCubeType;
   private Button buSolveType;
   private ListView lvHistory;
+  private TextView tvSolvesCount;
 
   private CubeType curCubeType;
   private SolveType curSolveType;
   private List<CubeType> cubeTypes;
   private List<SolveType> solveTypes;
+  private int solvesCount;
 
   private List<SolveTime> liHistory = new ArrayList<SolveTime>();
   private HistoryListAdapter adapter;
@@ -120,6 +123,8 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
     });
     buSolveType.setShadowLayer(1, 3f, 3f, getResources().getColor(R.color.black));
 
+    tvSolvesCount = (TextView) findViewById(R.id.tvSolvesCount);
+
     initHistoryList();
 
     Button buStart = (Button) findViewById(R.id.buStart);
@@ -158,13 +163,14 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
           if (totalItemCount == lastVisibleItem && lastVisibleItem != previousLastItem) {
             previousLastItem = lastVisibleItem;
             long from = liHistory.get(liHistory.size() - 1).getTimestamp();
-            App.INSTANCE.getService().getHistory(curSolveType, from, new DataCallback<List<SolveTime>>() {
+            App.INSTANCE.getService().getHistory(curSolveType, from, new DataCallback<SolveHistory>() {
               @Override
-              public void onData(final List<SolveTime> data) {
+              public void onData(final SolveHistory data) {
                 runOnUiThread(new Runnable() {
                   @Override
                   public void run() {
-                    liHistory.addAll(data);
+                    setSolvesCount(data.getSolvesCount());
+                    liHistory.addAll(data.getSolveTimes());
                     adapter.notifyDataSetChanged();
                   }
                 });
@@ -333,14 +339,15 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
   private void refreshHistory() {
     previousLastItem = 0;
     if (curSolveType != null) {
-      App.INSTANCE.getService().getHistory(curSolveType, new DataCallback<List<SolveTime>>() {
+      App.INSTANCE.getService().getHistory(curSolveType, new DataCallback<SolveHistory>() {
         @Override
-        public void onData(final List<SolveTime> data) {
+        public void onData(final SolveHistory data) {
           runOnUiThread(new Runnable() {
             @Override
             public void run() {
+              setSolvesCount(data.getSolvesCount());
               liHistory.clear();
-              liHistory.addAll(data);
+              liHistory.addAll(data.getSolveTimes());
               adapter.notifyDataSetChanged();
               lvHistory.setSelection(0);
             }
@@ -394,6 +401,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
       if (st.getId() == solveTime.getId()) {
         it.remove();
         adapter.notifyDataSetChanged();
+        setSolvesCount(solvesCount - 1);
         break;
       }
     }
@@ -419,6 +427,11 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
         }
       }
     }
+  }
+
+  private void setSolvesCount(int solvesCount) {
+    this.solvesCount = solvesCount;
+    tvSolvesCount.setText(String.valueOf(solvesCount) + " " + getString(R.string.solves));
   }
 
   private void showHideBannerAd() {

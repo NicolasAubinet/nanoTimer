@@ -5,7 +5,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import com.cube.nanotimer.services.db.DB;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveAverages;
+import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveTimeAverages;
 import com.cube.nanotimer.vo.SolveType;
@@ -323,16 +325,19 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   @Override
-  public List<SolveTime> getHistory(SolveType solveType) {
+  public SolveHistory getHistory(SolveType solveType) {
     return getHistory(solveType, System.currentTimeMillis());
   }
 
   @Override
-  public List<SolveTime> getHistory(SolveType solveType, long from) {
-    return getHistory(solveType, from, HISTORY_PAGE_SIZE);
+  public SolveHistory getHistory(SolveType solveType, long from) {
+    SolveHistory solveHistory = new SolveHistory();
+    solveHistory.setSolveTimes(getHistoryTimes(solveType, from, HISTORY_PAGE_SIZE));
+    solveHistory.setSolvesCount(getSolvesCount(solveType));
+    return solveHistory;
   }
 
-  public List<SolveTime> getHistory(SolveType solveType, long from, Integer pageSize) {
+  public List<SolveTime> getHistoryTimes(SolveType solveType, long from, Integer pageSize) {
     List<SolveTime> history = new ArrayList<SolveTime>();
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_ID);
@@ -366,6 +371,21 @@ public class ServiceProviderImpl implements ServiceProvider {
       cursor.close();
     }
     return history;
+  }
+
+  private int getSolvesCount(SolveType solveType) {
+    int solvesCount = 0;
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT COUNT(*)");
+    q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
+    q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
+    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId()));
+    if (cursor != null) {
+      if (cursor.moveToFirst()) {
+        solvesCount = cursor.getInt(0);
+      }
+    }
+    return solvesCount;
   }
 
   private List<Long> getSolveTimeSteps(SolveTime solveTime) {
@@ -406,6 +426,10 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   public List<Long> getSessionTimes(SolveType solveType) {
+    return getSessionTimes(solveType, SESSION_TIMES_COUNT);
+  }
+
+  public List<Long> getSessionTimes(SolveType solveType, Integer limit) {
     List<Long> sessionTimes = new ArrayList<Long>();
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_TIMEHISTORY_TIME);
@@ -416,7 +440,9 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("      FROM ").append(DB.TABLE_SOLVETYPE);
     q.append("      WHERE ").append(DB.COL_ID).append(" = ?)");
     q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC");
-    q.append(" LIMIT ").append(SESSION_TIMES_COUNT);
+    if (limit != null) {
+      q.append(" LIMIT ").append(limit);
+    }
     Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId(), solveType.getId()));
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
@@ -432,6 +458,23 @@ public class ServiceProviderImpl implements ServiceProvider {
     ContentValues values = new ContentValues();
     values.put(DB.COL_SOLVETYPE_SESSION_START, startTs);
     db.update(DB.TABLE_SOLVETYPE, values, DB.COL_ID + " = ?", getStringArray(solveType.getId()));
+  }
+
+  @Override
+  public long getSessionStart(SolveType solveType) {
+    long sessionStart = 0;
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT ").append(DB.COL_SOLVETYPE_SESSION_START);
+    q.append(" FROM ").append(DB.TABLE_SOLVETYPE);
+    q.append(" WHERE ").append(DB.COL_ID).append(" = ?");
+    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId()));
+    if (cursor != null) {
+      if (cursor.moveToFirst()) {
+        sessionStart = cursor.getLong(0);
+      }
+      cursor.close();
+    }
+    return sessionStart;
   }
 
   @Override
@@ -546,14 +589,18 @@ public class ServiceProviderImpl implements ServiceProvider {
         sta.setAvgOf50(getCursorLong(cursor, 7));
         sta.setAvgOf100(getCursorLong(cursor, 8));
         sta.setSolveType(solveTime.getSolveType());
-//        if (solveTime.getSolveType().hasSteps()) {
-//          List<Long> stepTimes = getSolveTimeSteps(st);
-//          st.setStepsTimes(stepTimes.size() == 0 ? null : stepTimes.toArray(new Long[0]));
-//        }
       }
       cursor.close();
     }
     return sta;
+  }
+
+  @Override
+  public SessionDetails getSessionDetails(SolveType solveType) {
+    SessionDetails sessionDetails = new SessionDetails();
+    sessionDetails.setTotalSolvesCount(getSolvesCount(solveType));
+    sessionDetails.setSessionTimes(getSessionTimes(solveType, null));
+    return sessionDetails;
   }
 
   private void recalculateAverages(long timestamp, SolveType solveType) {
@@ -776,10 +823,8 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("   AND ").append(DB.COL_TIMEHISTORY_TIME).append(" > 0");
     Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTypeId));
     if (cursor != null) {
-      if (cursor != null) {
-        if (cursor.moveToFirst()) {
-          cachedLifetimeBest = getCursorLong(cursor, 0);
-        }
+      if (cursor.moveToFirst()) {
+        cachedLifetimeBest = getCursorLong(cursor, 0);
       }
       cursor.close();
     }

@@ -6,11 +6,11 @@ import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveAverages;
+import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveTimeAverages;
 import com.cube.nanotimer.vo.SolveType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ServiceImpl extends DBHelper implements Service {
@@ -94,7 +94,7 @@ public class ServiceImpl extends DBHelper implements Service {
   }
 
   @Override
-  public void getHistory(final SolveType solveType, final DataCallback<List<SolveTime>> callback) {
+  public void getHistory(final SolveType solveType, final DataCallback<SolveHistory> callback) {
     run(new Runnable() {
       @Override
       public void run() {
@@ -104,7 +104,7 @@ public class ServiceImpl extends DBHelper implements Service {
   }
 
   @Override
-  public void getHistory(final SolveType solveType, final long from, final DataCallback<List<SolveTime>> callback) {
+  public void getHistory(final SolveType solveType, final long from, final DataCallback<SolveHistory> callback) {
     run(new Runnable() {
       @Override
       public void run() {
@@ -158,6 +158,16 @@ public class ServiceImpl extends DBHelper implements Service {
         if (callback != null) {
           callback.onData(null);
         }
+      }
+    });
+  }
+
+  @Override
+  public void getSessionStart(final SolveType solveType, final DataCallback<Long> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        callback.onData(provider.getSessionStart(solveType));
       }
     });
   }
@@ -237,35 +247,14 @@ public class ServiceImpl extends DBHelper implements Service {
     });
   }
 
-  int cpt = 0;
   @Override
-  public void getSessionDetails(SolveType solveType, DataCallback<SessionDetails> callback) {
-    // TODO (only return times if a new session was created for that solve type)
-    // mock:
-    SessionDetails sessionDetails = new SessionDetails();
-    sessionDetails.setSessionStartTime(System.currentTimeMillis() - 60 * 60 * 1000);
-    sessionDetails.setTotalSolvesCount(10250);
-    List<Long> times = new ArrayList<Long>();
-    times.add(620587l);
-    times.add(630843l);
-    times.add(20888l);
-    times.add(8980l);
-    times.add(610101l);
-    times.add(7350l);
-    times.add(8010l);
-    times.add(640612l);
-    times.add(8101l);
-    times.add(7671l);
-
-    List<Long> realTimes = new ArrayList<Long>();
-    for (int i = 0; i < cpt; i++) {
-      if (i < times.size()) {
-        realTimes.add(times.get(i));
+  public void getSessionDetails(final SolveType solveType, final DataCallback<SessionDetails> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        callback.onData(provider.getSessionDetails(solveType));
       }
-    }
-    sessionDetails.setSessionTimes(realTimes);
-    cpt++;
-    callback.onData(sessionDetails);
+    });
   }
 
   private void run(Runnable runnable) {

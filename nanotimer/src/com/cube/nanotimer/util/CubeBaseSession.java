@@ -75,19 +75,6 @@ public class CubeBaseSession {
     return -2;
   }
 
-  public long getMean() {
-    long mean = 0;
-    if (sessionTimes.size() > 0) {
-      for (Long t : sessionTimes) {
-        mean += t;
-      }
-      mean /= sessionTimes.size();
-    } else {
-      mean = -2;
-    }
-    return mean;
-  }
-
   public List<Long> getSessionTimes() {
     return sessionTimes;
   }

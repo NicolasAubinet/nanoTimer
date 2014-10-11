@@ -46,6 +46,7 @@ import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.CubeType.Type;
 import com.cube.nanotimer.vo.SolveAverages;
+import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.SolveTypeStep;
@@ -80,6 +81,7 @@ public class TimerActivity extends ActionBarActivity {
   private List<Long> stepsTimes;
   private long stepStartTs;
   private List<Animation> animations = new ArrayList<Animation>();
+  private boolean hasNewSession;
 
   private int historyTimesCount;
   private ColorStateList defaultTextColor;
@@ -125,6 +127,13 @@ public class TimerActivity extends ActionBarActivity {
     soundsEnabled = Options.INSTANCE.isInspectionSoundsEnabled();
     keepScreenOnWhenTimerOff = Options.INSTANCE.isKeepTimerScreenOnWhenTimerOff();
 
+    App.INSTANCE.getService().getSessionStart(solveType, new DataCallback<Long>() {
+      @Override
+      public void onData(Long data) {
+        hasNewSession = (data != null && data > 0);
+      }
+    });
+
     initViews();
 
     resetTimer();
@@ -139,10 +148,10 @@ public class TimerActivity extends ActionBarActivity {
           refreshSessionFields();
         }
       });
-      App.INSTANCE.getService().getHistory(solveType, new DataCallback<List<SolveTime>>() {
+      App.INSTANCE.getService().getHistory(solveType, new DataCallback<SolveHistory>() {
         @Override
-        public void onData(List<SolveTime> data) {
-          historyTimesCount = data.size(); // has a maximum of 20 times, but it's enough for this
+        public void onData(SolveHistory data) {
+          historyTimesCount = data.getSolvesCount();
         }
       });
     }
@@ -285,7 +294,11 @@ public class TimerActivity extends ActionBarActivity {
       menu.getItem(i).setVisible(showMenu);
     }
     if (solveType.hasSteps()) {
+      menu.findItem(R.id.itSessionDetails).setVisible(false);
       menu.findItem(R.id.itNewSession).setVisible(false);
+    }
+    if (!hasNewSession) {
+      menu.findItem(R.id.itSessionDetails).setVisible(false);
     }
     return true;
   }
@@ -326,7 +339,7 @@ public class TimerActivity extends ActionBarActivity {
             resetTimer();
           }
           break;
-        case R.id.itSession:
+        case R.id.itSessionDetails:
           Utils.showFragment(this, SessionDialog.newInstance(solveType));
           break;
         case R.id.itNewSession:
@@ -336,6 +349,10 @@ public class TimerActivity extends ActionBarActivity {
               App.INSTANCE.getService().startNewSession(solveType, System.currentTimeMillis(), null);
               cubeSession.clearSession();
               refreshSessionFields();
+              if (!hasNewSession) {
+                hasNewSession = true;
+                supportInvalidateOptionsMenu();
+              }
             }
           });
           break;

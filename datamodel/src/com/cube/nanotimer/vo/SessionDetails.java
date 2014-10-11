@@ -5,7 +5,6 @@ import java.util.List;
 public class SessionDetails {
 
   private int totalSolvesCount;
-  private long sessionStartTime;
   private List<Long> sessionTimes;
 
   public SessionDetails() {
@@ -19,20 +18,16 @@ public class SessionDetails {
     this.totalSolvesCount = totalSolvesCount;
   }
 
-  public long getSessionStartTime() {
-    return sessionStartTime;
-  }
-
-  public void setSessionStartTime(long sessionStartTime) {
-    this.sessionStartTime = sessionStartTime;
-  }
-
   public List<Long> getSessionTimes() {
     return sessionTimes;
   }
 
   public void setSessionTimes(List<Long> sessionTimes) {
     this.sessionTimes = sessionTimes;
+  }
+
+  public int getSessionSolvesCount() {
+    return (sessionTimes == null) ? 0 : sessionTimes.size();
   }
 
 }
