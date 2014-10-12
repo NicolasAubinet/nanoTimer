@@ -7,9 +7,9 @@
 
     <TextView
        android:id="@+id/tvItem"
-       android:textSize="26px"
-       android:layout_marginTop="7px"
-       android:layout_marginBottom="7px"
+       android:textSize="24px"
+       android:layout_marginTop="5px"
+       android:layout_marginBottom="5px"
        android:padding="2px"
        style="@style/ListViewItem"/>
 

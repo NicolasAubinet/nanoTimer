@@ -8,7 +8,7 @@
   <RelativeLayout
      android:layout_width="match_parent"
      android:layout_height="match_parent"
-     android:padding="12px">
+     android:padding="9px">
 
     <TextView
        android:id="@+id/tvStepName"
@@ -23,8 +23,8 @@
     <ImageView
        android:id="@+id/imgMove"
        android:src="@drawable/listmove"
-       android:layout_width="50px"
-       android:layout_height="50px"
+       android:layout_width="45px"
+       android:layout_height="45px"
        android:layout_centerVertical="true"
        android:layout_alignParentRight="true"
        android:layout_marginRight="8px"

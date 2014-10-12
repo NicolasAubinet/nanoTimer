@@ -140,7 +140,7 @@ public class TimerActivity extends ActionBarActivity {
     App.INSTANCE.getService().getSessionDetails(solveType, new DataCallback<SessionDetails>() {
       @Override
       public void onData(SessionDetails data) {
-        hasNewSession = (data.getSessionTimes() != null);
+        hasNewSession = (data.getSessionTimes() != null && !solveType.hasSteps());
         setSessionSolvesCount(data.getSessionSolvesCount());
         if (!hasNewSession) {
           tvSessionSolvesCount.setText("");
