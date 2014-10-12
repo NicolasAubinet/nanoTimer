@@ -171,10 +171,20 @@ public class TimerActivity extends ActionBarActivity {
     getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
     View v = getLayoutInflater().inflate(R.layout.textcentered_actionbar, null);
     tvSessionSolvesCount = (TextView) v.findViewById(R.id.tvSessionSolvesCount);
+
+    // TODO : find out how to know if the overflow button is displayed to adapt margin (below commented out code)
+
+    // TODO : what about SDK_INT > 10 && < 14?
+    /*if (Build.VERSION.SDK_INT <= 10 || (Build.VERSION.SDK_INT >= 14 && ViewConfiguration.get(this).hasPermanentMenuKey())) {
+      View tvTitle = v.findViewById(R.id.tvTitle);
+      MarginLayoutParams params = (MarginLayoutParams) tvTitle.getLayoutParams();
+      params.rightMargin = Utils.dipToPixels(48);
+      tvTitle.setLayoutParams(params);
+    }*/
     getSupportActionBar().setCustomView(v, new ActionBar.LayoutParams(
         LayoutParams.MATCH_PARENT,
         LayoutParams.WRAP_CONTENT,
-        Gravity.CENTER_VERTICAL | Gravity.LEFT));
+        Gravity.CENTER_VERTICAL));
   }
 
   private void initViews() {

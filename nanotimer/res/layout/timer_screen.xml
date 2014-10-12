@@ -70,7 +70,7 @@
         <TextView
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           android:layout_marginTop="12px"
+           android:layout_marginTop="7px"
            android:text="@string/scrambleC"
            style="@style/ScrambleTextField"/>
         <com.cube.nanotimer.util.view.FontFitTextView
@@ -90,7 +90,8 @@
          android:layout_weight="1"
          android:gravity="top"
          android:padding="1px"
-         android:layout_margin="2px">
+         android:layout_marginLeft="2px"
+         android:layout_marginRight="2px">
 
         <TextView style="@style/DividerRow"
            android:layout_marginLeft="3px"
@@ -132,9 +133,9 @@
           <TableLayout
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
-             android:layout_marginTop="3px"
+             android:layout_marginTop="1px"
              android:layout_weight="1">
-            <TableRow android:layout_marginTop="3px">
+            <TableRow android:layout_marginTop="1px">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
@@ -148,7 +149,7 @@
                  android:textColor="@color/white"
                  style="@style/SmallTextField"/>
             </TableRow>
-            <TableRow android:layout_marginTop="3px">
+            <TableRow android:layout_marginTop="2px">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
@@ -166,9 +167,9 @@
           <TableLayout
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
-             android:layout_marginTop="3px"
+             android:layout_marginTop="1px"
              android:layout_weight="1">
-            <TableRow android:layout_marginTop="3px">
+            <TableRow android:layout_marginTop="1px">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
@@ -182,7 +183,7 @@
                  android:textColor="@color/white"
                  style="@style/SmallTextField"/>
             </TableRow>
-            <TableRow android:layout_marginTop="3px">
+            <TableRow android:layout_marginTop="2px">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
@@ -207,7 +208,9 @@
        android:layout_height="wrap_content"
        android:layout_alignParentBottom="true"
        android:gravity="bottom"
-       android:layout_margin="2px">
+       android:layout_marginLeft="2px"
+       android:layout_marginRight="2px"
+       android:layout_marginBottom="2px">
       <TableRow>
         <TextView android:textSize="21px" android:textStyle="bold" android:layout_width="50px"/>
         <TextView android:id="@+id/tvAvgOf" android:text="@string/last_avg_of" android:layout_weight="1" style="@style/AverageTableHeaderField"/>

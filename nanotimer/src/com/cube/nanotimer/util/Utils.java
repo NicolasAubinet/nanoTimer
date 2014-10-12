@@ -8,6 +8,7 @@ import android.media.MediaPlayer;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.Html;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
@@ -212,6 +213,10 @@ public class Utils {
       mean = -2;
     }
     return mean;
+  }
+
+  public static int dipToPixels(int dip) {
+    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, App.INSTANCE.getContext().getResources().getDisplayMetrics());
   }
 
 }

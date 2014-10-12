@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -152,7 +151,7 @@ public class SessionDialog extends DialogFragment {
           TextView tv = (TextView) tr.getChildAt(j);
           LayoutParams params = (LayoutParams) tv.getLayoutParams();
           params.setMargins(3, 3, 3, 3);
-          params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 26, getResources().getDisplayMetrics());
+          params.height = Utils.dipToPixels(26);
           tv.setLayoutParams(params);
         }
       }

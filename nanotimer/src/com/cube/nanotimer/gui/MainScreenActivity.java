@@ -6,7 +6,7 @@ import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,7 +50,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-public class MainScreenActivity extends FragmentActivity implements TimeChangedHandler, SelectionHandler {
+public class MainScreenActivity extends ActionBarActivity implements TimeChangedHandler, SelectionHandler {
 
   private Button buCubeType;
   private Button buSolveType;
@@ -191,7 +191,7 @@ public class MainScreenActivity extends FragmentActivity implements TimeChangedH
     mixedAdBannerChance = new Random().nextInt(10) < 2; // 20% chance to not show banner in mixed mode
     showHideBannerAd();
   }
-  
+
   @Override
   protected void onPause() {
     super.onPause();

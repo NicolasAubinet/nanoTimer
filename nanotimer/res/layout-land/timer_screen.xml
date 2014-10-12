@@ -105,7 +105,7 @@
                  android:textColor="@color/white"
                  style="@style/SmallTextField"/>
             </TableRow>
-            <TableRow android:layout_marginTop="5px">
+            <TableRow android:layout_marginTop="2px">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
@@ -138,7 +138,7 @@
                  android:textColor="@color/white"
                  style="@style/SmallTextField"/>
             </TableRow>
-            <TableRow android:layout_marginTop="5px">
+            <TableRow android:layout_marginTop="2px">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
@@ -200,7 +200,9 @@
          android:layout_height="wrap_content"
          android:layout_alignParentBottom="true"
          android:gravity="bottom"
-         android:layout_margin="5px">
+         android:layout_marginLeft="5px"
+         android:layout_marginRight="5px"
+         android:layout_marginBottom="5px">
         <TableRow>
           <TextView android:textSize="21px" android:textStyle="bold" android:padding="2px" android:layout_width="50px"/>
           <TextView android:id="@+id/tvAvgOf" android:text="@string/last_avg_of" android:layout_weight="1" style="@style/AverageTableHeaderField" android:padding="2px"/>
