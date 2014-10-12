@@ -163,16 +163,6 @@ public class ServiceImpl extends DBHelper implements Service {
   }
 
   @Override
-  public void getSessionStart(final SolveType solveType, final DataCallback<Long> callback) {
-    run(new Runnable() {
-      @Override
-      public void run() {
-        callback.onData(provider.getSessionStart(solveType));
-      }
-    });
-  }
-
-  @Override
   public void addSolveType(final SolveType solveType, final DataCallback<Integer> callback) {
     run(new Runnable() {
       @Override

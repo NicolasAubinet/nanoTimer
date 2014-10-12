@@ -460,7 +460,6 @@ public class ServiceProviderImpl implements ServiceProvider {
     db.update(DB.TABLE_SOLVETYPE, values, DB.COL_ID + " = ?", getStringArray(solveType.getId()));
   }
 
-  @Override
   public long getSessionStart(SolveType solveType) {
     long sessionStart = 0;
     StringBuilder q = new StringBuilder();
@@ -599,7 +598,9 @@ public class ServiceProviderImpl implements ServiceProvider {
   public SessionDetails getSessionDetails(SolveType solveType) {
     SessionDetails sessionDetails = new SessionDetails();
     sessionDetails.setTotalSolvesCount(getSolvesCount(solveType));
-    sessionDetails.setSessionTimes(getSessionTimes(solveType, null));
+    if (getSessionStart(solveType) > 0) { // if a new session was created
+      sessionDetails.setSessionTimes(getSessionTimes(solveType, null));
+    }
     return sessionDetails;
   }
 

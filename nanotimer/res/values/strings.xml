@@ -75,6 +75,8 @@
   <string name="inspection_sounds_summary">Enable / disable inspection sounds</string>
   <string name="keep_screen_on">Keep screen on</string>
   <string name="keep_screen_on_summary">When timer is not running</string>
+  <string name="show_session_solves_count">Show session solves count</string>
+  <string name="show_session_solves_count_summary">Show solves count in timer top bar</string>
   <string name="solve_types">Solve types</string>
   <string name="edit_solve_types">Edit solve types</string>
   <string name="edit_solve_types_summary">Edit, create and delete solve types</string>

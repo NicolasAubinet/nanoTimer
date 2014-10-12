@@ -4,6 +4,7 @@
   <integer name="inspection_time">15</integer>
   <bool name="inspection_sounds">true</bool>
   <bool name="keep_timer_screen_on">true</bool>
+  <bool name="show_session_solves_count">false</bool>
   <string name="ads_style">3</string>
   <bool name="solve_types_shortcut">true</bool>
 </resources>

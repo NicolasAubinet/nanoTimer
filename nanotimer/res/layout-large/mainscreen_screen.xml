@@ -29,13 +29,13 @@
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:text="@string/cube_type"
-           android:textSize="24px"
+           android:textSize="22px"
            style="@style/SimpleTextField"/>
         <Button
            android:id="@+id/buCubeType"
            android:layout_marginLeft="15px"
-           android:layout_height="40px"
-           android:textSize="20px"
+           android:layout_height="38px"
+           android:textSize="18px"
            style="@style/CustomButton"/>
       </TableRow>
       <TableRow android:layout_marginTop="6px">
@@ -43,13 +43,13 @@
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:text="@string/solve_type"
-           android:textSize="24px"
+           android:textSize="22px"
            style="@style/SimpleTextField"/>
         <Button
            android:id="@+id/buSolveType"
            android:layout_marginLeft="15px"
-           android:layout_height="40px"
-           android:textSize="20px"
+           android:layout_height="38px"
+           android:textSize="18px"
            style="@style/CustomButton"/>
       </TableRow>
     </TableLayout>
@@ -99,8 +99,8 @@
        android:id="@+id/buStart"
        android:text="@string/start"
        android:layout_alignParentBottom="true"
-       android:layout_height="40px"
-       android:textSize="20px"
+       android:layout_height="38px"
+       android:textSize="18px"
        style="@style/CustomButton"/>
 
   </RelativeLayout>
