@@ -297,7 +297,6 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
         } else {
           curCubeType = null;
         }
-        refreshButtonTexts();
         refreshSolveTypes();
       }
     });

@@ -55,6 +55,13 @@ public class ReleaseNotes {
     sb.append("<html><body>");
     sb.append("<font color=\"white\">");
 
+    sb.append("<u><b>v1.1.0</b></u>");
+    sb.append("<ul>");
+    sb.append("<li>Improved graphical interface</li>");
+    sb.append("<li>New \"session details\" timer window</li>");
+    sb.append("<li>Total solves count now shown in history</li>");
+    sb.append("</ul>");
+
     sb.append("<u><b>v1.0.2</b></u>");
     sb.append("<ul>");
     sb.append("<li>Scrambles for Square-1 and Clock</li>");
@@ -64,7 +71,6 @@ public class ReleaseNotes {
     sb.append("<li>Displayed averages in history details</li>");
     sb.append("<li>Option to choose big cubes notation system</li>");
     sb.append("<li>Set Skewb and Pyraminx scramble sizes to 15</li>");
-    sb.append("<li>Minor bug fixes and improvements</li>");
     sb.append("</ul>");
 
     sb.append("<u><b>v1.0.1</b></u>");

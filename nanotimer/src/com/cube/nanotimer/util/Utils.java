@@ -4,12 +4,15 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.Html;
 import android.util.TypedValue;
+import android.view.Surface;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.LinearLayout;
@@ -217,6 +220,20 @@ public class Utils {
 
   public static int dipToPixels(int dip) {
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, App.INSTANCE.getContext().getResources().getDisplayMetrics());
+  }
+
+  public static int getDeviceDefaultOrientation(Context c) {
+    WindowManager windowManager = (WindowManager) c.getSystemService(Context.WINDOW_SERVICE);
+    Configuration config = c.getResources().getConfiguration();
+
+    int rotation = windowManager.getDefaultDisplay().getRotation();
+
+    if (((rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) && config.orientation == Configuration.ORIENTATION_LANDSCAPE) ||
+        ((rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) && config.orientation == Configuration.ORIENTATION_PORTRAIT)) {
+      return Configuration.ORIENTATION_LANDSCAPE;
+    } else {
+      return Configuration.ORIENTATION_PORTRAIT;
+    }
   }
 
 }

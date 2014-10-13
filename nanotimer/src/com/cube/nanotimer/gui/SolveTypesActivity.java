@@ -57,7 +57,7 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.solvetypes_screen);
-    setTitle("");
+    getSupportActionBar().setTitle("");
 
     initViews();
 
@@ -116,7 +116,7 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
     });
 
     if (curCubeType != null) {
-      setTitle(curCubeType.getName());
+      getSupportActionBar().setTitle(curCubeType.getName());
     }
   }
 
@@ -228,7 +228,7 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
       }
     });
     if (curCubeType != null) {
-      setTitle(curCubeType.getName());
+      getSupportActionBar().setTitle(curCubeType.getName());
     }
   }
 

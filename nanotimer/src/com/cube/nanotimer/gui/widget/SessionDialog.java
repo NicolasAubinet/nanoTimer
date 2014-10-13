@@ -150,7 +150,7 @@ public class SessionDialog extends DialogFragment {
         for (int j = 0; j < tr.getChildCount(); j++) {
           TextView tv = (TextView) tr.getChildAt(j);
           LayoutParams params = (LayoutParams) tv.getLayoutParams();
-          params.setMargins(3, 3, 3, 3);
+          params.setMargins(2, 2, 2, 2);
           params.height = Utils.dipToPixels(26);
           tv.setLayoutParams(params);
         }
