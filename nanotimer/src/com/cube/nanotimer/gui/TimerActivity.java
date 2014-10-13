@@ -11,10 +11,8 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBar.LayoutParams;
 import android.support.v7.app.ActionBarActivity;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,7 +24,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -47,9 +45,7 @@ import com.cube.nanotimer.util.Utils;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.CubeType.Type;
-import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveAverages;
-import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.SolveTypeStep;
@@ -69,10 +65,9 @@ public class TimerActivity extends ActionBarActivity {
   private TextView tvRA5;
   private TextView tvRA12;
   private ViewGroup layout;
-  private RelativeLayout actionBarLayout;
+  private LinearLayout actionBarLayout;
   private TableLayout sessionTimesLayout;
   private TableLayout timerStepsLayout;
-  private TextView tvSessionSolvesCount;
 
   private CubeType cubeType;
   private SolveType solveType;
@@ -86,7 +81,6 @@ public class TimerActivity extends ActionBarActivity {
   private long stepStartTs;
   private List<Animation> animations = new ArrayList<Animation>();
   private boolean hasNewSession;
-  private int sessionSolvesCount;
 
   private int historyTimesCount;
   private ColorStateList defaultTextColor;
@@ -137,17 +131,6 @@ public class TimerActivity extends ActionBarActivity {
     setDefaultBannerText();
     defaultTextColor = tvRA5.getTextColors();
 
-    App.INSTANCE.getService().getSessionDetails(solveType, new DataCallback<SessionDetails>() {
-      @Override
-      public void onData(SessionDetails data) {
-        hasNewSession = (data.getSessionTimes() != null && !solveType.hasSteps());
-        setSessionSolvesCount(data.getSessionSolvesCount());
-        if (!hasNewSession) {
-          tvSessionSolvesCount.setText("");
-        }
-      }
-    });
-
     if (!solveType.hasSteps()) {
       App.INSTANCE.getService().getSessionTimes(solveType, new DataCallback<List<Long>>() {
         @Override
@@ -156,12 +139,13 @@ public class TimerActivity extends ActionBarActivity {
           refreshSessionFields();
         }
       });
-      App.INSTANCE.getService().getHistory(solveType, new DataCallback<SolveHistory>() {
+      App.INSTANCE.getService().getSessionStart(solveType, new DataCallback<Long>() {
         @Override
-        public void onData(SolveHistory data) {
-          historyTimesCount = data.getSolvesCount();
+        public void onData(Long data) {
+          hasNewSession = (data != null && data > 0);
         }
       });
+      historyTimesCount = getIntent().getIntExtra("solvesCount", 0);
     }
 
     generateScramble();
@@ -169,22 +153,7 @@ public class TimerActivity extends ActionBarActivity {
 
   private void initActionBar() {
     getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-    View v = getLayoutInflater().inflate(R.layout.textcentered_actionbar, null);
-    tvSessionSolvesCount = (TextView) v.findViewById(R.id.tvSessionSolvesCount);
-
-    // TODO : find out how to know if the overflow button is displayed to adapt margin (below commented out code)
-
-    // TODO : what about SDK_INT > 10 && < 14?
-    /*if (Build.VERSION.SDK_INT <= 10 || (Build.VERSION.SDK_INT >= 14 && ViewConfiguration.get(this).hasPermanentMenuKey())) {
-      View tvTitle = v.findViewById(R.id.tvTitle);
-      MarginLayoutParams params = (MarginLayoutParams) tvTitle.getLayoutParams();
-      params.rightMargin = Utils.dipToPixels(48);
-      tvTitle.setLayoutParams(params);
-    }*/
-    getSupportActionBar().setCustomView(v, new ActionBar.LayoutParams(
-        LayoutParams.MATCH_PARENT,
-        LayoutParams.WRAP_CONTENT,
-        Gravity.CENTER_VERTICAL));
+    getSupportActionBar().setCustomView(R.layout.textcentered_actionbar);
   }
 
   private void initViews() {
@@ -216,7 +185,7 @@ public class TimerActivity extends ActionBarActivity {
       findViewById(R.id.trAvgOfLife).setVisibility(View.GONE);
     }
 
-    actionBarLayout = (RelativeLayout) findViewById(R.id.actionbarLayout);
+    actionBarLayout = (LinearLayout) findViewById(R.id.actionbarLayout);
     actionBarLayout.setOnTouchListener(layoutTouchListener);
 
     layout = (ViewGroup) findViewById(R.id.mainLayout);
@@ -363,9 +332,6 @@ public class TimerActivity extends ActionBarActivity {
             App.INSTANCE.getService().deleteTime(lastSolveTime, new SolveAverageCallback());
             cubeSession.deleteLast();
             historyTimesCount--;
-            if (hasNewSession) {
-              setSessionSolvesCount(sessionSolvesCount - 1);
-            }
             refreshSessionFields();
             resetTimer();
           }
@@ -380,7 +346,6 @@ public class TimerActivity extends ActionBarActivity {
               App.INSTANCE.getService().startNewSession(solveType, System.currentTimeMillis(), null);
               cubeSession.clearSession();
               refreshSessionFields();
-              setSessionSolvesCount(0);
               if (!hasNewSession) {
                 hasNewSession = true;
                 supportInvalidateOptionsMenu();
@@ -633,9 +598,6 @@ public class TimerActivity extends ActionBarActivity {
       cubeSession.addTime(time);
       refreshSessionFields();
       historyTimesCount++;
-      if (hasNewSession) {
-        setSessionSolvesCount(sessionSolvesCount + 1);
-      }
     }
     App.INSTANCE.getService().saveTime(solveTime, new SolveAverageCallback());
   }
@@ -726,20 +688,11 @@ public class TimerActivity extends ActionBarActivity {
   private void timerStarted() {
     setKeepScreenOn(true);
     showMenuButton(false);
-    tvSessionSolvesCount.setVisibility(View.GONE);
   }
 
   private void timerStopped() {
     setKeepScreenOn(keepScreenOnWhenTimerOff);
     showMenuButton(true);
-    tvSessionSolvesCount.setVisibility(View.VISIBLE);
-  }
-
-  private void setSessionSolvesCount(int sessionSolvesCount) {
-    this.sessionSolvesCount = Math.max(0, sessionSolvesCount);
-    if (Options.INSTANCE.isSessionSolvesCountShown()) {
-      tvSessionSolvesCount.setText(String.valueOf(Math.min(this.sessionSolvesCount, 999))); // don't display more than 999, due to lack of width
-    }
   }
 
   private void setKeepScreenOn(boolean keepOn) {
@@ -797,7 +750,7 @@ public class TimerActivity extends ActionBarActivity {
   private void refreshAvgFieldWithRecord(int fieldId, Long value, Long previousValue, String defaultValue,
                                          boolean showNotifications, boolean showBanner) {
     refreshAvgField(fieldId, value, defaultValue);
-    if (historyTimesCount > MIN_TIMES_FOR_RECORD_NOTIFICATION && previousValue != null && value != null && value < previousValue) {
+    if (historyTimesCount > MIN_TIMES_FOR_RECORD_NOTIFICATION && previousValue != null && value != null && value < previousValue && !solveType.hasSteps()) {
       final TextView tv = (TextView) findViewById(fieldId);
 
       if (showNotifications) {

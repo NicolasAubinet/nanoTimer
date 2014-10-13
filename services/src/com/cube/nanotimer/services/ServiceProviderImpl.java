@@ -425,6 +425,15 @@ public class ServiceProviderImpl implements ServiceProvider {
     }
   }
 
+  /**
+   * Returns the last session solve times.
+   * This returns the last n times, searching from the last session start,
+   * or from the beginning if no session was created.
+   * The number of returned results is limited by SESSION_TIMES_COUNT.
+   * @param solveType the solve type
+   * @return the list of most recent solve times
+   */
+  @Override
   public List<Long> getSessionTimes(SolveType solveType) {
     return getSessionTimes(solveType, SESSION_TIMES_COUNT);
   }
@@ -460,6 +469,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     db.update(DB.TABLE_SOLVETYPE, values, DB.COL_ID + " = ?", getStringArray(solveType.getId()));
   }
 
+  @Override
   public long getSessionStart(SolveType solveType) {
     long sessionStart = 0;
     StringBuilder q = new StringBuilder();
@@ -594,6 +604,13 @@ public class ServiceProviderImpl implements ServiceProvider {
     return sta;
   }
 
+  /**
+   * Returns the detailed list of session times, and the total solves count.
+   * The list of times will only be set if a new session was created for this solve type.
+   * It will be null if no session was ever created for this solve type.
+   * @param solveType the solve type
+   * @return the session details
+   */
   @Override
   public SessionDetails getSessionDetails(SolveType solveType) {
     SessionDetails sessionDetails = new SessionDetails();

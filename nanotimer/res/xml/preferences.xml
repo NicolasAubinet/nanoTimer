@@ -31,12 +31,6 @@
        android:summary="@string/keep_screen_on_summary"
        android:defaultValue="@bool/keep_timer_screen_on"/>
 
-    <CheckBoxPreference
-       android:key="show_session_solves_count"
-       android:title="@string/show_session_solves_count"
-       android:summary="@string/show_session_solves_count_summary"
-       android:defaultValue="@bool/show_session_solves_count"/>
-
   </PreferenceCategory>
 
   <PreferenceCategory

@@ -135,6 +135,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
         Intent i = new Intent(MainScreenActivity.this, TimerActivity.class);
         i.putExtra("cubeType", curCubeType);
         i.putExtra("solveType", curSolveType);
+        i.putExtra("solvesCount", solvesCount);
         startActivity(i);
       }
     });

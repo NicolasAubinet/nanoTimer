@@ -18,7 +18,6 @@ public enum Options {
   private static final String INSPECTION_TIME_KEY = "inspection_time";
   private static final String INSPECTION_SOUNDS_KEY = "inspection_sounds";
   private static final String KEEP_TIMER_SCREEN_ON_KEY = "keep_timer_screen_on";
-  private static final String SHOW_SESSION_SOLVES_COUNT_KEY = "show_session_solves_count";
   private static final String BIG_CUBES_NOTATION_KEY = "big_cubes_notation";
   private static final String ADS_STYLE_KEY = "ads_style";
   private static final String SOLVE_TYPES_SHORTCUT = "solve_types_shortcut";
@@ -59,11 +58,6 @@ public enum Options {
   public boolean isKeepTimerScreenOnWhenTimerOff() {
     Boolean defaultValue = context.getResources().getBoolean(R.bool.keep_timer_screen_on);
     return sharedPreferences.getBoolean(KEEP_TIMER_SCREEN_ON_KEY, defaultValue);
-  }
-
-  public boolean isSessionSolvesCountShown() {
-    Boolean defaultValue = context.getResources().getBoolean(R.bool.show_session_solves_count);
-    return sharedPreferences.getBoolean(SHOW_SESSION_SOLVES_COUNT_KEY, defaultValue);
   }
 
   public BigCubesNotation getBigCubesNotation() {
