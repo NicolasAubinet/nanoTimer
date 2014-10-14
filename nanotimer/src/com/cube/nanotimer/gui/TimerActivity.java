@@ -162,8 +162,8 @@ public class TimerActivity extends ActionBarActivity {
     TableLayout averagesLayout = (TableLayout) findViewById(R.id.averagesLayout);
     timerStepsLayout = (TableLayout) findViewById(R.id.timerStepsLayout);
 
-    if (cubeType.getType() == Type.SEVEN_BY_SEVEN) {
-      tvTimer.setTextSize(TypedValue.COMPLEX_UNIT_PX, 65);
+    if (currentOrientation == Configuration.ORIENTATION_PORTRAIT && cubeType.getType() == Type.SEVEN_BY_SEVEN) {
+      tvTimer.setTextSize(TypedValue.COMPLEX_UNIT_PX, tvTimer.getTextSize() - 5);
     }
 
     Float scrambleTextSize = getCubeTypeScrambleTextSize();
