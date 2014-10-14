@@ -641,7 +641,9 @@ public class TimerActivity extends ActionBarActivity {
         startTimer();
       } else {
         if (inspectionTime > 0) {
-          layout.setBackgroundResource(R.color.darkred);
+          stopInspectionTimer();
+          updateTimerText(-1); // DNF
+          saveTime(-1);
         }
       }
     }
