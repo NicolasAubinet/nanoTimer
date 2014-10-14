@@ -14,7 +14,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.util.Utils;
+import com.cube.nanotimer.util.helper.DialogUtils;
 
 public class AppRater {
 
@@ -110,14 +110,14 @@ public class AppRater {
     Intent rateAppIntent;
     String storePackage = context.getPackageManager().getInstallerPackageName(context.getPackageName());
     if (storePackage == null) {
-      Utils.showInfoMessage(R.string.could_not_find_market);
+      DialogUtils.showInfoMessage(R.string.could_not_find_market);
       return false;
     } else if (storePackage.equals("com.android.vending")) { // google
       rateAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + context.getPackageName()));
     } else if (storePackage.equals("com.amazon.venezia")) { // amazon
       rateAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("amzn://apps/android?p=" + context.getPackageName()));
     } else {
-      Utils.showInfoMessage(R.string.could_not_find_market);
+      DialogUtils.showInfoMessage(R.string.could_not_find_market);
       return false;
     }
 
@@ -126,10 +126,10 @@ public class AppRater {
         context.startActivity(rateAppIntent);
         return true;
       } catch (ActivityNotFoundException e) {
-        Utils.showInfoMessage(R.string.could_not_launch_market);
+        DialogUtils.showInfoMessage(R.string.could_not_launch_market);
       }
     } else {
-      Utils.showInfoMessage(R.string.could_not_find_market);
+      DialogUtils.showInfoMessage(R.string.could_not_find_market);
     }
     return false;
   }

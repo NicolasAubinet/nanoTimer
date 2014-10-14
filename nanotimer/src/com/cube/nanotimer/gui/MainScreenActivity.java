@@ -35,8 +35,8 @@ import com.cube.nanotimer.gui.widget.TimeChangedHandler;
 import com.cube.nanotimer.gui.widget.ads.AdProvider;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
-import com.cube.nanotimer.util.Utils;
 import com.cube.nanotimer.util.YesNoListener;
+import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.CubeType.Type;
 import com.cube.nanotimer.vo.SolveHistory;
@@ -99,7 +99,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
           for (CubeType t : cubeTypes) {
             types.add(t.getName());
           }
-          Utils.showFragment(MainScreenActivity.this,
+          DialogUtils.showFragment(MainScreenActivity.this,
               SelectorFragmentDialog.newInstance(ID_CUBETYPE, types, true, MainScreenActivity.this));
         }
       }
@@ -115,7 +115,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
           for (SolveType t : solveTypes) {
             types.add(t.getName());
           }
-          Utils.showFragment(MainScreenActivity.this,
+          DialogUtils.showFragment(MainScreenActivity.this,
               SolveTypesFragmentDialog.newInstance(ID_SOLVETYPE, types, true, MainScreenActivity.this,
                   Options.INSTANCE.isSolveTypesShortcutEnabled()));
         }
@@ -148,7 +148,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
     lvHistory.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Utils.showFragment(MainScreenActivity.this,
+        DialogUtils.showFragment(MainScreenActivity.this,
             HistoryDetailDialog.newInstance(liHistory.get(i), curCubeType, MainScreenActivity.this));
       }
     });
@@ -239,7 +239,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
       case R.id.itClearHistory:
-        Utils.showYesNoConfirmation(this, R.string.clear_history_solve_type_confirmation, new YesNoListener() {
+        DialogUtils.showYesNoConfirmation(this, R.string.clear_history_solve_type_confirmation, new YesNoListener() {
           @Override
           public void onYes() {
             if (curSolveType != null) {
@@ -257,7 +257,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
         startActivity(new Intent(this, OptionsActivity.class));
         break;
       case R.id.itAbout:
-        Utils.showFragment(this, AboutDialog.newInstance());
+        DialogUtils.showFragment(this, AboutDialog.newInstance());
         break;
     }
     return true;

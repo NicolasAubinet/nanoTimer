@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.util.Utils;
+import com.cube.nanotimer.util.helper.Utils;
 
 public class ReleaseNotes {
 

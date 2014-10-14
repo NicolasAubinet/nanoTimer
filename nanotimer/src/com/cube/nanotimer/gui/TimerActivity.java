@@ -1,13 +1,9 @@
 package com.cube.nanotimer.gui;
 
-import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.media.AudioManager;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
@@ -17,11 +13,9 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.Surface;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.LinearLayout;
@@ -41,8 +35,11 @@ import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.CubeSession;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.ScrambleFormatterService;
-import com.cube.nanotimer.util.Utils;
 import com.cube.nanotimer.util.YesNoListener;
+import com.cube.nanotimer.util.helper.DialogUtils;
+import com.cube.nanotimer.util.helper.GUIUtils;
+import com.cube.nanotimer.util.helper.ScreenUtils;
+import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.CubeType.Type;
 import com.cube.nanotimer.vo.SolveAverages;
@@ -165,7 +162,11 @@ public class TimerActivity extends ActionBarActivity {
     TableLayout averagesLayout = (TableLayout) findViewById(R.id.averagesLayout);
     timerStepsLayout = (TableLayout) findViewById(R.id.timerStepsLayout);
 
-    Integer scrambleTextSize = getCubeTypeScrambleTextSize();
+    if (cubeType.getType() == Type.SEVEN_BY_SEVEN) {
+      tvTimer.setTextSize(TypedValue.COMPLEX_UNIT_PX, 65);
+    }
+
+    Float scrambleTextSize = getCubeTypeScrambleTextSize();
     if (scrambleTextSize != null) {
       tvScramble.setTextSize(TypedValue.COMPLEX_UNIT_PX, scrambleTextSize);
     }
@@ -197,32 +198,32 @@ public class TimerActivity extends ActionBarActivity {
     }
   }
 
-  private Integer getCubeTypeScrambleTextSize() {
-    Integer size;
+  private Float getCubeTypeScrambleTextSize() {
+    Float size;
     Type type = cubeType.getType();
     switch (type) {
       case TWO_BY_TWO:
-        size = 24;
+        size = 24f;
         break;
       case PYRAMINX:
       case SKEWB:
-        size = 22;
+        size = 22f;
         break;
       case THREE_BY_THREE:
       case FOUR_BY_FOUR:
       case FIVE_BY_FIVE:
       case SQUARE1:
-        size = 21;
+        size = 21f;
         break;
       case CLOCK:
-        size = 20;
+        size = 20f;
         break;
       case SIX_BY_SIX:
       case MEGAMINX:
-        size = 18;
+        size = 18f;
         break;
       case SEVEN_BY_SEVEN:
-        size = 16;
+        size = 15.5f;
         break;
       default:
         size = null;
@@ -337,10 +338,10 @@ public class TimerActivity extends ActionBarActivity {
           }
           break;
         case R.id.itSessionDetails:
-          Utils.showFragment(this, SessionDialog.newInstance(solveType));
+          DialogUtils.showFragment(this, SessionDialog.newInstance(solveType));
           break;
         case R.id.itNewSession:
-          Utils.showYesNoConfirmation(this, getString(R.string.new_session_confirmation), new YesNoListener() {
+          DialogUtils.showYesNoConfirmation(this, getString(R.string.new_session_confirmation), new YesNoListener() {
             @Override
             public void onYes() {
               App.INSTANCE.getService().startNewSession(solveType, System.currentTimeMillis(), null);
@@ -420,7 +421,7 @@ public class TimerActivity extends ActionBarActivity {
           int worstInd = (sessionTimes.size() < 5) ? -1 : cubeSession.getWorstTimeInd(sessionTimes.size());
           for (int i = 0; i < sessionTimes.size(); i++) {
             TextView tv = getSessionTextView(i);
-            Utils.setSessionTimeCellText(tv, sessionTimes.get(i), i, bestInd, worstInd);
+            GUIUtils.setSessionTimeCellText(tv, sessionTimes.get(i), i, bestInd, worstInd);
           }
         }
         tvRA5.setText(FormatterService.INSTANCE.formatSolveTime(cubeSession.getRAOfFive()));
@@ -503,7 +504,7 @@ public class TimerActivity extends ActionBarActivity {
       return;
     }
     timerStartTs = curTime;
-    enableScreenRotation(false);
+    enableScreenRotationChanges(false);
     timerStarted();
     resetTimerText();
     timerState = TimerState.INSPECTING;
@@ -530,8 +531,17 @@ public class TimerActivity extends ActionBarActivity {
     layout.setBackgroundResource(R.color.graybg);
     setDefaultBannerText();
     timerState = TimerState.STOPPED;
-    enableScreenRotation(true);
+    enableScreenRotationChanges(true);
     timerStopped();
+  }
+
+  /**
+   * Used to fix a problem in the way android handles its views, when the layout is clicked during "Hold and release" inspection.
+   * When the orientation changes, the views are re-created and the layout is no longer considered as clicked.
+   * This is the reason why the orientation should not be allowed to change during inspection.
+   */
+  private void enableScreenRotationChanges(boolean enable) {
+    ScreenUtils.enableScreenRotationChanges(this, enable);
   }
 
   private void nextSolveStep() {
@@ -644,64 +654,6 @@ public class TimerActivity extends ActionBarActivity {
     }
   }
 
-  /**
-   * Enables or disables screen rotation changes.
-   * This is used to fix a problem in the way android handles its views, when the layout is clicked during "Hold and release" inspection.
-   * When the orientation changes, the views are re-created and the layout is no longer considered as clicked.
-   * This is the reason why the orientation should not be allowed to change during orientation.
-   *
-   * @param enable enable or disable screen rotations
-   */
-  private void enableScreenRotation(boolean enable) {
-    if (enable) {
-      setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-    } else {
-      if (VERSION.SDK_INT < VERSION_CODES.GINGERBREAD) {
-        // API prior to 9 does not allow to set reverse orientations
-        // There's still a bug here if switching from horizontal to vertical, but it's only for 2.2 in this specific case.
-        setRequestedOrientation(currentOrientation);
-      } else {
-        int rotation = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
-        int defaultOrientation = Utils.getDeviceDefaultOrientation(this);
-        int orientation;
-        switch (rotation) {
-          case Surface.ROTATION_0:
-            if (defaultOrientation == Configuration.ORIENTATION_PORTRAIT) {
-              orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-            } else {
-              orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-            }
-            break;
-          case Surface.ROTATION_90:
-            if (defaultOrientation == Configuration.ORIENTATION_PORTRAIT) {
-              orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-            } else {
-              orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
-            }
-            break;
-          case Surface.ROTATION_180:
-            if (defaultOrientation == Configuration.ORIENTATION_PORTRAIT) {
-              orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
-            } else {
-              orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
-            }
-            break;
-          case Surface.ROTATION_270:
-            if (defaultOrientation == Configuration.ORIENTATION_PORTRAIT) {
-              orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
-            } else {
-              orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-            }
-            break;
-          default:
-            orientation = currentOrientation;
-            break;
-        }
-        setRequestedOrientation(orientation);
-      }
-    }
-  }
-
   private void timerStarted() {
     setKeepScreenOn(true);
     showMenuButton(false);
@@ -806,9 +758,9 @@ public class TimerActivity extends ActionBarActivity {
             int timeInStepMs = interpolatedTimeMs % stepDurationMs;
             float stepProgression = (float) timeInStepMs / stepDurationMs; // the +1 is to avoid division by 0
             if (curStep % 2 == 0) { // default to yellow
-              tv.setTextColor(Utils.getColorCodeBetween(defaultColor, recordColor, stepProgression));
+              tv.setTextColor(GUIUtils.getColorCodeBetween(defaultColor, recordColor, stepProgression));
             } else { // yellow to default
-              tv.setTextColor(Utils.getColorCodeBetween(recordColor, defaultColor, stepProgression));
+              tv.setTextColor(GUIUtils.getColorCodeBetween(recordColor, defaultColor, stepProgression));
             }
           }
         };

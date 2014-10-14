@@ -27,8 +27,8 @@ import com.cube.nanotimer.gui.widget.list.FieldDialog;
 import com.cube.nanotimer.gui.widget.list.FieldEditDialog;
 import com.cube.nanotimer.gui.widget.list.FieldRenamer;
 import com.cube.nanotimer.services.db.DataCallback;
-import com.cube.nanotimer.util.Utils;
 import com.cube.nanotimer.util.YesNoListener;
+import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveType;
@@ -74,7 +74,7 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
             for (CubeType t : cubeTypes) {
               types.add(t.getName());
             }
-            Utils.showFragment(SolveTypesActivity.this,
+            DialogUtils.showFragment(SolveTypesActivity.this,
                 SelectorFragmentDialog.newInstance(0, types, getString(R.string.choose_cube_type), false, SolveTypesActivity.this));
           } else {
             finish();
@@ -130,7 +130,7 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
 
   private void showAddDialog() {
     FieldAddDialog dialog = FieldAddDialog.newInstance(this);
-    Utils.showFragment(this, dialog);
+    DialogUtils.showFragment(this, dialog);
   }
 
   @Override
@@ -138,9 +138,9 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
     final int position = ((AdapterContextMenuInfo) menuItem.getMenuInfo()).position;
     if (menuItem.getItemId() == ACTION_RENAME) {
       FieldDialog fieldDialog = FieldEditDialog.newInstance(this, position, liSolveTypes.get(position).getName());
-      Utils.showFragment(this, fieldDialog);
+      DialogUtils.showFragment(this, fieldDialog);
     } else if (menuItem.getItemId() == ACTION_DELETE) {
-      Utils.showYesNoConfirmation(this, getString(R.string.delete_solve_type_confirmation, liSolveTypes.get(position).getName()),
+      DialogUtils.showYesNoConfirmation(this, getString(R.string.delete_solve_type_confirmation, liSolveTypes.get(position).getName()),
           new YesNoListener() {
             @Override
             public void onYes() {
@@ -161,12 +161,12 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
             @Override
             public void run() {
               if (data.getSolveTimes().isEmpty()) {
-                Utils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
+                DialogUtils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
               } else {
-                Utils.showYesNoConfirmation(SolveTypesActivity.this, R.string.solvetype_has_times_addsteps, new YesNoListener() {
+                DialogUtils.showYesNoConfirmation(SolveTypesActivity.this, R.string.solvetype_has_times_addsteps, new YesNoListener() {
                   @Override
                   public void onYes() {
-                    Utils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
+                    DialogUtils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
                   }
                 });
               }
@@ -273,7 +273,7 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
     for (int i = 0; i < liSolveTypes.size(); i++) {
       if (liSolveTypes.get(i).getName().equals(name)) {
         if (index == null || i != index) {
-          Utils.showInfoMessage(this, R.string.solve_type_already_exists);
+          DialogUtils.showInfoMessage(this, R.string.solve_type_already_exists);
           return false;
         } else {
           // The name was not changed, do nothing

@@ -17,7 +17,9 @@ import com.cube.nanotimer.R;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.CubeBaseSession;
 import com.cube.nanotimer.util.FormatterService;
-import com.cube.nanotimer.util.Utils;
+import com.cube.nanotimer.util.helper.GUIUtils;
+import com.cube.nanotimer.util.helper.ScreenUtils;
+import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveType;
 
@@ -118,7 +120,7 @@ public class SessionDialog extends DialogFragment {
     int pageEndInd = Math.min(sessionTimesCount, pageStartInd + timesPerPage);
     for (int i = pageStartInd; i < pageEndInd; i++) {
       TextView tv = getNewSolveTimeTextView();
-      Utils.setSessionTimeCellText(tv, sessionTimes.get(i), i, bestInd, worstInd);
+      GUIUtils.setSessionTimeCellText(tv, sessionTimes.get(i), i, bestInd, worstInd);
       tr.addView(tv);
       if (i % TIMES_PER_LINE == 3) {
         sessionTimesLayout.addView(tr);
@@ -151,7 +153,7 @@ public class SessionDialog extends DialogFragment {
           TextView tv = (TextView) tr.getChildAt(j);
           LayoutParams params = (LayoutParams) tv.getLayoutParams();
           params.setMargins(2, 2, 2, 2);
-          params.height = Utils.dipToPixels(26);
+          params.height = ScreenUtils.dipToPixels(26);
           tv.setLayoutParams(params);
         }
       }

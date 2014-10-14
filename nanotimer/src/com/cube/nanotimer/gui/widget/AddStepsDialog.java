@@ -27,7 +27,7 @@ import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.list.FieldDialog;
 import com.cube.nanotimer.gui.widget.list.FieldEditDialog;
 import com.cube.nanotimer.gui.widget.list.FieldRenamer;
-import com.cube.nanotimer.util.Utils;
+import com.cube.nanotimer.util.helper.DialogUtils;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 import com.mobeta.android.dslv.DragSortListView.DropListener;
@@ -129,10 +129,10 @@ public class AddStepsDialog extends DialogFragment implements FieldRenamer {
               stepsAdapter.notifyDataSetChanged();
               lvSteps.setSelection(liSteps.size() - 1); // scroll to bottom
             } else {
-              Utils.showInfoMessage(R.string.step_already_exists);
+              DialogUtils.showInfoMessage(R.string.step_already_exists);
             }
           } else {
-            Utils.showInfoMessage(R.string.max_steps_count_reached);
+            DialogUtils.showInfoMessage(R.string.max_steps_count_reached);
           }
         }
       }
@@ -161,7 +161,7 @@ public class AddStepsDialog extends DialogFragment implements FieldRenamer {
 
   private void onConfirm() {
     if (liSteps.size() < 2) {
-      Utils.showInfoMessage(R.string.min_steps_count_not_reached);
+      DialogUtils.showInfoMessage(R.string.min_steps_count_not_reached);
     } else {
       stepsCreator.addSteps(liSteps, pos);
       dismiss();
@@ -183,7 +183,7 @@ public class AddStepsDialog extends DialogFragment implements FieldRenamer {
             switch (menuItem.getItemId()) {
               case ACTION_RENAME:
                 FieldDialog fieldDialog = FieldEditDialog.newInstance(AddStepsDialog.this, info.position, liSteps.get(info.position));
-                Utils.showFragment(getActivity(), fieldDialog);
+                DialogUtils.showFragment(getActivity(), fieldDialog);
                 break;
               case ACTION_DELETE:
                 liSteps.remove(info.position);
@@ -209,7 +209,7 @@ public class AddStepsDialog extends DialogFragment implements FieldRenamer {
       return true;
     } else {
       if (liSteps.indexOf(newName) != index) {
-        Utils.showInfoMessage(R.string.step_already_exists);
+        DialogUtils.showInfoMessage(R.string.step_already_exists);
         return false;
       } else {
         return true; // did not change

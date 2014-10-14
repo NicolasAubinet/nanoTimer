@@ -14,7 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.util.Utils;
+import com.cube.nanotimer.util.helper.Utils;
 
 public class AboutDialog extends DialogFragment {
 

@@ -20,22 +20,7 @@
     <item name="android:padding">0dp</item>
   </style>
 
-  <!-- Timer screen -->
-  <!--<style name="NanoTimerThemeSmallBar" parent="NanoTimerTheme">
-    <item name="android:actionBarStyle">@style/NanoTimerSmallActionBar</item>
-    <item name="actionBarStyle">@style/NanoTimerSmallActionBar</item>
-  </style>-->
-
-  <!--<style name="NanoTimerSmallActionBar" parent="NanoTimerActionBar">
-    <item name="android:height">40dp</item>
-    <item name="height">40dp</item>
-  </style>-->
-
   <style name="NanoTimerListView" parent="@style/Widget.AppCompat.ListView.Menu">
-    <!--<item name="android:background">@color/graybg</item>-->
-    <!--<item name="android:itemBackground">@color/graybg</item>-->
-    <!--<item name="android:editTextBackground">@color/graybg</item>-->
-    <!--<item name="android:colorBackground">@color/graybg</item>-->
     <item name="android:cacheColorHint">#00000000</item>
     <item name="android:divider">@color/gray800</item>
     <item name="android:dividerHeight">2dp</item>

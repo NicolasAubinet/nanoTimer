@@ -3,7 +3,7 @@ package com.cube.nanotimer.scrambler.randomstate;
 import android.util.Log;
 import com.cube.nanotimer.scrambler.Scrambler;
 import com.cube.nanotimer.scrambler.randomstate.ThreeSolver.CubeState;
-import com.cube.nanotimer.util.Utils;
+import com.cube.nanotimer.util.helper.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
