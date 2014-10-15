@@ -173,7 +173,7 @@ public class AddStepsDialog extends DialogFragment implements FieldRenamer {
     super.onCreateContextMenu(menu, v, menuInfo);
     if (v.getId() == R.id.lvSteps) {
       menu.setHeaderTitle(R.string.action);
-      menu.add(v.getId(), ACTION_RENAME, 0, R.string.edit);
+      menu.add(v.getId(), ACTION_RENAME, 0, R.string.rename);
       menu.add(v.getId(), ACTION_DELETE, 0, R.string.delete);
       for (int i = 0; i < menu.size(); i++) {
         menu.getItem(i).setOnMenuItemClickListener(new OnMenuItemClickListener() {

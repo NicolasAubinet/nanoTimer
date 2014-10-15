@@ -66,6 +66,24 @@ public class GUIUtils {
     v.startAnimation(a);
   }
 
+  /*private void moveViewToScreenCenter(Activity a, RelativeLayout rootLayout, View view) {
+    DisplayMetrics dm = new DisplayMetrics();
+    a.getWindowManager().getDefaultDisplay().getMetrics(dm);
+    int statusBarOffset = dm.heightPixels - rootLayout.getMeasuredHeight();
+
+    int originalPos[] = new int[2];
+    view.getLocationOnScreen(originalPos);
+
+    int xDest = dm.widthPixels / 2;
+    xDest -= (view.getMeasuredWidth() / 2);
+    int yDest = dm.heightPixels / 2 - (view.getMeasuredHeight() / 2) - statusBarOffset;
+
+    TranslateAnimation anim = new TranslateAnimation(0, xDest - originalPos[0], 0, yDest - originalPos[1]);
+    anim.setDuration(1000);
+    anim.setFillAfter(true);
+    view.startAnimation(anim);
+  }*/
+
   public static int getColorCodeBetween(int color1, int color2, float stepProgression) {
     int a1 = (color1 >> 24) & 0xFF;
     int r1 = (color1 >> 16) & 0xFF;

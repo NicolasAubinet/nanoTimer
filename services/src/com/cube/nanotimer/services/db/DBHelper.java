@@ -111,7 +111,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     insertSolveType(getString(R.string.one_handed), 2);
 
-    int solveTypeId = insertSolveType(getString(R.string.CFOP), 2);
+    int solveTypeId = insertSolveType(getString(R.string.CFOP_steps), 2);
     ContentValues values = new ContentValues();
     values.put(DB.COL_SOLVETYPESTEP_SOLVETYPE_ID, solveTypeId);
     values.put(DB.COL_SOLVETYPESTEP_POSITION, 1);

@@ -15,5 +15,5 @@
   <string name="def">Default</string>
   <string name="one_handed">One-handed</string>
   <string name="blindfolded">Blindfolded</string>
-  <string name="CFOP">CFOP</string>
+  <string name="CFOP_steps">CFOP steps</string>
 </resources>

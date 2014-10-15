@@ -29,7 +29,7 @@ public class FieldEditDialog extends FieldDialog {
 
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
-    dialog = getDialog(R.string.edit);
+    dialog = getDialog(R.string.confirm);
 
     pos = getArguments().getInt(ARG_POS);
     String defaultName = getArguments().getString(ARG_DEFAULT_NAME);
