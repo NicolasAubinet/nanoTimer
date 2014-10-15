@@ -38,7 +38,7 @@
   <string name="inspection">Inspection</string>
   <string name="last_avg_of">Last mean of</string>
   <string name="best_avg_of">Best mean of</string>
-  <string name="lifetime_avg">Lifetime mean:</string>
+  <string name="lifetime_avg">Lifetime avg:</string>
   <string name="lifetime_best">Lifetime best:</string>
   <string name="life">Life</string>
 
@@ -53,7 +53,7 @@
   <string name="stepsC">Steps:</string>
   <string name="NA">N/A</string>
 
-  <string name="session_ra">Rolling avg:</string>
+  <string name="session_avg">Average:</string>
   <string name="session_mean">Mean:</string>
   <string name="session_solves">Solves:</string>
   <string name="total_solves">Total solves:</string>
@@ -95,8 +95,8 @@
   <string name="mixed">Mixed</string>
 
   <string name="session">Session:</string>
-  <string name="raOf5">RA of 5:</string>
-  <string name="raOf12">RA of 12:</string>
+  <string name="avgOf5">Avg of 5:</string>
+  <string name="avgOf12">Avg of 12:</string>
   <string name="new_record">New record!</string>
 
   <string name="rate_message">If you like Nano Timer, please take a moment to rate it.\nThanks for your support.</string>
