@@ -75,4 +75,19 @@ public class ThreeSolverTest extends AndroidTestCase {
     //  found: [U, D', L, F, R', B', R2, F2, D2, R', F', ., D, F2, U', L2, D', R2, L2, F2, D2, F2, D2]
   }
 
+  @SmallTest
+  public void testRealScramble2() {
+    CubeState cubeState = new CubeState();
+    //  L2 R D L D2 B' U2 R F' D' U' L' R' D2 F L D2 B F' L' F2 L' R D' L2
+    cubeState.cornerPermutations = new byte[] { 2, 4, 6, 1, 0, 3, 5, 7 };
+    cubeState.edgePermutations = new byte[] { 8, 3, 9, 11, 10, 7, 5, 0, 2, 1, 4, 6 };
+    cubeState.cornerOrientations = new byte[] { 1, 0, 0, 1, 1, 1, 1, 1 };
+    cubeState.edgeOrientations = new byte[] { 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0 };
+
+    ThreeSolver solver = new ThreeSolver();
+    String[] scramble = solver.getSolution(cubeState);
+    Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble) + " (length: " + scramble.length + ")");
+    //  found:
+  }
+
 }

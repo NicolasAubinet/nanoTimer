@@ -34,8 +34,8 @@ public class ThreeSolver {
     }
   }
 
+  // TODO : pass the following static variables as parameters to solution(...) instead
   private static final int MAX_SOLUTION_LENGTH = 23;
-//  private static final int MAX_SOLUTION_LENGTH = 22;
   private static final int MAX_PHASE2_SOLUTION_LENGTH = 12;
 //  private static final int MAX_SEARCH_TIME = 10; // in seconds. will stop after that time if a solution was found, even if it is not optimal
   private static final int SAFE_PHASE1_ITERATIONS_LIMIT = 30;
@@ -44,7 +44,7 @@ public class ThreeSolver {
 
   // TODO : there seems to be a lot or phase 2 moves in the solution. see if normal
 
-  public static final boolean SHOW_PHASE_SEPARATOR = true; // for debug
+  public static final boolean SHOW_PHASE_SEPARATOR = false; // for debug
 
   private CubeState initialState;
   private List<Byte> solution1;
