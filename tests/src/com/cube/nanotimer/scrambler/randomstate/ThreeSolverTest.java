@@ -10,8 +10,18 @@ import java.util.Arrays;
 
 public class ThreeSolverTest extends AndroidTestCase {
 
-  // TODO : test with a solved cube (scramble should be empty, but not null)
-  // TODO : could also test a non-solvable configuration to see how long it takes to return null
+  @SmallTest
+  public void testSolvedCubeSolving() {
+    CubeState cubeState = new CubeState();
+    cubeState.cornerPermutations = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
+    cubeState.edgePermutations = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+    cubeState.cornerOrientations = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+    cubeState.edgeOrientations = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    ThreeSolver solver = new ThreeSolver();
+    String[] scramble = solver.getSolution(cubeState);
+    Assert.assertEquals(0, scramble.length);
+  }
 
   @SmallTest
   public void testVeryEasy() {
@@ -28,7 +38,21 @@ public class ThreeSolverTest extends AndroidTestCase {
     Assert.assertTrue(scramble.length > 0);
   }
 
-  // TODO : pass something that's already oriented and combined
+  @SmallTest
+  public void testOrientedAndCombined() {
+    CubeState cubeState = new CubeState();
+    // R2 U F2 D' B2 F2 U2 D L2 D
+    cubeState.cornerPermutations = new byte[] { 0, 1, 4, 2, 3, 6, 7, 5 };
+    cubeState.edgePermutations = new byte[] { 1, 2, 3, 0, 11, 4, 5, 7, 6, 9, 8, 10 };
+    cubeState.cornerOrientations = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+    cubeState.edgeOrientations = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    ThreeSolver solver = new ThreeSolver();
+    String[] scramble = solver.getSolution(cubeState);
+    Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
+    Assert.assertTrue(scramble.length > 0);
+    // Found: [D', L2, U2, D', F2, B2, D, F2, U', R2]
+  }
 
   @SmallTest
   public void testEasy() {
@@ -38,21 +62,6 @@ public class ThreeSolverTest extends AndroidTestCase {
     cubeState.edgePermutations = new byte[] { 5, 9, 8, 2, 3, 1, 6, 11, 10, 7, 0, 4 };
     cubeState.cornerOrientations = new byte[] { 1, 0, 2, 1, 2, 1, 2, 0 };
     cubeState.edgeOrientations = new byte[] { 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1 };
-
-    ThreeSolver solver = new ThreeSolver();
-    String[] scramble = solver.getSolution(cubeState);
-    Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
-    Assert.assertTrue(scramble.length > 0);
-  }
-
-  @SmallTest
-  public void testEasyWithLastPhase1Move() {
-    CubeState cubeState = new CubeState();
-    //  D2 R B2 F
-//    cubeState.cornerPermutations = new byte[] { 6, 4, 3, 7, 1, 2, 5, 0 };
-//    cubeState.edgePermutations = new byte[] { 5, 9, 8, 2, 3, 1, 6, 11, 10, 7, 0, 4 };
-//    cubeState.cornerOrientations = new byte[] { 1, 0, 2, 1, 2, 1, 2, 0 };
-//    cubeState.edgeOrientations = new byte[] { 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1 };
 
     ThreeSolver solver = new ThreeSolver();
     String[] scramble = solver.getSolution(cubeState);
@@ -87,7 +96,7 @@ public class ThreeSolverTest extends AndroidTestCase {
     ThreeSolver solver = new ThreeSolver();
     String[] scramble = solver.getSolution(cubeState);
     Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble) + " (length: " + scramble.length + ")");
-    //  found:
+    //  found: [U, R2, B2, R2, F', B', D2, L, U', R2, F, D', F2, B2, U', L2, U, B2, U', L2, D2, F2, R2]
   }
 
 }

@@ -315,12 +315,13 @@ public class StateTablesTest extends AndroidTestCase {
         [IndexConvertor.packPermutation(new byte[] { 1, 0, 3, 2 })]); // U2 R2 D2 L2
   }
 
-  /*public void testCreateFile() throws IOException {
-    StateTables.generateTables();
+  /*public void testSaveTables() throws IOException {
+    StateTables.generateTables(ThreeSolver.moves1, ThreeSolver.moves2);
 
-    FileOutputStream fos = new FileOutputStream(new File("/sdcard/docs/randomstatetables"));
+    FileOutputStream fos = getContext().openFileOutput("randomstatetables", Context.MODE_PRIVATE);
     ObjectOutputStream oos = new ObjectOutputStream(fos);
 
+    long ts = System.currentTimeMillis();
     oos.writeObject(StateTables.transitCornerPermutation);
     oos.writeObject(StateTables.transitCornerOrientation);
     oos.writeObject(StateTables.transitEEdgeCombination);
@@ -336,6 +337,29 @@ public class StateTablesTest extends AndroidTestCase {
     oos.flush();
     oos.close();
     fos.close();
+    Log.i("[NanoTimer]", "Time to write tables: " + (System.currentTimeMillis() - ts));
+  }
+
+  public void testReadTables() throws IOException, ClassNotFoundException {
+    FileInputStream fis = getContext().openFileInput("randomstatetables");
+    ObjectInputStream ois = new ObjectInputStream(fis);
+
+    long ts = System.currentTimeMillis();
+    int[][] iTrTable = (int[][]) ois.readObject();
+    short[][] trTable = (short[][]) ois.readObject();
+    trTable = (short[][]) ois.readObject();
+    trTable = (short[][]) ois.readObject();
+    iTrTable = (int[][]) ois.readObject();
+    trTable = (short[][]) ois.readObject();
+
+    byte[][] prTable = (byte[][]) ois.readObject();
+    prTable = (byte[][]) ois.readObject();
+    prTable = (byte[][]) ois.readObject();
+    prTable = (byte[][]) ois.readObject();
+
+    ois.close();
+    fis.close();
+    Log.i("[NanoTimer]", "Time to read tables: " + (System.currentTimeMillis() - ts));
   }*/
 
   @SmallTest
