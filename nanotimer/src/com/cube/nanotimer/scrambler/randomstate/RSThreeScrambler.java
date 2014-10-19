@@ -16,9 +16,7 @@ public class RSThreeScrambler implements Scrambler {
   public String[] getNewScramble() {
     CubeState randomState = getRandomState();
 //    Log.i("[NanoTimer]", "Random state:\n" + randomState.toString());
-    String[] solution = threeSolver.getSolution(randomState);
-//    Log.i("[NanoTimer]", "Solution: " + Arrays.toString(solution));
-    String[] scramble = invertMoves(solution);
+    String[] scramble = threeSolver.getSolution(randomState);
     Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
     return scramble;
   }

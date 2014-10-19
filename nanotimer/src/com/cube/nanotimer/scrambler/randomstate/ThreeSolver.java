@@ -171,9 +171,10 @@ public class ThreeSolver {
     if (pruningCornerOrientation[cornerOrientation][eEdgeCombination] <= depth &&
         pruningEdgeOrientation[edgeOrientation][eEdgeCombination] <= depth) {
       int curSolutionSize = solution1.size();
-      for (int i = 0; i < moves1.length; i++) {
-        if ((lastMove >= 0 && (byte) i == slices[lastMove]) || // same face twice in a row
-            (oldLastMove > 1 && opposites[i] == slices[lastMove] && opposites[slices[lastMove]] == slices[oldLastMove])) { // opposite faces 3 times in a row
+      for (byte i = 0; i < moves1.length; i++) {
+        if (lastMove >= 0 &&
+            (slices[i*3] == slices[lastMove] || // same face twice in a row
+            (oldLastMove >= 0 && opposites[slices[i*3]] == slices[lastMove] && opposites[slices[lastMove]] == slices[oldLastMove]))) { // opposite faces 3 times in a row
           continue;
         }
         int corOri = cornerOrientation;
@@ -217,9 +218,10 @@ public class ThreeSolver {
     if (pruningCornerPermutation[cornerPermutation][eEdgePermutation] <= depth &&
         pruningUDEdgePermutation[udEdgePermutation][eEdgePermutation] <= depth) {
       int curSolutionSize = solution2.size();
-      for (int i = 0; i < moves2.length; i++) {
-        if ((lastMove >= 0 && (byte) i == slices[lastMove]) || // same face twice in a row
-            (oldLastMove > 1 && opposites[i] == slices[lastMove] && opposites[slices[lastMove]] == slices[oldLastMove])) { // opposite faces 3 times in a row
+      for (byte i = 0; i < moves2.length; i++) {
+        if (lastMove >= 0 &&
+            (slices[i*3] == slices[lastMove] || // same face twice in a row
+            (oldLastMove >= 0 && opposites[slices[i*3]] == slices[lastMove] && opposites[slices[lastMove]] == slices[oldLastMove]))) { // opposite faces 3 times in a row
           continue;
         }
         int corPerm = cornerPermutation;
