@@ -116,6 +116,56 @@ public class IndexConvertorTest extends AndroidTestCase {
         new byte[] { 9, 5, 2, 3, 4, 0, 6, 7, 8, 1, 10, 11 }, 4)); // R
   }
 
+  /**
+   * Test random permutations and orientations unpacking to make sure that it's valid
+   */
+  @SmallTest
+  public void testRandomConversions() {
+    Random r = new Random();
+    byte[] state8 = new byte[8];
+    byte[] state12 = new byte[12];
+
+    for (int i = 0; i < 50; i++) {
+      // Corner permutations
+      int n = r.nextInt(StateTables.N_CORNER_PERMUTATIONS);
+      IndexConvertor.unpackPermutation(n, state8);
+      List<Byte> avail = new ArrayList<Byte>(8);
+      for (byte j = 0; j < 8; j++) { avail.add(j); }
+      for (byte b : state8) { avail.remove((Byte) b); }
+      Assert.assertEquals(0, avail.size());
+//      Log.i("[NanoTimer]", "Unpack cor perm " + n + ": " + Arrays.toString(state8));
+
+      // Edge permutations
+      n = r.nextInt(StateTables.N_EDGE_PERMUTATIONS);
+      IndexConvertor.unpackPermutation(n, state12);
+      avail = new ArrayList<Byte>(12);
+      for (byte j = 0; j < 12; j++) { avail.add(j); }
+      for (byte b : state12) { avail.remove((Byte) b); }
+      Assert.assertEquals(0, avail.size());
+//      Log.i("[NanoTimer]", "Unpack edge perm " + n + ": " + Arrays.toString(state12));
+
+      // Corner orientations
+      n = r.nextInt(StateTables.N_CORNER_ORIENTATIONS);
+      IndexConvertor.unpackOrientation(n, state8, (byte) 3);
+      int sum = 0;
+      for (int j = 0; j < 8; j++) {
+        sum += state8[j];
+      }
+      Assert.assertEquals(0, sum % 3);
+//      Log.i("[NanoTimer]", "Unpack cor ori " + n + ": " + Arrays.toString(state8));
+
+      // Edge orientations
+      n = r.nextInt(StateTables.N_EDGE_ORIENTATIONS);
+      IndexConvertor.unpackOrientation(n, state12, (byte) 2);
+      sum = 0;
+      for (int j = 0; j < 12; j++) {
+        sum += state12[j];
+      }
+      Assert.assertEquals(0, sum % 2);
+//      Log.i("[NanoTimer]", "Unpack edge ori " + n + ": " + Arrays.toString(state12));
+    }
+  }
+
   @SmallTest
   public void testRandomConversion() {
     Random r = new Random();

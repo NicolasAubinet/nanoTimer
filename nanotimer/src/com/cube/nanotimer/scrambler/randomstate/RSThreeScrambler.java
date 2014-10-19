@@ -5,9 +5,7 @@ import com.cube.nanotimer.scrambler.Scrambler;
 import com.cube.nanotimer.scrambler.randomstate.ThreeSolver.CubeState;
 import com.cube.nanotimer.util.helper.Utils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Random;
 
 public class RSThreeScrambler implements Scrambler {
@@ -17,11 +15,11 @@ public class RSThreeScrambler implements Scrambler {
   @Override
   public String[] getNewScramble() {
     CubeState randomState = getRandomState();
-    Log.i("[NanoTimer]", "Random state: " + randomState.toString());
+//    Log.i("[NanoTimer]", "Random state:\n" + randomState.toString());
     String[] solution = threeSolver.getSolution(randomState);
-    Log.i("[NanoTimer]", "Solution: " + solution.toString());
+//    Log.i("[NanoTimer]", "Solution: " + Arrays.toString(solution));
     String[] scramble = invertMoves(solution);
-    Log.i("[NanoTimer]", "Scramble: " + scramble.toString());
+    Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
     return scramble;
   }
 
@@ -29,67 +27,41 @@ public class RSThreeScrambler implements Scrambler {
     CubeState cubeState;
     Random r = Utils.getRandom();
 
-    // TODO : could also generate a simple random int for each, and unpack it!
-    //   (base index is now 0)
+    byte[] state;
 
     do {
       cubeState = new CubeState();
-      // corners
-      List<Byte> positions = new ArrayList<Byte>(8);
-      for (byte i = 1; i <= 8; i++) {
-        positions.add(i);
-      }
-      Collections.shuffle(positions, r);
-      for (int i = 0; i < 8; i++) {
-        cubeState.cornerPermutations[i] = positions.get(i);
-        if (i < 7) {
-          cubeState.cornerOrientations[i] = (byte) r.nextInt(3);
-          cubeState.cornerOrientations[7] += cubeState.cornerOrientations[i];
-        }
-      }
-      cubeState.cornerOrientations[7] = (byte) ((3 - cubeState.cornerOrientations[7] % 3) % 3);
 
-      // edges
-      // TODO : make sure that edge position is possible (based on corner positions) and that all positions still have equal probabilities (parities etc)
-      positions = new ArrayList<Byte>(12);
-      for (byte i = 1; i <= 12; i++) {
-        positions.add(i);
-      }
-      Collections.shuffle(positions, r);
-      for (int i = 0; i < 12; i++) {
-        cubeState.edgePermutations[i] = positions.get(i);
-        if (i < 11) {
-          cubeState.cornerOrientations[i] = (byte) r.nextInt(2);
-          cubeState.cornerOrientations[11] = cubeState.cornerOrientations[i];
-        }
-      }
-      cubeState.cornerOrientations[11] = (byte) ((2 - cubeState.cornerOrientations[11] % 2) % 2);
+      state = new byte[8];
+      IndexConvertor.unpackPermutation(r.nextInt(StateTables.N_CORNER_PERMUTATIONS), state);
+      cubeState.cornerPermutations = state;
+
+      state = new byte[12];
+      IndexConvertor.unpackPermutation(r.nextInt(StateTables.N_EDGE_PERMUTATIONS), state);
+      cubeState.edgePermutations = state;
+
+      state = new byte[8];
+      IndexConvertor.unpackOrientation(r.nextInt(StateTables.N_CORNER_ORIENTATIONS), state, (byte) 3);
+      cubeState.cornerOrientations = state;
+
+      state = new byte[12];
+      IndexConvertor.unpackOrientation(r.nextInt(StateTables.N_EDGE_ORIENTATIONS), state, (byte) 2);
+      cubeState.edgeOrientations = state;
     } while (hasParity(cubeState.cornerPermutations) != hasParity(cubeState.edgePermutations));
 
     return cubeState;
   }
 
-  boolean hasParity(byte[] permutation) {
-    List<Byte> available = new ArrayList<Byte>(permutation.length);
-    for (byte i = 0; i < permutation.length; i++) {
-      available.add(i);
-    }
-    int nextInd = 0;
-    available.remove(0);
-    while (available.size() > 2) {
-      if (!available.contains((byte) nextInd)) {
-        nextInd = available.get(0);
+  static boolean hasParity(byte[] perm) {
+    int inversion = 0;
+    for (int i = 0; i < perm.length; i++) {
+      for (int j = i + 1; j < perm.length; j++) {
+        if (perm[i] > perm[j]) {
+          inversion++;
+        }
       }
-      available.remove((byte) nextInd);
-      nextInd = permutation[nextInd];
-
-      if (!available.contains((byte) nextInd)) {
-        nextInd = available.get(0);
-      }
-      available.remove((byte) nextInd);
-      nextInd = permutation[nextInd];
     }
-    return available.size() == 1;
+    return (inversion % 2 != 0);
   }
 
   private String[] invertMoves(String[] moves) {

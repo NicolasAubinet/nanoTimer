@@ -9,15 +9,16 @@ public class StateTables {
 
   // TODO : make positions start at 0 (everywhere, starting from Move class, IndexConvertor, tests etc)
 
-  private static final int N_CORNER_PERMUTATIONS = 40320;
-//  private static final int N_CORNER_PERMUTATIONS = 5040;
-  private static final int N_CORNER_ORIENTATIONS = 2187;
-  private static final int N_E_EDGE_COMBINATIONS = 495;
+  static final int N_CORNER_PERMUTATIONS = 40320;
+//  static final int N_CORNER_PERMUTATIONS = 5040;
+  static final int N_CORNER_ORIENTATIONS = 2187;
+  static final int N_E_EDGE_COMBINATIONS = 495;
 
-  private static final int N_E_EDGE_PERMUTATIONS = 24;
-  private static final int N_U_D_EDGE_PERMUTATIONS = 40320;
-//  private static final int N_U_D_EDGE_PERMUTATIONS = 5040;
-  private static final int N_EDGE_ORIENTATIONS = 2048;
+  static final int N_E_EDGE_PERMUTATIONS = 24;
+  static final int N_U_D_EDGE_PERMUTATIONS = 40320;
+//  static final int N_U_D_EDGE_PERMUTATIONS = 5040;
+  static final int N_EDGE_ORIENTATIONS = 2048;
+  static final int N_EDGE_PERMUTATIONS = 479001600;
 
   // RELATIVE PERMUTATIONS are wrooooong! Don't know how to do a R after a U...
   // TODO : see if there is a way to make it work
