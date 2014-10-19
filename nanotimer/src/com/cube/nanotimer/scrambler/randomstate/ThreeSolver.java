@@ -158,7 +158,7 @@ public class ThreeSolver {
         int corPerm = IndexConvertor.packPermutation(state.cornerPermutations);
         int udEdgPerm = IndexConvertor.packPermutation(udEdgePermutation);
         int eEdgPerm = IndexConvertor.packPermutation(eEdgePermutation);
-        for (int i = 0; i < maxDepth && !foundSolution; i++) {
+        for (int i = 0; i <= maxDepth && !foundSolution; i++) {
           foundSolution |= phase2(corPerm, udEdgPerm, eEdgPerm, i, lastMove, oldLastMove);
         }
       }

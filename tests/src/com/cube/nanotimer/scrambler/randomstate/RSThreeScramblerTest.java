@@ -5,6 +5,8 @@ import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RSThreeScramblerTest extends AndroidTestCase {
 
@@ -18,6 +20,7 @@ public class RSThreeScramblerTest extends AndroidTestCase {
     int maxLength = 0;
     int totalLength = 0;
     long startTs = System.currentTimeMillis();
+    Map<Integer, Integer> lengthRepartition = new HashMap<Integer, Integer>();
     Log.i("[NanoTimer]", "Generating first scramble to generate tables (not counting this time)");
     scrambler.getNewScramble();
     Log.i("[NanoTimer]", "Generating " + nScrambles + " scrambles...");
@@ -37,11 +40,20 @@ public class RSThreeScramblerTest extends AndroidTestCase {
       if (scramble.length > maxLength) {
         maxLength = scramble.length;
       }
+      if (lengthRepartition.get(scramble.length) == null) {
+        lengthRepartition.put(scramble.length, 1);
+      } else {
+        lengthRepartition.put(scramble.length, lengthRepartition.get(scramble.length) + 1);
+      }
       totalLength += scramble.length;
     }
     long total = System.currentTimeMillis() - startTs;
     Log.i("[NanoTimer]", "Total time: " + total + " avg: " + (total / nScrambles) + " min: " + min + " max: " + max);
     Log.i("[NanoTimer]", "Scramble min: " + minLength + " max: " + maxLength + " avg length: " + (((float) totalLength) / nScrambles));
+    Log.i("[NanoTimer]", "Length repartition:");
+    for (Integer s : lengthRepartition.keySet()) {
+      Log.i("[NanoTimer]", "  length " + s + ": " + lengthRepartition.get(s));
+    }
   }
 
   @SmallTest
