@@ -21,7 +21,8 @@ public enum Options {
   private static final String BIG_CUBES_NOTATION_KEY = "big_cubes_notation";
   private static final String ADS_STYLE_KEY = "ads_style";
   private static final String SOLVE_TYPES_SHORTCUT = "solve_types_shortcut";
-  private static final String RANDOMSTATE_SCRAMBLES = "randomstate_scrambles";
+  public static final String RANDOMSTATE_SCRAMBLES = "randomstate_scrambles";
+  public static final String PREGEN_SCRAMBLES = "pregen_scrambles";
 
   private static final int MAX_STEPS_COUNT = 8;
 
@@ -97,7 +98,6 @@ public enum Options {
   }
 
   public boolean isRandomStateScrambles() {
-    // TODO : add this to preferences screen
     Boolean defaultValue = context.getResources().getBoolean(R.bool.randomstate_scrambles);
     return sharedPreferences.getBoolean(RANDOMSTATE_SCRAMBLES, defaultValue);
   }

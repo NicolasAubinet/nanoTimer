@@ -64,6 +64,20 @@
        android:dialogTitle="@string/big_cubes_notation"
        android:defaultValue="1"/>
 
+    <CheckBoxPreference
+       android:key="randomstate_scrambles"
+       android:title="@string/use_modern_scrambles"
+       android:summary="@string/use_modern_scrambles_summary"
+       android:defaultValue="@bool/randomstate_scrambles"/>
+
+    <EditTextPreference
+       android:key="pregen_scrambles"
+       android:dialogTitle="@string/pregen_scrambles"
+       android:title="@string/pregen_scrambles"
+       android:summary="@string/pregen_scrambles_summary"
+       android:inputType="number"
+       android:defaultValue="200"/>
+
   </PreferenceCategory>
 
   <PreferenceCategory

@@ -53,6 +53,9 @@ public class ThreeSolver {
   private List<Byte> bestSolution2;
   private long searchStartTs;
 
+  private final Object solutionSyncHelper = new Object();
+  private int solutionSearchCount = 0;
+
   static Move[] moves;
   static Move[] moves1;
   static Move[] moves2;
@@ -244,9 +247,11 @@ public class ThreeSolver {
   }
 
   public String[] getSolution(CubeState cubeState) {
-    if (transitCornerPermutation == null) {
-      // TODO : gen tables when app loads, if random-state option is enabled
-      getTables();
+    synchronized (solutionSyncHelper) {
+      solutionSearchCount++;
+      if (transitCornerPermutation == null) {
+        getTables();
+      }
     }
     searchStartTs = System.currentTimeMillis();
 
@@ -289,7 +294,35 @@ public class ThreeSolver {
     }
     Log.i("[NanoTimer]", "solution time: " + (System.currentTimeMillis() - searchStartTs));
 
+    synchronized (solutionSyncHelper) {
+      solutionSearchCount--;
+      solutionSyncHelper.notify();
+    }
+
     return solution;
+  }
+
+  public void freeMemory() {
+    synchronized (solutionSyncHelper) {
+      while (solutionSearchCount > 0) {
+        try {
+          solutionSyncHelper.wait();
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+      StateTables.transitCornerPermutation = null;
+      StateTables.transitCornerOrientation = null;
+      StateTables.transitEEdgeCombination = null;
+      StateTables.transitEEdgePermutation = null;
+      StateTables.transitUDEdgePermutation = null;
+      StateTables.transitEdgeOrientation = null;
+
+      StateTables.pruningCornerOrientation = null;
+      StateTables.pruningEdgeOrientation = null;
+      StateTables.pruningCornerPermutation = null;
+      StateTables.pruningUDEdgePermutation = null;
+    }
   }
 
   private void getTables() {

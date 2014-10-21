@@ -25,10 +25,12 @@ public class ScramblerService extends Service {
   private static final int DEFAULT_CACHE_SIZE = 50;
   private static final int MIN_CACHE_SIZE = 25;
 
-  private IBinder binder = new LocalBinder();
+  private IBinder binder = new ScrambleServiceBinder();
   private Queue<String[]> cachedScrambles = new LinkedList<String[]>();
-  private Scrambler rsScrambler = null;
+  private RSScrambler rsScrambler = null;
   private Thread generationThread = null;
+
+  final private Object cacheSyncHelper = new Object();
 
   @Override
   public IBinder onBind(Intent intent) {
@@ -43,17 +45,29 @@ public class ScramblerService extends Service {
 
   private void initRandomState() {
     if (Options.INSTANCE.isRandomStateScrambles() && rsScrambler == null) {
-      rsScrambler = getRandomStateScrambler();
-      loadCacheFromFile();
-      checkCache();
+      new Thread(new Runnable() {
+        @Override
+        public void run() {
+          rsScrambler = getRandomStateScrambler();
+          loadCacheFromFile();
+          checkCache();
+        }
+      }).start();
     }
   }
 
   private void stopRandomState() {
     if (!Options.INSTANCE.isRandomStateScrambles() && rsScrambler != null) {
-      // TODO : free up memory
-      rsScrambler = null;
-      cachedScrambles.clear();
+      new Thread(new Runnable() {
+        @Override
+        public void run() {
+          rsScrambler.freeMemory();
+          synchronized (cacheSyncHelper) {
+            rsScrambler = null;
+            cachedScrambles.clear();
+          }
+        }
+      }).start();
     }
   }
 
@@ -79,7 +93,10 @@ public class ScramblerService extends Service {
       @Override
       public void run() {
         for (int i = 0; i < n && generationThread == Thread.currentThread(); i++) {
-          cachedScrambles.add(rsScrambler.getNewScramble());
+          String[] scramble = rsScrambler.getNewScramble();
+          synchronized (cacheSyncHelper) {
+            cachedScrambles.add(scramble);
+          }
         }
         saveCacheToFile();
         if (activateRSForGeneration) {
@@ -90,18 +107,20 @@ public class ScramblerService extends Service {
     generationThread.start();
   }
 
-  private Scrambler getRandomStateScrambler() {
+  private RSScrambler getRandomStateScrambler() {
     return new RSThreeScrambler();
   }
 
-  private void loadCacheFromFile() {
+  private synchronized void loadCacheFromFile() {
     try {
       FileInputStream fis = openFileInput("randomstate_scrambles");
       BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-      String strScramble;
-      while ((strScramble = reader.readLine()) != null) {
-        String[] scramble = strScramble.split(" ");
-        cachedScrambles.add(scramble);
+      synchronized (cacheSyncHelper) {
+        String strScramble;
+        while ((strScramble = reader.readLine()) != null) {
+          String[] scramble = strScramble.split(" ");
+          cachedScrambles.add(scramble);
+        }
       }
       reader.close();
       fis.close();
@@ -112,17 +131,19 @@ public class ScramblerService extends Service {
     }
   }
 
-  private void saveCacheToFile() {
+  private synchronized void saveCacheToFile() {
     try {
-      FileOutputStream fos = openFileOutput("randomstate_scrambles", Context.MODE_APPEND);
+      FileOutputStream fos = openFileOutput("randomstate_scrambles", Context.MODE_PRIVATE);
       BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos));
-      for (String[] scramble : cachedScrambles) {
-        StringBuilder sb = new StringBuilder();
-        for (String move : scramble) {
-          sb.append(move).append(" ");
+      synchronized (cacheSyncHelper) {
+        for (String[] scramble : cachedScrambles) {
+          StringBuilder sb = new StringBuilder();
+          for (String move : scramble) {
+            sb.append(move).append(" ");
+          }
+          writer.write(sb.toString());
+          writer.newLine();
         }
-        writer.write(sb.toString());
-        writer.newLine();
       }
       writer.close();
       fos.close();
@@ -133,20 +154,28 @@ public class ScramblerService extends Service {
     }
   }
 
-  public class LocalBinder extends Binder {
+  public class ScrambleServiceBinder extends Binder {
 
     public String[] getScramble(CubeType cubeType) {
       if (Options.INSTANCE.isRandomStateScrambles() && !cachedScrambles.isEmpty()) {
-        String[] scramble = cachedScrambles.remove();
-        checkCache();
+        String[] scramble;
+        synchronized (cacheSyncHelper) {
+          scramble = cachedScrambles.remove();
+        }
+        new Thread(new Runnable() {
+          @Override
+          public void run() {
+            saveCacheToFile();
+            checkCache();
+          }
+        }).start();
         return scramble;
       } else {
         return ScramblerFactory.getScrambler(cubeType).getNewScramble();
       }
     }
 
-    public void preGenerate(CubeType cubeType, int nScrambles) throws AlreadyGeneratingException {
-      // TODO : take care of cubeType when random-state is also implemented for 2x2x2
+    public void preGenerate(int nScrambles) throws AlreadyGeneratingException {
       generateAndAddToCache(nScrambles);
     }
 
@@ -154,7 +183,6 @@ public class ScramblerService extends Service {
       generationThread = null;
     }
 
-    // TODO : call when changing random-state option
     public void activateRandomStateScrambles(boolean activate) {
       if (activate) {
         initRandomState();
