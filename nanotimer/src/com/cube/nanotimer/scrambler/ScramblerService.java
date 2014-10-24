@@ -1,13 +1,10 @@
 package com.cube.nanotimer.scrambler;
 
-import android.app.Service;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.scrambler.randomstate.RSThreeScrambler;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.CubeType.Type;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -20,40 +17,35 @@ import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class ScramblerService extends Service {
+public enum ScramblerService {
+  INSTANCE;
 
-  private static final int DEFAULT_CACHE_SIZE = 50;
+  private static final int DEFAULT_CACHE_SIZE = 50; // TODO : should instease these two values
   private static final int MIN_CACHE_SIZE = 25;
 
-  private IBinder binder = new ScrambleServiceBinder();
+  private Context context;
   private Queue<String[]> cachedScrambles = new LinkedList<String[]>();
   private RSScrambler rsScrambler = null;
   private Thread generationThread = null;
 
   final private Object cacheSyncHelper = new Object();
 
-  @Override
-  public IBinder onBind(Intent intent) {
-    return binder;
-  }
-
-  @Override
-  public void onCreate() {
-    super.onCreate();
-    initRandomState();
+  public void init(Context context) {
+    this.context = context;
+    if (Options.INSTANCE.isRandomStateScrambles() && rsScrambler == null) {
+      initRandomState();
+    }
   }
 
   private void initRandomState() {
-    if (Options.INSTANCE.isRandomStateScrambles() && rsScrambler == null) {
-      new Thread(new Runnable() {
-        @Override
-        public void run() {
-          rsScrambler = getRandomStateScrambler();
-          loadCacheFromFile();
-          checkCache();
-        }
-      }).start();
-    }
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        rsScrambler = getRandomStateScrambler();
+        loadCacheFromFile();
+        checkCache();
+      }
+    }).start();
   }
 
   private void stopRandomState() {
@@ -72,9 +64,10 @@ public class ScramblerService extends Service {
   }
 
   private void checkCache() {
+    System.out.println("[NanoTimer] checkCache. size: " + cachedScrambles.size());
     if (cachedScrambles.size() < MIN_CACHE_SIZE) {
       try {
-        generateAndAddToCache(DEFAULT_CACHE_SIZE - MIN_CACHE_SIZE);
+        generateAndAddToCache(DEFAULT_CACHE_SIZE - cachedScrambles.size());
       } catch (AlreadyGeneratingException e) {
         // Ignore. Scrambles are already being generated, no panic.
       }
@@ -96,12 +89,14 @@ public class ScramblerService extends Service {
           String[] scramble = rsScrambler.getNewScramble();
           synchronized (cacheSyncHelper) {
             cachedScrambles.add(scramble);
+            System.out.println("[NanoTimer] generate. size: " + cachedScrambles.size());
           }
         }
         saveCacheToFile();
         if (activateRSForGeneration) {
           stopRandomState();
         }
+        generationThread = null;
       }
     });
     generationThread.start();
@@ -113,7 +108,7 @@ public class ScramblerService extends Service {
 
   private synchronized void loadCacheFromFile() {
     try {
-      FileInputStream fis = openFileInput("randomstate_scrambles");
+      FileInputStream fis = context.openFileInput("randomstate_scrambles");
       BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
       synchronized (cacheSyncHelper) {
         String strScramble;
@@ -133,7 +128,7 @@ public class ScramblerService extends Service {
 
   private synchronized void saveCacheToFile() {
     try {
-      FileOutputStream fos = openFileOutput("randomstate_scrambles", Context.MODE_PRIVATE);
+      FileOutputStream fos = context.openFileOutput("randomstate_scrambles", Context.MODE_PRIVATE);
       BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos));
       synchronized (cacheSyncHelper) {
         for (String[] scramble : cachedScrambles) {
@@ -154,42 +149,43 @@ public class ScramblerService extends Service {
     }
   }
 
-  public class ScrambleServiceBinder extends Binder {
-
-    public String[] getScramble(CubeType cubeType) {
-      if (Options.INSTANCE.isRandomStateScrambles() && !cachedScrambles.isEmpty()) {
-        String[] scramble;
-        synchronized (cacheSyncHelper) {
-          scramble = cachedScrambles.remove();
-        }
-        new Thread(new Runnable() {
-          @Override
-          public void run() {
-            saveCacheToFile();
-            checkCache();
-          }
-        }).start();
-        return scramble;
-      } else {
-        return ScramblerFactory.getScrambler(cubeType).getNewScramble();
+  public String[] getScramble(CubeType cubeType) {
+    if (Options.INSTANCE.isRandomStateScrambles() && isRandomStateForCubeType(cubeType) && !cachedScrambles.isEmpty()) {
+      String[] scramble;
+      synchronized (cacheSyncHelper) {
+        scramble = cachedScrambles.remove();
       }
+      new Thread(new Runnable() {
+        @Override
+        public void run() {
+          saveCacheToFile();
+          checkCache();
+        }
+      }).start();
+      return scramble;
+    } else {
+      return ScramblerFactory.getScrambler(cubeType).getNewScramble();
     }
+  }
 
-    public void preGenerate(int nScrambles) throws AlreadyGeneratingException {
+  public void preGenerate(int nScrambles) throws AlreadyGeneratingException {
       generateAndAddToCache(nScrambles);
     }
 
-    public void stopGeneration() {
+  public void stopGeneration() {
       generationThread = null;
     }
 
-    public void activateRandomStateScrambles(boolean activate) {
-      if (activate) {
-        initRandomState();
-      } else {
-        stopRandomState();
-      }
+  public void activateRandomStateScrambles(boolean activate) {
+    if (activate) {
+      initRandomState();
+    } else {
+      stopRandomState();
     }
+  }
+
+  private boolean isRandomStateForCubeType(CubeType cubeType) {
+    return cubeType.getType() == Type.THREE_BY_THREE;
   }
 
 }

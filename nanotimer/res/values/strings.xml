@@ -86,9 +86,9 @@
   <string name="big_cubes_notation">Big cubes notation</string>
   <string name="big_cubes_notation_summary">Choose the big cubes notation system</string>
   <string name="use_modern_scrambles">Use modern scrambles</string>
-  <string name="use_modern_scrambles_summary">Use new "random-state" scrambles</string>
-  <string name="pregen_scrambles">Pre-generate modern scrambles</string>
-  <string name="pregen_scrambles_summary">Pre-generate scrambles to avoid calculating them dynamically</string>
+  <string name="use_modern_scrambles_summary">Use new \"random-state\" scrambles</string>
+  <string name="pregen_scrambles">Pre-generate scrambles</string>
+  <string name="pregen_scrambles_summary">Pre-generate modern scrambles (to save battery)</string>
   <string name="r_u_f">r u f</string>
   <string name="rw_uw_fw">Rw Uw Fw</string>
   <string name="ads">Advertisements</string>
@@ -98,6 +98,7 @@
   <string name="interstitial">Interstitial</string>
   <string name="mixed">Mixed</string>
   <string name="scrambles_already_generating">Scrambles are already being generated.</string>
+  <string name="scrambles_number_not_valid">The scrambles number is not valid.</string>
 
   <string name="session">Session:</string>
   <string name="avgOf5">Avg of 5:</string>

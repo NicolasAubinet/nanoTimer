@@ -3,6 +3,7 @@ package com.cube.nanotimer;
 import android.content.Context;
 import com.cube.nanotimer.gui.widget.AppRater;
 import com.cube.nanotimer.gui.widget.ReleaseNotes;
+import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.services.Service;
 import com.cube.nanotimer.services.ServiceImpl;
 
@@ -20,6 +21,7 @@ public enum App {
     if (this.context == null) { // the app is starting
       this.service = ServiceImpl.getInstance(context);
       Options.INSTANCE.setContext(context);
+      ScramblerService.INSTANCE.init(context);
       AppRater.appLaunched(context);
       ReleaseNotes.appLaunched(context);
     }

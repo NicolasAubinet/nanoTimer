@@ -30,7 +30,7 @@ import com.cube.nanotimer.Options.InspectionMode;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.SessionDialog;
 import com.cube.nanotimer.gui.widget.ads.AdProvider;
-import com.cube.nanotimer.scrambler.ScramblerFactory;
+import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.CubeSession;
 import com.cube.nanotimer.util.FormatterService;
@@ -205,11 +205,11 @@ public class TimerActivity extends ActionBarActivity {
       case TWO_BY_TWO:
         size = 24f;
         break;
+      case THREE_BY_THREE:
       case PYRAMINX:
       case SKEWB:
         size = 22f;
         break;
-      case THREE_BY_THREE:
       case FOUR_BY_FOUR:
       case FIVE_BY_FIVE:
       case SQUARE1:
@@ -651,7 +651,7 @@ public class TimerActivity extends ActionBarActivity {
 
   private void generateScramble() {
     if (cubeType != null) {
-      currentScramble = ScramblerFactory.getScrambler(cubeType).getNewScramble();
+      currentScramble = ScramblerService.INSTANCE.getScramble(cubeType);
       tvScramble.setText(ScrambleFormatterService.INSTANCE.formatToColoredScramble(currentScramble, cubeType, currentOrientation));
     }
   }

@@ -36,9 +36,11 @@ public enum ScrambleFormatterService {
    * @return the formatted scramble
    */
   public Spannable formatToColoredScramble(String scramble, CubeType cubeType) {
-    if (getMovesPerLine(cubeType) > 0 && !scramble.contains("\n")) {
+    if (!scramble.contains("\n")) {
       String[] splitted = parseStringScrambleToArray(scramble, String.valueOf(getScrambleDelimiter(cubeType)));
-      scramble = formatScramble(splitted, cubeType, null);
+      if (getMovesPerLine(cubeType, splitted) > 0) {
+        scramble = formatScramble(splitted, cubeType, null);
+      }
     }
     return colorFormattedScramble(scramble, cubeType);
   }
@@ -70,19 +72,20 @@ public enum ScrambleFormatterService {
     int alternateColor = App.INSTANCE.getContext().getResources().getColor(R.color.lightblue);
     int prevLinesCharCount = 0;
     String[] lines = scramble.split("\n");
+    String totalDelimiter = Pattern.quote(String.valueOf(delimiter)) + "\\s*";
 
     boolean twoElementsPerLine = true;
     for (String line : lines) {
-      String totalDelimiter = (delimiter == ' ') ? String.valueOf(delimiter) : (delimiter + " ");
-      if (line.split(Pattern.quote(totalDelimiter)).length > 2) {
+      if (line.trim().split(totalDelimiter).length > 2) {
         twoElementsPerLine = false;
         break;
       }
     }
 
-    String prevLine = "";
+    int prevLineLength = 0;
     for (int i = 0; i < lines.length; i++) {
       String line = lines[i];
+      int curLineLength = line.trim().split(totalDelimiter).length;
       if (twoElementsPerLine) { // color one line out of two
         span.setSpan(new ForegroundColorSpan((i % 2 == 0) ? defaultColor : alternateColor),
             prevLinesCharCount, prevLinesCharCount + line.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
@@ -90,8 +93,8 @@ public enum ScrambleFormatterService {
         int prevInd = prevLinesCharCount;
         int colorInd = 0;
         char prevChar = ')'; // initialized with a parenthesis for square-1 to color starting from 2nd column (and not from the 1st one)
-        if (line.length() <= prevLine.length() / 2) {
-          colorInd = 1; // used for the last square-1 line. if last line is half the size of the previous one, the first move will be colored
+        if (curLineLength < prevLineLength) { // used when the last line is smaller, to adapt the first move's color
+          colorInd = ((prevLineLength - curLineLength) / 2) % 2;
         }
         for (int j = 0; j < line.length(); j++) {
           char c = line.charAt(j);
@@ -104,7 +107,7 @@ public enum ScrambleFormatterService {
           prevChar = c;
         }
       }
-      prevLine = line;
+      prevLineLength = curLineLength;
       prevLinesCharCount += line.length() + 1;
     }
     return span;
@@ -125,7 +128,7 @@ public enum ScrambleFormatterService {
         maxMoveLength = m.length();
       }
     }
-    int movesPerLine = getMovesPerLine(cubeType, orientation);
+    int movesPerLine = getMovesPerLine(cubeType, scramble, orientation);
     StringBuilder s = new StringBuilder();
     for (int i = 0; i < scramble.length; i++) {
       s.append(scramble[i]);
@@ -145,7 +148,7 @@ public enum ScrambleFormatterService {
 
   public String formatScrambleAsSingleLine(String[] scramble, CubeType cubeType) {
     StringBuilder sb = new StringBuilder();
-    boolean addSpace = getMovesPerLine(cubeType) > 0;
+    boolean addSpace = getMovesPerLine(cubeType, scramble) > 0;
     if (scramble != null) {
       for (String s : scramble) {
         sb.append(s);
@@ -157,17 +160,19 @@ public enum ScrambleFormatterService {
     return sb.toString();
   }
 
-  private int getMovesPerLine(CubeType cubeType) {
-    return getMovesPerLine(cubeType, null);
+  private int getMovesPerLine(CubeType cubeType, String[] scramble) {
+    return getMovesPerLine(cubeType, scramble, null);
   }
 
-  private int getMovesPerLine(CubeType cubeType, Integer orientation) {
+  private int getMovesPerLine(CubeType cubeType, String[] scramble, Integer orientation) {
     int movesPerLine;
     if (orientation == null) {
       orientation = Configuration.ORIENTATION_PORTRAIT;
     }
     switch (cubeType.getType()) {
       case THREE_BY_THREE:
+        movesPerLine = getThreeByThreeMovesPerLine(scramble.length);
+        break;
       case PYRAMINX:
       case SKEWB:
         movesPerLine = 5;
@@ -201,6 +206,29 @@ public enum ScrambleFormatterService {
         break;
     }
     return movesPerLine;
+  }
+
+  private int getThreeByThreeMovesPerLine(int scrambleLength) {
+    switch (scrambleLength) {
+      case 16:
+        return 4;
+      case 15:
+      case 19:
+      case 20:
+      case 22:
+      case 23:
+      case 25:
+        return 5;
+      case 17:
+      case 18:
+      case 24:
+        return 6;
+      case 14:
+      case 21:
+        return 7;
+      default:
+        return 5;
+    }
   }
 
   private char getScrambleDelimiter(CubeType cubeType) {
