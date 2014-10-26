@@ -70,13 +70,10 @@
        android:summary="@string/use_modern_scrambles_summary"
        android:defaultValue="@bool/randomstate_scrambles"/>
 
-    <EditTextPreference
+    <com.cube.nanotimer.gui.widget.PreGenerateScramblesDialog
        android:key="pregen_scrambles"
-       android:dialogTitle="@string/pregen_scrambles"
        android:title="@string/pregen_scrambles"
-       android:summary="@string/pregen_scrambles_summary"
-       android:inputType="number"
-       android:defaultValue="200"/>
+       android:summary="@string/pregen_scrambles_summary"/>
 
   </PreferenceCategory>
 

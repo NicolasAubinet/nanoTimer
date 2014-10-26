@@ -10,9 +10,7 @@ import android.view.MenuItem;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.ReleaseNotes;
-import com.cube.nanotimer.scrambler.AlreadyGeneratingException;
 import com.cube.nanotimer.scrambler.ScramblerService;
-import com.cube.nanotimer.util.helper.DialogUtils;
 
 public class OptionsActivity extends PreferenceActivity {
 
@@ -54,19 +52,6 @@ public class OptionsActivity extends PreferenceActivity {
       Boolean defaultValue = getResources().getBoolean(R.bool.randomstate_scrambles);
       boolean randomState = pref.getBoolean(Options.RANDOMSTATE_SCRAMBLES, defaultValue);
       ScramblerService.INSTANCE.activateRandomStateScrambles(randomState);
-    } else if (key.equals(Options.PREGEN_SCRAMBLES)) {
-      String strScramblesCount = pref.getString(Options.PREGEN_SCRAMBLES, "100");
-      try {
-        int nScrambles = Integer.parseInt(strScramblesCount);
-        ScramblerService.INSTANCE.preGenerate(nScrambles);
-        // TODO : display progression dialog with "Generating scramble 1 of 200" etc.
-        // TODO :   also add a "Stop" button, and call binder.stopGeneration() if clicked (with confirmation msg)
-        // TODO :   need a progression listener
-      } catch (AlreadyGeneratingException e) {
-        DialogUtils.showInfoMessage(this, R.string.scrambles_already_generating);
-      } catch (NumberFormatException e) {
-        DialogUtils.showInfoMessage(this, R.string.scrambles_already_generating);
-      }
     }
   }
 

@@ -99,6 +99,9 @@
   <string name="mixed">Mixed</string>
   <string name="scrambles_already_generating">Scrambles are already being generated.</string>
   <string name="scrambles_number_not_valid">The scrambles number is not valid.</string>
+  <string name="scrambles_count">Scrambles count:</string>
+  <string name="generate">Generate</string>
+  <string name="generating_scramble">Generating scramble %1$d of %2$d</string>
 
   <string name="session">Session:</string>
   <string name="avgOf5">Avg of 5:</string>

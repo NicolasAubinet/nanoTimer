@@ -20,7 +20,7 @@ import java.util.Queue;
 public enum ScramblerService {
   INSTANCE;
 
-  private static final int DEFAULT_CACHE_SIZE = 50; // TODO : should instease these two values
+  private static final int DEFAULT_CACHE_SIZE = 50; // TODO : should increase these two values
   private static final int MIN_CACHE_SIZE = 25;
 
   private Context context;
