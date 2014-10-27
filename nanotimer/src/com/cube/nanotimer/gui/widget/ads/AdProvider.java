@@ -24,7 +24,7 @@ public class AdProvider {
   	StartAppSDK.init(a, "108845167", "208524420",
   			new SDKAdPreferences()
   				.setAge(20)
-  				.setGender(Gender.MALE));
+  				.setGender(Gender.MALE), false);
   	// interstitial
   	startAppAd = new StartAppAd(a);
   	startAppAd.loadAd();
