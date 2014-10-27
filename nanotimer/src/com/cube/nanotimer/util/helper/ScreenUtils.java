@@ -1,10 +1,12 @@
 package com.cube.nanotimer.util.helper;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
+import android.provider.Settings;
 import android.util.TypedValue;
 import android.view.Surface;
 import com.cube.nanotimer.App;
@@ -22,12 +24,19 @@ public class ScreenUtils {
     }
   }
 
+  public static boolean isDeviceScreenRotationEnabled(Context c) {
+    return Settings.System.getInt(c.getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0) == 1;
+  }
+
   /**
    * Enables or disables screen rotation changes.
    *
    * @param enable enable or disable screen rotations
    */
   public static void enableScreenRotationChanges(Activity a, boolean enable) {
+    if (!isDeviceScreenRotationEnabled(a)) {
+      return; // don't change orientation if it's disabled in the device's settings
+    }
     if (enable) {
       a.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
     } else {

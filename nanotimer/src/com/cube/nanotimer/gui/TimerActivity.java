@@ -510,6 +510,7 @@ public class TimerActivity extends ActionBarActivity {
     timerState = TimerState.INSPECTING;
     layout.setBackgroundResource(R.color.lightgraybg);
     setTitle(R.string.inspection);
+    clearAvgRecordStyle();
     timer = new Timer();
     TimerTask timerTask = new TimerTask() {
       public void run() {
@@ -718,16 +719,35 @@ public class TimerActivity extends ActionBarActivity {
     tv.setTypeface(null, Typeface.NORMAL);
   }
 
+  private void clearAvgRecordStyle() {
+    prevSolveAverages = null;
+    List<TextView> tvs = new ArrayList<TextView>();
+    tvs.add((TextView) findViewById(R.id.tvBestOfFive));
+    tvs.add((TextView) findViewById(R.id.tvBestOfTwelve));
+    tvs.add((TextView) findViewById(R.id.tvBestOfFifty));
+    tvs.add((TextView) findViewById(R.id.tvBestOfHundred));
+    tvs.add((TextView) findViewById(R.id.tvLifetimeBest));
+    for (TextView tv : tvs) {
+      tv.setTextColor(defaultTextColor);
+      tv.setTypeface(null, Typeface.NORMAL);
+    }
+    if (animations != null) {
+      for (Animation a : animations) {
+        a.cancel();
+      }
+    }
+  }
+
   private void refreshAvgFieldWithRecord(int fieldId, Long value, Long previousValue, String defaultValue,
                                          boolean showNotifications, boolean showBanner) {
     refreshAvgField(fieldId, value, defaultValue);
     if (historyTimesCount > MIN_TIMES_FOR_RECORD_NOTIFICATION && previousValue != null && value != null && value < previousValue && !solveType.hasSteps()) {
+      final int recordColor = getResources().getColor(R.color.new_record);
       final TextView tv = (TextView) findViewById(fieldId);
+      tv.setTypeface(null, Typeface.BOLD);
 
       if (showNotifications) {
         final int defaultColor = defaultTextColor.getDefaultColor();
-        final int recordColor = getResources().getColor(R.color.new_record);
-
         if (showBanner) {
           setTitle(R.string.new_record);
           setTitleColor(recordColor);
@@ -746,7 +766,6 @@ public class TimerActivity extends ActionBarActivity {
           bannerTimer.schedule(bannerTimerTask, 3000);
         }
 
-        tv.setTypeface(null, Typeface.BOLD);
         // animate text view color
         Animation a = new Animation() {
           private int animationTimes = 3;
@@ -770,7 +789,7 @@ public class TimerActivity extends ActionBarActivity {
         tv.startAnimation(a);
         animations.add(a);
       } else {
-        tv.setTextColor(getResources().getColor(R.color.new_record));
+        tv.setTextColor(recordColor);
       }
     }
   }
