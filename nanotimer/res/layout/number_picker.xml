@@ -16,7 +16,7 @@
      android:id="@+id/tfValue"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
-     android:numeric="integer"
+     android:inputType="number"
      android:gravity="center"
      android:textSize="20sp"/>
 
