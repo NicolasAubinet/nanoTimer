@@ -3,6 +3,7 @@
   <string name="inspection_mode">1</string>
   <integer name="inspection_time">15</integer>
   <integer name="gen_scrambles_count">200</integer>
+  <integer name="max_inspection_time_length">5</integer>
   <bool name="inspection_sounds">true</bool>
   <bool name="keep_timer_screen_on">true</bool>
   <string name="ads_style">3</string>
