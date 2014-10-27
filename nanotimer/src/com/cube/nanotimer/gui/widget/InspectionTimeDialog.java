@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.DialogPreference;
 import android.preference.PreferenceManager;
+import android.text.InputFilter;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,12 +32,21 @@ public class InspectionTimeDialog extends DialogPreference {
     Integer value = p.getInt(getKey(), defaultValue);
     tfValue.setText(value.toString());
 
+    final int maxInspectionLength = getContext().getResources().getInteger(R.integer.max_inspection_time_length);
+    tfValue.setFilters( new InputFilter[] { new InputFilter.LengthFilter(maxInspectionLength) } );
+
+    StringBuilder maxStr = new StringBuilder();
+    for (int i = 0; i < maxInspectionLength; i++) { maxStr.append("9"); }
+    final int maxValue = Integer.parseInt(maxStr.toString());
+
     Button buPlus = (Button) layout.findViewById(R.id.buPlus);
     buPlus.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
         int val = getValue();
-        tfValue.setText(String.valueOf(val + 1));
+        if (val < maxValue) {
+          tfValue.setText(String.valueOf(val + 1));
+        }
       }
     });
 
