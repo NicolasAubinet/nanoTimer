@@ -136,10 +136,12 @@ public enum ScrambleFormatterService {
         for (int j = scramble[i].length(); j < maxMoveLength; j++) {
           s.append(" ");
         }
-        if (movesPerLine > 0 && (i + 1) % movesPerLine == 0 && i > 0) {
-          s.append("\n");
-        } else if (i < scramble.length - 1) {
-          s.append(" ");
+        if (i < scramble.length - 1) {
+          if ((i + 1) % movesPerLine == 0 && i > 0) {
+            s.append("\n");
+          } else {
+            s.append(" ");
+          }
         }
       }
     }
