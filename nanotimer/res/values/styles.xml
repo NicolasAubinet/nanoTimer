@@ -20,9 +20,9 @@
   </style>
 
   <style name="TableCell">
-    <item name="android:textSize">20px</item>
+    <item name="android:textSize">21px</item>
     <item name="android:gravity">center</item>
-    <item name="android:layout_height">30px</item>
+    <item name="android:layout_height">31px</item>
     <item name="android:layout_width">0px</item>
     <item name="android:layout_margin">2px</item>
     <item name="android:background">@drawable/table_cell</item>
