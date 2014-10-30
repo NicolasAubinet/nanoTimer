@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.scrambler.AlreadyGeneratingException;
@@ -51,13 +53,24 @@ public class PreGenerateScramblesDialog extends DialogPreference implements Rand
     final RadioButton rbThreeByThree = (RadioButton) layout.findViewById(R.id.rbThreeByThree);
     final RadioButton rbTwoByTwo = (RadioButton) layout.findViewById(R.id.rbTwoByTwo);
 
+    cubeType = CubeType.THREE_BY_THREE;
+    rbThreeByThree.setChecked(true);
+    ((RadioGroup) layout.findViewById(R.id.radioGroup)).setOnCheckedChangeListener(new OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(RadioGroup radioGroup, int i) {
+        if (rbThreeByThree.isChecked()) {
+          cubeType = CubeType.THREE_BY_THREE;
+        } else if (rbTwoByTwo.isChecked()) {
+          cubeType = CubeType.TWO_BY_TWO;
+        }
+      }
+    });
+
     ScramblerService.INSTANCE.addRandomStateGenListener(PreGenerateScramblesDialog.this);
 
     Integer defaultValue = getContext().getResources().getInteger(R.integer.gen_scrambles_count);
     Integer value = getPersistedInt(defaultValue);
     tfScramblesCount.setText(value.toString());
-
-    cubeType = CubeType.THREE_BY_THREE;
     updateTotalScramblesCount();
 
     buGenerate.setOnClickListener(new View.OnClickListener() {
@@ -67,14 +80,6 @@ public class PreGenerateScramblesDialog extends DialogPreference implements Rand
           int nScrambles = Integer.parseInt(tfScramblesCount.getText().toString());
           persistInt(nScrambles);
           try {
-            if (rbThreeByThree.isChecked()) {
-              cubeType = CubeType.THREE_BY_THREE;
-            } else if (rbTwoByTwo.isChecked()) {
-              cubeType = CubeType.TWO_BY_TWO;
-            } else {
-              DialogUtils.showInfoMessage(R.string.select_a_cube_type);
-              return;
-            }
             ScramblerService.INSTANCE.preGenerate(cubeType, nScrambles);
           } catch (AlreadyGeneratingException e) {
             DialogUtils.showInfoMessage(getContext(), R.string.scrambles_already_generating);

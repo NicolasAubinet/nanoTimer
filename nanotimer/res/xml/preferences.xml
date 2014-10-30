@@ -73,7 +73,8 @@
     <com.cube.nanotimer.gui.widget.PreGenerateScramblesDialog
        android:key="pregen_scrambles"
        android:title="@string/pregen_scrambles"
-       android:summary="@string/pregen_scrambles_summary"/>
+       android:summary="@string/pregen_scrambles_summary"
+       android:dependency="randomstate_scrambles"/>
 
   </PreferenceCategory>
 

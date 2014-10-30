@@ -88,7 +88,7 @@
   <string name="use_modern_scrambles">Use modern scrambles</string>
   <string name="use_modern_scrambles_summary">Use new \"random-state\" scrambles</string>
   <string name="pregen_scrambles">Pre-generate scrambles</string>
-  <string name="pregen_scrambles_summary">Pre-generate modern scrambles (to save battery)</string>
+  <string name="pregen_scrambles_summary">Pre-generate modern scrambles</string>
   <string name="r_u_f">r u f</string>
   <string name="rw_uw_fw">Rw Uw Fw</string>
   <string name="ads">Advertisements</string>
@@ -106,7 +106,6 @@
   <string name="stop_generation">Stop generation</string>
   <string name="preparing_generation">Preparing generation&#8230;</string>
   <string name="generating_scramble">Generating scramble %1$d of %2$d</string>
-  <string name="select_a_cube_type">Please select a cube type</string>
   <string name="stopping_generation">Stopping generation&#8230;</string>
 
   <string name="session">Session:</string>

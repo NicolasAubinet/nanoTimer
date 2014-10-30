@@ -45,10 +45,12 @@ public enum ScramblerService {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        rsScrambler = getRandomStateScrambler(cubeType);
-        if (rsScrambler != null) {
-          loadCacheFromFile(cubeType);
-          checkCache(cubeType);
+        synchronized (scramblerHelper) {
+          rsScrambler = getRandomStateScrambler(cubeType);
+          if (rsScrambler != null) {
+            loadCacheFromFile(cubeType);
+            checkCache(cubeType);
+          }
         }
       }
     }).start();
@@ -60,8 +62,10 @@ public enum ScramblerService {
         @Override
         public void run() {
           synchronized (scramblerHelper) {
-            rsScrambler.freeMemory();
-            rsScrambler = null;
+            if (rsScrambler != null) {
+              rsScrambler.freeMemory();
+              rsScrambler = null;
+            }
           }
           synchronized (cacheMemHelper) {
             cachedScrambles.clear();
@@ -89,43 +93,43 @@ public enum ScramblerService {
     if (generationThread != null) {
       throw new AlreadyGeneratingException();
     }
-    final boolean activateRSForGeneration = (rsScrambler == null);
+    if (rsScrambler == null) {
+      return;
+    }
     generationThread = new Thread(new Runnable() {
       @Override
       public void run() {
-        if (activateRSForGeneration) { // TODO : see what to do about this... what happens if rs is disabled in options while tables are generating?
-          // TODO : should maybe make the "pre-gen" option grayed out when rs is disabled, and make the rs checkbox disabled when it's generating?
-          // TODO :    or make sure that generation is stopped correctly when rs checkbox is disabled? (b/c might want to disable when implicitly generating (like for the first time))
-          initRandomState(cubeType);
-        }
         List<String[]> toSave = new ArrayList<String[]>();
         sendGenStateToListeners(new RandomStateGenEvent(State.PREPARING, 0, n));
         synchronized (scramblerHelper) {
-          rsScrambler.genTables();
+          if (rsScrambler != null) {
+            rsScrambler.genTables();
+          }
         }
         for (int i = 0; i < n && generationThread == Thread.currentThread(); i++) {
-          String[] scramble;
+          String[] scramble = null;
           synchronized (scramblerHelper) {
             sendGenStateToListeners(new RandomStateGenEvent(State.GENERATING, i + 1, n));
-            scramble = rsScrambler.getNewScramble();
-          }
-          if (cachedScrambles.size() < MAX_SCRAMBLES_IN_MEMORY) {
-            synchronized (cacheMemHelper) {
-              cachedScrambles.add(scramble);
-              System.out.println("[NanoTimer] generate. size: " + cachedScrambles.size());
+            if (rsScrambler != null) {
+              scramble = rsScrambler.getNewScramble();
             }
           }
-          toSave.add(scramble);
-          if (toSave.size() >= 10) {
-            saveNewScramblesToFile(cubeType, toSave); // write new scrambles to file by batches
-            toSave.clear();
+          if (scramble != null) {
+            if (cachedScrambles.size() < MAX_SCRAMBLES_IN_MEMORY) {
+              synchronized (cacheMemHelper) {
+                cachedScrambles.add(scramble);
+                System.out.println("[NanoTimer] generate. size: " + cachedScrambles.size());
+              }
+            }
+            toSave.add(scramble);
+            if (toSave.size() >= 10) {
+              saveNewScramblesToFile(cubeType, toSave); // write new scrambles to file by batches
+              toSave.clear();
+            }
           }
         }
         if (!toSave.isEmpty()) {
           saveNewScramblesToFile(cubeType, toSave);
-        }
-        if (activateRSForGeneration) {
-          stopRandomState();
         }
         sendGenStateToListeners(new RandomStateGenEvent(State.IDLE, 0, 0));
         generationThread = null;
@@ -142,13 +146,11 @@ public enum ScramblerService {
   }
 
   private RSScrambler getRandomStateScrambler(CubeType cubeType) {
-    synchronized (scramblerHelper) {
-      switch (cubeType) {
-        case THREE_BY_THREE:
-          return new RSThreeScrambler();
-        default:
-          return null;
-      }
+    switch (cubeType) {
+      case THREE_BY_THREE:
+        return new RSThreeScrambler();
+      default:
+        return null;
     }
   }
 
@@ -219,8 +221,6 @@ public enum ScramblerService {
   }
 
   public void stopGeneration() {
-    // TODO : Handle tables generation stop
-    // TODO :   In StateTables, set all the tables to null if it was interrupted while they were being generated
     sendGenStateToListeners(new RandomStateGenEvent(State.STOPPING, 0, 0));
     generationThread = null;
   }
