@@ -40,7 +40,7 @@ public class ThreeSolver {
 //  private static final int MAX_SEARCH_TIME = 10; // in seconds. will stop after that time if a solution was found, even if it is not optimal
   private static final int SAFE_PHASE1_ITERATIONS_LIMIT = 30;
   // TODO : could maybe reduce this (but test on slow devices)
-  private static final int SEARCH_TIME_MIN = 100; // time in ms during which to search for a better solution
+  private static final int SEARCH_TIME_MIN = 150; // time in ms during which to search for a better solution
 
   // TODO : there seems to be a lot or phase 2 moves in the solution. see if normal
 
@@ -300,6 +300,12 @@ public class ThreeSolver {
     }
 
     return solution;
+  }
+
+  public void genTables() {
+    if (transitCornerPermutation == null) {
+      getTables();
+    }
   }
 
   public void freeMemory() {

@@ -1,9 +1,13 @@
 package com.cube.nanotimer.util.helper;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.media.MediaPlayer;
+import android.preference.PreferenceManager;
 import com.cube.nanotimer.App;
+import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.SolveType;
 
 import java.security.SecureRandom;
 import java.util.List;
@@ -48,6 +52,28 @@ public class Utils {
       mean = -2;
     }
     return mean;
+  }
+
+  public static CubeType getCurrentCubeType(Context c) {
+    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
+    return CubeType.getCubeType(prefs.getInt("cubeTypeId", CubeType.THREE_BY_THREE.getId()));
+  }
+
+  public static int getCurrentSolveTypeId(Context c) {
+    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
+    return prefs.getInt("solveTypeId", -1);
+  }
+
+  public static void setCurrentCubeType(Context c, CubeType cubeType) {
+    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
+    int id = (cubeType == null) ? CubeType.THREE_BY_THREE.getId() : cubeType.getId();
+    prefs.edit().putInt("cubeTypeId", id).commit();
+  }
+
+  public static void setCurrentSolveType(Context c, SolveType solveType) {
+    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
+    int id = (solveType == null) ? -1 : solveType.getId();
+    prefs.edit().putInt("solveTypeId", id).commit();
   }
 
 }

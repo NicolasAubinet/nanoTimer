@@ -78,20 +78,6 @@
   </PreferenceCategory>
 
   <PreferenceCategory
-     android:title="@string/ads">
-
-    <ListPreference
-       android:key="ads_style"
-       android:title="@string/ads_style"
-       android:summary="@string/ads_style_summary"
-       android:entries="@array/entries_ads_style"
-       android:entryValues="@array/entryvalues_ads_style"
-       android:dialogTitle="@string/ads_style"
-       android:defaultValue="3"/>
-
-  </PreferenceCategory>
-
-  <PreferenceCategory
      android:title="@string/history">
 
     <com.cube.nanotimer.gui.widget.ClearHistoryDialog

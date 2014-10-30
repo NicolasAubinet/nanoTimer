@@ -44,7 +44,7 @@ public class ServiceProviderImpl implements ServiceProvider {
   public List<CubeType> getCubeTypes(boolean getEmpty) {
     List<CubeType> cubeTypes = new ArrayList<CubeType>();
     StringBuilder q = new StringBuilder();
-    q.append("SELECT ").append(DB.COL_ID).append(", ").append(DB.COL_CUBETYPE_NAME);
+    q.append("SELECT ").append(DB.COL_ID);
     q.append(" FROM ").append(DB.TABLE_CUBETYPE);
     if (!getEmpty) {
       q.append(" WHERE 0 < (");
@@ -55,8 +55,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     Cursor cursor = db.rawQuery(q.toString(), null);
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-        CubeType ct = new CubeType(cursor.getInt(0), cursor.getString(1));
-        cubeTypes.add(ct);
+        cubeTypes.add(CubeType.getCubeType(cursor.getInt(0)));
       }
       cursor.close();
     }

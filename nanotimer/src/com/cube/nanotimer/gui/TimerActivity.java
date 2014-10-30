@@ -41,7 +41,6 @@ import com.cube.nanotimer.util.helper.GUIUtils;
 import com.cube.nanotimer.util.helper.ScreenUtils;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
-import com.cube.nanotimer.vo.CubeType.Type;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
@@ -162,7 +161,7 @@ public class TimerActivity extends ActionBarActivity {
     TableLayout averagesLayout = (TableLayout) findViewById(R.id.averagesLayout);
     timerStepsLayout = (TableLayout) findViewById(R.id.timerStepsLayout);
 
-    if (currentOrientation == Configuration.ORIENTATION_PORTRAIT && cubeType.getType() == Type.SEVEN_BY_SEVEN) {
+    if (currentOrientation == Configuration.ORIENTATION_PORTRAIT && cubeType == CubeType.SEVEN_BY_SEVEN) {
       tvTimer.setTextSize(TypedValue.COMPLEX_UNIT_PX, tvTimer.getTextSize() - 5);
     }
 
@@ -200,8 +199,7 @@ public class TimerActivity extends ActionBarActivity {
 
   private Float getCubeTypeScrambleTextSize() {
     Float size;
-    Type type = cubeType.getType();
-    switch (type) {
+    switch (cubeType) {
       case TWO_BY_TWO:
         size = 24f;
         break;
@@ -231,7 +229,7 @@ public class TimerActivity extends ActionBarActivity {
     }
     if (Options.INSTANCE.getBigCubesNotation() == BigCubesNotation.RWUWFW) {
       // adjust size otherwise it is too large, and causes a bug when going from landscape mode to portrait mode
-      switch (type) {
+      switch (cubeType) {
         case FOUR_BY_FOUR:
         case FIVE_BY_FIVE:
         case SIX_BY_SIX:

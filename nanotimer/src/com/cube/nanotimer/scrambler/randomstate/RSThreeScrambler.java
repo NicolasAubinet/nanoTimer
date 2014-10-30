@@ -26,6 +26,11 @@ public class RSThreeScrambler implements RSScrambler {
     threeSolver.freeMemory();
   }
 
+  @Override
+  public void genTables() {
+    threeSolver.genTables();
+  }
+
   private CubeState getRandomState() {
     CubeState cubeState;
     Random r = Utils.getRandom();

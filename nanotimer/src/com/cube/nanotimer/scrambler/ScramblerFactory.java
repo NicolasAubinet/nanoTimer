@@ -17,7 +17,7 @@ public class ScramblerFactory {
 
   public static Scrambler getScrambler(CubeType type) {
     Scrambler scrambler;
-    switch (type.getType()) {
+    switch (type) {
       case TWO_BY_TWO:
         scrambler = new TwoScrambler();
         break;

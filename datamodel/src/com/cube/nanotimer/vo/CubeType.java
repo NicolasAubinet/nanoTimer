@@ -2,34 +2,24 @@ package com.cube.nanotimer.vo;
 
 import java.io.Serializable;
 
-public class CubeType implements Serializable {
+public enum CubeType implements Serializable {
 
-  public enum Type {
-    TWO_BY_TWO(1),
-    THREE_BY_THREE(2),
-    FOUR_BY_FOUR(3),
-    FIVE_BY_FIVE(4),
-    SIX_BY_SIX(5),
-    SEVEN_BY_SEVEN(6),
-    MEGAMINX(7),
-    PYRAMINX(8),
-    SKEWB(9),
-    SQUARE1(10),
-    CLOCK(11);
-
-    private int id;
-    Type(int id) {
-      this.id = id;
-    }
-    public int getId() {
-      return id;
-    }
-  }
+  TWO_BY_TWO(1, "2x2x2"),
+  THREE_BY_THREE(2, "3x3x3"),
+  FOUR_BY_FOUR(3, "4x4x4"),
+  FIVE_BY_FIVE(4, "5x5x5"),
+  SIX_BY_SIX(5, "6x6x6"),
+  SEVEN_BY_SEVEN(6, "7x7x7"),
+  MEGAMINX(7, "Megaminx"),
+  PYRAMINX(8, "Pyraminx"),
+  SKEWB(9, "Skewb"),
+  SQUARE1(10, "Square-1"),
+  CLOCK(11, "Clock");
 
   private int id;
   private String name;
 
-  public CubeType(int id, String name) {
+  CubeType(int id, String name) {
     this.id = id;
     this.name = name;
   }
@@ -42,8 +32,8 @@ public class CubeType implements Serializable {
     return name;
   }
 
-  public Type getType() {
-    for (Type t : Type.values()) {
+  public static CubeType getCubeType(int id) {
+    for (CubeType t : values()) {
       if (t.getId() == id) {
         return t;
       }

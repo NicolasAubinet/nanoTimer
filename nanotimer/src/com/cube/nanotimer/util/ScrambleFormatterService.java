@@ -171,7 +171,7 @@ public enum ScrambleFormatterService {
     if (orientation == null) {
       orientation = Configuration.ORIENTATION_PORTRAIT;
     }
-    switch (cubeType.getType()) {
+    switch (cubeType) {
       case THREE_BY_THREE:
         movesPerLine = getThreeByThreeMovesPerLine(scramble.length);
         break;
@@ -236,7 +236,7 @@ public enum ScrambleFormatterService {
 
   private char getScrambleDelimiter(CubeType cubeType) {
     char delimiter;
-    switch (cubeType.getType()) {
+    switch (cubeType) {
       case SQUARE1:
       case CLOCK:
         delimiter = ')';

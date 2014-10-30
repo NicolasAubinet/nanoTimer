@@ -19,7 +19,6 @@ public enum Options {
   private static final String INSPECTION_SOUNDS_KEY = "inspection_sounds";
   private static final String KEEP_TIMER_SCREEN_ON_KEY = "keep_timer_screen_on";
   private static final String BIG_CUBES_NOTATION_KEY = "big_cubes_notation";
-  private static final String ADS_STYLE_KEY = "ads_style";
   private static final String SOLVE_TYPES_SHORTCUT = "solve_types_shortcut";
   public static final String RANDOMSTATE_SCRAMBLES = "randomstate_scrambles";
   public static final String PREGEN_SCRAMBLES = "pregen_scrambles";
@@ -75,17 +74,7 @@ public enum Options {
   }
 
   public AdsStyle getAdsStyle() {
-    int style = Integer.parseInt(sharedPreferences.getString(ADS_STYLE_KEY, "-1"));
-    switch (style) {
-      case 1:
-        return AdsStyle.BANNER;
-      case 2:
-        return AdsStyle.INTERSTITIAL;
-      case 3:
-        return AdsStyle.MIXED;
-      default:
-        return AdsStyle.MIXED;
-    }
+    return AdsStyle.BANNER;
   }
 
   public boolean isAdsEnabled() {

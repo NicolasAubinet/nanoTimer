@@ -4,12 +4,12 @@
    android:orientation="vertical"
    android:layout_width="match_parent"
    android:layout_height="match_parent"
-   android:layout_margin="5dp">
+   android:padding="8dp">
 
   <LinearLayout
      android:id="@+id/generateLayout"
      android:orientation="vertical"
-     android:layout_width="wrap_content"
+     android:layout_width="match_parent"
      android:layout_height="match_parent">
 
     <LinearLayout
@@ -29,36 +29,62 @@
          android:inputType="number"/>
     </LinearLayout>
 
-    <ListView
-       android:id="@+id/lvCubeType"
+    <RadioGroup
        android:layout_width="match_parent"
+       android:layout_height="wrap_content">
+      <RadioButton
+         android:id="@+id/rbThreeByThree"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="@string/three_by_three"/>
+      <RadioButton
+         android:id="@+id/rbTwoByTwo"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="@string/two_by_two"/>
+    </RadioGroup>
+
+    <TextView
+       android:id="@+id/tvTotalScramblesCount"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"/>
+
+    <Button
+       android:id="@+id/buGenerate"
+       android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_marginTop="8dp"/>
+       android:layout_gravity="center"
+       android:text="@string/generate"
+       android:layout_marginTop="8dp"
+       android:paddingLeft="12dp"
+       android:paddingRight="12dp"/>
 
   </LinearLayout>
 
   <LinearLayout
      android:id="@+id/generatingLayout"
      android:orientation="vertical"
-     android:layout_width="wrap_content"
+     android:layout_width="match_parent"
      android:layout_height="match_parent"
      android:visibility="gone">
 
     <TextView
+       android:id="@+id/tvGenState"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_gravity="center"/>
+       android:layout_gravity="center"
+       android:layout_marginTop="8dp"/>
+
+    <Button
+       android:id="@+id/buStopGeneration"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_gravity="center"
+       android:text="@string/stop_generation"
+       android:layout_marginTop="8dp"
+       android:paddingLeft="12dp"
+       android:paddingRight="12dp"/>
 
   </LinearLayout>
-
-  <Button
-     android:id="@+id/buAction"
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:layout_gravity="center"
-     android:text="@string/generate"
-     android:layout_marginTop="8dp"
-     android:paddingLeft="12dp"
-     android:paddingRight="12dp"/>
 
 </LinearLayout>

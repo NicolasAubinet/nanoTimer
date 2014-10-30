@@ -37,8 +37,8 @@ import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.util.helper.DialogUtils;
+import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
-import com.cube.nanotimer.vo.CubeType.Type;
 import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
@@ -85,6 +85,8 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
     setContentView(R.layout.mainscreen_screen);
     App.INSTANCE.setContext(this);
     setVolumeControlStream(AudioManager.STREAM_MUSIC);
+    curCubeType = Utils.getCurrentCubeType(this);
+    curSolveType = new SolveType(Utils.getCurrentSolveTypeId(this), "", curCubeType.getId());
 
     initViews();
   }
@@ -289,13 +291,13 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
             if (curCubeType != null && curCubeType.getId() == ct.getId()) {
               newCubeType = ct;
             }
-            if (ct.getId() == Type.THREE_BY_THREE.getId()) {
+            if (ct.getId() == CubeType.THREE_BY_THREE.getId()) {
               defaultCubeType = ct;
             }
           }
-          curCubeType = newCubeType != null ? newCubeType : defaultCubeType != null ? defaultCubeType : cubeTypes.get(0);
+          setCurCubeType(newCubeType != null ? newCubeType : defaultCubeType != null ? defaultCubeType : cubeTypes.get(0));
         } else {
-          curCubeType = null;
+          setCurCubeType(null);
         }
         refreshSolveTypes();
       }
@@ -313,23 +315,23 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
             if (curSolveType != null) {
               for (SolveType st : solveTypes) {
                 if (curSolveType.getId() == st.getId()) {
-                  curSolveType = st;
+                  setCurSolveType(st);
                   foundType = true;
                 }
               }
             }
             if (!foundType) {
-              curSolveType = solveTypes.get(0);
+              setCurSolveType(solveTypes.get(0));
             }
           } else {
-            curSolveType = null;
+            setCurSolveType(null);
           }
           refreshButtonTexts();
           refreshHistory();
         }
       });
     } else {
-      curSolveType = null;
+      setCurSolveType(null);
       solveTypes = Collections.EMPTY_LIST;
       refreshButtonTexts();
       refreshHistory();
@@ -411,12 +413,12 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   public void itemSelected(int id, int position) {
     if (position >= 0) {
       if (id == ID_CUBETYPE) {
-        curCubeType = cubeTypes.get(position);
+        setCurCubeType(cubeTypes.get(position));
         buCubeType.setText(curCubeType.getName());
         refreshSolveTypes();
       } else if (id == ID_SOLVETYPE) {
         if (position >= 0 && position < solveTypes.size()) {
-          curSolveType = solveTypes.get(position);
+          setCurSolveType(solveTypes.get(position));
           buSolveType.setText(curSolveType.getName());
           refreshHistory();
         } else {
@@ -432,6 +434,16 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   private void setSolvesCount(int solvesCount) {
     this.solvesCount = solvesCount;
     tvSolvesCount.setText(String.valueOf(solvesCount) + " " + getString(R.string.solves));
+  }
+
+  private void setCurCubeType(CubeType cubeType) {
+    this.curCubeType = cubeType;
+    Utils.setCurrentCubeType(this, cubeType);
+  }
+
+  private void setCurSolveType(SolveType solveType) {
+    this.curSolveType = solveType;
+    Utils.setCurrentSolveType(this, solveType);
   }
 
   private void showHideBannerAd() {
