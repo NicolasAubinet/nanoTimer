@@ -63,6 +63,7 @@ public class PreGenerateScramblesDialog extends DialogPreference implements Rand
         } else if (rbTwoByTwo.isChecked()) {
           cubeType = CubeType.TWO_BY_TWO;
         }
+        updateTotalScramblesCount();
       }
     });
 

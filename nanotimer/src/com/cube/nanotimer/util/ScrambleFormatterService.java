@@ -203,6 +203,9 @@ public enum ScrambleFormatterService {
           movesPerLine = 8;
         }
         break;
+      case TWO_BY_TWO:
+        movesPerLine = getTwoByTwoMovesPerLine(scramble.length);
+        break;
       default:
         movesPerLine = 10;
         break;
@@ -231,6 +234,14 @@ public enum ScrambleFormatterService {
         return 8;
       default:
         return 5;
+    }
+  }
+
+  private int getTwoByTwoMovesPerLine(int scrambleLength) {
+    if (scrambleLength < 10) {
+      return scrambleLength;
+    } else {
+      return (scrambleLength + 1) / 2;
     }
   }
 
