@@ -269,7 +269,6 @@ public class ThreeSolver {
     }
     int eEdgeCombination = IndexConvertor.packCombination(combinations, 4);
 
-    // TODO : could test phases loops with breadth-first search (to avoid calculating the same nodes so many times). check memory usage and compare speeds
     for (int i = 0; i < SAFE_PHASE1_ITERATIONS_LIMIT && (bestSolution1 == null || System.currentTimeMillis() < searchStartTs + SEARCH_TIME_MIN); i++) {
       if (phase1(cornerOrientation, edgeOrientation, eEdgeCombination, i, (byte) -1, (byte) -1)) {
         solution1 = new ArrayList<Byte>();
