@@ -1,7 +1,6 @@
 package com.cube.nanotimer;
 
 import android.content.Context;
-import android.util.Log;
 import com.cube.nanotimer.gui.MainScreenActivity;
 import com.cube.nanotimer.gui.widget.AppRater;
 import com.cube.nanotimer.gui.widget.ReleaseNotes;
@@ -39,7 +38,6 @@ public enum App {
   }
 
   private void initRandomStateGenListener(final Context context) {
-    Log.i("[NanoTimer]", "Utils initRandomStateGenListener");
     randomStateGenListener = new RandomStateGenListener() {
       @Override
       public void onStateUpdate(RandomStateGenEvent event) {
@@ -50,7 +48,6 @@ public enum App {
           GUIUtils.showNotification(context, SCRAMBLE_NOTIF_ID, title,
               context.getString(R.string.generating_scramble, event.getCurScramble(), event.getTotalToGenerate()), MainScreenActivity.class);
         } else if (event.getState() == State.IDLE) {
-          Log.i("[NanoTimer]", "  hide");
           GUIUtils.hideNotification(context, SCRAMBLE_NOTIF_ID);
         }
       }
