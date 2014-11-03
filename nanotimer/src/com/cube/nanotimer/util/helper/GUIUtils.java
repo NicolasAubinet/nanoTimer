@@ -1,7 +1,12 @@
 package com.cube.nanotimer.util.helper;
 
 import android.app.AlertDialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.text.Html;
 import android.view.View;
 import android.view.animation.Animation;
@@ -128,6 +133,29 @@ public class GUIUtils {
     AlertDialog dialog = builder.setView(pbar).create();
     dialog.show();
     return dialog;
+  }
+
+  public static void showNotification(Context c, int id, String title, String message, Class resultClass) {
+    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(c)
+        .setSmallIcon(R.drawable.icon)
+        .setContentTitle(title)
+        .setContentText(message);
+
+    Intent resultIntent = new Intent(c, resultClass);
+    TaskStackBuilder stackBuilder = TaskStackBuilder.create(c);
+    stackBuilder.addParentStack(resultClass);
+    stackBuilder.addNextIntent(resultIntent);
+
+    PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+    mBuilder.setContentIntent(pendingIntent);
+
+    NotificationManager notifManager = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
+    notifManager.notify(id, mBuilder.build());
+  }
+
+  public static void hideNotification(Context c, int id) {
+    NotificationManager notifManager = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
+    notifManager.cancel(id);
   }
 
 }

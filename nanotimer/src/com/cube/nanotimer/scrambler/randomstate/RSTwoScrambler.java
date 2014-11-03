@@ -1,7 +1,6 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
 import android.util.Log;
-import com.cube.nanotimer.scrambler.RSScrambler;
 import com.cube.nanotimer.scrambler.randomstate.TwoSolver.CubeState;
 import com.cube.nanotimer.util.helper.Utils;
 
@@ -13,12 +12,12 @@ public class RSTwoScrambler implements RSScrambler {
   private TwoSolver twoSolver = new TwoSolver();
 
   @Override
-  public String[] getNewScramble() {
+  public String[] getNewScramble(ScrambleConfig config) {
     String[] scramble;
     do {
       CubeState randomState = getRandomState();
-      Log.i("[NanoTimer]", "Random state:\n" + randomState.toString());
-      scramble = twoSolver.getSolution(randomState);
+//      Log.i("[NanoTimer]", "Random state:\n" + randomState.toString());
+      scramble = twoSolver.getSolution(randomState, config);
       Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
     } while (scramble.length < 4);
     return scramble;

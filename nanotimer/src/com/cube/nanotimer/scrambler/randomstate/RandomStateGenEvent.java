@@ -1,4 +1,4 @@
-package com.cube.nanotimer.scrambler;
+package com.cube.nanotimer.scrambler.randomstate;
 
 public class RandomStateGenEvent {
 

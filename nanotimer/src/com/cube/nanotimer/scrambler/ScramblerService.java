@@ -2,9 +2,14 @@ package com.cube.nanotimer.scrambler;
 
 import android.content.Context;
 import com.cube.nanotimer.Options;
-import com.cube.nanotimer.scrambler.RandomStateGenEvent.State;
+import com.cube.nanotimer.scrambler.randomstate.AlreadyGeneratingException;
+import com.cube.nanotimer.scrambler.randomstate.RSScrambler;
 import com.cube.nanotimer.scrambler.randomstate.RSThreeScrambler;
 import com.cube.nanotimer.scrambler.randomstate.RSTwoScrambler;
+import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent;
+import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.State;
+import com.cube.nanotimer.scrambler.randomstate.RandomStateGenListener;
+import com.cube.nanotimer.scrambler.randomstate.ScrambleConfig;
 import com.cube.nanotimer.util.helper.FileUtils;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
@@ -105,7 +110,7 @@ public enum ScramblerService {
           String[] scramble;
           synchronized (scramblerHelper) {
             sendGenStateToListeners(new RandomStateGenEvent(State.GENERATING, i + 1, n));
-            scramble = rsScrambler.getNewScramble();
+            scramble = rsScrambler.getNewScramble(new ScrambleConfig(Utils.getRSScrambleLengthFromQuality(cubeType)));
           }
           if (getCache(cubeType).size() < MAX_SCRAMBLES_IN_MEMORY) {
             synchronized (cacheMemHelper) {

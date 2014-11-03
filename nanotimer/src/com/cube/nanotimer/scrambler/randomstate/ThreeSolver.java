@@ -35,7 +35,7 @@ public class ThreeSolver {
   }
 
   // TODO : pass the following static variables as parameters to solution(...) instead
-  private static final int MAX_SOLUTION_LENGTH = 23;
+  private static final int DEFAULT_MAX_SOLUTION_LENGTH = 23;
   private static final int MAX_PHASE2_SOLUTION_LENGTH = 12;
 //  private static final int MAX_SEARCH_TIME = 10; // in seconds. will stop after that time if a solution was found, even if it is not optimal
   private static final int SAFE_PHASE1_ITERATIONS_LIMIT = 30;
@@ -52,6 +52,7 @@ public class ThreeSolver {
   private List<Byte> bestSolution1;
   private List<Byte> bestSolution2;
   private long searchStartTs;
+  private int maxSolutionLength;
 
   private final Object solutionSyncHelper = new Object();
   private int solutionSearchCount = 0;
@@ -62,20 +63,6 @@ public class ThreeSolver {
   static Move[] allMoves2;
   private static byte[] slices;
   private static byte[] opposites;
-
-  // Transition tables
-  private static int[][] transitCornerPermutation;
-  private static short[][] transitCornerOrientation;
-  private static short[][] transitEEdgeCombination;
-  private static short[][] transitEEdgePermutation;
-  private static int[][] transitUDEdgePermutation;
-  private static short[][] transitEdgeOrientation;
-
-  // Pruning tables
-  private static byte[][] pruningCornerOrientation;
-  private static byte[][] pruningEdgeOrientation;
-  private static byte[][] pruningCornerPermutation;
-  private static byte[][] pruningUDEdgePermutation;
 
   static {
     // Moves
@@ -157,7 +144,7 @@ public class ThreeSolver {
         }
 
         // search for phase 2 solution
-        int maxDepth = Math.min(MAX_PHASE2_SOLUTION_LENGTH, MAX_SOLUTION_LENGTH - solution1.size());
+        int maxDepth = Math.min(MAX_PHASE2_SOLUTION_LENGTH, maxSolutionLength - solution1.size());
         int corPerm = IndexConvertor.packPermutation(state.cornerPermutations);
         int udEdgPerm = IndexConvertor.packPermutation(udEdgePermutation);
         int eEdgPerm = IndexConvertor.packPermutation(eEdgePermutation);
@@ -171,8 +158,8 @@ public class ThreeSolver {
       return false;
     }
 
-    if (pruningCornerOrientation[cornerOrientation][eEdgeCombination] <= depth &&
-        pruningEdgeOrientation[edgeOrientation][eEdgeCombination] <= depth) {
+    if (StateTables.pruningCornerOrientation[cornerOrientation][eEdgeCombination] <= depth &&
+        StateTables.pruningEdgeOrientation[edgeOrientation][eEdgeCombination] <= depth) {
       int curSolutionSize = solution1.size();
       for (byte i = 0; i < moves1.length; i++) {
         if ((lastMove >= 0 && i == slices[lastMove]) || // same face twice in a row
@@ -183,9 +170,9 @@ public class ThreeSolver {
         int edgOri = edgeOrientation;
         int edgCom = eEdgeCombination;
         for (int j = 0; j < 3; j++) {
-          corOri = transitCornerOrientation[corOri][i];
-          edgOri = transitEdgeOrientation[edgOri][i];
-          edgCom = transitEEdgeCombination[edgCom][i];
+          corOri = StateTables.transitCornerOrientation[corOri][i];
+          edgOri = StateTables.transitEdgeOrientation[edgOri][i];
+          edgCom = StateTables.transitEEdgeCombination[edgCom][i];
           byte nextMove = (byte) (i * 3 + j);
           solution1.add(nextMove);
           foundSolution |= phase1(corOri, edgOri, edgCom, depth - 1, nextMove, lastMove);
@@ -217,8 +204,8 @@ public class ThreeSolver {
       return false;
     }
 
-    if (pruningCornerPermutation[cornerPermutation][eEdgePermutation] <= depth &&
-        pruningUDEdgePermutation[udEdgePermutation][eEdgePermutation] <= depth) {
+    if (StateTables.pruningCornerPermutation[cornerPermutation][eEdgePermutation] <= depth &&
+        StateTables.pruningUDEdgePermutation[udEdgePermutation][eEdgePermutation] <= depth) {
       int curSolutionSize = solution2.size();
       for (byte i = 0; i < moves2.length; i++) {
         if ((lastMove >= 0 && i == slices[lastMove]) || // same face twice in a row
@@ -230,9 +217,9 @@ public class ThreeSolver {
         int eEdgPerm = eEdgePermutation;
         int nSubMoves = (i < 2) ? 3 : 1;
         for (int j = 0; j < nSubMoves; j++) {
-          corPerm = transitCornerPermutation[corPerm][i];
-          udEdgPerm = transitUDEdgePermutation[udEdgPerm][i];
-          eEdgPerm = transitEEdgePermutation[eEdgPerm][i];
+          corPerm = StateTables.transitCornerPermutation[corPerm][i];
+          udEdgPerm = StateTables.transitUDEdgePermutation[udEdgPerm][i];
+          eEdgPerm = StateTables.transitEEdgePermutation[eEdgPerm][i];
           byte nextMove = (byte) (i * 3 + j + ((i < 2) ? 0 : 1));
 
           solution2.add(nextMove);
@@ -247,11 +234,18 @@ public class ThreeSolver {
   }
 
   public String[] getSolution(CubeState cubeState) {
+    return getSolution(cubeState, null);
+  }
+
+  public String[] getSolution(CubeState cubeState, ScrambleConfig config) {
     synchronized (solutionSyncHelper) {
       solutionSearchCount++;
-      if (transitCornerPermutation == null) {
-        getTables();
-      }
+      genTables();
+    }
+    if (config != null && config.getMaxLength() > 0) {
+      maxSolutionLength = config.getMaxLength();
+    } else {
+      maxSolutionLength = DEFAULT_MAX_SOLUTION_LENGTH;
     }
     searchStartTs = System.currentTimeMillis();
 
@@ -302,8 +296,8 @@ public class ThreeSolver {
   }
 
   public void genTables() {
-    if (transitCornerPermutation == null) {
-      getTables();
+    if (StateTables.transitCornerPermutation == null) {
+      StateTables.generateTables(moves1, moves2);
     }
   }
 
@@ -328,21 +322,6 @@ public class ThreeSolver {
       StateTables.pruningCornerPermutation = null;
       StateTables.pruningUDEdgePermutation = null;
     }
-  }
-
-  private void getTables() {
-    StateTables.generateTables(moves1, moves2);
-    transitCornerPermutation = StateTables.transitCornerPermutation;
-    transitCornerOrientation = StateTables.transitCornerOrientation;
-    transitEEdgeCombination = StateTables.transitEEdgeCombination;
-    transitEEdgePermutation = StateTables.transitEEdgePermutation;
-    transitUDEdgePermutation = StateTables.transitUDEdgePermutation;
-    transitEdgeOrientation = StateTables.transitEdgeOrientation;
-
-    pruningCornerOrientation = StateTables.pruningCornerOrientation;
-    pruningEdgeOrientation = StateTables.pruningEdgeOrientation;
-    pruningCornerPermutation = StateTables.pruningCornerPermutation;
-    pruningUDEdgePermutation = StateTables.pruningUDEdgePermutation;
   }
 
   // Performs moves on a cube state, and also modifies the first cubies positions

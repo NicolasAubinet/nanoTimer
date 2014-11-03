@@ -64,10 +64,12 @@ public class TwoSolver {
   public static final int N_ORIENT = 729;
 
   private static final int SEARCH_TIME_MIN = 100; // time in ms during which to search for a better solution
+  private static final int DEFAULT_MAX_SOLUTION_LENGTH = 11;
 
   private List<Byte> solution;
   private List<Byte> bestSolution;
   private long searchStartTs;
+  private int maxSolutionLength;
 
   private final Object solutionSyncHelper = new Object();
   private int solutionSearchCount = 0;
@@ -143,11 +145,20 @@ public class TwoSolver {
   }
 
   public String[] getSolution(CubeState cubeState) {
+    return getSolution(cubeState, null);
+  }
+
+  public String[] getSolution(CubeState cubeState, ScrambleConfig config) {
     synchronized (solutionSyncHelper) {
       solutionSearchCount++;
       if (transitPerm == null) {
         genTables();
       }
+    }
+    if (config != null && config.getMaxLength() > 0) {
+      maxSolutionLength = config.getMaxLength();
+    } else {
+      maxSolutionLength = DEFAULT_MAX_SOLUTION_LENGTH;
     }
     searchStartTs = System.currentTimeMillis();
 
@@ -157,7 +168,7 @@ public class TwoSolver {
     int cornerPermutation = IndexConvertor.packPermutation(cubeState.permutations);
     int cornerOrientation = IndexConvertor.packOrientation(cubeState.orientations, 3);
 
-    for (int i = 0; bestSolution == null || System.currentTimeMillis() < searchStartTs + SEARCH_TIME_MIN; i++) {
+    for (int i = 0; bestSolution == null || System.currentTimeMillis() < searchStartTs + SEARCH_TIME_MIN || bestSolution.size() > maxSolutionLength; i++) {
       if (search(cornerPermutation, cornerOrientation, i, (byte) -1)) {
         solution = new ArrayList<Byte>();
       }

@@ -16,4 +16,14 @@
     <item>1</item>
     <item>2</item>
   </string-array>
+  <string-array name="entries_scrambles_quality">
+    <item>@string/high_quality</item>
+    <item>@string/normal_quality</item>
+    <item>@string/low_quality</item>
+  </string-array>
+  <string-array name="entryvalues_scrambles_quality">
+    <item>1</item>
+    <item>2</item>
+    <item>3</item>
+  </string-array>
 </resources>

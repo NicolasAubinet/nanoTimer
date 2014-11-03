@@ -9,4 +9,6 @@
   <string name="ads_style">3</string>
   <bool name="solve_types_shortcut">true</bool>
   <bool name="randomstate_scrambles">true</bool>
+  <integer name="big_cubes_notation">1</integer>
+  <integer name="scrambles_quality">2</integer>
 </resources>

@@ -62,13 +62,23 @@
        android:entries="@array/entries_big_cubes_notation"
        android:entryValues="@array/entryvalues_big_cubes_notation"
        android:dialogTitle="@string/big_cubes_notation"
-       android:defaultValue="1"/>
+       android:defaultValue="@integer/big_cubes_notation"/>
 
     <CheckBoxPreference
        android:key="randomstate_scrambles"
        android:title="@string/use_modern_scrambles"
        android:summary="@string/use_modern_scrambles_summary"
        android:defaultValue="@bool/randomstate_scrambles"/>
+
+    <ListPreference
+       android:key="scrambles_quality"
+       android:title="@string/scrambles_quality"
+       android:summary="@string/scrambles_quality_summary"
+       android:entries="@array/entries_scrambles_quality"
+       android:entryValues="@array/entryvalues_scrambles_quality"
+       android:dialogTitle="@string/scrambles_quality"
+       android:defaultValue="@integer/scrambles_quality"
+       android:dependency="randomstate_scrambles"/>
 
     <com.cube.nanotimer.gui.widget.PreGenerateScramblesDialog
        android:key="pregen_scrambles"

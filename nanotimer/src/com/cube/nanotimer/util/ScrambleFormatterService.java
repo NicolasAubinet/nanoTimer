@@ -215,22 +215,20 @@ public enum ScrambleFormatterService {
 
   private int getThreeByThreeMovesPerLine(int scrambleLength) {
     switch (scrambleLength) {
-      case 16:
-        return 4;
+      case 14:
       case 15:
-      case 20:
-      case 25:
         return 5;
+      case 16:
       case 17:
       case 18:
-      case 24:
         return 6;
-      case 14:
       case 19:
+      case 20:
       case 21:
         return 7;
       case 22:
       case 23:
+      case 24:
         return 8;
       default:
         return 5;

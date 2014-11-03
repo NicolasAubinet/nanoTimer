@@ -10,6 +10,7 @@ public enum Options {
   public enum InspectionMode { HOLD_AND_RELEASE, AUTOMATIC }
   public enum AdsStyle { BANNER, INTERSTITIAL, MIXED }
   public enum BigCubesNotation { RUF, RWUWFW }
+  public enum ScramblesQuality { LOW, MEDIUM, HIGH }
 
   private Context context;
   private SharedPreferences sharedPreferences;
@@ -21,6 +22,7 @@ public enum Options {
   private static final String BIG_CUBES_NOTATION_KEY = "big_cubes_notation";
   private static final String SOLVE_TYPES_SHORTCUT = "solve_types_shortcut";
   public static final String RANDOMSTATE_SCRAMBLES = "randomstate_scrambles";
+  public static final String SCRAMBLES_QUALITY = "scrambles_quality";
   public static final String PREGEN_SCRAMBLES = "pregen_scrambles";
 
   private static final int MAX_STEPS_COUNT = 8;
@@ -89,6 +91,20 @@ public enum Options {
   public boolean isRandomStateScrambles() {
     Boolean defaultValue = context.getResources().getBoolean(R.bool.randomstate_scrambles);
     return sharedPreferences.getBoolean(RANDOMSTATE_SCRAMBLES, defaultValue);
+  }
+
+  public ScramblesQuality getScramblesQuality() {
+    int quality = Integer.parseInt(sharedPreferences.getString(SCRAMBLES_QUALITY, "-1"));
+    switch (quality) {
+      case 1:
+        return ScramblesQuality.HIGH;
+      case 2:
+        return ScramblesQuality.MEDIUM;
+      case 3:
+        return ScramblesQuality.LOW;
+      default:
+        return ScramblesQuality.MEDIUM;
+    }
   }
 
 }

@@ -15,11 +15,11 @@ import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.scrambler.AlreadyGeneratingException;
-import com.cube.nanotimer.scrambler.RandomStateGenEvent;
-import com.cube.nanotimer.scrambler.RandomStateGenEvent.State;
-import com.cube.nanotimer.scrambler.RandomStateGenListener;
 import com.cube.nanotimer.scrambler.ScramblerService;
+import com.cube.nanotimer.scrambler.randomstate.AlreadyGeneratingException;
+import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent;
+import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.State;
+import com.cube.nanotimer.scrambler.randomstate.RandomStateGenListener;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.vo.CubeType;
 
