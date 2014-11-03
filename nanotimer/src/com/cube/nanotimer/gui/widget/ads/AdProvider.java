@@ -1,8 +1,6 @@
 package com.cube.nanotimer.gui.widget.ads;
 
 import android.app.Activity;
-import com.appnext.appnextsdk.Appnext;
-import com.appnext.appnextsdk.PopupClosedInterface;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.Options.AdsStyle;
 import com.startapp.android.publish.SDKAdPreferences;
@@ -15,7 +13,7 @@ import java.util.Random;
 public class AdProvider {
 
 	private static StartAppAd startAppAd;
-  private static Appnext appnext;
+//  private static Appnext appnext;
   private static boolean interstitialShown; // true if the last call to showInterstitial did display an ad
 
   public static void init(Activity a) {
@@ -31,15 +29,15 @@ public class AdProvider {
   	
   	// Appnext
   	// interstitial
-  	appnext = new Appnext(a);
-    appnext.setAppID("dd009c3e-f718-4fbe-8897-b8f560e6eace");
-    appnext.cacheAd();
-    appnext.setPopupClosedCallback(new PopupClosedInterface() {
-      @Override
-      public void popupClosed() {
-        appnext.cacheAd();
-      }
-    });
+//  	appnext = new Appnext(a);
+//    appnext.setAppID("dd009c3e-f718-4fbe-8897-b8f560e6eace");
+//    appnext.cacheAd();
+//    appnext.setPopupClosedCallback(new PopupClosedInterface() {
+//      @Override
+//      public void popupClosed() {
+//        appnext.cacheAd();
+//      }
+//    });
   }
 
   public static void showInterstitial() {
@@ -71,23 +69,24 @@ public class AdProvider {
     	startAppAd.loadAd();
     } else if (adChoice == 1) {
     	// appnext
-      appnext.showBubble();
+//      appnext.showBubble();
     }
     interstitialShown = true;
     return;
   }
 
   public static boolean hideInterstitial() {
-    if (appnext != null && appnext.isBubbleVisible()) {
-      appnext.hideBubble();
-      return true;
-    }
+//    if (appnext != null && appnext.isBubbleVisible()) {
+//      appnext.hideBubble();
+//      return true;
+//    }
     // no need to handle startapp here as it is like a separate activity. backspace closes it already
     return false;
   }
 
   public static boolean isInterstialAppnextDisplayed() {
-    return appnext != null && appnext.isBubbleVisible();
+//    return appnext != null && appnext.isBubbleVisible();
+    return false;
   }
 
   public static void resume() {

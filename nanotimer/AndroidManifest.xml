@@ -56,7 +56,7 @@
        android:configChanges="orientation|keyboardHidden|screenSize"/>
     
     <!-- for appnext -->
-    <service android:name="com.appnext.appnextsdk.DownloadService"/>
+    <!--<service android:name="com.appnext.appnextsdk.DownloadService"/>-->
 
   </application>
 </manifest>
