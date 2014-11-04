@@ -1,7 +1,5 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,11 +21,6 @@ public class TwoSolver {
     public byte[] orientations = new byte[7];
 
     public CubeState() {
-    }
-
-    public CubeState(CubeState cubeState) {
-      System.arraycopy(cubeState.permutations, 0, this.permutations, 0, 7);
-      System.arraycopy(cubeState.orientations, 0, this.orientations, 0, 7);
     }
 
     public String toString() {
@@ -182,7 +175,7 @@ public class TwoSolver {
         solution[i++] = allMoves[m].name;
       }
     }
-    Log.i("[NanoTimer]", "solution time: " + (System.currentTimeMillis() - searchStartTs));
+//    Log.i("[NanoTimer]", "solution time: " + (System.currentTimeMillis() - searchStartTs));
 
     synchronized (solutionSyncHelper) {
       solutionSearchCount--;

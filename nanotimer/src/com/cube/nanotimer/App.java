@@ -19,7 +19,6 @@ public enum App {
   private Service service;
 
   private static final int SCRAMBLE_NOTIF_ID = 1;
-  private RandomStateGenListener randomStateGenListener;
 
   public Context getContext() {
     return context;
@@ -38,10 +37,10 @@ public enum App {
   }
 
   private void initRandomStateGenListener(final Context context) {
-    randomStateGenListener = new RandomStateGenListener() {
+    RandomStateGenListener randomStateGenListener = new RandomStateGenListener() {
       @Override
       public void onStateUpdate(RandomStateGenEvent event) {
-        String title = context.getString(R.string.scrambles_being_generated);
+        String title = context.getString(R.string.scrambles_being_generated, event.getCubeTypeName());
         if (event.getState() == State.PREPARING) {
           GUIUtils.showNotification(context, SCRAMBLE_NOTIF_ID, title, "", MainScreenActivity.class);
         } else if (event.getState() == State.GENERATING) {

@@ -1,7 +1,5 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
-import android.util.Log;
-
 public class StateTables {
 
   // TODO : make positions start at 0 (everywhere, starting from Move class, IndexConvertor, tests etc)
@@ -239,7 +237,7 @@ public class StateTables {
   }
 
   private static void logTimeDifference(long startTs, String msg) {
-    Log.i("[NanoTimer]", msg + ": " + (System.currentTimeMillis() - startTs));
+//    Log.i("[NanoTimer]", msg + ": " + (System.currentTimeMillis() - startTs));
   }
 
   static class PruningState {

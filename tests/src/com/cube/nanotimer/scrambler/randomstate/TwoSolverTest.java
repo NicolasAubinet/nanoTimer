@@ -6,6 +6,9 @@ import android.util.Log;
 import com.cube.nanotimer.scrambler.randomstate.TwoSolver.CubeState;
 import junit.framework.Assert;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
 public class TwoSolverTest extends AndroidTestCase {
@@ -140,12 +143,30 @@ public class TwoSolverTest extends AndroidTestCase {
 
   @SmallTest
   public void testTableSizes() {
-    // TODO
+    TwoSolver.genTables();
+    Log.i("[NanoTimer]", "transitPerm: " + getSize(TwoSolver.transitPerm));
+    Log.i("[NanoTimer]", "transitOrient: " + getSize(TwoSolver.transitOrient));
+    Log.i("[NanoTimer]", "pruningPerm: " + getSize(TwoSolver.pruningPerm));
+    Log.i("[NanoTimer]", "pruningOrient: " + getSize(TwoSolver.pruningOrient));
   }
 
   private void applyMove(CubeState state, TwoSolver.Move move) {
     state.permutations = StateTables.getPermResult(state.permutations, move.corPerm);
     state.orientations = StateTables.getOrientResult(state.orientations, move.corPerm, move.corOrient, 3);
+  }
+
+  private int getSize(Object obj) {
+    try {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      ObjectOutputStream oos = new ObjectOutputStream(baos);
+      oos.writeObject(obj);
+      oos.close();
+      return baos.size();
+    } catch (IOException e) {
+      e.printStackTrace();
+      Assert.fail();
+    }
+    return -1;
   }
 
 }

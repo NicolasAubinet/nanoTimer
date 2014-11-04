@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -139,7 +138,7 @@ public class PreGenerateScramblesDialog extends DialogPreference implements Rand
       @Override
       public void run() {
         final int scramblesCount = ScramblerService.INSTANCE.getScramblesCount(cubeType);
-        Log.i("[NanoTimer]", "Total count: " + scramblesCount);
+//        Log.i("[NanoTimer]", "Total count: " + scramblesCount);
         getActivity().runOnUiThread(new Runnable() {
           @Override
           public void run() {

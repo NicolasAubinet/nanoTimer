@@ -23,7 +23,12 @@ public class FileUtils {
   public static List<String> readLinesFromFile(Context context, String fileName, int linesLimit) {
     List<String> lines = new ArrayList<String>();
     try {
-      FileInputStream fis = context.openFileInput(fileName);
+      FileInputStream fis;
+      try {
+        fis = context.openFileInput(fileName);
+      } catch (FileNotFoundException e) {
+        return lines;
+      }
       Scanner fileScanner = new Scanner(fis);
       int i = 0;
       while (fileScanner.hasNextLine() && (linesLimit < 0 || i < linesLimit)) {
@@ -96,7 +101,12 @@ public class FileUtils {
   public static int getFileLinesCount(Context context, String fileName) {
     int linesCount = 0;
     try {
-      InputStream is = context.openFileInput(fileName);
+      InputStream is;
+      try {
+        is = context.openFileInput(fileName);
+      } catch (FileNotFoundException e) {
+        return 0;
+      }
       byte[] c = new byte[1024];
       int count = 0;
       int readChars = 0;

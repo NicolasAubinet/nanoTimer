@@ -1,7 +1,5 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -285,7 +283,7 @@ public class ThreeSolver {
         solution[i++] = moves[m].name;
       }
     }
-    Log.i("[NanoTimer]", "solution time: " + (System.currentTimeMillis() - searchStartTs));
+//    Log.i("[NanoTimer]", "solution time: " + (System.currentTimeMillis() - searchStartTs));
 
     synchronized (solutionSyncHelper) {
       solutionSearchCount--;

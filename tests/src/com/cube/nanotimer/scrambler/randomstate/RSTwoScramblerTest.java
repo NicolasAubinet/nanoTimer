@@ -26,7 +26,7 @@ public class RSTwoScramblerTest extends AndroidTestCase {
     Log.i("[NanoTimer]", "Generating " + nScrambles + " scrambles...");
     for (int i = 0; i < nScrambles; i++) {
       long ts = System.currentTimeMillis();
-      String[] scramble = scrambler.getNewScramble();
+      String[] scramble = scrambler.getNewScramble(new ScrambleConfig(11));
       long t = System.currentTimeMillis() - ts;
       if (t < min) {
         min = t;

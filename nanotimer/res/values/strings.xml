@@ -110,7 +110,7 @@
   <string name="generate">Generate</string>
   <string name="stop_generation">Stop generation</string>
   <string name="preparing_generation">Preparing generation&#8230;</string>
-  <string name="scrambles_being_generated">Scrambles are being generated</string>
+  <string name="scrambles_being_generated">%1$s scrambles generating</string>
   <string name="generating_scramble">Generating scramble %1$d of %2$d</string>
   <string name="stopping_generation">Stopping generation&#8230;</string>
 
