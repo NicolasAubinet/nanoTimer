@@ -17,7 +17,7 @@ public class RSThreeScrambler implements RSScrambler {
 //      Log.i("[NanoTimer]", "Random state:\n" + randomState.toString());
       scramble = threeSolver.getSolution(randomState, config);
 //      Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
-    } while (scramble.length < 12);
+    } while (scramble != null && scramble.length < 12);
     return scramble;
   }
 
@@ -29,6 +29,11 @@ public class RSThreeScrambler implements RSScrambler {
   @Override
   public void genTables() {
     threeSolver.genTables();
+  }
+
+  @Override
+  public void stop() {
+    threeSolver.stop();
   }
 
   private CubeState getRandomState() {

@@ -64,6 +64,9 @@ public class TwoSolver {
   private long searchStartTs;
   private int maxSolutionLength;
 
+  private volatile boolean running = false;
+  private volatile boolean mustStop = false;
+
   private final Object solutionSyncHelper = new Object();
   private int solutionSearchCount = 0;
 
@@ -98,7 +101,7 @@ public class TwoSolver {
     }
   }
 
-  private boolean search(int perm, int orient, int depth, byte lastMove) {
+  private boolean search(int perm, int orient, int depth, byte lastMove) throws InterruptedException {
     boolean foundSolution = false;
     if (depth == 0) {
       if (orient == 0 && perm == 0) {
@@ -114,6 +117,9 @@ public class TwoSolver {
     }
     if (bestSolution != null && System.currentTimeMillis() > searchStartTs + SEARCH_TIME_MIN) {
       return false;
+    }
+    if (mustStop) {
+      throw new InterruptedException("Scramble interruption requested.");
     }
 
     if (pruningPerm[perm] <= depth && pruningOrient[orient] <= depth) {
@@ -142,6 +148,7 @@ public class TwoSolver {
   }
 
   public String[] getSolution(CubeState cubeState, ScrambleConfig config) {
+    running = true;
     synchronized (solutionSyncHelper) {
       solutionSearchCount++;
       if (transitPerm == null) {
@@ -161,10 +168,14 @@ public class TwoSolver {
     int cornerPermutation = IndexConvertor.packPermutation(cubeState.permutations);
     int cornerOrientation = IndexConvertor.packOrientation(cubeState.orientations, 3);
 
-    for (int i = 0; bestSolution == null || System.currentTimeMillis() < searchStartTs + SEARCH_TIME_MIN || bestSolution.size() > maxSolutionLength; i++) {
-      if (search(cornerPermutation, cornerOrientation, i, (byte) -1)) {
-        solution = new ArrayList<Byte>();
+    try {
+      for (int i = 0; bestSolution == null || System.currentTimeMillis() < searchStartTs + SEARCH_TIME_MIN || bestSolution.size() > maxSolutionLength; i++) {
+        if (search(cornerPermutation, cornerOrientation, i, (byte) -1)) {
+          solution = new ArrayList<Byte>();
+        }
       }
+    } catch (InterruptedException e) {
+      // ignore, user requested stop
     }
 
     String[] solution = null;
@@ -181,6 +192,8 @@ public class TwoSolver {
       solutionSearchCount--;
       solutionSyncHelper.notify();
     }
+    running = false;
+    mustStop = false;
 
     return solution;
   }
@@ -252,6 +265,12 @@ public class TwoSolver {
       transitOrient = null;
       pruningOrient = null;
       pruningPerm = null;
+    }
+  }
+
+  public void stop() {
+    if (running) {
+      mustStop = true;
     }
   }
 

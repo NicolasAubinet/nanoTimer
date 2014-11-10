@@ -109,6 +109,9 @@ public enum ScramblerService {
             sendGenStateToListeners(new RandomStateGenEvent(State.GENERATING, cubeType, i + 1, n));
             scramble = rsScrambler.getNewScramble(new ScrambleConfig(Utils.getRSScrambleLengthFromQuality(cubeType)));
           }
+          if (scramble == null) { // was interrupted
+            break;
+          }
           if (getCache(cubeType).size() < MAX_SCRAMBLES_IN_MEMORY) {
             synchronized (cacheMemHelper) {
               getCache(cubeType).add(scramble);
@@ -188,10 +191,14 @@ public enum ScramblerService {
   }
 
   public String[] getScramble(final CubeType cubeType) {
-    if (Options.INSTANCE.isRandomStateScrambles() && getRandomStateCubeTypes().contains(cubeType) && !getCache(cubeType).isEmpty()) {
+    if (Options.INSTANCE.isRandomStateScrambles() && getRandomStateCubeTypes().contains(cubeType)) {
       String[] scramble;
-      synchronized (cacheMemHelper) {
-        scramble = getCache(cubeType).remove();
+      if (!getCache(cubeType).isEmpty()) {
+        synchronized (cacheMemHelper) {
+          scramble = getCache(cubeType).remove();
+        }
+      } else {
+        scramble = ScramblerFactory.getScrambler(cubeType).getNewScramble();
       }
       new Thread(new Runnable() {
         @Override
@@ -223,6 +230,9 @@ public enum ScramblerService {
   public void stopGeneration() {
     sendGenStateToListeners(new RandomStateGenEvent(State.STOPPING, null, 0, 0));
     generationThread = null;
+    for (RSScrambler scrambler : scramblers.values()) {
+      scrambler.stop();
+    }
   }
 
   public void activateRandomStateScrambles(final boolean activate) {

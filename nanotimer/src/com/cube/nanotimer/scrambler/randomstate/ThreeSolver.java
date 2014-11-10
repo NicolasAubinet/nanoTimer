@@ -52,6 +52,9 @@ public class ThreeSolver {
   private long searchStartTs;
   private int maxSolutionLength;
 
+  private volatile boolean running = false;
+  private volatile boolean mustStop = false;
+
   private final Object solutionSyncHelper = new Object();
   private int solutionSearchCount = 0;
 
@@ -113,7 +116,7 @@ public class ThreeSolver {
     opposites[5] = 4;
   }
 
-  private boolean phase1(int cornerOrientation, int edgeOrientation, int eEdgeCombination, int depth, byte lastMove, byte oldLastMove) {
+  private boolean phase1(int cornerOrientation, int edgeOrientation, int eEdgeCombination, int depth, byte lastMove, byte oldLastMove) throws InterruptedException {
     boolean foundSolution = false;
     if (depth == 0) {
       if (cornerOrientation == 0 && edgeOrientation == 0 && eEdgeCombination == 0) {
@@ -154,6 +157,9 @@ public class ThreeSolver {
     }
     if (bestSolution1 != null && System.currentTimeMillis() > searchStartTs + SEARCH_TIME_MIN) {
       return false;
+    }
+    if (mustStop) {
+      throw new InterruptedException("Scramble interruption requested.");
     }
 
     if (StateTables.pruningCornerOrientation[cornerOrientation][eEdgeCombination] <= depth &&
@@ -236,6 +242,7 @@ public class ThreeSolver {
   }
 
   public String[] getSolution(CubeState cubeState, ScrambleConfig config) {
+    running = true;
     synchronized (solutionSyncHelper) {
       solutionSearchCount++;
       genTables();
@@ -261,15 +268,19 @@ public class ThreeSolver {
     }
     int eEdgeCombination = IndexConvertor.packCombination(combinations, 4);
 
-    for (int i = 0; i < SAFE_PHASE1_ITERATIONS_LIMIT && (bestSolution1 == null || System.currentTimeMillis() < searchStartTs + SEARCH_TIME_MIN); i++) {
-      if (phase1(cornerOrientation, edgeOrientation, eEdgeCombination, i, (byte) -1, (byte) -1)) {
-        solution1 = new ArrayList<Byte>();
-        solution2 = new ArrayList<Byte>();
+    try {
+      for (int i = 0; i < SAFE_PHASE1_ITERATIONS_LIMIT && (bestSolution1 == null || System.currentTimeMillis() < searchStartTs + SEARCH_TIME_MIN); i++) {
+        if (phase1(cornerOrientation, edgeOrientation, eEdgeCombination, i, (byte) -1, (byte) -1)) {
+          solution1 = new ArrayList<Byte>();
+          solution2 = new ArrayList<Byte>();
+        }
       }
+    } catch (InterruptedException e) {
+      // ignore, user requested stop
     }
 
     String[] solution = null;
-    if (bestSolution1 != null) {
+    if (bestSolution2 != null) {
       int length = bestSolution1.size() + bestSolution2.size() + (SHOW_PHASE_SEPARATOR ? 1 : 0);
       solution = new String[length];
       int i = 0;
@@ -289,6 +300,8 @@ public class ThreeSolver {
       solutionSearchCount--;
       solutionSyncHelper.notify();
     }
+    running = false;
+    mustStop = false;
 
     return solution;
   }
@@ -319,6 +332,12 @@ public class ThreeSolver {
       StateTables.pruningEdgeOrientation = null;
       StateTables.pruningCornerPermutation = null;
       StateTables.pruningUDEdgePermutation = null;
+    }
+  }
+
+  public void stop() {
+    if (running) {
+      mustStop = true;
     }
   }
 

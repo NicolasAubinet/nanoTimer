@@ -17,7 +17,7 @@ public class RSTwoScrambler implements RSScrambler {
 //      Log.i("[NanoTimer]", "Random state:\n" + randomState.toString());
       scramble = twoSolver.getSolution(randomState, config);
 //      Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
-    } while (scramble.length < 4);
+    } while (scramble != null && scramble.length < 4);
     return scramble;
   }
 
@@ -29,6 +29,11 @@ public class RSTwoScrambler implements RSScrambler {
   @Override
   public void genTables() {
     twoSolver.genTables();
+  }
+
+  @Override
+  public void stop() {
+    twoSolver.stop();
   }
 
   private CubeState getRandomState() {
