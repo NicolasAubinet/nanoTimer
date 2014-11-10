@@ -32,7 +32,7 @@ import com.cube.nanotimer.gui.widget.SessionDialog;
 import com.cube.nanotimer.gui.widget.ads.AdProvider;
 import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.services.db.DataCallback;
-import com.cube.nanotimer.util.CubeSession;
+import com.cube.nanotimer.session.CubeSession;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.ScrambleFormatterService;
 import com.cube.nanotimer.util.YesNoListener;

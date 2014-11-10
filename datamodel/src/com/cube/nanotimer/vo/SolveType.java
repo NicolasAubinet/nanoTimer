@@ -9,18 +9,21 @@ public class SolveType implements Serializable {
   private String name;
   private int cubeTypeId;
   private SolveTypeStep[] steps = new SolveTypeStep[0];
+  private boolean blind = false;
 
   public SolveType() {
   }
 
-  public SolveType(String name, int cubeTypeId) {
+  public SolveType(String name, boolean blind, int cubeTypeId) {
     this.name = name;
+    this.blind = blind;
     this.cubeTypeId = cubeTypeId;
   }
 
-  public SolveType(int id, String name, int cubeTypeId) {
+  public SolveType(int id, String name, boolean blind, int cubeTypeId) {
     this.id = id;
     this.name = name;
+    this.blind = blind;
     this.cubeTypeId = cubeTypeId;
   }
 
@@ -46,6 +49,10 @@ public class SolveType implements Serializable {
 
   public void setCubeTypeId(int cubeTypeId) {
     this.cubeTypeId = cubeTypeId;
+  }
+
+  public boolean isBlind() {
+    return blind;
   }
 
   public SolveTypeStep[] getSteps() {

@@ -16,8 +16,7 @@ public abstract class FieldDialog extends DialogFragment {
   protected View editTextView;
 
   protected Dialog getDialog(int confirmText) {
-    LayoutInflater factory = LayoutInflater.from(getActivity());
-    editTextView = factory.inflate(R.layout.edittext_field, null);
+    editTextView = getCustomView();
     final AlertDialog d;
 
     d = new AlertDialog.Builder(getActivity())
@@ -55,6 +54,11 @@ public abstract class FieldDialog extends DialogFragment {
         }
       });
     }
+  }
+
+  protected View getCustomView() {
+    LayoutInflater factory = LayoutInflater.from(getActivity());
+    return factory.inflate(R.layout.edittext_field, null);
   }
 
 }

@@ -21,11 +21,11 @@ import com.cube.nanotimer.gui.widget.AddStepsDialog;
 import com.cube.nanotimer.gui.widget.SelectionHandler;
 import com.cube.nanotimer.gui.widget.SelectorFragmentDialog;
 import com.cube.nanotimer.gui.widget.StepsCreator;
-import com.cube.nanotimer.gui.widget.list.FieldAddDialog;
 import com.cube.nanotimer.gui.widget.list.FieldCreator;
 import com.cube.nanotimer.gui.widget.list.FieldDialog;
 import com.cube.nanotimer.gui.widget.list.FieldEditDialog;
 import com.cube.nanotimer.gui.widget.list.FieldRenamer;
+import com.cube.nanotimer.gui.widget.list.SolveTypeAddDialog;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.util.helper.DialogUtils;
@@ -39,6 +39,7 @@ import com.mobeta.android.dslv.DragSortListView.DropListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class SolveTypesActivity extends ActionBarActivity implements SelectionHandler, FieldRenamer, FieldCreator, StepsCreator {
 
@@ -129,7 +130,7 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
   }
 
   private void showAddDialog() {
-    FieldAddDialog dialog = FieldAddDialog.newInstance(this);
+    SolveTypeAddDialog dialog = SolveTypeAddDialog.newInstance(this);
     DialogUtils.showFragment(this, dialog);
   }
 
@@ -154,26 +155,30 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
             }
           });
     } else if (menuItem.getItemId() == ACTION_CREATESTEPS) {
-      App.INSTANCE.getService().getHistory(liSolveTypes.get(position), new DataCallback<SolveHistory>() {
-        @Override
-        public void onData(final SolveHistory data) {
-          runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              if (data.getSolveTimes().isEmpty()) {
-                DialogUtils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
-              } else {
-                DialogUtils.showYesNoConfirmation(SolveTypesActivity.this, R.string.solvetype_has_times_addsteps, new YesNoListener() {
-                  @Override
-                  public void onYes() {
-                    DialogUtils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
-                  }
-                });
+      if (liSolveTypes.get(position).isBlind()) {
+        DialogUtils.showInfoMessage(SolveTypesActivity.this, R.string.steps_can_not_be_added_to_blind_types);
+      } else {
+        App.INSTANCE.getService().getHistory(liSolveTypes.get(position), new DataCallback<SolveHistory>() {
+          @Override
+          public void onData(final SolveHistory data) {
+            runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                if (data.getSolveTimes().isEmpty()) {
+                  DialogUtils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
+                } else {
+                  DialogUtils.showYesNoConfirmation(SolveTypesActivity.this, R.string.solvetype_has_times_addsteps, new YesNoListener() {
+                    @Override
+                    public void onYes() {
+                      DialogUtils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
+                    }
+                  });
+                }
               }
-            }
-          });
-        }
-      });
+            });
+          }
+        });
+      }
     }
     return super.onContextItemSelected(menuItem);
   }
@@ -250,12 +255,13 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
   }
 
   @Override
-  public boolean createField(String name) {
+  public boolean createField(String name, Properties props) {
     boolean res = checkSolveTypeName(name, null);
     if (!res) {
       return res;
     }
-    SolveType st = new SolveType(name, curCubeType.getId());
+    boolean blindMode = Boolean.valueOf(props.getProperty(SolveTypeAddDialog.KEY_BLD, String.valueOf(false)));
+    SolveType st = new SolveType(name, blindMode, curCubeType.getId());
     liSolveTypes.add(st);
     App.INSTANCE.getService().addSolveType(st, new DataCallback<Integer>() {
       @Override
@@ -286,6 +292,10 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
 
   @Override
   public void addSteps(final List<String> stepNames, final int pos) {
+    if (liSolveTypes.get(pos).isBlind()) { // should never get here, but just to make absolutely sure
+      DialogUtils.showInfoMessage(SolveTypesActivity.this, R.string.steps_can_not_be_added_to_blind_types);
+      return;
+    }
     // delete existing times (if there are some) before adding the steps
     App.INSTANCE.getService().deleteHistory(liSolveTypes.get(pos), new DataCallback<Void>() {
       @Override
@@ -336,13 +346,15 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
           TextView tvName = (TextView) view.findViewById(R.id.tvSolveType);
           tvName.setText(item.getName());
 
-          TextView tvStepsCount = (TextView) view.findViewById(R.id.tvStepsCount);
+          TextView tvAdditionalInfo = (TextView) view.findViewById(R.id.tvAdditionalInfo);
           if (item.hasSteps()) {
             StringBuilder stepsCount = new StringBuilder();
             stepsCount.append("(").append(item.getSteps().length).append(" ").append(getString(R.string.steps)).append(")");
-            tvStepsCount.setText(stepsCount.toString());
+            tvAdditionalInfo.setText(stepsCount.toString());
+          } else if (item.isBlind()) {
+            tvAdditionalInfo.setText(R.string.blind);
           } else {
-            tvStepsCount.setText("");
+            tvAdditionalInfo.setText("");
           }
         }
       }

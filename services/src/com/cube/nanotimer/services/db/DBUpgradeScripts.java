@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import com.cube.nanotimer.session.CubeBaseSession;
 import com.cube.nanotimer.vo.SolveTime;
 
 import java.util.ArrayList;
@@ -13,9 +14,9 @@ public class DBUpgradeScripts {
 
   public static void calculateAndUpdateAvg50(SQLiteDatabase db) {
     List<Integer> solveTypeIds = getAllSolveTypesIds(db);
-    Log.i("[Avg50]", solveTypeIds.size() + " solve types.");
+//    Log.i("[Avg50]", solveTypeIds.size() + " solve types.");
     for (int solveTypeId : solveTypeIds) {
-      Log.i("[Avg50]", "\n      --> Processing solve type " + solveTypeId + "...\n");
+//      Log.i("[Avg50]", "\n      --> Processing solve type " + solveTypeId + "...\n");
       List<SolveTime> solveTimes = new ArrayList<SolveTime>();
       StringBuilder q = new StringBuilder();
       q.append("SELECT ").append(DB.COL_ID).append(", ").append(DB.COL_TIMEHISTORY_TIME);
@@ -33,24 +34,93 @@ public class DBUpgradeScripts {
         }
         cursor.close();
       }
-      Log.i("[Avg50]", "Found " + solveTimes.size() + " times. Start updating...");
+//      Log.i("[Avg50]", "Found " + solveTimes.size() + " times. Start updating...");
       long total = 0;
       for (int i = 0; i < solveTimes.size(); i++) {
         SolveTime st = solveTimes.get(i);
         total += st.getTime();
-        Log.i("[Avg50]", "  Time: " + st.getTime() + ". New total: " + total);
+//        Log.i("[Avg50]", "  Time: " + st.getTime() + ". New total: " + total);
         if (i >= 50 - 1) {
           if (i >= 50) {
             total -= solveTimes.get(i - 50).getTime();
-            Log.i("[Avg50]", "   Removed " + solveTimes.get(i - 50).getTime() + ". New total: " + total);
+//            Log.i("[Avg50]", "   Removed " + solveTimes.get(i - 50).getTime() + ". New total: " + total);
           }
           ContentValues values = new ContentValues();
           values.put(DB.COL_TIMEHISTORY_AVG50, (total / 50));
-          Log.i("[Avg50]", "  Update " + st.getId() + " with value " + (total / 50));
+//          Log.i("[Avg50]", "  Update " + st.getId() + " with value " + (total / 50));
           db.update(DB.TABLE_TIMEHISTORY, values, DB.COL_ID + " = ?", new String[] { String.valueOf(st.getId()) });
         }
       }
     }
+  }
+
+  public static void updateMeansToAverages(SQLiteDatabase db) {
+    List<Integer> solveTypeIds = getAllSolveTypesIds(db);
+    Log.i("[MeansToAvg]", solveTypeIds.size() + " solve types.");
+    for (int solveTypeId : solveTypeIds) {
+      Log.i("[MeansToAvg]", "\n      --> Processing solve type " + solveTypeId + "...\n");
+      List<Integer> liIds = new ArrayList<Integer>();
+      List<Long> liTimes = new ArrayList<Long>();
+      StringBuilder q = new StringBuilder();
+      q.append("SELECT ").append(DB.COL_ID).append(", ").append(DB.COL_TIMEHISTORY_TIME);
+      q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
+      q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
+      q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC"); // most recent time first (for session/RA calculations below)
+      Cursor cursor = db.rawQuery(q.toString(), new String[] { String.valueOf(solveTypeId) });
+      if (cursor != null) {
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+          liIds.add(cursor.getInt(0));
+          liTimes.add(cursor.getLong(1));
+        }
+        cursor.close();
+      }
+      Log.i("[MeansToAvg]", "Found " + liTimes.size() + " times");
+
+      boolean blindMode = false;
+      q = new StringBuilder();
+      q.append("SELECT ").append(DB.COL_SOLVETYPE_BLIND);
+      q.append(" FROM ").append(DB.TABLE_SOLVETYPE);
+      q.append(" WHERE ").append(DB.COL_ID).append(" = ?");
+      cursor = db.rawQuery(q.toString(), new String[] { String.valueOf(solveTypeId) });
+      if (cursor != null) {
+        if (cursor.moveToFirst()) {
+          blindMode = (cursor.getInt(0) == 1);
+        }
+      }
+      Log.i("[MeansToAvg]", "Blind mode? " + blindMode);
+      Log.i("[MeansToAvg]", "Start updating...");
+
+      for (int i = liIds.size() - 1; i >= 0; i--) { // reverse because most recent time is in position 0
+        CubeBaseSession session = new CubeBaseSession(liTimes.subList(i, Math.min(i + 100, liIds.size())));
+        ContentValues values = new ContentValues();
+        if (blindMode) {
+          values.put(DB.COL_TIMEHISTORY_AVG5, session.getMeanOf(3));
+        } else {
+          values.put(DB.COL_TIMEHISTORY_AVG5, session.getRAOf(5));
+        }
+        values.put(DB.COL_TIMEHISTORY_AVG12, session.getRAOf(12));
+        values.put(DB.COL_TIMEHISTORY_AVG50, session.getRAOf(50));
+        values.put(DB.COL_TIMEHISTORY_AVG100, session.getRAOf(100));
+
+        Log.i("[MeansToAvg]", "  Update " + liIds.get(i) + " (time: " + liTimes.get(i) + ") with averages " +
+            values.getAsLong(DB.COL_TIMEHISTORY_AVG5) + " | " +
+            values.getAsLong(DB.COL_TIMEHISTORY_AVG12) + " | " +
+            values.getAsLong(DB.COL_TIMEHISTORY_AVG50) + " | " +
+            values.getAsLong(DB.COL_TIMEHISTORY_AVG100));
+        db.update(DB.TABLE_TIMEHISTORY, values, DB.COL_ID + " = ?", new String[] { String.valueOf(liIds.get(i)) });
+      }
+    }
+  }
+
+  public static void updateSolveTypesToBlindType(SQLiteDatabase db) {
+    String q;
+    q = "UPDATE " + DB.TABLE_SOLVETYPE +
+        " SET " + DB.COL_SOLVETYPE_BLIND + " = 1" +
+        " WHERE (LOWER(" + DB.COL_SOLVETYPE_NAME + ") LIKE '%blind%'" +
+        "     OR LOWER(" + DB.COL_SOLVETYPE_NAME + ") LIKE '%bld%')" +
+        "    AND 0 = (SELECT COUNT(*) FROM " + DB.TABLE_SOLVETYPESTEP +
+        "             WHERE " + DB.COL_SOLVETYPESTEP_SOLVETYPE_ID + " = " + DB.TABLE_SOLVETYPE + "." + DB.COL_ID + ")";
+    db.execSQL(q);
   }
 
   private static List<Integer> getAllSolveTypesIds(SQLiteDatabase db) {

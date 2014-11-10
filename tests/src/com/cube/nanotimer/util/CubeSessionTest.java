@@ -2,6 +2,7 @@ package com.cube.nanotimer.util;
 
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
+import com.cube.nanotimer.session.CubeSession;
 import junit.framework.Assert;
 
 import java.util.ArrayList;

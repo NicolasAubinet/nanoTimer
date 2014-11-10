@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import com.cube.nanotimer.services.db.DB;
+import com.cube.nanotimer.session.CubeBaseSession;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveAverages;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class ServiceProviderImpl implements ServiceProvider {
 
@@ -28,7 +30,7 @@ public class ServiceProviderImpl implements ServiceProvider {
   private Map<Integer, Long> cachedBestAverages = new HashMap<Integer, Long>();
   private Long cachedLifetimeBest;
 
-  private Object cacheSyncHelper = new Object();
+  private final Object cacheSyncHelper = new Object();
 
   private final int CACHE_MAX_SIZE = 1010;
   private final int CACHE_MIN_SIZE = 1000;
@@ -66,7 +68,9 @@ public class ServiceProviderImpl implements ServiceProvider {
   public List<SolveType> getSolveTypes(CubeType cubeType) {
     List<SolveType> solveTypes = new ArrayList<SolveType>();
     StringBuilder q = new StringBuilder();
-    q.append("SELECT ").append(DB.COL_ID).append(", ").append(DB.COL_SOLVETYPE_NAME);
+    q.append("SELECT ").append(DB.COL_ID);
+    q.append(", ").append(DB.COL_SOLVETYPE_NAME);
+    q.append(", ").append(DB.COL_SOLVETYPE_BLIND);
     q.append(", ").append(DB.COL_SOLVETYPE_CUBETYPE_ID);
     q.append(" FROM ").append(DB.TABLE_SOLVETYPE);
     q.append(" WHERE ").append(DB.COL_SOLVETYPE_CUBETYPE_ID).append(" = ?");
@@ -74,7 +78,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     Cursor cursor = db.rawQuery(q.toString(), getStringArray(cubeType.getId()));
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-        SolveType st = new SolveType(cursor.getInt(0), cursor.getString(1), cursor.getInt(2));
+        SolveType st = new SolveType(cursor.getInt(0), cursor.getString(1), (cursor.getInt(2) == 1), cursor.getInt(3));
         st.setSteps(getSolveTypeSteps(st).toArray(new SolveTypeStep[0]));
         solveTypes.add(st);
       }
@@ -145,10 +149,10 @@ public class ServiceProviderImpl implements ServiceProvider {
         cachedSolveTimes.remove(cachedSolveTimes.size() - 1);
       }
     }
-    Long avg5 = getLastAvg(5, false);
-    Long avg12 = getLastAvg(12, false);
-    Long avg50 = getLastAvg(50, false);
-    Long avg100 = getLastAvg(100, false);
+    Long avg5 = getLastAvg(5);
+    Long avg12 = getLastAvg(12);
+    Long avg50 = getLastAvg(50);
+    Long avg100 = getLastAvg(100);
 
     syncBestAveragesWithCurrent(avg5, avg12, avg50, avg100);
     if (isTimeBetter(cachedLifetimeBest, solveTime.getTime())) {
@@ -189,11 +193,11 @@ public class ServiceProviderImpl implements ServiceProvider {
     syncCaches(solveType);
     SolveAverages solveAverages = new SolveAverages();
     if (!solveType.hasSteps()) {
-      solveAverages.setAvgOf5(getLastAvg(5, false));
-      solveAverages.setAvgOf12(getLastAvg(12, false));
-      solveAverages.setAvgOf50(getLastAvg(50, false));
-      solveAverages.setAvgOf100(getLastAvg(100, false));
-      solveAverages.setAvgOfLifetime(getLastAvg(1000, true));
+      solveAverages.setAvgOf5(getLastAvg(5));
+      solveAverages.setAvgOf12(getLastAvg(12));
+      solveAverages.setAvgOf50(getLastAvg(50));
+      solveAverages.setAvgOf100(getLastAvg(100));
+      solveAverages.setAvgOfLifetime(getLastMean(1000, true));
       solveAverages.setBestOf5(cachedBestAverages.get(5));
       solveAverages.setBestOf12(cachedBestAverages.get(12));
       solveAverages.setBestOf50(cachedBestAverages.get(50));
@@ -211,7 +215,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     }
     List<List<Long>> stepsTimes = new ArrayList<List<Long>>();
     StringBuilder q = new StringBuilder();
-    q.append("SELECT ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_ID).append(",");
+    q.append("SELECT ").append(DB.TABLE_SOLVETYPESTEP).append(".").append(DB.COL_SOLVETYPESTEP_POSITION).append(",");
     q.append("       ").append(DB.TABLE_TIMEHISTORYSTEP).append(".").append(DB.COL_TIMEHISTORYSTEP_TIME);
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
     q.append(" JOIN ").append(DB.TABLE_TIMEHISTORYSTEP);
@@ -222,48 +226,57 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("    = ").append(DB.TABLE_TIMEHISTORYSTEP).append(".").append(DB.COL_TIMEHISTORYSTEP_SOLVETYPESTEP_ID);
     q.append(" WHERE ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
     q.append("   AND ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_TIME).append(" > 0");
-    q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC, ").append(DB.COL_SOLVETYPESTEP_POSITION);
-    q.append(" LIMIT ").append(MAX_AVERAGE_COUNT);
+    q.append(" ORDER BY ").append(DB.COL_SOLVETYPESTEP_POSITION).append(", ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC");
     Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId()));
     if (cursor != null) {
-      int curHistoryId = -1;
-      List<Long> curSteps = new ArrayList<Long>();
+      int curStep = -1;
+      List<Long> times = new ArrayList<Long>();
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-        int historyId = cursor.getInt(0);
-        if (historyId != curHistoryId) {
-          if (curSteps.size() > 0) {
-            stepsTimes.add(curSteps);
+        int step = cursor.getInt(0);
+        if (step != curStep) {
+          if (times.size() > 0) {
+            stepsTimes.add(times);
           }
-          curSteps = new ArrayList<Long>();
-          curHistoryId = historyId;
+          times = new ArrayList<Long>();
+          curStep = step;
         }
-        curSteps.add(cursor.getLong(1));
+        times.add(cursor.getLong(1));
       }
-      if (curSteps.size() > 0) {
-        stepsTimes.add(curSteps);
+      if (times.size() > 0) {
+        stepsTimes.add(times);
       }
       cursor.close();
     }
 
     if (stepsTimes.size() > 0) {
-      int i = 0;
-      long[] stepsSums = new long[stepsTimes.get(0).size()];
-      for (List<Long> st : stepsTimes) {
-        for (int j = 0; j < st.size(); j++) {
-          stepsSums[j] += st.get(j);
-        }
-        if (i == 5-1 || i == 12-1 || i == 50-1 || i == 100-1) {
-          List<Long> avgs = new ArrayList<Long>();
-          for (Long l : stepsSums) {
-            avgs.add(l / (i+1));
+      Map<Integer, List<Long>> averages = new HashMap<Integer, List<Long>>();
+      long[] stepsSums = new long[stepsTimes.size()];
+      int timesCount = stepsTimes.get(0).size();
+      int[] avgsToGet = new int[] { 5, 12, 50, 100 };
+      for (int i = 0; i < stepsTimes.size(); i++) {
+        List<Long> st = stepsTimes.get(i);
+        CubeBaseSession session = new CubeBaseSession(st);
+        for (int a : avgsToGet) {
+          if (averages.get(a) == null) {
+            averages.put(a, new ArrayList<Long>());
           }
-          solveAverages.setStepsAvgOf(i + 1, avgs);
+          averages.get(a).add(session.getRAOf(a));
         }
-        i++;
+        for (int j = 0; j < st.size(); j++) {
+          stepsSums[i] += st.get(j);
+        }
       }
+      for (int a : avgsToGet) {
+        List<Long> avgs = averages.get(a);
+        if (avgs.get(0) == -2) {
+          avgs = null;
+        }
+        solveAverages.setStepsAvgOf(a, avgs);
+      }
+
       List<Long> lifeAvgs = new ArrayList<Long>();
-      for (Long l : stepsSums) {
-        lifeAvgs.add(l / i);
+      for (long l : stepsSums) {
+        lifeAvgs.add(l / timesCount);
       }
       solveAverages.setStepsAvgOfLifetime(lifeAvgs);
     }
@@ -509,6 +522,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     values.put(DB.COL_SOLVETYPE_NAME, solveType.getName());
     values.put(DB.COL_SOLVETYPE_POSITION, position);
     values.put(DB.COL_SOLVETYPE_CUBETYPE_ID, solveType.getCubeTypeId());
+    values.put(DB.COL_SOLVETYPE_BLIND, solveType.isBlind() ? 1 : 0);
     int id = (int) db.insert(DB.TABLE_SOLVETYPE, null, values);
     solveType.setId(id);
 
@@ -621,98 +635,35 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   private void recalculateAverages(long timestamp, SolveType solveType) {
-    long total5 = 0, total12 = 0, total50 = 0, total100 = 0;
-    List<CachedTime> allTimes = getTimesAroundTs(timestamp, solveType, true);
+    List<CachedTime> timesBefore = getTimesAroundTs(timestamp, solveType, true);
     List<CachedTime> timesAfter = getTimesAroundTs(timestamp, solveType, false);
-    allTimes.addAll(timesAfter);
 
-    boolean inAfter = false;
-    int i = 0;
-    if (timesAfter.size() > 0) {
-      for (CachedTime ct : allTimes) {
-        // adjust averages
-        total5 += ct.getTime();
-        total12 += ct.getTime();
-        total50 += ct.getTime();
-        total100 += ct.getTime();
-        if (i >= 5) {
-          total5 -= allTimes.get(i - 5).getTime();
-        }
-        if (i >= 12) {
-          total12 -= allTimes.get(i - 12).getTime();
-        }
-        if (i >= 50) {
-          total50 -= allTimes.get(i - 50).getTime();
-        }
-        if (i >= 100) {
-          total100 -= allTimes.get(i - 100).getTime();
-        }
-        if (ct.getSolveId() == timesAfter.get(0).getSolveId()) {
-          inAfter = true;
-        }
-        if (inAfter) {
-          // update averages in DB
-          ContentValues values = new ContentValues();
-          if (i >= 5 - 1) {
-            values.put(DB.COL_TIMEHISTORY_AVG5, (total5 / 5));
-          } else {
-            values.put(DB.COL_TIMEHISTORY_AVG5, (Long) null);
-          }
-          if (i >= 12 - 1) {
-            values.put(DB.COL_TIMEHISTORY_AVG12, (total12 / 12));
-          } else {
-            values.put(DB.COL_TIMEHISTORY_AVG12, (Long) null);
-          }
-          if (i >= 50 - 1) {
-            values.put(DB.COL_TIMEHISTORY_AVG50, (total50 / 50));
-          } else {
-            values.put(DB.COL_TIMEHISTORY_AVG50, (Long) null);
-          }
-          if (i >= 100 - 1) {
-            values.put(DB.COL_TIMEHISTORY_AVG100, (total100 / 100));
-          } else {
-            values.put(DB.COL_TIMEHISTORY_AVG100, (Long) null);
-          }
-          db.update(DB.TABLE_TIMEHISTORY, values, DB.COL_ID + " = ?", getStringArray(ct.getSolveId()));
-        }
-        i++;
+    for (int i = timesAfter.size() - 1; i >= 0; i--) { // newest time is in pos 0
+      CachedTime ct = timesAfter.get(i);
+      List<Long> times = new ArrayList<Long>();
+      for (int j = i; j < timesAfter.size() && times.size() < MAX_AVERAGE_COUNT; j++) {
+        times.add(timesAfter.get(j).getTime());
       }
-    }
+      for (int j = 0; j < timesBefore.size() && times.size() < MAX_AVERAGE_COUNT; j++) {
+        times.add(timesBefore.get(j).getTime());
+      }
+      CubeBaseSession session = new CubeBaseSession(times);
 
-    // Handle DNFs
-    List<SolveAverage> solveAverages = getAveragesTimesAfter(timestamp, solveType);
-    SolveAverage lastNonDNFAvg = null;
-    if (solveAverages.size() > 0 && solveAverages.get(0).getTimestamp() < timestamp) {
-      lastNonDNFAvg = solveAverages.get(0);
-    }
-    Long lastAvg5 = (lastNonDNFAvg == null) ? null : lastNonDNFAvg.getAvg5();
-    Long lastAvg12 = (lastNonDNFAvg == null) ? null : lastNonDNFAvg.getAvg12();
-    Long lastAvg50 = (lastNonDNFAvg == null) ? null : lastNonDNFAvg.getAvg50();
-    Long lastAvg100 = (lastNonDNFAvg == null) ? null : lastNonDNFAvg.getAvg100();
-    int nonDNFCount = 0;
-    for (SolveAverage sa : solveAverages) {
-      if (sa.getTime() == -1) { // DNF
-        ContentValues values = new ContentValues();
-        values.put(DB.COL_TIMEHISTORY_AVG5, lastAvg5);
-        values.put(DB.COL_TIMEHISTORY_AVG12, lastAvg12);
-        values.put(DB.COL_TIMEHISTORY_AVG50, lastAvg50);
-        values.put(DB.COL_TIMEHISTORY_AVG100, lastAvg100);
-        db.update(DB.TABLE_TIMEHISTORY, values, DB.COL_ID + " = ?", getStringArray(sa.getId()));
+      ContentValues values = new ContentValues();
+      if (solveType.isBlind()) {
+        values.put(DB.COL_TIMEHISTORY_AVG5, session.getMeanOf(3));
       } else {
-        lastAvg5 = sa.getAvg5();
-        lastAvg12 = sa.getAvg12();
-        lastAvg50 = sa.getAvg50();
-        lastAvg100 = sa.getAvg100();
-        nonDNFCount++;
+        values.put(DB.COL_TIMEHISTORY_AVG5, session.getRAOf(5));
       }
-      if (nonDNFCount > 101) {
-        break;
-      }
+      values.put(DB.COL_TIMEHISTORY_AVG12, session.getRAOf(12));
+      values.put(DB.COL_TIMEHISTORY_AVG50, session.getRAOf(50));
+      values.put(DB.COL_TIMEHISTORY_AVG100, session.getRAOf(100));
+
+      db.update(DB.TABLE_TIMEHISTORY, values, DB.COL_ID + " = ?", getStringArray(ct.getSolveId()));
     }
   }
 
   private List<CachedTime> getTimesAroundTs(long timestamp, SolveType solveType, boolean before) {
-    final int biggestAvg = 100;
     List<CachedTime> times = new ArrayList<CachedTime>();
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_ID);
@@ -724,58 +675,13 @@ public class ServiceProviderImpl implements ServiceProvider {
     } else {
       q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" >= ?");
     }
-    q.append("   AND ").append(DB.COL_TIMEHISTORY_TIME).append(" > 0");
-    q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
-    q.append(" LIMIT ").append(biggestAvg);
+    q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC");
+    q.append(" LIMIT ").append(MAX_AVERAGE_COUNT);
     Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId(), timestamp));
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         times.add(new CachedTime(cursor.getInt(0), cursor.getLong(1)));
       }
-    }
-    return times;
-  }
-
-  /**
-   * Get the averages for all times after timestamp, and for the latest non-DNF time before timestamp.
-   * @param timestamp the timestamp to search
-   * @param solveType the solve type
-   * @return list of solve averages
-   */
-  private List<SolveAverage> getAveragesTimesAfter(long timestamp, SolveType solveType) {
-    List<SolveAverage> times = new ArrayList<SolveAverage>();
-    StringBuilder select = new StringBuilder();
-    select.append("SELECT ").append(DB.COL_ID);
-    select.append("     , ").append(DB.COL_TIMEHISTORY_TIME);
-    select.append("     , ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
-    select.append("     , ").append(DB.COL_TIMEHISTORY_AVG5);
-    select.append("     , ").append(DB.COL_TIMEHISTORY_AVG12);
-    select.append("     , ").append(DB.COL_TIMEHISTORY_AVG50);
-    select.append("     , ").append(DB.COL_TIMEHISTORY_AVG100);
-    StringBuilder q = new StringBuilder();
-    q.append(select);
-    q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
-    q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
-    q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" >= ?");
-    q.append(" UNION ");
-    q.append(select);
-    q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
-    q.append(" WHERE ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" = ");
-    q.append("   ( ");
-    q.append("    SELECT MAX(").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(") ");
-    q.append("    FROM ").append(DB.TABLE_TIMEHISTORY);
-    q.append("    WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
-    q.append("      AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
-    q.append("      AND ").append(DB.COL_TIMEHISTORY_TIME).append(" > 0");
-    q.append("   ) ");
-    q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
-    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId(), timestamp, solveType.getId(), timestamp));
-    if (cursor != null) {
-      for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-        times.add(new SolveAverage(cursor.getInt(0), cursor.getInt(1), cursor.getLong(2), getCursorLong(cursor, 3),
-            getCursorLong(cursor, 4), getCursorLong(cursor, 5), getCursorLong(cursor, 6)));
-      }
-      cursor.close();
     }
     return times;
   }
@@ -811,22 +717,26 @@ public class ServiceProviderImpl implements ServiceProvider {
 
   private Map<Integer, Long> loadBestAverages(int solveTypeId) {
     cachedBestAverages = new HashMap<Integer, Long>();
-    StringBuilder q = new StringBuilder();
-    q.append("SELECT MIN(").append(DB.COL_TIMEHISTORY_AVG5).append(")");
-    q.append(", MIN(").append(DB.COL_TIMEHISTORY_AVG12).append(")");
-    q.append(", MIN(").append(DB.COL_TIMEHISTORY_AVG50).append(")");
-    q.append(", MIN(").append(DB.COL_TIMEHISTORY_AVG100).append(")");
-    q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
-    q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
-    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTypeId));
-    if (cursor != null) {
-      if (cursor.moveToFirst()) {
-        cachedBestAverages.put(5, getCursorLong(cursor, 0));
-        cachedBestAverages.put(12, getCursorLong(cursor, 1));
-        cachedBestAverages.put(50, getCursorLong(cursor, 2));
-        cachedBestAverages.put(100, getCursorLong(cursor, 3));
+    Map<String, Integer> colToAvgMapping = new HashMap<String, Integer>();
+    colToAvgMapping.put(DB.COL_TIMEHISTORY_AVG5, 5);
+    colToAvgMapping.put(DB.COL_TIMEHISTORY_AVG12, 12);
+    colToAvgMapping.put(DB.COL_TIMEHISTORY_AVG50, 50);
+    colToAvgMapping.put(DB.COL_TIMEHISTORY_AVG100, 100);
+
+    for (Entry<String, Integer> p : colToAvgMapping.entrySet()) {
+      String colName = p.getKey();
+      StringBuilder q = new StringBuilder();
+      q.append("SELECT MIN(").append(colName).append(")");
+      q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
+      q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
+      q.append("   AND ").append(colName).append(" > 0");
+      Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTypeId));
+      if (cursor != null) {
+        if (cursor.moveToFirst()) {
+          cachedBestAverages.put(p.getValue(), getCursorLong(cursor, 0));
+        }
+        cursor.close();
       }
-      cursor.close();
     }
     return cachedBestAverages;
   }
@@ -858,10 +768,27 @@ public class ServiceProviderImpl implements ServiceProvider {
    * Calculate the last average based on the cached time.
    * The last average is the average of solve times, starting from the most recent time.
    * @param n number of solve times for which to retrieve the average
-   * @param calculateAll if true, returns the average even if the number of solves did not reach n
    * @return the last average
    */
-  private Long getLastAvg(int n, boolean calculateAll) {
+  private Long getLastAvg(int n) {
+    List<Long> times = new ArrayList<Long>();
+    synchronized (cacheSyncHelper) {
+      for (CachedTime ct : cachedSolveTimes) {
+        times.add(ct.getTime());
+      }
+    }
+    CubeBaseSession session = new CubeBaseSession(times);
+    long avg = session.getRAOf(n);
+    return (avg == -2) ? null : avg;
+  }
+
+  /**
+   * Calculates the last mean (not rolling average) based on the cached times, only counting non DNF times.
+   * @param n number of solve times for which to retrieve the mean
+   * @param calculateAll if true, returns the mean even if the number of solves did not reach n
+   * @return the mean of n
+   */
+  private Long getLastMean(int n, boolean calculateAll) {
     long total = 0;
     int i = 0;
     synchronized (cacheSyncHelper) {

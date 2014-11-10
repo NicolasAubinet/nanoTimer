@@ -42,6 +42,7 @@ public class DBHelper extends SQLiteOpenHelper {
         DB.COL_SOLVETYPE_NAME + " TEXT NOT NULL, " +
         DB.COL_SOLVETYPE_SESSION_START + " INTEGER DEFAULT 0, " +
         DB.COL_SOLVETYPE_POSITION + " INTEGER DEFAULT 0, " +
+        DB.COL_SOLVETYPE_BLIND + " INTEGER DEFAULT 0, " +
         DB.COL_SOLVETYPE_CUBETYPE_ID + " INTEGER, " +
         "FOREIGN KEY (" + DB.COL_SOLVETYPE_CUBETYPE_ID + ") REFERENCES " + DB.TABLE_CUBETYPE + " (" + DB.COL_ID + ") " +
       ");"
@@ -90,9 +91,21 @@ public class DBHelper extends SQLiteOpenHelper {
       // Add Square-1 and Clock
       insertSolveType(getString(R.string.def), insertCubeType(10, getString(R.string.square1)));
       insertSolveType(getString(R.string.def), insertCubeType(11, getString(R.string.clock)));
+
       // Add avg50 column and calculate values for it
       db.execSQL("ALTER TABLE " + DB.TABLE_TIMEHISTORY + " ADD COLUMN " + DB.COL_TIMEHISTORY_AVG50 + " INTEGER");
       DBUpgradeScripts.calculateAndUpdateAvg50(db);
+    }
+
+    if (oldVersion < 10) {
+      // Add new blind solve type mode
+      db.execSQL("ALTER TABLE " + DB.TABLE_SOLVETYPE + " ADD COLUMN " + DB.COL_SOLVETYPE_BLIND + " INTEGER DEFAULT 0");
+
+      // Set blind mode to all solve types containing "Blind" or "BLD" in their names and that do not have any steps
+      DBUpgradeScripts.updateSolveTypesToBlindType(db);
+
+      // Update all averages to the new style (from means (dropping DNF's) to averages (counting DNF's)) + BLD mean of 3
+      DBUpgradeScripts.updateMeansToAverages(db);
     }
   }
 

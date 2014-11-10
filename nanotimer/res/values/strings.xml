@@ -132,4 +132,7 @@
   <string name="add_more_solve_types">Add more solve types&#8230;</string>
   <string name="solve_types_shortcut">Solve types shortcut</string>
   <string name="solve_types_shortcut_summary">Show \"Add more solve types\" in list</string>
+  <string name="blind">Blind</string>
+  <string name="blind_mode">Blind mode</string>
+  <string name="steps_can_not_be_added_to_blind_types">Steps can not be added to blind types.\nUse a non-blind type instead.</string>
 </resources>

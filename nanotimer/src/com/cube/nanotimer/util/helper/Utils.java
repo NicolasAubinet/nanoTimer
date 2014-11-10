@@ -11,7 +11,6 @@ import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveType;
 
 import java.security.SecureRandom;
-import java.util.List;
 import java.util.Random;
 
 public class Utils {
@@ -36,23 +35,6 @@ public class Utils {
   public static void playSound(int soundId) {
     MediaPlayer mp = MediaPlayer.create(App.INSTANCE.getContext(), soundId);
     mp.start();
-  }
-
-  public static long getMeanOf(List<Long> times) {
-    long mean = 0;
-    int validTimes = 0;
-    if (times.size() > 0) {
-      for (Long t : times) {
-        if (t >= 0) {
-          mean += t;
-          validTimes++;
-        }
-      }
-      mean /= validTimes;
-    } else {
-      mean = -2;
-    }
-    return mean;
   }
 
   public static CubeType getCurrentCubeType(Context c) {

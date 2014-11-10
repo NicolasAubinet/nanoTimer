@@ -15,11 +15,10 @@ import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.services.db.DataCallback;
-import com.cube.nanotimer.util.CubeBaseSession;
+import com.cube.nanotimer.session.CubeBaseSession;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.helper.GUIUtils;
 import com.cube.nanotimer.util.helper.ScreenUtils;
-import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveType;
 
@@ -76,7 +75,7 @@ public class SessionDialog extends DialogFragment {
     buMore = (Button) v.findViewById(R.id.buMore);
 
     ((TextView) v.findViewById(R.id.tvSessionRA)).setText(FormatterService.INSTANCE.formatSolveTime(session.getRAOf(Math.max(5, sessionTimes.size()))));
-    ((TextView) v.findViewById(R.id.tvSessionMean)).setText(FormatterService.INSTANCE.formatSolveTime(Utils.getMeanOf(session.getSessionTimes())));
+//    ((TextView) v.findViewById(R.id.tvSessionMean)).setText(FormatterService.INSTANCE.formatSolveTime(Utils.getMeanOf(session.getSessionTimes()))); // TODO : see what to display here
     ((TextView) v.findViewById(R.id.tvSessionSolves)).setText(String.valueOf(sessionDetails.getSessionSolvesCount()));
     ((TextView) v.findViewById(R.id.tvTotalSolves)).setText(String.valueOf(sessionDetails.getTotalSolvesCount()));
     sessionTimesLayout = (LinearLayout) v.findViewById(R.id.sessionTimesLayout);

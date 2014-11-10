@@ -14,14 +14,14 @@
        android:id="@+id/tvSolveType"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_toLeftOf="@+id/tvStepsCount"
+       android:layout_toLeftOf="@+id/tvAdditionalInfo"
        android:layout_centerVertical="true"
        android:layout_alignParentLeft="true"
        android:singleLine="true"
        android:textSize="26px"/>
 
     <TextView
-       android:id="@+id/tvStepsCount"
+       android:id="@+id/tvAdditionalInfo"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:layout_toLeftOf="@+id/imgMove"

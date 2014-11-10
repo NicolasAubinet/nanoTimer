@@ -27,7 +27,7 @@ public class FieldAddDialog extends FieldDialog {
   @Override
   protected void onConfirm() {
     EditText tfName = (EditText) editTextView.findViewById(R.id.tfName);
-    if (fieldCreator.createField(tfName.getText().toString())) {
+    if (fieldCreator.createField(tfName.getText().toString(), null)) {
       dialog.dismiss();
     }
   }

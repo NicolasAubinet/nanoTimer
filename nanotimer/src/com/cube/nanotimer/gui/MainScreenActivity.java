@@ -86,7 +86,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
     App.INSTANCE.setContext(this);
     setVolumeControlStream(AudioManager.STREAM_MUSIC);
     curCubeType = Utils.getCurrentCubeType(this);
-    curSolveType = new SolveType(Utils.getCurrentSolveTypeId(this), "", curCubeType.getId());
+    curSolveType = new SolveType(Utils.getCurrentSolveTypeId(this), "", false, curCubeType.getId());
 
     initViews();
   }
