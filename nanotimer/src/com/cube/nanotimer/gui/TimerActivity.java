@@ -90,7 +90,9 @@ public class TimerActivity extends ActionBarActivity {
   private volatile TimerState timerState = TimerState.STOPPED;
   private boolean showMenu = true;
 
+  private long lastTimerStartTs;
   private long lastTimerStopTs;
+  private final long START_STOP_DELAY = 200; // to avoid stopping timer too quickly after a start
   private final long STOP_START_DELAY = 500; // to avoid starting timer too quickly after a stop
 
   private int inspectionTime;
@@ -451,6 +453,7 @@ public class TimerActivity extends ActionBarActivity {
 
   private void startTimer() {
     long curTime = System.currentTimeMillis();
+    lastTimerStartTs = curTime;
     if (curTime - lastTimerStopTs < STOP_START_DELAY) {
       return;
     }
@@ -479,8 +482,12 @@ public class TimerActivity extends ActionBarActivity {
   }
 
   private void stopTimer(boolean save) {
-    long time = (System.currentTimeMillis() - timerStartTs);
-    lastTimerStopTs = System.currentTimeMillis();
+    long curTime = System.currentTimeMillis();
+    if (curTime - lastTimerStartTs < START_STOP_DELAY) {
+      return;
+    }
+    lastTimerStopTs = curTime;
+    long time = (curTime - timerStartTs);
     timerState = TimerState.STOPPED;
     if (timer != null) {
       timer.cancel();
