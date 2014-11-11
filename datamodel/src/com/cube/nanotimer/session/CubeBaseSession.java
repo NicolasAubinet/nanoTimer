@@ -91,6 +91,9 @@ public class CubeBaseSession {
         }
       }
     }
+    if (mean > 0) {
+      mean /= n;
+    }
     return mean;
   }
 

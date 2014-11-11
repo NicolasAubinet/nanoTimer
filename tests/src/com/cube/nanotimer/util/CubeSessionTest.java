@@ -239,6 +239,42 @@ public class CubeSessionTest extends AndroidTestCase {
   }
 
   @SmallTest
+  public void testMean() {
+    List<Long> sessionTimes = new ArrayList<Long>();
+    sessionTimes.add(6l);
+    sessionTimes.add(4l);
+    CubeSession cs = new CubeSession(sessionTimes);
+    Assert.assertEquals(5, cs.getMeanOf(2));
+    Assert.assertEquals(-2, cs.getMeanOf(3));
+    Assert.assertEquals(-2, cs.getMeanOf(5));
+    cs.addTime(8);
+    Assert.assertEquals(6, cs.getMeanOf(3));
+    Assert.assertEquals(-2, cs.getMeanOf(5));
+    cs.addTime(-1); // DNF
+    Assert.assertEquals(-1, cs.getMeanOf(3));
+    Assert.assertEquals(-2, cs.getMeanOf(5));
+    cs.addTime(10);
+    Assert.assertEquals(-1, cs.getMeanOf(3));
+    Assert.assertEquals(-1, cs.getMeanOf(5));
+    cs.addTime(12);
+    Assert.assertEquals(-1, cs.getMeanOf(3));
+    Assert.assertEquals(-1, cs.getMeanOf(5));
+    cs.addTime(14);
+    Assert.assertEquals(12, cs.getMeanOf(3));
+    Assert.assertEquals(-1, cs.getMeanOf(5));
+
+    sessionTimes = new ArrayList<Long>();
+    sessionTimes.add(6l);
+    sessionTimes.add(4l);
+    sessionTimes.add(10l);
+    sessionTimes.add(3l);
+    sessionTimes.add(5l);
+    cs = new CubeSession(sessionTimes);
+    Assert.assertEquals(6, cs.getMeanOf(3));
+    Assert.assertEquals(5, cs.getMeanOf(5));
+  }
+
+  @SmallTest
   public void testAverageBug() {
     List<Long> sessionTimes = new ArrayList<Long>();
     CubeSession cs = new CubeSession(sessionTimes);

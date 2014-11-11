@@ -149,7 +149,7 @@ public class ServiceProviderImpl implements ServiceProvider {
         cachedSolveTimes.remove(cachedSolveTimes.size() - 1);
       }
     }
-    Long avg5 = getLastAvg(5);
+    Long avg5 = getLastAvg5();
     Long avg12 = getLastAvg(12);
     Long avg50 = getLastAvg(50);
     Long avg100 = getLastAvg(100);
@@ -193,7 +193,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     syncCaches(solveType);
     SolveAverages solveAverages = new SolveAverages();
     if (!solveType.hasSteps()) {
-      solveAverages.setAvgOf5(getLastAvg(5));
+      solveAverages.setAvgOf5(getLastAvg5());
       solveAverages.setAvgOf12(getLastAvg(12));
       solveAverages.setAvgOf50(getLastAvg(50));
       solveAverages.setAvgOf100(getLastAvg(100));
@@ -298,7 +298,7 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   private boolean isTimeBetter(Long oldVal, Long newVal) {
-    if (oldVal == null && newVal != null) {
+    if (oldVal == null && newVal != null && newVal > 0) {
       return true;
     } else if (oldVal != null && newVal != null && newVal < oldVal && newVal > 0) {
       return true;
@@ -606,10 +606,14 @@ public class ServiceProviderImpl implements ServiceProvider {
         sta.setTimestamp(cursor.getLong(2));
         sta.setScramble(cursor.getString(3));
         sta.setPlusTwo(cursor.getInt(4) == 1);
-        sta.setAvgOf5(getCursorLong(cursor, 5));
-        sta.setAvgOf12(getCursorLong(cursor, 6));
-        sta.setAvgOf50(getCursorLong(cursor, 7));
-        sta.setAvgOf100(getCursorLong(cursor, 8));
+        Long v = getCursorLong(cursor, 5);
+        sta.setAvgOf5(v == null || v == -2 ? null : v);
+        v = getCursorLong(cursor, 6);
+        sta.setAvgOf12(v == null || v == -2 ? null : v);
+        v = getCursorLong(cursor, 7);
+        sta.setAvgOf50(v == null || v == -2 ? null : v);
+        v = getCursorLong(cursor, 8);
+        sta.setAvgOf100(v == null || v == -2 ? null : v);
         sta.setSolveType(solveTime.getSolveType());
       }
       cursor.close();
@@ -676,7 +680,9 @@ public class ServiceProviderImpl implements ServiceProvider {
       q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" >= ?");
     }
     q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC");
-    q.append(" LIMIT ").append(MAX_AVERAGE_COUNT);
+    if (before) { // only limit if searching before ts (otherwise it would not return the times right after ts if there are more times than MAX)
+      q.append(" LIMIT ").append(MAX_AVERAGE_COUNT);
+    }
     Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId(), timestamp));
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
@@ -764,6 +770,25 @@ public class ServiceProviderImpl implements ServiceProvider {
     cachedLifetimeBest = -2l;
   }
 
+  private Long getLastAvg5() {
+    Long avg5;
+    if (currentSolveType.isBlind()) {
+      // Get mean of 3 instead
+      List<Long> times = new ArrayList<Long>();
+      synchronized (cacheSyncHelper) {
+        for (int i = 0; i < cachedSolveTimes.size() && i < 3; i++) {
+          times.add(cachedSolveTimes.get(i).getTime());
+        }
+      }
+      CubeBaseSession session = new CubeBaseSession(times);
+      long avg = session.getMeanOf(3);
+      avg5 = (avg == -2) ? null : avg;
+    } else {
+      avg5 = getLastAvg(5);
+    }
+    return avg5;
+  }
+
   /**
    * Calculate the last average based on the cached time.
    * The last average is the average of solve times, starting from the most recent time.
@@ -773,8 +798,8 @@ public class ServiceProviderImpl implements ServiceProvider {
   private Long getLastAvg(int n) {
     List<Long> times = new ArrayList<Long>();
     synchronized (cacheSyncHelper) {
-      for (CachedTime ct : cachedSolveTimes) {
-        times.add(ct.getTime());
+      for (int i = 0; i < cachedSolveTimes.size() && i < n; i++) {
+        times.add(cachedSolveTimes.get(i).getTime());
       }
     }
     CubeBaseSession session = new CubeBaseSession(times);
