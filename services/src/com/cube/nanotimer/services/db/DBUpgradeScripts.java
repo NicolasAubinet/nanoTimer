@@ -3,7 +3,6 @@ package com.cube.nanotimer.services.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 import com.cube.nanotimer.session.CubeBaseSession;
 import com.cube.nanotimer.vo.SolveTime;
 
@@ -56,9 +55,9 @@ public class DBUpgradeScripts {
 
   public static void updateMeansToAverages(SQLiteDatabase db) {
     List<Integer> solveTypeIds = getAllSolveTypesIds(db);
-    Log.i("[MeansToAvg]", solveTypeIds.size() + " solve types.");
+//    Log.i("[MeansToAvg]", solveTypeIds.size() + " solve types.");
     for (int solveTypeId : solveTypeIds) {
-      Log.i("[MeansToAvg]", "\n      --> Processing solve type " + solveTypeId + "...\n");
+//      Log.i("[MeansToAvg]", "\n      --> Processing solve type " + solveTypeId + "...\n");
       List<Integer> liIds = new ArrayList<Integer>();
       List<Long> liTimes = new ArrayList<Long>();
       StringBuilder q = new StringBuilder();
@@ -74,7 +73,7 @@ public class DBUpgradeScripts {
         }
         cursor.close();
       }
-      Log.i("[MeansToAvg]", "Found " + liTimes.size() + " times");
+//      Log.i("[MeansToAvg]", "Found " + liTimes.size() + " times");
 
       boolean blindMode = false;
       q = new StringBuilder();
@@ -87,8 +86,8 @@ public class DBUpgradeScripts {
           blindMode = (cursor.getInt(0) == 1);
         }
       }
-      Log.i("[MeansToAvg]", "Blind mode? " + blindMode);
-      Log.i("[MeansToAvg]", "Start updating...");
+//      Log.i("[MeansToAvg]", "Blind mode? " + blindMode);
+//      Log.i("[MeansToAvg]", "Start updating...");
 
       for (int i = liIds.size() - 1; i >= 0; i--) { // reverse because most recent time is in position 0
         CubeBaseSession session = new CubeBaseSession(liTimes.subList(i, Math.min(i + 100, liIds.size())));
@@ -102,11 +101,11 @@ public class DBUpgradeScripts {
         values.put(DB.COL_TIMEHISTORY_AVG50, session.getRAOf(50));
         values.put(DB.COL_TIMEHISTORY_AVG100, session.getRAOf(100));
 
-        Log.i("[MeansToAvg]", "  Update " + liIds.get(i) + " (time: " + liTimes.get(i) + ") with averages " +
-            values.getAsLong(DB.COL_TIMEHISTORY_AVG5) + " | " +
-            values.getAsLong(DB.COL_TIMEHISTORY_AVG12) + " | " +
-            values.getAsLong(DB.COL_TIMEHISTORY_AVG50) + " | " +
-            values.getAsLong(DB.COL_TIMEHISTORY_AVG100));
+//        Log.i("[MeansToAvg]", "  Update " + liIds.get(i) + " (time: " + liTimes.get(i) + ") with averages " +
+//            values.getAsLong(DB.COL_TIMEHISTORY_AVG5) + " | " +
+//            values.getAsLong(DB.COL_TIMEHISTORY_AVG12) + " | " +
+//            values.getAsLong(DB.COL_TIMEHISTORY_AVG50) + " | " +
+//            values.getAsLong(DB.COL_TIMEHISTORY_AVG100));
         db.update(DB.TABLE_TIMEHISTORY, values, DB.COL_ID + " = ?", new String[] { String.valueOf(liIds.get(i)) });
       }
     }

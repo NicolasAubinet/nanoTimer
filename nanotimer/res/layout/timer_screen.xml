@@ -139,10 +139,10 @@
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:text="@string/avgOf5"
+                 android:text="@string/session_solves"
                  style="@style/SmallTextField"/>
               <TextView
-                 android:id="@+id/tvRA5"
+                 android:id="@+id/tvSolvesCount"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="6px"
@@ -153,10 +153,10 @@
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:text="@string/avgOf12"
+                 android:text="@string/meanOf3"
                  style="@style/SmallTextField"/>
               <TextView
-                 android:id="@+id/tvRA12"
+                 android:id="@+id/tvMeanOf3"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="6px"

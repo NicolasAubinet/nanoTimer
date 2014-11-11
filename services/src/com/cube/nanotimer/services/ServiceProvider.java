@@ -26,6 +26,7 @@ public interface ServiceProvider {
   void saveSolveTypesOrder(List<SolveType> solveTypes);
   SolveTimeAverages getSolveTimeAverages(SolveTime solveTime);
   SessionDetails getSessionDetails(SolveType solveType);
+  int getSolvesCount(SolveType solveType);
 
   int addSolveType(SolveType solveType);
   void addSolveTypeSteps(SolveType solveType);

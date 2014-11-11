@@ -345,7 +345,7 @@ public class ServiceProviderImpl implements ServiceProvider {
   public SolveHistory getHistory(SolveType solveType, long from) {
     SolveHistory solveHistory = new SolveHistory();
     solveHistory.setSolveTimes(getHistoryTimes(solveType, from, HISTORY_PAGE_SIZE));
-    solveHistory.setSolvesCount(getSolvesCount(solveType));
+    solveHistory.setSolvesCount(getHistorySolvesCount(solveType));
     return solveHistory;
   }
 
@@ -385,7 +385,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     return history;
   }
 
-  private int getSolvesCount(SolveType solveType) {
+  private int getHistorySolvesCount(SolveType solveType) {
     int solvesCount = 0;
     StringBuilder q = new StringBuilder();
     q.append("SELECT COUNT(*)");
@@ -631,11 +631,34 @@ public class ServiceProviderImpl implements ServiceProvider {
   @Override
   public SessionDetails getSessionDetails(SolveType solveType) {
     SessionDetails sessionDetails = new SessionDetails();
-    sessionDetails.setTotalSolvesCount(getSolvesCount(solveType));
+    sessionDetails.setTotalSolvesCount(getHistorySolvesCount(solveType));
     if (getSessionStart(solveType) > 0) { // if a new session was created
       sessionDetails.setSessionTimes(getSessionTimes(solveType, null));
     }
     return sessionDetails;
+  }
+
+  /**
+   * Returns the solves count, starting from session start if a session was created, or from start if no session exists
+   * @param solveType the solve type
+   * @return the solves count
+   */
+  @Override
+  public int getSolvesCount(SolveType solveType) {
+    int solvesCount = 0;
+    long sessionStart = getSessionStart(solveType);
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT COUNT(*)");
+    q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
+    q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
+    q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" >= ?");
+    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId(), sessionStart));
+    if (cursor != null) {
+      if (cursor.moveToFirst()) {
+        solvesCount = cursor.getInt(0);
+      }
+    }
+    return solvesCount;
   }
 
   private void recalculateAverages(long timestamp, SolveType solveType) {

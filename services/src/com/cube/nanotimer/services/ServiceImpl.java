@@ -257,6 +257,16 @@ public class ServiceImpl extends DBHelper implements Service {
     });
   }
 
+  @Override
+  public void getSolvesCount(final SolveType solveType, final DataCallback<Integer> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        callback.onData(provider.getSolvesCount(solveType));
+      }
+    });
+  }
+
   private void run(Runnable runnable) {
     new Thread(runnable).start();
   }

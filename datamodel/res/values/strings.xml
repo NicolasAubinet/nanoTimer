@@ -16,4 +16,6 @@
   <string name="one_handed">One-handed</string>
   <string name="blindfolded">Blindfolded</string>
   <string name="CFOP_steps">CFOP steps</string>
+
+  <string name="updating_database">Updating database, please wait.</string>
 </resources>

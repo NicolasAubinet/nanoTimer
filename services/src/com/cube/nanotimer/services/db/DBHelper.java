@@ -1,5 +1,6 @@
 package com.cube.nanotimer.services.db;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -87,6 +88,13 @@ public class DBHelper extends SQLiteOpenHelper {
     if (DBHelper.db == null) {
       DBHelper.db = db;
     }
+
+    ProgressDialog progressDialog = new ProgressDialog(context);
+    progressDialog.setMessage(getString(R.string.updating_database));
+    progressDialog.setIndeterminate(true);
+    progressDialog.setCancelable(false);
+    progressDialog.show();
+
     if (oldVersion < 9) {
       // Add Square-1 and Clock
       insertSolveType(getString(R.string.def), insertCubeType(10, getString(R.string.square1)));
@@ -107,6 +115,8 @@ public class DBHelper extends SQLiteOpenHelper {
       // Update all averages to the new style (from means (dropping DNF's) to averages (counting DNF's)) + BLD mean of 3
       DBUpgradeScripts.updateMeansToAverages(db);
     }
+
+    progressDialog.hide();
   }
 
   private void insertDefaultValues() {

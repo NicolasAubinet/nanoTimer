@@ -58,8 +58,8 @@ public class TimerActivity extends ActionBarActivity {
 
   private TextView tvTimer;
   private TextView tvScramble;
-  private TextView tvRA5;
-  private TextView tvRA12;
+  private TextView tvSolvesCount;
+  private TextView tvMeanOf3;
   private ViewGroup layout;
   private LinearLayout actionBarLayout;
   private TableLayout sessionTimesLayout;
@@ -78,7 +78,7 @@ public class TimerActivity extends ActionBarActivity {
   private List<Animation> animations = new ArrayList<Animation>();
   private boolean hasNewSession;
 
-  private int historyTimesCount;
+  private int solvesCount;
   private ColorStateList defaultTextColor;
   private static final int MIN_TIMES_FOR_RECORD_NOTIFICATION = 12;
 
@@ -127,7 +127,7 @@ public class TimerActivity extends ActionBarActivity {
 
     resetTimer();
     setDefaultBannerText();
-    defaultTextColor = tvRA5.getTextColors();
+    defaultTextColor = tvSolvesCount.getTextColors();
 
     if (!solveType.hasSteps()) {
       App.INSTANCE.getService().getSessionTimes(solveType, new DataCallback<List<Long>>() {
@@ -143,7 +143,18 @@ public class TimerActivity extends ActionBarActivity {
           hasNewSession = (data != null && data > 0);
         }
       });
-      historyTimesCount = getIntent().getIntExtra("solvesCount", 0);
+      App.INSTANCE.getService().getSolvesCount(solveType, new DataCallback<Integer>() {
+        @Override
+        public void onData(final Integer data) {
+          runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              solvesCount = data;
+              refreshSolvesCountText();
+            }
+          });
+        }
+      });
     }
 
     generateScramble();
@@ -157,8 +168,8 @@ public class TimerActivity extends ActionBarActivity {
   private void initViews() {
     tvTimer = (TextView) findViewById(R.id.tvTimer);
     tvScramble = (TextView) findViewById(R.id.tvScramble);
-    tvRA5 = (TextView) findViewById(R.id.tvRA5);
-    tvRA12 = (TextView) findViewById(R.id.tvRA12);
+    tvSolvesCount = (TextView) findViewById(R.id.tvSolvesCount);
+    tvMeanOf3 = (TextView) findViewById(R.id.tvMeanOf3);
     sessionTimesLayout = (TableLayout) findViewById(R.id.sessionTimesLayout);
     TableLayout averagesLayout = (TableLayout) findViewById(R.id.averagesLayout);
     timerStepsLayout = (TableLayout) findViewById(R.id.timerStepsLayout);
@@ -332,7 +343,7 @@ public class TimerActivity extends ActionBarActivity {
           if (lastSolveTime != null) {
             App.INSTANCE.getService().deleteTime(lastSolveTime, new SolveAverageCallback());
             cubeSession.deleteLast();
-            historyTimesCount--;
+            solvesCount = Math.max(0, solvesCount - 1);
             refreshSessionFields();
             resetTimer();
           }
@@ -346,6 +357,7 @@ public class TimerActivity extends ActionBarActivity {
             public void onYes() {
               App.INSTANCE.getService().startNewSession(solveType, System.currentTimeMillis(), null);
               cubeSession.clearSession();
+              solvesCount = 0;
               refreshSessionFields();
               if (!hasNewSession) {
                 hasNewSession = true;
@@ -424,8 +436,8 @@ public class TimerActivity extends ActionBarActivity {
             GUIUtils.setSessionTimeCellText(tv, sessionTimes.get(i), i, bestInd, worstInd);
           }
         }
-        tvRA5.setText(FormatterService.INSTANCE.formatSolveTime(cubeSession.getRAOfFive()));
-        tvRA12.setText(FormatterService.INSTANCE.formatSolveTime(cubeSession.getRAOfTwelve()));
+        tvMeanOf3.setText(FormatterService.INSTANCE.formatSolveTime(cubeSession.getMeanOf(3)));
+        refreshSolvesCountText();
       }
     });
   }
@@ -612,8 +624,8 @@ public class TimerActivity extends ActionBarActivity {
 
     if (cubeSession != null) {
       cubeSession.addTime(time);
+      solvesCount++;
       refreshSessionFields();
-      historyTimesCount++;
     }
     App.INSTANCE.getService().saveTime(solveTime, new SolveAverageCallback());
   }
@@ -674,6 +686,10 @@ public class TimerActivity extends ActionBarActivity {
 
   private void setKeepScreenOn(boolean keepOn) {
     layout.setKeepScreenOn(keepOn);
+  }
+
+  private void refreshSolvesCountText() {
+    tvSolvesCount.setText(String.valueOf(solvesCount));
   }
 
   private void refreshAvgFields(boolean showNotifications) {
@@ -746,7 +762,7 @@ public class TimerActivity extends ActionBarActivity {
   private void refreshAvgFieldWithRecord(int fieldId, Long value, Long previousValue, String defaultValue,
                                          boolean showNotifications, boolean showBanner) {
     refreshAvgField(fieldId, value, defaultValue);
-    if (historyTimesCount > MIN_TIMES_FOR_RECORD_NOTIFICATION && previousValue != null && value != null && value < previousValue && !solveType.hasSteps()) {
+    if (solvesCount > MIN_TIMES_FOR_RECORD_NOTIFICATION && previousValue != null && value != null && value < previousValue && !solveType.hasSteps()) {
       final int recordColor = getResources().getColor(R.color.new_record);
       final TextView tv = (TextView) findViewById(fieldId);
       tv.setTypeface(null, Typeface.BOLD);
