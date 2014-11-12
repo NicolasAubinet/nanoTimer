@@ -17,7 +17,7 @@ public enum FormatterService {
 
   public String formatSolveTime(Long solveTime, String defaultValue) {
     if (solveTime == null) {
-      return defaultValue == null ? "" : defaultValue;
+      return defaultValue == null ? App.INSTANCE.getContext().getString(R.string.NA) : defaultValue;
     }
     if (solveTime == -1) {
       return App.INSTANCE.getContext().getString(R.string.DNF);
@@ -37,6 +37,17 @@ public enum FormatterService {
     }
     sb.append(".").append(String.format("%02d", hundreds));
     return sb.toString();
+  }
+
+  public String formatPercentage(Integer pct) {
+    return formatPercentage(pct, null);
+  }
+
+  public String formatPercentage(Integer pct, String defaultValue) {
+    if (pct == null || pct < 0 || pct > 100) {
+      return defaultValue == null ? App.INSTANCE.getContext().getString(R.string.NA) : defaultValue;
+    }
+    return pct + "%";
   }
 
   public String formatDateTime(Long ms) {

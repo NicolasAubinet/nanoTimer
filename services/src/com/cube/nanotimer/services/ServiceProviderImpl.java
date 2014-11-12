@@ -149,7 +149,12 @@ public class ServiceProviderImpl implements ServiceProvider {
         cachedSolveTimes.remove(cachedSolveTimes.size() - 1);
       }
     }
-    Long avg5 = getLastAvg5();
+    Long avg5;
+    if (currentSolveType.isBlind()) {
+      avg5 = getLastMean(3);
+    } else {
+      avg5 = getLastAvg(5);
+    }
     Long avg12 = getLastAvg(12);
     Long avg50 = getLastAvg(50);
     Long avg100 = getLastAvg(100);
@@ -192,12 +197,26 @@ public class ServiceProviderImpl implements ServiceProvider {
   public SolveAverages getSolveAverages(SolveType solveType) {
     syncCaches(solveType);
     SolveAverages solveAverages = new SolveAverages();
-    if (!solveType.hasSteps()) {
-      solveAverages.setAvgOf5(getLastAvg5());
+    if (solveType.isBlind()) {
+      solveAverages.setMeanOf3(getLastMean(3));
+      solveAverages.setBestOf3(cachedBestAverages.get(5)); // DB column avg5 contains the mean of 3 for blind
+      Long[] averages = getSuccessAverages(new int[] { 12, 50, 100 });
+      solveAverages.setAvgOf12(averages[0]);
+      solveAverages.setAvgOf50(averages[1]);
+      solveAverages.setAvgOf100(averages[2]);
+      solveAverages.setAvgOfLifetime(getLastSuccessMean(1000, true));
+      solveAverages.setBestOfLifetime(cachedLifetimeBest);
+      solveAverages.setAccuracyOf12(getLastAccuracy(12, false));
+      solveAverages.setAccuracyOf50(getLastAccuracy(50, false));
+      solveAverages.setAccuracyOf100(getLastAccuracy(100, false));
+      solveAverages.setLifetimeAccuracy(getLastAccuracy(1000, true));
+    } else if (!solveType.hasSteps()) {
+      solveAverages.setMeanOf3(getLastMean(3));
+      solveAverages.setAvgOf5(getLastAvg(5));
       solveAverages.setAvgOf12(getLastAvg(12));
       solveAverages.setAvgOf50(getLastAvg(50));
       solveAverages.setAvgOf100(getLastAvg(100));
-      solveAverages.setAvgOfLifetime(getLastMean(1000, true));
+      solveAverages.setAvgOfLifetime(getLastSuccessMean(1000, true));
       solveAverages.setBestOf5(cachedBestAverages.get(5));
       solveAverages.setBestOf12(cachedBestAverages.get(12));
       solveAverages.setBestOf50(cachedBestAverages.get(50));
@@ -787,29 +806,44 @@ public class ServiceProviderImpl implements ServiceProvider {
     return cachedLifetimeBest;
   }
 
+  /**
+   * Returns the last averages of successes (non-DNF) for the current solve type.
+   * Averages are returned in an array sorted in the same order than the parameters.
+   * @param avgsToGet the averages to retrieve, sorted from small to big
+   * @return the averages
+   */
+  private Long[] getSuccessAverages(int[] avgsToGet) {
+    if (avgsToGet.length == 0) {
+      return new Long[0];
+    }
+    int maxAvg = avgsToGet[avgsToGet.length - 1];
+    Long[] averages = new Long[avgsToGet.length];
+    List<Long> times = new ArrayList<Long>(maxAvg);
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT ").append(DB.COL_TIMEHISTORY_TIME);
+    q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
+    q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
+    q.append("   AND ").append(DB.COL_TIMEHISTORY_TIME).append(" > 0");
+    q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC");
+    q.append(" LIMIT ?");
+    Cursor cursor = db.rawQuery(q.toString(), getStringArray(currentSolveType.getId(), maxAvg));
+    if (cursor != null) {
+      for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+        times.add(cursor.getLong(0));
+      }
+    }
+    CubeBaseSession session = new CubeBaseSession(times);
+    for (int i = 0; i < avgsToGet.length; i++) {
+      long avg = session.getRAOf(avgsToGet[i]);
+      averages[i] = (avg < 0) ? null : avg; // so that N/A (-2) is null
+    }
+    return averages;
+  }
+
   private void clearCaches() {
     cachedSolveTimes = null;
     cachedBestAverages = new HashMap<Integer, Long>();
     cachedLifetimeBest = -2l;
-  }
-
-  private Long getLastAvg5() {
-    Long avg5;
-    if (currentSolveType.isBlind()) {
-      // Get mean of 3 instead
-      List<Long> times = new ArrayList<Long>();
-      synchronized (cacheSyncHelper) {
-        for (int i = 0; i < cachedSolveTimes.size() && i < 3; i++) {
-          times.add(cachedSolveTimes.get(i).getTime());
-        }
-      }
-      CubeBaseSession session = new CubeBaseSession(times);
-      long avg = session.getMeanOf(3);
-      avg5 = (avg == -2) ? null : avg;
-    } else {
-      avg5 = getLastAvg(5);
-    }
-    return avg5;
   }
 
   /**
@@ -831,12 +865,29 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   /**
+   * Calculates the last mean (not rolling average) based on the cached times.
+   * @param n number of solve times for which to retrieve the mean
+   * @return the mean of n
+   */
+  private Long getLastMean(int n) {
+    List<Long> times = new ArrayList<Long>();
+    synchronized (cacheSyncHelper) {
+      for (int i = 0; i < cachedSolveTimes.size() && i < 3; i++) {
+        times.add(cachedSolveTimes.get(i).getTime());
+      }
+    }
+    CubeBaseSession session = new CubeBaseSession(times);
+    long mean = session.getMeanOf(n);
+    return (mean == -2) ? null : mean;
+  }
+
+  /**
    * Calculates the last mean (not rolling average) based on the cached times, only counting non DNF times.
    * @param n number of solve times for which to retrieve the mean
    * @param calculateAll if true, returns the mean even if the number of solves did not reach n
    * @return the mean of n
    */
-  private Long getLastMean(int n, boolean calculateAll) {
+  private Long getLastSuccessMean(int n, boolean calculateAll) {
     long total = 0;
     int i = 0;
     synchronized (cacheSyncHelper) {
@@ -853,6 +904,33 @@ public class ServiceProviderImpl implements ServiceProvider {
     }
     if (i > 0 && calculateAll) {
       return total / i;
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Calculate the accuracy (success rate) based on the cached times (used for blind mode).
+   * @param n number of solve times for which to retrieve the accuracy
+   * @param calculateAll if true, returns the accuracy even if the number of solves did not reach n
+   * @return the last accuracy, from 0 to 100
+   */
+  private Integer getLastAccuracy(int n, boolean calculateAll) {
+    long successes = 0;
+    int i;
+    synchronized (cacheSyncHelper) {
+      for (i = 0; i < cachedSolveTimes.size() && i < n; i++) {
+        if (cachedSolveTimes.get(i).getTime() > 0) { // if not a DNF
+          successes++;
+        }
+      }
+    }
+    if (i == n || (i > 0 && calculateAll)) {
+      if (successes == 0) {
+        return 0;
+      } else {
+        return (int) (successes * 100 / i);
+      }
     } else {
       return null;
     }
@@ -905,53 +983,6 @@ public class ServiceProviderImpl implements ServiceProvider {
 
     public void setTime(long time) {
       this.time = time;
-    }
-  }
-
-  private class SolveAverage {
-    private int id;
-    private long time;
-    private long timestamp;
-    private Long avg5;
-    private Long avg12;
-    private Long avg50;
-    private Long avg100;
-
-    public SolveAverage(int id, long time, long timestamp, Long avg5, Long avg12, Long avg50, Long avg100) {
-      this.id = id;
-      this.time = time;
-      this.avg5 = avg5;
-      this.avg12 = avg12;
-      this.avg50 = avg50;
-      this.avg100 = avg100;
-    }
-
-    public int getId() {
-      return id;
-    }
-
-    public long getTime() {
-      return time;
-    }
-
-    public long getTimestamp() {
-      return timestamp;
-    }
-
-    public Long getAvg5() {
-      return avg5;
-    }
-
-    public Long getAvg12() {
-      return avg12;
-    }
-
-    public Long getAvg50() {
-      return avg50;
-    }
-
-    public Long getAvg100() {
-      return avg100;
     }
   }
 

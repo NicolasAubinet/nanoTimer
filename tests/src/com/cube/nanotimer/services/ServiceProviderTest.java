@@ -38,7 +38,7 @@ public class ServiceProviderTest extends AndroidTestCase {
         solveType1 = solveTypes.get(0);
         solveType2 = solveTypes.get(1);
         for (SolveType st : solveTypes) {
-          if ("CFOP".equals(st.getName())) {
+          if ("CFOP steps".equals(st.getName())) {
             solveTypeSteps = st;
           } else if ("BLD".equals(st.getName())) {
             solveTypeBlind = st;
@@ -600,27 +600,27 @@ public class ServiceProviderTest extends AndroidTestCase {
 
     saveTime(1000, solveTypeBlind);
     SolveAverages averages = saveTime(2000, solveTypeBlind);
-    assertAvgEquals(null, null, null, null, 1500, null, null, null, null, 1000, averages);
+    assertEquals(null, averages.getMeanOf3());
     averages = saveTime(2500, solveTypeBlind);
-    assertAvgEquals(1833, null, null, null, 1833, 1833, null, null, null, 1000, averages);
+    assertEquals(Long.valueOf(1833), averages.getMeanOf3());
     averages = saveTime(2700, solveTypeBlind);
-    assertAvgEquals(2400, null, null, null, 2050, 1833, null, null, null, 1000, averages);
+    assertEquals(Long.valueOf(2400), averages.getMeanOf3());
     averages = saveTime(1200, solveTypeBlind);
-    assertAvgEquals(2133, null, null, null, 1880, 1833, null, null, null, 1000, averages);
+    assertEquals(Long.valueOf(2133), averages.getMeanOf3());
     averages = saveTime(-1, solveTypeBlind);
-    assertAvgEquals(-1, null, null, null, 1880, 1833, null, null, null, 1000, averages);
+    assertEquals(Long.valueOf(-1), averages.getMeanOf3());
     averages = saveTime(1400, solveTypeBlind);
-    assertAvgEquals(-1, null, null, null, 1800, 1833, null, null, null, 1000, averages);
+    assertEquals(Long.valueOf(-1), averages.getMeanOf3());
     averages = saveTime(1500, solveTypeBlind);
-    assertAvgEquals(-1, null, null, null, 1757, 1833, null, null, null, 1000, averages);
+    assertEquals(Long.valueOf(-1), averages.getMeanOf3());
     averages = saveTime(1300, solveTypeBlind);
-    assertAvgEquals(1400, null, null, null, 1700, 1400, null, null, null, 1000, averages);
+    assertEquals(Long.valueOf(1400), averages.getMeanOf3());
     averages = saveTime(1200, solveTypeBlind);
-    assertAvgEquals(1333, null, null, null, 1644, 1333, null, null, null, 1000, averages);
+    assertEquals(Long.valueOf(1333), averages.getMeanOf3());
     averages = saveTime(2200, solveTypeBlind);
-    assertAvgEquals(1566, null, null, null, 1700, 1333, null, null, null, 1000, averages);
+    assertEquals(Long.valueOf(1566), averages.getMeanOf3());
     averages = saveTime(2600, solveTypeBlind);
-    assertAvgEquals(2000, 1860, null, null, 1781, 1333, 1860, null, null, 1000, averages);
+    assertEquals(Long.valueOf(2000), averages.getMeanOf3());
   }
 
   private SolveAverages saveTimes(long time, int count) {

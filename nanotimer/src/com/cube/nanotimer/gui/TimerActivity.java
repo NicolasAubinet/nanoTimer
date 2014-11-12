@@ -59,9 +59,10 @@ public class TimerActivity extends ActionBarActivity {
   private TextView tvTimer;
   private TextView tvScramble;
   private TextView tvSolvesCount;
-  private TextView tvMeanOf3;
+  private TextView tvMeanOfThree;
+  private TextView tvBestMeanOfThree;
+  private TextView tvAccuracy;
   private ViewGroup layout;
-  private LinearLayout actionBarLayout;
   private TableLayout sessionTimesLayout;
   private TableLayout timerStepsLayout;
 
@@ -149,8 +150,7 @@ public class TimerActivity extends ActionBarActivity {
           runOnUiThread(new Runnable() {
             @Override
             public void run() {
-              solvesCount = data;
-              refreshSolvesCountText();
+              setSolvesCount(data);
             }
           });
         }
@@ -169,7 +169,9 @@ public class TimerActivity extends ActionBarActivity {
     tvTimer = (TextView) findViewById(R.id.tvTimer);
     tvScramble = (TextView) findViewById(R.id.tvScramble);
     tvSolvesCount = (TextView) findViewById(R.id.tvSolvesCount);
-    tvMeanOf3 = (TextView) findViewById(R.id.tvMeanOf3);
+    tvMeanOfThree = (TextView) findViewById(R.id.tvMeanOfThree);
+    tvBestMeanOfThree = (TextView) findViewById(R.id.tvBestMeanOfThree);
+    tvAccuracy = (TextView) findViewById(R.id.tvLifetimeAccuracy);
     sessionTimesLayout = (TableLayout) findViewById(R.id.sessionTimesLayout);
     TableLayout averagesLayout = (TableLayout) findViewById(R.id.averagesLayout);
     timerStepsLayout = (TableLayout) findViewById(R.id.timerStepsLayout);
@@ -193,12 +195,18 @@ public class TimerActivity extends ActionBarActivity {
       }
       findViewById(R.id.trAvgOfLife).setVisibility(View.VISIBLE);
       hideUnneededStepFields();
+    } else if (solveType.isBlind()) {
+      findViewById(R.id.trAvgOfFive).setVisibility(View.GONE);
+      findViewById(R.id.trLifetimeAccuracy).setVisibility(View.VISIBLE);
+      findViewById(R.id.trBestMeanOfThree).setVisibility(View.VISIBLE);
+      ((TextView) findViewById(R.id.tvAvgOf)).setText(R.string.success_avg);
+      ((TextView) findViewById(R.id.tvBestOf)).setText(R.string.accuracy);
     } else {
       timerStepsLayout.setVisibility(View.GONE);
       findViewById(R.id.trAvgOfLife).setVisibility(View.GONE);
     }
 
-    actionBarLayout = (LinearLayout) findViewById(R.id.actionbarLayout);
+    LinearLayout actionBarLayout = (LinearLayout) findViewById(R.id.actionbarLayout);
     actionBarLayout.setOnTouchListener(layoutTouchListener);
 
     layout = (ViewGroup) findViewById(R.id.mainLayout);
@@ -343,7 +351,7 @@ public class TimerActivity extends ActionBarActivity {
           if (lastSolveTime != null) {
             App.INSTANCE.getService().deleteTime(lastSolveTime, new SolveAverageCallback());
             cubeSession.deleteLast();
-            solvesCount = Math.max(0, solvesCount - 1);
+            setSolvesCount(solvesCount - 1);
             refreshSessionFields();
             resetTimer();
           }
@@ -357,7 +365,7 @@ public class TimerActivity extends ActionBarActivity {
             public void onYes() {
               App.INSTANCE.getService().startNewSession(solveType, System.currentTimeMillis(), null);
               cubeSession.clearSession();
-              solvesCount = 0;
+              setSolvesCount(0);
               refreshSessionFields();
               if (!hasNewSession) {
                 hasNewSession = true;
@@ -395,6 +403,7 @@ public class TimerActivity extends ActionBarActivity {
         tvTimer.setText(timerText);
       }
       tvScramble.setText(ScrambleFormatterService.INSTANCE.formatToColoredScramble(currentScramble, cubeType, currentOrientation));
+      tvSolvesCount.setText(String.valueOf(solvesCount));
 
       refreshSessionFields();
       refreshAvgFields(false);
@@ -436,8 +445,6 @@ public class TimerActivity extends ActionBarActivity {
             GUIUtils.setSessionTimeCellText(tv, sessionTimes.get(i), i, bestInd, worstInd);
           }
         }
-        tvMeanOf3.setText(FormatterService.INSTANCE.formatSolveTime(cubeSession.getMeanOf(3)));
-        refreshSolvesCountText();
       }
     });
   }
@@ -624,7 +631,7 @@ public class TimerActivity extends ActionBarActivity {
 
     if (cubeSession != null) {
       cubeSession.addTime(time);
-      solvesCount++;
+      setSolvesCount(solvesCount + 1);
       refreshSessionFields();
     }
     App.INSTANCE.getService().saveTime(solveTime, new SolveAverageCallback());
@@ -688,22 +695,42 @@ public class TimerActivity extends ActionBarActivity {
     layout.setKeepScreenOn(keepOn);
   }
 
-  private void refreshSolvesCountText() {
+  private void setSolvesCount(int solvesCount) {
+    this.solvesCount = Math.max(0, solvesCount);
     tvSolvesCount.setText(String.valueOf(solvesCount));
   }
 
   private void refreshAvgFields(boolean showNotifications) {
-    if (!solveType.hasSteps()) {
+    for (Animation a : animations) {
+      a.cancel();
+    }
+    animations = new ArrayList<Animation>();
+
+    if (solveType.isBlind()) {
+      tvAccuracy.setText(FormatterService.INSTANCE.formatPercentage(solveAverages.getLifetimeAccuracy()));
+      refreshAvgField(R.id.tvMeanOfThree, solveAverages.getMeanOf3(), getString(R.string.NA));
+      refreshAvgFieldWithRecord(R.id.tvBestMeanOfThree, solveAverages.getBestOf3(),
+          (prevSolveAverages != null ? prevSolveAverages.getBestOf3() : null), getString(R.string.NA), showNotifications, true);
+      refreshAvgFieldWithRecord(R.id.tvLifetimeBest, solveAverages.getBestOfLifetime(),
+          (prevSolveAverages != null ? prevSolveAverages.getBestOfLifetime() : null), getString(R.string.NA), showNotifications, true);
+
+      refreshAvgField(R.id.tvLifetimeAvg, solveAverages.getAvgOfLifetime(), getString(R.string.NA));
+      refreshAvgField(R.id.tvAvgOfTwelve, solveAverages.getAvgOf12(), "-");
+      refreshAvgField(R.id.tvAvgOfFifty, solveAverages.getAvgOf50(), "-");
+      refreshAvgField(R.id.tvAvgOfHundred, solveAverages.getAvgOf100(), "-");
+      ((TextView) findViewById(R.id.tvBestOfTwelve)).setText(
+          FormatterService.INSTANCE.formatPercentage(solveAverages.getAccuracyOf12(), "-"));
+      ((TextView) findViewById(R.id.tvBestOfFifty)).setText(
+          FormatterService.INSTANCE.formatPercentage(solveAverages.getAccuracyOf50(), "-"));
+      ((TextView) findViewById(R.id.tvBestOfHundred)).setText(
+          FormatterService.INSTANCE.formatPercentage(solveAverages.getAccuracyOf100(), "-"));
+    } else if (!solveType.hasSteps()) {
       refreshAvgField(R.id.tvAvgOfFive, solveAverages.getAvgOf5(), "-");
       refreshAvgField(R.id.tvAvgOfTwelve, solveAverages.getAvgOf12(), "-");
       refreshAvgField(R.id.tvAvgOfFifty, solveAverages.getAvgOf50(), "-");
       refreshAvgField(R.id.tvAvgOfHundred, solveAverages.getAvgOf100(), "-");
       refreshAvgField(R.id.tvLifetimeAvg, solveAverages.getAvgOfLifetime(), getString(R.string.NA));
-
-      for (Animation a : animations) {
-        a.cancel();
-      }
-      animations = new ArrayList<Animation>();
+      refreshAvgField(R.id.tvMeanOfThree, solveAverages.getMeanOf3(), getString(R.string.NA));
 
       refreshAvgFieldWithRecord(R.id.tvBestOfFive, solveAverages.getBestOf5(),
           (prevSolveAverages != null ? prevSolveAverages.getBestOf5() : null), "-", showNotifications, false);

@@ -24,9 +24,19 @@ public class SolveAverages {
   private List<Long> stepsAvgOf100;
   private List<Long> stepsAvgOfLifetime;
 
+  private Long meanOf3;
+  private Long bestOf3;
+  private Integer accuracyOf12;
+  private Integer accuracyOf50;
+  private Integer accuracyOf100;
+  private Integer lifetimeAccuracy;
+
   public SolveAverages() {
   }
 
+  /**
+   * Constructor for normal solve types
+   */
   public SolveAverages(Long avgOf5, Long avgOf12, Long avgOf50, Long avgOf100, Long avgOfLifetime, Long bestOf5, Long bestOf12, Long bestOf50, Long bestOf100, Long bestOfLifetime) {
     this.avgOf5 = avgOf5;
     this.avgOf12 = avgOf12;
@@ -38,6 +48,24 @@ public class SolveAverages {
     this.bestOf50 = bestOf50;
     this.bestOf100 = bestOf100;
     this.bestOfLifetime = bestOfLifetime;
+  }
+
+  /**
+   * Constructor for blind solve types
+   */
+  public SolveAverages(Long meanOf3, Long avgOf12, Long avgOf50, Long avgOf100, Long avgOfLifetime, Long bestOf3, Long bestOfLifetime,
+                       Integer accuracyOf12, Integer accuracyOf50, Integer accuracyOf100,Integer lifetimeAccuracy) {
+    this.meanOf3 = meanOf3;
+    this.avgOf12 = avgOf12;
+    this.avgOf50 = avgOf50;
+    this.avgOf100 = avgOf100;
+    this.avgOfLifetime = avgOfLifetime;
+    this.bestOf3 = bestOf3;
+    this.bestOfLifetime = bestOfLifetime;
+    this.accuracyOf12 = accuracyOf12;
+    this.accuracyOf50 = accuracyOf50;
+    this.accuracyOf100 = accuracyOf100;
+    this.lifetimeAccuracy = lifetimeAccuracy;
   }
 
   public SolveTime getSolveTime() {
@@ -164,6 +192,70 @@ public class SolveAverages {
     this.stepsAvgOfLifetime = stepsAvgOfLifetime;
   }
 
+  public void setStepsAvgOf5(List<Long> stepsAvgOf5) {
+    this.stepsAvgOf5 = stepsAvgOf5;
+  }
+
+  public void setStepsAvgOf12(List<Long> stepsAvgOf12) {
+    this.stepsAvgOf12 = stepsAvgOf12;
+  }
+
+  public void setStepsAvgOf50(List<Long> stepsAvgOf50) {
+    this.stepsAvgOf50 = stepsAvgOf50;
+  }
+
+  public void setStepsAvgOf100(List<Long> stepsAvgOf100) {
+    this.stepsAvgOf100 = stepsAvgOf100;
+  }
+
+  public Long getMeanOf3() {
+    return meanOf3;
+  }
+
+  public void setMeanOf3(Long meanOf3) {
+    this.meanOf3 = meanOf3;
+  }
+
+  public Long getBestOf3() {
+    return bestOf3;
+  }
+
+  public void setBestOf3(Long bestOf3) {
+    this.bestOf3 = bestOf3;
+  }
+
+  public Integer getAccuracyOf12() {
+    return accuracyOf12;
+  }
+
+  public void setAccuracyOf12(Integer accuracyOf12) {
+    this.accuracyOf12 = accuracyOf12;
+  }
+
+  public Integer getAccuracyOf50() {
+    return accuracyOf50;
+  }
+
+  public void setAccuracyOf50(Integer accuracyOf50) {
+    this.accuracyOf50 = accuracyOf50;
+  }
+
+  public Integer getAccuracyOf100() {
+    return accuracyOf100;
+  }
+
+  public void setAccuracyOf100(Integer accuracyOf100) {
+    this.accuracyOf100 = accuracyOf100;
+  }
+
+  public Integer getLifetimeAccuracy() {
+    return lifetimeAccuracy;
+  }
+
+  public void setLifetimeAccuracy(Integer lifetimeAccuracy) {
+    this.lifetimeAccuracy = lifetimeAccuracy;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -188,7 +280,8 @@ public class SolveAverages {
 
   @Override
   public int hashCode() {
-    int result = avgOf5 != null ? avgOf5.hashCode() : 0;
+    int result = solveTime != null ? solveTime.hashCode() : 0;
+    result = 31 * result + (avgOf5 != null ? avgOf5.hashCode() : 0);
     result = 31 * result + (avgOf12 != null ? avgOf12.hashCode() : 0);
     result = 31 * result + (avgOf50 != null ? avgOf50.hashCode() : 0);
     result = 31 * result + (avgOf100 != null ? avgOf100.hashCode() : 0);
@@ -198,23 +291,18 @@ public class SolveAverages {
     result = 31 * result + (bestOf50 != null ? bestOf50.hashCode() : 0);
     result = 31 * result + (bestOf100 != null ? bestOf100.hashCode() : 0);
     result = 31 * result + (bestOfLifetime != null ? bestOfLifetime.hashCode() : 0);
+    result = 31 * result + (stepsAvgOf5 != null ? stepsAvgOf5.hashCode() : 0);
+    result = 31 * result + (stepsAvgOf12 != null ? stepsAvgOf12.hashCode() : 0);
+    result = 31 * result + (stepsAvgOf50 != null ? stepsAvgOf50.hashCode() : 0);
+    result = 31 * result + (stepsAvgOf100 != null ? stepsAvgOf100.hashCode() : 0);
+    result = 31 * result + (stepsAvgOfLifetime != null ? stepsAvgOfLifetime.hashCode() : 0);
+    result = 31 * result + (meanOf3 != null ? meanOf3.hashCode() : 0);
+    result = 31 * result + (bestOf3 != null ? bestOf3.hashCode() : 0);
+    result = 31 * result + (accuracyOf12 != null ? accuracyOf12.hashCode() : 0);
+    result = 31 * result + (accuracyOf50 != null ? accuracyOf50.hashCode() : 0);
+    result = 31 * result + (accuracyOf100 != null ? accuracyOf100.hashCode() : 0);
+    result = 31 * result + (lifetimeAccuracy != null ? lifetimeAccuracy.hashCode() : 0);
     return result;
-  }
-
-  @Override
-  public String toString() {
-    return "SolveAverages{" +
-        "avgOf5=" + avgOf5 +
-        ", avgOf12=" + avgOf12 +
-        ", avgOf50=" + avgOf50 +
-        ", avgOf100=" + avgOf100 +
-        ", avgOfLifetime=" + avgOfLifetime +
-        ", bestOf5=" + bestOf5 +
-        ", bestOf12=" + bestOf12 +
-        ", bestOf50=" + bestOf50 +
-        ", bestOf100=" + bestOf100 +
-        ", bestOfLifetime=" + bestOfLifetime +
-        '}';
   }
 
 }
