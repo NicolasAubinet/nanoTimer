@@ -28,7 +28,7 @@ import com.cube.nanotimer.Options.AdsStyle;
 import com.cube.nanotimer.Options.BigCubesNotation;
 import com.cube.nanotimer.Options.InspectionMode;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.gui.widget.SessionDialog;
+import com.cube.nanotimer.gui.widget.SessionDetailDialog;
 import com.cube.nanotimer.gui.widget.ads.AdProvider;
 import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.services.db.DataCallback;
@@ -356,7 +356,7 @@ public class TimerActivity extends ActionBarActivity {
           }
           break;
         case R.id.itSessionDetails:
-          DialogUtils.showFragment(this, SessionDialog.newInstance(solveType));
+          DialogUtils.showFragment(this, SessionDetailDialog.newInstance(solveType));
           break;
         case R.id.itNewSession:
           DialogUtils.showYesNoConfirmation(this, getString(R.string.new_session_confirmation), new YesNoListener() {

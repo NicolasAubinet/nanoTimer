@@ -24,7 +24,7 @@ import com.cube.nanotimer.vo.SolveType;
 
 import java.util.List;
 
-public class SessionDialog extends DialogFragment {
+public class SessionDetailDialog extends DialogFragment {
 
   private static final int PAGE_LINES_COUNT = 10;
   private static final int TIMES_PER_LINE = 4;
@@ -38,12 +38,12 @@ public class SessionDialog extends DialogFragment {
   private int worstInd;
   private int curPageInd = 0;
 
-  public static SessionDialog newInstance(SolveType solveType) {
-    SessionDialog sessionDialog = new SessionDialog();
+  public static SessionDetailDialog newInstance(SolveType solveType) {
+    SessionDetailDialog sessionDetailDialog = new SessionDetailDialog();
     Bundle bundle = new Bundle();
     bundle.putSerializable(ARG_SOLVETYPE, solveType);
-    sessionDialog.setArguments(bundle);
-    return sessionDialog;
+    sessionDetailDialog.setArguments(bundle);
+    return sessionDetailDialog;
   }
 
   @Override
@@ -75,7 +75,7 @@ public class SessionDialog extends DialogFragment {
     buMore = (Button) v.findViewById(R.id.buMore);
 
     ((TextView) v.findViewById(R.id.tvSessionRA)).setText(FormatterService.INSTANCE.formatSolveTime(session.getRAOf(Math.max(5, sessionTimes.size()))));
-//    ((TextView) v.findViewById(R.id.tvSessionMean)).setText(FormatterService.INSTANCE.formatSolveTime(Utils.getMeanOf(session.getSessionTimes()))); // TODO : see what to display here
+    ((TextView) v.findViewById(R.id.tvSessionMean)).setText(FormatterService.INSTANCE.formatSolveTime(session.getMeanOf(sessionTimes.size())));
     ((TextView) v.findViewById(R.id.tvSessionSolves)).setText(String.valueOf(sessionDetails.getSessionSolvesCount()));
     ((TextView) v.findViewById(R.id.tvTotalSolves)).setText(String.valueOf(sessionDetails.getTotalSolvesCount()));
     sessionTimesLayout = (LinearLayout) v.findViewById(R.id.sessionTimesLayout);
