@@ -48,8 +48,20 @@ public class HistoryDetailDialog extends DialogFragment {
 
     final SolveTime solveTime = (SolveTime) getArguments().getSerializable(ARG_SOLVETIME);
     final CubeType cubeType = (CubeType) getArguments().getSerializable(ARG_CUBETYPE);
-    if (solveTime.hasSteps()) {
+    if (solveTime.getSolveType().isBlind()) {
       v.findViewById(R.id.averagesTable).setVisibility(View.GONE);
+      v.findViewById(R.id.trMeanOfThree).setVisibility(View.VISIBLE);
+      App.INSTANCE.getService().getSolveTimeAverages(solveTime, new DataCallback<SolveTimeAverages>() {
+        @Override
+        public void onData(SolveTimeAverages data) {
+          ((TextView) v.findViewById(R.id.tvMeanOfThree)).setText(FormatterService.INSTANCE.formatSolveTime(data.getAvgOf5())); // avg5 contains mean of 3 for blind type (same DB column)
+        }
+      });
+    } else if (solveTime.hasSteps()) {
+      v.findViewById(R.id.averagesTable).setVisibility(View.GONE);
+      v.findViewById(R.id.trSteps).setVisibility(View.VISIBLE);
+      ((TextView) v.findViewById(R.id.tvSteps)).setText(
+          FormatterService.INSTANCE.formatStepsTimes(Arrays.asList(solveTime.getStepsTimes())));
     } else {
       App.INSTANCE.getService().getSolveTimeAverages(solveTime, new DataCallback<SolveTimeAverages>() {
         @Override
@@ -69,13 +81,6 @@ public class HistoryDetailDialog extends DialogFragment {
     Button buPlusTwo = (Button) v.findViewById(R.id.buPlusTwo);
     Button buDNF = (Button) v.findViewById(R.id.buDNF);
     Button buDelete = (Button) v.findViewById(R.id.buDelete);
-
-    if (!solveTime.hasSteps()) {
-      v.findViewById(R.id.trSteps).setVisibility(View.GONE);
-    } else {
-      ((TextView) v.findViewById(R.id.tvSteps)).setText(
-          FormatterService.INSTANCE.formatStepsTimes(Arrays.asList(solveTime.getStepsTimes())));
-    }
 
     if (solveTime.isPlusTwo()) {
       buPlusTwo.setEnabled(false);

@@ -53,9 +53,10 @@
          android:layout_height="wrap_content"
          android:layout_marginLeft="15px"
          android:layout_weight="1"
+         android:textColor="@color/white"
          android:textSize="22px"/>
     </TableRow>
-    <TableRow android:id="@+id/trSteps" android:layout_marginTop="8px">
+    <TableRow android:id="@+id/trSteps" android:layout_marginTop="8px" android:visibility="gone">
       <TextView
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
@@ -67,6 +68,22 @@
          android:layout_height="wrap_content"
          android:layout_marginLeft="15px"
          android:layout_weight="1"
+         android:textColor="@color/white"
+         android:textSize="22px"/>
+    </TableRow>
+    <TableRow android:id="@+id/trMeanOfThree" android:layout_marginTop="8px" android:visibility="gone">
+      <TextView
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="@string/mean_of_three"
+         android:textSize="22px"/>
+      <TextView
+         android:id="@+id/tvMeanOfThree"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginLeft="15px"
+         android:layout_weight="1"
+         android:textColor="@color/white"
          android:textSize="22px"/>
     </TableRow>
   </TableLayout>
@@ -87,6 +104,7 @@
          android:layout_height="wrap_content"
          custom:font="MONOSPACE"
          android:layout_marginTop="8px"
+         android:layout_marginBottom="8px"
          android:padding="5px"
          style="@style/ScrambleTextField"/>
 
@@ -94,8 +112,7 @@
          android:id="@+id/averagesTable"
          android:orientation="vertical"
          android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_marginTop="8px">
+         android:layout_height="wrap_content">
 
         <TextView
            android:layout_width="wrap_content"
