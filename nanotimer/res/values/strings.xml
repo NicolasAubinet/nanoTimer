@@ -66,6 +66,7 @@
   <string name="total_solves">Total solves:</string>
   <string name="more">More</string>
   <string name="best_averages">Best averages</string>
+  <string name="times">Times</string>
   <string name="session_best_mean_of_three">Best Mo3:</string>
   <string name="session_success_average">Success avg:</string>
   <string name="session_accuracy">Accuracy:</string>

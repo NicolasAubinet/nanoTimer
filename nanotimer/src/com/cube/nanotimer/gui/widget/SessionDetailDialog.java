@@ -86,11 +86,9 @@ public class SessionDetailDialog extends DialogFragment {
       ((TextView) v.findViewById(R.id.tvBestMeanOfThree)).setText(FormatterService.INSTANCE.formatSolveTime(getBestMeanOf(sessionTimes, 3)));
       ((TextView) v.findViewById(R.id.tvAccuracy)).setText(FormatterService.INSTANCE.formatPercentage(session.getAccuracy(sessionTimes.size())));
       ((TextView) v.findViewById(R.id.tvAverage)).setText(FormatterService.INSTANCE.formatSolveTime(session.getSuccessAverageOf(sessionTimes.size(), true)));
-      ((TextView) v.findViewById(R.id.tvMean)).setText(FormatterService.INSTANCE.formatSolveTime(session.getSuccessMeanOf(sessionTimes.size(), true)));
     } else {
       setupBestAverages(v, sessionTimes);
       ((TextView) v.findViewById(R.id.tvAverage)).setText(FormatterService.INSTANCE.formatSolveTime(session.getAverageOf(Math.max(5, sessionTimes.size()))));
-      ((TextView) v.findViewById(R.id.tvMean)).setText(FormatterService.INSTANCE.formatSolveTime(session.getMeanOf(sessionTimes.size())));
     }
 
     ((TextView) v.findViewById(R.id.tvSolves)).setText(String.valueOf(sessionDetails.getSessionSolvesCount()));
