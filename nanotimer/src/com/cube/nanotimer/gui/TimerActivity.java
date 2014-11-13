@@ -92,7 +92,7 @@ public class TimerActivity extends ActionBarActivity {
 
   private long lastTimerStartTs;
   private long lastTimerStopTs;
-  private final long START_STOP_DELAY = 200; // to avoid stopping timer too quickly after a start
+  private final long START_STOP_DELAY = 150; // to avoid stopping timer too quickly after a start
   private final long STOP_START_DELAY = 500; // to avoid starting timer too quickly after a stop
 
   private int inspectionTime;
