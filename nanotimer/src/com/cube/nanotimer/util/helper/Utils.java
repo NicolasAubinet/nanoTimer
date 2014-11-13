@@ -85,4 +85,18 @@ public class Utils {
     return -1;
   }
 
+  public static String[] invertMoves(String[] moves) {
+    String[] inverted = new String[moves.length];
+    for (int i = 0; i < moves.length; i++) {
+      String m = moves[moves.length - 1 - i];
+      if (m.endsWith("'")) {
+        m = m.substring(0, m.length() - 1);
+      } else if (!m.endsWith("2")) {
+        m += "'";
+      }
+      inverted[i] = m;
+    }
+    return inverted;
+  }
+
 }

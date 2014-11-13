@@ -4,6 +4,7 @@ import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 import com.cube.nanotimer.scrambler.randomstate.ThreeSolver.CubeState;
+import com.cube.nanotimer.util.helper.Utils;
 import junit.framework.Assert;
 
 import java.util.Arrays;
@@ -82,6 +83,27 @@ public class ThreeSolverTest extends AndroidTestCase {
     String[] scramble = solver.getSolution(cubeState);
     Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble) + " (length: " + scramble.length + ")");
     //  found: [U, D', L, F, R', B', R2, F2, D2, R', F', ., D, F2, U', L2, D', R2, L2, F2, D2, F2, D2]
+  }
+
+  @SmallTest
+  public void testInvertedScramble() {
+    CubeState cubeState = new CubeState();
+    //  F L2 R' D2 R2 D' U' R D' B2 U2 F' U2 L2 D L R' U' F2 L R D2 B R' U2
+    cubeState.cornerPermutations = new byte[] { 3, 0, 4, 1, 6, 2, 5, 7 };
+    cubeState.edgePermutations = new byte[] { 1, 9, 8, 0, 11, 7, 6, 10, 4, 5, 3, 2 };
+    cubeState.cornerOrientations = new byte[] { 2, 2, 2, 1, 0, 1, 1, 0 };
+    cubeState.edgeOrientations = new byte[] { 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1 };
+
+    ThreeSolver solver = new ThreeSolver();
+    String[] scramble = Utils.invertMoves(solver.getSolution(cubeState));
+    Log.i("[NanoTimer]", "Inverted scramble: " + Arrays.toString(scramble) + " (length: " + scramble.length + ")");
+    //  Original non-inverted solution: [U, D', L, F, R', B', R2, F2, D2, R', F', ., D, F2, U', L2, D', R2, L2, F2, D2, F2, D2]
+    String[] expectedScramble = new String[] { "D2", "F2", "D2", "F2", "L2", "R2", "D", "L2", "U", "F2", "D'",
+        "F", "R", "D2", "F2", "R2", "B", "R", "F'", "L'", "D", "U'" };
+    Assert.assertEquals(expectedScramble.length, scramble.length);
+    for (int i = 0; i < expectedScramble.length; i++) {
+      Assert.assertEquals(expectedScramble[i], scramble[i]);
+    }
   }
 
   @SmallTest

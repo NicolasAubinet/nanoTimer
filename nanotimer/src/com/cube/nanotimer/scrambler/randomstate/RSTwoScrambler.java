@@ -15,7 +15,7 @@ public class RSTwoScrambler implements RSScrambler {
     do {
       CubeState randomState = getRandomState();
 //      Log.i("[NanoTimer]", "Random state:\n" + randomState.toString());
-      scramble = twoSolver.getSolution(randomState, config);
+      scramble = Utils.invertMoves(twoSolver.getSolution(randomState, config));
 //      Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
     } while (scramble != null && scramble.length < 4);
     return scramble;

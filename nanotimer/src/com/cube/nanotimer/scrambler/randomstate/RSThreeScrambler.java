@@ -15,7 +15,7 @@ public class RSThreeScrambler implements RSScrambler {
     do {
       CubeState randomState = getRandomState();
 //      Log.i("[NanoTimer]", "Random state:\n" + randomState.toString());
-      scramble = threeSolver.getSolution(randomState, config);
+      scramble = Utils.invertMoves(threeSolver.getSolution(randomState, config));
 //      Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
     } while (scramble != null && scramble.length < 12);
     return scramble;
@@ -75,20 +75,6 @@ public class RSThreeScrambler implements RSScrambler {
       }
     }
     return (inversion % 2 != 0);
-  }
-
-  private String[] invertMoves(String[] moves) {
-    String[] inverted = new String[moves.length];
-    for (int i = 0; i < moves.length; i++) {
-      String m = moves[moves.length - 1 - i];
-      if (m.endsWith("'")) {
-        m = m.substring(0, m.length() - 1);
-      } else if (!m.endsWith("2")) {
-        m += "'";
-      }
-      inverted[i] = m;
-    }
-    return inverted;
   }
 
 }
