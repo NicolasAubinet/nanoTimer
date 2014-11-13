@@ -279,7 +279,7 @@ public class ServiceProviderImpl implements ServiceProvider {
           if (averages.get(a) == null) {
             averages.put(a, new ArrayList<Long>());
           }
-          averages.get(a).add(session.getRAOf(a));
+          averages.get(a).add(session.getAverageOf(a));
         }
         for (int j = 0; j < st.size(); j++) {
           stepsSums[i] += st.get(j);
@@ -699,11 +699,11 @@ public class ServiceProviderImpl implements ServiceProvider {
       if (solveType.isBlind()) {
         values.put(DB.COL_TIMEHISTORY_AVG5, session.getMeanOf(3));
       } else {
-        values.put(DB.COL_TIMEHISTORY_AVG5, session.getRAOf(5));
+        values.put(DB.COL_TIMEHISTORY_AVG5, session.getAverageOf(5));
       }
-      values.put(DB.COL_TIMEHISTORY_AVG12, session.getRAOf(12));
-      values.put(DB.COL_TIMEHISTORY_AVG50, session.getRAOf(50));
-      values.put(DB.COL_TIMEHISTORY_AVG100, session.getRAOf(100));
+      values.put(DB.COL_TIMEHISTORY_AVG12, session.getAverageOf(12));
+      values.put(DB.COL_TIMEHISTORY_AVG50, session.getAverageOf(50));
+      values.put(DB.COL_TIMEHISTORY_AVG100, session.getAverageOf(100));
 
       db.update(DB.TABLE_TIMEHISTORY, values, DB.COL_ID + " = ?", getStringArray(ct.getSolveId()));
     }
@@ -834,7 +834,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     }
     CubeBaseSession session = new CubeBaseSession(times);
     for (int i = 0; i < avgsToGet.length; i++) {
-      long avg = session.getRAOf(avgsToGet[i]);
+      long avg = session.getAverageOf(avgsToGet[i]);
       averages[i] = (avg < 0) ? null : avg; // so that N/A (-2) is null
     }
     return averages;
@@ -853,14 +853,7 @@ public class ServiceProviderImpl implements ServiceProvider {
    * @return the last average
    */
   private Long getLastAvg(int n) {
-    List<Long> times = new ArrayList<Long>();
-    synchronized (cacheSyncHelper) {
-      for (int i = 0; i < cachedSolveTimes.size() && i < n; i++) {
-        times.add(cachedSolveTimes.get(i).getTime());
-      }
-    }
-    CubeBaseSession session = new CubeBaseSession(times);
-    long avg = session.getRAOf(n);
+    long avg = new CubeBaseSession(getCachedTimes(n)).getAverageOf(n);
     return (avg == -2) ? null : avg;
   }
 
@@ -870,14 +863,7 @@ public class ServiceProviderImpl implements ServiceProvider {
    * @return the mean of n
    */
   private Long getLastMean(int n) {
-    List<Long> times = new ArrayList<Long>();
-    synchronized (cacheSyncHelper) {
-      for (int i = 0; i < cachedSolveTimes.size() && i < 3; i++) {
-        times.add(cachedSolveTimes.get(i).getTime());
-      }
-    }
-    CubeBaseSession session = new CubeBaseSession(times);
-    long mean = session.getMeanOf(n);
+    long mean = new CubeBaseSession(getCachedTimes(n)).getMeanOf(n);
     return (mean == -2) ? null : mean;
   }
 
@@ -888,25 +874,8 @@ public class ServiceProviderImpl implements ServiceProvider {
    * @return the mean of n
    */
   private Long getLastSuccessMean(int n, boolean calculateAll) {
-    long total = 0;
-    int i = 0;
-    synchronized (cacheSyncHelper) {
-      for (CachedTime ct : cachedSolveTimes) {
-        long t = ct.getTime();
-        if (t > 0) { // if not a DNF
-          total += t;
-          i++;
-          if (i == n) {
-            return total / n;
-          }
-        }
-      }
-    }
-    if (i > 0 && calculateAll) {
-      return total / i;
-    } else {
-      return null;
-    }
+    long mean = new CubeBaseSession(getCachedTimes(n)).getSuccessMeanOf(n, calculateAll);
+    return (mean == -2) ? null : mean;
   }
 
   /**
@@ -916,24 +885,8 @@ public class ServiceProviderImpl implements ServiceProvider {
    * @return the last accuracy, from 0 to 100
    */
   private Integer getLastAccuracy(int n, boolean calculateAll) {
-    long successes = 0;
-    int i;
-    synchronized (cacheSyncHelper) {
-      for (i = 0; i < cachedSolveTimes.size() && i < n; i++) {
-        if (cachedSolveTimes.get(i).getTime() > 0) { // if not a DNF
-          successes++;
-        }
-      }
-    }
-    if (i == n || (i > 0 && calculateAll)) {
-      if (successes == 0) {
-        return 0;
-      } else {
-        return (int) (successes * 100 / i);
-      }
-    } else {
-      return null;
-    }
+    int accuracy = new CubeBaseSession(getCachedTimes(n)).getAccuracy(n, calculateAll);
+    return (accuracy == -2) ? null : accuracy;
   }
 
   protected Long getCursorLong(Cursor cursor, int ind) {
@@ -953,6 +906,16 @@ public class ServiceProviderImpl implements ServiceProvider {
       ret[i] = String.valueOf(values[i]);
     }
     return ret;
+  }
+
+  private List<Long> getCachedTimes(int max) {
+    List<Long> times = new ArrayList<Long>();
+    synchronized (cacheSyncHelper) {
+      for (int i = 0; i < cachedSolveTimes.size() && i < max; i++) {
+        times.add(cachedSolveTimes.get(i).getTime());
+      }
+    }
+    return times;
   }
 
   class CachedTime {

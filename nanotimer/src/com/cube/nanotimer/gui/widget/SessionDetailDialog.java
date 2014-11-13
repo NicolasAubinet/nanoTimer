@@ -2,14 +2,15 @@ package com.cube.nanotimer.gui.widget;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
@@ -28,12 +29,15 @@ public class SessionDetailDialog extends DialogFragment {
 
   private static final int PAGE_LINES_COUNT = 10;
   private static final int TIMES_PER_LINE = 4;
+  private static final int SESSION_TIMES_HEIGHT_DP = 26;
+  private static final int BEST_AVERAGES_HEIGHT_DP = 22;
   private static final String ARG_SOLVETYPE = "solvetype";
 
   private LayoutInflater inflater;
-  private LinearLayout sessionTimesLayout;
+  private TableLayout sessionTimesLayout;
   private Button buMore;
   private List<Long> sessionTimes;
+  private SolveType solveType;
   private int bestInd;
   private int worstInd;
   private int curPageInd = 0;
@@ -49,7 +53,7 @@ public class SessionDetailDialog extends DialogFragment {
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
     final View v = getActivity().getLayoutInflater().inflate(R.layout.sessiondetail_dialog, null);
-    final SolveType solveType = (SolveType) getArguments().getSerializable(ARG_SOLVETYPE);
+    solveType = (SolveType) getArguments().getSerializable(ARG_SOLVETYPE);
     App.INSTANCE.getService().getSessionDetails(solveType, new DataCallback<SessionDetails>() {
       @Override
       public void onData(final SessionDetails data) {
@@ -73,14 +77,25 @@ public class SessionDetailDialog extends DialogFragment {
     bestInd = (sessionTimes.size() < 5) ? -1 : session.getBestTimeInd(sessionTimes.size());
     worstInd = (sessionTimes.size() < 5) ? -1 : session.getWorstTimeInd(sessionTimes.size());
     buMore = (Button) v.findViewById(R.id.buMore);
-
-    ((TextView) v.findViewById(R.id.tvSessionRA)).setText(FormatterService.INSTANCE.formatSolveTime(session.getRAOf(Math.max(5, sessionTimes.size()))));
-    ((TextView) v.findViewById(R.id.tvSessionMean)).setText(FormatterService.INSTANCE.formatSolveTime(session.getMeanOf(sessionTimes.size())));
-    ((TextView) v.findViewById(R.id.tvSessionSolves)).setText(String.valueOf(sessionDetails.getSessionSolvesCount()));
-    ((TextView) v.findViewById(R.id.tvTotalSolves)).setText(String.valueOf(sessionDetails.getTotalSolvesCount()));
-    sessionTimesLayout = (LinearLayout) v.findViewById(R.id.sessionTimesLayout);
-
     inflater = getActivity().getLayoutInflater();
+
+    if (solveType.isBlind()) {
+      v.findViewById(R.id.bestAveragesLayout).setVisibility(View.GONE);
+      v.findViewById(R.id.trBestMeanOfThree).setVisibility(View.VISIBLE);
+      v.findViewById(R.id.trAccuracy).setVisibility(View.VISIBLE);
+      ((TextView) v.findViewById(R.id.tvBestMeanOfThree)).setText(FormatterService.INSTANCE.formatSolveTime(getBestMeanOf(sessionTimes, 3)));
+      ((TextView) v.findViewById(R.id.tvAccuracy)).setText(FormatterService.INSTANCE.formatPercentage(session.getAccuracy(sessionTimes.size())));
+      ((TextView) v.findViewById(R.id.tvAverage)).setText(FormatterService.INSTANCE.formatSolveTime(session.getSuccessAverageOf(sessionTimes.size(), true)));
+      ((TextView) v.findViewById(R.id.tvMean)).setText(FormatterService.INSTANCE.formatSolveTime(session.getSuccessMeanOf(sessionTimes.size(), true)));
+    } else {
+      setupBestAverages(v, sessionTimes);
+      ((TextView) v.findViewById(R.id.tvAverage)).setText(FormatterService.INSTANCE.formatSolveTime(session.getAverageOf(Math.max(5, sessionTimes.size()))));
+      ((TextView) v.findViewById(R.id.tvMean)).setText(FormatterService.INSTANCE.formatSolveTime(session.getMeanOf(sessionTimes.size())));
+    }
+
+    ((TextView) v.findViewById(R.id.tvSolves)).setText(String.valueOf(sessionDetails.getSessionSolvesCount()));
+    sessionTimesLayout = (TableLayout) v.findViewById(R.id.sessionTimesLayout);
+
     int sessionTimesCount = sessionTimes.size();
     if (sessionTimesCount == 0) {
       TableRow tr = new TableRow(getActivity());
@@ -101,7 +116,7 @@ public class SessionDetailDialog extends DialogFragment {
       addSolveTimesPage();
     }
 
-    adjustSessionTimesLayoutParams();
+    adjustTableLayoutParams(sessionTimesLayout, SESSION_TIMES_HEIGHT_DP);
 
     buMore.setOnClickListener(new OnClickListener() {
       @Override
@@ -109,6 +124,72 @@ public class SessionDetailDialog extends DialogFragment {
         addSolveTimesPage();
       }
     });
+  }
+
+  private long getBestMeanOf(List<Long> times, int n) {
+    long best = Long.MAX_VALUE;
+    for (int i = 0; i <= times.size() - n; i++) {
+      CubeBaseSession session = new CubeBaseSession(times.subList(i, Math.min(i + n, times.size())));
+      long mean = session.getMeanOf(n);
+      if (mean > 0 && mean < best) {
+        best = mean;
+      }
+    }
+    return best == Long.MAX_VALUE ? -2 : best;
+  }
+
+  private long getBestAverageOf(List<Long> times, int n) {
+    long best = Long.MAX_VALUE;
+    for (int i = 0; i <= times.size() - n; i++) {
+      CubeBaseSession session = new CubeBaseSession(times.subList(i, Math.min(i + n, times.size())));
+      long avg = session.getAverageOf(n);
+      if (avg > 0 && avg < best) {
+        best = avg;
+      }
+    }
+    return best == Long.MAX_VALUE ? -2 : best;
+  }
+
+  private void setupBestAverages(View v, List<Long> times) {
+    long avg5 = getBestAverageOf(times, 5);
+    long avg12 = getBestAverageOf(times, 12);
+    long avg50 = getBestAverageOf(times, 50);
+    long avg100 = getBestAverageOf(times, 100);
+
+    if (avg5 < 0 && avg12 < 0 && avg50 < 0 && avg100 < 0) {
+      v.findViewById(R.id.bestAveragesLayout).setVisibility(View.GONE);
+      return;
+    }
+    TableLayout bestAveragesTableLayout = (TableLayout) v.findViewById(R.id.bestAveragesTableLayout);
+    TableRow trHeaders = new TableRow(getActivity());
+    TableRow trAverages = new TableRow(getActivity());
+    if (avg5 > 0) {
+      addToBestAveragesTable(trHeaders, trAverages, 5, avg5);
+    }
+    if (avg12 > 0) {
+      addToBestAveragesTable(trHeaders, trAverages, 12, avg12);
+    }
+    if (avg50 > 0) {
+      addToBestAveragesTable(trHeaders, trAverages, 50, avg50);
+    }
+    if (avg100 > 0) {
+      addToBestAveragesTable(trHeaders, trAverages, 100, avg100);
+    }
+    bestAveragesTableLayout.addView(trHeaders);
+    bestAveragesTableLayout.addView(trAverages);
+    adjustTableLayoutParams(bestAveragesTableLayout, BEST_AVERAGES_HEIGHT_DP);
+  }
+
+  private void addToBestAveragesTable(TableRow trHeaders, TableRow trAverages, int avgHeader, long average) {
+    TextView tv = getNewSolveTimeTextView();
+    tv.setTextColor(getResources().getColor(R.color.lightblue));
+    tv.setText(String.valueOf(avgHeader));
+    tv.setTypeface(null, Typeface.BOLD);
+    trHeaders.addView(tv);
+
+    tv = getNewSolveTimeTextView();
+    tv.setText(FormatterService.INSTANCE.formatSolveTime(average));
+    trAverages.addView(tv);
   }
 
   private void addSolveTimesPage() {
@@ -139,20 +220,20 @@ public class SessionDetailDialog extends DialogFragment {
         }
       }
     }
-    adjustSessionTimesLayoutParams();
+    adjustTableLayoutParams(sessionTimesLayout, SESSION_TIMES_HEIGHT_DP);
     curPageInd++;
   }
 
-  private void adjustSessionTimesLayoutParams() {
+  private void adjustTableLayoutParams(TableLayout tableLayout, int tvHeightDp) {
     int startInd = curPageInd * PAGE_LINES_COUNT;
-    for (int i = startInd; i < sessionTimesLayout.getChildCount(); i++) {
-      if (sessionTimesLayout.getChildAt(i) instanceof TableRow) {
-        TableRow tr = (TableRow) sessionTimesLayout.getChildAt(i);
+    for (int i = startInd; i < tableLayout.getChildCount(); i++) {
+      if (tableLayout.getChildAt(i) instanceof TableRow) {
+        TableRow tr = (TableRow) tableLayout.getChildAt(i);
         for (int j = 0; j < tr.getChildCount(); j++) {
           TextView tv = (TextView) tr.getChildAt(j);
           LayoutParams params = (LayoutParams) tv.getLayoutParams();
           params.setMargins(2, 2, 2, 2);
-          params.height = ScreenUtils.dipToPixels(26);
+          params.height = ScreenUtils.dipToPixels(tvHeightDp);
           tv.setLayoutParams(params);
         }
       }

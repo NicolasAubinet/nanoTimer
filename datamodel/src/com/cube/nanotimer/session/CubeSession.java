@@ -16,11 +16,11 @@ public class CubeSession extends CubeBaseSession {
   }
 
   public long getRAOfFive() {
-    return getRAOf(5);
+    return getAverageOf(5);
   }
 
   public long getRAOfTwelve() {
-    return getRAOf(12);
+    return getAverageOf(12);
   }
 
   public void addTime(long time) {

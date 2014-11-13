@@ -95,11 +95,11 @@ public class DBUpgradeScripts {
         if (blindMode) {
           values.put(DB.COL_TIMEHISTORY_AVG5, session.getMeanOf(3));
         } else {
-          values.put(DB.COL_TIMEHISTORY_AVG5, session.getRAOf(5));
+          values.put(DB.COL_TIMEHISTORY_AVG5, session.getAverageOf(5));
         }
-        values.put(DB.COL_TIMEHISTORY_AVG12, session.getRAOf(12));
-        values.put(DB.COL_TIMEHISTORY_AVG50, session.getRAOf(50));
-        values.put(DB.COL_TIMEHISTORY_AVG100, session.getRAOf(100));
+        values.put(DB.COL_TIMEHISTORY_AVG12, session.getAverageOf(12));
+        values.put(DB.COL_TIMEHISTORY_AVG50, session.getAverageOf(50));
+        values.put(DB.COL_TIMEHISTORY_AVG100, session.getAverageOf(100));
 
 //        Log.i("[MeansToAvg]", "  Update " + liIds.get(i) + " (time: " + liTimes.get(i) + ") with averages " +
 //            values.getAsLong(DB.COL_TIMEHISTORY_AVG5) + " | " +
