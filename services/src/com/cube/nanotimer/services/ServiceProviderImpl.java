@@ -4,7 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import com.cube.nanotimer.services.db.DB;
-import com.cube.nanotimer.session.CubeBaseSession;
+import com.cube.nanotimer.session.TimesStatistics;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveAverages;
@@ -274,7 +274,7 @@ public class ServiceProviderImpl implements ServiceProvider {
       int[] avgsToGet = new int[] { 5, 12, 50, 100 };
       for (int i = 0; i < stepsTimes.size(); i++) {
         List<Long> st = stepsTimes.get(i);
-        CubeBaseSession session = new CubeBaseSession(st);
+        TimesStatistics session = new TimesStatistics(st);
         for (int a : avgsToGet) {
           if (averages.get(a) == null) {
             averages.put(a, new ArrayList<Long>());
@@ -693,7 +693,7 @@ public class ServiceProviderImpl implements ServiceProvider {
       for (int j = 0; j < timesBefore.size() && times.size() < MAX_AVERAGE_COUNT; j++) {
         times.add(timesBefore.get(j).getTime());
       }
-      CubeBaseSession session = new CubeBaseSession(times);
+      TimesStatistics session = new TimesStatistics(times);
 
       ContentValues values = new ContentValues();
       if (solveType.isBlind()) {
@@ -832,7 +832,7 @@ public class ServiceProviderImpl implements ServiceProvider {
         times.add(cursor.getLong(0));
       }
     }
-    CubeBaseSession session = new CubeBaseSession(times);
+    TimesStatistics session = new TimesStatistics(times);
     for (int i = 0; i < avgsToGet.length; i++) {
       long avg = session.getAverageOf(avgsToGet[i]);
       averages[i] = (avg < 0) ? null : avg; // so that N/A (-2) is null
@@ -853,7 +853,7 @@ public class ServiceProviderImpl implements ServiceProvider {
    * @return the last average
    */
   private Long getLastAvg(int n) {
-    long avg = new CubeBaseSession(getCachedTimes(n)).getAverageOf(n);
+    long avg = new TimesStatistics(getCachedTimes(n)).getAverageOf(n);
     return (avg == -2) ? null : avg;
   }
 
@@ -863,7 +863,7 @@ public class ServiceProviderImpl implements ServiceProvider {
    * @return the mean of n
    */
   private Long getLastMean(int n) {
-    long mean = new CubeBaseSession(getCachedTimes(n)).getMeanOf(n);
+    long mean = new TimesStatistics(getCachedTimes(n)).getMeanOf(n);
     return (mean == -2) ? null : mean;
   }
 
@@ -874,7 +874,7 @@ public class ServiceProviderImpl implements ServiceProvider {
    * @return the mean of n
    */
   private Long getLastSuccessMean(int n, boolean calculateAll) {
-    long mean = new CubeBaseSession(getCachedTimes(n)).getSuccessMeanOf(n, calculateAll);
+    long mean = new TimesStatistics(getCachedTimes(n)).getSuccessMeanOf(n, calculateAll);
     return (mean == -2) ? null : mean;
   }
 
@@ -885,7 +885,7 @@ public class ServiceProviderImpl implements ServiceProvider {
    * @return the last accuracy, from 0 to 100
    */
   private Integer getLastAccuracy(int n, boolean calculateAll) {
-    int accuracy = new CubeBaseSession(getCachedTimes(n)).getAccuracy(n, calculateAll);
+    int accuracy = new TimesStatistics(getCachedTimes(n)).getAccuracy(n, calculateAll);
     return (accuracy == -2) ? null : accuracy;
   }
 

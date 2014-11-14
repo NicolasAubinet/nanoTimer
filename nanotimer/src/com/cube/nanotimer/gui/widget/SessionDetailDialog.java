@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.services.db.DataCallback;
-import com.cube.nanotimer.session.CubeBaseSession;
+import com.cube.nanotimer.session.TimesStatistics;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.helper.GUIUtils;
 import com.cube.nanotimer.util.helper.ScreenUtils;
@@ -73,7 +73,7 @@ public class SessionDetailDialog extends DialogFragment {
 
   private void displaySessionDetails(View v, SessionDetails sessionDetails) {
     sessionTimes = sessionDetails.getSessionTimes();
-    CubeBaseSession session = new CubeBaseSession(sessionTimes);
+    TimesStatistics session = new TimesStatistics(sessionTimes);
     bestInd = (sessionTimes.size() < 5) ? -1 : session.getBestTimeInd(sessionTimes.size());
     worstInd = (sessionTimes.size() < 5) ? -1 : session.getWorstTimeInd(sessionTimes.size());
     buMore = (Button) v.findViewById(R.id.buMore);
@@ -85,7 +85,15 @@ public class SessionDetailDialog extends DialogFragment {
       v.findViewById(R.id.trAccuracy).setVisibility(View.VISIBLE);
       ((TextView) v.findViewById(R.id.tvBestMeanOfThree)).setText(FormatterService.INSTANCE.formatSolveTime(getBestMeanOf(sessionTimes, 3)));
       ((TextView) v.findViewById(R.id.tvAccuracy)).setText(FormatterService.INSTANCE.formatPercentage(session.getAccuracy(sessionTimes.size())));
-      ((TextView) v.findViewById(R.id.tvAverage)).setText(FormatterService.INSTANCE.formatSolveTime(session.getSuccessAverageOf(sessionTimes.size(), true)));
+      ((TextView) v.findViewById(R.id.tvAverage)).setText(FormatterService.INSTANCE.formatSolveTime(session.getSuccessAverageOf(sessionTimes.size(), 5, true)));
+      // Process worst ind for blind: the worst should not be a DNF as the average is calculated only based on successes
+      long worst = -1;
+      for (int i = 0; i < sessionTimes.size(); i++) {
+        if (sessionTimes.get(i) > worst) {
+          worst = sessionTimes.get(i);
+          worstInd = i;
+        }
+      }
     } else {
       setupBestAverages(v, sessionTimes);
       ((TextView) v.findViewById(R.id.tvAverage)).setText(FormatterService.INSTANCE.formatSolveTime(session.getAverageOf(Math.max(5, sessionTimes.size()))));
@@ -127,7 +135,7 @@ public class SessionDetailDialog extends DialogFragment {
   private long getBestMeanOf(List<Long> times, int n) {
     long best = Long.MAX_VALUE;
     for (int i = 0; i <= times.size() - n; i++) {
-      CubeBaseSession session = new CubeBaseSession(times.subList(i, Math.min(i + n, times.size())));
+      TimesStatistics session = new TimesStatistics(times.subList(i, Math.min(i + n, times.size())));
       long mean = session.getMeanOf(n);
       if (mean > 0 && mean < best) {
         best = mean;
@@ -139,7 +147,7 @@ public class SessionDetailDialog extends DialogFragment {
   private long getBestAverageOf(List<Long> times, int n) {
     long best = Long.MAX_VALUE;
     for (int i = 0; i <= times.size() - n; i++) {
-      CubeBaseSession session = new CubeBaseSession(times.subList(i, Math.min(i + n, times.size())));
+      TimesStatistics session = new TimesStatistics(times.subList(i, Math.min(i + n, times.size())));
       long avg = session.getAverageOf(n);
       if (avg > 0 && avg < best) {
         best = avg;

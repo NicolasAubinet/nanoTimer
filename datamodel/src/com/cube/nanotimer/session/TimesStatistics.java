@@ -4,20 +4,20 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CubeBaseSession {
+public class TimesStatistics {
 
-  protected LinkedList<Long> sessionTimes = new LinkedList<Long>(); // most recent time is in position 0
+  protected LinkedList<Long> times = new LinkedList<Long>(); // most recent time is in position 0
 
-  public CubeBaseSession() {
+  public TimesStatistics() {
   }
 
-  public CubeBaseSession(List<Long> sessionTimes) {
-    this.sessionTimes = new LinkedList<Long>(sessionTimes);
+  public TimesStatistics(List<Long> times) {
+    this.times = new LinkedList<Long>(times);
   }
 
   public int getBestTimeInd(int count) {
     int bestInd = -1;
-    List<Long> times = getSessionTimes();
+    List<Long> times = getTimes();
     if (times.size() >= count) {
       Long best = (long) 0;
       for (int i = 0; i < count; i++) {
@@ -33,7 +33,7 @@ public class CubeBaseSession {
 
   public int getWorstTimeInd(int count) {
     int worstInd = -1;
-    List<Long> times = getSessionTimes();
+    List<Long> times = getTimes();
     if (times.size() >= count) {
       Long worst = (long) 0;
       for (int i = 0; i < count; i++) {
@@ -51,7 +51,7 @@ public class CubeBaseSession {
   }
 
   public long getAverageOf(int n) {
-    List<Long> times = getSessionTimes();
+    List<Long> times = getTimes();
     if (times.size() >= n) {
       int bestInd = getBestTimeInd(n);
       int worstInd = getWorstTimeInd(n);
@@ -79,7 +79,7 @@ public class CubeBaseSession {
   }
 
   public long getMeanOf(int n) {
-    List<Long> times = getSessionTimes();
+    List<Long> times = getTimes();
     long mean = 0;
     if (times.size() >= n) {
       for (int i = 0; i < n; i++) {
@@ -98,20 +98,23 @@ public class CubeBaseSession {
     }
   }
 
-  public long getSuccessAverageOf(int n, boolean calculateAll) {
+  public long getSuccessAverageOf(int n, int minSuccesses, boolean calculateAll) {
     int i = 0;
+    if (n < minSuccesses) {
+      return -2;
+    }
     List<Long> successes = new ArrayList<Long>();
-    for (Long t : getSessionTimes()) {
+    for (Long t : getTimes()) {
       if (t > 0) { // if not a DNF
         i++;
         successes.add(t);
         if (i == n) {
-          return new CubeBaseSession(successes).getAverageOf(n);
+          return new TimesStatistics(successes).getAverageOf(n);
         }
       }
     }
-    if (i > 0 && calculateAll) {
-      return new CubeBaseSession(successes).getAverageOf(i);
+    if (i >= minSuccesses && calculateAll) {
+      return new TimesStatistics(successes).getAverageOf(i);
     } else {
       return -2;
     }
@@ -120,7 +123,7 @@ public class CubeBaseSession {
   public long getSuccessMeanOf(int n, boolean calculateAll) {
     long total = 0;
     int i = 0;
-    for (Long t : getSessionTimes()) {
+    for (Long t : getTimes()) {
       if (t > 0) { // if not a DNF
         total += t;
         i++;
@@ -141,7 +144,7 @@ public class CubeBaseSession {
   }
 
   public int getAccuracy(int n, boolean calculateAll) {
-    List<Long> times = getSessionTimes();
+    List<Long> times = getTimes();
     if (times.isEmpty()) {
       return -2;
     }
@@ -163,8 +166,8 @@ public class CubeBaseSession {
     }
   }
 
-  public List<Long> getSessionTimes() {
-    return sessionTimes;
+  public List<Long> getTimes() {
+    return times;
   }
 
 }

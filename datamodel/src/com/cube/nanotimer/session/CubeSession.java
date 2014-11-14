@@ -3,7 +3,7 @@ package com.cube.nanotimer.session;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CubeSession extends CubeBaseSession {
+public class CubeSession extends TimesStatistics {
 
   public static final int SESSION_MAX_SIZE = 13; // 12, + 1 for deletion
 
@@ -11,8 +11,8 @@ public class CubeSession extends CubeBaseSession {
     super();
   }
 
-  public CubeSession(List<Long> sessionTimes) {
-    super(sessionTimes);
+  public CubeSession(List<Long> times) {
+    super(times);
   }
 
   public long getRAOfFive() {
@@ -24,49 +24,49 @@ public class CubeSession extends CubeBaseSession {
   }
 
   public void addTime(long time) {
-    sessionTimes.addFirst(time);
-    if (sessionTimes.size() > SESSION_MAX_SIZE) {
-      sessionTimes.removeLast();
+    times.addFirst(time);
+    if (times.size() > SESSION_MAX_SIZE) {
+      times.removeLast();
     }
   }
 
   public void setLastAsDNF() {
-    if (!sessionTimes.isEmpty()) {
-      sessionTimes.set(0, (long) -1);
+    if (!times.isEmpty()) {
+      times.set(0, (long) -1);
     }
   }
 
   public void setLastAsPlusTwo() {
-    if (!sessionTimes.isEmpty()) {
-      long curLastTime = sessionTimes.get(0);
+    if (!times.isEmpty()) {
+      long curLastTime = times.get(0);
       if (curLastTime > 0) {
-        sessionTimes.set(0, curLastTime + 2000);
+        times.set(0, curLastTime + 2000);
       }
     }
   }
 
   public void deleteLast() {
-    if (!sessionTimes.isEmpty()) {
-      sessionTimes.removeFirst();
+    if (!times.isEmpty()) {
+      times.removeFirst();
     }
   }
 
   public void clearSession() {
-    if (sessionTimes != null) {
-      sessionTimes.clear();
+    if (times != null) {
+      times.clear();
     }
   }
 
-  public List<Long> getSessionTimes() {
-    if (sessionTimes.size() > 12) {
-      return sessionTimes.subList(0, 12);
+  public List<Long> getTimes() {
+    if (times.size() > 12) {
+      return times.subList(0, 12);
     } else {
-      return sessionTimes;
+      return times;
     }
   }
 
-  public void setSessionTimes(LinkedList<Long> sessionTimes) {
-    this.sessionTimes = sessionTimes;
+  public void setTimes(LinkedList<Long> times) {
+    this.times = times;
   }
 
 }

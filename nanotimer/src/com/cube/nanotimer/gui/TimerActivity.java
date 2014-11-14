@@ -435,7 +435,7 @@ public class TimerActivity extends ActionBarActivity {
         if (cubeSession == null) {
           return;
         }
-        List<Long> sessionTimes = cubeSession.getSessionTimes();
+        List<Long> sessionTimes = cubeSession.getTimes();
         if (!sessionTimes.isEmpty()) {
           int bestInd = (sessionTimes.size() < 5) ? -1 : cubeSession.getBestTimeInd(sessionTimes.size());
           int worstInd = (sessionTimes.size() < 5) ? -1 : cubeSession.getWorstTimeInd(sessionTimes.size());

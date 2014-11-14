@@ -3,7 +3,7 @@ package com.cube.nanotimer.services.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import com.cube.nanotimer.session.CubeBaseSession;
+import com.cube.nanotimer.session.TimesStatistics;
 import com.cube.nanotimer.vo.SolveTime;
 
 import java.util.ArrayList;
@@ -90,7 +90,7 @@ public class DBUpgradeScripts {
 //      Log.i("[MeansToAvg]", "Start updating...");
 
       for (int i = liIds.size() - 1; i >= 0; i--) { // reverse because most recent time is in position 0
-        CubeBaseSession session = new CubeBaseSession(liTimes.subList(i, Math.min(i + 100, liIds.size())));
+        TimesStatistics session = new TimesStatistics(liTimes.subList(i, Math.min(i + 100, liIds.size())));
         ContentValues values = new ContentValues();
         if (blindMode) {
           values.put(DB.COL_TIMEHISTORY_AVG5, session.getMeanOf(3));
