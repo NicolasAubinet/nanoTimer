@@ -437,11 +437,11 @@ public class TimerActivity extends ActionBarActivity {
         }
         List<Long> sessionTimes = cubeSession.getTimes();
         if (!sessionTimes.isEmpty()) {
-          int bestInd = (sessionTimes.size() < 5) ? -1 : cubeSession.getBestTimeInd(sessionTimes.size());
-          int worstInd = (sessionTimes.size() < 5) ? -1 : cubeSession.getWorstTimeInd(sessionTimes.size());
+          int bestInd = cubeSession.getBestTimeInd(solveType.isBlind());
+          int worstInd = cubeSession.getWorstTimeInd(solveType.isBlind());
           for (int i = 0; i < sessionTimes.size(); i++) {
             TextView tv = getSessionTextView(i);
-            GUIUtils.setSessionTimeCellText(tv, sessionTimes.get(i), i, bestInd, worstInd);
+            GUIUtils.setSessionTimeCellText(tv, sessionTimes.get(i), i, bestInd, worstInd, solveType.isBlind());
           }
         }
       }

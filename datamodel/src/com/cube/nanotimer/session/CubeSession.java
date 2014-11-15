@@ -15,11 +15,11 @@ public class CubeSession extends TimesStatistics {
     super(times);
   }
 
-  public long getRAOfFive() {
+  public long getAverageOfFive() {
     return getAverageOf(5);
   }
 
-  public long getRAOfTwelve() {
+  public long getAverageOfTwelve() {
     return getAverageOf(12);
   }
 

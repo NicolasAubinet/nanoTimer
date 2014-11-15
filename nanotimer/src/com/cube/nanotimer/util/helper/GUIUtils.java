@@ -110,7 +110,7 @@ public class GUIUtils {
     return res;
   }
 
-  public static void setSessionTimeCellText(TextView tv, long time, int timeInd, int bestInd, int worstInd) {
+  public static void setSessionTimeCellText(TextView tv, long time, int timeInd, int bestInd, int worstInd, boolean blind) {
     String strTime = FormatterService.INSTANCE.formatSolveTime(time);
     StringBuilder sbTimes = new StringBuilder();
     if (timeInd == bestInd) {
@@ -119,6 +119,10 @@ public class GUIUtils {
       tv.setText(Html.fromHtml(sbTimes.toString()));
     } else if (timeInd == worstInd) {
       sbTimes.append("<font color='").append(tv.getContext().getResources().getColor(R.color.red)).append("'>");
+      sbTimes.append(strTime).append("</font>");
+      tv.setText(Html.fromHtml(sbTimes.toString()));
+    } else if (blind && time == -1) { // DNF
+      sbTimes.append("<font color='").append(tv.getContext().getResources().getColor(R.color.gray600)).append("'>");
       sbTimes.append(strTime).append("</font>");
       tv.setText(Html.fromHtml(sbTimes.toString()));
     } else {
