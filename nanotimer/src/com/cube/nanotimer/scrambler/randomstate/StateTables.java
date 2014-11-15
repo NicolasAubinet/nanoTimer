@@ -1,8 +1,9 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
-public class StateTables {
+import android.util.Log;
+import android.util.SparseIntArray;
 
-  // TODO : make positions start at 0 (everywhere, starting from Move class, IndexConvertor, tests etc)
+public class StateTables {
 
   static final int N_CORNER_PERMUTATIONS = 40320;
 //  static final int N_CORNER_PERMUTATIONS = 5040;
@@ -14,10 +15,6 @@ public class StateTables {
 //  static final int N_U_D_EDGE_PERMUTATIONS = 5040;
   static final int N_EDGE_ORIENTATIONS = 2048;
   static final int N_EDGE_PERMUTATIONS = 479001600;
-
-  // RELATIVE PERMUTATIONS are wrooooong! Don't know how to do a R after a U...
-  // TODO : see if there is a way to make it work
-  // TODO : else, could see if possible to drop the last piece (have 7 corners and 7 UD edges and figure the last one out) to keep 5040 elements instead of 40320
 
   // TODO : transit optimization:
   //        use symmetries to reduce entries?
@@ -174,6 +171,34 @@ public class StateTables {
 
     logTimeDifference(tsPrun, "-> pruning time");
     logTimeDifference(ts, "time to generate tables");
+
+//    Log.i("[NanoTimer]", "prCorOri:");
+//    displayDistributions(pruningCornerOrientation);
+//    Log.i("[NanoTimer]", "prEdgOri:");
+//    displayDistributions(pruningEdgeOrientation);
+//    Log.i("[NanoTimer]", "prCorPerm:");
+//    displayDistributions(pruningCornerPermutation);
+//    Log.i("[NanoTimer]", "prEDEdgPerm:");
+//    displayDistributions(pruningUDEdgePermutation);
+  }
+
+  private static void displayDistributions(byte[][] pruningTable) {
+    SparseIntArray distributions = new SparseIntArray();
+    for (int i = 0; i < 20; i++) {
+      distributions.put(i, 0);
+    }
+    for (int i = 0; i < pruningTable.length; i++) {
+      for (int j = 0; j < pruningTable[i].length; j++) {
+        distributions.put((int) pruningTable[i][j], distributions.get(pruningTable[i][j]) + 1);
+      }
+    }
+    int d = 0;
+    Integer v = distributions.get(d);
+    while (v != null && v > 0) {
+      Log.i("[NanoTimer]", " pruning d " + d + ": " + v);
+      v = distributions.get(d);
+      d++;
+    }
   }
 
   private static void genPruning(byte[][] pruningTable, short[][] transit1, short[][] transit2, Move[] moves, int phase) {

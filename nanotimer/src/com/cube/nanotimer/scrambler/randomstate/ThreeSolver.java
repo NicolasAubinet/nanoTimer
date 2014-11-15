@@ -32,15 +32,10 @@ public class ThreeSolver {
     }
   }
 
-  // TODO : pass the following static variables as parameters to solution(...) instead
   private static final int DEFAULT_MAX_SOLUTION_LENGTH = 23;
   private static final int MAX_PHASE2_SOLUTION_LENGTH = 12;
-//  private static final int MAX_SEARCH_TIME = 10; // in seconds. will stop after that time if a solution was found, even if it is not optimal
   private static final int SAFE_PHASE1_ITERATIONS_LIMIT = 30;
-  // TODO : could maybe reduce this (but test on slow devices)
   private static final int SEARCH_TIME_MIN = 150; // time in ms during which to search for a better solution
-
-  // TODO : there seems to be a lot or phase 2 moves in the solution. see if normal
 
   public static final boolean SHOW_PHASE_SEPARATOR = false; // for debug
 
@@ -121,7 +116,6 @@ public class ThreeSolver {
     if (depth == 0) {
       if (cornerOrientation == 0 && edgeOrientation == 0 && eEdgeCombination == 0) {
         // check that last move is not a phase 2 move
-        // TODO : should make sure that two different enum instances of same type are equal (otherwise should compare name, or an id or something like that)
         if (lastMove >= 0) {
           Move m = moves[lastMove];
           for (int i = 0; i < allMoves2.length; i++) {

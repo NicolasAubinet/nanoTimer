@@ -26,7 +26,7 @@ public enum ScramblerService {
   INSTANCE;
 
   public static final int MAX_SCRAMBLES_IN_MEMORY = 500;
-  private static final int DEFAULT_CACHE_SIZE = 50; // TODO : should increase these two values
+  private static final int DEFAULT_CACHE_SIZE = 50;
   private static final int MIN_CACHE_SIZE = 25;
 
   private Context context;

@@ -68,7 +68,7 @@
   <string name="best_averages">Best averages</string>
   <string name="times">Times</string>
   <string name="session_best_mean_of_three">Best Mo3:</string>
-  <string name="session_success_average">Success avg:</string>
+  <string name="session_success_average">Succ. avg:</string>
   <string name="session_accuracy">Accuracy:</string>
 
   <string name="clear_history">Clear history</string>

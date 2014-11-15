@@ -31,6 +31,7 @@ public class SessionDetailDialog extends DialogFragment {
   private static final int TIMES_PER_LINE = 4;
   private static final int SESSION_TIMES_HEIGHT_DP = 26;
   private static final int BEST_AVERAGES_HEIGHT_DP = 22;
+  private static final int MIN_TIMES_FOR_AVERAGE = 5;
   private static final String ARG_SOLVETYPE = "solvetype";
 
   private LayoutInflater inflater;
@@ -74,8 +75,8 @@ public class SessionDetailDialog extends DialogFragment {
   private void displaySessionDetails(View v, SessionDetails sessionDetails) {
     sessionTimes = sessionDetails.getSessionTimes();
     TimesStatistics session = new TimesStatistics(sessionTimes);
-    bestInd = (sessionTimes.size() < 5) ? -1 : session.getBestTimeInd(sessionTimes.size());
-    worstInd = (sessionTimes.size() < 5) ? -1 : session.getWorstTimeInd(sessionTimes.size());
+    bestInd = (sessionTimes.size() < MIN_TIMES_FOR_AVERAGE) ? -1 : session.getBestTimeInd(sessionTimes.size());
+    worstInd = (sessionTimes.size() < MIN_TIMES_FOR_AVERAGE) ? -1 : session.getWorstTimeInd(sessionTimes.size());
     buMore = (Button) v.findViewById(R.id.buMore);
     inflater = getActivity().getLayoutInflater();
 
@@ -85,18 +86,25 @@ public class SessionDetailDialog extends DialogFragment {
       v.findViewById(R.id.trAccuracy).setVisibility(View.VISIBLE);
       ((TextView) v.findViewById(R.id.tvBestMeanOfThree)).setText(FormatterService.INSTANCE.formatSolveTime(getBestMeanOf(sessionTimes, 3)));
       ((TextView) v.findViewById(R.id.tvAccuracy)).setText(FormatterService.INSTANCE.formatPercentage(session.getAccuracy(sessionTimes.size())));
-      ((TextView) v.findViewById(R.id.tvAverage)).setText(FormatterService.INSTANCE.formatSolveTime(session.getSuccessAverageOf(sessionTimes.size(), 5, true)));
-      // Process worst ind for blind: the worst should not be a DNF as the average is calculated only based on successes
-      long worst = -1;
-      for (int i = 0; i < sessionTimes.size(); i++) {
-        if (sessionTimes.get(i) > worst) {
-          worst = sessionTimes.get(i);
-          worstInd = i;
+      ((TextView) v.findViewById(R.id.tvLabelAverage)).setText(R.string.session_success_average);
+      long successAverage = session.getSuccessAverageOf(sessionTimes.size(), MIN_TIMES_FOR_AVERAGE, true);
+      ((TextView) v.findViewById(R.id.tvAverage)).setText(FormatterService.INSTANCE.formatSolveTime(successAverage));
+      if (successAverage > 0) {
+        // Process worst ind for blind: the worst should not be a DNF as the average is calculated only based on successes
+        long worst = -1;
+        for (int i = 0; i < sessionTimes.size(); i++) {
+          if (sessionTimes.get(i) > worst) {
+            worst = sessionTimes.get(i);
+            worstInd = i;
+          }
         }
+      } else {
+        bestInd = -1;
+        worstInd = -1;
       }
     } else {
       setupBestAverages(v, sessionTimes);
-      ((TextView) v.findViewById(R.id.tvAverage)).setText(FormatterService.INSTANCE.formatSolveTime(session.getAverageOf(Math.max(5, sessionTimes.size()))));
+      ((TextView) v.findViewById(R.id.tvAverage)).setText(FormatterService.INSTANCE.formatSolveTime(session.getAverageOf(Math.max(MIN_TIMES_FOR_AVERAGE, sessionTimes.size()))));
     }
 
     ((TextView) v.findViewById(R.id.tvSolves)).setText(String.valueOf(sessionDetails.getSessionSolvesCount()));
