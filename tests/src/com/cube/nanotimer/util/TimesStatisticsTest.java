@@ -95,12 +95,41 @@ public class TimesStatisticsTest extends AndroidTestCase {
 
   @SmallTest
   public void testSuccessMean() {
-    // TODO
+    Assert.assertEquals(3000, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getSuccessMeanOf(5, false));
+    Assert.assertEquals(2840, new TimesStatistics(getTimesList(200, 2000, 3000, 4000, 5000)).getSuccessMeanOf(5, false));
+    Assert.assertEquals(4240, new TimesStatistics(getTimesList(200, 2000, 3000, 4000, 12000)).getSuccessMeanOf(5, false));
+    Assert.assertEquals(4840, new TimesStatistics(getTimesList(200, 2000, 6000, 4000, 12000)).getSuccessMeanOf(5, false));
+
+    Assert.assertEquals(3250, new TimesStatistics(getTimesList(1000, -1, 3000, 4000, 5000)).getSuccessMeanOf(5, true));
+    Assert.assertEquals(-2, new TimesStatistics(getTimesList(1000, -1, 3000, 4000, 5000)).getSuccessMeanOf(5, false));
+    Assert.assertEquals(3200, new TimesStatistics(getTimesList(-1, 6000, 3000, 1000, 4000, 2000, 5000)).getSuccessMeanOf(5, false));
+    Assert.assertEquals(4400, new TimesStatistics(getTimesList(8000, -1, 6000, 3000, 1000, 4000, 2000, 5000)).getSuccessMeanOf(5, false));
+
+    List<Long> times = getTimesList(6000, 8000, -1, 3000, 1000, 4000, 5000);
+    Assert.assertEquals(4400, new TimesStatistics(times).getSuccessMeanOf(5, false));
+    Assert.assertEquals(4400, new TimesStatistics(times).getSuccessMeanOf(5, true));
+    Assert.assertEquals(-2, new TimesStatistics(times).getSuccessMeanOf(12, false));
+    Assert.assertEquals(4500, new TimesStatistics(times).getSuccessMeanOf(12, true));
+    Assert.assertEquals(5666, new TimesStatistics(times).getSuccessMeanOf(3, false));
+    Assert.assertEquals(5666, new TimesStatistics(times).getSuccessMeanOf(3, true));
   }
 
   @SmallTest
   public void testAccuracy() {
-    // TODO
+    Assert.assertEquals(100, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getAccuracy(5, false));
+    Assert.assertEquals(100, new TimesStatistics(getTimesList(1000)).getAccuracy(1, false));
+    Assert.assertEquals(50, new TimesStatistics(getTimesList(1000, -1)).getAccuracy(2, false));
+    Assert.assertEquals(50, new TimesStatistics(getTimesList(-1, 1000)).getAccuracy(2, false));
+    Assert.assertEquals(25, new TimesStatistics(getTimesList(-1, 1000, -1, -1)).getAccuracy(4, false));
+    Assert.assertEquals(0, new TimesStatistics(getTimesList(-1)).getAccuracy(1, false));
+    Assert.assertEquals(-2, new TimesStatistics(getTimesList()).getAccuracy(0, false));
+    Assert.assertEquals(0, new TimesStatistics(getTimesList(-1, 1000)).getAccuracy(1, false));
+    Assert.assertEquals(-2, new TimesStatistics(getTimesList(-1, 1000)).getAccuracy(5, false));
+    Assert.assertEquals(50, new TimesStatistics(getTimesList(-1, 1000, -1)).getAccuracy(2, false));
+    Assert.assertEquals(75, new TimesStatistics(getTimesList(-1, 1000, 1000, 1000)).getAccuracy(5, true));
+    Assert.assertEquals(-2, new TimesStatistics(getTimesList(-1, 1000, 1000, 1000)).getAccuracy(5, false));
+    Assert.assertEquals(75, new TimesStatistics(getTimesList(-1, 1000, 1000, 1000)).getAccuracy(4, false));
+    Assert.assertEquals(50, new TimesStatistics(getTimesList(-1, 1000, -1, 1000)).getAccuracy(10, true));
   }
 
   private List<Long> getTimesList(int... times) {
