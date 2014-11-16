@@ -124,7 +124,8 @@ public class PreGenerateScramblesDialog extends DialogPreference implements Rand
           generatingLayout.setVisibility(View.VISIBLE);
           buStopGeneration.setVisibility(View.VISIBLE);
           if (state == State.GENERATING) {
-            tvState.setText(getContext().getString(R.string.generating_scramble, event.getCurScramble(), event.getTotalToGenerate()));
+            tvState.setText(getContext().getString(R.string.generating_cube_scramble, event.getCubeTypeName(),
+                event.getCurScramble(), event.getTotalToGenerate()));
           } else if (state == State.PREPARING) {
             tvState.setText(R.string.preparing_generation);
           }

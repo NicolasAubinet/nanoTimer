@@ -31,20 +31,20 @@ public class DialogUtils {
     Toast.makeText(context, messageId, Toast.LENGTH_LONG).show();
   }
 
-  public static void showYesNoConfirmation(Context context, String message, final YesNoListener listener) {
+  public static AlertDialog showYesNoConfirmation(Context context, String message, final YesNoListener listener) {
     DialogInterface.OnClickListener clickListener = getYesNoClickListener(listener);
 
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
-    builder.setMessage(message)
+    return builder.setMessage(message)
         .setPositiveButton("Yes", clickListener)
         .setNegativeButton("No", clickListener).show();
   }
 
-  public static void showYesNoConfirmation(Context context, int messageId, final YesNoListener listener) {
+  public static AlertDialog showYesNoConfirmation(Context context, int messageId, final YesNoListener listener) {
     DialogInterface.OnClickListener clickListener = getYesNoClickListener(listener);
 
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
-    builder.setMessage(messageId)
+    return builder.setMessage(messageId)
         .setPositiveButton("Yes", clickListener)
         .setNegativeButton("No", clickListener).show();
   }

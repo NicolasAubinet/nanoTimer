@@ -114,6 +114,7 @@
   <string name="banner">Banner</string>
   <string name="interstitial">Interstitial</string>
   <string name="mixed">Mixed</string>
+  <string name="want_to_clear_scramble_cache">Do you want to clear the scramble cache?</string>
 
   <string name="total_scrambles_count">Total generated scrambles: %1$d</string>
   <string name="scrambles_already_generating">Scrambles are already being generated.</string>
@@ -124,6 +125,7 @@
   <string name="preparing_generation">Preparing generation&#8230;</string>
   <string name="scrambles_being_generated">%1$s scrambles generating</string>
   <string name="generating_scramble">Generating scramble %1$d of %2$d</string>
+  <string name="generating_cube_scramble">%1$s scrambles generating&#8230;\n%2$d of %3$d</string>
   <string name="stopping_generation">Stopping generation&#8230;</string>
   <string name="new_record">New record!</string>
   <string name="inspection">Inspection</string>

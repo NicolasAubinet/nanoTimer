@@ -145,7 +145,7 @@
                  android:id="@+id/tvSolvesCount"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:layout_marginLeft="3px"
+                 android:layout_marginLeft="5px"
                  android:textColor="@color/white"
                  style="@style/SmallTextField"/>
             </TableRow>
@@ -159,7 +159,7 @@
                  android:id="@+id/tvLifetimeAccuracy"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:layout_marginLeft="3px"
+                 android:layout_marginLeft="5px"
                  android:textColor="@color/white"
                  style="@style/SmallTextField"/>
             </TableRow>
@@ -173,7 +173,7 @@
                  android:id="@+id/tvMeanOfThree"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:layout_marginLeft="3px"
+                 android:layout_marginLeft="5px"
                  android:textColor="@color/white"
                  style="@style/SmallTextField"/>
             </TableRow>
@@ -193,7 +193,7 @@
                  android:id="@+id/tvLifetimeBest"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:layout_marginLeft="3px"
+                 android:layout_marginLeft="5px"
                  android:textColor="@color/white"
                  style="@style/SmallTextField"/>
             </TableRow>
@@ -207,7 +207,7 @@
                  android:id="@+id/tvLifetimeAvg"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:layout_marginLeft="3px"
+                 android:layout_marginLeft="5px"
                  android:textColor="@color/white"
                  style="@style/SmallTextField"/>
             </TableRow>
@@ -221,7 +221,7 @@
                  android:id="@+id/tvBestMeanOfThree"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:layout_marginLeft="3px"
+                 android:layout_marginLeft="5px"
                  android:textColor="@color/white"
                  style="@style/SmallTextField"/>
             </TableRow>
