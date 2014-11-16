@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -35,7 +33,6 @@ public class SessionDetailDialog extends DialogFragment {
 
   private LayoutInflater inflater;
   private TableLayout sessionTimesLayout;
-  private Button buMore;
   private List<Long> sessionTimes;
   private SolveType solveType;
   private int bestInd;
@@ -76,7 +73,6 @@ public class SessionDetailDialog extends DialogFragment {
     TimesStatistics session = new TimesStatistics(sessionTimes);
     bestInd = session.getBestTimeInd(solveType.isBlind());
     worstInd = session.getWorstTimeInd(solveType.isBlind());
-    buMore = (Button) v.findViewById(R.id.buMore);
     inflater = getActivity().getLayoutInflater();
 
     if (solveType.isBlind()) {
@@ -117,13 +113,6 @@ public class SessionDetailDialog extends DialogFragment {
     }
 
     adjustTableLayoutParams(sessionTimesLayout, SESSION_TIMES_HEIGHT_DP);
-
-    buMore.setOnClickListener(new OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        addSolveTimesPage();
-      }
-    });
   }
 
   private long getBestMeanOf(List<Long> times, int n) {
@@ -195,10 +184,7 @@ public class SessionDetailDialog extends DialogFragment {
   private void addSolveTimesPage() {
     TableRow tr = new TableRow(getActivity());
     int sessionTimesCount = sessionTimes.size();
-    int timesPerPage = PAGE_LINES_COUNT * TIMES_PER_LINE;
-    int pageStartInd = curPageInd * timesPerPage;
-    int pageEndInd = Math.min(sessionTimesCount, pageStartInd + timesPerPage);
-    for (int i = pageStartInd; i < pageEndInd; i++) {
+    for (int i = 0; i < sessionTimesCount; i++) {
       TextView tv = getNewSolveTimeTextView();
       GUIUtils.setSessionTimeCellText(tv, sessionTimes.get(i), i, bestInd, worstInd, solveType.isBlind());
       tr.addView(tv);
@@ -207,17 +193,12 @@ public class SessionDetailDialog extends DialogFragment {
         tr = new TableRow(getActivity());
       }
     }
-    if (pageEndInd < sessionTimesCount) { // some more times remain
-      buMore.setVisibility(View.VISIBLE);
-    } else { // all times are displayed
-      buMore.setVisibility(View.GONE);
-      // add remaining cells to have the same cells count than above lines
-      if (sessionTimesCount % TIMES_PER_LINE != 0) {
-        sessionTimesLayout.addView(tr);
-        for (int i = 0; i < TIMES_PER_LINE - (sessionTimesCount % TIMES_PER_LINE); i++) {
-          TextView tv = getNewSolveTimeTextView();
-          tr.addView(tv);
-        }
+    // add remaining cells to have the same cells count than the above lines
+    if (sessionTimesCount % TIMES_PER_LINE != 0) {
+      sessionTimesLayout.addView(tr);
+      for (int i = 0; i < TIMES_PER_LINE - (sessionTimesCount % TIMES_PER_LINE); i++) {
+        TextView tv = getNewSolveTimeTextView();
+        tr.addView(tv);
       }
     }
     adjustTableLayoutParams(sessionTimesLayout, SESSION_TIMES_HEIGHT_DP);
