@@ -55,6 +55,15 @@ public class ReleaseNotes {
     sb.append("<html><body>");
     sb.append("<font color=\"white\">");
 
+    sb.append("<u><b>v1.1.1</b></u>");
+    sb.append("<ul>");
+    sb.append("<li>New random-state scrambles for 3x3x3 and 2x2x2</li>");
+    sb.append("<li>Scrambles pre-generation</li>");
+    sb.append("<li>Timer screen fields changes (means to averages)</li>");
+    sb.append("<li>New blind solve mode with additional blind-related statistics</li>");
+    sb.append("<li>Session details window improvements</li>");
+    sb.append("</ul>");
+
     sb.append("<u><b>v1.1.0</b></u>");
     sb.append("<ul>");
     sb.append("<li>Improved graphical interface</li>");

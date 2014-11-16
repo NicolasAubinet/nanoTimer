@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 public class ServiceProviderImpl implements ServiceProvider {
 
@@ -916,6 +917,29 @@ public class ServiceProviderImpl implements ServiceProvider {
       }
     }
     return times;
+  }
+
+  boolean fakeTimesInserted = false;
+  // Method used to insert times quickly (to make screenshots with times without creating them manually)
+  private void insertTestTimes(int count, int min, int max, SolveType solveType) {
+    if (!fakeTimesInserted) {
+      long tsStart = System.currentTimeMillis() - 30000 * count;
+      Random r = new Random();
+      for (int i = 0; i < count; i++) {
+        long time = min + r.nextInt(max - min);
+//        int dnfPct = (i < 50 ? 35 : i < 100 ? 30 : i < 140 ? 26 : 22);
+//        if (r.nextInt(100) < dnfPct) {
+//          time = -1;
+//        }
+        SolveTime solveTime = new SolveTime();
+        solveTime.setSolveType(solveType);
+        solveTime.setScramble("U2 R2 L2");
+        solveTime.setTime(time);
+        solveTime.setTimestamp(tsStart + (i * 30000));
+        saveTime(solveTime);
+      }
+      fakeTimesInserted = true;
+    }
   }
 
   class CachedTime {

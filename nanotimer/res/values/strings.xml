@@ -41,9 +41,9 @@
   <string name="accuracy">Accuracy</string>
   <string name="life">Life</string>
 
-  <string name="lifetime_avg">Lifetime avg:</string>
   <string name="lifetime_best">Lifetime best:</string>
-  <string name="lifetime_accuracy">Global accuracy:</string>
+  <string name="lifetime_avg">Global avg:</string>
+  <string name="lifetime_accuracy">Global accur:</string>
   <string name="last_mean_of_three">Last mean of 3:</string>
   <string name="best_mean_of_three">Best mean of 3:</string>
   <string name="solves_count">Solves count:</string>

@@ -86,6 +86,9 @@ public class Utils {
   }
 
   public static String[] invertMoves(String[] moves) {
+    if (moves == null) {
+      return null; // might happen if generation was cancelled
+    }
     String[] inverted = new String[moves.length];
     for (int i = 0; i < moves.length; i++) {
       String m = moves[moves.length - 1 - i];
