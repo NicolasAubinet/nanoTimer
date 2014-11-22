@@ -1,6 +1,7 @@
 package com.cube.nanotimer;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import com.cube.nanotimer.gui.MainScreenActivity;
 import com.cube.nanotimer.gui.widget.AppRater;
 import com.cube.nanotimer.gui.widget.ReleaseNotes;
@@ -56,6 +57,11 @@ public enum App {
 
   public Service getService() {
     return service;
+  }
+
+  public boolean isProEnabled() {
+    int sigMatch = context.getPackageManager().checkSignatures(context.getPackageName(), "com.cube.nanotimerpro");
+    return (sigMatch == PackageManager.SIGNATURE_MATCH);
   }
 
 }

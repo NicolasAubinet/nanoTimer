@@ -80,7 +80,7 @@ public enum Options {
   }
 
   public boolean isAdsEnabled() {
-    return true;
+    return !App.INSTANCE.isProEnabled();
   }
 
   public boolean isSolveTypesShortcutEnabled() {

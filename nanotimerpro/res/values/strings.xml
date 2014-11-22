@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">Nano Timer Pro</string>
+  <string name="nanotimer_unlocked">Nano Timer Pro features have been unlocked!</string>
+  <string name="app_description">This app is used as an unlocker to have access to Pro features within Nano Timer.</string>
+  <string name="open_nanotimer">Open Nano Timer to start experiencing the new features.</string>
+  <string name="open">Open</string>
+  <string name="nanotimer_should_be_installed">Nano Timer is not installed.\nPlease install the free version (in addition to this one) to start using the Pro features.</string>
+  <string name="go_to_play_store">Go to installation page</string>
+  <string name="could_not_find_market">Could not find the market app</string>
+  <string name="could_not_launch_market">Could not launch the market</string>
+  <string name="could_not_launch_nanotimer">Could not launch Nano Timer app</string>
+</resources>
