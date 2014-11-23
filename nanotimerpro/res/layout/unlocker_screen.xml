@@ -16,7 +16,7 @@
        android:id="@+id/tvMainTitle"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_marginTop="15dp"
+       android:layout_marginTop="20dp"
        android:gravity="center"
        android:textSize="16sp"
        android:text="@string/nanotimer_unlocked"/>
@@ -25,7 +25,7 @@
        android:id="@+id/tvDescription"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_marginTop="20dp"
+       android:layout_marginTop="35dp"
        android:gravity="center"
        android:textSize="16sp"
        android:text="@string/app_description"/>
@@ -34,7 +34,7 @@
        android:id="@+id/tvAction"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_marginTop="25dp"
+       android:layout_marginTop="35dp"
        android:gravity="center"
        android:textSize="16sp"
        android:text="@string/open_nanotimer"/>
@@ -43,7 +43,7 @@
        android:id="@+id/buAction"
        android:layout_width="wrap_content"
        android:layout_height="40dp"
-       android:layout_marginTop="20dp"
+       android:layout_marginTop="25dp"
        android:paddingRight="25dp"
        android:paddingLeft="25dp"
        android:textSize="16sp"
