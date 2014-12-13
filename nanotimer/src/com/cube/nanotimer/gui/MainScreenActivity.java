@@ -83,7 +83,6 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
     super.onCreate(savedInstanceState);
     AdProvider.init(this);
     setContentView(R.layout.mainscreen_screen);
-    App.INSTANCE.setContext(this);
     setVolumeControlStream(AudioManager.STREAM_MUSIC);
     curCubeType = Utils.getCurrentCubeType(this);
     curSolveType = new SolveType(Utils.getCurrentSolveTypeId(this), "", false, curCubeType.getId());
@@ -188,17 +187,13 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   @Override
   protected void onResume() {
     super.onResume();
+    App.INSTANCE.setContext(this);
+    App.INSTANCE.onResume();
     AdProvider.resume();
     refreshCubeTypes();
 
     mixedAdBannerChance = new Random().nextInt(10) < 2; // 20% chance to not show banner in mixed mode
     showHideBannerAd();
-  }
-
-  @Override
-  protected void onPause() {
-    super.onPause();
-    AdProvider.pause();
   }
 
   @Override

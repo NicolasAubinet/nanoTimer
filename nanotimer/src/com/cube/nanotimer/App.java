@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import com.cube.nanotimer.gui.MainScreenActivity;
 import com.cube.nanotimer.gui.widget.AppRater;
+import com.cube.nanotimer.gui.widget.ProVersionWelcome;
 import com.cube.nanotimer.gui.widget.ReleaseNotes;
 import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent;
@@ -62,6 +63,10 @@ public enum App {
   public boolean isProEnabled() {
     int sigMatch = context.getPackageManager().checkSignatures(context.getPackageName(), "com.cube.nanotimerpro");
     return (sigMatch == PackageManager.SIGNATURE_MATCH);
+  }
+
+  public void onResume() {
+    ProVersionWelcome.onResume(context, isProEnabled());
   }
 
 }

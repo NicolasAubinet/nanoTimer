@@ -140,10 +140,61 @@
   <string name="release_notes">Release notes</string>
   <string name="close">Close</string>
 
+  <string name="pro_version_welcome_title">Welcome to Pro version</string>
+  <string name="pro_version_welcome_message">Thanks for purchasing Nano Timer Pro!\nThe following features have been unlocked:</string>
+
   <string name="add_more_solve_types">Add more solve types&#8230;</string>
   <string name="solve_types_shortcut">Solve types shortcut</string>
   <string name="solve_types_shortcut_summary">Show \"Add more solve types\" in list</string>
   <string name="blind">Blind</string>
   <string name="blind_mode">Blind mode</string>
   <string name="steps_can_not_be_added_to_blind_types">Steps can not be added to blind types.\nUse a non-blind type instead.</string>
+
+  <string name="pro_version_features_html">
+    <![CDATA[<html><body>
+    <font color=\"white\">
+    <ul>
+      <li>Times export to csv</li>
+      <li>Times import from csv</li>
+      <li>Ad-free</li>
+    </ul>
+    </body></html>]]>
+  </string>
+
+  <string name="release_notes_features_html">
+    <![CDATA[<html><body>
+    <font color=\"white\">
+    <u><b>v1.1.1</b></u>
+    <ul>
+      <li>New random-state scrambles for 3x3x3 and 2x2x2</li>
+      <li>Scrambles pre-generation</li>
+      <li>Timer screen fields changes (means to averages)</li>
+      <li>New blind solve mode with additional blind-related statistics</li>
+      <li>Session details window improvements</li>
+    </ul>
+    <u><b>v1.1.0</b></u>
+    <ul>
+      <li>Improved graphical interface</li>
+      <li>New \"session details\" timer window</li>
+      <li>Total solves count now shown in history</li>
+    </ul>
+    <u><b>v1.0.2</b></u>
+    <ul>
+      <li>Scrambles for Square-1 and Clock</li>
+      <li>Average of 50</li>
+      <li>Shortcut to solve types editing from solve types list</li>
+      <li>Improved scrambles format based on type and orientation</li>
+      <li>Displayed averages in history details</li>
+      <li>Option to choose big cubes notation system</li>
+      <li>Set Skewb and Pyraminx scramble sizes to 15</li>
+    </ul>
+    <u><b>v1.0.1</b></u>
+    <ul>
+      <li>Changed session times grid order (the latest time is now in the top-left cell)</li>
+      <li>Reduced length of pyraminx and skewb scrambles from 25 to 20</li>
+      <li>Pyraminx corner moves are now at the end of the scramble</li>
+      <li>Minor GUI improvements</li>
+    </ul>
+    </body></html>]]>
+  </string>
 </resources>

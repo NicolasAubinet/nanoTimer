@@ -104,7 +104,6 @@ public class TimerActivity extends ActionBarActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.timer_screen);
-    App.INSTANCE.setContext(this);
     setVolumeControlStream(AudioManager.STREAM_MUSIC);
     currentOrientation = getResources().getConfiguration().orientation;
 
@@ -158,6 +157,13 @@ public class TimerActivity extends ActionBarActivity {
     }
 
     generateScramble();
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    App.INSTANCE.setContext(this);
+    App.INSTANCE.onResume();
   }
 
   private void initActionBar() {
@@ -710,7 +716,7 @@ public class TimerActivity extends ActionBarActivity {
       tvAccuracy.setText(FormatterService.INSTANCE.formatPercentage(solveAverages.getLifetimeAccuracy()));
       refreshAvgField(R.id.tvMeanOfThree, solveAverages.getMeanOf3(), getString(R.string.NA));
       refreshAvgFieldWithRecord(R.id.tvBestMeanOfThree, solveAverages.getBestOf3(),
-          (prevSolveAverages != null ? prevSolveAverages.getBestOf3() : null), getString(R.string.NA), showNotifications, true);
+          (prevSolveAverages != null ? prevSolveAverages.getBestOf3() : null), getString(R.string.NA), showNotifications, false);
       refreshAvgFieldWithRecord(R.id.tvLifetimeBest, solveAverages.getBestOfLifetime(),
           (prevSolveAverages != null ? prevSolveAverages.getBestOfLifetime() : null), getString(R.string.NA), showNotifications, true);
 
