@@ -1,20 +1,18 @@
 package com.cube.nanotimer.gui.widget;
 
 import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import com.cube.nanotimer.AppLaunchStats;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.util.helper.DialogUtils;
+import com.cube.nanotimer.util.helper.Utils;
 
 public class AppRater {
 
@@ -28,29 +26,19 @@ public class AppRater {
       return;
     }
 
-    SharedPreferences.Editor editor = prefs.edit();
-    // Increment launch counter
-    long launchCount = prefs.getLong("launch_count", 0) + 1;
-    editor.putLong("launch_count", launchCount);
-
-    // Get date of first launch
-    Long firstLaunchDate = prefs.getLong("date_firstlaunch", 0);
-    if (firstLaunchDate == 0) {
-      firstLaunchDate = System.currentTimeMillis();
-      editor.putLong("date_firstlaunch", firstLaunchDate);
-    }
-
+    long launchCount = AppLaunchStats.getLaunchCount(context);
+    long firstLaunchDate = AppLaunchStats.getFirstLaunchDate(context);
     // Get date when user clicked on "Ask later"
     Long askLaterDate = prefs.getLong("date_asklater", 0);
 
     long currentTime = System.currentTimeMillis();
     if (launchCount >= LAUNCHES_UNTIL_PROMPT &&
-        currentTime >= firstLaunchDate + daysToMs(DAYS_UNTIL_PROMPT) &&
-        (askLaterDate == 0 || currentTime >= askLaterDate + daysToMs(DAYS_ASK_LATER_PROMPT_AGAIN))) {
+        currentTime >= firstLaunchDate + Utils.daysToMs(DAYS_UNTIL_PROMPT) &&
+        (askLaterDate == 0 || currentTime >= askLaterDate + Utils.daysToMs(DAYS_ASK_LATER_PROMPT_AGAIN))) {
+      SharedPreferences.Editor editor = prefs.edit();
       showRateDialog(context, editor);
+      editor.commit();
     }
-
-    editor.commit();
   }
 
   public static void showRateDialog(final Context context, final SharedPreferences.Editor editor) {
@@ -63,7 +51,6 @@ public class AppRater {
       @Override
       public void onCancel(DialogInterface dialogInterface) {
         editor.putLong("date_asklater", System.currentTimeMillis());
-        editor.commit();
       }
     });
 
@@ -73,7 +60,6 @@ public class AppRater {
         if (openStoreForRating(context)) {
           // avoid asking again if the user rated the app (there's no way to know for sure if he actually rated it)
           editor.putBoolean("dontshowagain", true);
-          editor.commit();
         }
         dialog.dismiss();
       }
@@ -85,7 +71,6 @@ public class AppRater {
       public void onClick(View view) {
         if (editor != null) {
           editor.putLong("date_asklater", System.currentTimeMillis());
-          editor.commit();
         }
         dialog.dismiss();
       }
@@ -97,7 +82,6 @@ public class AppRater {
       public void onClick(View view) {
         if (editor != null) {
           editor.putBoolean("dontshowagain", true);
-          editor.commit();
         }
         dialog.dismiss();
       }
@@ -107,35 +91,7 @@ public class AppRater {
   }
 
   private static boolean openStoreForRating(Context context) {
-    Intent rateAppIntent;
-    String storePackage = context.getPackageManager().getInstallerPackageName(context.getPackageName());
-    if (storePackage == null) {
-      DialogUtils.showInfoMessage(R.string.could_not_find_market);
-      return false;
-    } else if (storePackage.equals("com.android.vending")) { // google
-      rateAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + context.getPackageName()));
-    } else if (storePackage.equals("com.amazon.venezia")) { // amazon
-      rateAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("amzn://apps/android?p=" + context.getPackageName()));
-    } else {
-      DialogUtils.showInfoMessage(R.string.could_not_find_market);
-      return false;
-    }
-
-    if (context.getPackageManager().queryIntentActivities(rateAppIntent, 0).size() > 0) {
-      try {
-        context.startActivity(rateAppIntent);
-        return true;
-      } catch (ActivityNotFoundException e) {
-        DialogUtils.showInfoMessage(R.string.could_not_launch_market);
-      }
-    } else {
-      DialogUtils.showInfoMessage(R.string.could_not_find_market);
-    }
-    return false;
-  }
-
-  private static long daysToMs(int days) {
-    return days * 24 * 60 * 60 * 1000;
+    return Utils.openPlayStorePage(context, context.getPackageName());
   }
 
 }

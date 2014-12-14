@@ -142,6 +142,9 @@
 
   <string name="pro_version_welcome_title">Welcome to Pro version</string>
   <string name="pro_version_welcome_message">Thanks for purchasing Nano Timer Pro!\nThe following features have been unlocked:</string>
+  <string name="pro_version_promotion_title">Nano Timer Pro</string>
+  <string name="pro_version_promotion_message">Nano Timer Pro is now available on Play Store!\nInstalling it will unlock the following features:</string>
+  <string name="open_page">Open page</string>
 
   <string name="add_more_solve_types">Add more solve types&#8230;</string>
   <string name="solve_types_shortcut">Solve types shortcut</string>
@@ -156,7 +159,7 @@
     <ul>
       <li>Times export to csv</li>
       <li>Times import from csv</li>
-      <li>Ad-free</li>
+      <li>No ads</li>
     </ul>
     </body></html>]]>
   </string>

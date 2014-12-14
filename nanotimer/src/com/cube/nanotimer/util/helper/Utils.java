@@ -1,12 +1,16 @@
 package com.cube.nanotimer.util.helper;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
+import com.cube.nanotimer.R;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveType;
 
@@ -100,6 +104,34 @@ public class Utils {
       inverted[i] = m;
     }
     return inverted;
+  }
+
+  public static long daysToMs(int days) {
+    return ((long) days) * 24 * 60 * 60 * 1000;
+  }
+
+  public static boolean openPlayStorePage(Context context, String packageName) {
+    Intent rateAppIntent;
+    String storePackage = context.getPackageManager().getInstallerPackageName(packageName);
+    if ("com.android.vending".equals(storePackage)) { // google
+      rateAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName));
+    } else if ("com.amazon.venezia".equals(storePackage)) { // amazon
+      rateAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("amzn://apps/android?p=" + packageName));
+    } else {
+      rateAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName)); // try google market (play store)
+    }
+
+    if (context.getPackageManager().queryIntentActivities(rateAppIntent, 0).size() > 0) {
+      try {
+        context.startActivity(rateAppIntent);
+        return true;
+      } catch (ActivityNotFoundException e) {
+        DialogUtils.showInfoMessage(context, R.string.could_not_launch_market);
+      }
+    } else {
+      DialogUtils.showInfoMessage(context, R.string.could_not_find_market);
+    }
+    return false;
   }
 
 }

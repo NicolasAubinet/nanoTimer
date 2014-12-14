@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import com.cube.nanotimer.gui.MainScreenActivity;
 import com.cube.nanotimer.gui.widget.AppRater;
+import com.cube.nanotimer.gui.widget.ProVersionAd;
 import com.cube.nanotimer.gui.widget.ProVersionWelcome;
 import com.cube.nanotimer.gui.widget.ReleaseNotes;
 import com.cube.nanotimer.scrambler.ScramblerService;
@@ -20,6 +21,8 @@ public enum App {
   private Context context;
   private Service service;
 
+  public static final String PRO_PACKAGE_NAME = "com.cube.nanotimerpro";
+
   private static final int SCRAMBLE_NOTIF_ID = 1;
 
   public Context getContext() {
@@ -27,15 +30,22 @@ public enum App {
   }
 
   public void setContext(Context context) {
-    if (this.context == null) { // the app is starting
+    boolean appStarted = (this.context == null);
+    this.context = context;
+    if (appStarted) { // the app is starting
       this.service = ServiceImpl.getInstance(context);
       Options.INSTANCE.setContext(context);
       ScramblerService.INSTANCE.init(context);
-      AppRater.appLaunched(context);
-      ReleaseNotes.appLaunched(context);
+      appLaunched(context);
       initRandomStateGenListener(context);
     }
-    this.context = context;
+  }
+
+  private void appLaunched(Context context) {
+    AppLaunchStats.appLaunched(context);
+    AppRater.appLaunched(context);
+    ReleaseNotes.appLaunched(context);
+    ProVersionAd.appLaunched(context);
   }
 
   private void initRandomStateGenListener(final Context context) {
@@ -61,7 +71,7 @@ public enum App {
   }
 
   public boolean isProEnabled() {
-    int sigMatch = context.getPackageManager().checkSignatures(context.getPackageName(), "com.cube.nanotimerpro");
+    int sigMatch = context.getPackageManager().checkSignatures(context.getPackageName(), PRO_PACKAGE_NAME);
     return (sigMatch == PackageManager.SIGNATURE_MATCH);
   }
 
