@@ -100,7 +100,7 @@
   <string name="use_modern_scrambles">Use modern scrambles</string>
   <string name="use_modern_scrambles_summary">Use new \"random-state\" scrambles</string>
   <string name="scrambles_quality">Scrambles quality</string>
-  <string name="scrambles_quality_summary">Scrambles quality for modern scrambles</string>
+  <string name="scrambles_quality_summary">Select scrambles quality</string>
   <string name="high_quality">High (less moves, slower to generate)</string>
   <string name="normal_quality">Normal</string>
   <string name="low_quality">Low (more moves, quicker to generate)</string>
@@ -115,6 +115,20 @@
   <string name="interstitial">Interstitial</string>
   <string name="mixed">Mixed</string>
   <string name="want_to_clear_scramble_cache">Do you want to clear the scramble cache?</string>
+  <string name="modern_scrambles_settings">Modern scrambles settings</string>
+  <string name="modern_scrambles_settings_summary">Choose when / how scrambles are generated</string>
+  <string name="notification_mode">Notification mode</string>
+  <string name="notification_mode_summary">Choose when to display generation notification</string>
+  <string name="when_generating">Always when generating</string>
+  <string name="when_generating_manually">Only when manually generating</string>
+  <string name="generate_when_plugged_in">Generate when plugged in</string>
+  <string name="generate_when_plugged_in_summary">Automatically generate when plugged in</string>
+  <string name="gen_count_when_plugged_in">Plugged scrambles count</string>
+  <string name="gen_count_when_plugged_in_summary">Number of scrambles to generate when plugged in</string>
+  <string name="min_cache_size">Minimum cache size</string>
+  <string name="min_cache_size_summary">Start automatic generation when reached</string>
+  <string name="max_cache_size">Maximum cache size</string>
+  <string name="max_cache_size_summary">Stop automatic generation when reached</string>
 
   <string name="total_scrambles_count">Total generated scrambles: %1$d</string>
   <string name="scrambles_already_generating">Scrambles are already being generated.</string>

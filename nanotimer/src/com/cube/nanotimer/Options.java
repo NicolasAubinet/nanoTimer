@@ -11,6 +11,7 @@ public enum Options {
   public enum AdsStyle { BANNER, INTERSTITIAL, MIXED }
   public enum BigCubesNotation { RUF, RWUWFW }
   public enum ScramblesQuality { LOW, MEDIUM, HIGH }
+  public enum ScrambleNotificationMode { ALWAYS, MANUAL }
 
   private Context context;
   private SharedPreferences sharedPreferences;
@@ -20,10 +21,16 @@ public enum Options {
   private static final String INSPECTION_SOUNDS_KEY = "inspection_sounds";
   private static final String KEEP_TIMER_SCREEN_ON_KEY = "keep_timer_screen_on";
   private static final String BIG_CUBES_NOTATION_KEY = "big_cubes_notation";
-  private static final String SOLVE_TYPES_SHORTCUT = "solve_types_shortcut";
-  public static final String RANDOMSTATE_SCRAMBLES = "randomstate_scrambles";
-  public static final String SCRAMBLES_QUALITY = "scrambles_quality";
-  public static final String PREGEN_SCRAMBLES = "pregen_scrambles";
+  private static final String SOLVE_TYPES_SHORTCUT_KEY = "solve_types_shortcut";
+
+  public static final String RANDOMSTATE_SCRAMBLES_KEY = "randomstate_scrambles";
+  public static final String SCRAMBLES_QUALITY_KEY = "scrambles_quality";
+  private static final String SCRAMBLE_NOTIFICATION_MODE_KEY = "scramble_notification_mode";
+  private static final String SCRAMBLES_GEN_WHEN_PLUGGED_IN_KEY = "scrambles_gen_when_plugged_in";
+  private static final String SCRAMBLES_GEN_COUNT_WHEN_PLUGGED_IN_KEY = "scrambles_gen_count_when_plugged_in";
+  private static final String SCRAMBLES_MIN_CACHE_SIZE_KEY = "scrambles_min_cache_size";
+  private static final String SCRAMBLES_MAX_CACHE_SIZE_KEY = "scrambles_max_cache_size";
+  private static final String PREGEN_SCRAMBLES_KEY = "pregen_scrambles";
 
   private static final int MAX_STEPS_COUNT = 8;
 
@@ -85,16 +92,16 @@ public enum Options {
 
   public boolean isSolveTypesShortcutEnabled() {
     Boolean defaultValue = context.getResources().getBoolean(R.bool.solve_types_shortcut);
-    return sharedPreferences.getBoolean(SOLVE_TYPES_SHORTCUT, defaultValue);
+    return sharedPreferences.getBoolean(SOLVE_TYPES_SHORTCUT_KEY, defaultValue);
   }
 
   public boolean isRandomStateScrambles() {
     Boolean defaultValue = context.getResources().getBoolean(R.bool.randomstate_scrambles);
-    return sharedPreferences.getBoolean(RANDOMSTATE_SCRAMBLES, defaultValue);
+    return sharedPreferences.getBoolean(RANDOMSTATE_SCRAMBLES_KEY, defaultValue);
   }
 
   public ScramblesQuality getScramblesQuality() {
-    int quality = Integer.parseInt(sharedPreferences.getString(SCRAMBLES_QUALITY, "-1"));
+    int quality = Integer.parseInt(sharedPreferences.getString(SCRAMBLES_QUALITY_KEY, "-1"));
     switch (quality) {
       case 1:
         return ScramblesQuality.HIGH;
@@ -105,6 +112,38 @@ public enum Options {
       default:
         return ScramblesQuality.MEDIUM;
     }
+  }
+
+  public ScrambleNotificationMode genScrambleNotificationMode() {
+    int mode = Integer.parseInt(sharedPreferences.getString(SCRAMBLE_NOTIFICATION_MODE_KEY, "-1"));
+    switch (mode) {
+      case 1:
+        return ScrambleNotificationMode.ALWAYS;
+      case 2:
+        return ScrambleNotificationMode.MANUAL;
+      default:
+        return ScrambleNotificationMode.ALWAYS;
+    }
+  }
+
+  public boolean isGenerateScramblesWhenPluggedIn() {
+    Boolean defaultValue = context.getResources().getBoolean(R.bool.scrambles_gen_when_plugged_in);
+    return sharedPreferences.getBoolean(SCRAMBLES_GEN_WHEN_PLUGGED_IN_KEY, defaultValue);
+  }
+
+  public int getPluggedInScramblesGenerateCount() {
+    Integer defaultValue = context.getResources().getInteger(R.integer.scramble_gen_count_when_plugged_in);
+    return sharedPreferences.getInt(SCRAMBLES_GEN_COUNT_WHEN_PLUGGED_IN_KEY, defaultValue);
+  }
+
+  public int getScramblesMinCacheSize() {
+    Integer defaultValue = context.getResources().getInteger(R.integer.min_scramble_cache_size);
+    return sharedPreferences.getInt(SCRAMBLES_MIN_CACHE_SIZE_KEY, defaultValue);
+  }
+
+  public int getScramblesMaxCacheSize() {
+    Integer defaultValue = context.getResources().getInteger(R.integer.max_scramble_cache_size);
+    return sharedPreferences.getInt(SCRAMBLES_MAX_CACHE_SIZE_KEY, defaultValue);
   }
 
 }

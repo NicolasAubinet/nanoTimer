@@ -10,4 +10,8 @@
       <enum name="MONOSPACE" value="0"/>
     </attr>
   </declare-styleable>
+  <declare-styleable name="NumberLimit">
+    <attr name="min" format="integer"/>
+    <attr name="max" format="integer"/>
+  </declare-styleable>
 </resources>

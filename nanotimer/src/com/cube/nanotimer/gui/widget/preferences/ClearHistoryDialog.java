@@ -1,4 +1,4 @@
-package com.cube.nanotimer.gui.widget;
+package com.cube.nanotimer.gui.widget.preferences;
 
 import android.content.Context;
 import android.preference.DialogPreference;

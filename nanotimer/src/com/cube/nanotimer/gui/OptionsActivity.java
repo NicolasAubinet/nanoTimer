@@ -55,11 +55,11 @@ public class OptionsActivity extends PreferenceActivity {
   }
 
   private void preferenceChanged(SharedPreferences pref, String key) {
-    if (key.equals(Options.RANDOMSTATE_SCRAMBLES)) {
+    if (key.equals(Options.RANDOMSTATE_SCRAMBLES_KEY)) {
       Boolean defaultValue = getResources().getBoolean(R.bool.randomstate_scrambles);
-      boolean randomState = pref.getBoolean(Options.RANDOMSTATE_SCRAMBLES, defaultValue);
+      boolean randomState = pref.getBoolean(Options.RANDOMSTATE_SCRAMBLES_KEY, defaultValue);
       ScramblerService.INSTANCE.activateRandomStateScrambles(randomState);
-    } else if (key.equals(Options.SCRAMBLES_QUALITY)) {
+    } else if (key.equals(Options.SCRAMBLES_QUALITY_KEY)) {
       // Calls to runOnUiThread and isFinishing were added to fix a crash when opening the dialog
       runOnUiThread(new Runnable() {
         @Override

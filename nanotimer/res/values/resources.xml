@@ -3,7 +3,6 @@
   <string name="inspection_mode">1</string>
   <integer name="inspection_time">15</integer>
   <integer name="gen_scrambles_count">200</integer>
-  <integer name="max_inspection_time_length">5</integer>
   <bool name="inspection_sounds">true</bool>
   <bool name="keep_timer_screen_on">true</bool>
   <string name="ads_style">3</string>
@@ -11,4 +10,9 @@
   <bool name="randomstate_scrambles">true</bool>
   <integer name="big_cubes_notation">1</integer>
   <integer name="scrambles_quality">2</integer>
+  <integer name="scramble_notification_mode">1</integer>
+  <bool name="scrambles_gen_when_plugged_in">false</bool>
+  <integer name="scramble_gen_count_when_plugged_in">100</integer>
+  <integer name="min_scramble_cache_size">25</integer>
+  <integer name="max_scramble_cache_size">50</integer>
 </resources>

@@ -1,7 +1,8 @@
-package com.cube.nanotimer.gui.widget;
+package com.cube.nanotimer.gui.widget.preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.preference.DialogPreference;
 import android.preference.PreferenceManager;
 import android.text.InputFilter;
@@ -13,12 +14,22 @@ import android.widget.Button;
 import android.widget.EditText;
 import com.cube.nanotimer.R;
 
-public class InspectionTimeDialog extends DialogPreference {
+public class NumberEntryDialog extends DialogPreference {
 
   private EditText tfValue;
 
-  public InspectionTimeDialog(Context context, AttributeSet attrs) {
+  private int min = 0;
+  private int max = 99999;
+
+  public NumberEntryDialog(Context context, AttributeSet attrs) {
     super(context, attrs);
+    TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.NumberLimit);
+    if (a.hasValue(R.styleable.NumberLimit_min)) {
+      min = a.getInt(R.styleable.NumberLimit_min, min);
+    }
+    if (a.hasValue(R.styleable.NumberLimit_max)) {
+      max = a.getInt(R.styleable.NumberLimit_max, max);
+    }
   }
 
   @Override
@@ -28,23 +39,18 @@ public class InspectionTimeDialog extends DialogPreference {
     tfValue = (EditText) layout.findViewById(R.id.tfValue);
 
     SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(getContext());
-    Integer defaultValue = getContext().getResources().getInteger(R.integer.inspection_time);
-    Integer value = p.getInt(getKey(), defaultValue);
+    Integer value = p.getInt(getKey(), 0); // TODO : retrieve the default value for the second parameter
     tfValue.setText(value.toString());
 
-    final int maxInspectionLength = getContext().getResources().getInteger(R.integer.max_inspection_time_length);
-    tfValue.setFilters( new InputFilter[] { new InputFilter.LengthFilter(maxInspectionLength) } );
-
-    StringBuilder maxStr = new StringBuilder();
-    for (int i = 0; i < maxInspectionLength; i++) { maxStr.append("9"); }
-    final int maxValue = Integer.parseInt(maxStr.toString());
+    final int maxTextSizeLength = String.valueOf(max).length();
+    tfValue.setFilters( new InputFilter[] { new InputFilter.LengthFilter(maxTextSizeLength) } );
 
     Button buPlus = (Button) layout.findViewById(R.id.buPlus);
     buPlus.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
         int val = getValue();
-        if (val < maxValue) {
+        if (val < max) {
           tfValue.setText(String.valueOf(val + 1));
         }
       }
@@ -55,7 +61,7 @@ public class InspectionTimeDialog extends DialogPreference {
       @Override
       public void onClick(View view) {
         int val = getValue();
-        if (val >= 1) {
+        if (val >= (min + 1)) {
           tfValue.setText(String.valueOf(val - 1));
         }
       }
@@ -69,11 +75,17 @@ public class InspectionTimeDialog extends DialogPreference {
     super.onDialogClosed(positiveResult);
 
     if (positiveResult) {
-      int time = getValue();
+      int time = adjustNumberToLimits(getValue());
       if (callChangeListener(time)) {
         persistInt(time);
       }
     }
+  }
+
+  private int adjustNumberToLimits(int n) {
+    n = Math.max(n, min);
+    n = Math.min(n, max);
+    return n;
   }
 
   private int getValue() {
