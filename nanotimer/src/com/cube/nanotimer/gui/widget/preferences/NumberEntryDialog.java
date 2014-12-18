@@ -20,6 +20,7 @@ public class NumberEntryDialog extends DialogPreference {
 
   private int min = 0;
   private int max = 99999;
+  private int defaultValue = 0;
 
   public NumberEntryDialog(Context context, AttributeSet attrs) {
     super(context, attrs);
@@ -30,6 +31,9 @@ public class NumberEntryDialog extends DialogPreference {
     if (a.hasValue(R.styleable.NumberLimit_max)) {
       max = a.getInt(R.styleable.NumberLimit_max, max);
     }
+    if (a.hasValue(R.styleable.NumberLimit_defaultVal)) {
+      defaultValue = a.getInt(R.styleable.NumberLimit_defaultVal, defaultValue);
+    }
   }
 
   @Override
@@ -39,7 +43,7 @@ public class NumberEntryDialog extends DialogPreference {
     tfValue = (EditText) layout.findViewById(R.id.tfValue);
 
     SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(getContext());
-    Integer value = p.getInt(getKey(), 0); // TODO : retrieve the default value for the second parameter
+    Integer value = p.getInt(getKey(), defaultValue);
     tfValue.setText(value.toString());
 
     final int maxTextSizeLength = String.valueOf(max).length();
@@ -75,16 +79,19 @@ public class NumberEntryDialog extends DialogPreference {
     super.onDialogClosed(positiveResult);
 
     if (positiveResult) {
-      int time = adjustNumberToLimits(getValue());
+      int time = checkMinMaxValue(getValue());
       if (callChangeListener(time)) {
         persistInt(time);
       }
     }
   }
 
-  private int adjustNumberToLimits(int n) {
-    n = Math.max(n, min);
-    n = Math.min(n, max);
+  private int checkMinMaxValue(int n) {
+    if (n < min) {
+      n = min;
+    } else if (n > max) {
+      n = max;
+    }
     return n;
   }
 

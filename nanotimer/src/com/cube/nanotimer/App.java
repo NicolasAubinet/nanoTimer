@@ -2,6 +2,7 @@ package com.cube.nanotimer;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import com.cube.nanotimer.Options.ScrambleNotificationMode;
 import com.cube.nanotimer.gui.MainScreenActivity;
 import com.cube.nanotimer.gui.widget.AppRater;
 import com.cube.nanotimer.gui.widget.ProVersionAd;
@@ -9,6 +10,7 @@ import com.cube.nanotimer.gui.widget.ProVersionWelcome;
 import com.cube.nanotimer.gui.widget.ReleaseNotes;
 import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent;
+import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.GenerationLaunch;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.State;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenListener;
 import com.cube.nanotimer.services.Service;
@@ -53,12 +55,13 @@ public enum App {
       @Override
       public void onStateUpdate(RandomStateGenEvent event) {
         String title = context.getString(R.string.scrambles_being_generated, event.getCubeTypeName());
-        if (event.getState() == State.PREPARING) {
+        boolean showNotif = (Options.INSTANCE.getGenScrambleNotificationMode() == ScrambleNotificationMode.ALWAYS || event.getGenerationLaunch() == GenerationLaunch.MANUAL);
+        if (event.getState() == State.PREPARING && showNotif) {
           GUIUtils.showNotification(context, SCRAMBLE_NOTIF_ID, title, "", MainScreenActivity.class);
-        } else if (event.getState() == State.GENERATING) {
+        } else if (event.getState() == State.GENERATING && showNotif) {
           GUIUtils.showNotification(context, SCRAMBLE_NOTIF_ID, title,
               context.getString(R.string.generating_scramble, event.getCurScramble(), event.getTotalToGenerate()), MainScreenActivity.class);
-        } else if (event.getState() == State.IDLE) {
+        } else if (event.getState() == State.IDLE || !showNotif) {
           GUIUtils.hideNotification(context, SCRAMBLE_NOTIF_ID);
         }
       }

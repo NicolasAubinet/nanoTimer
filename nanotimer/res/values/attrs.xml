@@ -13,5 +13,6 @@
   <declare-styleable name="NumberLimit">
     <attr name="min" format="integer"/>
     <attr name="max" format="integer"/>
+    <attr name="defaultVal" format="integer"/>
   </declare-styleable>
 </resources>

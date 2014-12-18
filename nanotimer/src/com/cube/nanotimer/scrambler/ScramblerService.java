@@ -7,6 +7,7 @@ import com.cube.nanotimer.scrambler.randomstate.RSScrambler;
 import com.cube.nanotimer.scrambler.randomstate.RSThreeScrambler;
 import com.cube.nanotimer.scrambler.randomstate.RSTwoScrambler;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent;
+import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.GenerationLaunch;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.State;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenListener;
 import com.cube.nanotimer.scrambler.randomstate.ScrambleConfig;
@@ -26,8 +27,6 @@ public enum ScramblerService {
   INSTANCE;
 
   public static final int MAX_SCRAMBLES_IN_MEMORY = 500;
-  private static final int DEFAULT_CACHE_SIZE = 50;
-  private static final int MIN_CACHE_SIZE = 25;
 
   private Context context;
   private Map<Integer, LinkedList<String[]>> cachedScrambles = new HashMap<Integer, LinkedList<String[]>>(); // id: cube type id | value: scrambles
@@ -35,7 +34,7 @@ public enum ScramblerService {
   private volatile Thread generationThread = null;
 
   private List<RandomStateGenListener> listeners = new ArrayList<RandomStateGenListener>();
-  private RandomStateGenEvent curState = new RandomStateGenEvent(State.IDLE, null, 0, 0);
+  private RandomStateGenEvent curState = new RandomStateGenEvent(State.IDLE, null, null, 0, 0);
 
   final private Object genThreadHelper = new Object();
   final private Object listenersHelper = new Object();
@@ -75,33 +74,34 @@ public enum ScramblerService {
 
   private void checkCache(CubeType cubeType) {
     try {
-      generateAndAddToCache(cubeType, -1);
+      generateAndAddToCache(cubeType, -1, GenerationLaunch.AUTO);
     } catch (AlreadyGeneratingException e) {
       // Ignore. Scrambles are already being generated.
     }
   }
 
   private int loadCacheAndGetToGenCount(CubeType cubeType) {
-    if (getCache(cubeType).size() < MIN_CACHE_SIZE) {
+    int minCacheSize = Options.INSTANCE.getScramblesMinCacheSize();
+    if (getCache(cubeType).size() < minCacheSize) {
       loadCacheFromFile(cubeType); // see if there are some more scrambles in the file
-      if (getCache(cubeType).size() < MIN_CACHE_SIZE) {
-        return DEFAULT_CACHE_SIZE - getCache(cubeType).size();
+      if (getCache(cubeType).size() < minCacheSize) {
+        return Math.max(Options.INSTANCE.getScramblesMaxCacheSize() - getCache(cubeType).size(), 0);
       }
     }
     return 0;
   }
 
-  private void generateAndAddToCache(final CubeType cubeType, int scramblesCount) throws AlreadyGeneratingException {
+  private void generateAndAddToCache(final CubeType cubeType, int scramblesCount, GenerationLaunch generationLaunch) throws AlreadyGeneratingException {
     synchronized (genThreadHelper) {
       if (generationThread != null) {
         throw new AlreadyGeneratingException();
       }
-      generationThread = getNewGenerationThread(cubeType, scramblesCount);
+      generationThread = getNewGenerationThread(cubeType, scramblesCount, generationLaunch);
       generationThread.start();
     }
   }
 
-  private Thread getNewGenerationThread(final CubeType cubeType, final int scramblesCount) {
+  private Thread getNewGenerationThread(final CubeType cubeType, final int scramblesCount, final GenerationLaunch generationLaunch) {
     return new Thread() {
       @Override
       public void run() {
@@ -109,7 +109,7 @@ public enum ScramblerService {
         for (CubeType rsCubeType : getRandomStateCubeTypes()) {
           generateScrambles(rsCubeType, -1);
         }
-        sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.IDLE, null, 0, 0));
+        sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.IDLE, null, null, 0, 0));
         if (generationThread == Thread.currentThread()) {
           generationThread = null;
         }
@@ -130,14 +130,14 @@ public enum ScramblerService {
           return;
         }
         List<String[]> toSave = new ArrayList<String[]>();
-        sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.PREPARING, cubeType, 0, n));
+        sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.PREPARING, cubeType, generationLaunch, 0, n));
         synchronized (scramblerHelper) {
           rsScrambler.genTables();
         }
         for (int i = 0; i < n && generationThread == Thread.currentThread(); i++) {
           String[] scramble;
           synchronized (scramblerHelper) {
-            sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.GENERATING, cubeType, i + 1, n));
+            sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.GENERATING, cubeType, generationLaunch, i + 1, n));
             scramble = rsScrambler.getNewScramble(new ScrambleConfig(Utils.getRSScrambleLengthFromQuality(cubeType)));
           }
           if (scramble == null) { // was interrupted
@@ -249,7 +249,7 @@ public enum ScramblerService {
 
   public void preGenerate(CubeType cubeType, int nScrambles) throws AlreadyGeneratingException {
     if (getRandomStateCubeTypes().contains(cubeType)) {
-      generateAndAddToCache(cubeType, nScrambles);
+      generateAndAddToCache(cubeType, nScrambles, GenerationLaunch.MANUAL);
     }
   }
 
@@ -257,7 +257,7 @@ public enum ScramblerService {
     synchronized (genThreadHelper) {
       if (generationThread != null) {
         generationThread = null;
-        sendGenStateToListeners(new RandomStateGenEvent(State.STOPPING, null, 0, 0));
+        sendGenStateToListeners(new RandomStateGenEvent(State.STOPPING, null, null, 0, 0));
       }
     }
     for (RSScrambler scrambler : scramblers.values()) {

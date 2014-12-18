@@ -2,6 +2,7 @@ package com.cube.nanotimer.gui;
 
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
@@ -22,6 +23,8 @@ public class OptionsActivity extends PreferenceActivity {
 
   private OnSharedPreferenceChangeListener prefChangedListener;
   private AlertDialog dialog;
+
+  private static final int MIN_DELTA_BETWEEN_SCRAMBLES_CACHE_MIN_MAX = 10;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +87,49 @@ public class OptionsActivity extends PreferenceActivity {
           }
         }
       });
+    } else if (key.equals(Options.SCRAMBLES_MIN_CACHE_SIZE_KEY)) {
+      int max = Options.INSTANCE.getScramblesMaxCacheSize();
+      int defaultMinValue = getResources().getInteger(R.integer.min_scramble_cache_size);
+      int min = pref.getInt(key, defaultMinValue);
+      if (min > (max - MIN_DELTA_BETWEEN_SCRAMBLES_CACHE_MIN_MAX)) {
+        int newValue = max - MIN_DELTA_BETWEEN_SCRAMBLES_CACHE_MIN_MAX;
+        final String infoMsg = (min > max) ? getString(R.string.min_scramble_cache_bigger_than_max, newValue) :
+            getString(R.string.min_scramble_cache_too_close_to_max, newValue);
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            if (!isFinishing()) {
+              DialogUtils.showInfoMessage(OptionsActivity.this, infoMsg);
+            }
+          }
+        });
+        min = newValue;
+        Editor editor = pref.edit();
+        editor.putInt(key, min);
+        editor.commit();
+      }
+      ScramblerService.INSTANCE.checkScrambleCaches();
+    } else if (key.equals(Options.SCRAMBLES_MAX_CACHE_SIZE_KEY)) {
+      int min = Options.INSTANCE.getScramblesMinCacheSize();
+      int defaultMaxValue = getResources().getInteger(R.integer.max_scramble_cache_size);
+      int max = pref.getInt(key, defaultMaxValue);
+      if (max < (min + MIN_DELTA_BETWEEN_SCRAMBLES_CACHE_MIN_MAX)) {
+        int newValue = min + MIN_DELTA_BETWEEN_SCRAMBLES_CACHE_MIN_MAX;
+        final String infoMsg = (max < min) ? getString(R.string.max_scramble_cache_smaller_than_min, newValue) :
+            getString(R.string.max_scramble_cache_too_close_to_min, newValue);
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            if (!isFinishing()) {
+              DialogUtils.showInfoMessage(OptionsActivity.this, infoMsg);
+            }
+          }
+        });
+        max = newValue;
+        Editor editor = pref.edit();
+        editor.putInt(key, max);
+        editor.commit();
+      }
     }
   }
 

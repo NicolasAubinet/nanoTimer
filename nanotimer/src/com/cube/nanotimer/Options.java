@@ -16,21 +16,21 @@ public enum Options {
   private Context context;
   private SharedPreferences sharedPreferences;
 
-  private static final String INSPECTION_MODE_KEY = "inspection_mode";
-  private static final String INSPECTION_TIME_KEY = "inspection_time";
-  private static final String INSPECTION_SOUNDS_KEY = "inspection_sounds";
-  private static final String KEEP_TIMER_SCREEN_ON_KEY = "keep_timer_screen_on";
-  private static final String BIG_CUBES_NOTATION_KEY = "big_cubes_notation";
-  private static final String SOLVE_TYPES_SHORTCUT_KEY = "solve_types_shortcut";
+  public static final String INSPECTION_MODE_KEY = "inspection_mode";
+  public static final String INSPECTION_TIME_KEY = "inspection_time";
+  public static final String INSPECTION_SOUNDS_KEY = "inspection_sounds";
+  public static final String KEEP_TIMER_SCREEN_ON_KEY = "keep_timer_screen_on";
+  public static final String BIG_CUBES_NOTATION_KEY = "big_cubes_notation";
+  public static final String SOLVE_TYPES_SHORTCUT_KEY = "solve_types_shortcut";
 
   public static final String RANDOMSTATE_SCRAMBLES_KEY = "randomstate_scrambles";
   public static final String SCRAMBLES_QUALITY_KEY = "scrambles_quality";
-  private static final String SCRAMBLE_NOTIFICATION_MODE_KEY = "scramble_notification_mode";
-  private static final String SCRAMBLES_GEN_WHEN_PLUGGED_IN_KEY = "scrambles_gen_when_plugged_in";
-  private static final String SCRAMBLES_GEN_COUNT_WHEN_PLUGGED_IN_KEY = "scrambles_gen_count_when_plugged_in";
-  private static final String SCRAMBLES_MIN_CACHE_SIZE_KEY = "scrambles_min_cache_size";
-  private static final String SCRAMBLES_MAX_CACHE_SIZE_KEY = "scrambles_max_cache_size";
-  private static final String PREGEN_SCRAMBLES_KEY = "pregen_scrambles";
+  public static final String SCRAMBLE_NOTIFICATION_MODE_KEY = "scramble_notification_mode";
+  public static final String SCRAMBLES_GEN_WHEN_PLUGGED_IN_KEY = "scrambles_gen_when_plugged_in";
+  public static final String SCRAMBLES_GEN_COUNT_WHEN_PLUGGED_IN_KEY = "scrambles_gen_count_when_plugged_in";
+  public static final String SCRAMBLES_MIN_CACHE_SIZE_KEY = "scrambles_min_cache_size";
+  public static final String SCRAMBLES_MAX_CACHE_SIZE_KEY = "scrambles_max_cache_size";
+  public static final String PREGEN_SCRAMBLES_KEY = "pregen_scrambles";
 
   private static final int MAX_STEPS_COUNT = 8;
 
@@ -114,7 +114,7 @@ public enum Options {
     }
   }
 
-  public ScrambleNotificationMode genScrambleNotificationMode() {
+  public ScrambleNotificationMode getGenScrambleNotificationMode() {
     int mode = Integer.parseInt(sharedPreferences.getString(SCRAMBLE_NOTIFICATION_MODE_KEY, "-1"));
     switch (mode) {
       case 1:

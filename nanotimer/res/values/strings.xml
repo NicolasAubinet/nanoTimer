@@ -122,13 +122,17 @@
   <string name="when_generating">Always when generating</string>
   <string name="when_generating_manually">Only when manually generating</string>
   <string name="generate_when_plugged_in">Generate when plugged in</string>
-  <string name="generate_when_plugged_in_summary">Automatically generate when plugged in</string>
+  <string name="generate_when_plugged_in_summary">Automatically generate when plugged in to charger</string>
   <string name="gen_count_when_plugged_in">Plugged scrambles count</string>
   <string name="gen_count_when_plugged_in_summary">Number of scrambles to generate when plugged in</string>
   <string name="min_cache_size">Minimum cache size</string>
   <string name="min_cache_size_summary">Start automatic generation when reached</string>
   <string name="max_cache_size">Maximum cache size</string>
   <string name="max_cache_size_summary">Stop automatic generation when reached</string>
+  <string name="min_scramble_cache_bigger_than_max">The minimum cache size is bigger than the maximum. Min will be set to %1$d</string>
+  <string name="min_scramble_cache_too_close_to_max">The minimum cache size is too close to the maximum. Min will be set to %1$d</string>
+  <string name="max_scramble_cache_smaller_than_min">The maximum cache size is smaller than the minimum. Max will be set to %1$d</string>
+  <string name="max_scramble_cache_too_close_to_min">The maximum cache size is too close to the minimum. Max will be set to %1$d</string>
 
   <string name="total_scrambles_count">Total generated scrambles: %1$d</string>
   <string name="scrambles_already_generating">Scrambles are already being generated.</string>

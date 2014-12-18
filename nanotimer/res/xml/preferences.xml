@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:custom="http://schemas.android.com/apk/res/com.cube.nanotimer">
+  xmlns:custom="http://schemas.android.com/apk/res/com.cube.nanotimer"
+   android:key="main_settings_screen">
 
   <PreferenceCategory
      android:title="@string/timer_screen">
@@ -19,7 +20,8 @@
        android:key="inspection_time"
        android:title="@string/inspection_time"
        android:summary="@string/inspection_time_summary"
-       android:defaultValue="@integer/inspection_time"/>
+       android:defaultValue="@integer/inspection_time"
+       custom:defaultVal="@integer/inspection_time"/>
 
     <CheckBoxPreference
        android:key="inspection_sounds"
@@ -73,6 +75,7 @@
        android:defaultValue="@bool/randomstate_scrambles"/>
 
     <PreferenceScreen
+       android:key="modern_scrambles_settings_screen"
        android:title="@string/modern_scrambles_settings"
        android:summary="@string/modern_scrambles_settings_summary"
        android:persistent="false"
@@ -108,6 +111,7 @@
          android:summary="@string/gen_count_when_plugged_in_summary"
          custom:min="30"
          android:defaultValue="@integer/scramble_gen_count_when_plugged_in"
+         custom:defaultVal="@integer/scramble_gen_count_when_plugged_in"
          android:dependency="scrambles_gen_when_plugged_in"/>
 
       <com.cube.nanotimer.gui.widget.preferences.NumberEntryDialog
@@ -115,14 +119,16 @@
          android:title="@string/min_cache_size"
          android:summary="@string/min_cache_size_summary"
          custom:min="20"
-         android:defaultValue="@integer/min_scramble_cache_size"/>
+         android:defaultValue="@integer/min_scramble_cache_size"
+         custom:defaultVal="@integer/min_scramble_cache_size"/>
 
       <com.cube.nanotimer.gui.widget.preferences.NumberEntryDialog
          android:key="scrambles_max_cache_size"
          android:title="@string/max_cache_size"
          android:summary="@string/max_cache_size_summary"
          custom:min="30"
-         android:defaultValue="@integer/max_scramble_cache_size"/>
+         android:defaultValue="@integer/max_scramble_cache_size"
+         custom:defaultVal="@integer/max_scramble_cache_size"/>
 
     </PreferenceScreen>
 
