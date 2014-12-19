@@ -3,10 +3,12 @@ package com.cube.nanotimer.util.helper;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.BatteryManager;
 import android.preference.PreferenceManager;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
@@ -132,6 +134,14 @@ public class Utils {
       DialogUtils.showInfoMessage(context, R.string.could_not_find_market);
     }
     return false;
+  }
+
+  public static boolean isCurrentlyCharging() {
+    IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+    Intent batteryStatus = App.INSTANCE.getContext().registerReceiver(null, filter);
+    int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+    return (status == BatteryManager.BATTERY_STATUS_CHARGING ||
+        status == BatteryManager.BATTERY_STATUS_FULL);
   }
 
 }

@@ -1,8 +1,10 @@
 package com.cube.nanotimer.scrambler;
 
 import android.content.Context;
+import android.content.Intent;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.scrambler.randomstate.AlreadyGeneratingException;
+import com.cube.nanotimer.scrambler.randomstate.ChargingStateReceiver;
 import com.cube.nanotimer.scrambler.randomstate.RSScrambler;
 import com.cube.nanotimer.scrambler.randomstate.RSThreeScrambler;
 import com.cube.nanotimer.scrambler.randomstate.RSTwoScrambler;
@@ -91,7 +93,7 @@ public enum ScramblerService {
     return 0;
   }
 
-  private void generateAndAddToCache(final CubeType cubeType, int scramblesCount, GenerationLaunch generationLaunch) throws AlreadyGeneratingException {
+  public void generateAndAddToCache(final CubeType cubeType, int scramblesCount, GenerationLaunch generationLaunch) throws AlreadyGeneratingException {
     synchronized (genThreadHelper) {
       if (generationThread != null) {
         throw new AlreadyGeneratingException();
@@ -111,6 +113,7 @@ public enum ScramblerService {
         }
         sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.IDLE, null, null, 0, 0));
         if (generationThread == Thread.currentThread()) {
+          checkPluggedIn();
           generationThread = null;
         }
       }
@@ -158,6 +161,11 @@ public enum ScramblerService {
         if (!toSave.isEmpty()) {
           saveNewScramblesToFile(cubeType, toSave);
         }
+      }
+
+      private void checkPluggedIn() {
+        // call service to check if generation should be started or stopped
+        context.sendBroadcast(new Intent(ChargingStateReceiver.CHECK_ACTION_NAME));
       }
     };
   }
@@ -303,7 +311,7 @@ public enum ScramblerService {
     }
   }
 
-  private List<CubeType> getRandomStateCubeTypes() {
+  public List<CubeType> getRandomStateCubeTypes() {
     return Arrays.asList(CubeType.THREE_BY_THREE, CubeType.TWO_BY_TWO);
   }
 

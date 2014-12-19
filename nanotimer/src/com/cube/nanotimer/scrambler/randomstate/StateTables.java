@@ -49,96 +49,127 @@ public class StateTables {
   static byte[][] pruningCornerPermutation;
   static byte[][] pruningUDEdgePermutation;
 
-  public static void generateTables(Move[] moves1, Move[] moves2) {
+  public static void generateTables(final Move[] moves1, final Move[] moves2) {
     long ts = System.currentTimeMillis();
 
     // #####################
     // # Transition tables #
     // #####################
 
-    byte[] state8 = new byte[8];
-    byte[] state12 = new byte[12];
-    boolean[] bState12 = new boolean[12];
-
     // --> Phase 1
-    long stepTs = System.currentTimeMillis();
-    transitCornerOrientation = new short[N_CORNER_ORIENTATIONS][moves1.length];
-    for (int i = 0; i < transitCornerOrientation.length; i++) {
-      IndexConvertor.unpackOrientation(i, state8, (byte) 3);
-      for (int j = 0; j < moves1.length; j++) {
-        transitCornerOrientation[i][j] = (short) IndexConvertor.packOrientMult(state8, moves1[j].corPerm, moves1[j].corOrient, 3);
+    TransitThread threadTrCorOri = new TransitThread() {
+      @Override
+      public void run() {
+        transitCornerOrientation = new short[N_CORNER_ORIENTATIONS][moves1.length];
+        for (int i = 0; i < transitCornerOrientation.length; i++) {
+          IndexConvertor.unpackOrientation(i, state8, (byte) 3);
+          for (int j = 0; j < moves1.length; j++) {
+            transitCornerOrientation[i][j] = (short) IndexConvertor.packOrientMult(state8, moves1[j].corPerm, moves1[j].corOrient, 3);
+          }
+        }
       }
-    }
-    logTimeDifference(stepTs, "trCorOri");
+    };
+    threadTrCorOri.start();
 
-    stepTs = System.currentTimeMillis();
-    transitEdgeOrientation = new short[N_EDGE_ORIENTATIONS][moves1.length];
-    for (int i = 0; i < transitEdgeOrientation.length; i++) {
-      IndexConvertor.unpackOrientation(i, state12, (byte) 2);
-      for (int j = 0; j < moves1.length; j++) {
-        transitEdgeOrientation[i][j] = (short) IndexConvertor.packOrientMult(state12, moves1[j].edgPerm, moves1[j].edgOrient, 2);
+    TransitThread threadTrEdgOri = new TransitThread() {
+      @Override
+      public void run() {
+        transitEdgeOrientation = new short[N_EDGE_ORIENTATIONS][moves1.length];
+        for (int i = 0; i < transitEdgeOrientation.length; i++) {
+          IndexConvertor.unpackOrientation(i, state12, (byte) 2);
+          for (int j = 0; j < moves1.length; j++) {
+            transitEdgeOrientation[i][j] = (short) IndexConvertor.packOrientMult(state12, moves1[j].edgPerm, moves1[j].edgOrient, 2);
+          }
+        }
       }
-    }
-    logTimeDifference(stepTs, "trEdgOri");
+    };
+    threadTrEdgOri.start();
 
-    stepTs = System.currentTimeMillis();
-    transitEEdgeCombination = new short[N_E_EDGE_COMBINATIONS][moves1.length];
-    for (int i = 0; i < transitEEdgeCombination.length; i++) {
-      IndexConvertor.unpackCombination(i, bState12, 4);
-      for (int j = 0; j < moves1.length; j++) {
-        transitEEdgeCombination[i][j] = (short) IndexConvertor.packCombPermMult(bState12, moves1[j].edgPerm, 4);
+    TransitThread threadTrEEdgComb = new TransitThread() {
+      @Override
+      public void run() {
+        transitEEdgeCombination = new short[N_E_EDGE_COMBINATIONS][moves1.length];
+        for (int i = 0; i < transitEEdgeCombination.length; i++) {
+          IndexConvertor.unpackCombination(i, bState12, 4);
+          for (int j = 0; j < moves1.length; j++) {
+            transitEEdgeCombination[i][j] = (short) IndexConvertor.packCombPermMult(bState12, moves1[j].edgPerm, 4);
+          }
+        }
       }
-    }
-    logTimeDifference(stepTs, "trEEdgComb");
+    };
+    threadTrEEdgComb.start();
 
     // --> Phase 2
-    stepTs = System.currentTimeMillis();
-    transitCornerPermutation = new int[N_CORNER_PERMUTATIONS][moves2.length];
-    for (int i = 0; i < transitCornerPermutation.length; i++) {
-      IndexConvertor.unpackPermutation(i, state8);
-      for (int j = 0; j < moves2.length; j++) {
-        transitCornerPermutation[i][j] = IndexConvertor.packPermMult(state8, moves2[j].corPerm);
+    TransitThread threadTrCorPerm = new TransitThread() {
+      @Override
+      public void run() {
+        transitCornerPermutation = new int[N_CORNER_PERMUTATIONS][moves2.length];
+        for (int i = 0; i < transitCornerPermutation.length; i++) {
+          IndexConvertor.unpackPermutation(i, state8);
+          for (int j = 0; j < moves2.length; j++) {
+            transitCornerPermutation[i][j] = IndexConvertor.packPermMult(state8, moves2[j].corPerm);
+          }
+        }
       }
-    }
-    logTimeDifference(stepTs, "trCorPerm");
+    };
+    threadTrCorPerm.start();
 
     // E and UD edges stay on the same slice/layers as phase 2 moves can only interchange them
-    stepTs = System.currentTimeMillis();
-    transitEEdgePermutation = new short[N_E_EDGE_PERMUTATIONS][moves2.length];
-    for (int i = 0; i < transitEEdgePermutation.length; i++) {
-      byte[] state = new byte[4];
-      byte[] edges = new byte[12];
-      IndexConvertor.unpackPermutation(i, state);
-      for (byte j = 0; j < edges.length; j++) {
-        edges[j] = (j < 4) ? state[j] : 0;
-      }
+    TransitThread threadTrEEdgPerm = new TransitThread() {
+      @Override
+      public void run() {
+        transitEEdgePermutation = new short[N_E_EDGE_PERMUTATIONS][moves2.length];
+        for (int i = 0; i < transitEEdgePermutation.length; i++) {
+          byte[] state = new byte[4];
+          byte[] edges = new byte[12];
+          IndexConvertor.unpackPermutation(i, state);
+          for (byte j = 0; j < edges.length; j++) {
+            edges[j] = (j < 4) ? state[j] : 0;
+          }
 
-      for (int j = 0; j < moves2.length; j++) {
-        byte[] res = getPermResult(edges, moves2[j].edgPerm);
-        byte[] eEdges = new byte[4];
-        System.arraycopy(res, 0, eEdges, 0, eEdges.length);
-        transitEEdgePermutation[i][j] = (short) IndexConvertor.packPermutation(eEdges);
+          for (int j = 0; j < moves2.length; j++) {
+            byte[] res = getPermResult(edges, moves2[j].edgPerm);
+            byte[] eEdges = new byte[4];
+            System.arraycopy(res, 0, eEdges, 0, eEdges.length);
+            transitEEdgePermutation[i][j] = (short) IndexConvertor.packPermutation(eEdges);
+          }
+        }
       }
+    };
+    threadTrEEdgPerm.start();
+
+    TransitThread threadTrUDEdgPerm = new TransitThread() {
+      @Override
+      public void run() {
+        transitUDEdgePermutation = new int[N_U_D_EDGE_PERMUTATIONS][moves2.length];
+        for (int i = 0; i < transitUDEdgePermutation.length; i++) {
+          IndexConvertor.unpackPermutation(i, state8);
+          byte[] edges = new byte[12];
+          for (byte j = 0; j < edges.length; j++) {
+            edges[j] = (j < 4) ? 0 : state8[j - 4];
+          }
+
+          for (int j = 0; j < moves2.length; j++) {
+            byte[] res = getPermResult(edges, moves2[j].edgPerm);
+            byte[] udEdges = new byte[8];
+            System.arraycopy(res, 4, udEdges, 0, udEdges.length);
+            transitUDEdgePermutation[i][j] = IndexConvertor.packPermutation(udEdges);
+          }
+        }
+      }
+    };
+    threadTrUDEdgPerm.start();
+
+    try {
+      threadTrCorOri.join();
+      threadTrEdgOri.join();
+      threadTrEEdgComb.join();
+      threadTrCorPerm.join();
+      threadTrEEdgPerm.join();
+      threadTrUDEdgPerm.join();
+    } catch (InterruptedException e) {
+      Log.e("[NanoTimer]", "Transit tables generation interrupted");
     }
-    logTimeDifference(stepTs, "trEEdgPerm");
-
-    stepTs = System.currentTimeMillis();
-    transitUDEdgePermutation = new int[N_U_D_EDGE_PERMUTATIONS][moves2.length];
-    for (int i = 0; i < transitUDEdgePermutation.length; i++) {
-      IndexConvertor.unpackPermutation(i, state8);
-      byte[] edges = new byte[12];
-      for (byte j = 0; j < edges.length; j++) {
-        edges[j] = (j < 4) ? 0 : state8[j - 4];
-      }
-
-      for (int j = 0; j < moves2.length; j++) {
-        byte[] res = getPermResult(edges, moves2[j].edgPerm);
-        byte[] udEdges = new byte[8];
-        System.arraycopy(res, 4, udEdges, 0, udEdges.length);
-        transitUDEdgePermutation[i][j] = IndexConvertor.packPermutation(udEdges);
-      }
-    }
-    logTimeDifference(stepTs, "trUDEdgPerm");
     logTimeDifference(ts, "-> transit time");
 
     // ##################
@@ -148,38 +179,54 @@ public class StateTables {
     long tsPrun = System.currentTimeMillis();
 
     // --> Phase 1
-    stepTs = System.currentTimeMillis();
-    pruningCornerOrientation = new byte[N_CORNER_ORIENTATIONS][N_E_EDGE_COMBINATIONS];
-    genPruning(pruningCornerOrientation, transitCornerOrientation, transitEEdgeCombination, moves1, 1);
-    logTimeDifference(stepTs, "prCorOri");
+    Thread threadPrCorOri = new Thread() {
+      @Override
+      public void run() {
+        pruningCornerOrientation = new byte[N_CORNER_ORIENTATIONS][N_E_EDGE_COMBINATIONS];
+        genPruning(pruningCornerOrientation, transitCornerOrientation, transitEEdgeCombination, moves1, 1);
+      }
+    };
+    threadPrCorOri.start();
 
-    stepTs = System.currentTimeMillis();
-    pruningEdgeOrientation = new byte[N_EDGE_ORIENTATIONS][N_E_EDGE_COMBINATIONS];
-    genPruning(pruningEdgeOrientation, transitEdgeOrientation, transitEEdgeCombination, moves1, 1);
-    logTimeDifference(stepTs, "prEdgOri");
+    Thread threadPrEdgOri = new Thread() {
+      @Override
+      public void run() {
+        pruningEdgeOrientation = new byte[N_EDGE_ORIENTATIONS][N_E_EDGE_COMBINATIONS];
+        genPruning(pruningEdgeOrientation, transitEdgeOrientation, transitEEdgeCombination, moves1, 1);
+      }
+    };
+    threadPrEdgOri.start();
 
     // --> Phase 2
-    stepTs = System.currentTimeMillis();
-    pruningCornerPermutation = new byte[N_CORNER_PERMUTATIONS][N_E_EDGE_PERMUTATIONS];
-    genPruning(pruningCornerPermutation, transitCornerPermutation, transitEEdgePermutation, moves2, 2);
-    logTimeDifference(stepTs, "prCorPerm");
+    Thread threadPrCorPerm = new Thread() {
+      @Override
+      public void run() {
+        pruningCornerPermutation = new byte[N_CORNER_PERMUTATIONS][N_E_EDGE_PERMUTATIONS];
+        genPruning(pruningCornerPermutation, transitCornerPermutation, transitEEdgePermutation, moves2, 2);
+      }
+    };
+    threadPrCorPerm.start();
 
-    stepTs = System.currentTimeMillis();
-    pruningUDEdgePermutation = new byte[N_U_D_EDGE_PERMUTATIONS][N_E_EDGE_PERMUTATIONS];
-    genPruning(pruningUDEdgePermutation, transitUDEdgePermutation, transitEEdgePermutation, moves2, 2);
-    logTimeDifference(stepTs, "prEdgPerm");
+    Thread threadPrUDEdgPerm = new Thread() {
+      @Override
+      public void run() {
+        pruningUDEdgePermutation = new byte[N_U_D_EDGE_PERMUTATIONS][N_E_EDGE_PERMUTATIONS];
+        genPruning(pruningUDEdgePermutation, transitUDEdgePermutation, transitEEdgePermutation, moves2, 2);
+      }
+    };
+    threadPrUDEdgPerm.start();
+
+    try {
+      threadPrCorOri.join();
+      threadPrEdgOri.join();
+      threadPrCorPerm.join();
+      threadPrUDEdgPerm.join();
+    } catch (InterruptedException e) {
+      Log.e("[NanoTimer]", "Pruning tables generation interrupted");
+    }
 
     logTimeDifference(tsPrun, "-> pruning time");
     logTimeDifference(ts, "time to generate tables");
-
-//    Log.i("[NanoTimer]", "prCorOri:");
-//    displayDistributions(pruningCornerOrientation);
-//    Log.i("[NanoTimer]", "prEdgOri:");
-//    displayDistributions(pruningEdgeOrientation);
-//    Log.i("[NanoTimer]", "prCorPerm:");
-//    displayDistributions(pruningCornerPermutation);
-//    Log.i("[NanoTimer]", "prEDEdgPerm:");
-//    displayDistributions(pruningUDEdgePermutation);
   }
 
   private static void displayDistributions(byte[][] pruningTable) {
@@ -265,21 +312,10 @@ public class StateTables {
 //    Log.i("[NanoTimer]", msg + ": " + (System.currentTimeMillis() - startTs));
   }
 
-  static class PruningState {
-    int ind1;
-    int ind2;
-    short distance;
-
-    PruningState(int ind1, int ind2) {
-      this.ind1 = ind1;
-      this.ind2 = ind2;
-    }
-
-    PruningState(int ind1, int ind2, short distance) {
-      this.ind1 = ind1;
-      this.ind2 = ind2;
-      this.distance = distance;
-    }
+  static class TransitThread extends Thread {
+    byte[] state8 = new byte[8];
+    byte[] state12 = new byte[12];
+    boolean[] bState12 = new boolean[12];
   }
 
 }

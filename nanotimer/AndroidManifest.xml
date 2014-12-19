@@ -45,6 +45,14 @@
         <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>
     </activity>
+    <service android:name=".scrambler.randomstate.ChargingStateService"/>
+    <receiver android:name=".scrambler.randomstate.ChargingStateReceiver">
+      <intent-filter>
+        <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
+        <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
+        <action android:name="com.cube.nanotimer.action.CHECK_PLUG_STATE"/>
+      </intent-filter>
+    </receiver>
 
     <!-- for startapp -->
     <activity
