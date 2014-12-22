@@ -6,7 +6,8 @@
   <string name="open_nanotimer">Open Nano Timer to start experiencing the new features.</string>
   <string name="open">Open</string>
   <string name="nanotimer_should_be_installed">Nano Timer is not installed.\nPlease install the free version (in addition to this one) to start using the Pro features.</string>
-  <string name="go_to_play_store">Go to installation page</string>
+  <string name="go_to_play_store">Go to app page</string>
+  <string name="version_too_old">Your Nano Timer free version is too old. Please upgrade it to the latest version to be able to access the new unlocked features.</string>
   <string name="could_not_find_market">Could not find the market app</string>
   <string name="could_not_launch_market">Could not launch the market</string>
   <string name="could_not_launch_nanotimer">Could not launch Nano Timer app</string>
