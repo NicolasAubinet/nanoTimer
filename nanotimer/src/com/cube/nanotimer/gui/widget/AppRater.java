@@ -17,7 +17,7 @@ import com.cube.nanotimer.util.helper.Utils;
 public class AppRater {
 
   private final static int DAYS_UNTIL_PROMPT = 5;
-  private final static int DAYS_ASK_LATER_PROMPT_AGAIN = 2;
+  private final static int DAYS_ASK_LATER_PROMPT_AGAIN = 3;
   private final static int LAUNCHES_UNTIL_PROMPT = 7;
 
   public static void appLaunched(Context context) {
@@ -35,15 +35,14 @@ public class AppRater {
     if (launchCount >= LAUNCHES_UNTIL_PROMPT &&
         currentTime >= firstLaunchDate + Utils.daysToMs(DAYS_UNTIL_PROMPT) &&
         (askLaterDate == 0 || currentTime >= askLaterDate + Utils.daysToMs(DAYS_ASK_LATER_PROMPT_AGAIN))) {
-      SharedPreferences.Editor editor = prefs.edit();
-      showRateDialog(context, editor);
-      editor.commit();
+      showRateDialog(context, prefs);
     }
   }
 
-  public static void showRateDialog(final Context context, final SharedPreferences.Editor editor) {
+  public static void showRateDialog(final Context context, final SharedPreferences prefs) {
     LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     ViewGroup v = (ViewGroup) inflater.inflate(R.layout.rate_dialog, null);
+    final SharedPreferences.Editor editor = prefs.edit();
 
     final AlertDialog dialog = new AlertDialog.Builder(context).setView(v).create();
     dialog.setTitle(context.getString(R.string.rate) + " " + context.getString(R.string.app_name));
@@ -51,6 +50,7 @@ public class AppRater {
       @Override
       public void onCancel(DialogInterface dialogInterface) {
         editor.putLong("date_asklater", System.currentTimeMillis());
+        editor.commit();
       }
     });
 
@@ -60,6 +60,7 @@ public class AppRater {
         if (openStoreForRating(context)) {
           // avoid asking again if the user rated the app (there's no way to know for sure if he actually rated it)
           editor.putBoolean("dontshowagain", true);
+          editor.commit();
         }
         dialog.dismiss();
       }
@@ -71,6 +72,7 @@ public class AppRater {
       public void onClick(View view) {
         if (editor != null) {
           editor.putLong("date_asklater", System.currentTimeMillis());
+          editor.commit();
         }
         dialog.dismiss();
       }
@@ -82,6 +84,7 @@ public class AppRater {
       public void onClick(View view) {
         if (editor != null) {
           editor.putBoolean("dontshowagain", true);
+          editor.commit();
         }
         dialog.dismiss();
       }
