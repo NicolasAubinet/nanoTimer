@@ -171,6 +171,11 @@
   <string name="blind_mode">Blind mode</string>
   <string name="steps_can_not_be_added_to_blind_types">Steps can not be added to blind types.\nUse a non-blind type instead.</string>
 
+  <string name="export">Export</string>
+  <string name="export_summary">Export times</string>
+  <string name="times_limit">Times limit</string>
+  <string name="no_limit">&lt;No Limit&gt;</string>
+
   <string name="pro_version_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">

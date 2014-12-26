@@ -44,7 +44,7 @@
        android:title="@string/edit_solve_types"
        android:summary="@string/edit_solve_types_summary">
 
-      <intent android:action="com.cube.nanotimer.activity.SolveTypesActivity"/>
+      <intent android:action="com.cube.nanotimer.gui.SolveTypesActivity"/>
 
     </Preference>
 
@@ -141,6 +141,14 @@
 
   <PreferenceCategory
      android:title="@string/history">
+
+    <Preference
+       android:title="@string/export"
+       android:summary="@string/export_summary">
+
+      <intent android:action="com.cube.nanotimer.gui.ExportActivity"/>
+
+    </Preference>
 
     <com.cube.nanotimer.gui.widget.preferences.ClearHistoryDialog
        android:title="@string/clear_history"

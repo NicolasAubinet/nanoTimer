@@ -455,15 +455,17 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   }
 
   private class HistoryListAdapter extends ArrayAdapter<SolveTime> {
+    private LayoutInflater inflater;
+
     public HistoryListAdapter(Context context, int textViewResourceId, List<SolveTime> objects) {
       super(context, textViewResourceId, objects);
+      inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
       View view = convertView;
       if (view == null) {
-        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         view = inflater.inflate(R.layout.history_list_item, null);
       }
 

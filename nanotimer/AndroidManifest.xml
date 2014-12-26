@@ -41,7 +41,13 @@
        android:name=".gui.SolveTypesActivity"
        android:configChanges="orientation|screenSize|keyboard|keyboardHidden">
       <intent-filter>
-        <action android:name="com.cube.nanotimer.activity.SolveTypesActivity"/>
+        <action android:name="com.cube.nanotimer.gui.SolveTypesActivity"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+      </intent-filter>
+    </activity>
+    <activity android:name=".gui.ExportActivity">
+      <intent-filter>
+        <action android:name="com.cube.nanotimer.gui.ExportActivity"/>
         <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>
     </activity>
