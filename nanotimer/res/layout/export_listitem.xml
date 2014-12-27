@@ -8,7 +8,8 @@
   <CheckBox
      android:id="@+id/cbSelected"
      android:layout_width="wrap_content"
-     android:layout_height="wrap_content"/>
+     android:layout_height="wrap_content"
+     android:layout_gravity="center"/>
 
   <View
      android:id="@+id/spacerView"
@@ -19,12 +20,14 @@
      android:id="@+id/imgTab"
      android:src="@drawable/tree_tab_arrow"
      android:layout_width="wrap_content"
-     android:layout_height="wrap_content"/>
+     android:layout_height="wrap_content"
+     android:layout_gravity="center"/>
 
   <TextView
      android:id="@+id/tvTitle"
      android:layout_width="wrap_content"
      android:layout_height="wrap_content"
-     android:textSize="18sp"/>
+     android:textSize="18sp"
+     android:layout_gravity="center"/>
 
 </LinearLayout>

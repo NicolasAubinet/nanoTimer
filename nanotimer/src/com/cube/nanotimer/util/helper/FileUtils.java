@@ -1,6 +1,7 @@
 package com.cube.nanotimer.util.helper;
 
 import android.content.Context;
+import com.cube.nanotimer.util.CSVGenerator;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -132,6 +133,30 @@ public class FileUtils {
   public static void deleteFile(Context context, String fileName) {
     File f = new File(context.getFilesDir(), fileName);
     f.delete();
+  }
+
+  public static File createCSVFile(Context context, String fileName, CSVGenerator generator) {
+    StringBuilder sb = new StringBuilder();
+    if (generator.getExportLine(0) != null) {
+      String newLine = Utils.getNewLine();
+      sb.append(generator.getHeaderLine());
+      for (int i = 0; generator.getExportLine(i) != null; i++) {
+        sb.append(newLine);
+        sb.append(generator.getExportLine(i));
+      }
+    }
+
+    File file = new File(context.getFilesDir(), fileName);
+    try {
+      FileOutputStream fos = new FileOutputStream(file);
+      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos));
+      writer.write(sb.toString());
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return file;
   }
 
 }

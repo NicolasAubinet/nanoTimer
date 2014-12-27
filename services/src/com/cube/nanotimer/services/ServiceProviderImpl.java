@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.cube.nanotimer.services.db.DB;
 import com.cube.nanotimer.session.TimesStatistics;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.ExportResult;
 import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveHistory;
@@ -679,6 +680,47 @@ public class ServiceProviderImpl implements ServiceProvider {
       }
     }
     return solvesCount;
+  }
+
+  @Override
+  public List<ExportResult> getExportResults(List<Integer> solveTypeIds, int limit) {
+    List<ExportResult> results = new ArrayList<ExportResult>();
+    for (Integer id : solveTypeIds) {
+      StringBuilder q = new StringBuilder();
+      q.append("SELECT ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_TIME);
+      q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_TIMESTAMP);
+      q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_CUBETYPE_ID);
+      q.append("     , ").append(DB.TABLE_CUBETYPE).append(".").append(DB.COL_CUBETYPE_NAME);
+      q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID);
+      q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_NAME);
+      q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_PLUSTWO);
+      q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_SCRAMBLE);
+      q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
+      q.append(" JOIN ").append(DB.TABLE_SOLVETYPE);
+      q.append("   ON ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID);
+      q.append("    = ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_ID);
+      q.append(" JOIN ").append(DB.TABLE_CUBETYPE);
+      q.append("   ON ").append(DB.COL_SOLVETYPE_CUBETYPE_ID);
+      q.append("    = ").append(DB.TABLE_CUBETYPE).append(".").append(DB.COL_ID);
+      q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
+      q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC");
+      String[] params = getStringArray(id);
+      if (limit > 0) {
+        q.append(" LIMIT ?");
+        params = getStringArray(id, limit);
+      }
+      Cursor cursor = db.rawQuery(q.toString(), params);
+      if (cursor != null) {
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+          ExportResult result = new ExportResult(cursor.getInt(0), cursor.getString(1), cursor.getInt(2),
+              cursor.getString(3), cursor.getInt(4), cursor.getLong(5), cursor.getInt(6) == 1, cursor.getString(7));
+          results.add(result);
+        }
+        cursor.close();
+      }
+    }
+
+    return results;
   }
 
   private void recalculateAverages(long timestamp, SolveType solveType) {

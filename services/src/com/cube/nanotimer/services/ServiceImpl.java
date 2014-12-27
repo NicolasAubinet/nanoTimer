@@ -4,6 +4,7 @@ import android.content.Context;
 import com.cube.nanotimer.services.db.DBHelper;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.ExportResult;
 import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveHistory;
@@ -263,6 +264,16 @@ public class ServiceImpl extends DBHelper implements Service {
       @Override
       public void run() {
         callback.onData(provider.getSolvesCount(solveType));
+      }
+    });
+  }
+
+  @Override
+  public void getExportFile(final List<Integer> solveTypeIds, final int limit, final DataCallback<List<ExportResult>> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        callback.onData(provider.getExportResults(solveTypeIds, limit));
       }
     });
   }

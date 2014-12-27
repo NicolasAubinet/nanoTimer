@@ -1,6 +1,7 @@
 package com.cube.nanotimer.services;
 
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.ExportResult;
 import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveHistory;
@@ -27,6 +28,7 @@ public interface ServiceProvider {
   SolveTimeAverages getSolveTimeAverages(SolveTime solveTime);
   SessionDetails getSessionDetails(SolveType solveType);
   int getSolvesCount(SolveType solveType);
+  List<ExportResult> getExportResults(List<Integer> solveTypeIds, int limit);
 
   int addSolveType(SolveType solveType);
   void addSolveTypeSteps(SolveType solveType);

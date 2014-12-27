@@ -144,4 +144,8 @@ public class Utils {
         status == BatteryManager.BATTERY_STATUS_FULL);
   }
 
+  public static String getNewLine() {
+    return System.getProperty("line.separator");
+  }
+
 }

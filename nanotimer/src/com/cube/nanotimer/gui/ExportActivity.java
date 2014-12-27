@@ -2,17 +2,23 @@ package com.cube.nanotimer.gui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
@@ -21,9 +27,16 @@ import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.ExportActivity.ListItem.Type;
 import com.cube.nanotimer.services.db.DataCallback;
+import com.cube.nanotimer.util.CSVGenerator;
+import com.cube.nanotimer.util.ExportCSVGenerator;
+import com.cube.nanotimer.util.FormatterService;
+import com.cube.nanotimer.util.helper.DialogUtils;
+import com.cube.nanotimer.util.helper.FileUtils;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.ExportResult;
 import com.cube.nanotimer.vo.SolveType;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,15 +47,40 @@ public class ExportActivity extends Activity {
   private ExportListAdapter adapter;
   private final List<ListItem> liItems = new ArrayList<ListItem>();
 
+  private CheckBox cbLimit;
+  private EditText tfLimit;
+
+  private static final String PREFS_NAME = "export";
+  private static final String EXPORT_LIMIT_KEY = "limit";
+  private static final String EXPORT_FILE_NAME = "export.csv";
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.export_screen);
 
+    getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN); // TODO keyboard still appears when coming back (like after sending a mail)
+
     lvItems = (ListView) findViewById(R.id.lvItems);
 
     adapter = new ExportListAdapter(this, R.id.lvItems, liItems);
     lvItems.setAdapter(adapter);
+
+    tfLimit = (EditText) findViewById(R.id.tfLimit);
+
+    cbLimit = (CheckBox) findViewById(R.id.cbLimit);
+    cbLimit.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+        if (b) {
+          tfLimit.setText(String.valueOf(getLastExportLimit()));
+          tfLimit.setEnabled(true);
+        } else {
+          tfLimit.setText(R.string.no_limit);
+          tfLimit.setEnabled(false);
+        }
+      }
+    });
 
     App.INSTANCE.getService().getCubeTypes(false, new DataCallback<List<CubeType>>() {
       @Override
@@ -75,32 +113,77 @@ public class ExportActivity extends Activity {
     buExport.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
-        synchronized (liItems) {
-          for (ListItem it : liItems) {
-            if (it.isSelected()) {
-              // TODO display dialog with times limit and send mode (mail or sd file)
-              Log.i("[NanoTimer]", "Export: " + it.getId() + "\t" + it.getName());
+        export();
+      }
+    });
+  }
+
+  private void export() {
+    List<Integer> solveTypeIds = new ArrayList<Integer>();
+    synchronized (liItems) {
+      for (ListItem it : liItems) {
+        if (it.isSelected() && it.getType() == Type.SOLVETYPE) {
+          solveTypeIds.add(it.getId());
+        }
+      }
+    }
+    if (solveTypeIds.isEmpty()) {
+      DialogUtils.showInfoMessage(this, R.string.select_at_least_one_solve_type);
+    }
+    int limit = -1;
+    if (cbLimit.isChecked()) {
+      try {
+        limit = Integer.parseInt(tfLimit.getText().toString());
+        saveLastExportLimit(limit);
+      } catch (NumberFormatException e) {
+        Log.e("[NanoTimer]", "Export limit parsing exception");
+      }
+    }
+    // TODO take care to not do this twice if the button is clicked multiple times (should be fixed with the loading indicator)
+    // TODO display loading indicator while exporting times
+    App.INSTANCE.getService().getExportFile(solveTypeIds, limit, new DataCallback<List<ExportResult>>() {
+      @Override
+      public void onData(List<ExportResult> data) {
+        if (data != null && !data.isEmpty()) {
+          CSVGenerator generator = new ExportCSVGenerator(data);
+          File file = FileUtils.createCSVFile(ExportActivity.this, EXPORT_FILE_NAME, generator);
+          sendExportFile(file);
+//          FileUtils.deleteFile(ExportActivity.this, EXPORT_FILE_NAME); // TODO put back in (where i can)
+        } else {
+          runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              DialogUtils.showInfoMessage(ExportActivity.this, R.string.no_data_to_export);
             }
-          }
+          });
         }
       }
     });
   }
 
+  private void sendExportFile(File file) {
+    Uri uri = Uri.fromFile(file);
+    // TODO fails to send attachment because it comes from private folder. see if possible to send from private folder (maybe from memory?)
+    Intent i = new Intent(Intent.ACTION_SEND);
+    // TODO should maybe limit the number of send options (lots of things appear in the send dialog)
+    i.setType("text/plain");
+    i.putExtra(Intent.EXTRA_EMAIL, "");
+    i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.export_mail_subject));
+    i.putExtra(Intent.EXTRA_TEXT, getString(R.string.export_mail_body, FormatterService.INSTANCE.formatDateTime(System.currentTimeMillis())));
+    i.putExtra(Intent.EXTRA_STREAM, uri);
+    startActivityForResult(Intent.createChooser(i, getString(R.string.send_via)), 0);
+  }
+
   private class ExportListAdapter extends ArrayAdapter<ListItem> {
-    private LayoutInflater inflater;
 
     public ExportListAdapter(Context context, int textViewResourceId, List<ListItem> objects) {
       super(context, textViewResourceId, objects);
-      inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-      View view = convertView;
-      if (view == null) {
-        view = inflater.inflate(R.layout.export_listitem, null);
-      }
+      LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+      View view = inflater.inflate(R.layout.export_listitem, null); // inflating every time to avoid bugs in items on old htc (looks like caching bugs when selecting rows)
 
       synchronized (liItems) {
         if (position >= 0 && position < liItems.size()) {
@@ -230,6 +313,18 @@ public class ExportActivity extends Activity {
     }
   }
 
+  private int getLastExportLimit() {
+    SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
+    return prefs.getInt(EXPORT_LIMIT_KEY, 1000);
+  }
+
+  private void saveLastExportLimit(int limit) {
+    SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
+    Editor editor = prefs.edit();
+    editor.putInt(EXPORT_LIMIT_KEY, limit);
+    editor.commit();
+  }
+
   static class ListItem {
     enum Type { CUBETYPE, SOLVETYPE };
 
@@ -242,7 +337,7 @@ public class ExportActivity extends Activity {
       this.type = type;
       this.id = id;
       this.name = name;
-      this.selected = true;
+      this.selected = false;
     }
 
     public Type getType() {

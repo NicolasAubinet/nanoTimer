@@ -9,13 +9,49 @@
      android:id="@+id/lvItems"
      android:layout_width="match_parent"
      android:layout_height="match_parent"
-     android:layout_above="@+id/buExport"
-     android:layout_marginBottom="3dp"/>
+     android:layout_above="@+id/separator"
+     android:layout_marginBottom="3dp"
+     android:scrollingCache="false"
+     android:animationCache="false"/>
+
+  <View
+     android:id="@+id/separator"
+     android:layout_width="match_parent"
+     android:layout_height="2dp"
+     android:layout_above="@+id/limitLayout"
+     android:layout_marginBottom="2dp"
+     style="@style/DividerRow"/>
+
+  <LinearLayout
+     android:id="@+id/limitLayout"
+     android:orientation="horizontal"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginBottom="3dp"
+     android:layout_above="@+id/buExport">
+    <CheckBox
+       android:id="@+id/cbLimit"
+       android:text="@string/times_limit"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:textSize="18sp"
+       android:checked="false"/>
+    <EditText
+       android:id="@+id/tfLimit"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginLeft="5dp"
+       android:layout_marginStart="5dp"
+       android:text="@string/no_limit"
+       android:textSize="18sp"
+       android:inputType="number"
+       android:enabled="false"/>
+  </LinearLayout>
 
   <Button
      android:id="@+id/buExport"
      android:layout_width="match_parent"
-     android:layout_height="wrap_content"
+     android:layout_height="40dp"
      android:layout_alignParentBottom="true"
      android:text="@string/export"
      android:textSize="18sp"

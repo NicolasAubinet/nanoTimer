@@ -172,17 +172,22 @@
   <string name="steps_can_not_be_added_to_blind_types">Steps can not be added to blind types.\nUse a non-blind type instead.</string>
 
   <string name="export">Export</string>
-  <string name="export_summary">Export times</string>
-  <string name="times_limit">Times limit</string>
+  <string name="export_summary">Export times history</string>
+  <string name="times_limit">Times limit:</string>
   <string name="no_limit">&lt;No Limit&gt;</string>
+  <string name="export_mail_subject">Nano Timer history export</string>
+  <string name="export_mail_body">History export from %1$s</string>
+  <string name="send_via">Send via:</string>
+  <string name="no_data_to_export">Could not find any data to export.</string>
+  <string name="select_at_least_one_solve_type">Please select at least one solve type to export</string>
 
   <string name="pro_version_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
     <ul>
       <li>Times export to csv</li>
-      <li>Times import from csv</li>
       <li>No ads</li>
+      <li>More to come soon…</li>
     </ul>
     </body></html>]]>
   </string>
