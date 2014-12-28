@@ -23,7 +23,7 @@ public class ChargingStateService extends Service {
         // already generating, skip
       }
     }
-    return START_STICKY;
+    return START_NOT_STICKY;
   }
 
   @Override
