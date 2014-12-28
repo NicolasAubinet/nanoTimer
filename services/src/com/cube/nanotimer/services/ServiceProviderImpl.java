@@ -687,12 +687,12 @@ public class ServiceProviderImpl implements ServiceProvider {
     List<ExportResult> results = new ArrayList<ExportResult>();
     for (Integer id : solveTypeIds) {
       StringBuilder q = new StringBuilder();
-      q.append("SELECT ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_TIME);
-      q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_TIMESTAMP);
-      q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_CUBETYPE_ID);
+      q.append("SELECT ").append(DB.TABLE_CUBETYPE).append(".").append(DB.COL_ID);
       q.append("     , ").append(DB.TABLE_CUBETYPE).append(".").append(DB.COL_CUBETYPE_NAME);
-      q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID);
+      q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_ID);
       q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_NAME);
+      q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_TIME);
+      q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_TIMESTAMP);
       q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_PLUSTWO);
       q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_SCRAMBLE);
       q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
@@ -713,7 +713,7 @@ public class ServiceProviderImpl implements ServiceProvider {
       if (cursor != null) {
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
           ExportResult result = new ExportResult(cursor.getInt(0), cursor.getString(1), cursor.getInt(2),
-              cursor.getString(3), cursor.getInt(4), cursor.getLong(5), cursor.getInt(6) == 1, cursor.getString(7));
+              cursor.getString(3), cursor.getLong(4), cursor.getLong(5), cursor.getInt(6) == 1, cursor.getString(7));
           results.add(result);
         }
         cursor.close();

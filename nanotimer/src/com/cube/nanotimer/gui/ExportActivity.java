@@ -1,10 +1,12 @@
 package com.cube.nanotimer.gui;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -43,7 +44,6 @@ import java.util.List;
 
 public class ExportActivity extends Activity {
 
-  private ListView lvItems;
   private ExportListAdapter adapter;
   private final List<ListItem> liItems = new ArrayList<ListItem>();
 
@@ -53,34 +53,14 @@ public class ExportActivity extends Activity {
   private static final String PREFS_NAME = "export";
   private static final String EXPORT_LIMIT_KEY = "limit";
   private static final String EXPORT_FILE_NAME = "export.csv";
+  private static final int SEND_REQUEST_CODE = 0;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.export_screen);
 
-    getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN); // TODO keyboard still appears when coming back (like after sending a mail)
-
-    lvItems = (ListView) findViewById(R.id.lvItems);
-
-    adapter = new ExportListAdapter(this, R.id.lvItems, liItems);
-    lvItems.setAdapter(adapter);
-
-    tfLimit = (EditText) findViewById(R.id.tfLimit);
-
-    cbLimit = (CheckBox) findViewById(R.id.cbLimit);
-    cbLimit.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-      @Override
-      public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-        if (b) {
-          tfLimit.setText(String.valueOf(getLastExportLimit()));
-          tfLimit.setEnabled(true);
-        } else {
-          tfLimit.setText(R.string.no_limit);
-          tfLimit.setEnabled(false);
-        }
-      }
-    });
+    initViews();
 
     App.INSTANCE.getService().getCubeTypes(false, new DataCallback<List<CubeType>>() {
       @Override
@@ -108,6 +88,28 @@ public class ExportActivity extends Activity {
         });
       }
     });
+  }
+
+  private void initViews() {
+    ListView lvItems = (ListView) findViewById(R.id.lvItems);
+    adapter = new ExportListAdapter(this, R.id.lvItems, liItems);
+    lvItems.setAdapter(adapter);
+
+    tfLimit = (EditText) findViewById(R.id.tfLimit);
+
+    cbLimit = (CheckBox) findViewById(R.id.cbLimit);
+    cbLimit.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+        if (b) {
+          tfLimit.setText(String.valueOf(getLastExportLimit()));
+          tfLimit.setEnabled(true);
+        } else {
+          tfLimit.setText(R.string.no_limit);
+          tfLimit.setEnabled(false);
+        }
+      }
+    });
 
     Button buExport = (Button) findViewById(R.id.buExport);
     buExport.setOnClickListener(new OnClickListener() {
@@ -116,6 +118,19 @@ public class ExportActivity extends Activity {
         export();
       }
     });
+  }
+
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    boolean timesLimitChecked = cbLimit.isChecked();
+    String timesLimitText = tfLimit.getText().toString();
+
+    setContentView(R.layout.export_screen);
+    initViews();
+
+    cbLimit.setChecked(timesLimitChecked);
+    tfLimit.setText(timesLimitText);
   }
 
   private void export() {
@@ -129,6 +144,7 @@ public class ExportActivity extends Activity {
     }
     if (solveTypeIds.isEmpty()) {
       DialogUtils.showInfoMessage(this, R.string.select_at_least_one_solve_type);
+      return;
     }
     int limit = -1;
     if (cbLimit.isChecked()) {
@@ -139,39 +155,42 @@ public class ExportActivity extends Activity {
         Log.e("[NanoTimer]", "Export limit parsing exception");
       }
     }
-    // TODO take care to not do this twice if the button is clicked multiple times (should be fixed with the loading indicator)
-    // TODO display loading indicator while exporting times
+
+    final ProgressDialog progressDialog = new ProgressDialog(this);
+    progressDialog.setMessage(getString(R.string.exporting_history));
+    progressDialog.setIndeterminate(true);
+    progressDialog.setCancelable(false);
+    progressDialog.show();
     App.INSTANCE.getService().getExportFile(solveTypeIds, limit, new DataCallback<List<ExportResult>>() {
       @Override
-      public void onData(List<ExportResult> data) {
-        if (data != null && !data.isEmpty()) {
-          CSVGenerator generator = new ExportCSVGenerator(data);
-          File file = FileUtils.createCSVFile(ExportActivity.this, EXPORT_FILE_NAME, generator);
-          sendExportFile(file);
-//          FileUtils.deleteFile(ExportActivity.this, EXPORT_FILE_NAME); // TODO put back in (where i can)
-        } else {
-          runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+      public void onData(final List<ExportResult> data) {
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            progressDialog.hide();
+            progressDialog.dismiss();
+            if (data != null && !data.isEmpty()) {
+              CSVGenerator generator = new ExportCSVGenerator(data);
+              File file = FileUtils.createCSVFile(ExportActivity.this, EXPORT_FILE_NAME, generator);
+              sendExportFile(file);
+            } else {
               DialogUtils.showInfoMessage(ExportActivity.this, R.string.no_data_to_export);
             }
-          });
-        }
+          }
+        });
       }
     });
   }
 
   private void sendExportFile(File file) {
     Uri uri = Uri.fromFile(file);
-    // TODO fails to send attachment because it comes from private folder. see if possible to send from private folder (maybe from memory?)
     Intent i = new Intent(Intent.ACTION_SEND);
-    // TODO should maybe limit the number of send options (lots of things appear in the send dialog)
-    i.setType("text/plain");
+    i.setType("message/rfc822");
     i.putExtra(Intent.EXTRA_EMAIL, "");
     i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.export_mail_subject));
     i.putExtra(Intent.EXTRA_TEXT, getString(R.string.export_mail_body, FormatterService.INSTANCE.formatDateTime(System.currentTimeMillis())));
     i.putExtra(Intent.EXTRA_STREAM, uri);
-    startActivityForResult(Intent.createChooser(i, getString(R.string.send_via)), 0);
+    startActivityForResult(Intent.createChooser(i, getString(R.string.send_via)), SEND_REQUEST_CODE);
   }
 
   private class ExportListAdapter extends ArrayAdapter<ListItem> {

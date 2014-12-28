@@ -30,7 +30,7 @@ public class ExportCSVGenerator implements CSVGenerator {
     sb.append(",");
     sb.append(FormatterService.INSTANCE.formatSolveTime(line.getTime()));
     sb.append(",");
-    sb.append(FormatterService.INSTANCE.formatDateTime(line.getTimestamp()));
+    sb.append(FormatterService.INSTANCE.formatExportDateTime(line.getTimestamp()));
     sb.append(",");
     sb.append(line.isPlusTwo() ? "y" : "n");
     sb.append(",");

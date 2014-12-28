@@ -58,6 +58,14 @@ public enum FormatterService {
     return sdf.format(new Date(ms));
   }
 
+  public String formatExportDateTime(Long ms) {
+    if (ms == null) {
+      return "";
+    }
+    SimpleDateFormat sdf = new SimpleDateFormat("MMM d yyyy - HH:mm:ss", Locale.ENGLISH);
+    return sdf.format(new Date(ms));
+  }
+
   /**
    * Format the times of different steps to a String
    * @param times a list of times in ms

@@ -140,9 +140,11 @@
   </PreferenceCategory>
 
   <PreferenceCategory
+     android:key="history"
      android:title="@string/history">
 
     <Preference
+       android:key="export"
        android:title="@string/export"
        android:summary="@string/export_summary">
 

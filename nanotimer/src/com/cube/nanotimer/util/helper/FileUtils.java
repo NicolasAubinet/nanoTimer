@@ -140,17 +140,21 @@ public class FileUtils {
     if (generator.getExportLine(0) != null) {
       String newLine = Utils.getNewLine();
       sb.append(generator.getHeaderLine());
-      for (int i = 0; generator.getExportLine(i) != null; i++) {
+      String line;
+      for (int i = 0; (line = generator.getExportLine(i)) != null; i++) {
         sb.append(newLine);
-        sb.append(generator.getExportLine(i));
+        sb.append(line);
       }
     }
 
-    File file = new File(context.getFilesDir(), fileName);
+    File file = new File(context.getExternalCacheDir(), fileName); // TODO see if also works on versions < KITKAT (might require permission... if so, find an other folder)
+//    File file = new File(context.getFilesDir(), fileName);
     try {
       FileOutputStream fos = new FileOutputStream(file);
-      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos));
-      writer.write(sb.toString());
+      OutputStreamWriter osw = new OutputStreamWriter(fos);
+      osw.write(sb.toString(), 0, sb.length());
+      osw.close();
+      fos.close();
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     } catch (IOException e) {

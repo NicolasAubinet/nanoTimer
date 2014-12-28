@@ -6,10 +6,13 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.ReleaseNotes;
@@ -33,6 +36,12 @@ public class OptionsActivity extends PreferenceActivity {
     super.onCreate(savedInstanceState);
     setTitle(R.string.settings);
     addPreferencesFromResource(R.xml.preferences);
+
+    if (!App.INSTANCE.isProEnabled()) { // export only accessible from within Pro app
+      Preference exportPref = findPreference("export");
+      PreferenceCategory historyCategory = (PreferenceCategory) findPreference("history");
+      historyCategory.removePreference(exportPref);
+    }
 
     prefChangedListener = new OnSharedPreferenceChangeListener() {
       @Override

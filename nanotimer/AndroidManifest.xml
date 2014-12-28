@@ -45,7 +45,9 @@
         <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>
     </activity>
-    <activity android:name=".gui.ExportActivity">
+    <activity android:name=".gui.ExportActivity"
+       android:windowSoftInputMode="stateAlwaysHidden"
+       android:configChanges="orientation|screenSize|keyboard|keyboardHidden">
       <intent-filter>
         <action android:name="com.cube.nanotimer.gui.ExportActivity"/>
         <category android:name="android.intent.category.DEFAULT"/>
