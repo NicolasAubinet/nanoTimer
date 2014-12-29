@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-   android:versionCode="17"
-   android:versionName="1.1.1"
+   android:versionCode="18"
+   android:versionName="1.1.2"
    package="com.cube.nanotimer">
 
   <uses-sdk
@@ -53,6 +53,7 @@
         <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>
     </activity>
+
     <service android:name=".scrambler.randomstate.ChargingStateService"/>
     <receiver android:name=".scrambler.randomstate.ChargingStateReceiver">
       <intent-filter>
@@ -61,6 +62,16 @@
         <action android:name="com.cube.nanotimer.action.CHECK_PLUG_STATE"/>
       </intent-filter>
     </receiver>
+
+    <provider
+       android:name="android.support.v4.content.FileProvider"
+       android:authorities="com.cube.nanotimer.fileprovider"
+       android:exported="false"
+       android:grantUriPermissions="true">
+      <meta-data
+         android:name="android.support.FILE_PROVIDER_PATHS"
+         android:resource="@xml/fileprovider"/>
+    </provider>
 
     <!-- for startapp -->
     <activity

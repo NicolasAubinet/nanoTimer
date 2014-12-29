@@ -9,6 +9,8 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ShareCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -183,14 +185,17 @@ public class ExportActivity extends Activity {
   }
 
   private void sendExportFile(File file) {
-    Uri uri = Uri.fromFile(file);
-    Intent i = new Intent(Intent.ACTION_SEND);
-    i.setType("message/rfc822");
-    i.putExtra(Intent.EXTRA_EMAIL, "");
-    i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.export_mail_subject));
-    i.putExtra(Intent.EXTRA_TEXT, getString(R.string.export_mail_body, FormatterService.INSTANCE.formatDateTime(System.currentTimeMillis())));
-    i.putExtra(Intent.EXTRA_STREAM, uri);
-    startActivityForResult(Intent.createChooser(i, getString(R.string.send_via)), SEND_REQUEST_CODE);
+    Uri uri = FileProvider.getUriForFile(this, "com.cube.nanotimer.fileprovider", file);
+    Intent i = ShareCompat.IntentBuilder.from(this)
+        .setType("message/rfc822")
+        .setSubject(getString(R.string.export_mail_subject))
+        .setText(getString(R.string.export_mail_body, FormatterService.INSTANCE.formatDateTime(System.currentTimeMillis())))
+        .setStream(uri)
+        .setChooserTitle(R.string.send_via)
+        .createChooserIntent()
+        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
+        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    startActivityForResult(i, SEND_REQUEST_CODE);
   }
 
   private class ExportListAdapter extends ArrayAdapter<ListItem> {
@@ -345,7 +350,10 @@ public class ExportActivity extends Activity {
   }
 
   static class ListItem {
-    enum Type { CUBETYPE, SOLVETYPE };
+
+    enum Type {CUBETYPE, SOLVETYPE}
+
+    ;
 
     private Type type;
     private int id;

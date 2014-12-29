@@ -147,8 +147,7 @@ public class FileUtils {
       }
     }
 
-    File file = new File(context.getExternalCacheDir(), fileName); // TODO see if also works on versions < KITKAT (might require permission... if so, find an other folder)
-//    File file = new File(context.getFilesDir(), fileName);
+    File file = new File(context.getCacheDir(), fileName);
     try {
       FileOutputStream fos = new FileOutputStream(file);
       OutputStreamWriter osw = new OutputStreamWriter(fos);
