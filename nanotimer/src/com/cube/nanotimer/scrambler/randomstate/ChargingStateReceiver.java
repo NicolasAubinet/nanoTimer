@@ -3,6 +3,7 @@ package com.cube.nanotimer.scrambler.randomstate;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.GenerationLaunch;
@@ -18,6 +19,7 @@ public class ChargingStateReceiver extends BroadcastReceiver {
   @Override
   public void onReceive(Context context, Intent intent) {
     this.context = context;
+    App.INSTANCE.setContext(context.getApplicationContext());
     boolean charging = Utils.isCurrentlyCharging();
     if (Options.INSTANCE.isGenerateScramblesWhenPluggedIn() && charging) {
       startPlugGeneration();
