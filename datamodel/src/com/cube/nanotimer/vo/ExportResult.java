@@ -2,6 +2,7 @@ package com.cube.nanotimer.vo;
 
 public class ExportResult {
 
+  private int solveTimeId;
   private int cubeTypeId;
   private String cubeTypeName;
   private int solveTypeId;
@@ -11,7 +12,11 @@ public class ExportResult {
   private boolean plusTwo;
   private String scramble;
 
-  public ExportResult(int cubeTypeId, String cubeTypeName, int solveTypeId, String solveTypeName, long time, long timestamp, boolean plusTwo, String scramble) {
+  private String[] stepsNames;
+  private Long[] stepsTimes;
+
+  public ExportResult(int solveTimeId, int cubeTypeId, String cubeTypeName, int solveTypeId, String solveTypeName, long time, long timestamp, boolean plusTwo, String scramble) {
+    this.solveTimeId = solveTimeId;
     this.cubeTypeId = cubeTypeId;
     this.cubeTypeName = cubeTypeName;
     this.solveTypeId = solveTypeId;
@@ -20,6 +25,14 @@ public class ExportResult {
     this.timestamp = timestamp;
     this.plusTwo = plusTwo;
     this.scramble = scramble;
+  }
+
+  public int getSolveTimeId() {
+    return solveTimeId;
+  }
+
+  public void setSolveTimeId(int solveTimeId) {
+    this.solveTimeId = solveTimeId;
   }
 
   public long getTime() {
@@ -84,6 +97,26 @@ public class ExportResult {
 
   public void setPlusTwo(boolean plusTwo) {
     this.plusTwo = plusTwo;
+  }
+
+  public String[] getStepsNames() {
+    return stepsNames;
+  }
+
+  public void setStepsNames(String[] stepsNames) {
+    this.stepsNames = stepsNames;
+  }
+
+  public Long[] getStepsTimes() {
+    return stepsTimes;
+  }
+
+  public void setStepsTimes(Long[] stepsTimes) {
+    this.stepsTimes = stepsTimes;
+  }
+
+  public boolean hasSteps() {
+    return stepsNames != null && stepsTimes != null;
   }
 
 }

@@ -30,9 +30,10 @@ import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.ExportActivity.ListItem.Type;
 import com.cube.nanotimer.services.db.DataCallback;
-import com.cube.nanotimer.util.CSVGenerator;
-import com.cube.nanotimer.util.ExportCSVGenerator;
 import com.cube.nanotimer.util.FormatterService;
+import com.cube.nanotimer.util.export.CSVGenerator;
+import com.cube.nanotimer.util.export.ExportCSVGenerator;
+import com.cube.nanotimer.util.export.ReportStepsException;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.FileUtils;
 import com.cube.nanotimer.vo.CubeType;
@@ -72,7 +73,7 @@ public class ExportActivity extends Activity {
           public void run() {
             for (CubeType ct : data) {
               synchronized (liItems) {
-                liItems.add(new ListItem(Type.CUBETYPE, ct.getId(), ct.getName()));
+                liItems.add(new ListItem(Type.CUBETYPE, ct.getId(), ct.getName(), false));
               }
               App.INSTANCE.getService().getSolveTypes(ct, new DataCallback<List<SolveType>>() {
                 @Override
@@ -137,15 +138,23 @@ public class ExportActivity extends Activity {
 
   private void export() {
     List<Integer> solveTypeIds = new ArrayList<Integer>();
+    boolean hasSteps = false;
     synchronized (liItems) {
       for (ListItem it : liItems) {
         if (it.isSelected() && it.getType() == Type.SOLVETYPE) {
           solveTypeIds.add(it.getId());
+          if (it.hasSteps) {
+            hasSteps = true;
+          }
         }
       }
     }
     if (solveTypeIds.isEmpty()) {
       DialogUtils.showInfoMessage(this, R.string.select_at_least_one_solve_type);
+      return;
+    }
+    if (hasSteps && solveTypeIds.size() > 1) {
+      DialogUtils.showInfoMessage(this, R.string.only_one_step_solve_type_is_allowed);
       return;
     }
     int limit = -1;
@@ -172,9 +181,13 @@ public class ExportActivity extends Activity {
             progressDialog.hide();
             progressDialog.dismiss();
             if (data != null && !data.isEmpty()) {
-              CSVGenerator generator = new ExportCSVGenerator(data);
-              File file = FileUtils.createCSVFile(ExportActivity.this, EXPORT_FILE_NAME, generator);
-              sendExportFile(file);
+              try {
+                CSVGenerator generator = new ExportCSVGenerator(data);
+                File file = FileUtils.createCSVFile(ExportActivity.this, EXPORT_FILE_NAME, generator);
+                sendExportFile(file);
+              } catch (ReportStepsException e) {
+                DialogUtils.showInfoMessage(ExportActivity.this, R.string.only_one_step_solve_type_is_allowed);
+              }
             } else {
               DialogUtils.showInfoMessage(ExportActivity.this, R.string.no_data_to_export);
             }
@@ -327,7 +340,7 @@ public class ExportActivity extends Activity {
             // found corresponding cube type
             for (int j = solveTypes.size() - 1; j >= 0; j--) {
               SolveType solveType = solveTypes.get(j);
-              liItems.add(i + 1, new ListItem(Type.SOLVETYPE, solveType.getId(), solveType.getName()));
+              liItems.add(i + 1, new ListItem(Type.SOLVETYPE, solveType.getId(), solveType.getName(), solveType.hasSteps()));
             }
             break;
           }
@@ -358,12 +371,14 @@ public class ExportActivity extends Activity {
     private Type type;
     private int id;
     private String name;
+    private boolean hasSteps;
     private boolean selected;
 
-    private ListItem(Type type, int id, String name) {
+    private ListItem(Type type, int id, String name, boolean hasSteps) {
       this.type = type;
       this.id = id;
       this.name = name;
+      this.hasSteps = hasSteps;
       this.selected = false;
     }
 
@@ -377,6 +392,10 @@ public class ExportActivity extends Activity {
 
     public String getName() {
       return name;
+    }
+
+    public boolean isHasSteps() {
+      return hasSteps;
     }
 
     public boolean isSelected() {

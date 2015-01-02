@@ -81,7 +81,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         SolveType st = new SolveType(cursor.getInt(0), cursor.getString(1), (cursor.getInt(2) == 1), cursor.getInt(3));
-        st.setSteps(getSolveTypeSteps(st).toArray(new SolveTypeStep[0]));
+        st.setSteps(getSolveTypeSteps(st.getId()).toArray(new SolveTypeStep[0]));
         solveTypes.add(st);
       }
       cursor.close();
@@ -89,14 +89,14 @@ public class ServiceProviderImpl implements ServiceProvider {
     return solveTypes;
   }
 
-  private List<SolveTypeStep> getSolveTypeSteps(SolveType solveType) {
+  private List<SolveTypeStep> getSolveTypeSteps(int solveTypeId) {
     List<SolveTypeStep> solveTypeSteps = new ArrayList<SolveTypeStep>();
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_ID).append(", ").append(DB.COL_SOLVETYPESTEP_NAME);
     q.append(" FROM ").append(DB.TABLE_SOLVETYPESTEP);
     q.append(" WHERE ").append(DB.COL_SOLVETYPESTEP_SOLVETYPE_ID).append(" = ?");
     q.append(" ORDER BY ").append(DB.COL_SOLVETYPESTEP_POSITION);
-    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId()));
+    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTypeId));
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         SolveTypeStep st = new SolveTypeStep();
@@ -178,7 +178,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     values.put(DB.COL_TIMEHISTORY_AVG100, avg100);
     long historyId = db.insert(DB.TABLE_TIMEHISTORY, null, values);
     if (solveTime.hasSteps()) {
-      Iterator<SolveTypeStep> stsIt = getSolveTypeSteps(solveTime.getSolveType()).iterator();
+      Iterator<SolveTypeStep> stsIt = getSolveTypeSteps(solveTime.getSolveType().getId()).iterator();
       for (Long stepTime : solveTime.getStepsTimes()) {
         values = new ContentValues();
         values.put(DB.COL_TIMEHISTORYSTEP_TIME, stepTime);
@@ -396,7 +396,7 @@ public class ServiceProviderImpl implements ServiceProvider {
         st.setPlusTwo(cursor.getInt(4) == 1);
         st.setSolveType(solveType);
         if (solveType.hasSteps()) {
-          List<Long> stepTimes = getSolveTimeSteps(st);
+          List<Long> stepTimes = getSolveTimeSteps(st.getId());
           st.setStepsTimes(stepTimes.size() == 0 ? null : stepTimes.toArray(new Long[0]));
         }
         history.add(st);
@@ -421,7 +421,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     return solvesCount;
   }
 
-  private List<Long> getSolveTimeSteps(SolveTime solveTime) {
+  private List<Long> getSolveTimeSteps(int solveTimeId) {
     List<Long> stepTimes = new ArrayList<Long>();
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_TIMEHISTORYSTEP_TIME);
@@ -431,7 +431,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("    = ").append(DB.TABLE_TIMEHISTORYSTEP).append(".").append(DB.COL_TIMEHISTORYSTEP_SOLVETYPESTEP_ID);
     q.append(" WHERE ").append(DB.COL_TIMEHISTORYSTEP_TIMEHISTORY_ID).append(" = ?");
     q.append(" ORDER BY ").append(DB.COL_SOLVETYPESTEP_POSITION);
-    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTime.getId()));
+    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTimeId));
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         stepTimes.add(cursor.getLong(0));
@@ -556,7 +556,7 @@ public class ServiceProviderImpl implements ServiceProvider {
   @Override
   public void addSolveTypeSteps(SolveType solveType) {
     // only add steps if it does not already have some (we can't edit the steps because it would mess up the times)
-    if (solveType.getId() == 0 || getSolveTypeSteps(solveType).size() > 0) {
+    if (solveType.getId() == 0 || getSolveTypeSteps(solveType.getId()).size() > 0) {
       return;
     }
     int i = 1;
@@ -687,7 +687,8 @@ public class ServiceProviderImpl implements ServiceProvider {
     List<ExportResult> results = new ArrayList<ExportResult>();
     for (Integer id : solveTypeIds) {
       StringBuilder q = new StringBuilder();
-      q.append("SELECT ").append(DB.TABLE_CUBETYPE).append(".").append(DB.COL_ID);
+      q.append("SELECT ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_ID);
+      q.append("     , ").append(DB.TABLE_CUBETYPE).append(".").append(DB.COL_ID);
       q.append("     , ").append(DB.TABLE_CUBETYPE).append(".").append(DB.COL_CUBETYPE_NAME);
       q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_ID);
       q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_NAME);
@@ -709,15 +710,28 @@ public class ServiceProviderImpl implements ServiceProvider {
         q.append(" LIMIT ?");
         params = getStringArray(id, limit);
       }
+      List<ExportResult> curResults = new ArrayList<ExportResult>();
       Cursor cursor = db.rawQuery(q.toString(), params);
       if (cursor != null) {
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-          ExportResult result = new ExportResult(cursor.getInt(0), cursor.getString(1), cursor.getInt(2),
-              cursor.getString(3), cursor.getLong(4), cursor.getLong(5), cursor.getInt(6) == 1, cursor.getString(7));
-          results.add(result);
+          ExportResult result = new ExportResult(cursor.getInt(0), cursor.getInt(1), cursor.getString(2), cursor.getInt(3),
+              cursor.getString(4), cursor.getLong(5), cursor.getLong(6), cursor.getInt(7) == 1, cursor.getString(8));
+          curResults.add(result);
         }
         cursor.close();
       }
+      List<SolveTypeStep> steps = getSolveTypeSteps(id);
+      if (steps.size() > 0) { // if solve type has steps
+        String[] stepsNames = new String[steps.size()];
+        for (int i = 0; i < steps.size(); i++) {
+          stepsNames[i] = steps.get(i).getName();
+        }
+        for (ExportResult r : curResults) {
+          r.setStepsNames(stepsNames);
+          r.setStepsTimes(getSolveTimeSteps(r.getSolveTimeId()).toArray(new Long[0]));
+        }
+      }
+      results.addAll(curResults);
     }
 
     return results;

@@ -1,7 +1,7 @@
 package com.cube.nanotimer.util.helper;
 
 import android.content.Context;
-import com.cube.nanotimer.util.CSVGenerator;
+import com.cube.nanotimer.util.export.CSVGenerator;
 
 import java.io.BufferedWriter;
 import java.io.File;

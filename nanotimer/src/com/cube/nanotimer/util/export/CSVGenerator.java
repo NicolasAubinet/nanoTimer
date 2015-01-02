@@ -1,4 +1,4 @@
-package com.cube.nanotimer.util;
+package com.cube.nanotimer.util.export;
 
 public interface CSVGenerator {
   String getHeaderLine();
