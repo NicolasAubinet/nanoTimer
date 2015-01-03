@@ -17,6 +17,9 @@ public class AdProvider {
   private static boolean interstitialShown; // true if the last call to showInterstitial did display an ad
 
   public static void init(Activity a) {
+    if (!isAdsEnabled()) {
+      return;
+    }
     // Startapp
     // banner
   	StartAppSDK.init(a, "108845167", "208524420",
@@ -41,6 +44,9 @@ public class AdProvider {
   }
 
   public static void showInterstitial() {
+    if (!isAdsEnabled()) {
+      return;
+    }
     if (interstitialShown) {
       // don't show interstitial ads two times in a row
       interstitialShown = false;
@@ -90,15 +96,25 @@ public class AdProvider {
   }
 
   public static void resume() {
+    if (!isAdsEnabled()) {
+      return;
+    }
   	startAppAd.onResume();
   }
   
   public static void pause() {
+    if (!isAdsEnabled()) {
+      return;
+    }
   	startAppAd.onPause();
   }
 
   public static boolean wasInterstitialShown() {
     return interstitialShown;
+  }
+
+  private static boolean isAdsEnabled() {
+    return Options.INSTANCE.isAdsEnabled();
   }
 
 }

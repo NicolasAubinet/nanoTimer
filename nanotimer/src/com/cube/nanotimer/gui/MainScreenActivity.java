@@ -81,6 +81,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    App.INSTANCE.setContext(this);
     AdProvider.init(this);
     setContentView(R.layout.mainscreen_screen);
     setVolumeControlStream(AudioManager.STREAM_MUSIC);
