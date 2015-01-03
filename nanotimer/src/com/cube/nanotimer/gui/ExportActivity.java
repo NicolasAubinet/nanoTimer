@@ -138,13 +138,16 @@ public class ExportActivity extends Activity {
 
   private void export() {
     List<Integer> solveTypeIds = new ArrayList<Integer>();
-    boolean hasSteps = false;
+    String stepsTypes = "";
     synchronized (liItems) {
       for (ListItem it : liItems) {
         if (it.isSelected() && it.getType() == Type.SOLVETYPE) {
           solveTypeIds.add(it.getId());
           if (it.hasSteps) {
-            hasSteps = true;
+            if (!stepsTypes.equals("")) {
+              stepsTypes += ", ";
+            }
+            stepsTypes += it.getName();
           }
         }
       }
@@ -153,8 +156,8 @@ public class ExportActivity extends Activity {
       DialogUtils.showInfoMessage(this, R.string.select_at_least_one_solve_type);
       return;
     }
-    if (hasSteps && solveTypeIds.size() > 1) {
-      DialogUtils.showInfoMessage(this, R.string.only_one_step_solve_type_is_allowed);
+    if (!stepsTypes.equals("") && solveTypeIds.size() > 1) {
+      DialogUtils.showInfoMessage(this, getString(R.string.only_one_step_solve_type_is_allowed_steps, stepsTypes));
       return;
     }
     int limit = -1;

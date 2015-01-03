@@ -182,6 +182,7 @@
   <string name="no_data_to_export">Could not find any data to export.</string>
   <string name="select_at_least_one_solve_type">Please select at least one solve type to export</string>
   <string name="only_one_step_solve_type_is_allowed">Can not export multiple solve types if one of them has steps</string>
+  <string name="only_one_step_solve_type_is_allowed_steps">Can not export multiple solve types if one of them has steps.\nThe following type(s) have steps: %1$s</string>
   <string name="exporting_history">Exporting history…</string>
 
   <string name="pro_version_features_html">
