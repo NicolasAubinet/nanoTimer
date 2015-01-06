@@ -11,7 +11,7 @@ public enum Options {
   public enum AdsStyle { BANNER, INTERSTITIAL, MIXED }
   public enum BigCubesNotation { RUF, RWUWFW }
   public enum ScramblesQuality { LOW, MEDIUM, HIGH }
-  public enum ScrambleNotificationMode { ALWAYS, MANUAL }
+  public enum ScrambleNotificationMode { ALWAYS, MANUAL, NEVER }
 
   private Context context;
   private SharedPreferences sharedPreferences;
@@ -121,6 +121,8 @@ public enum Options {
         return ScrambleNotificationMode.ALWAYS;
       case 2:
         return ScrambleNotificationMode.MANUAL;
+      case 3:
+        return ScrambleNotificationMode.NEVER;
       default:
         return ScrambleNotificationMode.ALWAYS;
     }

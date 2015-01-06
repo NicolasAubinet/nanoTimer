@@ -104,8 +104,8 @@
   <string name="high_quality">High (less moves, slower to generate)</string>
   <string name="normal_quality">Normal</string>
   <string name="low_quality">Low (more moves, quicker to generate)</string>
-  <string name="pregen_scrambles">Pre-generate scrambles</string>
-  <string name="pregen_scrambles_summary">Pre-generate modern scrambles</string>
+  <string name="pregen_scrambles">Manually generate scrambles</string>
+  <string name="pregen_scrambles_summary">Manually generate random-state scrambles</string>
   <string name="r_u_f">r u f</string>
   <string name="rw_uw_fw">Rw Uw Fw</string>
   <string name="ads">Advertisements</string>
@@ -121,10 +121,11 @@
   <string name="notification_mode_summary">Choose when to display generation notification</string>
   <string name="when_generating">Always when generating</string>
   <string name="when_generating_manually">Only when manually generating</string>
-  <string name="generate_when_plugged_in">Generate when plugged in</string>
-  <string name="generate_when_plugged_in_summary">Automatically generate when plugged in to charger</string>
-  <string name="gen_count_when_plugged_in">Plugged scrambles count</string>
-  <string name="gen_count_when_plugged_in_summary">Number of scrambles to generate when plugged in</string>
+  <string name="never_show_notif">Never (not recommended)</string>
+  <string name="generate_when_plugged_in">Generate when charging</string>
+  <string name="generate_when_plugged_in_summary">Automatically generate when charging</string>
+  <string name="gen_count_when_plugged_in">Charging scrambles count</string>
+  <string name="gen_count_when_plugged_in_summary">Number of scrambles to generate when charging</string>
   <string name="min_cache_size">Minimum cache size</string>
   <string name="min_cache_size_summary">Start automatic generation when reached</string>
   <string name="max_cache_size">Maximum cache size</string>

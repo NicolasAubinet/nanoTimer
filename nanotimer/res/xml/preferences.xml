@@ -130,12 +130,12 @@
          android:defaultValue="@integer/max_scramble_cache_size"
          custom:defaultVal="@integer/max_scramble_cache_size"/>
 
-    </PreferenceScreen>
+      <com.cube.nanotimer.gui.widget.preferences.PreGenerateScramblesDialog
+         android:key="pregen_scrambles"
+         android:title="@string/pregen_scrambles"
+         android:summary="@string/pregen_scrambles_summary"/>
 
-    <com.cube.nanotimer.gui.widget.preferences.PreGenerateScramblesDialog
-       android:key="pregen_scrambles"
-       android:title="@string/pregen_scrambles"
-       android:summary="@string/pregen_scrambles_summary"/>
+    </PreferenceScreen>
 
   </PreferenceCategory>
 
