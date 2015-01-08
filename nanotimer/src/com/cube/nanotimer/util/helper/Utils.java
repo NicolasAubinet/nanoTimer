@@ -114,7 +114,7 @@ public class Utils {
 
   public static boolean openPlayStorePage(Context context, String packageName) {
     Intent rateAppIntent;
-    String storePackage = context.getPackageManager().getInstallerPackageName(packageName);
+    String storePackage = context.getPackageManager().getInstallerPackageName(context.getPackageName());
     if ("com.android.vending".equals(storePackage)) { // google
       rateAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName));
     } else if ("com.amazon.venezia".equals(storePackage)) { // amazon
