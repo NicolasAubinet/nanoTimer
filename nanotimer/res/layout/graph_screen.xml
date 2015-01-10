@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:orientation="vertical"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent">
+
+  <RelativeLayout
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_margin="2dp"
+     android:paddingLeft="5dp"
+     android:paddingRight="5dp">
+
+    <TextView
+       android:id="@+id/tvCubeType"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentLeft="true"
+       android:layout_alignParentStart="true"
+       android:layout_centerVertical="true"
+       android:textSize="16sp"/>
+
+    <TextView
+       android:id="@+id/tvSolveType"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_toRightOf="@+id/tvCubeType"
+       android:layout_toEndOf="@+id/tvCubeType"
+       android:layout_marginLeft="10dp"
+       android:layout_marginStart="10dp"
+       android:layout_centerVertical="true"
+       android:textSize="16sp"/>
+
+    <Spinner
+       android:id="@+id/spPeriod"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentRight="true"
+       android:layout_alignParentEnd="true"
+       android:layout_centerVertical="true"/>
+
+  </RelativeLayout>
+
+  <com.github.mikephil.charting.charts.LineChart
+     android:id="@+id/chart"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"/>
+
+</LinearLayout>

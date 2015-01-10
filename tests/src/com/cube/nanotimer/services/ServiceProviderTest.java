@@ -127,21 +127,21 @@ public class ServiceProviderTest extends AndroidTestCase {
     averages = saveTime(200);
     assertAvgEquals(300, 510, null, null, 561, 300, 510, null, null, 200, averages); // 1000(x5), 300(x7), 200(x1)
 
-    List<SolveTime> times = provider.getHistory(solveType1).getSolveTimes();
+    List<SolveTime> times = provider.getPagedHistory(solveType1).getSolveTimes();
     averages = provider.deleteTime(times.get(1)); // remove 300
     assertAvgEquals(300, 580, null, null, 583, 300, 580, null, null, 200, averages); // 1000(x5), 300(x6), 200(x1)
 
-    times = provider.getHistory(solveType1).getSolveTimes();
+    times = provider.getPagedHistory(solveType1).getSolveTimes();
     averages = provider.deleteTime(times.get(times.size() - 4)); // remove 1000
     assertAvgEquals(300, null, null, null, 545, 300, null, null, null, 200, averages); // 1000(x4), 300(x6), 200(x1)
     averages = saveTime(150);
     assertAvgEquals(266, 500, null, null, 512, 266, 500, null, null, 150, averages); // 1000(x4), 300(x6), 200(x1), 150(x1)
 
-    times = provider.getHistory(solveType1).getSolveTimes();
+    times = provider.getPagedHistory(solveType1).getSolveTimes();
     averages = provider.deleteTime(times.get(1)); // remove 200
     assertAvgEquals(300, null, null, null, 540, 300, null, null, null, 150, averages); // 1000(x4), 300(x6), 150(x1)
 
-    times = provider.getHistory(solveType1).getSolveTimes();
+    times = provider.getPagedHistory(solveType1).getSolveTimes();
     for (int i = 4; i < 10; i++) {
       provider.deleteTime(times.get(i));
     }
@@ -151,7 +151,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     averages = provider.getSolveAverages(solveType1);
     assertAvgEquals(null, null, null, null, 475, null, null, null, null, 300, averages); // 1000(x1) 300(x3)
 
-    times = provider.getHistory(solveType1).getSolveTimes();
+    times = provider.getPagedHistory(solveType1).getSolveTimes();
     for (int i = 0; i < 3; i++) {
       provider.deleteTime(times.get(i));
     }
@@ -174,10 +174,10 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertAvgEquals(500, null, null, null, 450, 350, null, null, null, 150, averages); // 150, 250, 350, 450, 700, 800
     averages = saveTime(600);
     assertAvgEquals(583, null, null, null, 471, 350, null, null, null, 150, averages); // 150, 250, 350, 450, 700, 800, 600
-    times = provider.getHistory(solveType1).getSolveTimes();
+    times = provider.getPagedHistory(solveType1).getSolveTimes();
     averages = provider.deleteTime(times.get(2)); // remove 700
     assertAvgEquals(466, null, null, null, 433, 350, null, null, null, 150, averages); // 150, 250, 350, 450, 800, 600
-    times = provider.getHistory(solveType1).getSolveTimes();
+    times = provider.getPagedHistory(solveType1).getSolveTimes();
     averages = provider.deleteTime(times.get(3)); // remove 350
     assertAvgEquals(433, null, null, null, 450, 433, null, null, null, 150, averages); // 150, 250, 450, 800, 600
   }
@@ -195,7 +195,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     averages = saveTimes(500, 2);
     assertAvgEquals(833, null, null, null, 1142, 833, null, null, null, 500, averages); // 3000, 1000(x4), 500(x2)
 
-    List<SolveTime> times = provider.getHistory(solveType1).getSolveTimes();
+    List<SolveTime> times = provider.getPagedHistory(solveType1).getSolveTimes();
     times.get(3).setTime(-1);
     averages = provider.saveTime(times.get(3));
     assertAvgEquals(833, null, null, null, 1166, 833, null, null, null, 500, averages); // 3000, 1000(x2), -1, 1000, 500(x2)
@@ -207,7 +207,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertAvgEquals(2166, null, null, null, 1833, 2166, null, null, null, 500, averages); // 3000, 1000, 3000, -1, 3000, 500(x2)
 
     saveTime(4000);
-    times = provider.getHistory(solveType1).getSolveTimes();
+    times = provider.getPagedHistory(solveType1).getSolveTimes();
     times.get(7).setTime(1000);
     provider.saveTime(times.get(7));
     times.get(5).setTime(1000);
@@ -241,7 +241,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     averages = saveTime(2000);
     assertAvgEquals(3000, null, null, null, 2000, 1000, null, null, null, 1000, averages); // 1000(x4), -1, 6000, 2000
 
-    List<SolveTime> times = provider.getHistory(solveType1).getSolveTimes();
+    List<SolveTime> times = provider.getPagedHistory(solveType1).getSolveTimes();
     times.get(3).setTime(-1);
     averages = provider.saveTime(times.get(3));
     assertAvgEquals(-1, null, null, null, 2200, null, null, null, null, 1000, averages); // 1000(x3), -1(x2), 6000, 2000
@@ -259,22 +259,22 @@ public class ServiceProviderTest extends AndroidTestCase {
     averages = provider.saveTime(time);
     assertAvgEquals(-1, null, null, null, 2500, null, null, null, null, 1000, averages); // -1, 1000(x2), -1(x2), 6000, 2000, -1
 
-    time = provider.getHistory(solveType1).getSolveTimes().get(6);
+    time = provider.getPagedHistory(solveType1).getSolveTimes().get(6);
     time.setTime(-1);
     averages = provider.saveTime(time);
     assertAvgEquals(-1, null, null, null, 3000, null, null, null, null, 1000, averages); // -1(x2), 1000, -1(x2), 6000, 2000, -1
 
-    time = provider.getHistory(solveType1).getSolveTimes().get(5);
+    time = provider.getPagedHistory(solveType1).getSolveTimes().get(5);
     time.setTime(-1);
     averages = provider.saveTime(time);
     assertAvgEquals(-1, null, null, null, 4000, null, null, null, null, 2000, averages); // -1(x5), 6000, 2000, -1
 
-    time = provider.getHistory(solveType1).getSolveTimes().get(1);
+    time = provider.getPagedHistory(solveType1).getSolveTimes().get(1);
     time.setTime(-1);
     averages = provider.saveTime(time);
     assertAvgEquals(-1, null, null, null, 6000, null, null, null, null, 6000, averages); // -1(x5), 6000, -1(x2)
 
-    time = provider.getHistory(solveType1).getSolveTimes().get(2);
+    time = provider.getPagedHistory(solveType1).getSolveTimes().get(2);
     time.setTime(-1);
     averages = provider.saveTime(time);
     assertAvgEquals(-1, null, null, null, null, null, null, null, null, null, averages); // -1(x8)
@@ -294,7 +294,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     averages = provider.saveTime(time);
     assertAvgEquals(-1, null, null, null, 20, null, null, null, null, 10, averages);  // -1(x8), 10, 30, -1
 
-    time = provider.getHistory(solveType1).getSolveTimes().get(2);
+    time = provider.getPagedHistory(solveType1).getSolveTimes().get(2);
     time.setTime(-1);
     averages = provider.saveTime(time);
     assertAvgEquals(-1, null, null, null, 30, null, null, null, null, 30, averages);  // -1(x9), 30, -1
@@ -308,7 +308,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     averages = provider.saveTime(time);
     assertAvgEquals(-1, -1, null, null, 50, null, null, null, null, 30, averages);  // -1(x9), 30, -1, 50, 70
 
-    time = provider.getHistory(solveType1).getSolveTimes().get(3);
+    time = provider.getPagedHistory(solveType1).getSolveTimes().get(3);
     time.setTime(60);
     averages = provider.saveTime(time);
     assertAvgEquals(-1, -1, null, null, 60, null, null, null, null, 50, averages);  // -1(x9), 60, -1, 50, 70
@@ -383,7 +383,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     averages = provider.saveTime(time);
     assertAvgEquals(10000, 10000, 7604, null, 7500, 5000, 5000, 7500, null, 5000, averages); // 5000(x25), 10000(x25), DNF
 
-    time = provider.getHistory(solveType1).getSolveTimes().get(5);
+    time = provider.getPagedHistory(solveType1).getSolveTimes().get(5);
     time.setTime(12000);
     averages = provider.saveTime(time);
     assertAvgEquals(10000, 10200, 7645, null, 7540, 5000, 5000, 7500, null, 5000, averages); // 5000(x25), 10000(x20), 12000, 10000(x4), DNF
@@ -411,21 +411,21 @@ public class ServiceProviderTest extends AndroidTestCase {
   public void testSolveTimeAveragesAndRecalculation() {
     provider.deleteHistory();
     saveTimes(1000, 5);
-    List<SolveTime> times = provider.getHistory(solveType1).getSolveTimes();
+    List<SolveTime> times = provider.getPagedHistory(solveType1).getSolveTimes();
     SolveTime time = times.get(0);
     time.setTime(3000);
     SolveAverages averages = provider.saveTime(time);
     assertAvgEquals(1000, null, null, null, 1400, 1000, null, null, null, 1000, averages); // 1000(x4), 3000
     assertSolveTimeAveragesEquals(1000, null, null, null, provider.getSolveTimeAverages(time));
 
-    times = provider.getHistory(solveType1).getSolveTimes();
+    times = provider.getPagedHistory(solveType1).getSolveTimes();
     time = times.get(3);
     time.setTime(800);
     averages = provider.saveTime(time);
     assertAvgEquals(1000, null, null, null, 1360, 1000, null, null, null, 800, averages); // 1000, 800, 1000(x2), 3000
     assertSolveTimeAveragesEquals(null, null, null, null, provider.getSolveTimeAverages(time));
 
-    times = provider.getHistory(solveType1).getSolveTimes();
+    times = provider.getPagedHistory(solveType1).getSolveTimes();
     time = times.get(0);
     time.setTime(-1);
     averages = provider.saveTime(time);
@@ -434,7 +434,7 @@ public class ServiceProviderTest extends AndroidTestCase {
 
     saveTimes(1000, 11);
 
-    times = provider.getHistory(solveType1).getSolveTimes();
+    times = provider.getPagedHistory(solveType1).getSolveTimes();
     time = times.get(0);
     time.setTime(-1);
     averages = provider.saveTime(time);
@@ -448,7 +448,7 @@ public class ServiceProviderTest extends AndroidTestCase {
 
     provider.deleteTime(times.get(0)); // 1000, 800, 1000(x2), -1, 1000(x10)
 
-    times = provider.getHistory(solveType1).getSolveTimes();
+    times = provider.getPagedHistory(solveType1).getSolveTimes();
     time = times.get(2);
     time.setTime(-1);
     averages = provider.saveTime(time);
@@ -661,13 +661,13 @@ public class ServiceProviderTest extends AndroidTestCase {
   }
 
   private SolveTime getFirstTime() {
-    List<SolveTime> times = provider.getHistory(solveType1).getSolveTimes();
+    List<SolveTime> times = provider.getPagedHistory(solveType1).getSolveTimes();
     Assert.assertTrue(times != null && times.size() > 0);
     return times.get(times.size() - 1);
   }
 
   private SolveTime getLastTime() {
-    List<SolveTime> times = provider.getHistory(solveType1).getSolveTimes();
+    List<SolveTime> times = provider.getPagedHistory(solveType1).getSolveTimes();
     Assert.assertTrue(times != null && times.size() > 0);
     return times.get(0);
   }

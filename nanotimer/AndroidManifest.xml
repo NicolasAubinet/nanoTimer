@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-   android:versionCode="19"
-   android:versionName="1.1.2"
+   android:versionCode="20"
+   android:versionName="1.1.3"
    package="com.cube.nanotimer">
 
   <uses-sdk
@@ -37,6 +37,7 @@
        android:name=".gui.TimerActivity"
        android:configChanges="orientation|screenSize|keyboard|keyboardHidden"/>
     <activity android:name=".gui.OptionsActivity"/>
+    <activity android:name=".gui.GraphActivity"/>
     <activity
        android:name=".gui.SolveTypesActivity"
        android:configChanges="orientation|screenSize|keyboard|keyboardHidden">

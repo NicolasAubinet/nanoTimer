@@ -95,11 +95,21 @@ public class ServiceImpl extends DBHelper implements Service {
   }
 
   @Override
-  public void getHistory(final SolveType solveType, final DataCallback<SolveHistory> callback) {
+  public void getPagedHistory(final SolveType solveType, final DataCallback<SolveHistory> callback) {
     run(new Runnable() {
       @Override
       public void run() {
-        callback.onData(provider.getHistory(solveType));
+        callback.onData(provider.getPagedHistory(solveType));
+      }
+    });
+  }
+
+  @Override
+  public void getPagedHistory(final SolveType solveType, final long from, final DataCallback<SolveHistory> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        callback.onData(provider.getPagedHistory(solveType, from));
       }
     });
   }

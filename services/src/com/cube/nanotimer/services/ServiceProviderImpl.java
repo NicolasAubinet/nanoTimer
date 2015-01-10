@@ -358,19 +358,27 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   @Override
-  public SolveHistory getHistory(SolveType solveType) {
-    return getHistory(solveType, System.currentTimeMillis());
+  public SolveHistory getPagedHistory(SolveType solveType) {
+    return getPagedHistory(solveType, System.currentTimeMillis());
+  }
+
+  @Override
+  public SolveHistory getPagedHistory(SolveType solveType, long from) {
+    SolveHistory solveHistory = new SolveHistory();
+    solveHistory.setSolveTimes(getHistoryTimes(solveType, from, true, HISTORY_PAGE_SIZE));
+    solveHistory.setSolvesCount(getHistorySolvesCount(solveType));
+    return solveHistory;
   }
 
   @Override
   public SolveHistory getHistory(SolveType solveType, long from) {
     SolveHistory solveHistory = new SolveHistory();
-    solveHistory.setSolveTimes(getHistoryTimes(solveType, from, HISTORY_PAGE_SIZE));
+    solveHistory.setSolveTimes(getHistoryTimes(solveType, from, false, null));
     solveHistory.setSolvesCount(getHistorySolvesCount(solveType));
     return solveHistory;
   }
 
-  public List<SolveTime> getHistoryTimes(SolveType solveType, long from, Integer pageSize) {
+  public List<SolveTime> getHistoryTimes(SolveType solveType, long from, boolean searchInPast, Integer pageSize) {
     List<SolveTime> history = new ArrayList<SolveTime>();
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_ID);
@@ -380,7 +388,11 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("     , ").append(DB.COL_TIMEHISTORY_PLUSTWO);
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
-    q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
+    if (searchInPast) {
+      q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
+    } else {
+      q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" >= ?");
+    }
     q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC");
     if (pageSize != null) {
       q.append(" LIMIT ").append(HISTORY_PAGE_SIZE);

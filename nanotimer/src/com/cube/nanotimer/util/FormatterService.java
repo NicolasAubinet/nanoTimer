@@ -2,6 +2,7 @@ package com.cube.nanotimer.util;
 
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.gui.GraphActivity.Period;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -63,6 +64,19 @@ public enum FormatterService {
       return "";
     }
     SimpleDateFormat sdf = new SimpleDateFormat("MMM d yyyy - HH:mm:ss", Locale.ENGLISH);
+    return sdf.format(new Date(ms));
+  }
+
+  public String formatGraphDateTime(Long ms, Period period) {
+    if (ms == null) {
+      return "";
+    }
+    SimpleDateFormat sdf;
+    if (period == Period.DAY) {
+      sdf = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
+    } else {
+      sdf = new SimpleDateFormat("MMM d, yyyy", Locale.ENGLISH);
+    }
     return sdf.format(new Date(ms));
   }
 

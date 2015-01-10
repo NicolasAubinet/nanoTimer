@@ -166,7 +166,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
           if (totalItemCount == lastVisibleItem && lastVisibleItem != previousLastItem) {
             previousLastItem = lastVisibleItem;
             long from = liHistory.get(liHistory.size() - 1).getTimestamp();
-            App.INSTANCE.getService().getHistory(curSolveType, from, new DataCallback<SolveHistory>() {
+            App.INSTANCE.getService().getPagedHistory(curSolveType, from, new DataCallback<SolveHistory>() {
               @Override
               public void onData(final SolveHistory data) {
                 runOnUiThread(new Runnable() {
@@ -253,6 +253,14 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
       case R.id.itOptions:
         startActivity(new Intent(this, OptionsActivity.class));
         break;
+      case R.id.itGraphs:
+        if (Utils.checkProFeature(this)) {
+          Intent i = new Intent(this, GraphActivity.class);
+          i.putExtra("cubeType", curCubeType);
+          i.putExtra("solveType", curSolveType);
+          startActivity(i);
+        }
+        break;
       case R.id.itAbout:
         DialogUtils.showFragment(this, AboutDialog.newInstance());
         break;
@@ -336,7 +344,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   private void refreshHistory() {
     previousLastItem = 0;
     if (curSolveType != null) {
-      App.INSTANCE.getService().getHistory(curSolveType, new DataCallback<SolveHistory>() {
+      App.INSTANCE.getService().getPagedHistory(curSolveType, new DataCallback<SolveHistory>() {
         @Override
         public void onData(final SolveHistory data) {
           runOnUiThread(new Runnable() {

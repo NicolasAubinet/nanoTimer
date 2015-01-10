@@ -158,7 +158,7 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
       if (liSolveTypes.get(position).isBlind()) {
         DialogUtils.showInfoMessage(SolveTypesActivity.this, R.string.steps_can_not_be_added_to_blind_types);
       } else {
-        App.INSTANCE.getService().getHistory(liSolveTypes.get(position), new DataCallback<SolveHistory>() {
+        App.INSTANCE.getService().getPagedHistory(liSolveTypes.get(position), new DataCallback<SolveHistory>() {
           @Override
           public void onData(final SolveHistory data) {
             runOnUiThread(new Runnable() {

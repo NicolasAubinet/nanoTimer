@@ -18,7 +18,8 @@ public interface Service {
   void saveTime(SolveTime solveTime, DataCallback<SolveAverages> callback);
   void deleteTime(SolveTime solveTime, DataCallback<SolveAverages> callback);
   void getSolveAverages(SolveType solveType, DataCallback<SolveAverages> callback);
-  void getHistory(SolveType solveType, DataCallback<SolveHistory> callback);
+  void getPagedHistory(SolveType solveType, DataCallback<SolveHistory> callback);
+  void getPagedHistory(SolveType solveType, long from, DataCallback<SolveHistory> callback);
   void getHistory(SolveType solveType, long from, DataCallback<SolveHistory> callback);
   void deleteHistory(DataCallback<Void> callback);
   void deleteHistory(SolveType solveType, DataCallback<Void> callback);

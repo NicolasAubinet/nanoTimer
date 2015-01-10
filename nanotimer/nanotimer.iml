@@ -39,6 +39,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="mpandroidchartlibrary-1-7-4" level="project" />
   </component>
 </module>
 

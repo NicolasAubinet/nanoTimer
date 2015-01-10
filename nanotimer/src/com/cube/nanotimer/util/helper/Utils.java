@@ -148,4 +148,13 @@ public class Utils {
     return System.getProperty("line.separator");
   }
 
+  public static boolean checkProFeature(Context context) {
+    if (App.INSTANCE.isProEnabled()) {
+      return true;
+    } else {
+      DialogUtils.showInfoMessage(context, R.string.need_pro_version); // TODO : should display dialog instead, with button to Pro Play Store page (similar to ProVersionAd)
+      return false;
+    }
+  }
+
 }

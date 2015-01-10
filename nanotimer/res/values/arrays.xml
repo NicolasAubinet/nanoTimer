@@ -36,4 +36,11 @@
     <item>2</item>
     <item>3</item>
   </string-array>
+  <string-array name="graph_periods">
+    <item>@string/day</item>
+    <item>@string/week</item>
+    <item>@string/month</item>
+    <item>@string/year</item>
+    <item>@string/all</item>
+  </string-array>
 </resources>
