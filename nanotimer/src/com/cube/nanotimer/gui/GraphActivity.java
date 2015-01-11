@@ -2,11 +2,13 @@ package com.cube.nanotimer.gui;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
@@ -21,16 +23,21 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.utils.ValueFormatter;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 public class GraphActivity extends Activity {
 
   private CubeType cubeType;
   private SolveType solveType;
+  private List<ChartTime> chartTimes;
 
   private LineChart chart;
   private Spinner spPeriod;
+  private CheckBox cbAverage;
 
   public enum Period {
     DAY(1),
@@ -39,16 +46,25 @@ public class GraphActivity extends Activity {
     YEAR(365),
     ALL(0);
     private int days;
+
     Period(int days) {
       this.days = days;
     }
+
     private long getPeriodStart() {
       if (days == 0) {
         return 0;
+      } else if (this == DAY) {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DATE);
+        calendar.set(year, month, day, 0, 0, 0);
+        return calendar.getTimeInMillis();
       }
-      return System.currentTimeMillis() - (((long) days) * 24*60*60*1000);
+      return System.currentTimeMillis() - (((long) days) * 24 * 60 * 60 * 1000);
     }
-  };
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -63,11 +79,19 @@ public class GraphActivity extends Activity {
     cubeType = (CubeType) getIntent().getSerializableExtra("cubeType");
     solveType = (SolveType) getIntent().getSerializableExtra("solveType");
 
-    // Labels
     ((TextView) findViewById(R.id.tvCubeType)).setText(cubeType.getName());
     ((TextView) findViewById(R.id.tvSolveType)).setText(solveType.getName());
 
-    // Spinner
+    cbAverage = (CheckBox) findViewById(R.id.cbAverage);
+    cbAverage.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+        if (chartTimes != null) {
+          refreshData();
+        }
+      }
+    });
+
     spPeriod = (Spinner) findViewById(R.id.spPeriod);
     ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.graph_periods, android.R.layout.simple_spinner_item);
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -75,7 +99,7 @@ public class GraphActivity extends Activity {
     spPeriod.setOnItemSelectedListener(new OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-        refreshData();
+        getData();
       }
 
       @Override
@@ -83,7 +107,6 @@ public class GraphActivity extends Activity {
       }
     });
 
-    // Chart
     chart = (LineChart) findViewById(R.id.chart);
     chart.setDescription("");
     chart.setDrawLegend(false);
@@ -91,33 +114,44 @@ public class GraphActivity extends Activity {
     chart.setGridColor(getColor(R.color.gray600));
     chart.setBackgroundColor(getColor(R.color.white));
     chart.setDrawYValues(false);
+    chart.setValueFormatter(new ValueFormatter() {
+      @Override
+      public String getFormattedValue(float value) {
+        return FormatterService.INSTANCE.formatSolveTime(Math.round((double) value));
+      }
+    });
+    chart.getYLabels().setFormatter(new ValueFormatter() {
+      @Override
+      public String getFormattedValue(float value) {
+        return FormatterService.INSTANCE.formatGraphTimeYLabel(Math.round((double) value));
+      }
+    });
   }
 
-  private void refreshData() {
-    Log.i("[NanoTimer]", "Get times starting at " + getSelectedPeriod().getPeriodStart() + " for period " + getSelectedPeriod());
+  private void getData() {
     App.INSTANCE.getService().getHistory(solveType, getSelectedPeriod().getPeriodStart(), new DataCallback<SolveHistory>() {
       @Override
       public void onData(final SolveHistory data) {
         runOnUiThread(new Runnable() {
           @Override
           public void run() {
-            refreshData(data);
+            chartTimes = getChartTimesFromSolveHistory(data);
+            refreshData();
           }
         });
       }
     });
   }
 
-  private void refreshData(SolveHistory data) {
+  private void refreshData() {
+    List<ChartTime> data = getChartTimes(cbAverage.isChecked());
     ArrayList<Entry> times = new ArrayList<Entry>();
     ArrayList<String> xLabels = new ArrayList<String>();
-    int timesCount = data.getSolveTimes().size();
-    for (int i = 0; i < timesCount; i++) {
-      SolveTime solveTime = data.getSolveTimes().get(i);
-      if (solveTime.getTime() > 0) {
-        times.add(new Entry(solveTime.getTime(), ((timesCount - 1) - i)));
-        xLabels.add(FormatterService.INSTANCE.formatGraphDateTime(solveTime.getTimestamp(), getSelectedPeriod()));
-      }
+    for (int i = 0; i < data.size(); i++) {
+      ChartTime solveTime = data.get(i);
+      times.add(new Entry(solveTime.getTime(), times.size()));
+//      xLabels.add(FormatterService.INSTANCE.formatGraphDateTime(solveTime.getTimestamp(), getSelectedPeriod()));
+      xLabels.add(FormatterService.INSTANCE.formatDateTime(solveTime.getTimestamp()));
     }
 
     LineDataSet dataSet = new LineDataSet(times, getString(R.string.times));
@@ -131,12 +165,6 @@ public class GraphActivity extends Activity {
     LineData chartData = new LineData(xLabels, dataSets);
     chart.setData(chartData);
     chart.invalidate();
-//    chart.setValueFormatter(new ValueFormatter() {
-//      @Override
-//      public String getFormattedValue(float value) {
-//        return FormatterService.INSTANCE.formatSolveTime((long) value);
-//      }
-//    });
   }
 
   private int getColor(int colorRes) {
@@ -150,6 +178,59 @@ public class GraphActivity extends Activity {
       return periods[pos];
     } else {
       return Period.DAY;
+    }
+  }
+
+  /**
+   * Return the times that will be displayed on the map
+   * @param averageTimes if true, the times will be averaged (to smooth the graph data)
+   * @return the chart data to display
+   */
+  private List<ChartTime> getChartTimes(boolean averageTimes) {
+    if (!averageTimes) {
+      return chartTimes;
+    }
+    final int averageTimesCount = 10; // number of times to average together (bigger will smooth out more)
+    final int totalTimesToShow = 50; // maximum number of times to display
+    final int timesToKeep = Math.max(1, chartTimes.size() / totalTimesToShow); // will keep 1 time for every timesToKeep times
+    List<ChartTime> times = new ArrayList<ChartTime>();
+    for (int i = 0; i < chartTimes.size(); i += timesToKeep) {
+      long total = 0;
+      for (int j = i; j < (i + averageTimesCount) && j < chartTimes.size(); j++) {
+        total += chartTimes.get(j).getTime();
+      }
+      long time = total / Math.min(averageTimesCount, chartTimes.size() - i);
+      times.add(new ChartTime(time, chartTimes.get(i).getTimestamp()));
+    }
+    return times;
+  }
+
+  private List<ChartTime> getChartTimesFromSolveHistory(SolveHistory solveHistory) {
+    List<ChartTime> chartTimes = new ArrayList<ChartTime>();
+    for (int i = solveHistory.getSolveTimes().size() - 1; i >= 0; i--) {
+      SolveTime solveTime = solveHistory.getSolveTimes().get(i);
+      if (solveTime.getTime() > 0) {
+        chartTimes.add(new ChartTime(solveTime.getTime(), solveTime.getTimestamp()));
+      }
+    }
+    return chartTimes;
+  }
+
+  class ChartTime {
+    private long time;
+    private long timestamp;
+
+    ChartTime(long time, long timestamp) {
+      this.time = time;
+      this.timestamp = timestamp;
+    }
+
+    public long getTime() {
+      return time;
+    }
+
+    public long getTimestamp() {
+      return timestamp;
     }
   }
 

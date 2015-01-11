@@ -17,7 +17,6 @@
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:layout_alignParentLeft="true"
-       android:layout_alignParentStart="true"
        android:layout_centerVertical="true"
        android:textSize="16sp"/>
 
@@ -26,18 +25,26 @@
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:layout_toRightOf="@+id/tvCubeType"
-       android:layout_toEndOf="@+id/tvCubeType"
        android:layout_marginLeft="10dp"
-       android:layout_marginStart="10dp"
        android:layout_centerVertical="true"
+       android:singleLine="true"
        android:textSize="16sp"/>
+
+    <CheckBox
+       android:id="@+id/cbAverage"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_toLeftOf="@+id/spPeriod"
+       android:layout_marginRight="3dp"
+       android:text="@string/average"
+       android:textSize="16sp"
+       android:layout_centerVertical="true"/>
 
     <Spinner
        android:id="@+id/spPeriod"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:layout_alignParentRight="true"
-       android:layout_alignParentEnd="true"
        android:layout_centerVertical="true"/>
 
   </RelativeLayout>

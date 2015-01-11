@@ -2,7 +2,6 @@ package com.cube.nanotimer.util;
 
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.gui.GraphActivity.Period;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -67,7 +66,7 @@ public enum FormatterService {
     return sdf.format(new Date(ms));
   }
 
-  public String formatGraphDateTime(Long ms, Period period) {
+  /*public String formatGraphDateTime(Long ms, Period period) {
     if (ms == null) {
       return "";
     }
@@ -78,6 +77,21 @@ public enum FormatterService {
       sdf = new SimpleDateFormat("MMM d, yyyy", Locale.ENGLISH);
     }
     return sdf.format(new Date(ms));
+  }*/
+
+  public String formatGraphTimeYLabel(long solveTime) {
+    StringBuilder sb = new StringBuilder();
+    int minutes = (int) (solveTime / 60000);
+    int seconds = (int) (solveTime / 1000) % 60;
+    int hundreds = (int) (solveTime / 10) % 100;
+    if (minutes > 0) {
+      sb.append(minutes).append(":");
+      sb.append(String.format("%02d", seconds));
+    } else {
+      sb.append(seconds);
+    }
+    sb.append(".").append(String.format("%02d", hundreds));
+    return sb.toString();
   }
 
   /**
