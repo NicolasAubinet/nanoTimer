@@ -27,14 +27,6 @@
        android:layout_marginTop="10dp"
        android:textSize="16sp"/>
 
-    <TextView
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_marginTop="10dp"
-       android:text="@string/more_to_come_soon"
-       android:textSize="16sp"
-       android:textColor="@color/white"/>
-
   </LinearLayout>
 
 </ScrollView>

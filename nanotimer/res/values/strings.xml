@@ -3,6 +3,7 @@
   <string name="app_name">Nano Timer</string>
   <string name="app_name_copyright">&#169; 2014 Nano Timer</string>
   <string name="app_description">Rubik\'s Cube timer for Android</string>
+  <string name="app_license">This app uses drag-sort-listview and MPAndroidChart libraries licensed under Apache 2.0.</string>
   <string name="feedback_message">If you encounter a bug or have any suggestions or comments, don\'t hesitate to send an email to the address below.</string>
   <string name="dev_name">Nicolas Aubinet</string>
   <string name="email">NanoTimerCube@gmail.com</string>
@@ -163,7 +164,6 @@
   <string name="pro_version_welcome_message">Thanks for purchasing Nano Timer Pro!\nThe following features have been unlocked:</string>
   <string name="pro_version_promotion_title">Nano Timer Pro</string>
   <string name="pro_version_promotion_message">Nano Timer Pro is now available on Play Store!\nInstalling it will unlock the following features:</string>
-  <string name="more_to_come_soon">More to come soon&#8230;</string>
   <string name="open_page">Open page</string>
 
   <string name="add_more_solve_types">Add more solve types&#8230;</string>
@@ -189,7 +189,7 @@
   <string name="need_pro_version">Install Pro version to access this feature</string>
   <string name="progression_graph">Progression graph</string>
   <string name="progression">Progression</string>
-  <string name="average">Average</string>
+  <string name="smooth">Smooth</string>
   <string name="day">Day</string>
   <string name="week">Week</string>
   <string name="month">Month</string>
@@ -201,6 +201,7 @@
     <font color=\"white\">
     <ul>
       <li>Times export to csv</li>
+      <li>Progression graph</li>
       <li>No ads</li>
     </ul>
     </body></html>]]>
@@ -209,6 +210,11 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
+    <u><b>v1.1.3</b></u>
+    <ul>
+      <li>Pro: added progression graph</li>
+      <li>Fixed crash sometimes happening when device is plugged in/out</li>
+    </ul>
     <u><b>v1.1.2</b></u>
     <ul>
       <li>Added random-state scrambles customization options</li>

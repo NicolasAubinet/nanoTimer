@@ -31,12 +31,12 @@
        android:textSize="16sp"/>
 
     <CheckBox
-       android:id="@+id/cbAverage"
+       android:id="@+id/cbSmooth"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:layout_toLeftOf="@+id/spPeriod"
        android:layout_marginRight="3dp"
-       android:text="@string/average"
+       android:text="@string/smooth"
        android:textSize="16sp"
        android:layout_centerVertical="true"/>
 

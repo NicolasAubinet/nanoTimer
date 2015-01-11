@@ -1,6 +1,8 @@
 package com.cube.nanotimer.gui;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -37,7 +39,8 @@ public class GraphActivity extends Activity {
 
   private LineChart chart;
   private Spinner spPeriod;
-  private CheckBox cbAverage;
+  private CheckBox cbSmooth;
+  private SharedPreferences prefs;
 
   public enum Period {
     DAY(1),
@@ -82,10 +85,16 @@ public class GraphActivity extends Activity {
     ((TextView) findViewById(R.id.tvCubeType)).setText(cubeType.getName());
     ((TextView) findViewById(R.id.tvSolveType)).setText(solveType.getName());
 
-    cbAverage = (CheckBox) findViewById(R.id.cbAverage);
-    cbAverage.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+    prefs = getSharedPreferences("graph", 0);
+
+    cbSmooth = (CheckBox) findViewById(R.id.cbSmooth);
+    cbSmooth.setChecked(prefs.getBoolean("smooth", false));
+    cbSmooth.setOnCheckedChangeListener(new OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+        Editor editor = prefs.edit();
+        editor.putBoolean("smooth", b);
+        editor.commit();
         if (chartTimes != null) {
           refreshData();
         }
@@ -96,9 +105,13 @@ public class GraphActivity extends Activity {
     ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.graph_periods, android.R.layout.simple_spinner_item);
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     spPeriod.setAdapter(adapter);
+    spPeriod.setSelection(prefs.getInt("period", 0));
     spPeriod.setOnItemSelectedListener(new OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+        Editor editor = prefs.edit();
+        editor.putInt("period", pos);
+        editor.commit();
         getData();
       }
 
@@ -144,7 +157,11 @@ public class GraphActivity extends Activity {
   }
 
   private void refreshData() {
-    List<ChartTime> data = getChartTimes(cbAverage.isChecked());
+    List<ChartTime> data = getChartTimes(cbSmooth.isChecked());
+    chart.clear();
+    if (data.isEmpty()) {
+      return;
+    }
     ArrayList<Entry> times = new ArrayList<Entry>();
     ArrayList<String> xLabels = new ArrayList<String>();
     for (int i = 0; i < data.size(); i++) {
@@ -183,11 +200,11 @@ public class GraphActivity extends Activity {
 
   /**
    * Return the times that will be displayed on the map
-   * @param averageTimes if true, the times will be averaged (to smooth the graph data)
+   * @param smooth if true, the times will be averaged (to smooth the graph data)
    * @return the chart data to display
    */
-  private List<ChartTime> getChartTimes(boolean averageTimes) {
-    if (!averageTimes) {
+  private List<ChartTime> getChartTimes(boolean smooth) {
+    if (!smooth) {
       return chartTimes;
     }
     int averageTimesCount = 2; // number of times to average together around each time (bigger will smooth out more)
