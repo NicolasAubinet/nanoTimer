@@ -190,16 +190,21 @@ public class GraphActivity extends Activity {
     if (!averageTimes) {
       return chartTimes;
     }
-    final int averageTimesCount = 10; // number of times to average together (bigger will smooth out more)
-    final int totalTimesToShow = 50; // maximum number of times to display
+    int averageTimesCount = 2; // number of times to average together around each time (bigger will smooth out more)
+    final int totalTimesToShow = 50; // maximum number of times to display (approximation, might be a bit more)
     final int timesToKeep = Math.max(1, chartTimes.size() / totalTimesToShow); // will keep 1 time for every timesToKeep times
+    if (averageTimesCount < timesToKeep - 1) { // if too many times, adjust averageTimesCount to avoid losing times while averaging
+      averageTimesCount = timesToKeep - 1;
+    }
     List<ChartTime> times = new ArrayList<ChartTime>();
     for (int i = 0; i < chartTimes.size(); i += timesToKeep) {
       long total = 0;
-      for (int j = i; j < (i + averageTimesCount) && j < chartTimes.size(); j++) {
+      int start = Math.max(0, i - averageTimesCount);
+      int end = Math.min(i + averageTimesCount + 1, chartTimes.size());
+      for (int j = start; j < end; j++) {
         total += chartTimes.get(j).getTime();
       }
-      long time = total / Math.min(averageTimesCount, chartTimes.size() - i);
+      long time = total / (end - start);
       times.add(new ChartTime(time, chartTimes.get(i).getTimestamp()));
     }
     return times;
