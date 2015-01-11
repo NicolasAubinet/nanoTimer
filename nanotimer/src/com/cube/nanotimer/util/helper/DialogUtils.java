@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
-import com.cube.nanotimer.App;
 import com.cube.nanotimer.util.YesNoListener;
 
 public class DialogUtils {
@@ -15,16 +14,8 @@ public class DialogUtils {
     df.show(a.getSupportFragmentManager(), "dialog");
   }
 
-  public static void showInfoMessage(String message) {
-    showInfoMessage(App.INSTANCE.getContext(), message);
-  }
-
   public static void showInfoMessage(Context context, String message) {
     Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-  }
-
-  public static void showInfoMessage(int messageId) {
-    showInfoMessage(App.INSTANCE.getContext(), messageId);
   }
 
   public static void showInfoMessage(Context context, int messageId) {

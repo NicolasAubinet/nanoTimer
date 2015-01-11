@@ -4,7 +4,6 @@ import android.content.res.Configuration;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.Options.BigCubesNotation;
@@ -255,11 +254,6 @@ public enum ScrambleFormatterService {
         break;
     }
     return delimiter;
-  }
-
-  private int getDefaultTextColor() {
-    TextView tv = new TextView(App.INSTANCE.getContext());
-    return tv.getCurrentTextColor();
   }
 
 }

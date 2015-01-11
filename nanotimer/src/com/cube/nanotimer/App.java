@@ -22,6 +22,7 @@ public enum App {
 
   private Context context;
   private Service service;
+  private boolean appGUILaunched;
 
   public static final String PRO_PACKAGE_NAME = "com.cube.nanotimerpro";
 
@@ -32,18 +33,31 @@ public enum App {
   }
 
   public void setContext(Context context) {
+    init(context, false);
+  }
+
+  public void setApplicationContext(Context context) { // called from broadcast receiver
+    init(context, true);
+  }
+
+  public void init(Context context, boolean fromService) {
     boolean appStarted = (this.context == null);
-    this.context = context;
-    if (appStarted) { // the app is starting
-      this.service = ServiceImpl.getInstance(context);
+    if (appStarted || !fromService) {
+      this.context = context;
+    }
+    if (appStarted) { // app started (either from GUI or from service)
+      service = ServiceImpl.getInstance(context);
       Options.INSTANCE.setContext(context);
       ScramblerService.INSTANCE.init(context);
-      appLaunched(context);
       initRandomStateGenListener(context);
+    }
+    if (!appGUILaunched && !fromService) { // app GUI started
+      appGUILaunched(context);
     }
   }
 
-  private void appLaunched(Context context) {
+  private void appGUILaunched(Context context) {
+    appGUILaunched = true;
     AppLaunchStats.appLaunched(context);
     AppRater.appLaunched(context);
     ReleaseNotes.appLaunched(context);

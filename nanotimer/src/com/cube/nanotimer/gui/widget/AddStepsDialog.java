@@ -129,10 +129,10 @@ public class AddStepsDialog extends DialogFragment implements FieldRenamer {
               stepsAdapter.notifyDataSetChanged();
               lvSteps.setSelection(liSteps.size() - 1); // scroll to bottom
             } else {
-              DialogUtils.showInfoMessage(R.string.step_already_exists);
+              DialogUtils.showInfoMessage(getActivity(), R.string.step_already_exists);
             }
           } else {
-            DialogUtils.showInfoMessage(R.string.max_steps_count_reached);
+            DialogUtils.showInfoMessage(getActivity(), R.string.max_steps_count_reached);
           }
         }
       }
@@ -161,7 +161,7 @@ public class AddStepsDialog extends DialogFragment implements FieldRenamer {
 
   private void onConfirm() {
     if (liSteps.size() < 2) {
-      DialogUtils.showInfoMessage(R.string.min_steps_count_not_reached);
+      DialogUtils.showInfoMessage(getActivity(), R.string.min_steps_count_not_reached);
     } else {
       stepsCreator.addSteps(liSteps, pos);
       dismiss();
@@ -209,7 +209,7 @@ public class AddStepsDialog extends DialogFragment implements FieldRenamer {
       return true;
     } else {
       if (liSteps.indexOf(newName) != index) {
-        DialogUtils.showInfoMessage(R.string.step_already_exists);
+        DialogUtils.showInfoMessage(getActivity(), R.string.step_already_exists);
         return false;
       } else {
         return true; // did not change
