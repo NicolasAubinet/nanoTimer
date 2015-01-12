@@ -164,6 +164,7 @@
   <string name="pro_version_welcome_message">Thanks for purchasing Nano Timer Pro!\nThe following features have been unlocked:</string>
   <string name="pro_version_promotion_title">Nano Timer Pro</string>
   <string name="pro_version_promotion_message">Nano Timer Pro is now available on Play Store!\nInstalling it will unlock the following features:</string>
+  <string name="need_pro_version">Download Nano Timer Pro to access this feature.\nInstalling it will unlock:</string>
   <string name="open_page">Open page</string>
 
   <string name="add_more_solve_types">Add more solve types&#8230;</string>
@@ -186,7 +187,6 @@
   <string name="only_one_step_solve_type_is_allowed_steps">Can not export multiple solve types if one of them has steps.\nThe following type(s) have steps: %1$s</string>
   <string name="exporting_history">Exporting history…</string>
 
-  <string name="need_pro_version">Install Pro version to access this feature</string>
   <string name="progression_graph">Progression graph</string>
   <string name="progression">Progression</string>
   <string name="smooth">Smooth</string>
@@ -196,15 +196,10 @@
   <string name="year">Year</string>
   <string name="all">All</string>
 
-  <string name="pro_version_features_html">
-    <![CDATA[<html><body>
-    <font color=\"white\">
-    <ul>
-      <li>Times export to csv</li>
-      <li>Progression graph</li>
-      <li>No ads</li>
-    </ul>
-    </body></html>]]>
+  <string name="pro_version_features">
+    - Times export to csv\n
+    - Progression graph\n
+    - No ads
   </string>
 
   <string name="release_notes_features_html">
@@ -214,6 +209,7 @@
     <ul>
       <li>Pro: added progression graph</li>
       <li>Fixed crash sometimes happening when device is plugged in/out</li>
+      <li>Removed non-used permissions</li>
     </ul>
     <u><b>v1.1.2</b></u>
     <ul>

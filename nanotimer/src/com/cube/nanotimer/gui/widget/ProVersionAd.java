@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.Button;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.AppLaunchStats;
@@ -69,17 +68,16 @@ public class ProVersionAd {
     editor.commit();
   }
 
-  private static void showProVersionAdDialog(final Context context) {
+  public static void showProVersionAdDialog(Context context) {
+    AlertDialog dialog = new AlertDialog.Builder(context).setView(getProVersionAdView(context)).create();
+    dialog.setTitle(R.string.pro_version_promotion_title);
+    dialog.setCanceledOnTouchOutside(true);
+    dialog.show();
+  }
+
+  public static View getProVersionAdView(final Context context) {
     LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     ViewGroup v = (ViewGroup) inflater.inflate(R.layout.pro_version_ad_dialog, null);
-
-    final AlertDialog dialog = new AlertDialog.Builder(context).setView(v).create();
-    dialog.setTitle(context.getString(R.string.pro_version_promotion_title));
-    dialog.setCanceledOnTouchOutside(false);
-
-    WebView tvFeaturesList = (WebView) v.findViewById(R.id.tvProFeatures);
-    tvFeaturesList.setBackgroundColor(context.getResources().getColor(R.color.transparent));
-    tvFeaturesList.loadData(context.getString(R.string.pro_version_features_html), "text/html", "utf-8");
 
     Button buOpenPage = (Button) v.findViewById(R.id.buOpenPage);
     buOpenPage.setOnClickListener(new OnClickListener() {
@@ -89,15 +87,7 @@ public class ProVersionAd {
       }
     });
 
-    Button buCancel = (Button) v.findViewById(R.id.buCancel);
-    buCancel.setOnClickListener(new OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        dialog.dismiss();
-      }
-    });
-
-    dialog.show();
+    return v;
   }
 
 }

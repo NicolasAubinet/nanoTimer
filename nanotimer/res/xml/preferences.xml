@@ -146,11 +146,7 @@
     <Preference
        android:key="export"
        android:title="@string/export"
-       android:summary="@string/export_summary">
-
-      <intent android:action="com.cube.nanotimer.gui.ExportActivity"/>
-
-    </Preference>
+       android:summary="@string/export_summary"/>
 
     <com.cube.nanotimer.gui.widget.preferences.ClearHistoryDialog
        android:title="@string/clear_history"

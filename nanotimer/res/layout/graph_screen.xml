@@ -25,6 +25,7 @@
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:layout_toRightOf="@+id/tvCubeType"
+       android:layout_toLeftOf="@+id/cbSmooth"
        android:layout_marginLeft="10dp"
        android:layout_centerVertical="true"
        android:singleLine="true"

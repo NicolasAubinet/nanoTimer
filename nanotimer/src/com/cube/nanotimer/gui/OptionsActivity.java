@@ -7,12 +7,11 @@ import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.ReleaseNotes;
@@ -23,6 +22,7 @@ import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.State;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenListener;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.util.helper.DialogUtils;
+import com.cube.nanotimer.util.helper.Utils;
 
 public class OptionsActivity extends PreferenceActivity {
 
@@ -37,11 +37,18 @@ public class OptionsActivity extends PreferenceActivity {
     setTitle(R.string.settings);
     addPreferencesFromResource(R.xml.preferences);
 
-    if (!App.INSTANCE.isProEnabled()) { // export only accessible from within Pro app
-      Preference exportPref = findPreference("export");
-      PreferenceCategory historyCategory = (PreferenceCategory) findPreference("history");
-      historyCategory.removePreference(exportPref);
-    }
+    Preference exportPref = findPreference("export");
+    exportPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+      @Override
+      public boolean onPreferenceClick(Preference preference) {
+        if (Utils.checkProFeature(OptionsActivity.this)) {
+          startActivity(new Intent(OptionsActivity.this, ExportActivity.class));
+          return true;
+        } else {
+          return false;
+        }
+      }
+    });
 
     prefChangedListener = new OnSharedPreferenceChangeListener() {
       @Override

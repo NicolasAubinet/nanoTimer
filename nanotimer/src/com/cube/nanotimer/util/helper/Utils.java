@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.gui.widget.ProVersionFeature;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveType;
 
@@ -152,7 +153,7 @@ public class Utils {
     if (App.INSTANCE.isProEnabled()) {
       return true;
     } else {
-      DialogUtils.showInfoMessage(context, R.string.need_pro_version); // TODO : should display dialog instead, with button to Pro Play Store page (similar to ProVersionAd)
+      ProVersionFeature.getDialog(context).show();
       return false;
     }
   }

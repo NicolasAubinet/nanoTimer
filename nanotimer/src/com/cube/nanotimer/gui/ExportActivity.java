@@ -1,6 +1,5 @@
 package com.cube.nanotimer.gui;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +8,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
@@ -36,6 +36,7 @@ import com.cube.nanotimer.util.export.ExportCSVGenerator;
 import com.cube.nanotimer.util.export.ReportStepsException;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.FileUtils;
+import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ExportResult;
 import com.cube.nanotimer.vo.SolveType;
@@ -45,7 +46,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ExportActivity extends Activity {
+public class ExportActivity extends FragmentActivity {
 
   private ExportListAdapter adapter;
   private final List<ListItem> liItems = new ArrayList<ListItem>();
@@ -62,6 +63,10 @@ public class ExportActivity extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.export_screen);
+    if (!Utils.checkProFeature(this)) {
+      finish();
+      return;
+    }
 
     initViews();
 

@@ -8,24 +8,26 @@
      android:orientation="vertical"
      android:layout_width="match_parent"
      android:layout_height="match_parent"
-     android:layout_margin="10dp">
+     android:layout_margin="10dp"
+     android:gravity="center">
 
     <TextView
        android:id="@+id/tvWelcomeMessage"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:layout_gravity="center"
-       android:gravity="center"
        android:text="@string/pro_version_welcome_message"
        android:textSize="16sp"
        android:textColor="@color/white"/>
 
-    <WebView
+    <TextView
        android:id="@+id/tvProFeatures"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:layout_marginTop="10dp"
-       android:textSize="16sp"/>
+       android:text="@string/pro_version_features"
+       android:textSize="16sp"
+       android:textColor="@color/white"/>
 
   </LinearLayout>
 

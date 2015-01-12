@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import com.cube.nanotimer.R;
 
 public class ProVersionWelcome {
@@ -37,11 +36,6 @@ public class ProVersionWelcome {
     dialog = new AlertDialog.Builder(context).setView(v).create();
     dialog.setTitle(context.getString(R.string.pro_version_welcome_title));
     dialog.setCanceledOnTouchOutside(true);
-
-    WebView tvFeaturesList = (WebView) v.findViewById(R.id.tvProFeatures);
-    tvFeaturesList.setBackgroundColor(context.getResources().getColor(R.color.transparent));
-    tvFeaturesList.loadData(context.getString(R.string.pro_version_features_html), "text/html", "utf-8");
-
     dialog.show();
   }
 

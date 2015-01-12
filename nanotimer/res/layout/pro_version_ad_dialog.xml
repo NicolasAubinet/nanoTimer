@@ -12,6 +12,7 @@
      android:gravity="center">
 
     <TextView
+       android:id="@+id/tvText"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:gravity="center"
@@ -19,17 +20,19 @@
        android:text="@string/pro_version_promotion_message"
        android:textColor="@color/white"/>
 
-    <WebView
+    <TextView
        android:id="@+id/tvProFeatures"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:layout_marginTop="6dp"
-       android:textSize="16sp"/>
+       android:text="@string/pro_version_features"
+       android:textSize="16sp"
+       android:textColor="@color/white"/>
 
     <LinearLayout
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_marginTop="5dp"
+       android:layout_marginTop="7dp"
        android:orientation="horizontal">
       <Button
          android:id="@+id/buOpenPage"
@@ -37,15 +40,6 @@
          android:layout_weight="1"
          android:layout_marginRight="3dp"
          android:text="@string/open_page"
-         android:textSize="15sp"
-         style="@style/MenuButton"/>
-      <Button
-         android:id="@+id/buCancel"
-         android:layout_height="35dp"
-         android:layout_weight="1"
-         android:layout_marginLeft="3dp"
-         android:layout_marginRight="3dp"
-         android:text="@string/cancel"
          android:textSize="15sp"
          style="@style/MenuButton"/>
     </LinearLayout>
