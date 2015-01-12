@@ -4,6 +4,7 @@ import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveAverages;
+import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveTimeAverages;
 import com.cube.nanotimer.vo.SolveType;
@@ -623,6 +624,61 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertEquals(Long.valueOf(2000), averages.getMeanOf3());
   }
 
+  @SmallTest
+  public void testHistory() {
+    for (int i = 65; i >= 1; i--) {
+      saveTime(100 * i);
+    }
+    // Paged history
+    SolveHistory solveHistory = provider.getPagedHistory(solveType1);
+    assertEquals(solveHistory.getSolvesCount(), 65);
+    List<SolveTime> solveTimes = solveHistory.getSolveTimes();
+    assertEquals(solveTimes.size(), 20);
+    assertEquals(solveTimes.get(0).getTime(), 100);
+    assertEquals(solveTimes.get(19).getTime(), 2000);
+
+    solveHistory = provider.getPagedHistory(solveType1, solveTimes.get(solveTimes.size() - 1).getTimestamp());
+    assertEquals(solveHistory.getSolvesCount(), 65);
+    solveTimes = solveHistory.getSolveTimes();
+    assertEquals(solveTimes.size(), 20);
+    assertEquals(solveTimes.get(0).getTime(), 2100);
+    assertEquals(solveTimes.get(19).getTime(), 4000);
+
+    solveHistory = provider.getPagedHistory(solveType1, solveTimes.get(solveTimes.size() - 1).getTimestamp());
+    assertEquals(solveHistory.getSolvesCount(), 65);
+    solveTimes = solveHistory.getSolveTimes();
+    assertEquals(solveTimes.size(), 20);
+    assertEquals(solveTimes.get(0).getTime(), 4100);
+    assertEquals(solveTimes.get(19).getTime(), 6000);
+
+    solveHistory = provider.getPagedHistory(solveType1, solveTimes.get(solveTimes.size() - 1).getTimestamp());
+    assertEquals(solveHistory.getSolvesCount(), 65);
+    solveTimes = solveHistory.getSolveTimes();
+    assertEquals(solveTimes.size(), 5);
+    assertEquals(solveTimes.get(0).getTime(), 6100);
+    assertEquals(solveTimes.get(4).getTime(), 6500);
+
+    // History
+    solveHistory = provider.getHistory(solveType1, 1000000000);
+    assertEquals(solveHistory.getSolvesCount(), 65);
+    solveTimes = solveHistory.getSolveTimes();
+    assertEquals(solveTimes.size(), 0);
+
+    solveHistory = provider.getHistory(solveType1, 0);
+    assertEquals(solveHistory.getSolvesCount(), 65);
+    solveTimes = solveHistory.getSolveTimes();
+    assertEquals(solveTimes.size(), 65);
+    assertEquals(solveTimes.get(0).getTime(), 100);
+    assertEquals(solveTimes.get(64).getTime(), 6500);
+
+    solveHistory = provider.getHistory(solveType1, solveTimes.get(29).getTimestamp());
+    assertEquals(solveHistory.getSolvesCount(), 65);
+    solveTimes = solveHistory.getSolveTimes();
+    assertEquals(solveTimes.size(), 30);
+    assertEquals(solveTimes.get(0).getTime(), 100);
+    assertEquals(solveTimes.get(29).getTime(), 3000);
+  }
+
   private SolveAverages saveTimes(long time, int count) {
     SolveAverages averages = null;
     for (int i = 0; i < count; i++) {
@@ -673,7 +729,7 @@ public class ServiceProviderTest extends AndroidTestCase {
   }
 
   private List<SolveTime> getWholeHistory() {
-    return provider.getHistoryTimes(solveType1, System.currentTimeMillis(), null);
+    return provider.getHistoryTimes(solveType1, System.currentTimeMillis(), true, null);
   }
 
   private void assertAvgEquals(Integer avg5, Integer avg12, Integer avg50, Integer avg100, Integer avgLifetime,
