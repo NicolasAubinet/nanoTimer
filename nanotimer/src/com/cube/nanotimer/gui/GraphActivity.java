@@ -127,6 +127,7 @@ public class GraphActivity extends Activity {
     chart.setGridColor(getColor(R.color.gray600));
     chart.setBackgroundColor(getColor(R.color.white));
     chart.setDrawYValues(false);
+    chart.getXLabels().setSpaceBetweenLabels(1);
     chart.setValueFormatter(new ValueFormatter() {
       @Override
       public String getFormattedValue(float value) {
