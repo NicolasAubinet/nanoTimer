@@ -68,6 +68,7 @@ public class ExportActivity extends FragmentActivity {
       return;
     }
 
+    setTitle(R.string.export);
     initViews();
 
     App.INSTANCE.getService().getCubeTypes(false, new DataCallback<List<CubeType>>() {
