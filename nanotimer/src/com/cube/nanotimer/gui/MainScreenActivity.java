@@ -7,31 +7,16 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
+import android.view.*;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
+import android.widget.*;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.Options.AdsStyle;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.gui.widget.AboutDialog;
-import com.cube.nanotimer.gui.widget.HistoryDetailDialog;
-import com.cube.nanotimer.gui.widget.SelectionHandler;
-import com.cube.nanotimer.gui.widget.SelectorFragmentDialog;
-import com.cube.nanotimer.gui.widget.SolveTypesFragmentDialog;
-import com.cube.nanotimer.gui.widget.TimeChangedHandler;
+import com.cube.nanotimer.gui.widget.*;
 import com.cube.nanotimer.gui.widget.ads.AdProvider;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
@@ -44,11 +29,7 @@ import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 import com.startapp.android.publish.banner.Banner;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class MainScreenActivity extends ActionBarActivity implements TimeChangedHandler, SelectionHandler {
 
@@ -273,12 +254,14 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
     super.onConfigurationChanged(newConfig);
     String cubeTypeText = buCubeType.getText().toString();
     String solveTypeText = buSolveType.getText().toString();
+    String solvesCountText = tvSolvesCount.getText().toString();
 
     setContentView(R.layout.mainscreen_screen);
     initViews();
 
     buCubeType.setText(cubeTypeText);
     buSolveType.setText(solveTypeText);
+    tvSolvesCount.setText(solvesCountText);
     showHideBannerAd();
   }
 

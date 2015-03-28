@@ -86,6 +86,8 @@
   <string name="inspection_time_summary">Select the timer inspection time</string>
   <string name="inspection_sounds">Inspection sounds</string>
   <string name="inspection_sounds_summary">Enable / disable inspection sounds</string>
+  <string name="show_time_when_running">Display time when running</string>
+  <string name="show_time_when_running_summary">Display time when timer is running</string>
   <string name="keep_screen_on">Keep screen on</string>
   <string name="keep_screen_on_summary">When timer is not running</string>
   <string name="solve_types">Solve types</string>

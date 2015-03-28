@@ -19,6 +19,7 @@ public enum Options {
   public static final String INSPECTION_MODE_KEY = "inspection_mode";
   public static final String INSPECTION_TIME_KEY = "inspection_time";
   public static final String INSPECTION_SOUNDS_KEY = "inspection_sounds";
+  public static final String SHOW_TIME_WHEN_RUNNING = "show_time_when_running";
   public static final String KEEP_TIMER_SCREEN_ON_KEY = "keep_timer_screen_on";
   public static final String BIG_CUBES_NOTATION_KEY = "big_cubes_notation";
   public static final String SOLVE_TYPES_SHORTCUT_KEY = "solve_types_shortcut";
@@ -63,6 +64,11 @@ public enum Options {
   public boolean isInspectionSoundsEnabled() {
     Boolean defaultValue = context.getResources().getBoolean(R.bool.inspection_sounds);
     return sharedPreferences.getBoolean(INSPECTION_SOUNDS_KEY, defaultValue);
+  }
+
+  public boolean isShowTimeWhenRunning() {
+      Boolean defaultValue = context.getResources().getBoolean(R.bool.show_time_when_running);
+      return sharedPreferences.getBoolean(SHOW_TIME_WHEN_RUNNING, defaultValue);
   }
 
   public boolean isKeepTimerScreenOnWhenTimerOff() {
