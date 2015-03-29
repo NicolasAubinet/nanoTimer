@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
@@ -81,6 +82,7 @@ public class HistoryDetailDialog extends DialogFragment {
     Button buPlusTwo = (Button) v.findViewById(R.id.buPlusTwo);
     Button buDNF = (Button) v.findViewById(R.id.buDNF);
     Button buDelete = (Button) v.findViewById(R.id.buDelete);
+    ImageView imgPb = (ImageView) v.findViewById(R.id.imgPb);
 
     if (solveTime.isPlusTwo()) {
       buPlusTwo.setEnabled(false);
@@ -88,6 +90,11 @@ public class HistoryDetailDialog extends DialogFragment {
     if (solveTime.isDNF()) {
       buDNF.setEnabled(false);
       buPlusTwo.setEnabled(false);
+    }
+    if (solveTime.isPb()) {
+      imgPb.setVisibility(View.VISIBLE);
+    } else {
+      imgPb.setVisibility(View.GONE);
     }
 
     tvScramble.setText(ScrambleFormatterService.INSTANCE.formatToColoredScramble(solveTime.getScramble(), cubeType));

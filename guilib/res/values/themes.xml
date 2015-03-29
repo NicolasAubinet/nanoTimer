@@ -22,8 +22,8 @@
 
   <style name="NanoTimerListView" parent="@style/Widget.AppCompat.ListView.Menu">
     <item name="android:cacheColorHint">@color/transparent</item>
-    <!--<item name="android:divider">@color/gray800</item>-->
-    <!--<item name="android:dividerHeight">2dp</item>-->
+    <item name="android:divider">@color/gray800</item>
+    <item name="android:dividerHeight">2dp</item>
   </style>
 
 </resources>

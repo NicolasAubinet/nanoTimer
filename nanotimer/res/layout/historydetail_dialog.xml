@@ -47,14 +47,25 @@
          android:layout_height="wrap_content"
          android:text="@string/time"
          android:textSize="22px"/>
-      <TextView
-         android:id="@+id/tvTime"
+      <LinearLayout
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
+         android:orientation="horizontal"
          android:layout_marginLeft="15px"
-         android:layout_weight="1"
-         android:textColor="@color/white"
-         android:textSize="22px"/>
+         android:layout_weight="1">
+        <TextView
+           android:id="@+id/tvTime"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:textColor="@color/white"
+           android:textSize="22px"/>
+        <ImageView
+           android:id="@+id/imgPb"
+           android:layout_width="26px"
+           android:layout_height="26px"
+           android:paddingLeft="8px"
+           android:src="@drawable/star"/>
+      </LinearLayout>
     </TableRow>
     <TableRow android:id="@+id/trSteps" android:layout_marginTop="8px" android:visibility="gone">
       <TextView

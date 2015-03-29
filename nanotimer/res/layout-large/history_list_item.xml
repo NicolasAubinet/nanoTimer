@@ -19,8 +19,8 @@
 
     <ImageView
        android:id="@+id/imgPb"
-       android:layout_width="24px"
-       android:layout_height="24px"
+       android:layout_width="22px"
+       android:layout_height="22px"
        android:layout_centerVertical="true"
        android:layout_toLeftOf="@+id/tvTime"
        android:src="@drawable/star"/>

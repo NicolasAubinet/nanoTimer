@@ -26,6 +26,7 @@ public class ServiceProviderImpl implements ServiceProvider {
   private final int HISTORY_PAGE_SIZE = 20;
   private final int SESSION_TIMES_COUNT = 12;
   private final int MAX_AVERAGE_COUNT = 100;
+  private final int MIN_TIMES_BEFORE_PB_FLAG = 12;
 
   public ServiceProviderImpl(SQLiteDatabase db) {
     this.db = db;
@@ -110,7 +111,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     ContentValues values = new ContentValues();
     values.put(DB.COL_TIMEHISTORY_TIME, solveTime.getTime());
     values.put(DB.COL_TIMEHISTORY_PLUSTWO, solveTime.isPlusTwo() ? 1 : 0);
-    if (isTimeBetter(cachedLifetimeBest, solveTime.getTime())) {
+    if (isTimeBetter(cachedLifetimeBest, solveTime.getTime()) && getTimesCountBefore(solveTime) >= MIN_TIMES_BEFORE_PB_FLAG) {
       values.put(DB.COL_TIMEHISTORY_PB, 1);
     } else if (solveTime.isPb() && isBetterTimeBefore(solveTime)) {
       // this isn't the best time anymore
@@ -134,6 +135,19 @@ public class ServiceProviderImpl implements ServiceProvider {
     solveAverages.setSolveTime(solveTime);
 
     return solveAverages;
+  }
+
+  private int getTimesCountBefore(SolveTime solveTime) {
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT COUNT(*)");
+    q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
+    q.append(" WHERE ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
+    q.append("   AND ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
+    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTime.getTimestamp(), solveTime.getSolveType().getId()));
+    if (cursor != null && cursor.moveToFirst()) {
+      return cursor.getInt(0);
+    }
+    return 0;
   }
 
   private boolean isBetterTimeBefore(SolveTime solveTime) {
@@ -170,7 +184,7 @@ public class ServiceProviderImpl implements ServiceProvider {
 
     syncBestAveragesWithCurrent(avg5, avg12, avg50, avg100);
     boolean isPersonalBest = false;
-    if (isTimeBetter(cachedLifetimeBest, solveTime.getTime())) {
+    if (isTimeBetter(cachedLifetimeBest, solveTime.getTime()) && cachedSolveTimes.size() >= MIN_TIMES_BEFORE_PB_FLAG) {
       isPersonalBest = true;
       cachedLifetimeBest = solveTime.getTime();
     }
