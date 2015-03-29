@@ -59,6 +59,7 @@ public class DBHelper extends SQLiteOpenHelper {
         DB.COL_TIMEHISTORY_AVG50 + " INTEGER, " +
         DB.COL_TIMEHISTORY_AVG100 + " INTEGER, " +
         DB.COL_TIMEHISTORY_PLUSTWO + " INTEGER DEFAULT 0, " +
+        DB.COL_TIMEHISTORY_PB + " INTEGER DEFAULT 0, " +
         DB.COL_TIMEHISTORY_SOLVETYPE_ID + " INTEGER, " +
         "FOREIGN KEY (" + DB.COL_TIMEHISTORY_SOLVETYPE_ID + ") REFERENCES " + DB.TABLE_SOLVETYPE + " (" + DB.COL_ID + ") " +
       ");"
@@ -114,6 +115,14 @@ public class DBHelper extends SQLiteOpenHelper {
 
       // Update all averages to the new style (from means (dropping DNF's) to averages (counting DNF's)) + BLD mean of 3
       DBUpgradeScripts.updateMeansToAverages(db);
+    }
+
+    if (oldVersion < 11) {
+      // Add new pb column (indicates if it's a new record)
+      db.execSQL("ALTER TABLE " + DB.TABLE_TIMEHISTORY + " ADD COLUMN " + DB.COL_TIMEHISTORY_PB + " INTEGER DEFAULT 0");
+
+      // Update personal flag for existing times
+      DBUpgradeScripts.updatePersonalBestFlag(db);
     }
 
     progressDialog.hide();

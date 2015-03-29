@@ -122,6 +122,43 @@ public class DBUpgradeScripts {
     db.execSQL(q);
   }
 
+  public static void updatePersonalBestFlag(SQLiteDatabase db) {
+    final int timesCountBeforeBest = 12; // only set pb flag if >= 12 times for that solve type
+    for (int solveTypeId : getAllSolveTypesIds(db)) {
+      long bestTime = Integer.MAX_VALUE;
+      List<SolveTime> solveTimes = new ArrayList<SolveTime>();
+      StringBuilder q = new StringBuilder();
+      q.append("SELECT ").append(DB.COL_ID).append(", ").append(DB.COL_TIMEHISTORY_TIME);
+      q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
+      q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
+      q.append("   AND ").append(DB.COL_TIMEHISTORY_TIME).append(" > 0");
+      q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
+      Cursor cursor = db.rawQuery(q.toString(), new String[] { String.valueOf(solveTypeId) });
+      if (cursor != null) {
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+          SolveTime st = new SolveTime();
+          st.setId(cursor.getInt(0));
+          st.setTime(cursor.getInt(1));
+          solveTimes.add(st);
+        }
+        cursor.close();
+      }
+
+      int timesCount = 1;
+      for (SolveTime st : solveTimes) {
+        if (st.getTime() < bestTime) {
+          if (timesCount >= timesCountBeforeBest) {
+            ContentValues values = new ContentValues();
+            values.put(DB.COL_TIMEHISTORY_PB, 1);
+            db.update(DB.TABLE_TIMEHISTORY, values, DB.COL_ID + " = ?", new String[] { String.valueOf(st.getId()) });
+          }
+          bestTime = st.getTime();
+        }
+        timesCount++;
+      }
+    }
+  }
+
   private static List<Integer> getAllSolveTypesIds(SQLiteDatabase db) {
     List<Integer> solveTypeIds = new ArrayList<Integer>();
     StringBuilder q = new StringBuilder();

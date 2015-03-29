@@ -5,23 +5,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import com.cube.nanotimer.services.db.DB;
 import com.cube.nanotimer.session.TimesStatistics;
-import com.cube.nanotimer.vo.CubeType;
-import com.cube.nanotimer.vo.ExportResult;
-import com.cube.nanotimer.vo.SessionDetails;
-import com.cube.nanotimer.vo.SolveAverages;
-import com.cube.nanotimer.vo.SolveHistory;
-import com.cube.nanotimer.vo.SolveTime;
-import com.cube.nanotimer.vo.SolveTimeAverages;
-import com.cube.nanotimer.vo.SolveType;
-import com.cube.nanotimer.vo.SolveTypeStep;
+import com.cube.nanotimer.vo.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Random;
 
 public class ServiceProviderImpl implements ServiceProvider {
 
@@ -123,6 +110,12 @@ public class ServiceProviderImpl implements ServiceProvider {
     ContentValues values = new ContentValues();
     values.put(DB.COL_TIMEHISTORY_TIME, solveTime.getTime());
     values.put(DB.COL_TIMEHISTORY_PLUSTWO, solveTime.isPlusTwo() ? 1 : 0);
+    if (isTimeBetter(cachedLifetimeBest, solveTime.getTime())) {
+      values.put(DB.COL_TIMEHISTORY_PB, 1);
+    } else if (solveTime.isPb() && isBetterTimeBefore(solveTime)) {
+      // this isn't the best time anymore
+      values.put(DB.COL_TIMEHISTORY_PB, 0);
+    }
     db.update(DB.TABLE_TIMEHISTORY, values, DB.COL_ID + " = ?", getStringArray(solveTime.getId()));
     synchronized (cacheSyncHelper) {
       for (CachedTime ct : cachedSolveTimes) {
@@ -141,6 +134,20 @@ public class ServiceProviderImpl implements ServiceProvider {
     solveAverages.setSolveTime(solveTime);
 
     return solveAverages;
+  }
+
+  private boolean isBetterTimeBefore(SolveTime solveTime) {
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT ").append(DB.COL_ID);
+    q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
+    q.append(" WHERE ").append(DB.COL_TIMEHISTORY_TIME).append(" <= ?");
+    q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
+    q.append("   AND ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
+    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTime.getTime(), solveTime.getTimestamp(), solveTime.getSolveType().getId()));
+    if (cursor != null && cursor.moveToFirst()) {
+      return true;
+    }
+    return false;
   }
 
   private SolveAverages createTime(SolveTime solveTime) {
@@ -162,7 +169,9 @@ public class ServiceProviderImpl implements ServiceProvider {
     Long avg100 = getLastAvg(100);
 
     syncBestAveragesWithCurrent(avg5, avg12, avg50, avg100);
+    boolean isPersonalBest = false;
     if (isTimeBetter(cachedLifetimeBest, solveTime.getTime())) {
+      isPersonalBest = true;
       cachedLifetimeBest = solveTime.getTime();
     }
 
@@ -172,6 +181,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     values.put(DB.COL_TIMEHISTORY_SCRAMBLE, solveTime.getScramble());
     values.put(DB.COL_TIMEHISTORY_TIMESTAMP, solveTime.getTimestamp());
     values.put(DB.COL_TIMEHISTORY_PLUSTWO, solveTime.isPlusTwo() ? 1 : 0);
+    values.put(DB.COL_TIMEHISTORY_PB, isPersonalBest ? 1 : 0);
     values.put(DB.COL_TIMEHISTORY_AVG5, avg5);
     values.put(DB.COL_TIMEHISTORY_AVG12, avg12);
     values.put(DB.COL_TIMEHISTORY_AVG50, avg50);
@@ -386,6 +396,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("     , ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
     q.append("     , ").append(DB.COL_TIMEHISTORY_SCRAMBLE);
     q.append("     , ").append(DB.COL_TIMEHISTORY_PLUSTWO);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_PB);
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
     if (searchInPast) {
@@ -406,6 +417,7 @@ public class ServiceProviderImpl implements ServiceProvider {
         st.setTimestamp(cursor.getLong(2));
         st.setScramble(cursor.getString(3));
         st.setPlusTwo(cursor.getInt(4) == 1);
+        st.setPb(cursor.getInt(5) == 1);
         st.setSolveType(solveType);
         if (solveType.hasSteps()) {
           List<Long> stepTimes = getSolveTimeSteps(st.getId());
@@ -623,6 +635,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("     , ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
     q.append("     , ").append(DB.COL_TIMEHISTORY_SCRAMBLE);
     q.append("     , ").append(DB.COL_TIMEHISTORY_PLUSTWO);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_PB);
     q.append("     , ").append(DB.COL_TIMEHISTORY_AVG5);
     q.append("     , ").append(DB.COL_TIMEHISTORY_AVG12);
     q.append("     , ").append(DB.COL_TIMEHISTORY_AVG50);
@@ -639,13 +652,14 @@ public class ServiceProviderImpl implements ServiceProvider {
         sta.setTimestamp(cursor.getLong(2));
         sta.setScramble(cursor.getString(3));
         sta.setPlusTwo(cursor.getInt(4) == 1);
-        Long v = getCursorLong(cursor, 5);
+        sta.setPb(cursor.getInt(5) == 1);
+        Long v = getCursorLong(cursor, 6);
         sta.setAvgOf5(v == null || v == -2 ? null : v);
-        v = getCursorLong(cursor, 6);
-        sta.setAvgOf12(v == null || v == -2 ? null : v);
         v = getCursorLong(cursor, 7);
-        sta.setAvgOf50(v == null || v == -2 ? null : v);
+        sta.setAvgOf12(v == null || v == -2 ? null : v);
         v = getCursorLong(cursor, 8);
+        sta.setAvgOf50(v == null || v == -2 ? null : v);
+        v = getCursorLong(cursor, 9);
         sta.setAvgOf100(v == null || v == -2 ? null : v);
         sta.setSolveType(solveTime.getSolveType());
       }

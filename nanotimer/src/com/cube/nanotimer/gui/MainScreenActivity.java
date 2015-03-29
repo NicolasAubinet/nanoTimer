@@ -466,6 +466,11 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
         if (st != null) {
           ((TextView) view.findViewById(R.id.tvDate)).setText(FormatterService.INSTANCE.formatDateTime(st.getTimestamp()));
           ((TextView) view.findViewById(R.id.tvTime)).setText(FormatterService.INSTANCE.formatSolveTime(st.getTime()));
+          if (st.isPb()) {
+            view.findViewById(R.id.imgPb).setVisibility(View.VISIBLE);
+          } else {
+            view.findViewById(R.id.imgPb).setVisibility(View.GONE);
+          }
         }
       }
       return view;

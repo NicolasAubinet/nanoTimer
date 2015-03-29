@@ -15,6 +15,14 @@
        android:layout_alignParentLeft="true"
        style="@style/SmallListViewItem"/>
 
+    <ImageView
+       android:id="@+id/imgPb"
+       android:layout_width="26px"
+       android:layout_height="26px"
+       android:layout_centerVertical="true"
+       android:layout_toLeftOf="@+id/tvTime"
+       android:src="@drawable/star"/>
+
     <TextView
        android:id="@+id/tvTime"
        android:layout_width="wrap_content"

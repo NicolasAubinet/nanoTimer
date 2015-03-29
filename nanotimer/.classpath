@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_39"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/datamodel"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/services"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/drag-sort-listview"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/guilib"/>
+	<classpathentry kind="lib" path="libs/StartAppInApp-2.4.2.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/mpandroidchartlibrary-1-7-4"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/android-support-v4"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/android-support-v7-appcompat"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="lib" path="libs/mpandroidchartlibrary-1-7-4.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

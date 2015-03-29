@@ -69,10 +69,10 @@
     public static <fields>;
    }
 
-  -keepclassmembers class * 
-  {
-    @android.webkit.JavascriptInterface <methods>;
-  }
+#  -keepclassmembers class * 
+#  {
+#    @android.webkit.JavascriptInterface <methods>;
+#  }
    -keep class * extends android.view.View 
     { 
 	 
