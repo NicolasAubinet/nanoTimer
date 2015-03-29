@@ -2,12 +2,7 @@ package com.cube.nanotimer.services;
 
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
-import com.cube.nanotimer.vo.CubeType;
-import com.cube.nanotimer.vo.SolveAverages;
-import com.cube.nanotimer.vo.SolveHistory;
-import com.cube.nanotimer.vo.SolveTime;
-import com.cube.nanotimer.vo.SolveTimeAverages;
-import com.cube.nanotimer.vo.SolveType;
+import com.cube.nanotimer.vo.*;
 import junit.framework.Assert;
 
 import java.util.List;
@@ -677,6 +672,107 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertEquals(solveTimes.size(), 30);
     assertEquals(solveTimes.get(0).getTime(), 100);
     assertEquals(solveTimes.get(29).getTime(), 3000);
+  }
+
+  @SmallTest
+  public void testPb() {
+    saveTime(100);
+    saveTime(200);
+    saveTime(300);
+    SolveTime st = saveTime(98).getSolveTime();
+    assertFalse(st.isPb()); // not a pb because not enough times
+    saveTime(150);
+    saveTime(250);
+    saveTime(350);
+    SolveTime testTime = saveTime(450).getSolveTime();
+    saveTime(550);
+    saveTime(650);
+    st = saveTime(97).getSolveTime();
+    assertFalse(st.isPb()); // not a pb because not enough times
+    st = saveTime(96).getSolveTime();
+    assertTrue(st.isPb()); // not a pb because not enough times
+    SolveTime testTime2 = saveTime(95).getSolveTime();
+    assertTrue(testTime2.isPb());
+    st = saveTime(96).getSolveTime();
+    assertFalse(st.isPb());
+    st = saveTime(-1).getSolveTime();
+    assertFalse(st.isPb());
+    SolveTime testTime3 = saveTime(800).getSolveTime();
+    assertFalse(testTime3.isPb());
+    st = saveTime(94).getSolveTime();
+    assertTrue(st.isPb());
+    // 100 200 300 98 150 250 350 450 550 650 97 96(b) 95(b) 96 -1 800 94(b)
+
+    st.setTime(150);
+    st = provider.saveTime(st).getSolveTime();
+    assertFalse(st.isPb());
+    st.setTime(94);
+    st = provider.saveTime(st).getSolveTime();
+    assertFalse(st.isPb());
+    st.setTime(93);
+    st = provider.saveTime(st).getSolveTime();
+    assertTrue(st.isPb());
+    st.setTime(92);
+    st = provider.saveTime(st).getSolveTime();
+    assertTrue(st.isPb());
+    // 100 200 300 98 150 250 350 450 550 650 97 96(b) 95(b) 96 -1 800 94(b) 150 94 92(b)
+    assertPBsInIndices(11, 12, 16, 19);
+
+    testTime.setTime(94); // not a pb because not enough times
+    testTime = provider.saveTime(testTime).getSolveTime();
+    assertFalse(testTime.isPb());
+    // 100 200 300 98 150 250 350 94 550 650 97 96 95 96 -1 800 94 150 94 92(b)
+    assertPBsInIndices(19);
+
+    testTime2.setTime(85);
+    testTime2 = provider.saveTime(testTime2).getSolveTime();
+    assertTrue(testTime2.isPb());
+    st = provider.getSolveTime(st.getId());
+    assertFalse(st.isPb());
+    // 100 200 300 98 150 250 350 94 550 650 97 96 85(b) 96 -1 800 94 150 94 92
+    assertPBsInIndices(12);
+
+    testTime2.setTime(-1);
+    testTime2 = provider.saveTime(testTime2).getSolveTime();
+    assertFalse(testTime2.isPb());
+    // 100 200 300 98 150 250 350 94 550 650 97 96 -1 96 -1 800 94 150 94 92(b)
+    assertPBsInIndices(19);
+
+    testTime3.setTime(80);
+    testTime3 = provider.saveTime(testTime3).getSolveTime();
+    assertTrue(testTime3.isPb());
+    // 100 200 300 98 150 250 350 94 550 650 97 96 -1 96 -1 80(b) 94 150 94 92
+    saveTime(100);
+    // 100 200 300 98 150 250 350 94 550 650 97 96 -1 96 -1 80(b) 94 150 94 92 100
+    assertPBsInIndices(15);
+    provider.deleteTime(testTime);
+    provider.deleteTime(testTime3);
+    // 100 200 300 98 150 250 350 550 650 97 96 -1 96 -1 94(b) 150 94 92(b) 100
+    assertPBsInIndices(14, 17);
+  }
+
+  @SmallTest
+  public void testPbUpdateAndDelete() {
+    // TODO write more tests for checkNewerPBs
+    // TODO   test it for update AND for delete
+  }
+
+  private void assertPBsInIndices(int... pbIndices) {
+    List<SolveTime> solveTimes = getWholeHistory();
+    for (int i = 0; i < solveTimes.size(); i++) {
+      boolean found = false;
+      for (int ind : pbIndices) {
+        if (i == ind) {
+          found = true;
+          break;
+        }
+      }
+      if (found) {
+        assertTrue(solveTimes.get(i).isPb());
+      } else {
+        assertFalse(solveTimes.get(i).isPb());
+      }
+    }
   }
 
   private SolveAverages saveTimes(long time, int count) {
