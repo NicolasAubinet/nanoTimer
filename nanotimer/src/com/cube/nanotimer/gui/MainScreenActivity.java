@@ -373,13 +373,32 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
 
   @Override
   public void onTimeChanged(SolveTime solveTime) {
+    SolveTime historyTime = null;
     for (SolveTime st : liHistory) {
       if (st.getId() == solveTime.getId()) {
-        st.setTime(solveTime.getTime());
-        adapter.notifyDataSetChanged();
+        historyTime = st;
         break;
       }
     }
+    if (solveTime != null) {
+      updateListTime(historyTime);
+    }
+  }
+
+  private void updateListTime(final SolveTime solveTime) {
+    App.INSTANCE.getService().getSolveTime(solveTime.getId(), new DataCallback<SolveTime>() {
+      @Override
+      public void onData(final SolveTime data) {
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            solveTime.setTime(data.getTime());
+            solveTime.setPb(data.isPb());
+            adapter.notifyDataSetChanged();
+          }
+        });
+      }
+    });
   }
 
   @Override

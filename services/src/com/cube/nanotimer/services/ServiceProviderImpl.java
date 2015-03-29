@@ -112,11 +112,12 @@ public class ServiceProviderImpl implements ServiceProvider {
     values.put(DB.COL_TIMEHISTORY_TIME, solveTime.getTime());
     values.put(DB.COL_TIMEHISTORY_PLUSTWO, solveTime.isPlusTwo() ? 1 : 0);
     if (isTimeBetter(cachedLifetimeBest, solveTime.getTime()) && getTimesCountBefore(solveTime) >= MIN_TIMES_BEFORE_PB_FLAG) {
-      values.put(DB.COL_TIMEHISTORY_PB, 1);
-    } else if (solveTime.isPb() && isBetterTimeBefore(solveTime)) {
+      solveTime.setPb(true);
+    } else if (solveTime.isPb() && (solveTime.isDNF() || isBetterTimeBefore(solveTime))) {
       // this isn't the best time anymore
-      values.put(DB.COL_TIMEHISTORY_PB, 0);
+      solveTime.setPb(false);
     }
+    values.put(DB.COL_TIMEHISTORY_PB, solveTime.isPb() ? 1 : 0);
     db.update(DB.TABLE_TIMEHISTORY, values, DB.COL_ID + " = ?", getStringArray(solveTime.getId()));
     synchronized (cacheSyncHelper) {
       for (CachedTime ct : cachedSolveTimes) {
@@ -144,10 +145,14 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
     q.append("   AND ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
     Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTime.getTimestamp(), solveTime.getSolveType().getId()));
-    if (cursor != null && cursor.moveToFirst()) {
-      return cursor.getInt(0);
+    int count = 0;
+    if (cursor != null) {
+      if (cursor.moveToFirst()) {
+        count = cursor.getInt(0);
+      }
+      cursor.close();
     }
-    return 0;
+    return count;
   }
 
   private boolean isBetterTimeBefore(SolveTime solveTime) {
@@ -155,13 +160,18 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("SELECT ").append(DB.COL_ID);
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_TIME).append(" <= ?");
+    q.append("   AND ").append(DB.COL_TIMEHISTORY_TIME).append(" > 0");
     q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
     q.append("   AND ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
     Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTime.getTime(), solveTime.getTimestamp(), solveTime.getSolveType().getId()));
-    if (cursor != null && cursor.moveToFirst()) {
-      return true;
+    boolean result = false;
+    if (cursor != null) {
+      if (cursor.moveToFirst()) {
+        result = true;
+      }
+      cursor.close();
     }
-    return false;
+    return result;
   }
 
   private SolveAverages createTime(SolveTime solveTime) {
@@ -183,9 +193,8 @@ public class ServiceProviderImpl implements ServiceProvider {
     Long avg100 = getLastAvg(100);
 
     syncBestAveragesWithCurrent(avg5, avg12, avg50, avg100);
-    boolean isPersonalBest = false;
     if (isTimeBetter(cachedLifetimeBest, solveTime.getTime()) && cachedSolveTimes.size() >= MIN_TIMES_BEFORE_PB_FLAG) {
-      isPersonalBest = true;
+      solveTime.setPb(true);
       cachedLifetimeBest = solveTime.getTime();
     }
 
@@ -195,7 +204,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     values.put(DB.COL_TIMEHISTORY_SCRAMBLE, solveTime.getScramble());
     values.put(DB.COL_TIMEHISTORY_TIMESTAMP, solveTime.getTimestamp());
     values.put(DB.COL_TIMEHISTORY_PLUSTWO, solveTime.isPlusTwo() ? 1 : 0);
-    values.put(DB.COL_TIMEHISTORY_PB, isPersonalBest ? 1 : 0);
+    values.put(DB.COL_TIMEHISTORY_PB, solveTime.isPb() ? 1 : 0);
     values.put(DB.COL_TIMEHISTORY_AVG5, avg5);
     values.put(DB.COL_TIMEHISTORY_AVG12, avg12);
     values.put(DB.COL_TIMEHISTORY_AVG50, avg50);
@@ -455,6 +464,7 @@ public class ServiceProviderImpl implements ServiceProvider {
       if (cursor.moveToFirst()) {
         solvesCount = cursor.getInt(0);
       }
+      cursor.close();
     }
     return solvesCount;
   }
@@ -718,6 +728,7 @@ public class ServiceProviderImpl implements ServiceProvider {
       if (cursor.moveToFirst()) {
         solvesCount = cursor.getInt(0);
       }
+      cursor.close();
     }
     return solvesCount;
   }
@@ -775,6 +786,33 @@ public class ServiceProviderImpl implements ServiceProvider {
     }
 
     return results;
+  }
+
+  public SolveTime getSolveTime(int solveTimeId) {
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT ").append(DB.COL_ID);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_TIME);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_SCRAMBLE);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_PLUSTWO);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_PB);
+    q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
+    q.append(" WHERE ").append(DB.COL_ID).append(" = ?");
+    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTimeId));
+    SolveTime st = null;
+    if (cursor != null) {
+      if (cursor.moveToFirst()) {
+        st = new SolveTime();
+        st.setId(cursor.getInt(0));
+        st.setTime(cursor.getInt(1));
+        st.setTimestamp(cursor.getLong(2));
+        st.setScramble(cursor.getString(3));
+        st.setPlusTwo(cursor.getInt(4) == 1);
+        st.setPb(cursor.getInt(5) == 1);
+      }
+      cursor.close();
+    }
+    return st;
   }
 
   private void recalculateAverages(long timestamp, SolveType solveType) {

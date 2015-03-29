@@ -109,7 +109,6 @@ public class HistoryDetailDialog extends DialogFragment {
         if (!solveTime.isDNF() && !solveTime.isPlusTwo()) {
           solveTime.plusTwo();
           saveTime(solveTime);
-          handler.onTimeChanged(solveTime);
         }
         dialog.dismiss();
       }
@@ -121,7 +120,6 @@ public class HistoryDetailDialog extends DialogFragment {
         if (!solveTime.isDNF()) {
           solveTime.setTime(-1);
           saveTime(solveTime);
-          handler.onTimeChanged(solveTime);
         }
         dialog.dismiss();
       }
@@ -142,10 +140,11 @@ public class HistoryDetailDialog extends DialogFragment {
     return dialog;
   }
 
-  private void saveTime(SolveTime solveTime) {
+  private void saveTime(final SolveTime solveTime) {
     App.INSTANCE.getService().saveTime(solveTime, new DataCallback<SolveAverages>() {
       @Override
       public void onData(SolveAverages data) {
+        handler.onTimeChanged(solveTime);
       }
     });
   }

@@ -1,13 +1,6 @@
 package com.cube.nanotimer.services;
 
-import com.cube.nanotimer.vo.CubeType;
-import com.cube.nanotimer.vo.ExportResult;
-import com.cube.nanotimer.vo.SessionDetails;
-import com.cube.nanotimer.vo.SolveAverages;
-import com.cube.nanotimer.vo.SolveHistory;
-import com.cube.nanotimer.vo.SolveTime;
-import com.cube.nanotimer.vo.SolveTimeAverages;
-import com.cube.nanotimer.vo.SolveType;
+import com.cube.nanotimer.vo.*;
 
 import java.util.List;
 
@@ -30,6 +23,7 @@ public interface ServiceProvider {
   SessionDetails getSessionDetails(SolveType solveType);
   int getSolvesCount(SolveType solveType);
   List<ExportResult> getExportResults(List<Integer> solveTypeIds, int limit);
+  SolveTime getSolveTime(int solveTimeId);
 
   int addSolveType(SolveType solveType);
   void addSolveTypeSteps(SolveType solveType);
