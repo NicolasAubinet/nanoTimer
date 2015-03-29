@@ -966,6 +966,7 @@ public class ServiceProviderImpl implements ServiceProvider {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         times.add(cursor.getLong(0));
       }
+      cursor.close();
     }
     TimesStatistics session = new TimesStatistics(times);
     for (int i = 0; i < avgsToGet.length; i++) {
