@@ -755,8 +755,72 @@ public class ServiceProviderTest extends AndroidTestCase {
 
   @SmallTest
   public void testPbUpdateAndDelete() {
-    // TODO write more tests for checkNewerPBs
-    // TODO   test it for update AND for delete
+    provider.deleteHistory();
+    for (int i = 1; i <= 15; i++) {
+      saveTime(i * 50);
+    }
+    assertPBsInIndices(); // no PBs
+
+    SolveTime st = saveTime(100).getSolveTime();
+    assertFalse(st.isPb());
+    st = saveTime(45).getSolveTime();
+    assertTrue(st.isPb());
+    st = saveTime(75).getSolveTime();
+    assertFalse(st.isPb());
+    assertPBsInIndices(16); // 50 100 150 200 250 300 350 400 450 500 550 600 650 700 750 100 45(b) 75
+
+    List<SolveTime> times = provider.getPagedHistory(solveType1).getSolveTimes();
+    Collections.reverse(times);
+    st = times.get(0);
+    st.setTime(-1);
+    provider.saveTime(st);
+    assertPBsInIndices(16); // -1 100 150 200 250 300 350 400 450 500 550 600 650 700 750 100 45(b) 75
+
+    st = times.get(1);
+    provider.deleteTime(st);
+    assertPBsInIndices(14, 15); // -1 150 200 250 300 350 400 450 500 550 600 650 700 750 100(b) 45(b) 75
+
+    times = provider.getPagedHistory(solveType1).getSolveTimes();
+    Collections.reverse(times);
+    st = times.get(2);
+    st.setTime(40);
+    provider.saveTime(st);
+    assertPBsInIndices(); // -1 150 40 250 300 350 400 450 500 550 600 650 700 750 100 45 75
+
+    st.setTime(70);
+    provider.saveTime(st);
+    assertPBsInIndices(15); // -1 150 70 250 300 350 400 450 500 550 600 650 700 750 100 45(b) 75
+
+    provider.deleteTime(st);
+    assertPBsInIndices(13, 14); // -1 150 250 300 350 400 450 500 550 600 650 700 750 100(b) 45(b) 75
+
+    times = provider.getPagedHistory(solveType1).getSolveTimes();
+    Collections.reverse(times);
+    st = times.get(13);
+    st.setTime(30);
+    provider.saveTime(st);
+    assertPBsInIndices(13); // -1 150 250 300 350 400 450 500 550 600 650 700 750 30(b) 45 75
+
+    provider.deleteTime(st);
+    assertPBsInIndices(13); // -1 150 250 300 350 400 450 500 550 600 650 700 750 45(b) 75
+
+    st = times.get(3);
+    st.setTime(20);
+    provider.saveTime(st);
+    assertPBsInIndices(); // -1 150 250 20 350 400 450 500 550 600 650 700 750 30 45 75
+
+    provider.deleteTime(st);
+    assertPBsInIndices(); // -1 150 250 350 400 450 500 550 600 650 700 750 30(b) 45 75
+
+    saveTime(25);
+    times = provider.getPagedHistory(solveType1).getSolveTimes();
+    Collections.reverse(times);
+    provider.deleteTime(times.get(12));
+    assertPBsInIndices(12, 13); // -1 150 250 350 400 450 500 550 600 650 700 750 45(b) 75(b) 25
+    provider.deleteTime(times.get(11));
+    assertPBsInIndices(11, 12); // -1 150 250 350 400 450 500 550 600 650 700 45(b) 75(b) 25
+    provider.deleteTime(times.get(10));
+    assertPBsInIndices(11); // -1 150 250 350 400 450 500 550 600 650 45 75(b) 25
   }
 
   private void assertPBsInIndices(int... pbIndices) {
@@ -764,7 +828,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     Collections.reverse(solveTimes);
     for (int i = 0; i < solveTimes.size(); i++) {
       boolean found = false;
-      for (int ind : pbIndices) {
+      for (int ind : pbIndices) { // -1 150 200 250 300 350 400 450 500 550 600 650 700 750 100(b) 45(b) 75
         if (i == ind) {
           found = true;
           break;

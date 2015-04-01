@@ -143,7 +143,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     loadLifetimeBest(solveTime.getSolveType().getId());
 
     if (recheckPBs) {
-      checkNewerPBs(previousBestTime, solveTime.getTimestamp(), solveTime.getSolveType().getId());
+      checkNewerPBs(previousBestTime, solveTime);
     }
 
     SolveAverages solveAverages = getSolveAverages(solveTime.getSolveType());
@@ -152,7 +152,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     return solveAverages;
   }
 
-  private void checkNewerPBs(long previousBestTime, long ts, int solveTypeId) {
+  private void checkNewerPBs(long previousBestTime, SolveTime solveTime) {
     // Update PB flags of times newer than ts
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_ID);
@@ -162,25 +162,30 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" > ?");
     q.append("   AND ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
     q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
-    Cursor cursor = db.rawQuery(q.toString(), getStringArray(ts, solveTypeId));
+    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTime.getTimestamp(), solveTime.getSolveType().getId()));
     if (cursor != null) {
       long curBestTime = previousBestTime;
+      int i = 0;
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         int solveTimeId = cursor.getInt(0);
         long time = cursor.getInt(1);
         boolean pb = (cursor.getInt(2) == 1);
-        if (isTimeBetter(curBestTime, time)) {
+        boolean isBetter = isTimeBetter(curBestTime, time);
+        if (isBetter && i >= MIN_TIMES_BEFORE_PB_FLAG) { // TODO this doesn't work because we read from ts, not before (so comparing to MIN..FLAG doesn't make sense)
           if (!pb) {
             ContentValues values = new ContentValues();
             values.put(DB.COL_TIMEHISTORY_PB, 1);
             db.update(DB.TABLE_TIMEHISTORY, values, DB.COL_ID + " = ?", getStringArray(solveTimeId));
           }
-          curBestTime = time;
         } else if (pb) {
           ContentValues values = new ContentValues();
           values.put(DB.COL_TIMEHISTORY_PB, 0);
           db.update(DB.TABLE_TIMEHISTORY, values, DB.COL_ID + " = ?", getStringArray(solveTimeId));
         }
+        if (isBetter) {
+          curBestTime = time;
+        }
+        i++;
       }
       cursor.close();
     }
@@ -272,6 +277,9 @@ public class ServiceProviderImpl implements ServiceProvider {
     }
     cachedTime.setSolveId((int) historyId);
     solveTime.setId((int) historyId);
+
+    loadBestAverages(solveTime.getSolveType().getId());
+    loadLifetimeBest(solveTime.getSolveType().getId());
 
     SolveAverages solveAverages = getSolveAverages(solveTime.getSolveType());
     solveAverages.setSolveTime(solveTime);
@@ -402,7 +410,7 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   private boolean isTimeBetter(Long oldVal, Long newVal) {
-    if (oldVal == null && newVal != null && newVal > 0) {
+    if ((oldVal == null || oldVal == -1) && newVal != null && newVal > 0) {
       return true;
     } else if (oldVal != null && newVal != null && newVal < oldVal && newVal > 0) {
       return true;
@@ -437,9 +445,9 @@ public class ServiceProviderImpl implements ServiceProvider {
     loadBestAverages(solveTime.getSolveType().getId());
     loadLifetimeBest(solveTime.getSolveType().getId());
 
-    if (solveTime.isPb()) {
-      long prevBestTime = getBestTimeBefore(solveTime);
-      checkNewerPBs(prevBestTime, solveTime.getTimestamp(), solveTime.getSolveType().getId());
+    long previousBest = getBestTimeBefore(solveTime);
+    if (isTimeBetter(previousBest, solveTime.getTime())) {
+      checkNewerPBs(previousBest, solveTime);
     }
 
     return getSolveAverages(solveTime.getSolveType());
