@@ -5,6 +5,7 @@ import android.test.suitebuilder.annotation.SmallTest;
 import com.cube.nanotimer.vo.*;
 import junit.framework.Assert;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ServiceProviderTest extends AndroidTestCase {
@@ -621,6 +622,7 @@ public class ServiceProviderTest extends AndroidTestCase {
 
   @SmallTest
   public void testHistory() {
+    provider.deleteHistory();
     for (int i = 65; i >= 1; i--) {
       saveTime(100 * i);
     }
@@ -676,6 +678,7 @@ public class ServiceProviderTest extends AndroidTestCase {
 
   @SmallTest
   public void testPb() {
+    provider.deleteHistory();
     saveTime(100);
     saveTime(200);
     saveTime(300);
@@ -701,64 +704,64 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertFalse(testTime3.isPb());
     st = saveTime(94).getSolveTime();
     assertTrue(st.isPb());
-    // 100 200 300 98 150 250 350 450 550 650 97 96(b) 95(b) 96 -1 800 94(b)
+    // 100 200 300 98 150 250 350 450 550 650 97 96(b) 95(b) 96 -1 800 94(b)
 
-    st.setTime(150);
+    saveTime(150);
+    st.setTime(95);
     st = provider.saveTime(st).getSolveTime();
     assertFalse(st.isPb());
     st.setTime(94);
     st = provider.saveTime(st).getSolveTime();
-    assertFalse(st.isPb());
+    assertTrue(st.isPb());
     st.setTime(93);
     st = provider.saveTime(st).getSolveTime();
     assertTrue(st.isPb());
-    st.setTime(92);
-    st = provider.saveTime(st).getSolveTime();
-    assertTrue(st.isPb());
-    // 100 200 300 98 150 250 350 450 550 650 97 96(b) 95(b) 96 -1 800 94(b) 150 94 92(b)
-    assertPBsInIndices(11, 12, 16, 19);
+    // 100 200 300 98 150 250 350 450 550 650 97 96(b) 95(b) 96 -1 800 93(b) 150
+    assertPBsInIndices(11, 12, 16);
 
     testTime.setTime(94); // not a pb because not enough times
     testTime = provider.saveTime(testTime).getSolveTime();
     assertFalse(testTime.isPb());
-    // 100 200 300 98 150 250 350 94 550 650 97 96 95 96 -1 800 94 150 94 92(b)
-    assertPBsInIndices(19);
+    // 100 200 300 98 150 250 350 94 550 650 97 96 95 96 -1 800 93(b) 150
+    assertPBsInIndices(16);
 
     testTime2.setTime(85);
     testTime2 = provider.saveTime(testTime2).getSolveTime();
     assertTrue(testTime2.isPb());
     st = provider.getSolveTime(st.getId());
     assertFalse(st.isPb());
-    // 100 200 300 98 150 250 350 94 550 650 97 96 85(b) 96 -1 800 94 150 94 92
+    // 100 200 300 98 150 250 350 94 550 650 97 96 85(b) 96 -1 800 93 150
     assertPBsInIndices(12);
 
     testTime2.setTime(-1);
     testTime2 = provider.saveTime(testTime2).getSolveTime();
     assertFalse(testTime2.isPb());
-    // 100 200 300 98 150 250 350 94 550 650 97 96 -1 96 -1 800 94 150 94 92(b)
-    assertPBsInIndices(19);
+    // 100 200 300 98 150 250 350 94 550 650 97 96 -1 96 -1 800 93(b) 150
+    assertPBsInIndices(16);
 
     testTime3.setTime(80);
     testTime3 = provider.saveTime(testTime3).getSolveTime();
     assertTrue(testTime3.isPb());
-    // 100 200 300 98 150 250 350 94 550 650 97 96 -1 96 -1 80(b) 94 150 94 92
+    // 100 200 300 98 150 250 350 94 550 650 97 96 -1 96 -1 80(b) 93 150
     saveTime(100);
-    // 100 200 300 98 150 250 350 94 550 650 97 96 -1 96 -1 80(b) 94 150 94 92 100
+    // 100 200 300 98 150 250 350 94 550 650 97 96 -1 96 -1 80(b) 93 150 100
     assertPBsInIndices(15);
     provider.deleteTime(testTime);
     provider.deleteTime(testTime3);
-    // 100 200 300 98 150 250 350 550 650 97 96 -1 96 -1 94(b) 150 94 92(b) 100
+    saveTime(90);
+    // 100 200 300 98 150 250 350 550 650 97 96 -1 96 -1 93(b) 150 100 90(b)
     assertPBsInIndices(14, 17);
   }
 
   @SmallTest
   public void testPbUpdateAndDelete() {
-    // TODO write more tests for checkNewerPBs
-    // TODO   test it for update AND for delete
+    // TODO write more tests for checkNewerPBs
+    // TODO   test it for update AND for delete
   }
 
   private void assertPBsInIndices(int... pbIndices) {
     List<SolveTime> solveTimes = getWholeHistory();
+    Collections.reverse(solveTimes);
     for (int i = 0; i < solveTimes.size(); i++) {
       boolean found = false;
       for (int ind : pbIndices) {

@@ -113,11 +113,11 @@ public class ServiceProviderImpl implements ServiceProvider {
     values.put(DB.COL_TIMEHISTORY_PLUSTWO, solveTime.isPlusTwo() ? 1 : 0);
     long previousBestTime = getBestTimeBefore(solveTime);
     boolean recheckPBs = false;
-    if (isTimeBetter(previousBestTime, solveTime.getTime()) && getTimesCountBefore(solveTime) >= MIN_TIMES_BEFORE_PB_FLAG) {
-      if (!solveTime.isPb()) {
+    if (isTimeBetter(previousBestTime, solveTime.getTime())) {
+      if (!solveTime.isPb() && getTimesCountBefore(solveTime) >= MIN_TIMES_BEFORE_PB_FLAG) {
         solveTime.setPb(true);
-        recheckPBs = true;
       }
+      recheckPBs = true;
     } else if (solveTime.isPb() && (solveTime.isDNF() || previousBestTime <= solveTime.getTime())) {
       // this isn't the best time anymore
       solveTime.setPb(false);
@@ -161,7 +161,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" > ?");
     q.append("   AND ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
-    q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
+    q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
     Cursor cursor = db.rawQuery(q.toString(), getStringArray(ts, solveTypeId));
     if (cursor != null) {
       long curBestTime = previousBestTime;
@@ -169,7 +169,7 @@ public class ServiceProviderImpl implements ServiceProvider {
         int solveTimeId = cursor.getInt(0);
         long time = cursor.getInt(1);
         boolean pb = (cursor.getInt(2) == 1);
-        if (time < curBestTime) {
+        if (isTimeBetter(curBestTime, time)) {
           if (!pb) {
             ContentValues values = new ContentValues();
             values.put(DB.COL_TIMEHISTORY_PB, 1);
@@ -207,15 +207,17 @@ public class ServiceProviderImpl implements ServiceProvider {
     StringBuilder q = new StringBuilder();
     q.append("SELECT MIN(").append(DB.COL_TIMEHISTORY_TIME).append(")");
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
-    q.append(" WHERE ").append(DB.COL_TIMEHISTORY_TIME).append(" <= ?");
-    q.append("   AND ").append(DB.COL_TIMEHISTORY_TIME).append(" > 0");
+    q.append(" WHERE ").append(DB.COL_TIMEHISTORY_TIME).append(" > 0");
     q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
     q.append("   AND ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
-    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTime.getTime(), solveTime.getTimestamp(), solveTime.getSolveType().getId()));
+    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTime.getTimestamp(), solveTime.getSolveType().getId()));
     int time = -1;
     if (cursor != null) {
       if (cursor.moveToFirst()) {
-        time = cursor.getInt(0);
+        int val = cursor.getInt(0);
+        if (val > 0) { // if something was found (min returns 0 otherwise)
+          time = val;
+        }
       }
       cursor.close();
     }
@@ -843,21 +845,21 @@ public class ServiceProviderImpl implements ServiceProvider {
 
   public SolveTime getSolveTime(int solveTimeId) {
     StringBuilder q = new StringBuilder();
-    q.append("SELECT ").append(DB.TABLE_TIMEHISTORY).append(DB.COL_ID);
-    q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(DB.COL_TIMEHISTORY_TIME);
-    q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(DB.COL_TIMEHISTORY_TIMESTAMP);
-    q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(DB.COL_TIMEHISTORY_SCRAMBLE);
-    q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(DB.COL_TIMEHISTORY_PLUSTWO);
-    q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(DB.COL_TIMEHISTORY_PB);
-    q.append("     , ").append(DB.TABLE_SOLVETYPE).append(DB.COL_ID);
-    q.append("     , ").append(DB.TABLE_SOLVETYPE).append(DB.COL_SOLVETYPE_NAME);
-    q.append("     , ").append(DB.TABLE_SOLVETYPE).append(DB.COL_SOLVETYPE_BLIND);
-    q.append("     , ").append(DB.TABLE_SOLVETYPE).append(DB.COL_SOLVETYPE_CUBETYPE_ID);
+    q.append("SELECT ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_ID);
+    q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_TIME);
+    q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_TIMESTAMP);
+    q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_SCRAMBLE);
+    q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_PLUSTWO);
+    q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_PB);
+    q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_ID);
+    q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_NAME);
+    q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_BLIND);
+    q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_CUBETYPE_ID);
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
     q.append(" JOIN ").append(DB.TABLE_SOLVETYPE);
-    q.append("   ON ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID);
+    q.append("   ON ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID);
     q.append("    = ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_ID);
-    q.append(" WHERE ").append(DB.COL_ID).append(" = ?");
+    q.append(" WHERE ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_ID).append(" = ?");
     Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTimeId));
     SolveTime st = null;
     if (cursor != null) {
