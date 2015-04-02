@@ -157,7 +157,9 @@ public class ServiceProviderImpl implements ServiceProvider {
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_ID);
     q.append(" , ").append(DB.COL_TIMEHISTORY_TIME);
+    q.append(" , ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
     q.append(" , ").append(DB.COL_TIMEHISTORY_PB);
+    q.append(" , ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID);
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" > ?");
     q.append("   AND ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
@@ -165,18 +167,21 @@ public class ServiceProviderImpl implements ServiceProvider {
     Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTime.getTimestamp(), solveTime.getSolveType().getId()));
     if (cursor != null) {
       long curBestTime = previousBestTime;
-      int i = 0;
+      boolean isMinTimesReached = false;
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         int solveTimeId = cursor.getInt(0);
         long time = cursor.getInt(1);
-        boolean pb = (cursor.getInt(2) == 1);
+        long timestamp = cursor.getInt(2);
+        boolean pb = (cursor.getInt(3) == 1);
+        int solveTypeId = cursor.getInt(4);
         boolean isBetter = isTimeBetter(curBestTime, time);
-        if (isBetter && i >= MIN_TIMES_BEFORE_PB_FLAG) { // TODO this doesn't work because we read from ts, not before (so comparing to MIN..FLAG doesn't make sense)
+        if (isBetter && (isMinTimesReached || getTimesCountBefore(timestamp, solveTypeId) >= MIN_TIMES_BEFORE_PB_FLAG)) {
           if (!pb) {
             ContentValues values = new ContentValues();
             values.put(DB.COL_TIMEHISTORY_PB, 1);
             db.update(DB.TABLE_TIMEHISTORY, values, DB.COL_ID + " = ?", getStringArray(solveTimeId));
           }
+          isMinTimesReached = true;
         } else if (pb) {
           ContentValues values = new ContentValues();
           values.put(DB.COL_TIMEHISTORY_PB, 0);
@@ -185,19 +190,22 @@ public class ServiceProviderImpl implements ServiceProvider {
         if (isBetter) {
           curBestTime = time;
         }
-        i++;
       }
       cursor.close();
     }
   }
 
   private int getTimesCountBefore(SolveTime solveTime) {
+    return getTimesCountBefore(solveTime.getTimestamp(), solveTime.getSolveType().getId());
+  }
+
+  private int getTimesCountBefore(long timestamp, int solveTypeId) {
     StringBuilder q = new StringBuilder();
     q.append("SELECT COUNT(*)");
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
     q.append("   AND ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
-    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTime.getTimestamp(), solveTime.getSolveType().getId()));
+    Cursor cursor = db.rawQuery(q.toString(), getStringArray(timestamp, solveTypeId));
     int count = 0;
     if (cursor != null) {
       if (cursor.moveToFirst()) {

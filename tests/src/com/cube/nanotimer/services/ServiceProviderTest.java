@@ -810,17 +810,15 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertPBsInIndices(); // -1 150 250 20 350 400 450 500 550 600 650 700 750 30 45 75
 
     provider.deleteTime(st);
-    assertPBsInIndices(); // -1 150 250 350 400 450 500 550 600 650 700 750 30(b) 45 75
+    assertPBsInIndices(12); // -1 150 250 350 400 450 500 550 600 650 700 750 30(b) 45 75
 
     saveTime(25);
     times = provider.getPagedHistory(solveType1).getSolveTimes();
     Collections.reverse(times);
     provider.deleteTime(times.get(12));
-    assertPBsInIndices(12, 13); // -1 150 250 350 400 450 500 550 600 650 700 750 45(b) 75(b) 25
+    assertPBsInIndices(12, 13); // -1 150 250 350 400 450 500 550 600 650 700 750 45(b) 25(b)
     provider.deleteTime(times.get(11));
-    assertPBsInIndices(11, 12); // -1 150 250 350 400 450 500 550 600 650 700 45(b) 75(b) 25
-    provider.deleteTime(times.get(10));
-    assertPBsInIndices(11); // -1 150 250 350 400 450 500 550 600 650 45 75(b) 25
+    assertPBsInIndices(11, 12); // -1 150 250 350 400 450 500 550 600 650 700 45(b) 25(b)
   }
 
   private void assertPBsInIndices(int... pbIndices) {
