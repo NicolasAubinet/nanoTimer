@@ -12,8 +12,8 @@
   <integer name="big_cubes_notation">1</integer>
   <integer name="scrambles_quality">2</integer>
   <integer name="scramble_notification_mode">1</integer>
-  <bool name="scrambles_gen_when_plugged_in">false</bool>
-  <integer name="scramble_gen_count_when_plugged_in">200</integer>
+  <bool name="scrambles_gen_when_plugged_in">true</bool>
+  <integer name="scramble_gen_count_when_plugged_in">100</integer>
   <integer name="min_scramble_cache_size">25</integer>
   <integer name="max_scramble_cache_size">50</integer>
 </resources>
