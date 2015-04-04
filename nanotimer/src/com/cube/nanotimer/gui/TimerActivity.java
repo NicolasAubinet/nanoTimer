@@ -868,14 +868,17 @@ public class TimerActivity extends ActionBarActivity {
           stopTimer(true);
         }
         return false;
-      } else if (inspectionMode == InspectionMode.HOLD_AND_RELEASE) {
+      } else if (solveType.isBlind() && motionEvent.getAction() == MotionEvent.ACTION_UP) {
+        // no inspection for blind solve types
+        startTimer();
+      } else if (inspectionMode == InspectionMode.HOLD_AND_RELEASE && !solveType.isBlind()) {
           if (timerState == TimerState.STOPPED && motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
             startInspectionTimer();
           } else if (timerState == TimerState.INSPECTING && motionEvent.getAction() == MotionEvent.ACTION_UP) {
             stopInspectionTimer();
             startTimer();
           }
-      } else if (inspectionMode == InspectionMode.AUTOMATIC) {
+      } else if (inspectionMode == InspectionMode.AUTOMATIC && !solveType.isBlind()) {
         if (timerState == TimerState.STOPPED && motionEvent.getAction() == MotionEvent.ACTION_UP) {
           startInspectionTimer();
         } else if (timerState == TimerState.INSPECTING && motionEvent.getAction() == MotionEvent.ACTION_UP) {
