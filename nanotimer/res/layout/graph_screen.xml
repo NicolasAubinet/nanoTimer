@@ -18,7 +18,7 @@
        android:layout_height="wrap_content"
        android:layout_alignParentLeft="true"
        android:layout_centerVertical="true"
-       android:textSize="20sp"/>
+       android:textSize="18sp"/>
 
     <TextView
        android:id="@+id/tvSolveType"
@@ -29,16 +29,16 @@
        android:layout_marginLeft="10dp"
        android:layout_centerVertical="true"
        android:singleLine="true"
-       android:textSize="20sp"/>
+       android:textSize="18sp"/>
 
     <CheckBox
        android:id="@+id/cbSmooth"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:layout_toLeftOf="@+id/spPeriod"
-       android:layout_marginRight="7dp"
+       android:layout_marginRight="10dp"
        android:text="@string/smooth"
-       android:textSize="20sp"
+       android:textSize="18sp"
        android:layout_centerVertical="true"/>
 
     <Spinner

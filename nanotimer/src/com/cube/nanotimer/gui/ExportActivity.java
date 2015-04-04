@@ -8,24 +8,17 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
+import android.widget.*;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout.LayoutParams;
-import android.widget.ListView;
-import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.ExportActivity.ListItem.Type;
@@ -46,7 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ExportActivity extends FragmentActivity {
+public class ExportActivity extends ActionBarActivity {
 
   private ExportListAdapter adapter;
   private final List<ListItem> liItems = new ArrayList<ListItem>();
