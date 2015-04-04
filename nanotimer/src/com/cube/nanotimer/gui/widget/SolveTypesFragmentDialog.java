@@ -19,7 +19,8 @@ public class SolveTypesFragmentDialog extends SelectorFragmentDialog {
 
   public static SolveTypesFragmentDialog newInstance(int id, ArrayList<String> items, boolean cancelTouchOutside,
                                                    SelectionHandler handler, boolean showShortcut) {
-    SolveTypesFragmentDialog f = new SolveTypesFragmentDialog(handler);
+    SolveTypesFragmentDialog f = new SolveTypesFragmentDialog();
+    f.handler = handler;
     Bundle bundle = new Bundle();
     bundle.putInt(ARG_ID, id);
     bundle.putBoolean(ARG_TOUCHOUT, cancelTouchOutside);
@@ -32,10 +33,6 @@ public class SolveTypesFragmentDialog extends SelectorFragmentDialog {
 
     f.setArguments(bundle);
     return f;
-  }
-
-  protected SolveTypesFragmentDialog(SelectionHandler handler) {
-    super(handler);
   }
 
   protected ArrayAdapter<String> getNewAdapter() {

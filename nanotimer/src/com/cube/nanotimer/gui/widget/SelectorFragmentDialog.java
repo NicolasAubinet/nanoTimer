@@ -37,7 +37,8 @@ public class SelectorFragmentDialog extends DialogFragment {
   }
 
   public static SelectorFragmentDialog newInstance(int id, ArrayList<String> items, String title, boolean cancelTouchOutside, SelectionHandler handler) {
-    SelectorFragmentDialog f = new SelectorFragmentDialog(handler);
+    SelectorFragmentDialog f = new SelectorFragmentDialog();
+    f.handler = handler;
     Bundle bundle = new Bundle();
     bundle.putInt(ARG_ID, id);
     bundle.putString(ARG_TITLE, title);
@@ -45,10 +46,6 @@ public class SelectorFragmentDialog extends DialogFragment {
     bundle.putStringArrayList(ARG_ITEMS, items);
     f.setArguments(bundle);
     return f;
-  }
-
-  protected SelectorFragmentDialog(SelectionHandler handler) {
-    this.handler = handler;
   }
 
   @Override
