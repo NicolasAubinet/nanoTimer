@@ -8,6 +8,14 @@
     <item>1</item>
     <item>2</item>
   </string-array>
+  <string-array name="entries_inspection_sounds_type">
+    <item>@string/classic</item>
+    <item>@string/official</item>
+  </string-array>
+  <string-array name="entryvalues_inspection_sounds_type">
+    <item>1</item>
+    <item>2</item>
+  </string-array>
   <string-array name="entries_big_cubes_notation">
     <item>@string/r_u_f</item>
     <item>@string/rw_uw_fw</item>

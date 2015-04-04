@@ -29,6 +29,15 @@
        android:summary="@string/inspection_sounds_summary"
        android:defaultValue="@bool/inspection_sounds"/>
 
+    <ListPreference
+       android:key="inspection_sounds_type"
+       android:title="@string/inspection_sounds_type"
+       android:summary="@string/inspection_sounds_type_summary"
+       android:entries="@array/entries_inspection_sounds_type"
+       android:entryValues="@array/entryvalues_inspection_sounds_type"
+       android:dialogTitle="@string/inspection_sounds_type"
+       android:defaultValue="1"/>
+
     <CheckBoxPreference
        android:key="show_time_when_running"
        android:title="@string/show_time_when_running"

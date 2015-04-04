@@ -8,6 +8,7 @@ public enum Options {
   INSTANCE;
 
   public enum InspectionMode { HOLD_AND_RELEASE, AUTOMATIC }
+  public enum InspectionSoundsType { CLASSIC, OFFICIAL }
   public enum AdsStyle { BANNER, INTERSTITIAL, MIXED }
   public enum BigCubesNotation { RUF, RWUWFW }
   public enum ScramblesQuality { LOW, MEDIUM, HIGH }
@@ -19,6 +20,7 @@ public enum Options {
   public static final String INSPECTION_MODE_KEY = "inspection_mode";
   public static final String INSPECTION_TIME_KEY = "inspection_time";
   public static final String INSPECTION_SOUNDS_KEY = "inspection_sounds";
+  public static final String INSPECTION_SOUNDS_TYPE_KEY = "inspection_sounds_type";
   public static final String SHOW_TIME_WHEN_RUNNING = "show_time_when_running";
   public static final String KEEP_TIMER_SCREEN_ON_KEY = "keep_timer_screen_on";
   public static final String BIG_CUBES_NOTATION_KEY = "big_cubes_notation";
@@ -64,6 +66,18 @@ public enum Options {
   public boolean isInspectionSoundsEnabled() {
     Boolean defaultValue = context.getResources().getBoolean(R.bool.inspection_sounds);
     return sharedPreferences.getBoolean(INSPECTION_SOUNDS_KEY, defaultValue);
+  }
+
+  public InspectionSoundsType getInspectionSoundsType() {
+    int type = Integer.parseInt(sharedPreferences.getString(INSPECTION_SOUNDS_TYPE_KEY, "-1"));
+    switch (type) {
+      case 1:
+        return InspectionSoundsType.CLASSIC;
+      case 2:
+        return InspectionSoundsType.OFFICIAL;
+      default:
+        return InspectionSoundsType.CLASSIC;
+    }
   }
 
   public boolean isShowTimeWhenRunning() {

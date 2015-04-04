@@ -88,6 +88,10 @@
   <string name="inspection_time_summary">Select the timer inspection time</string>
   <string name="inspection_sounds">Inspection sounds</string>
   <string name="inspection_sounds_summary">Enable / disable inspection sounds</string>
+  <string name="inspection_sounds_type">Inspection warnings type</string>
+  <string name="inspection_sounds_type_summary">Select the type of warnings</string>
+  <string name="classic">Classic (warn 3 seconds before end)</string>
+  <string name="official">Official (warn at 8 and 12 seconds)</string>
   <string name="show_time_when_running">Display time when running</string>
   <string name="show_time_when_running_summary">Display time when timer is running</string>
   <string name="keep_screen_on">Keep screen on</string>
@@ -211,11 +215,12 @@
     <font color=\"white\">
     <u><b>v1.1.4</b></u>
     <ul>
-      <li>Added icon next to best times</li>
+      <li>Added icon next to best times in history</li>
       <li>New setting to hide time when timer is running</li>
+      <li>New official inspection warning sounds and setting</li>
       <li>Adapted automatic inspection mode to start on release</li>
       <li>Added standard deviation and best time to session details</li>
-      <li>Activated scrambles generation when plugged in by default</li>
+      <li>Scrambles generation when plugged in is now on by default</li>
       <li>Disabled inspection for blind solve types</li>
       <li>Updated app theme</li>
     </ul>

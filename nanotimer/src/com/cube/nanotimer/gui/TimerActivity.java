@@ -654,17 +654,31 @@ public class TimerActivity extends ActionBarActivity {
     long curTime = System.currentTimeMillis() - timerStartTs;
     int seconds = (int) (curTime / 1000);
     tvTimer.setText(String.valueOf(seconds));
-    if (inspectionTime > 0 && seconds > 0 && seconds >= inspectionTime - 3 && seconds <= inspectionTime && soundsEnabled) {
-      Utils.playSound(R.raw.beep);
+    boolean automaticMode = inspectionMode == InspectionMode.AUTOMATIC;
+    if (soundsEnabled) {
+      if (Options.INSTANCE.getInspectionSoundsType() == Options.InspectionSoundsType.CLASSIC) {
+        if (inspectionTime > 0 && seconds > 0 && seconds >= inspectionTime - 3 && (seconds < inspectionTime || (automaticMode && seconds == inspectionTime))) {
+          Utils.playSound(R.raw.beep);
+        }
+      } else if (Options.INSTANCE.getInspectionSoundsType() == Options.InspectionSoundsType.OFFICIAL) {
+        if (seconds == 8) {
+          Utils.playSound(R.raw.eight);
+        } else if (seconds == 12) {
+          Utils.playSound(R.raw.twelve);
+        } else if (automaticMode && seconds == inspectionTime) {
+          Utils.playSound(R.raw.beep);
+        }
+      }
     }
     if (seconds == inspectionTime) {
-      if (inspectionMode == InspectionMode.AUTOMATIC) {
+      if (automaticMode) {
         stopInspectionTimer();
         startTimer();
       } else {
         if (inspectionTime > 0) {
           stopInspectionTimer();
           updateTimerText(-1); // DNF
+          Utils.playSound(R.raw.error);
           saveTime(-1);
         }
       }
