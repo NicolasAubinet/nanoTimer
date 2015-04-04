@@ -97,8 +97,8 @@ public class GraphActivity extends ActionBarActivity {
     });
 
     spPeriod = (Spinner) findViewById(R.id.spPeriod);
-    ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.graph_periods, android.R.layout.simple_spinner_item);
-    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.graph_periods, R.layout.spinner_item);
+    adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
     spPeriod.setAdapter(adapter);
     spPeriod.setSelection(prefs.getInt("period", 0));
     spPeriod.setOnItemSelectedListener(new OnItemSelectedListener() {
@@ -125,6 +125,7 @@ public class GraphActivity extends ActionBarActivity {
     chart.setDrawYValues(false);
     chart.getXLabels().setSpaceBetweenLabels(1);
     chart.getXLabels().setTextColor(getColor(R.color.white));
+    chart.getXLabels().setTextSize(12);
     chart.setValueFormatter(new ValueFormatter() {
       @Override
       public String getFormattedValue(float value) {
@@ -132,6 +133,7 @@ public class GraphActivity extends ActionBarActivity {
       }
     });
     chart.getYLabels().setTextColor(getColor(R.color.white));
+    chart.getYLabels().setTextSize(12);
     chart.getYLabels().setFormatter(new ValueFormatter() {
       @Override
       public String getFormattedValue(float value) {
