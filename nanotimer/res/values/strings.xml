@@ -213,7 +213,7 @@
       <li>New setting to hide time when timer is running</li>
       <li>Adapted automatic inspection mode to start on release</li>
       <li>Activated scrambles generation when plugged in by default</li>
-      <li>Deactivated inspection for blind solve types</li>
+      <li>Disabled inspection for blind solve types</li>
       <li>Updated app theme</li>
       <li>Pro: adapted graph colors to match app theme</li>
     </ul>
