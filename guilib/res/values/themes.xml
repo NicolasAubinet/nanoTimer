@@ -10,6 +10,11 @@
     <item name="android:windowBackground">@color/graybg</item>
   </style>
 
+  <style name="NanoTimerThemeNoActionBar" parent="@style/Theme.AppCompat.NoActionBar">
+    <item name="android:listViewStyle">@style/NanoTimerListView</item>
+    <item name="android:windowBackground">@color/graybg</item>
+  </style>
+
   <style name="NanoTimerActionBar" parent="@style/Widget.AppCompat.ActionBar">
     <item name="android:background">@drawable/actionbar_bg</item>
     <item name="background">@drawable/actionbar_bg</item>

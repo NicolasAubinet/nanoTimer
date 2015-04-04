@@ -18,7 +18,7 @@
        android:layout_height="wrap_content"
        android:layout_alignParentLeft="true"
        android:layout_centerVertical="true"
-       android:textSize="16sp"/>
+       android:textSize="20sp"/>
 
     <TextView
        android:id="@+id/tvSolveType"
@@ -29,16 +29,16 @@
        android:layout_marginLeft="10dp"
        android:layout_centerVertical="true"
        android:singleLine="true"
-       android:textSize="16sp"/>
+       android:textSize="20sp"/>
 
     <CheckBox
        android:id="@+id/cbSmooth"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:layout_toLeftOf="@+id/spPeriod"
-       android:layout_marginRight="3dp"
+       android:layout_marginRight="5dp"
        android:text="@string/smooth"
-       android:textSize="16sp"
+       android:textSize="20sp"
        android:layout_centerVertical="true"/>
 
     <Spinner
@@ -50,9 +50,15 @@
 
   </RelativeLayout>
 
+  <LinearLayout
+     android:layout_width="match_parent"
+     android:layout_height="3dp"
+     android:background="@color/iceblue"/>
+
   <com.github.mikephil.charting.charts.LineChart
      android:id="@+id/chart"
      android:layout_width="match_parent"
-     android:layout_height="match_parent"/>
+     android:layout_height="match_parent"
+     android:layout_marginTop="7dp"/>
 
 </LinearLayout>

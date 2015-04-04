@@ -35,7 +35,8 @@
        android:name=".gui.TimerActivity"
        android:configChanges="orientation|screenSize|keyboard|keyboardHidden"/>
     <activity android:name=".gui.OptionsActivity"/>
-    <activity android:name=".gui.GraphActivity"/>
+    <activity android:name=".gui.GraphActivity"
+       android:theme="@style/NanoTimerThemeNoActionBar"/>
     <activity
        android:name=".gui.SolveTypesActivity"
        android:configChanges="orientation|screenSize|keyboard|keyboardHidden">

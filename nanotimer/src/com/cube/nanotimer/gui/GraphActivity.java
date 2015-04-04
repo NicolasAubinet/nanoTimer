@@ -1,18 +1,13 @@
 package com.cube.nanotimer.gui;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
-import android.widget.AdapterView;
+import android.widget.*;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.Spinner;
-import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.services.db.DataCallback;
@@ -31,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class GraphActivity extends Activity {
+public class GraphActivity extends ActionBarActivity {
 
   private CubeType cubeType;
   private SolveType solveType;
@@ -124,16 +119,19 @@ public class GraphActivity extends Activity {
     chart.setDescription("");
     chart.setDrawLegend(false);
     chart.setHighlightEnabled(false);
-    chart.setGridColor(getColor(R.color.gray600));
-    chart.setBackgroundColor(getColor(R.color.white));
+    chart.setGridColor(getColor(R.color.gray800));
+    chart.setBackgroundColor(getColor(R.color.graybg));
+    chart.setDrawGridBackground(false);
     chart.setDrawYValues(false);
     chart.getXLabels().setSpaceBetweenLabels(1);
+    chart.getXLabels().setTextColor(getColor(R.color.white));
     chart.setValueFormatter(new ValueFormatter() {
       @Override
       public String getFormattedValue(float value) {
         return FormatterService.INSTANCE.formatSolveTime(Math.round((double) value));
       }
     });
+    chart.getYLabels().setTextColor(getColor(R.color.white));
     chart.getYLabels().setFormatter(new ValueFormatter() {
       @Override
       public String getFormattedValue(float value) {
