@@ -191,6 +191,43 @@ public class TimesStatisticsTest extends AndroidTestCase {
     Assert.assertEquals(-1, new TimesStatistics(getTimesList(2000, 4000, 5000, 1000, -1, 6000)).getWorstTimeInd(6, true));
   }
 
+  @SmallTest
+  public void testBestTime() {
+    Assert.assertEquals(10, new TimesStatistics(getTimesList(10, 20, 30)).getBestTime(3));
+    Assert.assertEquals(10, new TimesStatistics(getTimesList(20, 10, 30)).getBestTime(3));
+    Assert.assertEquals(10, new TimesStatistics(getTimesList(20, 30, 10)).getBestTime(3));
+    Assert.assertEquals(20, new TimesStatistics(getTimesList(20, 30, 10)).getBestTime(2));
+    Assert.assertEquals(10, new TimesStatistics(getTimesList(20, 30, 10)).getBestTime(4));
+    Assert.assertEquals(15, new TimesStatistics(getTimesList(45, -1, 15, 30)).getBestTime(4));
+    Assert.assertEquals(30, new TimesStatistics(getTimesList(45, -1, -1, 30)).getBestTime(4));
+    Assert.assertEquals(45, new TimesStatistics(getTimesList(45, -1, -1, 30)).getBestTime(3));
+    Assert.assertEquals(-1, new TimesStatistics(getTimesList(-1, -1, -1)).getBestTime(3));
+    Assert.assertEquals(-2, new TimesStatistics(getTimesList()).getBestTime(0));
+    Assert.assertEquals(-2, new TimesStatistics(getTimesList()).getBestTime(1));
+  }
+
+  @SmallTest
+  public void testDeviation() {
+    Assert.assertEquals(0, new TimesStatistics(getTimesList(10, 10, 10)).getDeviation(3));
+    Assert.assertEquals(100, new TimesStatistics(getTimesList(100, 200, 300)).getDeviation(3));
+    Assert.assertEquals(200, new TimesStatistics(getTimesList(100, 300, 500)).getDeviation(3));
+    Assert.assertEquals(264, new TimesStatistics(getTimesList(100, 200, 600)).getDeviation(3));
+    Assert.assertEquals(264, new TimesStatistics(getTimesList(100, 200, 600)).getDeviation(3));
+    Assert.assertEquals(397, new TimesStatistics(getTimesList(245, 790, 530, 1024, 42)).getDeviation(5));
+    Assert.assertEquals(-2, new TimesStatistics(getTimesList(245, 790, 530, 1024, 42)).getDeviation(6));
+    Assert.assertEquals(335, new TimesStatistics(getTimesList(245, 790, 530, 1024, 42)).getDeviation(4));
+    Assert.assertEquals(397, new TimesStatistics(getTimesList(245, 790, -1, 530, 1024, 42)).getDeviation(6));
+    Assert.assertEquals(397, new TimesStatistics(getTimesList(245, 790, -1, 530, -1, 1024, 42)).getDeviation(7));
+    Assert.assertEquals(-2, new TimesStatistics(getTimesList(245, 790, -1, 530, -1, 1024, 42)).getDeviation(8));
+    Assert.assertEquals(397, new TimesStatistics(getTimesList(245, -1, 790, -1, 530, 1024, 42)).getDeviation(7));
+    Assert.assertEquals(272, new TimesStatistics(getTimesList(245, -1, 790, -1, 530, 1024, 42)).getDeviation(5));
+    Assert.assertEquals(385, new TimesStatistics(getTimesList(245, -1, 790, -1)).getDeviation(4));
+    Assert.assertEquals(-2, new TimesStatistics(getTimesList(-1, -1, -1)).getDeviation(3));
+    Assert.assertEquals(-2, new TimesStatistics(getTimesList(-1, -1, 790, -1)).getDeviation(4));
+    Assert.assertEquals(-2, new TimesStatistics(getTimesList()).getDeviation(0));
+    Assert.assertEquals(-2, new TimesStatistics(getTimesList(300)).getDeviation(1));
+  }
+
   private List<Long> getTimesList(int... times) {
     List<Long> list = new ArrayList<Long>();
     for (int t : times) {

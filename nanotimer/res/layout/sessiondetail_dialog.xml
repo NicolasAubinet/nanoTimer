@@ -33,6 +33,21 @@
            android:textColor="@color/white"
            android:textSize="16sp"/>
       </TableRow>
+      <TableRow android:layout_marginTop="2dp">
+        <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="@string/session_best"
+           android:textSize="16sp"/>
+        <TextView
+           android:id="@+id/tvBest"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:textColor="@color/white"
+           android:layout_marginStart="3dp"
+           android:layout_marginLeft="3dp"
+           android:textSize="16sp"/>
+      </TableRow>
       <TableRow android:id="@+id/trBestMeanOfThree" android:layout_marginTop="2dp" android:visibility="gone">
         <TextView
            android:layout_width="wrap_content"
@@ -67,6 +82,21 @@
            android:layout_marginStart="3dp"
            android:layout_marginLeft="3dp"
            android:textColor="@color/white"
+           android:textSize="16sp"/>
+      </TableRow>
+      <TableRow android:layout_marginTop="2dp">
+        <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="@string/session_deviation"
+           android:textSize="16sp"/>
+        <TextView
+           android:id="@+id/tvDeviation"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:textColor="@color/white"
+           android:layout_marginStart="3dp"
+           android:layout_marginLeft="3dp"
            android:textSize="16sp"/>
       </TableRow>
       <TableRow android:id="@+id/trAccuracy" android:layout_marginTop="2dp" android:visibility="gone">

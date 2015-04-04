@@ -90,6 +90,8 @@ public class SessionDetailDialog extends DialogFragment {
     }
 
     ((TextView) v.findViewById(R.id.tvSolves)).setText(String.valueOf(sessionDetails.getSessionSolvesCount()));
+    ((TextView) v.findViewById(R.id.tvBest)).setText(FormatterService.INSTANCE.formatSolveTime(session.getBestTime(sessionTimes.size())));
+    ((TextView) v.findViewById(R.id.tvDeviation)).setText(FormatterService.INSTANCE.formatSolveTime(session.getDeviation(sessionTimes.size())));
     sessionTimesLayout = (TableLayout) v.findViewById(R.id.sessionTimesLayout);
 
     int sessionTimesCount = sessionTimes.size();

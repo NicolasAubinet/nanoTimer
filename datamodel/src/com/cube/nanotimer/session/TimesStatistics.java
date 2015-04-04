@@ -217,6 +217,48 @@ public class TimesStatistics {
     }
   }
 
+  public long getBestTime(int n) {
+    long best = -2;
+    for (int i = 0; i < times.size() && i < n; i++) {
+      long time = times.get(i);
+      if ((time > 0 && time < best) || best < 0) {
+        best = time;
+      }
+    }
+    return best;
+  }
+
+  public long getDeviation(int n) {
+    if (times.size() < n) {
+      return -2;
+    }
+    int validTimesCount = 0;
+    long mean = 0;
+    // calculate mean manually because we don't want a DNF mean if there is a DNF time (DNF's are just ignored)
+    for (int i = 0; i < n; i++) {
+      long time = times.get(i);
+      if (time > 0) {
+        mean += time;
+        validTimesCount++;
+      }
+    }
+    if (validTimesCount <= 1) {
+      return -2;
+    }
+    mean /= validTimesCount;
+
+    // calculate deviation
+    long sum = 0;
+    for (int i = 0; i < n; i++) {
+      long time = times.get(i);
+      if (time > 0) {
+        long diff = times.get(i) - mean;
+        sum += diff * diff;
+      }
+    }
+    return (long) Math.sqrt(sum / (validTimesCount - 1));
+  }
+
   public List<Long> getSuccesses() {
     List<Long> successes = new ArrayList<Long>();
     for (Long t : getTimes()) {
