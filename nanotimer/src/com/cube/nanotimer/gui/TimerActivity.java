@@ -528,7 +528,6 @@ public class TimerActivity extends ActionBarActivity {
     timerStarted();
     resetTimerText();
     timerState = TimerState.INSPECTING;
-    layout.setBackgroundResource(R.color.lightgraybg);
     setTitle(R.string.inspection);
     clearAvgRecordStyle();
     timer = new Timer();
@@ -549,7 +548,6 @@ public class TimerActivity extends ActionBarActivity {
       timer.cancel();
       timer.purge();
     }
-    layout.setBackgroundResource(R.color.graybg);
     setDefaultBannerText();
     timerState = TimerState.STOPPED;
     enableScreenRotationChanges(true);
@@ -872,7 +870,17 @@ public class TimerActivity extends ActionBarActivity {
   private OnTouchListener layoutTouchListener = new OnTouchListener() {
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
+      // change bg color
+      if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+        if (System.currentTimeMillis() - lastTimerStopTs >= STOP_START_DELAY) {
+          layout.setBackgroundResource(R.color.gray850);
+        }
+      } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+        layout.setBackgroundResource(R.color.graybg);
+      }
+      // handle timer start/stop
       if (timerState == TimerState.RUNNING && motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+        layout.setBackgroundResource(R.color.graybg); // force here because ACTION_UP isn't received when solve ends
         if (solveType.hasSteps()) {
           nextSolveStep();
           if (stepsTimes.size() == solveType.getSteps().length) {
