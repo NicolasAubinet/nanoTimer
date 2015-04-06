@@ -79,6 +79,7 @@ public class TimerActivity extends ActionBarActivity {
 
   private long lastTimerStartTs;
   private long lastTimerStopTs;
+  private boolean ignoreActionUp;
   private final long START_STOP_DELAY = 150; // to avoid stopping timer too quickly after a start
   private final long STOP_START_DELAY = 500; // to avoid starting timer too quickly after a stop
 
@@ -874,13 +875,18 @@ public class TimerActivity extends ActionBarActivity {
       if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
         if (System.currentTimeMillis() - lastTimerStopTs >= STOP_START_DELAY) {
           layout.setBackgroundResource(R.color.gray850);
+        } else {
+          return false; // to avoid receiving the ACTION_UP
         }
       } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
         layout.setBackgroundResource(R.color.graybg);
+        if (ignoreActionUp) {
+          ignoreActionUp = false;
+          return true;
+        }
       }
       // handle timer start/stop
       if (timerState == TimerState.RUNNING && motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-        layout.setBackgroundResource(R.color.graybg); // force here because ACTION_UP isn't received when solve ends
         if (solveType.hasSteps()) {
           nextSolveStep();
           if (stepsTimes.size() == solveType.getSteps().length) {
@@ -889,7 +895,7 @@ public class TimerActivity extends ActionBarActivity {
         } else {
           stopTimer(true);
         }
-        return false;
+        ignoreActionUp = true; // to avoid starting timer again when releasing
       } else if (solveType.isBlind() && motionEvent.getAction() == MotionEvent.ACTION_UP) {
         // no inspection for blind solve types
         startTimer();

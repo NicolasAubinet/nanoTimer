@@ -821,6 +821,37 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertPBsInIndices(11, 12); // -1 150 250 350 400 450 500 550 600 650 700 45(b) 25(b)
   }
 
+  /*@SmallTest
+  public void testPBPerfs() {
+    provider.deleteHistory();
+    int size = 100;
+    int[] times = new int[size];
+    int[] newTimes = new int[size];
+    Log.i("NanoTimer", "Saving times...");
+    for (int i = 0; i < times.length; i++) {
+      times[i] = new Random().nextInt(1000) + 1;
+      saveTime(times[i]);
+      newTimes[i] = new Random().nextInt(1000) + 1;
+    }
+    Log.i("NanoTimer", "Times saved! Now updating...");
+
+    List<SolveTime> history = getWholeHistory();
+    int i = 0;
+    long ms = System.currentTimeMillis();
+    for (SolveTime st : history) {
+      st.setTime(newTimes[i]);
+      provider.saveTime(st);
+      i++;
+    }
+    Log.i("NanoTimer", "Time to update: " + (System.currentTimeMillis() - ms));
+
+    ms = System.currentTimeMillis();
+    for (SolveTime st : history) {
+      provider.deleteTime(st);
+    }
+    Log.i("NanoTimer", "Time to delete: " + (System.currentTimeMillis() - ms));
+  }*/
+
   private void assertPBsInIndices(int... pbIndices) {
     List<SolveTime> solveTimes = getWholeHistory();
     Collections.reverse(solveTimes);
