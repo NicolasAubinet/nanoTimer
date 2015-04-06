@@ -18,6 +18,10 @@
   <style name="NanoTimerActionBar" parent="@style/Widget.AppCompat.ActionBar">
     <item name="android:background">@drawable/actionbar_bg</item>
     <item name="background">@drawable/actionbar_bg</item>
+    <!--<item name="icon">@drawable/actionbar_icon</item>-->
+    <!--<item name="android:icon">@drawable/actionbar_icon</item>-->
+    <!--<item name="android:displayOptions">showHome|showTitle</item>-->
+    <!--<item name="displayOptions">showHome|showTitle</item>-->
   </style>
 
   <style name="NanoTimerActionButtonOverflow" parent="@style/Widget.AppCompat.ActionButton.Overflow">
