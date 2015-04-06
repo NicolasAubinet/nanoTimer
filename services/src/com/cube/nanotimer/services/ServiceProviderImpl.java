@@ -463,11 +463,11 @@ public class ServiceProviderImpl implements ServiceProvider {
 
   @Override
   public SolveHistory getPagedHistory(SolveType solveType) {
-    return getPagedHistory(solveType, System.currentTimeMillis());
+    return getPagedHistory(solveType, null);
   }
 
   @Override
-  public SolveHistory getPagedHistory(SolveType solveType, long from) {
+  public SolveHistory getPagedHistory(SolveType solveType, Long from) {
     SolveHistory solveHistory = new SolveHistory();
     solveHistory.setSolveTimes(getHistoryTimes(solveType, from, true, HISTORY_PAGE_SIZE));
     solveHistory.setSolvesCount(getHistorySolvesCount(solveType));
@@ -475,14 +475,14 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   @Override
-  public SolveHistory getHistory(SolveType solveType, long from) {
+  public SolveHistory getHistory(SolveType solveType, Long from) {
     SolveHistory solveHistory = new SolveHistory();
     solveHistory.setSolveTimes(getHistoryTimes(solveType, from, false, null));
     solveHistory.setSolvesCount(getHistorySolvesCount(solveType));
     return solveHistory;
   }
 
-  public List<SolveTime> getHistoryTimes(SolveType solveType, long from, boolean searchInPast, Integer pageSize) {
+  public List<SolveTime> getHistoryTimes(SolveType solveType, Long from, boolean searchInPast, Integer pageSize) {
     List<SolveTime> history = new ArrayList<SolveTime>();
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_ID);
@@ -493,16 +493,19 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("     , ").append(DB.COL_TIMEHISTORY_PB);
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
-    if (searchInPast) {
-      q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
-    } else {
-      q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" >= ?");
+    if (from != null) {
+      if (searchInPast) {
+        q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
+      } else {
+        q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" >= ?");
+      }
     }
     q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC");
     if (pageSize != null) {
       q.append(" LIMIT ").append(HISTORY_PAGE_SIZE);
     }
-    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId(), from));
+    String[] params = (from == null) ? getStringArray(solveType.getId()) : getStringArray(solveType.getId(), from);
+    Cursor cursor = db.rawQuery(q.toString(), params);
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         SolveTime st = new SolveTime();
