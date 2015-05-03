@@ -5,9 +5,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
@@ -17,6 +19,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.util.FormatterService;
+
+import java.io.File;
 
 public class GUIUtils {
 
@@ -160,6 +164,17 @@ public class GUIUtils {
   public static void hideNotification(Context c, int id) {
     NotificationManager notifManager = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
     notifManager.cancel(id);
+  }
+
+  public static Typeface createFont(Context c, String font) {
+    Typeface typeface;
+    try {
+      typeface = Typeface.createFromAsset(c.getAssets(), "fonts" + File.separator + font);
+    } catch (RuntimeException e) {
+      Log.e("NanoTimer", "Unable to create font: " + font, e);
+      typeface = Typeface.defaultFromStyle(Typeface.NORMAL);
+    }
+    return typeface;
   }
 
 }

@@ -213,6 +213,10 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
+    <u><b>v1.1.5</b></u>
+    <ul>
+      <li>Improved Android 5.0 UI</li>
+    </ul>
     <u><b>v1.1.4</b></u>
     <ul>
       <li>Added icon next to best times in history</li>

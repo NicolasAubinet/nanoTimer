@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.widget.TextView;
+import com.cube.nanotimer.util.helper.GUIUtils;
 
 public class DigitalTextView extends TextView {
 
@@ -24,7 +25,7 @@ public class DigitalTextView extends TextView {
 
   public void setFont() {
     if (!isInEditMode()) {
-      Typeface font = Typeface.createFromAsset(getContext().getAssets(), "fonts/Digital_dream_Fat_Skew_Narrow.ttf");
+      Typeface font = GUIUtils.createFont(getContext(), "Digital_dream_Fat_Skew_Narrow.ttf");
       setTypeface(font);
     }
   }
