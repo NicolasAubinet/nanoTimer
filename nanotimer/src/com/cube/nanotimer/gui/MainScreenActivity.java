@@ -23,10 +23,7 @@ import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
-import com.cube.nanotimer.vo.CubeType;
-import com.cube.nanotimer.vo.SolveHistory;
-import com.cube.nanotimer.vo.SolveTime;
-import com.cube.nanotimer.vo.SolveType;
+import com.cube.nanotimer.vo.*;
 import com.startapp.android.publish.banner.Banner;
 
 import java.util.*;
@@ -37,12 +34,14 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   private Button buSolveType;
   private ListView lvHistory;
   private TextView tvSolvesCount;
+  private TextView tvHistory;
 
   private CubeType curCubeType;
   private SolveType curSolveType;
   private List<CubeType> cubeTypes;
   private List<SolveType> solveTypes;
   private int solvesCount;
+  private TimesSort timesSort = TimesSort.TIMESTAMP;
 
   private List<SolveTime> liHistory = new ArrayList<SolveTime>();
   private HistoryListAdapter adapter;
@@ -99,14 +98,15 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
             types.add(t.getName());
           }
           DialogUtils.showFragment(MainScreenActivity.this,
-              SolveTypesFragmentDialog.newInstance(ID_SOLVETYPE, types, true, MainScreenActivity.this,
-                  Options.INSTANCE.isSolveTypesShortcutEnabled()));
+                  SolveTypesFragmentDialog.newInstance(ID_SOLVETYPE, types, true, MainScreenActivity.this,
+                          Options.INSTANCE.isSolveTypesShortcutEnabled()));
         }
       }
     });
     buSolveType.setShadowLayer(1, 3f, 3f, getResources().getColor(R.color.black));
 
     tvSolvesCount = (TextView) findViewById(R.id.tvSolvesCount);
+    tvHistory = (TextView) findViewById(R.id.tvHistory);
 
     initHistoryList();
 
@@ -132,7 +132,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
       @Override
       public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         DialogUtils.showFragment(MainScreenActivity.this,
-            HistoryDetailDialog.newInstance(liHistory.get(i), curCubeType, MainScreenActivity.this));
+                HistoryDetailDialog.newInstance(liHistory.get(i), curCubeType, MainScreenActivity.this));
       }
     });
     lvHistory.setOnScrollListener(new OnScrollListener() {
@@ -146,8 +146,13 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
           int lastVisibleItem = firstVisibleItem + visibleItemCount;
           if (totalItemCount == lastVisibleItem && lastVisibleItem != previousLastItem) {
             previousLastItem = lastVisibleItem;
-            long from = liHistory.get(liHistory.size() - 1).getTimestamp();
-            App.INSTANCE.getService().getPagedHistory(curSolveType, from, new DataCallback<SolveHistory>() {
+            long from;
+            if (timesSort == TimesSort.TIME) {
+              from = liHistory.get(liHistory.size() - 1).getTime();
+            } else {
+              from = liHistory.get(liHistory.size() - 1).getTimestamp();
+            }
+            App.INSTANCE.getService().getPagedHistory(curSolveType, from, timesSort, new DataCallback<SolveHistory>() {
               @Override
               public void onData(final SolveHistory data) {
                 runOnUiThread(new Runnable() {
@@ -233,6 +238,19 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
         break;
       case R.id.itOptions:
         startActivity(new Intent(this, OptionsActivity.class));
+        break;
+      case R.id.itSortMode:
+        if (timesSort == TimesSort.TIMESTAMP) {
+          item.setTitle(R.string.show_history);
+          tvHistory.setText(R.string.best_times);
+          timesSort = TimesSort.TIME;
+          refreshHistory();
+        } else if (timesSort == TimesSort.TIME) {
+          item.setTitle(R.string.show_best_times);
+          tvHistory.setText(R.string.history);
+          timesSort = TimesSort.TIMESTAMP;
+          refreshHistory();
+        }
         break;
       case R.id.itGraphs:
         if (Utils.checkProFeature(this)) {
@@ -327,7 +345,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   private void refreshHistory() {
     previousLastItem = 0;
     if (curSolveType != null) {
-      App.INSTANCE.getService().getPagedHistory(curSolveType, new DataCallback<SolveHistory>() {
+      App.INSTANCE.getService().getPagedHistory(curSolveType, timesSort, new DataCallback<SolveHistory>() {
         @Override
         public void onData(final SolveHistory data) {
           runOnUiThread(new Runnable() {

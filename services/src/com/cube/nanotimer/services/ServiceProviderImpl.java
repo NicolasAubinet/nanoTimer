@@ -462,14 +462,14 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   @Override
-  public SolveHistory getPagedHistory(SolveType solveType) {
-    return getPagedHistory(solveType, null);
+  public SolveHistory getPagedHistory(SolveType solveType, TimesSort timesSort) {
+    return getPagedHistory(solveType, null, timesSort);
   }
 
   @Override
-  public SolveHistory getPagedHistory(SolveType solveType, Long from) {
+  public SolveHistory getPagedHistory(SolveType solveType, Long from, TimesSort timesSort) {
     SolveHistory solveHistory = new SolveHistory();
-    solveHistory.setSolveTimes(getHistoryTimes(solveType, from, true, HISTORY_PAGE_SIZE));
+    solveHistory.setSolveTimes(getHistoryTimes(solveType, from, true, HISTORY_PAGE_SIZE, timesSort));
     solveHistory.setSolvesCount(getHistorySolvesCount(solveType));
     return solveHistory;
   }
@@ -477,12 +477,12 @@ public class ServiceProviderImpl implements ServiceProvider {
   @Override
   public SolveHistory getHistory(SolveType solveType, Long from) {
     SolveHistory solveHistory = new SolveHistory();
-    solveHistory.setSolveTimes(getHistoryTimes(solveType, from, false, null));
+    solveHistory.setSolveTimes(getHistoryTimes(solveType, from, false, null, TimesSort.TIMESTAMP));
     solveHistory.setSolvesCount(getHistorySolvesCount(solveType));
     return solveHistory;
   }
 
-  public List<SolveTime> getHistoryTimes(SolveType solveType, Long from, boolean searchInPast, Integer pageSize) {
+  public List<SolveTime> getHistoryTimes(SolveType solveType, Long from, boolean searchInPast, Integer pageSize, TimesSort timesSort) {
     List<SolveTime> history = new ArrayList<SolveTime>();
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_ID);
@@ -493,14 +493,26 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("     , ").append(DB.COL_TIMEHISTORY_PB);
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
-    if (from != null) {
-      if (searchInPast) {
-        q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
-      } else {
-        q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" >= ?");
-      }
+
+    String sortColumn = DB.COL_TIMEHISTORY_TIMESTAMP;
+    if (timesSort == TimesSort.TIME) {
+      sortColumn = DB.COL_TIMEHISTORY_TIME;
     }
-    q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC");
+    if (from != null) {
+      String fromSymbol = " < ";
+      if (timesSort == TimesSort.TIMESTAMP && !searchInPast) {
+        fromSymbol = " >= ";
+      } else if (timesSort == TimesSort.TIME && searchInPast) {
+        fromSymbol = " > ";
+      }
+      q.append("   AND ").append(sortColumn).append(" ").append(fromSymbol).append(" ?");
+    }
+    String sortOrder = " DESC";
+    if (timesSort == TimesSort.TIME) {
+      sortOrder = " ASC";
+      q.append("   AND ").append(DB.COL_TIMEHISTORY_TIME).append(" > 0");
+    }
+    q.append(" ORDER BY ").append(sortColumn).append(sortOrder);
     if (pageSize != null) {
       q.append(" LIMIT ").append(HISTORY_PAGE_SIZE);
     }

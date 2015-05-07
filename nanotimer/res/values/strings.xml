@@ -204,6 +204,10 @@
   <string name="year">Year</string>
   <string name="all">All</string>
 
+  <string name="show_best_times">Show best times</string>
+  <string name="show_history">Show history</string>
+  <string name="best_times">Best times</string>
+
   <string name="pro_version_features">
     - Times export to csv\n
     - Progression graph\n
@@ -215,6 +219,7 @@
     <font color=\"white\">
     <u><b>v1.1.5</b></u>
     <ul>
+      <li>Show best times (accessible from history screen menu)</li>
       <li>Improved Android 5.0 UI</li>
     </ul>
     <u><b>v1.1.4</b></u>

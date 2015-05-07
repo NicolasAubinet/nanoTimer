@@ -10,8 +10,8 @@ public interface ServiceProvider {
   SolveAverages saveTime(SolveTime solveTime);
   SolveAverages getSolveAverages(SolveType solveType);
   SolveAverages deleteTime(SolveTime solveTime);
-  SolveHistory getPagedHistory(SolveType solveType);
-  SolveHistory getPagedHistory(SolveType solveType, Long from);
+  SolveHistory getPagedHistory(SolveType solveType, TimesSort timesSort);
+  SolveHistory getPagedHistory(SolveType solveType, Long from, TimesSort timesSort);
   SolveHistory getHistory(SolveType solveType, Long from);
   void deleteHistory();
   void deleteHistory(SolveType solveType);

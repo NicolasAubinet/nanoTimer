@@ -4,12 +4,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.view.ContextMenu;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
@@ -21,18 +16,11 @@ import com.cube.nanotimer.gui.widget.AddStepsDialog;
 import com.cube.nanotimer.gui.widget.SelectionHandler;
 import com.cube.nanotimer.gui.widget.SelectorFragmentDialog;
 import com.cube.nanotimer.gui.widget.StepsCreator;
-import com.cube.nanotimer.gui.widget.list.FieldCreator;
-import com.cube.nanotimer.gui.widget.list.FieldDialog;
-import com.cube.nanotimer.gui.widget.list.FieldEditDialog;
-import com.cube.nanotimer.gui.widget.list.FieldRenamer;
-import com.cube.nanotimer.gui.widget.list.SolveTypeAddDialog;
+import com.cube.nanotimer.gui.widget.list.*;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.util.helper.DialogUtils;
-import com.cube.nanotimer.vo.CubeType;
-import com.cube.nanotimer.vo.SolveHistory;
-import com.cube.nanotimer.vo.SolveType;
-import com.cube.nanotimer.vo.SolveTypeStep;
+import com.cube.nanotimer.vo.*;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 import com.mobeta.android.dslv.DragSortListView.DropListener;
@@ -158,7 +146,7 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
       if (liSolveTypes.get(position).isBlind()) {
         DialogUtils.showInfoMessage(SolveTypesActivity.this, R.string.steps_can_not_be_added_to_blind_types);
       } else {
-        App.INSTANCE.getService().getPagedHistory(liSolveTypes.get(position), new DataCallback<SolveHistory>() {
+        App.INSTANCE.getService().getPagedHistory(liSolveTypes.get(position), TimesSort.TIMESTAMP, new DataCallback<SolveHistory>() {
           @Override
           public void onData(final SolveHistory data) {
             runOnUiThread(new Runnable() {
