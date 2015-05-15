@@ -35,6 +35,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   private ListView lvHistory;
   private TextView tvSolvesCount;
   private TextView tvHistory;
+  private MenuItem miSortMode;
 
   private CubeType curCubeType;
   private SolveType curSolveType;
@@ -179,6 +180,8 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
     AdProvider.resume();
     refreshCubeTypes();
 
+    setSortMode(TimesSort.TIMESTAMP);
+
     mixedAdBannerChance = new Random().nextInt(10) < 2; // 20% chance to not show banner in mixed mode
     showHideBannerAd();
   }
@@ -215,6 +218,8 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.mainscreen_menu, menu);
+    miSortMode = menu.findItem(R.id.itSortMode);
+    setSortMode(TimesSort.TIMESTAMP);
     return true;
   }
 
@@ -241,15 +246,9 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
         break;
       case R.id.itSortMode:
         if (timesSort == TimesSort.TIMESTAMP) {
-          item.setTitle(R.string.show_history);
-          tvHistory.setText(R.string.best_times);
-          timesSort = TimesSort.TIME;
-          refreshHistory();
+          setSortMode(TimesSort.TIME);
         } else if (timesSort == TimesSort.TIME) {
-          item.setTitle(R.string.show_best_times);
-          tvHistory.setText(R.string.history);
-          timesSort = TimesSort.TIMESTAMP;
-          refreshHistory();
+          setSortMode(TimesSort.TIMESTAMP);
         }
         break;
       case R.id.itGraphs:
@@ -273,6 +272,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
     String cubeTypeText = buCubeType.getText().toString();
     String solveTypeText = buSolveType.getText().toString();
     String solvesCountText = tvSolvesCount.getText().toString();
+    String historyText = tvHistory.getText().toString();
 
     setContentView(R.layout.mainscreen_screen);
     initViews();
@@ -280,6 +280,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
     buCubeType.setText(cubeTypeText);
     buSolveType.setText(solveTypeText);
     tvSolvesCount.setText(solvesCountText);
+    tvHistory.setText(historyText);
     showHideBannerAd();
   }
 
@@ -387,6 +388,23 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
         }
       }
     });
+  }
+
+  private void setSortMode(TimesSort timesSort) {
+    if (miSortMode == null) {
+      return;
+    }
+    if (timesSort == TimesSort.TIMESTAMP) {
+      tvHistory.setText(R.string.history);
+      miSortMode.setTitle(R.string.show_best_times);
+    } else {
+      tvHistory.setText(R.string.best_times);
+      miSortMode.setTitle(R.string.show_history);
+    }
+    if (this.timesSort != timesSort) {
+      this.timesSort = timesSort;
+      refreshHistory();
+    }
   }
 
   @Override
