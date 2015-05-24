@@ -602,24 +602,33 @@ public class ServiceProviderImpl implements ServiceProvider {
    */
   @Override
   public List<Long> getSessionTimes(SolveType solveType) {
-    return getSessionTimes(solveType, SESSION_TIMES_COUNT);
+    return getSessionTimes(solveType, null, null, SESSION_TIMES_COUNT);
   }
 
-  public List<Long> getSessionTimes(SolveType solveType, Integer limit) {
+  public List<Long> getSessionTimes(SolveType solveType, Long from, Long to, Integer limit) {
+    if (from == null) {
+      from = getSessionStart(solveType);
+    }
     List<Long> sessionTimes = new ArrayList<Long>();
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_TIMEHISTORY_TIME);
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
-    q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" >= ");
-    q.append("     (SELECT ").append(DB.COL_SOLVETYPE_SESSION_START);
-    q.append("      FROM ").append(DB.TABLE_SOLVETYPE);
-    q.append("      WHERE ").append(DB.COL_ID).append(" = ?)");
+    q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" >= ?");
+    if (to != null) {
+      q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
+    }
     q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC");
     if (limit != null) {
       q.append(" LIMIT ").append(limit);
     }
-    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId(), solveType.getId()));
+    String[] params;
+    if (to != null) {
+      params = getStringArray(solveType.getId(), from, to);
+    } else {
+      params = getStringArray(solveType.getId(), from);
+    }
+    Cursor cursor = db.rawQuery(q.toString(), params);
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         sessionTimes.add(cursor.getLong(0));
@@ -632,17 +641,18 @@ public class ServiceProviderImpl implements ServiceProvider {
   @Override
   public void startNewSession(SolveType solveType, long startTs) {
     ContentValues values = new ContentValues();
-    values.put(DB.COL_SOLVETYPE_SESSION_START, startTs);
-    db.update(DB.TABLE_SOLVETYPE, values, DB.COL_ID + " = ?", getStringArray(solveType.getId()));
+    values.put(DB.COL_SESSION_START, startTs);
+    values.put(DB.COL_SESSION_SOLVETYPE_ID, solveType.getId());
+    db.insert(DB.TABLE_SESSION, null, values);
   }
 
   @Override
   public long getSessionStart(SolveType solveType) {
     long sessionStart = 0;
     StringBuilder q = new StringBuilder();
-    q.append("SELECT ").append(DB.COL_SOLVETYPE_SESSION_START);
-    q.append(" FROM ").append(DB.TABLE_SOLVETYPE);
-    q.append(" WHERE ").append(DB.COL_ID).append(" = ?");
+    q.append("SELECT MAX(").append(DB.COL_SESSION_START).append(")");
+    q.append(" FROM ").append(DB.TABLE_SESSION);
+    q.append(" WHERE ").append(DB.COL_SESSION_SOLVETYPE_ID).append(" = ?");
     Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId()));
     if (cursor != null) {
       if (cursor.moveToFirst()) {
@@ -783,16 +793,38 @@ public class ServiceProviderImpl implements ServiceProvider {
    * The list of times will only be set if a new session was created for this solve type.
    * It will be null if no session was ever created for this solve type.
    * @param solveType the solve type
+   * @param from from when to get the session details (inclusive)
+   * @param to to when to get the session details (exclusive)
    * @return the session details
    */
   @Override
-  public SessionDetails getSessionDetails(SolveType solveType) {
+  public SessionDetails getSessionDetails(SolveType solveType, Long from, Long to) {
     SessionDetails sessionDetails = new SessionDetails();
     sessionDetails.setTotalSolvesCount(getHistorySolvesCount(solveType));
-    if (getSessionStart(solveType) > 0) { // if a new session was created
-      sessionDetails.setSessionTimes(getSessionTimes(solveType, null));
+    long sessionStart = getSessionStart(solveType);
+    sessionDetails.setSessionStart(sessionStart);
+    if (sessionStart > 0) { // if a new session was created
+      sessionDetails.setSessionTimes(getSessionTimes(solveType, from, to, null));
     }
     return sessionDetails;
+  }
+
+  @Override
+  public List<Long> getSessionStarts(SolveType solveType) {
+    List<Long> sessionStarts = new ArrayList<Long>();
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT ").append(DB.COL_SESSION_START);
+    q.append(" FROM ").append(DB.TABLE_SESSION);
+    q.append(" WHERE ").append(DB.COL_SESSION_SOLVETYPE_ID).append(" = ?");
+    q.append(" ORDER BY ").append(DB.COL_SESSION_START).append(" DESC");
+    Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId()));
+    if (cursor != null) {
+      for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+        sessionStarts.add(cursor.getLong(0));
+      }
+      cursor.close();
+    }
+    return sessionStarts;
   }
 
   /**

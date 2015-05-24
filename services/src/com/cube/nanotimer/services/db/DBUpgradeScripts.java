@@ -3,6 +3,7 @@ package com.cube.nanotimer.services.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import com.cube.nanotimer.session.TimesStatistics;
 import com.cube.nanotimer.vo.SolveTime;
 
@@ -156,6 +157,27 @@ public class DBUpgradeScripts {
         }
         timesCount++;
       }
+    }
+  }
+
+  public static void updateSessionStarts(SQLiteDatabase db) {
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT ").append(DB.COL_ID).append(", sessionstart");
+    q.append(" FROM ").append(DB.TABLE_SOLVETYPE);
+    q.append(" WHERE sessionstart IS NOT NULL");
+    q.append("   AND sessionstart > 0");
+    Cursor cursor = db.rawQuery(q.toString(), new String[] { });
+    if (cursor != null) {
+      for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+        int solveTypeId = cursor.getInt(0);
+        long sessionStart = cursor.getLong(1);
+        Log.i("[NanoTimer]", "Insert start " + sessionStart + " for solve type id " + solveTypeId);
+        ContentValues values = new ContentValues();
+        values.put(DB.COL_SESSION_START, sessionStart);
+        values.put(DB.COL_SESSION_SOLVETYPE_ID, solveTypeId);
+        db.insert(DB.TABLE_SESSION, null, values);
+      }
+      cursor.close();
     }
   }
 

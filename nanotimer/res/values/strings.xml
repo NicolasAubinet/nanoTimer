@@ -73,6 +73,7 @@
   <string name="session_best_mean_of_three">Best Mo3:</string>
   <string name="session_success_average">Succ. avg:</string>
   <string name="session_accuracy">Accuracy:</string>
+  <string name="session_start">Start:</string>
 
   <string name="clear_history">Clear history</string>
   <string name="clear_history_solve_type_confirmation">Are you sure you want to delete all the times for this solve type?</string>
@@ -211,6 +212,7 @@
   <string name="pro_version_features">
     - Times export to csv\n
     - Progression graph\n
+    - Previous sessions details visualization\n
     - No ads
   </string>
 
@@ -220,6 +222,8 @@
     <u><b>v1.1.5</b></u>
     <ul>
       <li>Show best times (accessible from history screen menu)</li>
+      <li>Show session start in session details</li>
+      <li>Pro: Allow to see previous sessions details (not retro-active)</li>
       <li>Improved Android 5.0 UI</li>
     </ul>
     <u><b>v1.1.4</b></u>

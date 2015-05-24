@@ -43,6 +43,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   private List<SolveType> solveTypes;
   private int solvesCount;
   private TimesSort timesSort = TimesSort.TIMESTAMP;
+  private boolean refreshingHistory;
 
   private List<SolveTime> liHistory = new ArrayList<SolveTime>();
   private HistoryListAdapter adapter;
@@ -143,7 +144,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
 
       @Override
       public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        if (view.getId() == R.id.lvHistory && !liHistory.isEmpty()) {
+        if (view.getId() == R.id.lvHistory && !liHistory.isEmpty() && !refreshingHistory) {
           int lastVisibleItem = firstVisibleItem + visibleItemCount;
           if (totalItemCount == lastVisibleItem && lastVisibleItem != previousLastItem) {
             previousLastItem = lastVisibleItem;
@@ -346,6 +347,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   private void refreshHistory() {
     previousLastItem = 0;
     if (curSolveType != null) {
+      refreshingHistory = true;
       App.INSTANCE.getService().getPagedHistory(curSolveType, timesSort, new DataCallback<SolveHistory>() {
         @Override
         public void onData(final SolveHistory data) {
@@ -357,6 +359,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
               liHistory.addAll(data.getSolveTimes());
               adapter.notifyDataSetChanged();
               lvHistory.setSelection(0);
+              refreshingHistory = false;
             }
           });
         }

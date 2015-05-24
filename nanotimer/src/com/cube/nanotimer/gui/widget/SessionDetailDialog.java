@@ -5,12 +5,13 @@ import android.app.Dialog;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.*;
 import android.widget.LinearLayout.LayoutParams;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.services.db.DataCallback;
@@ -21,6 +22,7 @@ import com.cube.nanotimer.util.helper.ScreenUtils;
 import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SessionDetailDialog extends DialogFragment {
@@ -32,12 +34,15 @@ public class SessionDetailDialog extends DialogFragment {
   private static final String ARG_SOLVETYPE = "solvetype";
 
   private LayoutInflater inflater;
+  private TextView tvSessionStart;
+  private Spinner spSessionsList;
+  private ArrayAdapter<String> spinnerAdapter;
   private TableLayout sessionTimesLayout;
+  private List<Long> sessionStarts;
   private List<Long> sessionTimes;
   private SolveType solveType;
   private int bestInd;
   private int worstInd;
-  private int curPageInd = 0;
 
   public static SessionDetailDialog newInstance(SolveType solveType) {
     SessionDetailDialog sessionDetailDialog = new SessionDetailDialog();
@@ -49,7 +54,8 @@ public class SessionDetailDialog extends DialogFragment {
 
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
-    final View v = getActivity().getLayoutInflater().inflate(R.layout.sessiondetail_dialog, null);
+    inflater = getActivity().getLayoutInflater();
+    final View v = inflater.inflate(R.layout.sessiondetail_dialog, null);
     solveType = (SolveType) getArguments().getSerializable(ARG_SOLVETYPE);
     App.INSTANCE.getService().getSessionDetails(solveType, new DataCallback<SessionDetails>() {
       @Override
@@ -62,8 +68,13 @@ public class SessionDetailDialog extends DialogFragment {
         });
       }
     });
+    View titleView = getTitleView();
+    if (App.INSTANCE.isProEnabled()) {
+      initSessionsList(v);
+    }
 
     final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(v).create();
+    dialog.setCustomTitle(titleView);
     dialog.setCanceledOnTouchOutside(true);
     return dialog;
   }
@@ -73,7 +84,10 @@ public class SessionDetailDialog extends DialogFragment {
     TimesStatistics session = new TimesStatistics(sessionTimes);
     bestInd = session.getBestTimeInd(solveType.isBlind());
     worstInd = session.getWorstTimeInd(solveType.isBlind());
-    inflater = getActivity().getLayoutInflater();
+
+    if (!App.INSTANCE.isProEnabled()) { // pro uses a spinner, not a textview
+      tvSessionStart.setText(FormatterService.INSTANCE.formatDateTimeWithoutSeconds(sessionDetails.getSessionStart()));
+    }
 
     if (solveType.isBlind()) {
       v.findViewById(R.id.bestAveragesLayout).setVisibility(View.GONE);
@@ -93,6 +107,7 @@ public class SessionDetailDialog extends DialogFragment {
     ((TextView) v.findViewById(R.id.tvBest)).setText(FormatterService.INSTANCE.formatSolveTime(session.getBestTime(sessionTimes.size())));
     ((TextView) v.findViewById(R.id.tvDeviation)).setText(FormatterService.INSTANCE.formatSolveTime(session.getDeviation(sessionTimes.size())));
     sessionTimesLayout = (TableLayout) v.findViewById(R.id.sessionTimesLayout);
+    sessionTimesLayout.removeAllViews();
 
     int sessionTimesCount = sessionTimes.size();
     if (sessionTimesCount == 0) {
@@ -152,6 +167,7 @@ public class SessionDetailDialog extends DialogFragment {
       return;
     }
     TableLayout bestAveragesTableLayout = (TableLayout) v.findViewById(R.id.bestAveragesTableLayout);
+    bestAveragesTableLayout.removeAllViews();
     TableRow trHeaders = new TableRow(getActivity());
     TableRow trAverages = new TableRow(getActivity());
     if (avg5 > 0) {
@@ -203,13 +219,10 @@ public class SessionDetailDialog extends DialogFragment {
         tr.addView(tv);
       }
     }
-    adjustTableLayoutParams(sessionTimesLayout, SESSION_TIMES_HEIGHT_DP);
-    curPageInd++;
   }
 
   private void adjustTableLayoutParams(TableLayout tableLayout, int tvHeightDp) {
-    int startInd = curPageInd * PAGE_LINES_COUNT;
-    for (int i = startInd; i < tableLayout.getChildCount(); i++) {
+    for (int i = 0; i < tableLayout.getChildCount(); i++) {
       if (tableLayout.getChildAt(i) instanceof TableRow) {
         TableRow tr = (TableRow) tableLayout.getChildAt(i);
         for (int j = 0; j < tr.getChildCount(); j++) {
@@ -227,6 +240,93 @@ public class SessionDetailDialog extends DialogFragment {
     TextView tv = (TextView) inflater.inflate(R.layout.timecell_textview, null);
     tv.setTextSize(15);
     return tv;
+  }
+
+  private void initSessionsList(final View v) {
+    App.INSTANCE.getService().getSessionStarts(solveType, new DataCallback<List<Long>>() {
+      @Override
+      public void onData(List<Long> data) {
+        sessionStarts = data;
+        getActivity().runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            List<String> sessionStartsTexts = new ArrayList<String>();
+            for (long sessionStart : sessionStarts) {
+              sessionStartsTexts.add(FormatterService.INSTANCE.formatDateTimeWithoutSeconds(sessionStart));
+            }
+            spinnerAdapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, sessionStartsTexts);
+            spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+            spSessionsList.setAdapter(spinnerAdapter);
+          }
+        });
+      }
+    });
+
+    spSessionsList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+      @Override
+      public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        long from = sessionStarts.get(i);
+        long to = (i-1 >= 0) ? sessionStarts.get(i-1) : System.currentTimeMillis();
+        App.INSTANCE.getService().getSessionDetails(solveType, from, to, new DataCallback<SessionDetails>() { // TODO find a way to avoid calling this twice (onece from onCreateDialog, once from here)
+          @Override
+          public void onData(final SessionDetails data) {
+            getActivity().runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                displaySessionDetails(v, data);
+              }
+            });
+          }
+        });
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> adapterView) {
+      }
+    });
+  }
+
+  private View getTitleView() {
+    int fontSize = 20;
+    LinearLayout view = new LinearLayout(getActivity());
+    view.setOrientation(LinearLayout.VERTICAL);
+
+    RelativeLayout titleLayout = new RelativeLayout(getActivity());
+    titleLayout.setPadding(20, 20, 20, 20);
+    titleLayout.setGravity(Gravity.CENTER_VERTICAL);
+    titleLayout.setBackgroundColor(getResources().getColor(R.color.graybg));
+
+    TextView tvStart = new TextView(getActivity());
+    tvStart.setPadding(10, 0, 0, 0);
+    tvStart.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
+    tvStart.setText(R.string.session_start);
+    RelativeLayout.LayoutParams tvStartParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    tvStartParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+
+    View sessionView;
+    if (App.INSTANCE.isProEnabled()) {
+      spSessionsList = new Spinner(getActivity());
+      sessionView = spSessionsList;
+    } else {
+      tvSessionStart = new TextView(getActivity());
+      tvSessionStart.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
+      sessionView = tvSessionStart;
+    }
+    sessionView.setPadding(0, 0, 5, 0);
+    RelativeLayout.LayoutParams sessionViewParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    sessionViewParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+
+    titleLayout.addView(tvStart, tvStartParams);
+    titleLayout.addView(sessionView, sessionViewParams);
+
+    LinearLayout separator = new LinearLayout(getActivity());
+    separator.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 3));
+    separator.setBackgroundColor(getResources().getColor(R.color.iceblue));
+
+    view.addView(titleLayout);
+    view.addView(separator);
+
+    return view;
   }
 
 }

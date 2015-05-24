@@ -22,6 +22,8 @@ public interface Service {
   void saveSolveTypesOrder(List<SolveType> solveTypes, DataCallback<Void> callback);
   void getSolveTimeAverages(SolveTime solveTime, DataCallback<SolveTimeAverages> callback);
   void getSessionDetails(SolveType solveType, DataCallback<SessionDetails> callback);
+  void getSessionDetails(SolveType solveType, long from, long to, DataCallback<SessionDetails> callback);
+  void getSessionStarts(SolveType solveType, DataCallback<List<Long>> callback);
   void getSolvesCount(SolveType solveType, DataCallback<Integer> callback);
   void getExportFile(List<Integer> solveTypeIds, int limit, DataCallback<List<ExportResult>> callback);
   void getSolveTime(int solveTimeId, DataCallback<SolveTime> callback);

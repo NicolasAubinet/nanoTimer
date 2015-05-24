@@ -26,7 +26,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
   @Override
   public void onCreate(SQLiteDatabase db) {
-    this.db = db;
+    DBHelper.db = db;
     createTables(db);
     insertDefaultValues();
   }
@@ -41,7 +41,6 @@ public class DBHelper extends SQLiteOpenHelper {
     db.execSQL("CREATE TABLE " + DB.TABLE_SOLVETYPE + "(" +
         DB.COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
         DB.COL_SOLVETYPE_NAME + " TEXT NOT NULL, " +
-        DB.COL_SOLVETYPE_SESSION_START + " INTEGER DEFAULT 0, " +
         DB.COL_SOLVETYPE_POSITION + " INTEGER DEFAULT 0, " +
         DB.COL_SOLVETYPE_BLIND + " INTEGER DEFAULT 0, " +
         DB.COL_SOLVETYPE_CUBETYPE_ID + " INTEGER, " +
@@ -80,6 +79,14 @@ public class DBHelper extends SQLiteOpenHelper {
         DB.COL_TIMEHISTORYSTEP_TIMEHISTORY_ID + " INTEGER, " +
         "FOREIGN KEY (" + DB.COL_TIMEHISTORYSTEP_SOLVETYPESTEP_ID + ") REFERENCES " + DB.TABLE_SOLVETYPESTEP + " (" + DB.COL_ID + "), " +
         "FOREIGN KEY (" + DB.COL_TIMEHISTORYSTEP_TIMEHISTORY_ID + ") REFERENCES " + DB.TABLE_TIMEHISTORY + " (" + DB.COL_ID + ") " +
+      ");"
+    );
+
+    db.execSQL("CREATE TABLE " + DB.TABLE_SESSION + "(" +
+        DB.COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+        DB.COL_SESSION_START + " INTEGER NOT NULL, " +
+        DB.COL_SESSION_SOLVETYPE_ID + " INTEGER, " +
+        "FOREIGN KEY (" + DB.COL_SESSION_SOLVETYPE_ID + ") REFERENCES " + DB.TABLE_SOLVETYPE + " (" + DB.COL_ID + ") " +
       ");"
     );
   }
@@ -123,6 +130,20 @@ public class DBHelper extends SQLiteOpenHelper {
 
       // Update personal flag for existing times
       DBUpgradeScripts.updatePersonalBestFlag(db);
+    }
+
+    if (oldVersion < 12) {
+      // Create new Session table
+      db.execSQL("CREATE TABLE " + DB.TABLE_SESSION + "(" +
+          DB.COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+          DB.COL_SESSION_START + " INTEGER NOT NULL, " +
+          DB.COL_SESSION_SOLVETYPE_ID + " INTEGER, " +
+          "FOREIGN KEY (" + DB.COL_SESSION_SOLVETYPE_ID + ") REFERENCES " + DB.TABLE_SOLVETYPE + " (" + DB.COL_ID + ") " +
+        ");"
+      );
+
+      // Move solvetype.sessionstart field to the new session table
+      DBUpgradeScripts.updateSessionStarts(db);
     }
 
     progressDialog.hide();

@@ -256,7 +256,27 @@ public class ServiceImpl extends DBHelper implements Service {
     run(new Runnable() {
       @Override
       public void run() {
-        callback.onData(provider.getSessionDetails(solveType));
+        callback.onData(provider.getSessionDetails(solveType, null, null));
+      }
+    });
+  }
+
+  @Override
+  public void getSessionDetails(final SolveType solveType, final long from, final long to, final DataCallback<SessionDetails> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        callback.onData(provider.getSessionDetails(solveType, from, to));
+      }
+    });
+  }
+
+  @Override
+  public void getSessionStarts(final SolveType solveType, final DataCallback<List<Long>> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        callback.onData(provider.getSessionStarts(solveType));
       }
     });
   }

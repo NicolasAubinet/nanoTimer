@@ -6,6 +6,7 @@ public class SessionDetails {
 
   private int totalSolvesCount;
   private List<Long> sessionTimes;
+  private long sessionStart;
 
   public SessionDetails() {
   }
@@ -28,6 +29,14 @@ public class SessionDetails {
 
   public int getSessionSolvesCount() {
     return (sessionTimes == null) ? 0 : sessionTimes.size();
+  }
+
+  public long getSessionStart() {
+    return sessionStart;
+  }
+
+  public void setSessionStart(long sessionStart) {
+    this.sessionStart = sessionStart;
   }
 
 }

@@ -20,7 +20,8 @@ public interface ServiceProvider {
   long getSessionStart(SolveType solveType);
   void saveSolveTypesOrder(List<SolveType> solveTypes);
   SolveTimeAverages getSolveTimeAverages(SolveTime solveTime);
-  SessionDetails getSessionDetails(SolveType solveType);
+  SessionDetails getSessionDetails(SolveType solveType, Long from, Long to);
+  List<Long> getSessionStarts(SolveType solveType);
   int getSolvesCount(SolveType solveType);
   List<ExportResult> getExportResults(List<Integer> solveTypeIds, int limit);
   SolveTime getSolveTime(int solveTimeId);
