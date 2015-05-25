@@ -39,6 +39,7 @@ public class SessionDetailDialog extends DialogFragment {
   private ArrayAdapter<String> spinnerAdapter;
   private TableLayout sessionTimesLayout;
   private List<Long> sessionStarts;
+  private boolean sessionStartsInitialized;
   private List<Long> sessionTimes;
   private SolveType solveType;
   private int bestInd;
@@ -265,9 +266,13 @@ public class SessionDetailDialog extends DialogFragment {
     spSessionsList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        if (!sessionStartsInitialized) { // used to avoid calling the service twice when dialog is opened
+          sessionStartsInitialized = true;
+          return;
+        }
         long from = sessionStarts.get(i);
         long to = (i-1 >= 0) ? sessionStarts.get(i-1) : System.currentTimeMillis();
-        App.INSTANCE.getService().getSessionDetails(solveType, from, to, new DataCallback<SessionDetails>() { // TODO find a way to avoid calling this twice (onece from onCreateDialog, once from here)
+        App.INSTANCE.getService().getSessionDetails(solveType, from, to, new DataCallback<SessionDetails>() {
           @Override
           public void onData(final SessionDetails data) {
             getActivity().runOnUiThread(new Runnable() {
