@@ -829,6 +829,14 @@ public class ServiceProviderTest extends AndroidTestCase {
     long[] times = new long[] {
             100, 300, 200, 600, 1200, 50, 30, 400, 500, 250
     };
+    Long[] invertedTimes = new Long[times.length];
+    for (int i = 0; i < times.length; i++) {
+      invertedTimes[i] = times[i];
+    }
+    List<Long> invertedList = Arrays.asList(invertedTimes);
+    Collections.reverse(invertedList);
+    invertedTimes = invertedList.toArray(new Long[0]);
+
     long[] sortedTimes = new long[times.length];
     System.arraycopy(times, 0, sortedTimes, 0, sortedTimes.length);
     Arrays.sort(sortedTimes);
@@ -842,7 +850,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertEquals(solveHistory.getSolvesCount(), times.length);
     List<SolveTime> solveTimes = solveHistory.getSolveTimes();
     for (int i = 0; i < solveHistory.getSolvesCount(); i++) {
-      assertEquals(solveTimes.get(i).getTime(), times[i]);
+      assertEquals(solveTimes.get(i).getTime(), (long) invertedTimes[i]);
     }
 
     solveHistory = getPagedHistory(solveType1, TimesSort.TIME);
@@ -852,24 +860,24 @@ public class ServiceProviderTest extends AndroidTestCase {
       assertEquals(solveTimes.get(i).getTime(), sortedTimes[i]);
     }
 
-    long bestTime = 10;
+    long bestTime = 10000;
     saveTime(bestTime);
 
     solveHistory = getPagedHistory(solveType1, TimesSort.TIMESTAMP);
     assertEquals(solveHistory.getSolvesCount(), times.length + 1);
     solveTimes = solveHistory.getSolveTimes();
-    for (int i = 0; i < solveHistory.getSolvesCount(); i++) {
-      assertEquals(solveTimes.get(i).getTime(), times[i]);
+    for (int i = 1; i < solveHistory.getSolvesCount(); i++) {
+      assertEquals(solveTimes.get(i).getTime(), (long) invertedTimes[i-1]);
     }
-    assertEquals(solveTimes.get(solveHistory.getSolvesCount()).getTime(), bestTime);
+    assertEquals(solveTimes.get(0).getTime(), bestTime);
 
     solveHistory = getPagedHistory(solveType1, TimesSort.TIME);
     assertEquals(solveHistory.getSolvesCount(), times.length + 1);
     solveTimes = solveHistory.getSolveTimes();
-    assertEquals(solveTimes.get(0).getTime(), bestTime);
-    for (int i = 1; i < solveHistory.getSolvesCount(); i++) {
-      assertEquals(solveTimes.get(i).getTime(), sortedTimes[i-1]);
+    for (int i = 0; i < times.length; i++) {
+      assertEquals(solveTimes.get(i).getTime(), sortedTimes[i]);
     }
+    assertEquals(solveTimes.get(times.length).getTime(), bestTime);
   }
 
   /*@SmallTest

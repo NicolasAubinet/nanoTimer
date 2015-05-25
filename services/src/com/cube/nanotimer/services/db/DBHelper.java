@@ -1,6 +1,5 @@
 package com.cube.nanotimer.services.db;
 
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -97,11 +96,11 @@ public class DBHelper extends SQLiteOpenHelper {
       DBHelper.db = db;
     }
 
-    ProgressDialog progressDialog = new ProgressDialog(context);
+    /*ProgressDialog progressDialog = new ProgressDialog(context);
     progressDialog.setMessage(getString(R.string.updating_database));
     progressDialog.setIndeterminate(true);
     progressDialog.setCancelable(false);
-    progressDialog.show();
+    progressDialog.show();*/
 
     if (oldVersion < 9) {
       // Add Square-1 and Clock
@@ -146,7 +145,7 @@ public class DBHelper extends SQLiteOpenHelper {
       DBUpgradeScripts.updateSessionStarts(db);
     }
 
-    progressDialog.hide();
+//    progressDialog.hide();
   }
 
   private void insertDefaultValues() {
