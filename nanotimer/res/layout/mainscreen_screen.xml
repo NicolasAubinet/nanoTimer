@@ -12,6 +12,16 @@
      android:layout_height="wrap_content"
      android:gravity="center"/>
 
+  <TextView
+     android:id="@+id/tvUpdateProApp"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:text="@string/upgrade_pro_app"
+     android:textSize="26px"
+     android:textColor="@color/warning"
+     android:visibility="gone"
+     android:gravity="center"/>
+
   <RelativeLayout
      android:layout_width="match_parent"
      android:layout_height="wrap_content"

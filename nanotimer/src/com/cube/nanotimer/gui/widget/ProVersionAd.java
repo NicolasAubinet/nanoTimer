@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.AppLaunchStats;
+import com.cube.nanotimer.ProChecker;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.util.helper.Utils;
 
@@ -25,7 +26,7 @@ public class ProVersionAd {
   public static final String NEXT_SHOW_DATE_KEY = "next_show_date";
 
   public static void appLaunched(Context context) {
-    if (App.INSTANCE.isProEnabled()) {
+    if (ProChecker.getProState(context) != ProChecker.ProState.UNINSTALLED) {
       return;
     }
     long currentTime = System.currentTimeMillis();

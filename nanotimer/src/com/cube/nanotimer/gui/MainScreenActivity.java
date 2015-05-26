@@ -15,6 +15,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.Options.AdsStyle;
+import com.cube.nanotimer.ProChecker;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.*;
 import com.cube.nanotimer.gui.widget.ads.AdProvider;
@@ -178,7 +179,17 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
     super.onResume();
     App.INSTANCE.setContext(this);
     App.INSTANCE.onResume();
-    AdProvider.resume();
+
+    ProChecker.ProState proState = ProChecker.getProState(this);
+    if (proState != ProChecker.ProState.ENABLED) {
+      if (proState == ProChecker.ProState.INVALID_VERSION) {
+        findViewById(R.id.tvUpdateProApp).setVisibility(View.VISIBLE);
+      } else {
+        findViewById(R.id.tvUpdateProApp).setVisibility(View.GONE);
+      }
+      AdProvider.resume();
+    }
+
     refreshCubeTypes();
 
     setSortMode(TimesSort.TIMESTAMP);

@@ -1,7 +1,6 @@
 package com.cube.nanotimer;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import com.cube.nanotimer.Options.ScrambleNotificationMode;
 import com.cube.nanotimer.gui.MainScreenActivity;
 import com.cube.nanotimer.gui.widget.AppRater;
@@ -91,8 +90,7 @@ public enum App {
   }
 
   public boolean isProEnabled() {
-    int sigMatch = context.getPackageManager().checkSignatures(context.getPackageName(), PRO_PACKAGE_NAME);
-    return (sigMatch == PackageManager.SIGNATURE_MATCH);
+    return ProChecker.getProState(context) == ProChecker.ProState.ENABLED;
   }
 
   public void onResume() {
