@@ -297,7 +297,7 @@ public class SessionDetailDialog extends DialogFragment {
     view.setOrientation(LinearLayout.VERTICAL);
 
     RelativeLayout titleLayout = new RelativeLayout(getActivity());
-    titleLayout.setPadding(20, 20, 20, 20);
+    titleLayout.setPadding(10, 10, 10, 10);
     titleLayout.setGravity(Gravity.CENTER_VERTICAL);
     titleLayout.setBackgroundColor(getResources().getColor(R.color.graybg));
 

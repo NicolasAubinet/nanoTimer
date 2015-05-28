@@ -6,4 +6,5 @@
    android:textSize="18sp"
    android:gravity="start"
    android:padding="10dp"
-   android:ellipsize="marquee"/>
+   android:ellipsize="marquee"
+   android:background="@color/graybg"/>
