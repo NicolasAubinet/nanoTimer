@@ -181,7 +181,9 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
     App.INSTANCE.onResume();
 
     ProChecker.ProState proState = ProChecker.getProState(this);
-    if (proState != ProChecker.ProState.ENABLED) {
+    if (proState == ProChecker.ProState.ENABLED) {
+      findViewById(R.id.tvUpdateProApp).setVisibility(View.GONE);
+    } else {
       if (proState == ProChecker.ProState.INVALID_VERSION) {
         findViewById(R.id.tvUpdateProApp).setVisibility(View.VISIBLE);
       } else {

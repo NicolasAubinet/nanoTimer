@@ -210,12 +210,7 @@
   <string name="show_history">Show history</string>
   <string name="best_times">Best times</string>
 
-  <string name="pro_version_features">
-    - Times export to csv\n
-    - Progression graph\n
-    - Previous sessions details visualization\n
-    - No ads
-  </string>
+  <string name="pro_version_features">- Times export to csv\n- Progression graph\n- Previous sessions details visualization\n- No ads</string>
 
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
