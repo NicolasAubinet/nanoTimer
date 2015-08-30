@@ -22,6 +22,7 @@
     <orderEntry type="module" module-name="services" />
     <orderEntry type="module" module-name="drag-sort-listview" />
     <orderEntry type="module" module-name="guilib" />
+    <orderEntry type="module" module-name="wheel" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>

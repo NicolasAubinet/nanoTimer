@@ -97,7 +97,11 @@ public class HistoryDetailDialog extends DialogFragment {
       imgPb.setVisibility(View.GONE);
     }
 
-    tvScramble.setText(ScrambleFormatterService.INSTANCE.formatToColoredScramble(solveTime.getScramble(), cubeType));
+    if (solveTime.getScramble() != null) {
+      tvScramble.setText(ScrambleFormatterService.INSTANCE.formatToColoredScramble(solveTime.getScramble(), cubeType));
+    } else {
+      tvScramble.setText(R.string.no_scramble);
+    }
     tvTime.setText(FormatterService.INSTANCE.formatSolveTime(solveTime.getTime()));
 
     final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(v).create();

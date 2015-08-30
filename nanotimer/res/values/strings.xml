@@ -3,7 +3,7 @@
   <string name="app_name">Nano Timer</string>
   <string name="app_name_copyright">&#169; 2014 Nano Timer</string>
   <string name="app_description">Rubik\'s Cube timer for Android</string>
-  <string name="app_license">This app uses drag-sort-listview and MPAndroidChart libraries licensed under Apache 2.0.</string>
+  <string name="app_license">This app uses drag-sort-listview, MPAndroidChart and android-wheel libraries licensed under Apache 2.0.</string>
   <string name="feedback_message">If you encounter a bug or have any suggestions or comments, don\'t hesitate to send an email to the address below.</string>
   <string name="dev_name">Nicolas Aubinet</string>
   <string name="email">NanoTimerCube@gmail.com</string>
@@ -60,6 +60,7 @@
   <string name="steps">Steps</string>
   <string name="stepsC">Steps:</string>
   <string name="NA">N/A</string>
+  <string name="no_scramble">No scramble\n(time was inserted manually)</string>
 
   <string name="session_avg">Average:</string>
   <string name="session_mean">Mean:</string>
