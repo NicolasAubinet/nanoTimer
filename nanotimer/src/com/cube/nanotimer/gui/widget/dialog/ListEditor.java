@@ -1,4 +1,4 @@
-package com.cube.nanotimer.gui.widget.list;
+package com.cube.nanotimer.gui.widget.dialog;
 
 import com.cube.nanotimer.gui.widget.SelectionHandler;
 

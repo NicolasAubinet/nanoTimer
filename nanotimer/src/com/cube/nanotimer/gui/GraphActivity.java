@@ -140,6 +140,7 @@ public class GraphActivity extends ActionBarActivity {
         return FormatterService.INSTANCE.formatGraphTimeYLabel(Math.round((double) value));
       }
     });
+    chart.setNoDataText("");
   }
 
   private void getData() {
@@ -158,6 +159,7 @@ public class GraphActivity extends ActionBarActivity {
   }
 
   private void refreshData() {
+    chart.setNoDataText(getString(R.string.no_data_found)); // done here to avoid displaying that message when data is loading
     List<ChartTime> data = getChartTimes(cbSmooth.isChecked());
     chart.clear();
     if (data.isEmpty()) {

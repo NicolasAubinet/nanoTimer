@@ -255,7 +255,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
           }
         });
         break;
-      case R.id.itOptions:
+      case R.id.itSettings:
         startActivity(new Intent(this, OptionsActivity.class));
         break;
       case R.id.itSortMode:
@@ -271,6 +271,11 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
           i.putExtra("cubeType", curCubeType);
           i.putExtra("solveType", curSolveType);
           startActivity(i);
+        }
+        break;
+      case R.id.itAddNewTime:
+        if (Utils.checkProFeature(this)) {
+
         }
         break;
       case R.id.itAbout:

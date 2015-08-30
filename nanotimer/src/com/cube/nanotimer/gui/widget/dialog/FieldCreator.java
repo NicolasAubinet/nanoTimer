@@ -1,4 +1,4 @@
-package com.cube.nanotimer.gui.widget.list;
+package com.cube.nanotimer.gui.widget.dialog;
 
 import java.util.Properties;
 

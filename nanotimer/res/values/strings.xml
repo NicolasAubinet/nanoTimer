@@ -205,10 +205,13 @@
   <string name="month">Month</string>
   <string name="year">Year</string>
   <string name="all">All</string>
+  <string name="no_data_found">No data found</string>
 
   <string name="show_best_times">Show best times</string>
   <string name="show_history">Show history</string>
   <string name="best_times">Best times</string>
+
+  <string name="add_new_time">Add new time</string>
 
   <string name="pro_version_features">- Times export to csv\n- Progression graph\n- Previous sessions details visualization\n- No ads</string>
 

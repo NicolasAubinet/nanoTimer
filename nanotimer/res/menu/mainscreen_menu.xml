@@ -2,7 +2,7 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <item android:id="@+id/itOptions"
+  <item android:id="@+id/itSettings"
      android:title="@string/settings"/>
 
   <item android:id="@+id/itSortMode"
@@ -10,6 +10,9 @@
 
   <item android:id="@+id/itGraphs"
      android:title="@string/progression_graph"/>
+
+  <item android:id="@+id/itAddNewTime"
+     android:title="@string/add_new_time"/>
 
   <item android:id="@+id/itClearHistory"
      android:title="@string/clear_history"/>

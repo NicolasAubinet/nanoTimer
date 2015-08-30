@@ -1,4 +1,4 @@
-package com.cube.nanotimer.gui.widget.list;
+package com.cube.nanotimer.gui.widget.dialog;
 
 import android.app.Dialog;
 import android.os.Bundle;
