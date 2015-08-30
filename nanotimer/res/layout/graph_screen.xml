@@ -45,6 +45,15 @@
        android:id="@+id/spPeriod"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
+       android:layout_toLeftOf="@+id/spGraphType"
+       android:layout_marginLeft="3dp"
+       android:layout_marginRight="6dp"
+       android:layout_centerVertical="true"/>
+
+    <Spinner
+       android:id="@+id/spGraphType"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
        android:layout_alignParentRight="true"
        android:layout_centerVertical="true"/>
 

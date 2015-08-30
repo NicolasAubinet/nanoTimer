@@ -199,7 +199,7 @@
   <string name="only_one_step_solve_type_is_allowed_steps">Can not export multiple solve types if one of them has steps.\nThe following type(s) have steps: %1$s</string>
   <string name="exporting_history">Exporting history…</string>
 
-  <string name="progression_graph">Progression graph</string>
+  <string name="graphs">Graphs</string>
   <string name="progression">Progression</string>
   <string name="smooth">Smooth</string>
   <string name="day">Day</string>
@@ -208,6 +208,8 @@
   <string name="year">Year</string>
   <string name="all">All</string>
   <string name="no_data_found">No data found</string>
+  <string name="chart_type_progression">Progression</string>
+  <string name="chart_type_frequency">Frequency</string>
 
   <string name="show_best_times">Show best times</string>
   <string name="show_history">Show history</string>
@@ -216,7 +218,7 @@
   <string name="add_new_time">Add new time</string>
   <string name="select_time_to_add">Select time to add:</string>
 
-  <string name="pro_version_features">- Times export\n- Progression graph\n- Manual times creation\n- Previous sessions details visualization\n- No ads</string>
+  <string name="pro_version_features">- Times export\n- Graphs (progression, frequency)\n- Manual times creation\n- Previous sessions details visualization\n- No ads</string>
 
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
@@ -224,6 +226,7 @@
     <u><b>v1.1.6</b></u>
     <ul>
       <li>Pro: Add times manually</li>
+      <li>Pro: New frequency graph</li>
     </ul>
     <u><b>v1.1.5</b></u>
     <ul>

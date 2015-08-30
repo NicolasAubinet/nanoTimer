@@ -27,6 +27,7 @@ public interface Service {
   void getSolvesCount(SolveType solveType, DataCallback<Integer> callback);
   void getExportFile(List<Integer> solveTypeIds, int limit, DataCallback<List<ExportResult>> callback);
   void getSolveTime(int solveTimeId, DataCallback<SolveTime> callback);
+  void getFrequencyData(SolveType solveType, long from, DataCallback<List<FrequencyData>> callback);
 
   void addSolveType(SolveType solveType, DataCallback<Integer> callback);
   void addSolveTypeSteps(SolveType solveType, DataCallback<Void> callback);

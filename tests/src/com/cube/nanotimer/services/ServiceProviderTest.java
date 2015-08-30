@@ -14,7 +14,7 @@ public class ServiceProviderTest extends AndroidTestCase {
   private ServiceProviderImpl provider;
   private ServiceImpl service;
 
-  private static final String SCRAMBLE = "F B L R U D";
+  private static final String SCRAMBLE = "F B R L U D";
   private CubeType cubeType1;
   private SolveType solveType1;
   private SolveType solveType2;
@@ -880,6 +880,34 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertEquals(solveTimes.get(times.length).getTime(), bestTime);
   }
 
+  @SmallTest
+  public void testFrequencyData() {
+    provider.deleteHistory();
+    saveTime(50, 1440057600000L); // 20/08 10:00
+    saveTime(60, 1440059400000L); // 20/08 10:30
+    saveTime(60, 1440075600000L); // 20/08 15:00
+    saveTime(30, 1440248400000L); // 22/08 15:00
+    saveTime(20, 1440252000000L); // 22/08 16:00
+    saveTime(60, 1440576000000L); // 26/08 10:00
+    saveTime(50, 1440928800000L); // 30/08 12:00
+    saveTime(40, 1440932400000L); // 30/08 13:00
+    saveTime(10, 1440936000000L); // 30/08 14:00
+    saveTime(20, 1440939600000L); // 30/08 15:00
+
+    List<FrequencyData> frequencyData = provider.getFrequencyData(solveType1, 1439625600000L); // 15/08 10:00
+    assertFrequencyDataEquals(frequencyData.get(0), 1439589600000L, 0); // 15/08
+    assertFrequencyDataEquals(frequencyData.get(1), 1439676000000L, 0); // 16/08
+    assertFrequencyDataEquals(frequencyData.get(4), 1439935200000L, 0); // 19/08
+    assertFrequencyDataEquals(frequencyData.get(5), 1440021600000L, 3); // 20/08
+    assertFrequencyDataEquals(frequencyData.get(6), 1440108000000L, 0); // 21/08
+    assertFrequencyDataEquals(frequencyData.get(7), 1440194400000L, 2); // 22/08
+    assertFrequencyDataEquals(frequencyData.get(8), 1440280800000L, 0); // 23/08
+    assertFrequencyDataEquals(frequencyData.get(11), 1440540000000L, 1); // 26/08
+    assertFrequencyDataEquals(frequencyData.get(12), 1440626400000L, 0); // 27/08
+    assertFrequencyDataEquals(frequencyData.get(14), 1440799200000L, 0); // 29/08
+    assertFrequencyDataEquals(frequencyData.get(15), 1440885600000L, 4); // 30/08
+  }
+
   /*@SmallTest
   public void testPBPerfs() {
     provider.deleteHistory();
@@ -951,6 +979,15 @@ public class ServiceProviderTest extends AndroidTestCase {
     return provider.saveTime(st);
   }
 
+  private SolveAverages saveTime(long time, long timestamp) {
+    SolveTime st = new SolveTime();
+    st.setScramble(SCRAMBLE);
+    st.setTimestamp(timestamp);
+    st.setSolveType(solveType1);
+    st.setTime(time);
+    return provider.saveTime(st);
+  }
+
   private SolveAverages saveStepTimes(long... times) {
     SolveTime st = new SolveTime();
     st.setScramble(SCRAMBLE);
@@ -1012,6 +1049,11 @@ public class ServiceProviderTest extends AndroidTestCase {
     Long lbest100 = (best100 == null) ? null : Long.valueOf(best100);
     Long lbestLifetime = (bestLifetime == null) ? null : Long.valueOf(bestLifetime);
     Assert.assertEquals(new SolveAverages(lavg5, lavg12, lavg50, lavg100, lavgLifetime, lbest5, lbest12, lbest50, lbest100, lbestLifetime), averages);
+  }
+
+  private void assertFrequencyDataEquals(FrequencyData frequencyData, long day, int solvesCount) {
+    assertEquals(day, frequencyData.getDay());
+    assertEquals(solvesCount, frequencyData.getSolvesCount());
   }
 
   private void assertSolveTimeAveragesEquals(Integer avg5, Integer avg12, Integer avg50, Integer avg100, SolveTimeAverages sta) {

@@ -941,6 +941,42 @@ public class ServiceProviderImpl implements ServiceProvider {
     return st;
   }
 
+  public List<FrequencyData> getFrequencyData(SolveType solveType, Long from) {
+    List<FrequencyData> frequencyData = new ArrayList<FrequencyData>();
+    List<SolveTime> solveTimes = getHistory(solveType, from).getSolveTimes();
+    if (solveTimes.isEmpty()) {
+      return frequencyData;
+    }
+    long dayDuration = 24 * 60 * 60 * 1000;
+    long dayStart = getDayStart((from == null || from == 0) ? solveTimes.get(solveTimes.size() - 1).getTimestamp() : from);
+    long nextDayStart = dayStart + dayDuration;
+    long currentTime = System.currentTimeMillis();
+    while (dayStart < currentTime) {
+      int solvesCount = 0;
+      for (SolveTime solveTime : solveTimes) {
+        long ts = solveTime.getTimestamp();
+        if (ts >= dayStart && ts < nextDayStart) {
+          solvesCount++;
+        }
+      }
+      frequencyData.add(new FrequencyData(solvesCount, dayStart));
+
+      dayStart = nextDayStart;
+      nextDayStart = dayStart + dayDuration;
+    }
+    return frequencyData;
+  }
+
+  private long getDayStart(long ts) {
+    Calendar cal = Calendar.getInstance(TimeZone.getDefault());
+    cal.setTimeInMillis(ts);
+    cal.set(Calendar.HOUR_OF_DAY, 0);
+    cal.set(Calendar.MINUTE, 0);
+    cal.set(Calendar.SECOND, 0);
+    cal.set(Calendar.MILLISECOND, 0);
+    return cal.getTimeInMillis();
+  }
+
   private void recalculateAverages(long timestamp, SolveType solveType) { // TODO see if can improve (very slow, makes updating 100 times take from 1.2s (when method disabled) to 36s!) (see ServiceProviderTest.testDBPerfs())
     List<CachedTime> timesBefore = getTimesAroundTs(timestamp, solveType, true);
     List<CachedTime> timesAfter = getTimesAroundTs(timestamp, solveType, false);

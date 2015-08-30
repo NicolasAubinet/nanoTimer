@@ -9,7 +9,7 @@
      android:title="@string/show_best_times"/>
 
   <item android:id="@+id/itGraphs"
-     android:title="@string/progression_graph"/>
+     android:title="@string/graphs"/>
 
   <item android:id="@+id/itAddNewTime"
      android:title="@string/add_new_time"/>

@@ -36,7 +36,8 @@
        android:configChanges="orientation|screenSize|keyboard|keyboardHidden"/>
     <activity android:name=".gui.OptionsActivity"/>
     <activity android:name=".gui.GraphActivity"
-       android:theme="@style/NanoTimerThemeNoActionBar"/>
+       android:theme="@style/NanoTimerThemeNoActionBar"
+       android:screenOrientation="landscape"/>
     <activity
        android:name=".gui.SolveTypesActivity"
        android:configChanges="orientation|screenSize|keyboard|keyboardHidden">

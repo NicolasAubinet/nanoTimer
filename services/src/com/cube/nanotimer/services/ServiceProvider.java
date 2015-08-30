@@ -25,6 +25,7 @@ public interface ServiceProvider {
   int getSolvesCount(SolveType solveType);
   List<ExportResult> getExportResults(List<Integer> solveTypeIds, int limit);
   SolveTime getSolveTime(int solveTimeId);
+  List<FrequencyData> getFrequencyData(SolveType solveType, Long from);
 
   int addSolveType(SolveType solveType);
   void addSolveTypeSteps(SolveType solveType);

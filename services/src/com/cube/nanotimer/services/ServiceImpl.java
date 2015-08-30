@@ -311,6 +311,16 @@ public class ServiceImpl extends DBHelper implements Service {
     });
   }
 
+  @Override
+  public void getFrequencyData(final SolveType solveType, final long from, final DataCallback<List<FrequencyData>> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        callback.onData(provider.getFrequencyData(solveType, from));
+      }
+    });
+  }
+
   private void run(Runnable runnable) {
     new Thread(runnable).start();
   }
