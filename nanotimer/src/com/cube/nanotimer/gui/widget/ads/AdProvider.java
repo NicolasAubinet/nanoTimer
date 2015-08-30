@@ -99,14 +99,18 @@ public class AdProvider {
     if (!isAdsEnabled()) {
       return;
     }
-  	startAppAd.onResume();
+    if (startAppAd != null) {
+      startAppAd.onResume();
+    }
   }
   
   public static void pause() {
     if (!isAdsEnabled()) {
       return;
     }
-  	startAppAd.onPause();
+    if (startAppAd != null) {
+      startAppAd.onPause();
+    }
   }
 
   public static boolean wasInterstitialShown() {
