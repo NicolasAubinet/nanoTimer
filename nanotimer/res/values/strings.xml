@@ -213,12 +213,17 @@
   <string name="best_times">Best times</string>
 
   <string name="add_new_time">Add new time</string>
+  <string name="select_time_to_add">Select time to add:</string>
 
   <string name="pro_version_features">- Times export to csv\n- Progression graph\n- Previous sessions details visualization\n- No ads</string>
 
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
+    <u><b>v1.1.6</b></u>
+    <ul>
+      <li>Pro: Add times manually</li>
+    </ul>
     <u><b>v1.1.5</b></u>
     <ul>
       <li>Show best times (accessible from history screen menu)</li>
