@@ -16,7 +16,7 @@
        android:layout_width="120dp"
        android:layout_height="120dp"
        android:layout_marginTop="3dp"
-       android:src="@drawable/icon_hires"/>
+       android:src="@drawable/icon_pro_hires"/>
 
     <TextView
        android:id="@+id/tvMainTitle"

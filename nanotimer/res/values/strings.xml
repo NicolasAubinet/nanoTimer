@@ -173,8 +173,9 @@
   <string name="pro_version_welcome_title">Welcome to Pro version</string>
   <string name="pro_version_welcome_message">Thanks for purchasing Nano Timer Pro!\nThe following features have been unlocked:</string>
   <string name="pro_version_promotion_title">Nano Timer Pro</string>
-  <string name="pro_version_promotion_message">Nano Timer Pro is now available on Play Store!\nInstalling it will unlock the following features:</string>
-  <string name="need_pro_version">Download Nano Timer Pro to access this feature.\nInstalling it will unlock:</string>
+  <string name="pro_version_available">Nano Timer Pro is now available on Play Store!</string>
+  <string name="pro_version_install">Installing it will unlock the following features:</string>
+  <string name="need_pro_version">Download Nano Timer Pro to access this feature</string>
   <string name="upgrade_pro_app">Please update Nano Timer Pro to keep accessing Pro features</string>
   <string name="open_page">Open page</string>
 
@@ -215,7 +216,7 @@
   <string name="add_new_time">Add new time</string>
   <string name="select_time_to_add">Select time to add:</string>
 
-  <string name="pro_version_features">- Times export to csv\n- Progression graph\n- Previous sessions details visualization\n- No ads</string>
+  <string name="pro_version_features">- Times export\n- Progression graph\n- Manual times creation\n- Previous sessions details visualization\n- No ads</string>
 
   <string name="release_notes_features_html">
     <![CDATA[<html><body>

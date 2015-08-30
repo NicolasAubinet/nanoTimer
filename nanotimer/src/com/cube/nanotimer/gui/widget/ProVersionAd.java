@@ -71,7 +71,6 @@ public class ProVersionAd {
 
   public static void showProVersionAdDialog(Context context) {
     AlertDialog dialog = new AlertDialog.Builder(context).setView(getProVersionAdView(context)).create();
-    dialog.setTitle(R.string.pro_version_promotion_title);
     dialog.setCanceledOnTouchOutside(true);
     dialog.show();
   }

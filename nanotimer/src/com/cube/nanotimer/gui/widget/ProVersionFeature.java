@@ -20,7 +20,6 @@ public class ProVersionFeature {
     }
 
     AlertDialog dialog = new AlertDialog.Builder(context).setView(v).create();
-    dialog.setTitle(R.string.pro_version_promotion_title);
     dialog.setCanceledOnTouchOutside(true);
     return dialog;
   }

@@ -17,7 +17,22 @@
        android:layout_height="wrap_content"
        android:gravity="center"
        android:textSize="18sp"
-       android:text="@string/pro_version_promotion_message"
+       android:text="@string/pro_version_available"
+       android:textColor="@color/white"/>
+
+    <ImageView
+       android:layout_width="60dp"
+       android:layout_height="60dp"
+       android:layout_marginTop="3dp"
+       android:layout_marginBottom="3dp"
+       android:src="@drawable/icon_pro_hires"/>
+
+    <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:gravity="center"
+       android:textSize="18sp"
+       android:text="@string/pro_version_install"
        android:textColor="@color/white"/>
 
     <TextView
