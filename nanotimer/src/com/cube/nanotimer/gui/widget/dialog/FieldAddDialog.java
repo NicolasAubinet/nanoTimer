@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.widget.EditText;
 import com.cube.nanotimer.R;
 
-public class FieldAddDialog extends FieldDialog {
+public class FieldAddDialog extends ConfirmDialog {
 
   private FieldCreator fieldCreator;
 
@@ -26,7 +26,7 @@ public class FieldAddDialog extends FieldDialog {
 
   @Override
   protected void onConfirm() {
-    EditText tfName = (EditText) editTextView.findViewById(R.id.tfName);
+    EditText tfName = (EditText) view.findViewById(R.id.tfName);
     if (fieldCreator.createField(tfName.getText().toString(), null)) {
       dialog.dismiss();
     }

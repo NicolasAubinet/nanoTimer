@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.widget.EditText;
 import com.cube.nanotimer.R;
 
-public class FieldEditDialog extends FieldDialog {
+public class FieldEditDialog extends ConfirmDialog {
 
   private int pos;
   private EditText tfName;
@@ -34,7 +34,7 @@ public class FieldEditDialog extends FieldDialog {
     pos = getArguments().getInt(ARG_POS);
     String defaultName = getArguments().getString(ARG_DEFAULT_NAME);
 
-    tfName = (EditText) editTextView.findViewById(R.id.tfName);
+    tfName = (EditText) view.findViewById(R.id.tfName);
     tfName.setText(defaultName);
     tfName.setSelection(0, tfName.length());
     return dialog;

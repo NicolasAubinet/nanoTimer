@@ -10,17 +10,17 @@ import android.view.WindowManager;
 import android.widget.Button;
 import com.cube.nanotimer.R;
 
-public abstract class FieldDialog extends DialogFragment {
+public abstract class ConfirmDialog extends DialogFragment {
 
   protected Dialog dialog;
-  protected View editTextView;
+  protected View view;
 
   protected Dialog getDialog(int confirmText) {
-    editTextView = getCustomView();
+    view = getCustomView();
     final AlertDialog d;
 
     d = new AlertDialog.Builder(getActivity())
-        .setView(editTextView)
+        .setView(view)
         .setPositiveButton(confirmText, new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int whichButton) {
           }

@@ -16,7 +16,10 @@ import com.cube.nanotimer.gui.widget.AddStepsDialog;
 import com.cube.nanotimer.gui.widget.SelectionHandler;
 import com.cube.nanotimer.gui.widget.SelectorFragmentDialog;
 import com.cube.nanotimer.gui.widget.StepsCreator;
-import com.cube.nanotimer.gui.widget.dialog.*;
+import com.cube.nanotimer.gui.widget.dialog.FieldCreator;
+import com.cube.nanotimer.gui.widget.dialog.FieldEditDialog;
+import com.cube.nanotimer.gui.widget.dialog.FieldRenamer;
+import com.cube.nanotimer.gui.widget.dialog.SolveTypeAddDialog;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.util.helper.DialogUtils;
@@ -126,7 +129,7 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
   public boolean onContextItemSelected(MenuItem menuItem) {
     final int position = ((AdapterContextMenuInfo) menuItem.getMenuInfo()).position;
     if (menuItem.getItemId() == ACTION_RENAME) {
-      FieldDialog fieldDialog = FieldEditDialog.newInstance(this, position, liSolveTypes.get(position).getName());
+      FieldEditDialog fieldDialog = FieldEditDialog.newInstance(this, position, liSolveTypes.get(position).getName());
       DialogUtils.showFragment(this, fieldDialog);
     } else if (menuItem.getItemId() == ACTION_DELETE) {
       DialogUtils.showYesNoConfirmation(this, getString(R.string.delete_solve_type_confirmation, liSolveTypes.get(position).getName()),

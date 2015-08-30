@@ -15,7 +15,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.gui.widget.dialog.FieldDialog;
 import com.cube.nanotimer.gui.widget.dialog.FieldEditDialog;
 import com.cube.nanotimer.gui.widget.dialog.FieldRenamer;
 import com.cube.nanotimer.util.helper.DialogUtils;
@@ -173,7 +172,7 @@ public class AddStepsDialog extends DialogFragment implements FieldRenamer {
             AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuItem.getMenuInfo();
             switch (menuItem.getItemId()) {
               case ACTION_RENAME:
-                FieldDialog fieldDialog = FieldEditDialog.newInstance(AddStepsDialog.this, info.position, liSteps.get(info.position));
+                FieldEditDialog fieldDialog = FieldEditDialog.newInstance(AddStepsDialog.this, info.position, liSteps.get(info.position));
                 DialogUtils.showFragment(getActivity(), fieldDialog);
                 break;
               case ACTION_DELETE:

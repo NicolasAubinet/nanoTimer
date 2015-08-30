@@ -10,7 +10,7 @@ import com.cube.nanotimer.R;
 
 import java.util.Properties;
 
-public class SolveTypeAddDialog extends FieldDialog {
+public class SolveTypeAddDialog extends ConfirmDialog {
 
   public static final String KEY_BLD = "key_bld";
 
@@ -33,8 +33,8 @@ public class SolveTypeAddDialog extends FieldDialog {
 
   @Override
   protected void onConfirm() {
-    EditText tfName = (EditText) editTextView.findViewById(R.id.tfName);
-    CheckBox cbBlind = (CheckBox) editTextView.findViewById(R.id.cbBlind);
+    EditText tfName = (EditText) view.findViewById(R.id.tfName);
+    CheckBox cbBlind = (CheckBox) view.findViewById(R.id.cbBlind);
 
     Properties props = new Properties();
     props.put(KEY_BLD, String.valueOf(cbBlind.isChecked()));
