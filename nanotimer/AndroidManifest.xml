@@ -16,6 +16,7 @@
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
   <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
   <application
      android:icon="@drawable/icon"
@@ -49,10 +50,10 @@
     <activity android:name=".gui.ExportActivity"
        android:windowSoftInputMode="stateAlwaysHidden"
        android:configChanges="orientation|screenSize|keyboard|keyboardHidden">
-      <intent-filter>
-        <action android:name="com.cube.nanotimer.gui.ExportActivity"/>
-        <category android:name="android.intent.category.DEFAULT"/>
-      </intent-filter>
+    </activity>
+    <activity android:name=".gui.ImportActivity"
+       android:windowSoftInputMode="stateAlwaysHidden"
+       android:configChanges="orientation|screenSize|keyboard|keyboardHidden">
     </activity>
 
     <service android:name=".scrambler.randomstate.ChargingStateService"/>

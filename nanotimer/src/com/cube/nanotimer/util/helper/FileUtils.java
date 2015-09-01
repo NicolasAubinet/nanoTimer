@@ -3,14 +3,7 @@ package com.cube.nanotimer.util.helper;
 import android.content.Context;
 import com.cube.nanotimer.util.export.CSVGenerator;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -21,15 +14,30 @@ public class FileUtils {
     return readLinesFromFile(context, fileName, -1);
   }
 
-  public static List<String> readLinesFromFile(Context context, String fileName, int linesLimit) {
+  public static List<String> readLinesFromFile(Context context, File file, int linesLimit) {
     List<String> lines = new ArrayList<String>();
     try {
-      FileInputStream fis;
-      try {
-        fis = context.openFileInput(fileName);
-      } catch (FileNotFoundException e) {
-        return lines;
-      }
+      FileInputStream fis = new FileInputStream(file);
+      lines = readLinesFromFile(fis, linesLimit);
+    } catch (FileNotFoundException e) {
+    }
+    return lines;
+  }
+
+  public static List<String> readLinesFromFile(Context context, String fileName, int linesLimit) {
+    List<String> lines = new ArrayList<String>();
+    FileInputStream fis;
+    try {
+      fis = context.openFileInput(fileName);
+      lines = readLinesFromFile(fis, linesLimit);
+    } catch (FileNotFoundException e) {
+    }
+    return lines;
+  }
+
+  private static List<String> readLinesFromFile(FileInputStream fis, int linesLimit) {
+    List<String> lines = new ArrayList<String>();
+    try {
       Scanner fileScanner = new Scanner(fis);
       int i = 0;
       while (fileScanner.hasNextLine() && (linesLimit < 0 || i < linesLimit)) {

@@ -158,11 +158,6 @@
      android:key="history"
      android:title="@string/history">
 
-    <Preference
-       android:key="export"
-       android:title="@string/export"
-       android:summary="@string/export_summary"/>
-
     <com.cube.nanotimer.gui.widget.preferences.ClearHistoryDialog
        android:title="@string/clear_history"
        android:summary="@string/clear_all_history"

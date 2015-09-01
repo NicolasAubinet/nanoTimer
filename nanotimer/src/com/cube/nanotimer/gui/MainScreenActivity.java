@@ -283,6 +283,16 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
           startActivity(i);
         }
         break;
+      case R.id.itExport:
+        if (Utils.checkProFeature(this)) {
+          startActivity(new Intent(this, ExportActivity.class));
+        }
+        break;
+      case R.id.itImport:
+        if (Utils.checkProFeature(this)) {
+          startActivity(new Intent(this, ImportActivity.class));
+        }
+        break;
       case R.id.itAddNewTime:
         if (Utils.checkProFeature(this)) {
           AddNewTimeDialog dialog = AddNewTimeDialog.newInstance(this, curSolveType);

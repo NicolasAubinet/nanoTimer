@@ -199,6 +199,8 @@
   <string name="only_one_step_solve_type_is_allowed_steps">Can not export multiple solve types if one of them has steps.\nThe following type(s) have steps: %1$s</string>
   <string name="exporting_history">Exporting history…</string>
 
+  <string name="import_times">Import</string>
+
   <string name="graphs">Graphs</string>
   <string name="progression">Progression</string>
   <string name="smooth">Smooth</string>

@@ -14,6 +14,12 @@
   <item android:id="@+id/itAddNewTime"
      android:title="@string/add_new_time"/>
 
+  <item android:id="@+id/itExport"
+     android:title="@string/export"/>
+
+  <item android:id="@+id/itImport"
+     android:title="@string/import_times"/>
+
   <item android:id="@+id/itClearHistory"
      android:title="@string/clear_history"/>
 
