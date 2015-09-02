@@ -26,7 +26,7 @@
        inkscape:collect="always"
        id="linearGradient4164">
       <stop
-         style="stop-color:#d2d2d2;stop-opacity:1"
+         style="stop-color:#bebebe;stop-opacity:1"
          offset="0"
          id="stop4166" />
       <stop
@@ -170,7 +170,8 @@
        x="34.938068"
        y="484.25259"
        rx="29.705965"
-       ry="29.762754" />
+       ry="29.762754"
+       transform="matrix(0.97369628,0,0,0.97369628,6.6135078,19.808713)" />
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:10;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter4416)"
        id="rect4172"
@@ -181,14 +182,14 @@
        rx="80"
        ry="80" />
     <rect
-       ry="70"
-       rx="70"
-       y="293.66327"
-       x="315.29678"
-       height="337.00406"
-       width="337.00406"
+       ry="68.237503"
+       rx="68.237503"
+       y="297.90591"
+       x="319.53943"
+       height="328.51877"
+       width="328.51877"
        id="rect4174"
-       style="fill:#d2d2d2;fill-opacity:1;stroke:none;stroke-width:10;stroke-miterlimit:4;stroke-dasharray:none" />
+       style="fill:#b4b4b4;fill-opacity:1;stroke:none;stroke-width:10;stroke-miterlimit:4;stroke-dasharray:none" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:10.07842159;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 293.88016,458.05519 206.0198,192.24254"
