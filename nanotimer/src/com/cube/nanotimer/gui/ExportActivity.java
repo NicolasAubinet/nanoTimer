@@ -16,9 +16,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.ListView;
+import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.ExportActivity.ListItem.Type;
@@ -70,6 +77,7 @@ public class ExportActivity extends ActionBarActivity {
         runOnUiThread(new Runnable() {
           @Override
           public void run() {
+            liItems.add(new ListItem(Type.SELECTALL, 0, getString(R.string.select_all), false));
             for (CubeType ct : data) {
               synchronized (liItems) {
                 liItems.add(new ListItem(Type.CUBETYPE, ct.getId(), ct.getName(), false));
@@ -232,7 +240,8 @@ public class ExportActivity extends ActionBarActivity {
             ImageView imgTab = (ImageView) view.findViewById(R.id.imgTab);
             View spacerView = view.findViewById(R.id.spacerView);
             LayoutParams layoutParams = (LayoutParams) spacerView.getLayoutParams();
-            if (st.getType() == Type.CUBETYPE) {
+            if (st.getType() == Type.CUBETYPE
+            ||  st.getType() == Type.SELECTALL) {
               layoutParams.width = 15;
               imgTab.setVisibility(View.GONE);
             } else if (st.getType() == Type.SOLVETYPE) {
@@ -241,12 +250,19 @@ public class ExportActivity extends ActionBarActivity {
             }
             spacerView.setLayoutParams(layoutParams);
 
-            CheckBox cbSelected = (CheckBox) view.findViewById(R.id.cbSelected);
+            final CheckBox cbSelected = (CheckBox) view.findViewById(R.id.cbSelected);
             cbSelected.setChecked(st.isSelected());
             cbSelected.setOnCheckedChangeListener(new OnCheckedChangeListener() {
               @Override
               public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 checkedStatusChanged(position, b);
+              }
+            });
+
+            view.setOnClickListener(new OnClickListener() {
+              @Override
+              public void onClick(View view) {
+                checkedStatusChanged(position, !cbSelected.isChecked());
               }
             });
           }
@@ -276,6 +292,10 @@ public class ExportActivity extends ActionBarActivity {
         }
         if (allSolveTypesSelected) {
           parentCubeType.setSelected(true);
+        }
+      } else if (it.getType() == Type.SELECTALL) {
+        for (ListItem item : liItems) {
+          item.setSelected(checked);
         }
       }
       adapter.notifyDataSetChanged();
@@ -365,10 +385,7 @@ public class ExportActivity extends ActionBarActivity {
   }
 
   static class ListItem {
-
-    enum Type {CUBETYPE, SOLVETYPE}
-
-    ;
+    enum Type {CUBETYPE, SOLVETYPE, SELECTALL}
 
     private Type type;
     private int id;
