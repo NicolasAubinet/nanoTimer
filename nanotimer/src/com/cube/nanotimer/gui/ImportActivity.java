@@ -23,6 +23,7 @@ public class ImportActivity extends Activity {
 
   private void initViews() {
     fileBrowser = (FileBrowser) findViewById(R.id.fileBrowser);
+    fileBrowser.setRootFolderDisplayName(getString(R.string.import_times));
     fileBrowser.setOnFileSelectedListener(new OnFileSelectedListener() {
       @Override
       public void onFileSelected(File parFile) {
@@ -44,7 +45,11 @@ public class ImportActivity extends Activity {
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
 
+    File currentFolder = fileBrowser.getCurrentFolder();
+
     setContentView(R.layout.import_screen);
     initViews();
+
+    fileBrowser.displayFolder(currentFolder);
   }
 }
