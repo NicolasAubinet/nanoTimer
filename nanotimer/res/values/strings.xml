@@ -200,6 +200,7 @@
   <string name="exporting_history">Exporting history…</string>
 
   <string name="import_times">Import</string>
+  <string name="import_activity_not_found">Import activity not found.\nPlease update Nano Timer Pro to the latest version.</string>
 
   <string name="graphs">Graphs</string>
   <string name="progression">Progression</string>
@@ -220,7 +221,7 @@
   <string name="add_new_time">Add new time</string>
   <string name="select_time_to_add">Select time to add:</string>
 
-  <string name="pro_version_features">- Times export\n- Graphs (progression, frequency)\n- Manual times creation\n- Previous sessions details visualization\n- No ads</string>
+  <string name="pro_version_features">- Times export/import\n- Graphs (progression, frequency)\n- Manual times creation\n- Previous sessions details visualization\n- No ads</string>
 
   <string name="release_notes_features_html">
     <![CDATA[<html><body>

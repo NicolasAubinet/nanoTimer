@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 
 public class ProChecker {
-  private static final int VALID_PRO_VERSION_CODE = 2;
+  private static final int VALID_PRO_VERSION_CODE = 3;
 
   public enum ProState { UNINSTALLED, ENABLED, INVALID_VERSION }
 

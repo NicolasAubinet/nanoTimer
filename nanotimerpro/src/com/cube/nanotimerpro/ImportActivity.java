@@ -13,7 +13,6 @@ public class ImportActivity extends Activity {
   private FileBrowser fileBrowser;
 
   public static final String FILE_SELECTED_ACTION = "com.cube.nanotimer.FILE_SELECTED";
-  public static final String FILE_PARAM = "file";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +29,7 @@ public class ImportActivity extends Activity {
       @Override
       public void onFileSelected(File file) {
         Intent result = new Intent(FILE_SELECTED_ACTION);
-        result.putExtra(FILE_PARAM, file);
+        result.putExtra("file", file);
         setResult(Activity.RESULT_OK, result);
         finish();
       }

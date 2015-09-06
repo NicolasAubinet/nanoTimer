@@ -17,6 +17,7 @@ public class ProVersionFeature {
       ((TextView) v.findViewById(R.id.tvText)).setText(R.string.need_pro_version);
     } else if (proState == ProChecker.ProState.INVALID_VERSION) {
       ((TextView) v.findViewById(R.id.tvText)).setText(R.string.upgrade_pro_app);
+      v.findViewById(R.id.layoutFeatures).setVisibility(View.GONE);
     }
 
     AlertDialog dialog = new AlertDialog.Builder(context).setView(v).create();

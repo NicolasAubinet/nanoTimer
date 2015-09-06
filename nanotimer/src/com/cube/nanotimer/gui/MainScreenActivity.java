@@ -1,6 +1,7 @@
 package com.cube.nanotimer.gui;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -318,7 +319,11 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
         break;
       case R.id.itImport:
         if (Utils.checkProFeature(this)) {
-          startActivityForResult(new Intent("com.cube.nanotimerpro.ImportActivity"), IMPORT_REQUEST_CODE); // TODO might not be found if Pro is not up-to-date
+          try {
+            startActivityForResult(new Intent("com.cube.nanotimerpro.ImportActivity"), IMPORT_REQUEST_CODE);
+          } catch (ActivityNotFoundException e) {
+            DialogUtils.showInfoMessage(this, R.string.import_activity_not_found);
+          }
         }
         break;
       case R.id.itAddNewTime:
