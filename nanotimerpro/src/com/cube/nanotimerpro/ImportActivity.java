@@ -1,17 +1,19 @@
-package com.cube.nanotimer.gui;
+package com.cube.nanotimerpro;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import com.ankhsoft.filebrowser.FileBrowser;
 import com.ankhsoft.filebrowser.OnFileSelectedListener;
-import com.cube.nanotimer.R;
-import com.cube.nanotimer.util.helper.DialogUtils;
 
 import java.io.File;
 
 public class ImportActivity extends Activity {
   private FileBrowser fileBrowser;
+
+  public static final String FILE_SELECTED_ACTION = "com.cube.nanotimer.FILE_SELECTED";
+  public static final String FILE_PARAM = "file";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -23,11 +25,14 @@ public class ImportActivity extends Activity {
 
   private void initViews() {
     fileBrowser = (FileBrowser) findViewById(R.id.fileBrowser);
-    fileBrowser.setRootFolderDisplayName(getString(R.string.import_times));
+    fileBrowser.setRootFolderDisplayName(getString(R.string.storage));
     fileBrowser.setOnFileSelectedListener(new OnFileSelectedListener() {
       @Override
-      public void onFileSelected(File parFile) {
-        DialogUtils.showInfoMessage(ImportActivity.this, "Selected file: " + parFile.getName());
+      public void onFileSelected(File file) {
+        Intent result = new Intent(FILE_SELECTED_ACTION);
+        result.putExtra(FILE_PARAM, file);
+        setResult(Activity.RESULT_OK, result);
+        finish();
       }
     });
   }

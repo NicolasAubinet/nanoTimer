@@ -1,5 +1,6 @@
 package com.cube.nanotimer.gui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -48,6 +49,7 @@ import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.TimesSort;
 import com.startapp.android.publish.banner.Banner;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -86,6 +88,8 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
 
   private static final int ID_CUBETYPE = 1;
   private static final int ID_SOLVETYPE = 2;
+
+  private static final int IMPORT_REQUEST_CODE = 1;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -314,7 +318,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
         break;
       case R.id.itImport:
         if (Utils.checkProFeature(this)) {
-          startActivity(new Intent(this, ImportActivity.class));
+          startActivityForResult(new Intent("com.cube.nanotimerpro.ImportActivity"), IMPORT_REQUEST_CODE); // TODO might not be found if Pro is not up-to-date
         }
         break;
       case R.id.itAddNewTime:
@@ -536,6 +540,14 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
           startActivity(i);
         }
       }
+    }
+  }
+
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (requestCode == IMPORT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+      File file = (File) data.getSerializableExtra("file");
+      DialogUtils.showInfoMessage(this, "Selected file: " + file.getName());
     }
   }
 

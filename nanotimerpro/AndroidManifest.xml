@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-   android:versionCode="2"
-   android:versionName="1.0.1"
+   android:versionCode="3"
+   android:versionName="1.0.2"
    package="com.cube.nanotimerpro">
 
   <uses-sdk
      android:minSdkVersion="8"
      android:targetSdkVersion="20"/>
+
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
   <application
      android:icon="@drawable/icon_pro"
@@ -19,6 +21,15 @@
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
         <category android:name="android.intent.category.LAUNCHER"/>
+      </intent-filter>
+    </activity>
+
+    <activity android:name=".ImportActivity"
+       android:windowSoftInputMode="stateAlwaysHidden"
+       android:configChanges="orientation|screenSize|keyboard|keyboardHidden">
+      <intent-filter>
+        <action android:name="com.cube.nanotimerpro.ImportActivity"/>
+        <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>
     </activity>
 

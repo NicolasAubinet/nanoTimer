@@ -18,6 +18,7 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 22 Platform" jdkType="Android SDK" />
     <orderEntry type="module" module-name="guilib" />
+    <orderEntry type="module" module-name="file-browser" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
