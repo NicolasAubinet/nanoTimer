@@ -5,10 +5,27 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import com.cube.nanotimer.services.db.DB;
 import com.cube.nanotimer.session.TimesStatistics;
-import com.cube.nanotimer.vo.*;
+import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.ExportResult;
+import com.cube.nanotimer.vo.FrequencyData;
+import com.cube.nanotimer.vo.SessionDetails;
+import com.cube.nanotimer.vo.SolveAverages;
+import com.cube.nanotimer.vo.SolveHistory;
+import com.cube.nanotimer.vo.SolveTime;
+import com.cube.nanotimer.vo.SolveTimeAverages;
+import com.cube.nanotimer.vo.SolveType;
+import com.cube.nanotimer.vo.SolveTypeStep;
+import com.cube.nanotimer.vo.TimesSort;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.TimeZone;
 
 public class ServiceProviderImpl implements ServiceProvider {
 
@@ -864,6 +881,7 @@ public class ServiceProviderImpl implements ServiceProvider {
       q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_TIME);
       q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_TIMESTAMP);
       q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_PLUSTWO);
+      q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_BLIND);
       q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_SCRAMBLE);
       q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
       q.append(" JOIN ").append(DB.TABLE_SOLVETYPE);
@@ -884,7 +902,7 @@ public class ServiceProviderImpl implements ServiceProvider {
       if (cursor != null) {
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
           ExportResult result = new ExportResult(cursor.getInt(0), cursor.getInt(1), cursor.getString(2), cursor.getInt(3),
-              cursor.getString(4), cursor.getLong(5), cursor.getLong(6), cursor.getInt(7) == 1, cursor.getString(8));
+              cursor.getString(4), cursor.getLong(5), cursor.getLong(6), (cursor.getInt(7) == 1), (cursor.getInt(8) == 1), cursor.getString(9));
           curResults.add(result);
         }
         cursor.close();

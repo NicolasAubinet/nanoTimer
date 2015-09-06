@@ -10,12 +10,14 @@ public class ExportResult {
   private long time;
   private long timestamp;
   private boolean plusTwo;
+  private boolean blindType;
   private String scramble;
 
   private String[] stepsNames;
   private Long[] stepsTimes;
 
-  public ExportResult(int solveTimeId, int cubeTypeId, String cubeTypeName, int solveTypeId, String solveTypeName, long time, long timestamp, boolean plusTwo, String scramble) {
+  public ExportResult(int solveTimeId, int cubeTypeId, String cubeTypeName, int solveTypeId, String solveTypeName,
+                      long time, long timestamp, boolean plusTwo, boolean blindType, String scramble) {
     this.solveTimeId = solveTimeId;
     this.cubeTypeId = cubeTypeId;
     this.cubeTypeName = cubeTypeName;
@@ -24,6 +26,7 @@ public class ExportResult {
     this.time = time;
     this.timestamp = timestamp;
     this.plusTwo = plusTwo;
+    this.blindType = blindType;
     this.scramble = scramble;
   }
 
@@ -97,6 +100,14 @@ public class ExportResult {
 
   public void setPlusTwo(boolean plusTwo) {
     this.plusTwo = plusTwo;
+  }
+
+  public boolean isBlindType() {
+    return blindType;
+  }
+
+  public void setBlindType(boolean blindType) {
+    this.blindType = blindType;
   }
 
   public String[] getStepsNames() {

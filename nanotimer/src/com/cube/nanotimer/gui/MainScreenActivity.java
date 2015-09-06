@@ -7,17 +7,33 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.*;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.Options.AdsStyle;
 import com.cube.nanotimer.ProChecker;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.gui.widget.*;
+import com.cube.nanotimer.gui.widget.AboutDialog;
+import com.cube.nanotimer.gui.widget.HistoryDetailDialog;
+import com.cube.nanotimer.gui.widget.HistoryRefreshHandler;
+import com.cube.nanotimer.gui.widget.SelectionHandler;
+import com.cube.nanotimer.gui.widget.SelectorFragmentDialog;
+import com.cube.nanotimer.gui.widget.SolveTypesFragmentDialog;
+import com.cube.nanotimer.gui.widget.TimeChangedHandler;
 import com.cube.nanotimer.gui.widget.ads.AdProvider;
 import com.cube.nanotimer.gui.widget.dialog.AddNewTimeDialog;
 import com.cube.nanotimer.services.db.DataCallback;
@@ -25,10 +41,18 @@ import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
-import com.cube.nanotimer.vo.*;
+import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.SolveHistory;
+import com.cube.nanotimer.vo.SolveTime;
+import com.cube.nanotimer.vo.SolveType;
+import com.cube.nanotimer.vo.TimesSort;
 import com.startapp.android.publish.banner.Banner;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 public class MainScreenActivity extends ActionBarActivity implements TimeChangedHandler, SelectionHandler, HistoryRefreshHandler {
 
@@ -527,7 +551,12 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
 
   private void setCurSolveType(SolveType solveType) {
     this.curSolveType = solveType;
-    updateAddNewTimeItemVisibility();
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        updateAddNewTimeItemVisibility();
+      }
+    });
     Utils.setCurrentSolveType(this, solveType);
   }
 

@@ -7,6 +7,8 @@ public class SolveTypeStep implements Serializable {
   private int id;
   private String name;
 
+  public static final char[] FORBIDDEN_NAME_CHARACTERS = new char[] { '"', ',', ';', '|', '=' };
+
   public SolveTypeStep() {
   }
 
@@ -26,4 +28,14 @@ public class SolveTypeStep implements Serializable {
     this.name = name;
   }
 
+  public static Character checkForForbiddenCharacters(String stepName) {
+    Character forbiddenChar = null;
+    for (char c : SolveTypeStep.FORBIDDEN_NAME_CHARACTERS) {
+      if (stepName.contains(String.valueOf(c))) {
+        forbiddenChar = c;
+        break;
+      }
+    }
+    return forbiddenChar;
+  }
 }

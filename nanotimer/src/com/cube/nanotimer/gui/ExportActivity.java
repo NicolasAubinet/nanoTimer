@@ -33,7 +33,6 @@ import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.export.CSVGenerator;
 import com.cube.nanotimer.util.export.ExportCSVGenerator;
-import com.cube.nanotimer.util.export.ReportStepsException;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.FileUtils;
 import com.cube.nanotimer.util.helper.Utils;
@@ -145,26 +144,15 @@ public class ExportActivity extends ActionBarActivity {
 
   private void export() {
     List<Integer> solveTypeIds = new ArrayList<Integer>();
-    String stepsTypes = "";
     synchronized (liItems) {
       for (ListItem it : liItems) {
         if (it.isSelected() && it.getType() == Type.SOLVETYPE) {
           solveTypeIds.add(it.getId());
-          if (it.hasSteps) {
-            if (!stepsTypes.equals("")) {
-              stepsTypes += ", ";
-            }
-            stepsTypes += it.getName();
-          }
         }
       }
     }
     if (solveTypeIds.isEmpty()) {
       DialogUtils.showInfoMessage(this, R.string.select_at_least_one_solve_type);
-      return;
-    }
-    if (!stepsTypes.equals("") && solveTypeIds.size() > 1) {
-      DialogUtils.showInfoMessage(this, getString(R.string.only_one_step_solve_type_is_allowed_steps, stepsTypes));
       return;
     }
     int limit = -1;
@@ -191,13 +179,9 @@ public class ExportActivity extends ActionBarActivity {
             progressDialog.hide();
             progressDialog.dismiss();
             if (data != null && !data.isEmpty()) {
-              try {
-                CSVGenerator generator = new ExportCSVGenerator(data);
-                File file = FileUtils.createCSVFile(ExportActivity.this, EXPORT_FILE_NAME, generator);
-                sendExportFile(file);
-              } catch (ReportStepsException e) {
-                DialogUtils.showInfoMessage(ExportActivity.this, R.string.only_one_step_solve_type_is_allowed);
-              }
+              CSVGenerator generator = new ExportCSVGenerator(data);
+              File file = FileUtils.createCSVFile(ExportActivity.this, EXPORT_FILE_NAME, generator);
+              sendExportFile(file);
             } else {
               DialogUtils.showInfoMessage(ExportActivity.this, R.string.no_data_to_export);
             }

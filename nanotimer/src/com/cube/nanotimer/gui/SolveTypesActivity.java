@@ -4,7 +4,12 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.view.*;
+import android.view.ContextMenu;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
@@ -23,7 +28,11 @@ import com.cube.nanotimer.gui.widget.dialog.SolveTypeAddDialog;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.util.helper.DialogUtils;
-import com.cube.nanotimer.vo.*;
+import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.SolveHistory;
+import com.cube.nanotimer.vo.SolveType;
+import com.cube.nanotimer.vo.SolveTypeStep;
+import com.cube.nanotimer.vo.TimesSort;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 import com.mobeta.android.dslv.DragSortListView.DropListener;
@@ -67,7 +76,7 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
               types.add(t.getName());
             }
             DialogUtils.showFragment(SolveTypesActivity.this,
-                SelectorFragmentDialog.newInstance(0, types, getString(R.string.choose_cube_type), false, SolveTypesActivity.this));
+              SelectorFragmentDialog.newInstance(0, types, getString(R.string.choose_cube_type), false, SolveTypesActivity.this));
           } else {
             finish();
           }
@@ -230,9 +239,8 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
 
   @Override
   public boolean renameField(int index, String newName) {
-    boolean res = checkSolveTypeName(newName, index);
-    if (!res) {
-      return res;
+    if (!checkSolveTypeName(newName, index)) {
+      return false;
     }
     SolveType st = liSolveTypes.get(index);
     st.setName(newName.trim());
@@ -247,9 +255,8 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
 
   @Override
   public boolean createField(String name, Properties props) {
-    boolean res = checkSolveTypeName(name, null);
-    if (!res) {
-      return res;
+    if (!checkSolveTypeName(name, null)) {
+      return false;
     }
     boolean blindMode = Boolean.valueOf(props.getProperty(SolveTypeAddDialog.KEY_BLD, String.valueOf(false)));
     SolveType st = new SolveType(name, blindMode, curCubeType.getId());
@@ -265,6 +272,11 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
 
   private boolean checkSolveTypeName(String name, Integer index) {
     if ("".equals(name.trim())) {
+      return false;
+    }
+    Character forbiddenChar = SolveTypeStep.checkForForbiddenCharacters(name);
+    if (forbiddenChar != null) {
+      DialogUtils.showInfoMessage(this, getString(R.string.name_contains_forbidden_char, forbiddenChar));
       return false;
     }
     for (int i = 0; i < liSolveTypes.size(); i++) {

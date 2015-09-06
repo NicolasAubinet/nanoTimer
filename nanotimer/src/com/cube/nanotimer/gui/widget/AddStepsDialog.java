@@ -7,17 +7,27 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
-import android.view.*;
+import android.view.ContextMenu;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
+import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.*;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.dialog.FieldEditDialog;
 import com.cube.nanotimer.gui.widget.dialog.FieldRenamer;
 import com.cube.nanotimer.util.helper.DialogUtils;
+import com.cube.nanotimer.vo.SolveTypeStep;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 import com.mobeta.android.dslv.DragSortListView.DropListener;
@@ -114,10 +124,12 @@ public class AddStepsDialog extends DialogFragment implements FieldRenamer {
         if (!"".equals(stepName.trim())) {
           if (liSteps.size() < Options.INSTANCE.getMaxStepsCount()) {
             if (!liSteps.contains(stepName)) {
-              liSteps.add(stepName);
-              tfStepName.setText("");
-              stepsAdapter.notifyDataSetChanged();
-              lvSteps.setSelection(liSteps.size() - 1); // scroll to bottom
+              if (checkForForbiddenCharacters(stepName)) {
+                liSteps.add(stepName);
+                tfStepName.setText("");
+                stepsAdapter.notifyDataSetChanged();
+                lvSteps.setSelection(liSteps.size() - 1); // scroll to bottom
+              }
             } else {
               DialogUtils.showInfoMessage(getActivity(), R.string.step_already_exists);
             }
@@ -131,6 +143,16 @@ public class AddStepsDialog extends DialogFragment implements FieldRenamer {
     d.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
     return d;
+  }
+
+  private boolean checkForForbiddenCharacters(String stepName) {
+    boolean valid = true;
+    Character forbiddenChar = SolveTypeStep.checkForForbiddenCharacters(stepName);
+    if (forbiddenChar != null) {
+      DialogUtils.showInfoMessage(getActivity(), getString(R.string.name_contains_forbidden_char, forbiddenChar));
+      valid = false;
+    }
+    return valid;
   }
 
   @Override

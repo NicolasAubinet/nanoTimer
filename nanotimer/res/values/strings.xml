@@ -28,6 +28,7 @@
   <string name="confirm">Confirm</string>
   <string name="solve_type_already_exists">A solve type with the same name already exists</string>
   <string name="step_already_exists">A step with the same name already exists for this solve type</string>
+  <string name="name_contains_forbidden_char">Invalid character in name: \'%1$s\'</string>
   <string name="delete_solve_type_confirmation">Are you sure you want to delete the solve type \'%1$s\' and all its times?</string>
   <string name="new_session_confirmation">Are you sure you want to start a new session?</string>
   <string name="solvetype_has_times_addsteps">This solve type contains some times. Adding steps will delete them. Are you sure you want to continue?</string>
@@ -196,8 +197,6 @@
   <string name="send_via">Send via:</string>
   <string name="no_data_to_export">Could not find any data to export</string>
   <string name="select_at_least_one_solve_type">Please select at least one solve type to export</string>
-  <string name="only_one_step_solve_type_is_allowed">Can not export multiple solve types if one of them has steps</string>
-  <string name="only_one_step_solve_type_is_allowed_steps">Can not export multiple solve types if one of them has steps.\nThe following type(s) have steps: %1$s</string>
   <string name="exporting_history">Exporting history…</string>
 
   <string name="import_times">Import</string>
