@@ -27,7 +27,7 @@ import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.dialog.FieldEditDialog;
 import com.cube.nanotimer.gui.widget.dialog.FieldRenamer;
 import com.cube.nanotimer.util.helper.DialogUtils;
-import com.cube.nanotimer.vo.SolveTypeStep;
+import com.cube.nanotimer.util.helper.Utils;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 import com.mobeta.android.dslv.DragSortListView.DropListener;
@@ -147,7 +147,7 @@ public class AddStepsDialog extends DialogFragment implements FieldRenamer {
 
   private boolean checkForForbiddenCharacters(String stepName) {
     boolean valid = true;
-    Character forbiddenChar = SolveTypeStep.checkForForbiddenCharacters(stepName);
+    Character forbiddenChar = Utils.checkForForbiddenCharacters(stepName);
     if (forbiddenChar != null) {
       DialogUtils.showInfoMessage(getActivity(), getString(R.string.name_contains_forbidden_char, forbiddenChar));
       valid = false;

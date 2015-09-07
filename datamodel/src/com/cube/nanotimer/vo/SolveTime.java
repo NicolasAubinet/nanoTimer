@@ -17,6 +17,14 @@ public class SolveTime implements Serializable {
   public SolveTime() {
   }
 
+  public SolveTime(long timestamp, long time, boolean plusTwo, String scramble, SolveType solveType) {
+    this.timestamp = timestamp;
+    this.time = time;
+    this.plusTwo = plusTwo;
+    this.scramble = scramble;
+    this.solveType = solveType;
+  }
+
   public int getId() {
     return id;
   }

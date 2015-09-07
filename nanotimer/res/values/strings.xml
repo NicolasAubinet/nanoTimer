@@ -201,6 +201,14 @@
 
   <string name="import_times">Import</string>
   <string name="import_activity_not_found">Import activity not found.\nPlease update Nano Timer Pro to the latest version.</string>
+  <string name="line">line</string>
+  <string name="import_invalid_columns_count">Invalid CSV columns count. Please check the import file format.</string>
+  <string name="could_not_convert_time">Could not convert time: \'%1$s\'</string>
+  <string name="could_not_convert_date">Could not convert date: \'%1$s\'</string>
+  <string name="could_not_find_cube_type">Could not resolve cube type \'%1$s\'.\nPlease check input file, or try updating.</string>
+  <string name="solve_type_conflict">Inconsistencies found in solve type \'%1$s\' of cube type \'%2$s\'.\nPlease check input file or contact support at \'%3$s\'.</string>
+  <string name="invalid_step_format">Invalid format for step \'%1$s\'</string>
+  <string name="could_not_convert_step_time">Could not convert step time \'%1$s\'</string>
 
   <string name="graphs">Graphs</string>
   <string name="progression">Progression</string>

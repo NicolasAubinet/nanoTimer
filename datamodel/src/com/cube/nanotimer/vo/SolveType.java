@@ -21,10 +21,8 @@ public class SolveType implements Serializable {
   }
 
   public SolveType(int id, String name, boolean blind, int cubeTypeId) {
+    this(name, blind, cubeTypeId);
     this.id = id;
-    this.name = name;
-    this.blind = blind;
-    this.cubeTypeId = cubeTypeId;
   }
 
   public int getId() {
@@ -73,6 +71,6 @@ public class SolveType implements Serializable {
       return false;
     }
     SolveType st = (SolveType) o;
-    return this.id == st.id && this.name.equals(st.name) && this.cubeTypeId == st.cubeTypeId && Arrays.equals(this.steps, st.steps);
+    return this.id == st.id && this.name.equals(st.name) && this.cubeTypeId == st.cubeTypeId && Arrays.equals(this.steps, st.steps) && this.blind == st.blind;
   }
 }

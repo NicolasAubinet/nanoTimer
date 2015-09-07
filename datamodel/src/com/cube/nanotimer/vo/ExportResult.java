@@ -18,10 +18,14 @@ public class ExportResult {
 
   public ExportResult(int solveTimeId, int cubeTypeId, String cubeTypeName, int solveTypeId, String solveTypeName,
                       long time, long timestamp, boolean plusTwo, boolean blindType, String scramble) {
+    this(cubeTypeName, solveTypeName, time, timestamp, plusTwo, blindType, scramble);
     this.solveTimeId = solveTimeId;
     this.cubeTypeId = cubeTypeId;
-    this.cubeTypeName = cubeTypeName;
     this.solveTypeId = solveTypeId;
+  }
+
+  public ExportResult(String cubeTypeName, String solveTypeName, long time, long timestamp, boolean plusTwo, boolean blindType, String scramble) {
+    this.cubeTypeName = cubeTypeName;
     this.solveTypeName = solveTypeName;
     this.time = time;
     this.timestamp = timestamp;

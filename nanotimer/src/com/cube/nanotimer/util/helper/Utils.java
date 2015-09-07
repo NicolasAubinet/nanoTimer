@@ -22,6 +22,8 @@ import java.util.Random;
 
 public class Utils {
 
+  public static final char[] FORBIDDEN_NAME_CHARACTERS = new char[] { '"', ',', ';', '|', '=' };
+
   public static String parseFloatToString(Float f) {
     return f == null ? null : String.valueOf(f);
   }
@@ -156,6 +158,17 @@ public class Utils {
       ProVersionFeature.getDialog(context).show();
       return false;
     }
+  }
+
+  public static Character checkForForbiddenCharacters(String stepName) {
+    Character forbiddenChar = null;
+    for (char c : FORBIDDEN_NAME_CHARACTERS) {
+      if (stepName.contains(String.valueOf(c))) {
+        forbiddenChar = c;
+        break;
+      }
+    }
+    return forbiddenChar;
   }
 
 }

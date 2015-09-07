@@ -28,6 +28,7 @@ import com.cube.nanotimer.gui.widget.dialog.SolveTypeAddDialog;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.util.helper.DialogUtils;
+import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveType;
@@ -274,7 +275,7 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
     if ("".equals(name.trim())) {
       return false;
     }
-    Character forbiddenChar = SolveTypeStep.checkForForbiddenCharacters(name);
+    Character forbiddenChar = Utils.checkForForbiddenCharacters(name);
     if (forbiddenChar != null) {
       DialogUtils.showInfoMessage(this, getString(R.string.name_contains_forbidden_char, forbiddenChar));
       return false;

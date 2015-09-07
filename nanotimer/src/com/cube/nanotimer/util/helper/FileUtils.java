@@ -1,9 +1,16 @@
 package com.cube.nanotimer.util.helper;
 
 import android.content.Context;
-import com.cube.nanotimer.util.export.CSVGenerator;
+import com.cube.nanotimer.util.exportimport.CSVGenerator;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -14,7 +21,7 @@ public class FileUtils {
     return readLinesFromFile(context, fileName, -1);
   }
 
-  public static List<String> readLinesFromFile(Context context, File file, int linesLimit) {
+  public static List<String> readLinesFromFile(File file, int linesLimit) {
     List<String> lines = new ArrayList<String>();
     try {
       FileInputStream fis = new FileInputStream(file);
@@ -40,7 +47,7 @@ public class FileUtils {
     try {
       Scanner fileScanner = new Scanner(fis);
       int i = 0;
-      while (fileScanner.hasNextLine() && (linesLimit < 0 || i < linesLimit)) {
+      while (fileScanner.hasNextLine() && (linesLimit <= 0 || i < linesLimit)) {
         lines.add(fileScanner.nextLine());
         i++;
       }

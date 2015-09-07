@@ -40,4 +40,13 @@ public enum CubeType implements Serializable {
     }
     return null;
   }
+
+  public static CubeType getCubeTypeFromName(String cubeTypeName) {
+    for (CubeType t : values()) {
+      if (t.getName().equals(cubeTypeName)) {
+        return t;
+      }
+    }
+    return null;
+  }
 }

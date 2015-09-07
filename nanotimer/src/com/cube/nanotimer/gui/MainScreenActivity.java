@@ -41,6 +41,7 @@ import com.cube.nanotimer.gui.widget.dialog.AddNewTimeDialog;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.YesNoListener;
+import com.cube.nanotimer.util.exportimport.CSVImporter;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
@@ -552,7 +553,8 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == IMPORT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
       File file = (File) data.getSerializableExtra("file");
-      DialogUtils.showInfoMessage(this, "Selected file: " + file.getName());
+      CSVImporter csvImporter = new CSVImporter(this);
+      csvImporter.importTimes(file);
     }
   }
 
