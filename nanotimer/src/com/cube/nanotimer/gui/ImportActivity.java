@@ -1,4 +1,4 @@
-package com.cube.nanotimerpro;
+package com.cube.nanotimer.gui;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import com.ankhsoft.filebrowser.FileBrowser;
 import com.ankhsoft.filebrowser.OnFileSelectedListener;
+import com.cube.nanotimer.R;
 
 import java.io.File;
 

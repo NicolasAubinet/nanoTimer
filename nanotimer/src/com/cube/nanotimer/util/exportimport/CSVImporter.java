@@ -23,6 +23,8 @@ public class CSVImporter {
 
   public void importTimes(File importFile) throws CSVFormatException {
     ImportTimesData importData = getImportData(importFile);
+    // TODO show progress dialog (+ cancel when finished or if exception is received)
+
     // TODO parse solve types while reading them from DB and set the id's of those that exist + keep list of those that don't exist
     // TODO show confirm dialog with solve types that will be inserted (display solve/cube types in dialog and ask if ok or cancel)
     // TODO if confirmed, insert solve types and read them to get the ids
@@ -34,6 +36,7 @@ public class CSVImporter {
 
   private ImportTimesData getImportData(File importFile) throws CSVFormatException {
     List<String> lines = FileUtils.readLinesFromFile(importFile, 0);
+    groupQuotedLines(lines);
     List<ExportResult> exportResults = getExportResults(lines);
 
     ImportTimesData importData = new ImportTimesData(context);
@@ -61,13 +64,37 @@ public class CSVImporter {
     return importData;
   }
 
+  private void groupQuotedLines(List<String> lines) {
+    // Group lines that are in the same quotes together (like those with Megaminx scrambles)
+    List<String> grouped = new ArrayList<String>();
+    boolean inUnendedQuotes = false;
+    boolean prevLineInUnendedQuotes = false;
+    for (String line : lines) {
+      for (char c : line.toCharArray()) {
+        if (c == '"') {
+          inUnendedQuotes = !inUnendedQuotes;
+        }
+      }
+      if (prevLineInUnendedQuotes) {
+        int index = grouped.size() - 1;
+        String l = grouped.get(index);
+        grouped.set(index, l + "\n" + line);
+      } else {
+        grouped.add(line);
+      }
+      prevLineInUnendedQuotes = inUnendedQuotes;
+    }
+    lines.clear();
+    lines.addAll(grouped);
+  }
+
   private List<ExportResult> getExportResults(List<String> lines) throws CSVFormatException {
     List<ExportResult> results = new ArrayList<ExportResult>();
-    for (int i = 0; i < lines.size(); i++) {
+    for (int i = 1; i < lines.size(); i++) {
       try {
         results.add(ExportResultConverter.fromCSVLine(context, lines.get(i)));
       } catch (CSVFormatException e) {
-        throw new CSVFormatException(e.getMessage() + "(" + R.string.line + ": " + (i+1) + ")");
+        throw new CSVFormatException(e.getMessage() + "(" + context.getString(R.string.line) + ": " + (i+1) + ")");
       }
     }
     return results;

@@ -63,7 +63,7 @@ public enum FormatterService {
       if (split.length == 2) {
         minutes = Integer.parseInt(split[0]);
       }
-      split = split[split.length - 1].split(".");
+      split = split[split.length - 1].split("\\.");
       seconds = Integer.parseInt(split[0]);
       hundreds = Integer.parseInt(split[1]);
     } catch (NumberFormatException e) {

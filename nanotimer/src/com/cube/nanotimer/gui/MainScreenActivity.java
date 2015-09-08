@@ -1,7 +1,6 @@
 package com.cube.nanotimer.gui;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -41,6 +40,7 @@ import com.cube.nanotimer.gui.widget.dialog.AddNewTimeDialog;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.YesNoListener;
+import com.cube.nanotimer.util.exportimport.CSVFormatException;
 import com.cube.nanotimer.util.exportimport.CSVImporter;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
@@ -320,11 +320,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
         break;
       case R.id.itImport:
         if (Utils.checkProFeature(this)) {
-          try {
-            startActivityForResult(new Intent("com.cube.nanotimerpro.ImportActivity"), IMPORT_REQUEST_CODE);
-          } catch (ActivityNotFoundException e) {
-            DialogUtils.showInfoMessage(this, R.string.import_activity_not_found);
-          }
+          startActivityForResult(new Intent(this, ImportActivity.class), IMPORT_REQUEST_CODE);
         }
         break;
       case R.id.itAddNewTime:
@@ -554,7 +550,11 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
     if (requestCode == IMPORT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
       File file = (File) data.getSerializableExtra("file");
       CSVImporter csvImporter = new CSVImporter(this);
-      csvImporter.importTimes(file);
+      try {
+        csvImporter.importTimes(file);
+      } catch (CSVFormatException e) {
+        DialogUtils.showInfoMessage(this, e.getMessage());
+      }
     }
   }
 

@@ -11,5 +11,4 @@
   <string name="could_not_find_market">Could not find the market app</string>
   <string name="could_not_launch_market">Could not launch the market</string>
   <string name="could_not_launch_nanotimer">Could not launch Nano Timer app</string>
-  <string name="storage">Storage</string>
 </resources>

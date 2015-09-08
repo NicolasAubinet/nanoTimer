@@ -61,10 +61,13 @@ public class ExportResultConverter {
 
   private static Long[] getStepsTimes(Context context, String stepsField) throws CSVFormatException {
     String[] stepsTimesStr = getStepsField(context, stepsField, 1);
+    if (stepsTimesStr == null) {
+      return null;
+    }
     Long[] stepsTimes = new Long[stepsTimesStr.length];
     for (int i = 0; i < stepsTimesStr.length; i++) {
       try {
-        stepsTimes[i] = Long.parseLong(stepsTimesStr[i]);
+        stepsTimes[i] = FormatterService.INSTANCE.unformatSolveTime(stepsTimesStr[i]);
       } catch (NumberFormatException e) {
         throw new CSVFormatException(context.getString(R.string.could_not_convert_step_time, stepsTimesStr[i]));
       }

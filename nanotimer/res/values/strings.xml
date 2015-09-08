@@ -200,7 +200,7 @@
   <string name="exporting_history">Exporting history…</string>
 
   <string name="import_times">Import</string>
-  <string name="import_activity_not_found">Import activity not found.\nPlease update Nano Timer Pro to the latest version.</string>
+  <string name="storage">Storage</string>
   <string name="line">line</string>
   <string name="import_invalid_columns_count">Invalid CSV columns count. Please check the import file format.</string>
   <string name="could_not_convert_time">Could not convert time: \'%1$s\'</string>

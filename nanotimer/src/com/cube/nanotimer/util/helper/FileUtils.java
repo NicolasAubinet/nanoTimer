@@ -27,6 +27,7 @@ public class FileUtils {
       FileInputStream fis = new FileInputStream(file);
       lines = readLinesFromFile(fis, linesLimit);
     } catch (FileNotFoundException e) {
+      e.printStackTrace();
     }
     return lines;
   }
@@ -38,6 +39,7 @@ public class FileUtils {
       fis = context.openFileInput(fileName);
       lines = readLinesFromFile(fis, linesLimit);
     } catch (FileNotFoundException e) {
+      e.printStackTrace();
     }
     return lines;
   }

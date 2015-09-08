@@ -7,14 +7,15 @@ import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ImportTimesData {
 
   private Context context;
-  private Map<CubeType, List<SolveType>> solveTypes;
-  private Map<SolveType, List<SolveTime>> solveTimes;
+  private Map<CubeType, List<SolveType>> solveTypes = new HashMap<CubeType, List<SolveType>>();
+  private Map<SolveType, List<SolveTime>> solveTimes = new HashMap<SolveType, List<SolveTime>>();
 
   public ImportTimesData(Context context) {
     this.context = context;

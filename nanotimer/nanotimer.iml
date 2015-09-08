@@ -23,6 +23,7 @@
     <orderEntry type="module" module-name="drag-sort-listview" />
     <orderEntry type="module" module-name="guilib" />
     <orderEntry type="module" module-name="wheel" />
+    <orderEntry type="module" module-name="file-browser" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
