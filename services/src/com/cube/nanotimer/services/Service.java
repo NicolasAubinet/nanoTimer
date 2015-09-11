@@ -1,7 +1,16 @@
 package com.cube.nanotimer.services;
 
 import com.cube.nanotimer.services.db.DataCallback;
-import com.cube.nanotimer.vo.*;
+import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.ExportResult;
+import com.cube.nanotimer.vo.FrequencyData;
+import com.cube.nanotimer.vo.SessionDetails;
+import com.cube.nanotimer.vo.SolveAverages;
+import com.cube.nanotimer.vo.SolveHistory;
+import com.cube.nanotimer.vo.SolveTime;
+import com.cube.nanotimer.vo.SolveTimeAverages;
+import com.cube.nanotimer.vo.SolveType;
+import com.cube.nanotimer.vo.TimesSort;
 
 import java.util.List;
 
@@ -33,4 +42,6 @@ public interface Service {
   void addSolveTypeSteps(SolveType solveType, DataCallback<Void> callback);
   void updateSolveType(SolveType solveType, DataCallback<Void> callback);
   void deleteSolveType(SolveType solveType, DataCallback<Void> callback);
+
+  ServiceProvider getProviderAccess();
 }

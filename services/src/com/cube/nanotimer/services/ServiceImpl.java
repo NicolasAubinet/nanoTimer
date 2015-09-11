@@ -3,7 +3,16 @@ package com.cube.nanotimer.services;
 import android.content.Context;
 import com.cube.nanotimer.services.db.DBHelper;
 import com.cube.nanotimer.services.db.DataCallback;
-import com.cube.nanotimer.vo.*;
+import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.ExportResult;
+import com.cube.nanotimer.vo.FrequencyData;
+import com.cube.nanotimer.vo.SessionDetails;
+import com.cube.nanotimer.vo.SolveAverages;
+import com.cube.nanotimer.vo.SolveHistory;
+import com.cube.nanotimer.vo.SolveTime;
+import com.cube.nanotimer.vo.SolveTimeAverages;
+import com.cube.nanotimer.vo.SolveType;
+import com.cube.nanotimer.vo.TimesSort;
 
 import java.util.List;
 
@@ -323,6 +332,10 @@ public class ServiceImpl extends DBHelper implements Service {
 
   private void run(Runnable runnable) {
     new Thread(runnable).start();
+  }
+
+  public ServiceProvider getProviderAccess() {
+    return provider;
   }
 
 }

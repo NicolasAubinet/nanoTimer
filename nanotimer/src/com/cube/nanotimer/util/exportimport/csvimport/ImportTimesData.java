@@ -1,7 +1,8 @@
-package com.cube.nanotimer.util.exportimport;
+package com.cube.nanotimer.util.exportimport.csvimport;
 
 import android.content.Context;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.util.exportimport.CSVFormatException;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
@@ -59,4 +60,11 @@ public class ImportTimesData {
     solveTimesList.add(solveTime);
   }
 
+  public Map<CubeType, List<SolveType>> getSolveTypes() {
+    return solveTypes;
+  }
+
+  public Map<SolveType, List<SolveTime>> getSolveTimes() {
+    return solveTimes;
+  }
 }

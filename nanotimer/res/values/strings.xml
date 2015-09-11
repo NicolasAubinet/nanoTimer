@@ -209,6 +209,11 @@
   <string name="solve_type_conflict">Inconsistencies found in solve type \'%1$s\' of cube type \'%2$s\'.\nPlease check input file or contact support at \'%3$s\'.</string>
   <string name="invalid_step_format">Invalid format for step \'%1$s\'</string>
   <string name="could_not_convert_step_time">Could not convert step time \'%1$s\'</string>
+  <string name="reading_import_file">Reading import file…</string>
+  <string name="solve_types_do_not_exist">The following solve types do not exist:\n\'%1$s\'\nDo you want to create them?</string>
+  <string name="inserting_solve_types">Inserting solve types…</string>
+  <string name="inserting_times">Inserting times…</string>
+  <string name="times_imported_successfully">Times imported successfully!</string>
 
   <string name="graphs">Graphs</string>
   <string name="progression">Progression</string>

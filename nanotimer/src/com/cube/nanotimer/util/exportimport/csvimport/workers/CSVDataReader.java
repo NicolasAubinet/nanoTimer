@@ -1,7 +1,15 @@
-package com.cube.nanotimer.util.exportimport;
+package com.cube.nanotimer.util.exportimport.csvimport.workers;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.AsyncTask;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.util.exportimport.CSVFormatException;
+import com.cube.nanotimer.util.exportimport.ErrorListener;
+import com.cube.nanotimer.util.exportimport.csvexport.ExportResultConverter;
+import com.cube.nanotimer.util.exportimport.csvimport.CSVImporter;
+import com.cube.nanotimer.util.exportimport.csvimport.ImportResultListener;
+import com.cube.nanotimer.util.exportimport.csvimport.ImportTimesData;
 import com.cube.nanotimer.util.helper.FileUtils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ExportResult;
@@ -13,25 +21,44 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CSVImporter {
+public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
 
   private Context context;
+  private ProgressDialog progressDialog;
+  private ErrorListener errorListener;
+  private ImportResultListener dataListener;
 
-  public CSVImporter(Context context) {
+  public CSVDataReader(Context context, ProgressDialog progressDialog, ErrorListener errorListener, ImportResultListener dataListener) {
     this.context = context;
+    this.progressDialog = progressDialog;
+    this.errorListener = errorListener;
+    this.dataListener = dataListener;
   }
 
-  public void importTimes(File importFile) throws CSVFormatException {
-    ImportTimesData importData = getImportData(importFile);
-    // TODO show progress dialog (+ cancel when finished or if exception is received)
+  @Override
+  protected ImportTimesData doInBackground(File... files) {
+    File file = files[0];
+    ImportTimesData importData = null;
+    try {
+      importData = getImportData(file);
+    } catch (CSVFormatException e) {
+      errorListener.onError(e.getMessage());
+    }
+    return importData;
+  }
 
-    // TODO parse solve types while reading them from DB and set the id's of those that exist + keep list of those that don't exist
-    // TODO show confirm dialog with solve types that will be inserted (display solve/cube types in dialog and ask if ok or cancel)
-    // TODO if confirmed, insert solve types and read them to get the ids
-    // TODO update solve times of inserted solve types to point to the inserted solve type (with the correct id)
+  @Override
+  protected void onPreExecute() {
+    progressDialog.setMessage(context.getString(R.string.reading_import_file));
+  }
 
-    // TODO remove solve times that already exist from the list (to not have them twice in DB)
-    // TODO insert solve times
+  @Override
+  protected void onPostExecute(ImportTimesData importData) {
+    if (importData == null) {
+      dataListener.onResult(CSVImporter.ERROR);
+    } else {
+      new SolveTypesVerifier(context, progressDialog, errorListener, dataListener).execute(importData);
+    }
   }
 
   private ImportTimesData getImportData(File importFile) throws CSVFormatException {

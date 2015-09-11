@@ -40,8 +40,8 @@ import com.cube.nanotimer.gui.widget.dialog.AddNewTimeDialog;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.YesNoListener;
-import com.cube.nanotimer.util.exportimport.CSVFormatException;
-import com.cube.nanotimer.util.exportimport.CSVImporter;
+import com.cube.nanotimer.util.exportimport.ErrorListener;
+import com.cube.nanotimer.util.exportimport.csvimport.CSVImporter;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
@@ -549,12 +549,12 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == IMPORT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
       File file = (File) data.getSerializableExtra("file");
-      CSVImporter csvImporter = new CSVImporter(this);
-      try {
-        csvImporter.importTimes(file);
-      } catch (CSVFormatException e) {
-        DialogUtils.showInfoMessage(this, e.getMessage());
-      }
+      new CSVImporter(this, new ErrorListener() {
+        @Override
+        public void onError(String message) {
+          DialogUtils.showInfoMessage(MainScreenActivity.this, message);
+        }
+      }).importData(file);
     }
   }
 
