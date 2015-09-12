@@ -551,8 +551,13 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
       File file = (File) data.getSerializableExtra("file");
       new CSVImporter(this, new ErrorListener() {
         @Override
-        public void onError(String message) {
-          DialogUtils.showInfoMessage(MainScreenActivity.this, message);
+        public void onError(final String message) {
+          runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              DialogUtils.showOkDialog(MainScreenActivity.this, getString(R.string.import_error), message);
+            }
+          });
         }
       }).importData(file);
     }

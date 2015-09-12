@@ -41,10 +41,12 @@ public class ImportTimesData {
       solveTypeInList = solveType;
     } else {
       if (!solveType.equals(existingSolveType)) {
+        // happens if a same solve type has conflicts like if it's once set as blind and once as non-blind,
+        // or one has steps and an other doesn't
         throw new CSVFormatException(context.getString(R.string.solve_type_conflict,
           solveType.getName(),
           cubeType.getName(),
-          R.string.email));
+          context.getString(R.string.email)));
       }
       solveTypeInList = existingSolveType;
     }
@@ -66,5 +68,9 @@ public class ImportTimesData {
 
   public Map<SolveType, List<SolveTime>> getSolveTimes() {
     return solveTimes;
+  }
+
+  public boolean isEmpty() {
+    return solveTypes.size() == 0 && solveTimes.size() == 0;
   }
 }

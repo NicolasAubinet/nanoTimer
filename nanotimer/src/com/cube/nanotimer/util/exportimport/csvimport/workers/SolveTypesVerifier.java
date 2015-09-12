@@ -40,10 +40,13 @@ public class SolveTypesVerifier extends AsyncTask<ImportTimesData, Void, List<So
 
   @Override
   protected void onPreExecute() {
+    progressDialog.setMessage(context.getString(R.string.fetching_solve_types));
+    progressDialog.show();
   }
 
   @Override
   protected void onPostExecute(List<SolveType> missingSolveTypes) {
+    progressDialog.hide();
     if (missingSolveTypes.size() > 0) {
       DialogUtils.showYesNoConfirmation(context, context.getString(R.string.solve_types_do_not_exist, formatSolveTypes(missingSolveTypes)), new YesNoListener() {
         @Override
@@ -57,7 +60,19 @@ public class SolveTypesVerifier extends AsyncTask<ImportTimesData, Void, List<So
   }
 
   private String formatSolveTypes(List<SolveType> solveTypes) {
-    return ""; // TODO
+    StringBuilder sb = new StringBuilder();
+    int curCubeTypeId = -1;
+    for (SolveType solveType : solveTypes) {
+      if (curCubeTypeId != solveType.getCubeTypeId()) {
+        curCubeTypeId = solveType.getCubeTypeId();
+        CubeType cubeType = CubeType.getCubeType(solveType.getCubeTypeId());
+        if (cubeType != null) {
+          sb.append(cubeType.getName()).append(":\n");
+        }
+      }
+      sb.append("\t- ").append(solveType.getName()).append("\n");
+    }
+    return sb.toString();
   }
 
   private List<SolveType> getMissingSolveTypesAndUpdateIds(ImportTimesData importData) {

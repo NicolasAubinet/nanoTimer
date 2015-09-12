@@ -67,11 +67,11 @@ public class ExportResultConverter {
     }
     Long[] stepsTimes = new Long[stepsTimesStr.length];
     for (int i = 0; i < stepsTimesStr.length; i++) {
-      try {
-        stepsTimes[i] = FormatterService.INSTANCE.unformatSolveTime(stepsTimesStr[i]);
-      } catch (NumberFormatException e) {
+      Long stepTime = FormatterService.INSTANCE.unformatSolveTime(stepsTimesStr[i]);
+      if (stepTime == null) {
         throw new CSVFormatException(context.getString(R.string.could_not_convert_step_time, stepsTimesStr[i]));
       }
+      stepsTimes[i] = stepTime;
     }
     return stepsTimes;
   }

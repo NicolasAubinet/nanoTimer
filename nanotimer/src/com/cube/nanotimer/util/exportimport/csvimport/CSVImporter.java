@@ -1,7 +1,7 @@
 package com.cube.nanotimer.util.exportimport.csvimport;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.util.exportimport.ErrorListener;
 import com.cube.nanotimer.util.exportimport.csvimport.workers.CSVDataReader;
@@ -11,31 +11,38 @@ import java.io.File;
 
 public class CSVImporter {
 
-  private Context context;
+  private Activity activity;
   private ErrorListener errorListener;
 
   public static final String SUCCESS = "success";
+  public static final String NO_DATA = "no_data";
   public static final String ERROR = "error";
 
-  public CSVImporter(Context context, ErrorListener errorListener) {
-    this.context = context;
+  public CSVImporter(Activity activity, ErrorListener errorListener) {
+    this.activity = activity;
     this.errorListener = errorListener;
   }
 
   public void importData(File file) {
-    final ProgressDialog progressDialog = new ProgressDialog(context);
+    final ProgressDialog progressDialog = new ProgressDialog(activity);
     progressDialog.setIndeterminate(true);
     progressDialog.setCancelable(false);
-    progressDialog.show();
 
-    new CSVDataReader(context, progressDialog, errorListener, new ImportResultListener() {
+    new CSVDataReader(activity, progressDialog, errorListener, new ImportResultListener() {
       @Override
-      public void onResult(String result) {
-        if (result.equals(SUCCESS)) {
-          DialogUtils.showInfoMessage(context, R.string.times_imported_successfully);
-        }
-        progressDialog.hide();
-        progressDialog.dismiss();
+      public void onResult(final String result) {
+        activity.runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            if (result.equals(SUCCESS)) {
+              DialogUtils.showOkDialog(activity, R.string.import_times, R.string.times_imported_successfully);
+            } else if (result.equals(NO_DATA)) {
+              DialogUtils.showOkDialog(activity, R.string.import_times, R.string.no_import_data_found);
+            }
+            progressDialog.hide();
+            progressDialog.dismiss();
+          }
+        });
       }
     }).execute(file);
   }

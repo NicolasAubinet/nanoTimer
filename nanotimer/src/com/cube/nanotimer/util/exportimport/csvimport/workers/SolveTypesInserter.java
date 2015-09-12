@@ -33,6 +33,7 @@ public class SolveTypesInserter extends AsyncTask<ImportTimesData, Void, String>
   @Override
   protected void onPreExecute() {
     progressDialog.setMessage(context.getString(R.string.inserting_solve_types));
+    progressDialog.show();
   }
 
   @Override

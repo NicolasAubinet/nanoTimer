@@ -6,6 +6,8 @@ import java.util.List;
 
 public class ExportCSVGenerator implements CSVGenerator {
 
+  public static final String CSV_HEADER_LINE = "cubetype,solvetype,time,date,steps,plustwo,blind,scramble";
+
   private List<ExportResult> results;
 
   public ExportCSVGenerator(List<ExportResult> results) {
@@ -14,7 +16,7 @@ public class ExportCSVGenerator implements CSVGenerator {
 
   @Override
   public String getHeaderLine() {
-    return "cubetype,solvetype,time,date,steps,plustwo,blind,scramble";
+    return CSV_HEADER_LINE;
   }
 
   @Override

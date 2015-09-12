@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
+import com.cube.nanotimer.R;
 import com.cube.nanotimer.util.YesNoListener;
 
 public class DialogUtils {
@@ -38,6 +39,22 @@ public class DialogUtils {
     return builder.setMessage(messageId)
         .setPositiveButton("Yes", clickListener)
         .setNegativeButton("No", clickListener).show();
+  }
+
+  public static AlertDialog showOkDialog(Context context, String title, String message) {
+    return new AlertDialog.Builder(context)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(R.string.ok, null)
+            .show();
+  }
+
+  public static AlertDialog showOkDialog(Context context, int titleId, int messageId) {
+    return new AlertDialog.Builder(context)
+            .setTitle(titleId)
+            .setMessage(messageId)
+            .setPositiveButton(R.string.ok, null)
+            .show();
   }
 
   private static DialogInterface.OnClickListener getYesNoClickListener(final YesNoListener listener) {

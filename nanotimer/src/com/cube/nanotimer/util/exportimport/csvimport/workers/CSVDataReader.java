@@ -6,11 +6,11 @@ import android.os.AsyncTask;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.util.exportimport.CSVFormatException;
 import com.cube.nanotimer.util.exportimport.ErrorListener;
+import com.cube.nanotimer.util.exportimport.csvexport.ExportCSVGenerator;
 import com.cube.nanotimer.util.exportimport.csvexport.ExportResultConverter;
 import com.cube.nanotimer.util.exportimport.csvimport.CSVImporter;
 import com.cube.nanotimer.util.exportimport.csvimport.ImportResultListener;
 import com.cube.nanotimer.util.exportimport.csvimport.ImportTimesData;
-import com.cube.nanotimer.util.helper.FileUtils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ExportResult;
 import com.cube.nanotimer.vo.SolveTime;
@@ -18,8 +18,12 @@ import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.SolveTypeStep;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
 
@@ -50,23 +54,28 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
   @Override
   protected void onPreExecute() {
     progressDialog.setMessage(context.getString(R.string.reading_import_file));
+    progressDialog.show();
   }
 
   @Override
   protected void onPostExecute(ImportTimesData importData) {
     if (importData == null) {
       dataListener.onResult(CSVImporter.ERROR);
-    } else {
+    } else if (!importData.isEmpty()) {
       new SolveTypesVerifier(context, progressDialog, errorListener, dataListener).execute(importData);
     }
   }
 
   private ImportTimesData getImportData(File importFile) throws CSVFormatException {
-    List<String> lines = FileUtils.readLinesFromFile(importFile, 0);
+    List<String> lines = readCSVFile(importFile);
     groupQuotedLines(lines);
     List<ExportResult> exportResults = getExportResults(lines);
-
     ImportTimesData importData = new ImportTimesData(context);
+    if (exportResults.size() == 0) {
+      dataListener.onResult(CSVImporter.NO_DATA);
+      return importData;
+    }
+
     for (ExportResult exportResult : exportResults) {
       CubeType cubeType = CubeType.getCubeTypeFromName(exportResult.getCubeTypeName());
       if (cubeType == null) {
@@ -89,6 +98,30 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
       importData.addSolveTime(solveType, solveTime);
     }
     return importData;
+  }
+
+  private List<String> readCSVFile(File file) throws CSVFormatException {
+    List<String> lines = new ArrayList<String>();
+    try {
+      FileInputStream fis = new FileInputStream(file);
+      Scanner fileScanner = new Scanner(fis);
+      int i = 0;
+      while (fileScanner.hasNextLine()) {
+        String line = fileScanner.nextLine();
+        if (i == 0 && !line.equals(ExportCSVGenerator.CSV_HEADER_LINE)) {
+          throw new CSVFormatException(context.getString(R.string.invalid_import_file_format));
+        }
+        lines.add(line);
+        i++;
+      }
+      fileScanner.close();
+      fis.close();
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return lines;
   }
 
   private void groupQuotedLines(List<String> lines) {
@@ -121,7 +154,7 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
       try {
         results.add(ExportResultConverter.fromCSVLine(context, lines.get(i)));
       } catch (CSVFormatException e) {
-        throw new CSVFormatException(e.getMessage() + "(" + context.getString(R.string.line) + ": " + (i+1) + ")");
+        throw new CSVFormatException(context.getString(R.string.error_in_line, (i+1)) + ": " + e.getMessage());
       }
     }
     return results;
