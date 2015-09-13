@@ -8,6 +8,7 @@ import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +69,14 @@ public class ImportTimesData {
 
   public Map<SolveType, List<SolveTime>> getSolveTimes() {
     return solveTimes;
+  }
+
+  public int getSolveTimesCount() {
+    int count = 0;
+    for (Collection<SolveTime> st : solveTimes.values()) {
+      count += st.size();
+    }
+    return count;
   }
 
   public boolean isEmpty() {

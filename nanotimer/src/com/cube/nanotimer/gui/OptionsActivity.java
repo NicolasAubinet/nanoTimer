@@ -6,8 +6,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -22,7 +20,6 @@ import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.State;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenListener;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.util.helper.DialogUtils;
-import com.cube.nanotimer.util.helper.Utils;
 
 public class OptionsActivity extends ActionBarActivity {
 
@@ -61,19 +58,6 @@ public class OptionsActivity extends ActionBarActivity {
     public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       addPreferencesFromResource(R.xml.preferences);
-
-      Preference exportPref = findPreference("export");
-      exportPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-        @Override
-        public boolean onPreferenceClick(Preference preference) {
-          if (Utils.checkProFeature(getActivity())) {
-            startActivity(new Intent(getActivity(), ExportActivity.class));
-            return true;
-          } else {
-            return false;
-          }
-        }
-      });
 
       prefChangedListener = new OnSharedPreferenceChangeListener() {
         @Override

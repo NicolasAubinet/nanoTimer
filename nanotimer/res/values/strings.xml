@@ -203,7 +203,7 @@
   <string name="storage">Storage</string>
   <string name="line">line</string>
   <string name="error_in_line">Error in line %1$d</string>
-  <string name="import_invalid_columns_count">Invalid columns count. Please check the import file format.</string>
+  <string name="import_invalid_columns_count">Invalid columns count. Please check the import file format or try re-exporting.</string>
   <string name="import_error">Import error</string>
   <string name="could_not_convert_time">Could not convert time \'%1$s\'</string>
   <string name="could_not_convert_date">Could not convert date \'%1$s\'</string>
@@ -211,14 +211,15 @@
   <string name="solve_type_conflict">Inconsistencies found in solve type \'%1$s\' of cube type \'%2$s\'.\nPlease check input file or contact support at %3$s.</string>
   <string name="invalid_step_format">Invalid format for step \'%1$s\'</string>
   <string name="could_not_convert_step_time">Could not convert step time \'%1$s\'</string>
-  <string name="reading_import_file">Reading import file…</string>
+  <string name="error_reading_import_file">Could not read import file: %1$s</string>
+  <string name="reading_import_file">Reading import file…\n(this might take a few minutes)</string>
   <string name="solve_types_do_not_exist">The following solve types do not exist:\n%1$s\nDo you want to create them?</string>
   <string name="fetching_solve_types">Fetching solve types…</string>
   <string name="inserting_solve_types">Inserting solve types…</string>
-  <string name="inserting_times">Inserting times…</string>
+  <string name="inserting_times">Inserting times in database…</string>
   <string name="times_imported_successfully">Times imported successfully!</string>
   <string name="no_import_data_found">No import data found in file.</string>
-  <string name="invalid_import_file_format">Invalid import file. Please check that the correct file is selected, or try re-exporting.</string>
+  <string name="invalid_import_file_format">Invalid import file format. Please select a valid import file, or try re-exporting.</string>
   <string name="ok">OK</string>
 
   <string name="graphs">Graphs</string>

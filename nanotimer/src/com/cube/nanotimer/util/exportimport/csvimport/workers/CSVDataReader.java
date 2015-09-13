@@ -32,9 +32,8 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
   private ErrorListener errorListener;
   private ImportResultListener dataListener;
 
-  public CSVDataReader(Context context, ProgressDialog progressDialog, ErrorListener errorListener, ImportResultListener dataListener) {
+  public CSVDataReader(Context context, ErrorListener errorListener, ImportResultListener dataListener) {
     this.context = context;
-    this.progressDialog = progressDialog;
     this.errorListener = errorListener;
     this.dataListener = dataListener;
   }
@@ -53,16 +52,22 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
 
   @Override
   protected void onPreExecute() {
+    progressDialog = new ProgressDialog(context);
+    progressDialog.setIndeterminate(true);
+    progressDialog.setCancelable(false);
     progressDialog.setMessage(context.getString(R.string.reading_import_file));
     progressDialog.show();
   }
 
   @Override
   protected void onPostExecute(ImportTimesData importData) {
+    progressDialog.hide();
+    progressDialog.dismiss();
+
     if (importData == null) {
       dataListener.onResult(CSVImporter.ERROR);
     } else if (!importData.isEmpty()) {
-      new SolveTypesVerifier(context, progressDialog, errorListener, dataListener).execute(importData);
+      new SolveTypesVerifier(context, errorListener, dataListener).execute(importData);
     }
   }
 
@@ -87,6 +92,7 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
         for (int i = 0; i < exportResult.getStepsNames().length; i++) {
           SolveTypeStep step = new SolveTypeStep();
           step.setName(exportResult.getStepsNames()[i]);
+          steps[i] = step;
         }
         solveType.setSteps(steps);
       }
@@ -117,9 +123,9 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
       fileScanner.close();
       fis.close();
     } catch (FileNotFoundException e) {
-      e.printStackTrace();
+      errorListener.onError(context.getString(R.string.error_reading_import_file, e.getMessage()));
     } catch (IOException e) {
-      e.printStackTrace();
+      errorListener.onError(context.getString(R.string.error_reading_import_file, e.getMessage()));
     }
     return lines;
   }

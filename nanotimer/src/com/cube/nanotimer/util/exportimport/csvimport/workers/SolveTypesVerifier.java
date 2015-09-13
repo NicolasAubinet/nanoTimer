@@ -25,9 +25,8 @@ public class SolveTypesVerifier extends AsyncTask<ImportTimesData, Void, List<So
   private ImportResultListener dataListener;
   private ImportTimesData importData;
 
-  public SolveTypesVerifier(Context context, ProgressDialog progressDialog, ErrorListener errorListener, ImportResultListener dataListener) {
+  public SolveTypesVerifier(Context context, ErrorListener errorListener, ImportResultListener dataListener) {
     this.context = context;
-    this.progressDialog = progressDialog;
     this.errorListener = errorListener;
     this.dataListener = dataListener;
   }
@@ -40,22 +39,26 @@ public class SolveTypesVerifier extends AsyncTask<ImportTimesData, Void, List<So
 
   @Override
   protected void onPreExecute() {
+    progressDialog = new ProgressDialog(context);
+    progressDialog.setIndeterminate(true);
+    progressDialog.setCancelable(false);
     progressDialog.setMessage(context.getString(R.string.fetching_solve_types));
     progressDialog.show();
   }
 
   @Override
-  protected void onPostExecute(List<SolveType> missingSolveTypes) {
+  protected void onPostExecute(final List<SolveType> missingSolveTypes) {
     progressDialog.hide();
+    progressDialog.dismiss();
     if (missingSolveTypes.size() > 0) {
       DialogUtils.showYesNoConfirmation(context, context.getString(R.string.solve_types_do_not_exist, formatSolveTypes(missingSolveTypes)), new YesNoListener() {
         @Override
         public void onYes() {
-          new SolveTypesInserter(context, progressDialog, errorListener, dataListener).execute(importData);
+          new SolveTypesInserter(context, errorListener, dataListener, importData).execute(missingSolveTypes);
         }
       });
     } else {
-      new SolveTimesInserter(context, progressDialog, errorListener, dataListener).execute(importData);
+      new SolveTimesInserter(context, errorListener, dataListener).execute(importData);
     }
   }
 

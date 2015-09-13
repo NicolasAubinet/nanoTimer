@@ -1,7 +1,6 @@
 package com.cube.nanotimer.util.exportimport.csvimport;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.util.exportimport.ErrorListener;
 import com.cube.nanotimer.util.exportimport.csvimport.workers.CSVDataReader;
@@ -24,11 +23,7 @@ public class CSVImporter {
   }
 
   public void importData(File file) {
-    final ProgressDialog progressDialog = new ProgressDialog(activity);
-    progressDialog.setIndeterminate(true);
-    progressDialog.setCancelable(false);
-
-    new CSVDataReader(activity, progressDialog, errorListener, new ImportResultListener() {
+    new CSVDataReader(activity, errorListener, new ImportResultListener() {
       @Override
       public void onResult(final String result) {
         activity.runOnUiThread(new Runnable() {
@@ -39,8 +34,6 @@ public class CSVImporter {
             } else if (result.equals(NO_DATA)) {
               DialogUtils.showOkDialog(activity, R.string.import_times, R.string.no_import_data_found);
             }
-            progressDialog.hide();
-            progressDialog.dismiss();
           }
         });
       }
