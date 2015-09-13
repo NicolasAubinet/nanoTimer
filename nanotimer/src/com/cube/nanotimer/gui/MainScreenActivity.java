@@ -549,7 +549,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == IMPORT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
       File file = (File) data.getSerializableExtra("file");
-      new CSVImporter(this, new ErrorListener() {
+      new CSVImporter(this, this, new ErrorListener() {
         @Override
         public void onError(final String message) {
           runOnUiThread(new Runnable() {

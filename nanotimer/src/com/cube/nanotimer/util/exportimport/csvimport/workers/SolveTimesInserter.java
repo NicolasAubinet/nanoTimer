@@ -39,12 +39,13 @@ public class SolveTimesInserter extends AsyncTask<ImportTimesData, Integer, Stri
       SolveType solveType = entry.getKey();
       List<SolveTime> solveTimes = entry.getValue();
 
-      removeAlreadyExistingSolveTimes(solveType, solveTimes);
+      processedCount += removeAlreadyExistingSolveTimes(solveType, solveTimes);
+      publishProgress(solveTimesCount, processedCount);
       for (SolveTime solveTime : solveTimes) {
         App.INSTANCE.getService().getProviderAccess().saveTime(solveTime);
+        processedCount++;
+        publishProgress(solveTimesCount, processedCount);
       }
-      processedCount += solveTimes.size();
-      publishProgress(solveTimesCount, processedCount); // TODO doesn't update progress
     }
     return null;
   }
@@ -52,10 +53,9 @@ public class SolveTimesInserter extends AsyncTask<ImportTimesData, Integer, Stri
   @Override
   protected void onPreExecute() {
     progressDialog = new ProgressDialog(context);
-    progressDialog.setCancelable(false);
-    progressDialog.setIndeterminate(false);
-    progressDialog.setMessage(context.getString(R.string.inserting_times));
     progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+    progressDialog.setCancelable(false);
+    progressDialog.setMessage(context.getString(R.string.inserting_times));
     progressDialog.show();
   }
 
@@ -74,7 +74,8 @@ public class SolveTimesInserter extends AsyncTask<ImportTimesData, Integer, Stri
     progressDialog.setProgress(processedCount);
   }
 
-  private void removeAlreadyExistingSolveTimes(SolveType solveType, List<SolveTime> solveTimes) {
+  private int removeAlreadyExistingSolveTimes(SolveType solveType, List<SolveTime> solveTimes) {
+    int removedCount = 0;
     long from = getOldestTimestamp(solveTimes);
     SolveHistory solveHistory = App.INSTANCE.getService().getProviderAccess().getHistory(solveType, from);
     Iterator<SolveTime> iterator = solveTimes.iterator();
@@ -89,8 +90,10 @@ public class SolveTimesInserter extends AsyncTask<ImportTimesData, Integer, Stri
       }
       if (existsInDb) {
         iterator.remove();
+        removedCount++;
       }
     }
+    return removedCount;
   }
 
   private long getComparableTimestamp(long timestamp) {
