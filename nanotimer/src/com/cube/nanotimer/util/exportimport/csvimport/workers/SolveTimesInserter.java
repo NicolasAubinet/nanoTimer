@@ -9,6 +9,7 @@ import com.cube.nanotimer.util.exportimport.ErrorListener;
 import com.cube.nanotimer.util.exportimport.csvimport.CSVImporter;
 import com.cube.nanotimer.util.exportimport.csvimport.ImportResultListener;
 import com.cube.nanotimer.util.exportimport.csvimport.ImportTimesData;
+import com.cube.nanotimer.vo.ProgressListener;
 import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
@@ -33,7 +34,7 @@ public class SolveTimesInserter extends AsyncTask<ImportTimesData, Integer, Stri
   @Override
   protected String doInBackground(ImportTimesData... data) {
     ImportTimesData importData = data[0];
-    int solveTimesCount = importData.getSolveTimesCount();
+    final int solveTimesCount = importData.getSolveTimesCount();
     int processedCount = 0;
     for (Entry<SolveType, List<SolveTime>> entry : importData.getSolveTimes().entrySet()) {
       SolveType solveType = entry.getKey();
@@ -41,11 +42,15 @@ public class SolveTimesInserter extends AsyncTask<ImportTimesData, Integer, Stri
 
       processedCount += removeAlreadyExistingSolveTimes(solveType, solveTimes);
       publishProgress(solveTimesCount, processedCount);
-      for (SolveTime solveTime : solveTimes) {
-        App.INSTANCE.getService().getProviderAccess().saveTime(solveTime);
-        processedCount++;
-        publishProgress(solveTimesCount, processedCount);
-      }
+
+      final int currentProcessedCount = processedCount;
+      App.INSTANCE.getService().getProviderAccess().saveTimes(solveTimes, new ProgressListener() {
+        @Override
+        public void onProgress(int progress) {
+          publishProgress(solveTimesCount, currentProcessedCount + progress);
+        }
+      });
+      processedCount += solveTimes.size();
     }
     return null;
   }

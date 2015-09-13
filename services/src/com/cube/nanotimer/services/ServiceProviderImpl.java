@@ -8,6 +8,7 @@ import com.cube.nanotimer.session.TimesStatistics;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ExportResult;
 import com.cube.nanotimer.vo.FrequencyData;
+import com.cube.nanotimer.vo.ProgressListener;
 import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveHistory;
@@ -116,12 +117,30 @@ public class ServiceProviderImpl implements ServiceProvider {
 
   @Override
   public SolveAverages saveTime(SolveTime solveTime) {
+    return saveTime(solveTime, true);
+  }
+
+  public SolveAverages saveTime(SolveTime solveTime, boolean updateCachesFromDB) {
     syncCaches(solveTime.getSolveType());
     if (solveTime.getId() > 0) {
       return updateTime(solveTime);
     } else {
-      return createTime(solveTime);
+      return createTime(solveTime, updateCachesFromDB);
     }
+  }
+
+  @Override
+  public SolveAverages saveTimes(List<SolveTime> solveTimes, ProgressListener progressListener) {
+    SolveType solveType = (solveTimes.size() > 0) ? solveTimes.get(0).getSolveType() : null;
+    syncCaches(solveType);
+    int i = 0;
+    for (SolveTime solveTime : solveTimes) {
+      createTime(solveTime, false);
+      if (progressListener != null) {
+        progressListener.onProgress(++i);
+      }
+    }
+    return updateAveragesAndPBCaches(solveType);
   }
 
   private SolveAverages updateTime(SolveTime solveTime) {
@@ -254,7 +273,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     return time;
   }
 
-  private SolveAverages createTime(SolveTime solveTime) {
+  private SolveAverages createTime(SolveTime solveTime, boolean updateCachesFromDB) {
     CachedTime cachedTime = new CachedTime(solveTime);
     synchronized (cacheSyncHelper) {
       cachedSolveTimes.add(0, cachedTime);
@@ -303,12 +322,21 @@ public class ServiceProviderImpl implements ServiceProvider {
     cachedTime.setSolveId((int) historyId);
     solveTime.setId((int) historyId);
 
-    loadBestAverages(solveTime.getSolveType().getId());
-    loadLifetimeBest(solveTime.getSolveType().getId());
-
-    SolveAverages solveAverages = getSolveAverages(solveTime.getSolveType());
-    solveAverages.setSolveTime(solveTime);
+    SolveAverages solveAverages = null;
+    if (updateCachesFromDB) {
+      solveAverages = updateAveragesAndPBCaches(solveTime.getSolveType());
+      solveAverages.setSolveTime(solveTime);
+    }
     return solveAverages;
+  }
+
+  private SolveAverages updateAveragesAndPBCaches(SolveType solveType) {
+    if (solveType == null) {
+      return null;
+    }
+    loadBestAverages(solveType.getId());
+    loadLifetimeBest(solveType.getId());
+    return getSolveAverages(solveType);
   }
 
   @Override
