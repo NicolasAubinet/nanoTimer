@@ -16,11 +16,13 @@
        android:dialogTitle="@string/inspection_mode"
        android:defaultValue="1"/>
 
-    <com.cube.nanotimer.gui.widget.preferences.NumberEntryDialog
+    <com.cube.nanotimer.gui.widget.preferences.WheelViewDialog
        android:key="inspection_time"
        android:title="@string/inspection_time"
        android:summary="@string/inspection_time_summary"
        android:defaultValue="@integer/inspection_time"
+       custom:min="0"
+       custom:max="600"
        custom:defaultVal="@integer/inspection_time"/>
 
     <CheckBoxPreference

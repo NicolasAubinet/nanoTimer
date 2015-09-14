@@ -14,5 +14,6 @@
     <attr name="min" format="integer"/>
     <attr name="max" format="integer"/>
     <attr name="defaultVal" format="integer"/>
+    <attr name="cyclic" format="boolean"/>
   </declare-styleable>
 </resources>
