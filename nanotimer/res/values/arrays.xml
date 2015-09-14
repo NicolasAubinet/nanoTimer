@@ -55,4 +55,8 @@
     <item>@string/chart_type_progression</item>
     <item>@string/chart_type_frequency</item>
   </string-array>
+  <string-array name="import_export">
+    <item>@string/import_times</item>
+    <item>@string/export_times</item>
+  </string-array>
 </resources>

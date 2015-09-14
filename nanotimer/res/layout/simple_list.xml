@@ -5,7 +5,9 @@
    android:layout_width="match_parent"
    android:layout_height="match_parent"
    android:paddingRight="8px"
-   android:paddingLeft="8px">
+   android:paddingLeft="8px"
+   android:paddingTop="2px"
+   android:paddingBottom="4px">
 
   <ListView
      android:id="@+id/lvItems"

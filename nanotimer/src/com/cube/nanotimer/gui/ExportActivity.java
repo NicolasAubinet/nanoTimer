@@ -67,7 +67,7 @@ public class ExportActivity extends ActionBarActivity {
       return;
     }
 
-    setTitle(R.string.export);
+    setTitle(R.string.export_times);
     initViews();
 
     App.INSTANCE.getService().getCubeTypes(false, new DataCallback<List<CubeType>>() {

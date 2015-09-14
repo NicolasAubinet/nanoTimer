@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.ankhsoft.filebrowser.FileBrowser;
 import com.ankhsoft.filebrowser.OnFileSelectedListener;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.util.helper.Utils;
 
 import java.io.File;
 
@@ -19,6 +20,10 @@ public class ImportActivity extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.import_screen);
+    if (!Utils.checkProFeature(this)) {
+      finish();
+      return;
+    }
 
     initViews();
   }

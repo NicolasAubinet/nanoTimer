@@ -53,6 +53,7 @@ import com.startapp.android.publish.banner.Banner;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -90,6 +91,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
 
   private static final int ID_CUBETYPE = 1;
   private static final int ID_SOLVETYPE = 2;
+  private static final int ID_IMPORTEXPORT = 3;
 
   private static final int IMPORT_REQUEST_CODE = 1;
 
@@ -133,8 +135,8 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
             types.add(t.getName());
           }
           DialogUtils.showFragment(MainScreenActivity.this,
-                  SolveTypesFragmentDialog.newInstance(ID_SOLVETYPE, types, true, MainScreenActivity.this,
-                          Options.INSTANCE.isSolveTypesShortcutEnabled()));
+            SolveTypesFragmentDialog.newInstance(ID_SOLVETYPE, types, true, MainScreenActivity.this,
+              Options.INSTANCE.isSolveTypesShortcutEnabled()));
         }
       }
     });
@@ -167,7 +169,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
       @Override
       public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         DialogUtils.showFragment(MainScreenActivity.this,
-                HistoryDetailDialog.newInstance(liHistory.get(i), curCubeType, MainScreenActivity.this));
+          HistoryDetailDialog.newInstance(liHistory.get(i), curCubeType, MainScreenActivity.this));
       }
     });
     lvHistory.setOnScrollListener(new OnScrollListener() {
@@ -313,14 +315,10 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
           startActivity(i);
         }
         break;
-      case R.id.itExport:
+      case R.id.itImportExport:
         if (Utils.checkProFeature(this)) {
-          startActivity(new Intent(this, ExportActivity.class));
-        }
-        break;
-      case R.id.itImport:
-        if (Utils.checkProFeature(this)) {
-          startActivityForResult(new Intent(this, ImportActivity.class), IMPORT_REQUEST_CODE);
+          ArrayList<String> items = new ArrayList(Arrays.asList(getResources().getStringArray(R.array.import_export)));
+          DialogUtils.showFragment(this, SelectorFragmentDialog.newInstance(ID_IMPORTEXPORT, items, true, this));
         }
         break;
       case R.id.itAddNewTime:
@@ -540,6 +538,12 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
           Intent i = new Intent(this, SolveTypesActivity.class);
           i.putExtra("cubeType", curCubeType);
           startActivity(i);
+        }
+      } else if (id == ID_IMPORTEXPORT) {
+        if (position == 0) {
+          startActivityForResult(new Intent(this, ImportActivity.class), IMPORT_REQUEST_CODE);
+        } else if (position == 1) {
+          startActivity(new Intent(this, ExportActivity.class));
         }
       }
     }
