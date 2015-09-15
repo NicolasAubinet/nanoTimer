@@ -35,16 +35,4 @@ public class ChartUtils {
     return times;
   }
 
-  /*public static List<ChartData> getSmoothedChartTimes(List<ChartData> chartData) {
-    double epsilon = chartData.size() / 20;
-    RamerDouglasPeuckerFilter filter = new RamerDouglasPeuckerFilter(epsilon);
-    ChartDataContainer[] data = chartData.toArray(new ChartData[0]);
-    ChartDataContainer[] filtered = filter.filter(data);
-    List<ChartData> filteredChartData = new ArrayList<ChartData>();
-    for (ChartDataContainer filteredData : filtered) {
-      filteredChartData.add((ChartData) filteredData);
-    }
-    return filteredChartData;
-  }*/
-
 }
