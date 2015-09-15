@@ -5,14 +5,25 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
-import android.widget.*;
+import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.Spinner;
+import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
-import com.cube.nanotimer.vo.*;
+import com.cube.nanotimer.util.chart.ChartData;
+import com.cube.nanotimer.util.chart.ChartUtils;
+import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.FrequencyData;
+import com.cube.nanotimer.vo.SolveHistory;
+import com.cube.nanotimer.vo.SolveTime;
+import com.cube.nanotimer.vo.SolveType;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -65,7 +76,7 @@ public class GraphActivity extends ActionBarActivity {
   enum GraphType {
     PROGRESSION {
       @Override
-      public String formatValue(long value) {
+      public String formatValue(float value) {
         return FormatterService.INSTANCE.formatSolveTime(Math.round((double) value));
       }
 
@@ -76,8 +87,8 @@ public class GraphActivity extends ActionBarActivity {
     },
     FREQUENCY {
       @Override
-      public String formatValue(long value) {
-        return String.valueOf(value);
+      public String formatValue(float value) {
+        return FormatterService.INSTANCE.formatFloat(value, 2);
       }
 
       @Override
@@ -86,7 +97,7 @@ public class GraphActivity extends ActionBarActivity {
       }
     };
 
-    public abstract String formatValue(long value);
+    public abstract String formatValue(float value);
     public abstract String formatXLabel(long value);
   }
 
@@ -139,7 +150,7 @@ public class GraphActivity extends ActionBarActivity {
     ValueFormatter valueFormatter = new ValueFormatter() {
       @Override
       public String getFormattedValue(float value) {
-        return getSelectedGraphType().formatValue((long) value);
+        return getSelectedGraphType().formatValue(value);
       }
     };
 
@@ -218,7 +229,7 @@ public class GraphActivity extends ActionBarActivity {
     GraphType selectedGraphType = getSelectedGraphType();
     List<ChartData> data;
     if (cbSmooth.isChecked()) {
-      data = getSmoothedChartTimes();
+      data = ChartUtils.getSmoothedChartTimes(chartData);
     } else {
       data = chartData;
     }
@@ -270,27 +281,6 @@ public class GraphActivity extends ActionBarActivity {
     }
   }
 
-  private List<ChartData> getSmoothedChartTimes() {
-    int averageTimesCount = 2; // number of times to average together around each time (bigger will smooth out more)
-    final int totalTimesToShow = 50; // maximum number of times to display (approximation, might be a bit more)
-    final int timesToKeep = Math.max(1, chartData.size() / totalTimesToShow); // will keep 1 time for every timesToKeep times
-    if (averageTimesCount < timesToKeep - 1) { // if too many times, adjust averageTimesCount to avoid losing times while averaging
-      averageTimesCount = timesToKeep - 1;
-    }
-    List<ChartData> times = new ArrayList<ChartData>();
-    for (int i = 0; i < chartData.size(); i += timesToKeep) {
-      long total = 0;
-      int start = Math.max(0, i - averageTimesCount);
-      int end = Math.min(i + averageTimesCount + 1, chartData.size());
-      for (int j = start; j < end; j++) {
-        total += chartData.get(j).getData();
-      }
-      long time = total / (end - start);
-      times.add(new ChartData(time, chartData.get(i).getTimestamp()));
-    }
-    return times;
-  }
-
   private List<ChartData> getChartTimesFromSolveHistory(SolveHistory solveHistory) {
     List<ChartData> chartTimes = new ArrayList<ChartData>();
     for (int i = solveHistory.getSolveTimes().size() - 1; i >= 0; i--) {
@@ -308,24 +298,6 @@ public class GraphActivity extends ActionBarActivity {
       chartData.add(new ChartData(curFrequencyData.getSolvesCount(), curFrequencyData.getDay()));
     }
     return chartData;
-  }
-
-  class ChartData {
-    private long data;
-    private long timestamp;
-
-    ChartData(long data, long timestamp) {
-      this.data = data;
-      this.timestamp = timestamp;
-    }
-
-    public long getData() {
-      return data;
-    }
-
-    public long getTimestamp() {
-      return timestamp;
-    }
   }
 
 }

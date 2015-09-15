@@ -130,6 +130,13 @@ public enum FormatterService {
     return ts;
   }
 
+  public String formatFloat(double value, int decimalsCount) {
+    double multiplicator = Math.pow(10, decimalsCount);
+    value = value * multiplicator;
+    long rounded = Math.round(value); // to avoid things like "2.9999"
+    return String.valueOf(((float) rounded) / multiplicator);
+  }
+
   /**
    * Format the times of different steps to a String
    * @param times a list of times in ms
