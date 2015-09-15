@@ -249,8 +249,13 @@
     <font color=\"white\">
     <u><b>v1.1.6</b></u>
     <ul>
-      <li>Pro: Add times manually</li>
-      <li>Pro: New frequency graph</li>
+      <li>Pro: Import times from CSV (synchronization handled to avoid inserting times that already exist). Requires a re-export.</li>
+      <li>Pro: Enter times manually</li>
+      <li>Pro: New frequency graph (solves count over time)</li>
+      <li>Pro: Allow to export times with and without steps all at once</li>
+      <li>Moved export/import buttons to main menu</li>
+      <li>Improved graphs smoothing</li>
+      <li>Various fixes and improvements</li>
     </ul>
     <u><b>v1.1.5</b></u>
     <ul>
