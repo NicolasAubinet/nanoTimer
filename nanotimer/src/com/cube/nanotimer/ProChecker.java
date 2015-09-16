@@ -18,7 +18,7 @@ public class ProChecker {
       // don't do anything (pro app might not be installed)
     }
     if (sigMatch == PackageManager.SIGNATURE_MATCH) {
-      if (versionCode == VALID_PRO_VERSION_CODE) {
+      if (versionCode >= VALID_PRO_VERSION_CODE) {
         return ProState.ENABLED;
       } else {
         return ProState.INVALID_VERSION;
