@@ -30,7 +30,9 @@ public class ExportResultConverter {
     sb.append(",");
     sb.append(result.isBlindType() ? "y" : "n");
     sb.append(",");
-    sb.append(escapeString(result.getScramble()));
+    if (result.getScramble() != null) {
+      sb.append(escapeString(result.getScramble()));
+    }
     return sb.toString();
   }
 
