@@ -28,7 +28,7 @@ public class CSVImporter {
   public void importData(File file) {
     new CSVDataReader(activity, errorListener, new ImportResultListener() {
       @Override
-      public void onResult(final String result) {
+      public void onResult(final String result, final Object... params) {
         activity.runOnUiThread(new Runnable() {
           @Override
           public void run() {
@@ -36,7 +36,12 @@ public class CSVImporter {
               if (refreshHandler != null) {
                 refreshHandler.refreshHistory();
               }
-              DialogUtils.showOkDialog(activity, R.string.import_times, R.string.times_imported_successfully);
+              int locInsertCount = (Integer) params[0];
+              if (locInsertCount > 0) {
+                DialogUtils.showOkDialog(activity, activity.getString(R.string.import_times), activity.getString(R.string.times_imported_successfully, locInsertCount));
+              } else {
+                DialogUtils.showOkDialog(activity, R.string.import_times, R.string.no_new_times_inserted);
+              }
             } else if (result.equals(NO_DATA)) {
               DialogUtils.showOkDialog(activity, R.string.import_times, R.string.no_import_data_found);
             }

@@ -218,7 +218,8 @@
   <string name="fetching_solve_types">Fetching solve types…</string>
   <string name="inserting_solve_types">Inserting solve types…</string>
   <string name="inserting_times">Inserting times in database…</string>
-  <string name="times_imported_successfully">Times imported successfully!</string>
+  <string name="times_imported_successfully">Times imported successfully!\n%1$d new times were inserted.</string>
+  <string name="no_new_times_inserted">No new time was inserted because they were already in database.</string>
   <string name="no_import_data_found">No import data found in file.</string>
   <string name="invalid_import_file_format">Invalid import file format. Please select a valid import file, or try re-exporting.</string>
   <string name="ok">OK</string>

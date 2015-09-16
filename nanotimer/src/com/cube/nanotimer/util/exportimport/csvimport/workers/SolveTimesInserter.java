@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
-public class SolveTimesInserter extends AsyncTask<ImportTimesData, Integer, String> {
+public class SolveTimesInserter extends AsyncTask<ImportTimesData, Integer, Integer> {
 
   private Context context;
   private ProgressDialog progressDialog;
@@ -32,10 +32,11 @@ public class SolveTimesInserter extends AsyncTask<ImportTimesData, Integer, Stri
   }
 
   @Override
-  protected String doInBackground(ImportTimesData... data) {
+  protected Integer doInBackground(ImportTimesData... data) {
     ImportTimesData importData = data[0];
     final int solveTimesCount = importData.getSolveTimesCount();
     int processedCount = 0;
+    int insertCount = 0;
     for (Entry<SolveType, List<SolveTime>> entry : importData.getSolveTimes().entrySet()) {
       SolveType solveType = entry.getKey();
       List<SolveTime> solveTimes = entry.getValue();
@@ -50,25 +51,27 @@ public class SolveTimesInserter extends AsyncTask<ImportTimesData, Integer, Stri
           publishProgress(solveTimesCount, currentProcessedCount + progress);
         }
       });
-      processedCount += solveTimes.size();
+      insertCount += solveTimes.size();
+      processedCount += insertCount;
     }
-    return null;
+    return insertCount;
   }
 
   @Override
   protected void onPreExecute() {
     progressDialog = new ProgressDialog(context);
-    progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+    progressDialog.setIndeterminate(false);
     progressDialog.setCancelable(false);
+    progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
     progressDialog.setMessage(context.getString(R.string.inserting_times));
     progressDialog.show();
   }
 
   @Override
-  protected void onPostExecute(String s) {
+  protected void onPostExecute(Integer insertCount) {
     progressDialog.hide();
     progressDialog.dismiss();
-    dataListener.onResult(CSVImporter.SUCCESS);
+    dataListener.onResult(CSVImporter.SUCCESS, insertCount);
   }
 
   @Override

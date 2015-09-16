@@ -131,7 +131,10 @@ public class ServiceProviderImpl implements ServiceProvider {
 
   @Override
   public SolveAverages saveTimes(List<SolveTime> solveTimes, ProgressListener progressListener) {
-    SolveType solveType = (solveTimes.size() > 0) ? solveTimes.get(0).getSolveType() : null;
+    if (solveTimes.size() == 0) {
+      return null;
+    }
+    SolveType solveType = solveTimes.get(0).getSolveType();
     syncCaches(solveType);
     int i = 0;
     for (SolveTime solveTime : solveTimes) {
