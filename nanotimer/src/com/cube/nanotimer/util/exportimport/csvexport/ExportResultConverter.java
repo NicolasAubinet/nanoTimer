@@ -54,6 +54,9 @@ public class ExportResultConverter {
     boolean plusTwo = (fields.get(5).equals("y"));
     boolean blindType = (fields.get(6).equals("y"));
     String scramble = fields.get(7);
+    if ("".equals(scramble.trim())) {
+      scramble = null;
+    }
 
     ExportResult exportResult = new ExportResult(cubeTypeName, solveTypeName, time, timestamp, plusTwo, blindType, scramble);
     String stepsField = fields.get(4);
