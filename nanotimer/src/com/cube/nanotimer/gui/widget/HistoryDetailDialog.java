@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
@@ -15,6 +16,7 @@ import com.cube.nanotimer.R;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.ScrambleFormatterService;
+import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.view.FontFitTextView;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveAverages;
@@ -82,6 +84,7 @@ public class HistoryDetailDialog extends DialogFragment {
     Button buPlusTwo = (Button) v.findViewById(R.id.buPlusTwo);
     Button buDNF = (Button) v.findViewById(R.id.buDNF);
     Button buDelete = (Button) v.findViewById(R.id.buDelete);
+    ImageButton buShareTime = (ImageButton) v.findViewById(R.id.buShareTime);
     ImageView imgPb = (ImageView) v.findViewById(R.id.imgPb);
 
     if (solveTime.isPlusTwo()) {
@@ -138,6 +141,13 @@ public class HistoryDetailDialog extends DialogFragment {
         });
         handler.onTimeDeleted(solveTime);
         dialog.dismiss();
+      }
+    });
+
+    buShareTime.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        DialogUtils.shareTime(getActivity(), solveTime, cubeType);
       }
     });
 

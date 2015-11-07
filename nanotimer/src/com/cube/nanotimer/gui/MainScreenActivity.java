@@ -30,13 +30,12 @@ import com.cube.nanotimer.ProChecker;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.AboutDialog;
 import com.cube.nanotimer.gui.widget.HistoryDetailDialog;
-import com.cube.nanotimer.gui.widget.HistoryRefreshHandler;
+import com.cube.nanotimer.gui.widget.ResultListener;
 import com.cube.nanotimer.gui.widget.SelectionHandler;
 import com.cube.nanotimer.gui.widget.SelectorFragmentDialog;
 import com.cube.nanotimer.gui.widget.SolveTypesFragmentDialog;
 import com.cube.nanotimer.gui.widget.TimeChangedHandler;
 import com.cube.nanotimer.gui.widget.ads.AdProvider;
-import com.cube.nanotimer.gui.widget.dialog.AddNewTimeDialog;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.YesNoListener;
@@ -59,7 +58,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-public class MainScreenActivity extends ActionBarActivity implements TimeChangedHandler, SelectionHandler, HistoryRefreshHandler {
+public class MainScreenActivity extends ActionBarActivity implements TimeChangedHandler, SelectionHandler, ResultListener {
 
   private Button buCubeType;
   private Button buSolveType;
@@ -67,7 +66,6 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   private TextView tvSolvesCount;
   private TextView tvHistory;
   private MenuItem miSortMode;
-  private MenuItem miAddNewTime;
 
   private CubeType curCubeType;
   private SolveType curSolveType;
@@ -267,16 +265,8 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.mainscreen_menu, menu);
     miSortMode = menu.findItem(R.id.itSortMode);
-    miAddNewTime = menu.findItem(R.id.itAddNewTime);
-    updateAddNewTimeItemVisibility();
     setSortMode(TimesSort.TIMESTAMP);
     return true;
-  }
-
-  private void updateAddNewTimeItemVisibility() {
-    if (miAddNewTime != null) {
-      miAddNewTime.setVisible(curSolveType == null || !curSolveType.hasSteps());
-    }
   }
 
   @Override
@@ -319,12 +309,6 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
         if (Utils.checkProFeature(this)) {
           ArrayList<String> items = new ArrayList(Arrays.asList(getResources().getStringArray(R.array.import_export)));
           DialogUtils.showFragment(this, SelectorFragmentDialog.newInstance(ID_IMPORTEXPORT, items, true, this));
-        }
-        break;
-      case R.id.itAddNewTime:
-        if (Utils.checkProFeature(this)) {
-          AddNewTimeDialog dialog = AddNewTimeDialog.newInstance(this, curSolveType);
-          DialogUtils.showFragment(this, dialog);
         }
         break;
       case R.id.itAbout:
@@ -411,7 +395,6 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
     }
   }
 
-  @Override
   public void refreshHistory() {
     previousLastItem = 0;
     if (curSolveType != null) {
@@ -441,6 +424,11 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
         }
       });
     }
+  }
+
+  @Override
+  public void onResult(Object... params) {
+    refreshHistory();
   }
 
   private void refreshButtonTexts() {
@@ -579,12 +567,6 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
 
   private void setCurSolveType(SolveType solveType) {
     this.curSolveType = solveType;
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        updateAddNewTimeItemVisibility();
-      }
-    });
     Utils.setCurrentSolveType(this, solveType);
   }
 

@@ -11,9 +11,6 @@
   <item android:id="@+id/itGraphs"
      android:title="@string/graphs"/>
 
-  <item android:id="@+id/itAddNewTime"
-     android:title="@string/add_new_time"/>
-
   <item android:id="@+id/itImportExport"
      android:title="@string/import_export"/>
 

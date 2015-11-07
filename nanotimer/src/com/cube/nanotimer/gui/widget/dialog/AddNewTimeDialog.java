@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.gui.widget.HistoryRefreshHandler;
+import com.cube.nanotimer.gui.widget.ResultListener;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
@@ -16,17 +16,19 @@ import kankan.wheel.widget.adapters.NumericWheelAdapter;
 
 public class AddNewTimeDialog extends ConfirmDialog {
 
-  private HistoryRefreshHandler historyRefreshHandler;
+  private ResultListener resultListener;
   private SolveType solveType;
+  private String scramble;
 
-  public static AddNewTimeDialog newInstance(HistoryRefreshHandler historyRefreshHandler, SolveType solveType) {
-    AddNewTimeDialog frag = new AddNewTimeDialog(historyRefreshHandler, solveType);
+  public static AddNewTimeDialog newInstance(ResultListener resultListener, SolveType solveType, String scramble) {
+    AddNewTimeDialog frag = new AddNewTimeDialog(resultListener, solveType, scramble);
     return frag;
   }
 
-  private AddNewTimeDialog(HistoryRefreshHandler historyRefreshHandler, SolveType solveType) {
-    this.historyRefreshHandler = historyRefreshHandler;
+  private AddNewTimeDialog(ResultListener resultListener, SolveType solveType, String scramble) {
+    this.resultListener = resultListener;
     this.solveType = solveType;
+    this.scramble = scramble;
   }
 
   @Override
@@ -48,12 +50,13 @@ public class AddNewTimeDialog extends ConfirmDialog {
     solveTime.setTime(time);
     solveTime.setTimestamp(System.currentTimeMillis());
     solveTime.setSolveType(solveType);
+    solveTime.setScramble(scramble);
 
     App.INSTANCE.getService().saveTime(solveTime, new DataCallback<SolveAverages>() {
       @Override
       public void onData(SolveAverages data) {
-        if (historyRefreshHandler != null) {
-          historyRefreshHandler.refreshHistory();
+        if (resultListener != null) {
+          resultListener.onResult(data);
         }
       }
     });

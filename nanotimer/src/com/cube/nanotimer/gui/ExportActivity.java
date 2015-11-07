@@ -56,7 +56,6 @@ public class ExportActivity extends ActionBarActivity {
   private static final String PREFS_NAME = "export";
   private static final String EXPORT_LIMIT_KEY = "limit";
   private static final String EXPORT_FILE_NAME = "export.csv";
-  private static final int SEND_REQUEST_CODE = 0;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -193,16 +192,10 @@ public class ExportActivity extends ActionBarActivity {
 
   private void sendExportFile(File file) {
     Uri uri = FileProvider.getUriForFile(this, "com.cube.nanotimer.fileprovider", file);
-    Intent i = ShareCompat.IntentBuilder.from(this)
-        .setType("message/rfc822")
-        .setSubject(getString(R.string.export_mail_subject))
-        .setText(getString(R.string.export_mail_body, FormatterService.INSTANCE.formatDateTime(System.currentTimeMillis())))
-        .setStream(uri)
-        .setChooserTitle(R.string.send_via)
-        .createChooserIntent()
-        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
-        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-    startActivityForResult(i, SEND_REQUEST_CODE);
+    DialogUtils.shareData(this,
+      getString(R.string.export_mail_subject),
+      getString(R.string.export_mail_body, FormatterService.INSTANCE.formatDateTime(System.currentTimeMillis())),
+      uri);
   }
 
   private class ExportListAdapter extends ArrayAdapter<ListItem> {

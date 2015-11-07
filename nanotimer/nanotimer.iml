@@ -4,7 +4,7 @@
     <facet type="android" name="Android">
       <configuration>
         <proGuardCfgFiles>
-          <file>file://$USER_HOME$/adt/sdk/tools/proguard/proguard-android.txt</file>
+          <file>file://%MODULE_SDK_HOME%/sdk/tools/proguard/proguard-android.txt</file>
         </proGuardCfgFiles>
         <option name="UPDATE_PROPERTY_FILES" value="true" />
       </configuration>
@@ -16,7 +16,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" generated="true" />
     </content>
-    <orderEntry type="jdk" jdkName="Android API 22 Platform" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android API 23 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="datamodel" />
     <orderEntry type="module" module-name="services" />
@@ -35,6 +35,7 @@
     </orderEntry>
     <orderEntry type="library" name="mpandroidchartlibrary-1-7-4" level="project" />
     <orderEntry type="library" name="android-support-v4" level="project" />
+    <orderEntry type="module" module-name="android-support-v7" />
     <orderEntry type="library" name="android-support-v7-appcompat" level="project" />
   </component>
 </module>

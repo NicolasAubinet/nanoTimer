@@ -23,8 +23,10 @@ import com.cube.nanotimer.Options.AdsStyle;
 import com.cube.nanotimer.Options.BigCubesNotation;
 import com.cube.nanotimer.Options.InspectionMode;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.gui.widget.ResultListener;
 import com.cube.nanotimer.gui.widget.SessionDetailDialog;
 import com.cube.nanotimer.gui.widget.ads.AdProvider;
+import com.cube.nanotimer.gui.widget.dialog.AddNewTimeDialog;
 import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.session.CubeSession;
@@ -39,7 +41,7 @@ import com.cube.nanotimer.vo.*;
 
 import java.util.*;
 
-public class TimerActivity extends ActionBarActivity {
+public class TimerActivity extends ActionBarActivity implements ResultListener {
 
   enum TimerState {STOPPED, RUNNING, INSPECTING}
 
@@ -50,6 +52,7 @@ public class TimerActivity extends ActionBarActivity {
   private ViewGroup layout;
   private TableLayout sessionTimesLayout;
   private TableLayout timerStepsLayout;
+  private MenuItem miShareTime;
 
   private CubeType cubeType;
   private SolveType solveType;
@@ -59,10 +62,11 @@ public class TimerActivity extends ActionBarActivity {
   private SolveAverages solveAverages;
   private SolveAverages prevSolveAverages;
   private int currentOrientation;
-  private List<Long> stepsTimes;
+  private List<Long> stepsTimes = new ArrayList<Long>();
   private long stepStartTs;
   private List<Animation> animations = new ArrayList<Animation>();
   private boolean hasNewSession;
+  private SolveAverageCallback solveAverageCallback = new SolveAverageCallback();
 
   private int solvesCount; // session solves count (or history solves count if no session exists)
   private int historySolvesCount;
@@ -102,7 +106,7 @@ public class TimerActivity extends ActionBarActivity {
       finish();
     }
     cubeSession = new CubeSession();
-    App.INSTANCE.getService().getSolveAverages(solveType, new SolveAverageCallback());
+    App.INSTANCE.getService().getSolveAverages(solveType, solveAverageCallback);
 
     initActionBar();
 
@@ -305,10 +309,13 @@ public class TimerActivity extends ActionBarActivity {
     if (solveType.hasSteps()) {
       menu.findItem(R.id.itSessionDetails).setVisible(false);
       menu.findItem(R.id.itNewSession).setVisible(false);
+      menu.findItem(R.id.itAddTime).setVisible(false);
     }
     if (!hasNewSession) {
       menu.findItem(R.id.itSessionDetails).setVisible(false);
     }
+    miShareTime = menu.findItem(R.id.itShareTime);
+    miShareTime.setVisible(lastSolveTime != null);
     return true;
   }
 
@@ -324,7 +331,7 @@ public class TimerActivity extends ActionBarActivity {
         case R.id.itPlusTwo:
           if (lastSolveTime != null && !lastSolveTime.isDNF() && !lastSolveTime.isPlusTwo()) {
             lastSolveTime.plusTwo();
-            App.INSTANCE.getService().saveTime(lastSolveTime, new SolveAverageCallback());
+            App.INSTANCE.getService().saveTime(lastSolveTime, solveAverageCallback);
             tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(lastSolveTime.getTime()));
             cubeSession.setLastAsPlusTwo();
             refreshSessionFields();
@@ -333,7 +340,7 @@ public class TimerActivity extends ActionBarActivity {
         case R.id.itDNF:
           if (lastSolveTime != null && !lastSolveTime.isDNF()) {
             lastSolveTime.setTime(-1);
-            App.INSTANCE.getService().saveTime(lastSolveTime, new SolveAverageCallback());
+            App.INSTANCE.getService().saveTime(lastSolveTime, solveAverageCallback);
             tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(lastSolveTime.getTime()));
             cubeSession.setLastAsDNF();
             refreshSessionFields();
@@ -341,7 +348,7 @@ public class TimerActivity extends ActionBarActivity {
           break;
         case R.id.itDelete:
           if (lastSolveTime != null) {
-            App.INSTANCE.getService().deleteTime(lastSolveTime, new SolveAverageCallback());
+            App.INSTANCE.getService().deleteTime(lastSolveTime, solveAverageCallback);
             cubeSession.deleteLast();
             historySolvesCount--;
             setSolvesCount(solvesCount - 1);
@@ -366,6 +373,18 @@ public class TimerActivity extends ActionBarActivity {
               }
             }
           });
+          break;
+        case R.id.itAddTime:
+          if (Utils.checkProFeature(this)) {
+            String scramble = ScrambleFormatterService.INSTANCE.formatScrambleAsSingleLine(currentScramble, cubeType);
+            AddNewTimeDialog dialog = AddNewTimeDialog.newInstance(this, solveType, scramble);
+            DialogUtils.showFragment(this, dialog);
+          }
+          break;
+        case R.id.itShareTime:
+          if (lastSolveTime != null) {
+            DialogUtils.shareTime(this, lastSolveTime, cubeType);
+          }
           break;
       }
     }
@@ -411,6 +430,19 @@ public class TimerActivity extends ActionBarActivity {
         }
       }
     }
+  }
+
+  @Override
+  public void onResult(Object... params) {
+    final SolveAverages solveAverages = (SolveAverages) params[0];
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        addTimeToUI(solveAverages.getSolveTime().getTime());
+        generateScramble();
+      }
+    });
+    solveAverageCallback.onData(solveAverages);
   }
 
   public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -471,7 +503,7 @@ public class TimerActivity extends ActionBarActivity {
     }
     timerStartTs = curTime;
     if (solveType.hasSteps()) {
-      stepsTimes = new ArrayList<Long>();
+      stepsTimes.clear();
       stepStartTs = timerStartTs;
     }
     timerStarted();
@@ -624,13 +656,17 @@ public class TimerActivity extends ActionBarActivity {
       solveTime.setStepsTimes(stepsTimes.toArray(new Long[0]));
     }
 
+    addTimeToUI(time);
+    App.INSTANCE.getService().saveTime(solveTime, solveAverageCallback);
+  }
+
+  private void addTimeToUI(long time) {
     if (cubeSession != null) {
       cubeSession.addTime(time);
       historySolvesCount++;
       setSolvesCount(solvesCount + 1);
       refreshSessionFields();
     }
-    App.INSTANCE.getService().saveTime(solveTime, new SolveAverageCallback());
   }
 
   private void updateStepTimeText(int id, String time) {
@@ -855,13 +891,16 @@ public class TimerActivity extends ActionBarActivity {
   private class SolveAverageCallback extends DataCallback<SolveAverages> {
 
     @Override
-    public void onData(final SolveAverages data) {
+    public synchronized void onData(final SolveAverages data) {
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
           prevSolveAverages = solveAverages;
           solveAverages = data;
           lastSolveTime = data.getSolveTime();
+          if (miShareTime != null) {
+            miShareTime.setVisible(lastSolveTime != null);
+          }
           refreshAvgFields(true);
         }
       });

@@ -45,11 +45,13 @@
       <TextView
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
+         android:layout_gravity="center_vertical"
          android:text="@string/time"
          android:textSize="22px"/>
       <LinearLayout
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
+         android:layout_gravity="center_vertical"
          android:orientation="horizontal"
          android:layout_marginLeft="15px"
          android:layout_weight="1">
@@ -66,6 +68,13 @@
            android:paddingLeft="8px"
            android:src="@drawable/star"/>
       </LinearLayout>
+      <ImageButton
+         android:id="@+id/buShareTime"
+         android:layout_gravity="center_vertical"
+         android:layout_width="60px"
+         android:layout_height="60px"
+         android:src="@android:drawable/ic_menu_share"
+         android:contentDescription="@string/share_time"/>
     </TableRow>
     <TableRow android:id="@+id/trSteps" android:layout_marginTop="8px" android:visibility="gone">
       <TextView

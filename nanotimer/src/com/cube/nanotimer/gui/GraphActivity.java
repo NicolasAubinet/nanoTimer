@@ -141,8 +141,8 @@ public class GraphActivity extends ActionBarActivity {
     chart.setDescription("");
     chart.setDrawLegend(false);
     chart.setHighlightEnabled(false);
-    chart.setGridColor(getColor(R.color.gray800));
-    chart.setBackgroundColor(getColor(R.color.graybg));
+    chart.setGridColor(getResourceColor(R.color.gray800));
+    chart.setBackgroundColor(getResourceColor(R.color.graybg));
     chart.setDrawGridBackground(false);
     chart.setDrawYValues(false);
     chart.setNoDataText("");
@@ -155,11 +155,11 @@ public class GraphActivity extends ActionBarActivity {
     };
 
     chart.getXLabels().setSpaceBetweenLabels(1);
-    chart.getXLabels().setTextColor(getColor(R.color.white));
+    chart.getXLabels().setTextColor(getResourceColor(R.color.white));
     chart.getXLabels().setTextSize(12);
     chart.setValueFormatter(valueFormatter);
 
-    chart.getYLabels().setTextColor(getColor(R.color.white));
+    chart.getYLabels().setTextColor(getResourceColor(R.color.white));
     chart.getYLabels().setTextSize(12);
     chart.getYLabels().setFormatter(valueFormatter);
   }
@@ -244,9 +244,9 @@ public class GraphActivity extends ActionBarActivity {
       xLabels.add(selectedGraphType.formatXLabel(solveTime.getTimestamp()));
     }
 
-    LineDataSet dataSet = new LineDataSet(times, "");//getString(R.string.times));
-    dataSet.setColor(getColor(R.color.iceblue));
-    dataSet.setCircleColor(getColor(R.color.iceblue));
+    LineDataSet dataSet = new LineDataSet(times, "");
+    dataSet.setColor(getResourceColor(R.color.iceblue));
+    dataSet.setCircleColor(getResourceColor(R.color.iceblue));
     dataSet.setCircleSize(3f);
 
     ArrayList<LineDataSet> dataSets = new ArrayList<LineDataSet>();
@@ -257,7 +257,7 @@ public class GraphActivity extends ActionBarActivity {
     chart.invalidate();
   }
 
-  private int getColor(int colorRes) {
+  private int getResourceColor(int colorRes) {
     return getResources().getColor(colorRes);
   }
 

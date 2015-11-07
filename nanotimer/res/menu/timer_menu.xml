@@ -17,4 +17,10 @@
   <item android:id="@+id/itNewSession"
     android:title="@string/new_session"/>
 
+  <item android:id="@+id/itAddTime"
+     android:title="@string/add_time"/>
+
+  <item android:id="@+id/itShareTime"
+     android:title="@string/share_time"/>
+
 </menu>
