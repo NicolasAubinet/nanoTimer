@@ -429,6 +429,7 @@ public class MainScreenActivity extends ActionBarActivity implements TimeChanged
   @Override
   public void onResult(Object... params) {
     refreshHistory();
+    refreshSolveTypes();
   }
 
   private void refreshButtonTexts() {

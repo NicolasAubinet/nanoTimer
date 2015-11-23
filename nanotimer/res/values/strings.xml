@@ -109,7 +109,7 @@
   <string name="scrambles">Scrambles</string>
   <string name="big_cubes_notation">Big cubes notation</string>
   <string name="big_cubes_notation_summary">Choose the big cubes notation system</string>
-  <string name="use_modern_scrambles">Use modern scrambles</string>
+  <string name="use_modern_scrambles">Use random-state scrambles</string>
   <string name="use_modern_scrambles_summary">Use new \"random-state\" scrambles</string>
   <string name="scrambles_quality">Scrambles quality</string>
   <string name="scrambles_quality_summary">Select scrambles quality</string>
@@ -127,7 +127,7 @@
   <string name="interstitial">Interstitial</string>
   <string name="mixed">Mixed</string>
   <string name="want_to_clear_scramble_cache">Do you want to clear the scramble cache?</string>
-  <string name="modern_scrambles_settings">Modern scrambles settings</string>
+  <string name="modern_scrambles_settings">Random-state scrambles settings</string>
   <string name="modern_scrambles_settings_summary">Choose when / how scrambles are generated</string>
   <string name="notification_mode">Notification mode</string>
   <string name="notification_mode_summary">Choose when to display generation notification</string>
