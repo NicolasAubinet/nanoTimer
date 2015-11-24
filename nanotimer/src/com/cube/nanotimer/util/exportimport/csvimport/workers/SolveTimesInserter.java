@@ -3,6 +3,7 @@ package com.cube.nanotimer.util.exportimport.csvimport.workers;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.util.exportimport.ErrorListener;
@@ -52,7 +53,7 @@ public class SolveTimesInserter extends AsyncTask<ImportTimesData, Integer, Inte
         }
       });
       insertCount += solveTimes.size();
-      processedCount += insertCount;
+      processedCount += solveTimes.size();
     }
     return insertCount;
   }
