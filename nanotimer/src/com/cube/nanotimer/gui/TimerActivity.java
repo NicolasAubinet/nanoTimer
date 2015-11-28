@@ -301,8 +301,8 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
 
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
-    MenuItem miShareTime = menu.findItem(R.id.itShareTime);
-    miShareTime.setVisible(lastSolveTime != null);
+    menu.findItem(R.id.itShareTime).setVisible(lastSolveTime != null);
+    menu.findItem(R.id.itSessionDetails).setVisible(hasNewSession);
     return super.onPrepareOptionsMenu(menu);
   }
 
@@ -316,9 +316,6 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
       menu.findItem(R.id.itSessionDetails).setVisible(false);
       menu.findItem(R.id.itNewSession).setVisible(false);
       menu.findItem(R.id.itAddTime).setVisible(false);
-    }
-    if (!hasNewSession) {
-      menu.findItem(R.id.itSessionDetails).setVisible(false);
     }
     return true;
   }
@@ -373,7 +370,6 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
               refreshSessionFields();
               if (!hasNewSession) {
                 hasNewSession = true;
-                supportInvalidateOptionsMenu();
               }
             }
           });
@@ -392,7 +388,7 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
           break;
       }
     }
-    return super.onOptionsItemSelected(item);
+    return true;
   }
 
   @Override
@@ -447,14 +443,6 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
       }
     });
     solveAverageCallback.onData(solveAverages);
-  }
-
-  public boolean onKeyDown(int keyCode, KeyEvent event) {
-    if (keyCode == KeyEvent.KEYCODE_MENU) {
-      openOptionsMenu();
-      return true;
-    }
-    return super.onKeyDown(keyCode, event);
   }
 
   private void refreshSessionFields() {
