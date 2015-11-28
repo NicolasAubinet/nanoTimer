@@ -2,12 +2,10 @@ package com.cube.nanotimer.gui.widget.dialog;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.KeyEvent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnKeyListener;
 import android.widget.EditText;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
@@ -17,8 +15,6 @@ import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
-import kankan.wheel.widget.WheelView;
-import kankan.wheel.widget.adapters.NumericWheelAdapter;
 
 public class AddNewTimeDialog extends ConfirmDialog {
 
@@ -93,9 +89,9 @@ public class AddNewTimeDialog extends ConfirmDialog {
     tfSeconds = (EditText) view.findViewById(R.id.tfSeconds);
     tfHundreds = (EditText) view.findViewById(R.id.tfHundreds);
 
-    tfMinutes.setOnKeyListener(new OnNumericFieldKeyListener(null, tfMinutes, tfSeconds));
-    tfSeconds.setOnKeyListener(new OnNumericFieldKeyListener(tfMinutes, tfSeconds, tfHundreds));
-    tfHundreds.setOnKeyListener(new OnNumericFieldKeyListener(tfSeconds, tfHundreds, null));
+    tfMinutes.addTextChangedListener(new OnNumericFieldKeyListener(tfSeconds));
+    tfSeconds.addTextChangedListener(new OnNumericFieldKeyListener(tfHundreds));
+    tfHundreds.addTextChangedListener(new OnNumericFieldKeyListener(null));
     return view;
   }
 
@@ -122,37 +118,35 @@ public class AddNewTimeDialog extends ConfirmDialog {
       tfHundreds.requestFocus();
       DialogUtils.showInfoMessage(getContext(), getString(R.string.invalid_value_for_field, getString(R.string.hundreds)));
       valid = false;
+    } else if (minutes == 0 && seconds == 0 && hundreds == 0) {
+      DialogUtils.showInfoMessage(getContext(), R.string.please_set_a_value);
+      valid = false;
     }
     return valid;
   }
 
-  class OnNumericFieldKeyListener implements OnKeyListener {
-    private EditText previous;
-    private EditText current;
+  class OnNumericFieldKeyListener implements TextWatcher {
     private EditText next;
 
-    public OnNumericFieldKeyListener(EditText previous, EditText current, EditText next) {
-      this.previous = previous;
-      this.current = current;
+    public OnNumericFieldKeyListener(EditText next) {
       this.next = next;
     }
 
     @Override
-    public boolean onKey(View v, int keyCode, KeyEvent event) {
-      if (keyCode == KeyEvent.KEYCODE_DEL || keyCode == KeyEvent.KEYCODE_FORWARD_DEL) {
-        return false;
-      }
-      if (keyCode == KeyEvent.KEYCODE_ENTER) {
-        onConfirm();
-        return true;
-      }
-      if (current.getText().toString().length() >= 2) {
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+      if (s.length() >= 2) {
         if (next != null) {
           next.requestFocus();
         }
-        return true;
       }
-      return false;
     }
   }
 
