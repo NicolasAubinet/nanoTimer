@@ -20,9 +20,11 @@
       android:layout_height="wrap_content"
       android:layout_marginTop="12dp">
 
-     <kankan.wheel.widget.WheelView
-        android:id="@+id/wvMinutes"
-        style="@style/NumericWheelView"/>
+   <EditText
+      android:id="@+id/tfMinutes"
+      android:layout_width="50dp"
+      android:layout_height="wrap_content"
+      style="@style/NumericEditText"/>
 
      <TextView
         android:layout_width="wrap_content"
@@ -33,11 +35,13 @@
         android:layout_centerVertical="true"
         android:textSize="24sp"/>
 
-     <kankan.wheel.widget.WheelView
-        android:id="@+id/wvSeconds"
+     <EditText
+        android:id="@+id/tfSeconds"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginLeft="5dp"
-        style="@style/NumericWheelView"/>
+        style="@style/NumericEditText"/>
 
      <TextView
         android:layout_width="wrap_content"
@@ -47,11 +51,13 @@
         android:text="."
         android:textSize="24sp"/>
 
-     <kankan.wheel.widget.WheelView
-        android:id="@+id/wvHundreds"
+     <EditText
+        android:id="@+id/tfHundreds"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginLeft="5dp"
-        style="@style/NumericWheelView"/>
+        style="@style/NumericEditText"/>
 
    </LinearLayout>
 

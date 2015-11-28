@@ -52,7 +52,6 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
   private ViewGroup layout;
   private TableLayout sessionTimesLayout;
   private TableLayout timerStepsLayout;
-  private MenuItem miShareTime;
 
   private CubeType cubeType;
   private SolveType solveType;
@@ -301,6 +300,13 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
   }
 
   @Override
+  public boolean onPrepareOptionsMenu(Menu menu) {
+    MenuItem miShareTime = menu.findItem(R.id.itShareTime);
+    miShareTime.setVisible(lastSolveTime != null);
+    return super.onPrepareOptionsMenu(menu);
+  }
+
+  @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.timer_menu, menu);
     for (int i = 0; i < menu.size(); i++) {
@@ -314,8 +320,6 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
     if (!hasNewSession) {
       menu.findItem(R.id.itSessionDetails).setVisible(false);
     }
-    miShareTime = menu.findItem(R.id.itShareTime);
-    miShareTime.setVisible(lastSolveTime != null);
     return true;
   }
 
@@ -388,7 +392,7 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
           break;
       }
     }
-    return true;
+    return super.onOptionsItemSelected(item);
   }
 
   @Override
@@ -898,9 +902,6 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
           prevSolveAverages = solveAverages;
           solveAverages = data;
           lastSolveTime = data.getSolveTime();
-          if (miShareTime != null) {
-            miShareTime.setVisible(lastSolveTime != null);
-          }
           refreshAvgFields(true);
         }
       });

@@ -92,4 +92,10 @@
     <item name="android:layout_height">80dp</item>
   </style>
 
+  <style name="NumericEditText">
+    <item name="android:inputType">number</item>
+    <item name="android:gravity">center</item>
+    <item name="android:textSize">20sp</item>
+  </style>
+
 </resources>

@@ -242,6 +242,11 @@
 
   <string name="add_time">Add time</string>
   <string name="select_time_to_add">Select time to add:</string>
+  <string name="invalid_integer_value">Invalid value. Please enter an integer number.</string>
+  <string name="invalid_value_for_field">Invalid value for %1$s</string>
+  <string name="minutes">minutes</string>
+  <string name="seconds">seconds</string>
+  <string name="hundreds">hundreds</string>
 
   <string name="share_time">Share time</string>
   <string name="share_time_subject">New solve time: %1$s</string>
@@ -256,7 +261,8 @@
     <u><b>v1.1.7</b></u>
     <ul>
       <li>New "Share time" feature allowing to share your times with your friends</li>
-      <li>Moved "Add time" menu to timer screen to save time with current scramble</li>
+      <li>Moved "Add time" menu to timer screen to save time with current scramble, and changed to text entries instead of wheels</li>
+      <li>Minor fixes and improvements</li>
     </ul>
     <u><b>v1.1.6</b></u>
     <ul>
