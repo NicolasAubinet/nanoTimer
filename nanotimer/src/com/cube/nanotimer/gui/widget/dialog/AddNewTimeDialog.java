@@ -111,12 +111,15 @@ public class AddNewTimeDialog extends ConfirmDialog {
   private boolean checkTimeValues(int minutes, int seconds, int hundreds) {
     boolean valid = true;
     if (minutes < 0) {
+      tfMinutes.requestFocus();
       DialogUtils.showInfoMessage(getContext(), getString(R.string.invalid_value_for_field, getString(R.string.minutes)));
       valid = false;
     } else if (seconds < 0 || seconds >= 60) {
+      tfSeconds.requestFocus();
       DialogUtils.showInfoMessage(getContext(), getString(R.string.invalid_value_for_field, getString(R.string.seconds)));
       valid = false;
     } else if (hundreds < 0 || hundreds >= 100) {
+      tfHundreds.requestFocus();
       DialogUtils.showInfoMessage(getContext(), getString(R.string.invalid_value_for_field, getString(R.string.hundreds)));
       valid = false;
     }
@@ -138,6 +141,10 @@ public class AddNewTimeDialog extends ConfirmDialog {
     public boolean onKey(View v, int keyCode, KeyEvent event) {
       if (keyCode == KeyEvent.KEYCODE_DEL || keyCode == KeyEvent.KEYCODE_FORWARD_DEL) {
         return false;
+      }
+      if (keyCode == KeyEvent.KEYCODE_ENTER) {
+        onConfirm();
+        return true;
       }
       if (current.getText().toString().length() >= 2) {
         if (next != null) {
