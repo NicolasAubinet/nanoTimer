@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -163,6 +164,7 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
         throw new CSVFormatException(context.getString(R.string.error_in_line, (i+1)) + ": " + e.getMessage());
       }
     }
+    Collections.reverse(results); // sort from oldest to newest
     return results;
   }
 

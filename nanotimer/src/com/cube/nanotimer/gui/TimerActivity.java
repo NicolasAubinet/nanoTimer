@@ -9,8 +9,12 @@ import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.TypedValue;
-import android.view.*;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.LinearLayout;
@@ -37,9 +41,17 @@ import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.GUIUtils;
 import com.cube.nanotimer.util.helper.ScreenUtils;
 import com.cube.nanotimer.util.helper.Utils;
-import com.cube.nanotimer.vo.*;
+import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.SolveAverages;
+import com.cube.nanotimer.vo.SolveTime;
+import com.cube.nanotimer.vo.SolveType;
+import com.cube.nanotimer.vo.SolveTypeStep;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class TimerActivity extends ActionBarActivity implements ResultListener {
 
@@ -301,8 +313,8 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
 
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
-    menu.findItem(R.id.itShareTime).setVisible(lastSolveTime != null);
-    menu.findItem(R.id.itSessionDetails).setVisible(hasNewSession);
+    menu.findItem(R.id.itShareTime).setVisible(showMenu && lastSolveTime != null);
+    menu.findItem(R.id.itSessionDetails).setVisible(showMenu && hasNewSession);
     return super.onPrepareOptionsMenu(menu);
   }
 
