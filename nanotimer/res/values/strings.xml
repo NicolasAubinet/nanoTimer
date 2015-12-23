@@ -259,6 +259,13 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
+    <u><b>v1.1.8</b></u>
+    <ul>
+      <li>Hide action bar menu button when timer is running</li>
+      <li>Fix import bug that was causing PB flag to be incorrect</li>
+      <li>Fix PB flag recalculation after time deletion</li>
+      <li>Fix crash that was sometimes happening when changing options</li>
+    </ul>
     <u><b>v1.1.7</b></u>
     <ul>
       <li>New \"Share time\" feature allowing to share times with your friends</li>
