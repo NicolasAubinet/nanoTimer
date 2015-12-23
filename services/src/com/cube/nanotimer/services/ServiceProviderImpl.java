@@ -210,7 +210,7 @@ public class ServiceProviderImpl implements ServiceProvider {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         int solveTimeId = cursor.getInt(0);
         long time = cursor.getInt(1);
-        long timestamp = cursor.getInt(2);
+        long timestamp = cursor.getLong(2);
         boolean pb = (cursor.getInt(3) == 1);
         int solveTypeId = cursor.getInt(4);
         boolean isBetter = isTimeBetter(curBestTime, time);
@@ -1026,7 +1026,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     return cal.getTimeInMillis();
   }
 
-  private void recalculateAverages(long timestamp, SolveType solveType) { // TODO see if can improve (very slow, makes updating 100 times take from 1.2s (when method disabled) to 36s!) (see ServiceProviderTest.testDBPerfs())
+  private void recalculateAverages(long timestamp, SolveType solveType) { // TODO see if can improveï¿½(very slow, makes updating 100 times take from 1.2s (when method disabled) to 36s!) (see ServiceProviderTest.testDBPerfs())
     List<CachedTime> timesBefore = getTimesAroundTs(timestamp, solveType, true);
     List<CachedTime> timesAfter = getTimesAroundTs(timestamp, solveType, false);
 
