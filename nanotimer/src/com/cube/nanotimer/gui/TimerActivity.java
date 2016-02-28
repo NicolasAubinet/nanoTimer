@@ -106,6 +106,7 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    App.INSTANCE.setContext(this);
     setContentView(R.layout.timer_screen);
     setVolumeControlStream(AudioManager.STREAM_MUSIC);
     currentOrientation = getResources().getConfiguration().orientation;
