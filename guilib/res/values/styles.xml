@@ -23,7 +23,7 @@
     <item name="android:textSize">21px</item>
     <item name="android:gravity">center</item>
     <item name="android:layout_height">31px</item>
-    <item name="android:layout_width">0px</item>
+    <item name="android:layout_width">wrap_content</item>
     <item name="android:layout_margin">2px</item>
     <item name="android:background">@drawable/table_cell</item>
     <item name="android:textColor">@color/white</item>
@@ -32,6 +32,10 @@
   <style name="AverageTableHeaderField" parent="TableCell">
     <item name="android:textColor">@color/lightblue</item>
     <item name="android:textStyle">bold</item>
+  </style>
+
+  <style name="AverageTableFirstField" parent="AverageTableHeaderField">
+    <item name="android:layout_width">40px</item>
   </style>
 
   <style name="ListViewItem">
