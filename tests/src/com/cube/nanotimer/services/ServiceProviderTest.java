@@ -2,9 +2,17 @@ package com.cube.nanotimer.services;
 
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
-import com.cube.nanotimer.vo.*;
+import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.FrequencyData;
+import com.cube.nanotimer.vo.SolveAverages;
+import com.cube.nanotimer.vo.SolveHistory;
+import com.cube.nanotimer.vo.SolveTime;
+import com.cube.nanotimer.vo.SolveTimeAverages;
+import com.cube.nanotimer.vo.SolveType;
+import com.cube.nanotimer.vo.TimesSort;
 import junit.framework.Assert;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -906,6 +914,28 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertFrequencyDataEquals(frequencyData.get(12), 1440626400000L, 0); // 27/08
     assertFrequencyDataEquals(frequencyData.get(14), 1440799200000L, 0); // 29/08
     assertFrequencyDataEquals(frequencyData.get(15), 1440885600000L, 4); // 30/08
+  }
+
+  @SmallTest
+  public void testImportOldTimesAveragesBug() {
+    provider.deleteHistory();
+    long ts = 1440057600000L; // 20/08 10:00
+    for (int i = 0; i < 120; i++) {
+      saveTime(30, ts + (i*60000));
+    }
+
+    ts = 1439193000000L; // 10/08 09:50;
+    List<SolveTime> solveTimes = new ArrayList<>();
+    for (int i = 0; i < 100; i++) {
+      solveTimes.add(new SolveTime(ts + (i*60000), 60 + i, false, "", solveType1));
+    }
+
+    SolveAverages solveAverages = provider.saveTimes(solveTimes, null);
+    assertEquals((long) solveAverages.getAvgOf5(), 30l);
+    assertEquals((long) solveAverages.getAvgOf12(), 30l);
+    assertEquals((long) solveAverages.getAvgOf50(), 30l);
+    assertEquals((long) solveAverages.getAvgOf100(), 30l);
+    assertEquals((long) solveAverages.getMeanOf3(), 30l);
   }
 
   /*@SmallTest

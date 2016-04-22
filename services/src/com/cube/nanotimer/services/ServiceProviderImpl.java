@@ -279,7 +279,13 @@ public class ServiceProviderImpl implements ServiceProvider {
   private SolveAverages createTime(SolveTime solveTime, boolean updateCachesFromDB) {
     CachedTime cachedTime = new CachedTime(solveTime);
     synchronized (cacheSyncHelper) {
-      cachedSolveTimes.add(0, cachedTime);
+      int i;
+      for (i = 0; i < cachedSolveTimes.size(); i++) {
+        if (solveTime.getTimestamp() >= cachedSolveTimes.get(i).getTimestamp()) {
+          break;
+        }
+      }
+      cachedSolveTimes.add(i, cachedTime);
       if (cachedSolveTimes.size() > CACHE_MAX_SIZE) {
         cachedSolveTimes.remove(cachedSolveTimes.size() - 1);
       }
@@ -1060,6 +1066,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_ID);
     q.append("     , ").append(DB.COL_TIMEHISTORY_TIME);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
     if (before) {
@@ -1074,7 +1081,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveType.getId(), timestamp));
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-        times.add(new CachedTime(cursor.getInt(0), cursor.getLong(1)));
+        times.add(new CachedTime(cursor.getInt(0), cursor.getLong(1), cursor.getLong(2)));
       }
     }
     return times;
@@ -1093,7 +1100,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     synchronized (cacheSyncHelper) {
       cachedSolveTimes = new ArrayList<CachedTime>();
       StringBuilder q = new StringBuilder();
-      q.append("SELECT ").append(DB.COL_ID).append(", ").append(DB.COL_TIMEHISTORY_TIME);
+      q.append("SELECT ").append(DB.COL_ID).append(", ").append(DB.COL_TIMEHISTORY_TIME).append(", ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
       q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
       q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
       q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC");
@@ -1101,7 +1108,7 @@ public class ServiceProviderImpl implements ServiceProvider {
       Cursor cursor = db.rawQuery(q.toString(), getStringArray(solveTypeId));
       if (cursor != null) {
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-          cachedSolveTimes.add(new CachedTime(cursor.getInt(0), cursor.getLong(1)));
+          cachedSolveTimes.add(new CachedTime(cursor.getInt(0), cursor.getLong(1), cursor.getLong(2)));
         }
         cursor.close();
       }
@@ -1291,15 +1298,18 @@ public class ServiceProviderImpl implements ServiceProvider {
   class CachedTime {
     private int solveId;
     private long time;
+    private long timestamp;
 
     public CachedTime(SolveTime solveTime) {
       this.solveId = solveTime.getId();
       this.time = solveTime.getTime();
+      this.timestamp = solveTime.getTimestamp();
     }
 
-    public CachedTime(int solveId, long time) {
+    public CachedTime(int solveId, long time, long timestamp) {
       this.solveId = solveId;
       this.time = time;
+      this.timestamp = timestamp;
     }
 
     public int getSolveId() {
@@ -1316,6 +1326,10 @@ public class ServiceProviderImpl implements ServiceProvider {
 
     public void setTime(long time) {
       this.time = time;
+    }
+
+    public long getTimestamp() {
+      return timestamp;
     }
   }
 
