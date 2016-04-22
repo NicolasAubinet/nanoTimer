@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -458,6 +459,24 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
     solveAverageCallback.onData(solveAverages);
   }
 
+  @Override
+  public boolean onKeyDown(int keyCode, KeyEvent event) {
+    if (keyCode == KeyEvent.KEYCODE_SPACE && event.getRepeatCount() == 0) {
+      onTouchEvent(MotionEvent.ACTION_DOWN);
+      return true;
+    }
+    return super.onKeyDown(keyCode, event);
+  }
+
+  @Override
+  public boolean onKeyUp(int keyCode, KeyEvent event) {
+    if (keyCode == KeyEvent.KEYCODE_SPACE && event.getRepeatCount() == 0) {
+      onTouchEvent(MotionEvent.ACTION_UP);
+      return true;
+    }
+    return super.onKeyUp(keyCode, event);
+  }
+
   private void refreshSessionFields() {
     runOnUiThread(new Runnable() {
       @Override
@@ -686,7 +705,7 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
     tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(curTime));
     if (solveType.hasSteps()) {
       updateStepTimeText(stepsTimes.size(),
-          FormatterService.INSTANCE.formatSolveTime(System.currentTimeMillis() - stepStartTs));
+        FormatterService.INSTANCE.formatSolveTime(System.currentTimeMillis() - stepStartTs));
     }
   }
 
@@ -893,8 +912,54 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
     }
   }
 
-  private class SolveAverageCallback extends DataCallback<SolveAverages> {
+  private boolean onTouchEvent(int parMotionEventAction) {
+    // change bg color
+    if (parMotionEventAction == MotionEvent.ACTION_DOWN) {
+      if (System.currentTimeMillis() - lastTimerStopTs >= STOP_START_DELAY) {
+        layout.setBackgroundResource(R.color.gray850);
+      } else {
+        return false; // to avoid receiving the ACTION_UP
+      }
+    } else if (parMotionEventAction == MotionEvent.ACTION_UP) {
+      layout.setBackgroundResource(R.color.graybg);
+      if (ignoreActionUp) {
+        ignoreActionUp = false;
+        return true;
+      }
+    }
+    // handle timer start/stop
+    if (timerState == TimerState.RUNNING && parMotionEventAction == MotionEvent.ACTION_DOWN) {
+      if (solveType.hasSteps()) {
+        nextSolveStep();
+        if (stepsTimes.size() == solveType.getSteps().length) {
+          stopTimer(true);
+        }
+      } else {
+        stopTimer(true);
+      }
+      ignoreActionUp = true; // to avoid starting timer again when releasing
+    } else if (solveType.isBlind() && parMotionEventAction == MotionEvent.ACTION_UP) {
+      // no inspection for blind solve types
+      startTimer();
+    } else if (inspectionMode == InspectionMode.HOLD_AND_RELEASE && !solveType.isBlind()) {
+      if (timerState == TimerState.STOPPED && parMotionEventAction == MotionEvent.ACTION_DOWN) {
+        startInspectionTimer();
+      } else if (timerState == TimerState.INSPECTING && parMotionEventAction == MotionEvent.ACTION_UP) {
+        stopInspectionTimer();
+        startTimer();
+      }
+    } else if (inspectionMode == InspectionMode.AUTOMATIC && !solveType.isBlind()) {
+      if (timerState == TimerState.STOPPED && parMotionEventAction == MotionEvent.ACTION_UP) {
+        startInspectionTimer();
+      } else if (timerState == TimerState.INSPECTING && parMotionEventAction == MotionEvent.ACTION_UP) {
+        stopInspectionTimer();
+        startTimer();
+      }
+    }
+    return true;
+  }
 
+  private class SolveAverageCallback extends DataCallback<SolveAverages> {
     @Override
     public synchronized void onData(final SolveAverages data) {
       runOnUiThread(new Runnable() {
@@ -912,50 +977,7 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
   private OnTouchListener layoutTouchListener = new OnTouchListener() {
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-      // change bg color
-      if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-        if (System.currentTimeMillis() - lastTimerStopTs >= STOP_START_DELAY) {
-          layout.setBackgroundResource(R.color.gray850);
-        } else {
-          return false; // to avoid receiving the ACTION_UP
-        }
-      } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-        layout.setBackgroundResource(R.color.graybg);
-        if (ignoreActionUp) {
-          ignoreActionUp = false;
-          return true;
-        }
-      }
-      // handle timer start/stop
-      if (timerState == TimerState.RUNNING && motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-        if (solveType.hasSteps()) {
-          nextSolveStep();
-          if (stepsTimes.size() == solveType.getSteps().length) {
-            stopTimer(true);
-          }
-        } else {
-          stopTimer(true);
-        }
-        ignoreActionUp = true; // to avoid starting timer again when releasing
-      } else if (solveType.isBlind() && motionEvent.getAction() == MotionEvent.ACTION_UP) {
-        // no inspection for blind solve types
-        startTimer();
-      } else if (inspectionMode == InspectionMode.HOLD_AND_RELEASE && !solveType.isBlind()) {
-          if (timerState == TimerState.STOPPED && motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-            startInspectionTimer();
-          } else if (timerState == TimerState.INSPECTING && motionEvent.getAction() == MotionEvent.ACTION_UP) {
-            stopInspectionTimer();
-            startTimer();
-          }
-      } else if (inspectionMode == InspectionMode.AUTOMATIC && !solveType.isBlind()) {
-        if (timerState == TimerState.STOPPED && motionEvent.getAction() == MotionEvent.ACTION_UP) {
-          startInspectionTimer();
-        } else if (timerState == TimerState.INSPECTING && motionEvent.getAction() == MotionEvent.ACTION_UP) {
-          stopInspectionTimer();
-          startTimer();
-        }
-      }
-      return true;
+      return onTouchEvent(motionEvent.getAction());
     }
   };
 
