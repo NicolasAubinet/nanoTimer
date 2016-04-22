@@ -262,7 +262,8 @@
     <u><b>v1.1.9</b></u>
     <ul>
       <li>Fix averages table layout that did not display correctly on some devices</li>
-      <li>Other minor bug fixes</li>
+      <li>Fix incorrect last averages when importing old times</li>
+      <li>Other minor fixes and improvements</li>
     </ul>
     <u><b>v1.1.8</b></u>
     <ul>
