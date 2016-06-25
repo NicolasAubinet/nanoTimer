@@ -117,6 +117,23 @@ public enum ScrambleFormatterService {
    * and to split it among multiple lines.
    * @param scramble the scramble containing one move in each array element
    * @param cubeType the cube type for which to format the scramble
+   * @return the formatted scramble
+   */
+  public String formatScrambleForExport(String scramble, CubeType cubeType) {
+    if (cubeType == CubeType.MEGAMINX && !scramble.contains("\n")) { // only megaminx should be formatted when exporting
+      String[] splitted = parseStringScrambleToArray(scramble, String.valueOf(getScrambleDelimiter(cubeType)));
+      if (getMovesPerLine(cubeType, splitted) > 0) {
+        scramble = formatScramble(splitted, cubeType, null);
+      }
+    }
+    return scramble;
+  }
+
+  /**
+   * Format the scramble to add enough spaces to align the moves vertically
+   * and to split it among multiple lines.
+   * @param scramble the scramble containing one move in each array element
+   * @param cubeType the cube type for which to format the scramble
    * @param orientation optional parameter to indicate the screen orientation to adjust the scramble
    * @return the formatted scramble
    */

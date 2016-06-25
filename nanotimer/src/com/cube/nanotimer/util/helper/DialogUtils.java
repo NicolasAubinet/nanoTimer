@@ -10,9 +10,9 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ShareCompat;
 import android.widget.Toast;
-import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.util.FormatterService;
+import com.cube.nanotimer.util.ScrambleFormatterService;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveTime;
@@ -84,6 +84,7 @@ public class DialogUtils {
     String timestampStr = FormatterService.INSTANCE.formatExportDateTime(solveTime.getTimestamp());
     String subject = activity.getString(R.string.share_time_subject, timeStr);
     String playStorePage = "http://play.google.com/store/apps/details?id=" + activity.getPackageName();
+    String scramble = ScrambleFormatterService.INSTANCE.formatScrambleForExport(solveTime.getScramble(), cubeType);
     String text;
     if (solveTime.hasSteps()) {
       StringBuilder stepsSb = new StringBuilder();
@@ -94,9 +95,9 @@ public class DialogUtils {
         String stepTime = FormatterService.INSTANCE.formatSolveTime(stepsTimes[i]);
         stepsSb.append("- ").append(stepName).append(": ").append(stepTime).append("\n");
       }
-      text = activity.getString(R.string.share_time_steps_text, cubeType.getName(), timeStr, stepsSb.toString(), timestampStr, playStorePage);
+      text = activity.getString(R.string.share_time_steps_text, cubeType.getName(), timeStr, stepsSb.toString(), scramble, timestampStr, playStorePage);
     } else {
-      text = activity.getString(R.string.share_time_text, cubeType.getName(), timeStr, timestampStr, playStorePage);
+      text = activity.getString(R.string.share_time_text, cubeType.getName(), timeStr, scramble, timestampStr, playStorePage);
     }
     shareData(activity, subject, text, null);
   }
