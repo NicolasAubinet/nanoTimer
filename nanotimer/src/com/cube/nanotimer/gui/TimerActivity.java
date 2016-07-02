@@ -89,10 +89,10 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
   private Timer timer;
   private Timer holdToStartTimer;
   private Handler timerHandler = new Handler();
-  private Handler holdToStartTimerHandler = new Handler();
-  private Object timerSync = new Object();
+  private final Object holdToStartTimerSync = new Object();
+  private final Object timerSync = new Object();
   private long timerStartTs;
-  private long holdToStartTs;
+  private volatile long holdToStartTs;
   private final long HOLD_TO_START_MIN_DURATION = 500;
   private volatile TimerState timerState = TimerState.STOPPED;
   private boolean showMenu = true;
@@ -281,8 +281,7 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
     if (!solveType.getName().equals(getString(R.string.def))) {
       sb.append(" (").append(solveType.getName()).append(")");
     }
-    setTitle(sb.toString());
-    setTitleColor(defaultTextColor.getDefaultColor());
+    setTitle(sb.toString(), defaultTextColor.getDefaultColor());
   }
 
   public void setTitle(String s) {
@@ -291,6 +290,11 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
 
   public void setTitle(int res) {
     ((TextView) findViewById(R.id.tvTitle)).setText(res);
+  }
+
+  public synchronized void setTitle(String s, int textColor) {
+    setTitle(s);
+    setTitleColor(textColor);
   }
 
   @Override
@@ -771,18 +775,21 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
   private void startHoldToStartTimer() {
     holdToStartTs = System.currentTimeMillis();
     holdToStartTimer = new Timer();
+    final Handler timerHandler = new Handler();
     TimerTask timerTask = new TimerTask() {
       public void run() {
-        holdToStartTimerHandler.post(new Runnable() {
+        timerHandler.post(new Runnable() {
+          @Override
           public void run() {
-            long remainingHoldTime = Math.max(0, HOLD_TO_START_MIN_DURATION - (System.currentTimeMillis() - holdToStartTs));
-            //Log.i("NanoTimer", "htsTs: " + holdToStartTs + " curTime: " + System.currentTimeMillis() + " remaining: " + remainingHoldTime + " result: " + ((float) remainingHoldTime / 1000));
-            setTitle(String.format("%.1f", ((float) remainingHoldTime / 1000)));
-            if (remainingHoldTime == 0) {
-              holdToStartTs = 0;
-              stopHoldToStartTimer();
-              setTitle(R.string.ready);
-              setTitleColor(getResources().getColor(R.color.green));
+            synchronized (holdToStartTimerSync) {
+              if (holdToStartTs > 0) {
+                long remainingHoldTime = Math.max(0, HOLD_TO_START_MIN_DURATION - (System.currentTimeMillis() - holdToStartTs));
+                setTitle(String.format("%.1f", ((float) remainingHoldTime / 1000)));
+                if (remainingHoldTime == 0) {
+                  stopHoldToStartTimer();
+                  setTitle(getString(R.string.ready), getResources().getColor(R.color.green));
+                }
+              }
             }
           }
         });
@@ -795,6 +802,7 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
     if (holdToStartTimer != null) {
       holdToStartTimer.cancel();
       holdToStartTimer.purge();
+      holdToStartTimer = null;
     }
   }
 
@@ -921,8 +929,7 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
       if (showNotifications) {
         final int defaultColor = defaultTextColor.getDefaultColor();
         if (showBanner) {
-          setTitle(R.string.new_record);
-          setTitleColor(recordColor);
+          setTitle(getString(R.string.new_record), recordColor);
           final Handler bannerHandler = new Handler();
           Timer bannerTimer = new Timer();
           TimerTask bannerTimerTask = new TimerTask() {
@@ -930,7 +937,6 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
               bannerHandler.post(new Runnable() {
                 public void run() {
                   setDefaultBannerText();
-                  setTitleColor(defaultColor);
                 }
               });
             }
@@ -1015,18 +1021,20 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
       if (timerState == TimerState.STOPPED && parMotionEventAction == MotionEvent.ACTION_UP) {
         startInspectionTimer();
       } else if (timerState == TimerState.INSPECTING) {
-        if (parMotionEventAction == KeyEvent.ACTION_DOWN) {
-          startHoldToStartTimer();
-        } else if (parMotionEventAction == MotionEvent.ACTION_UP) {
-          stopHoldToStartTimer();
-          if (System.currentTimeMillis() - holdToStartTs > HOLD_TO_START_MIN_DURATION) { // if screen pushed for long enough
-            stopInspectionTimer();
-            startTimer();
-            setDefaultBannerText();
-          } else {
-            setTitle(R.string.inspection);
+        synchronized (holdToStartTimerSync) {
+          if (parMotionEventAction == KeyEvent.ACTION_DOWN) {
+            startHoldToStartTimer();
+          } else if (parMotionEventAction == MotionEvent.ACTION_UP) {
+            stopHoldToStartTimer();
+            if (System.currentTimeMillis() - holdToStartTs > HOLD_TO_START_MIN_DURATION) { // if screen pushed for long enough
+              stopInspectionTimer();
+              startTimer();
+              setDefaultBannerText();
+            } else {
+              setTitle(R.string.inspection);
+            }
+            holdToStartTs = 0;
           }
-          holdToStartTs = 0;
         }
       }
     }
