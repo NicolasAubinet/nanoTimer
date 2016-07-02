@@ -1,8 +1,10 @@
 package com.cube.nanotimer.gui.widget.preferences;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.preference.DialogPreference;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,7 +46,24 @@ public class WheelViewDialog extends DialogPreference {
     wheelView.setViewAdapter(new NumericWheelAdapter(getContext(), min, max));
     wheelView.setCurrentItem(defaultValue);
     wheelView.setCyclic(cyclic);
+
+    SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(getContext());
+    Integer value = p.getInt(getKey(), defaultValue);
+    wheelView.setCurrentItem(value);
+
     return layout;
+  }
+
+  @Override
+  protected void onDialogClosed(boolean positiveResult) {
+    super.onDialogClosed(positiveResult);
+
+    if (positiveResult) {
+      int value = wheelView.getCurrentItem();
+      if (callChangeListener(value)) {
+        persistInt(value);
+      }
+    }
   }
 
 }
