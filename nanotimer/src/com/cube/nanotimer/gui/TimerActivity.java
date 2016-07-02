@@ -96,6 +96,7 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
   private final long HOLD_TO_START_MIN_DURATION = 500;
   private volatile TimerState timerState = TimerState.STOPPED;
   private boolean showMenu = true;
+  private boolean oversteppedInspection = false;
 
   private long lastTimerStartTs;
   private long lastTimerStopTs;
@@ -571,6 +572,10 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
       timer.purge();
     }
     timerStopped();
+    if (oversteppedInspection) {
+      time += 2000; // add 2s to time if started solve after inspection time ended (for official inspection mode)
+      oversteppedInspection = false;
+    }
     // update time once more to get the ms right
     // (as all ms do not necessarily appear when timing, some are skipped due to refresh interval)
     updateTimerText(time);
@@ -586,6 +591,7 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
       return;
     }
     timerStartTs = curTime;
+    oversteppedInspection = false;
     enableScreenRotationChanges(false);
     timerStarted();
     resetTimerText();
@@ -745,7 +751,7 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
           mustDnfTime = true;
         } else if (seconds >= inspectionTime) {
           tvTimer.setText(R.string.plus_two);
-          // TODO add +2 seconds to time when it's completed (or start at 2s), find a way to display it clearly
+          oversteppedInspection = true;
         }
       } else {
         if (inspectionTime > 0) {
