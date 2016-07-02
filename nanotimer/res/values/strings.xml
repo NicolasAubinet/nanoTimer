@@ -85,16 +85,17 @@
   <string name="timer_screen">Timer screen</string>
   <string name="inspection_mode">Inspection mode</string>
   <string name="inspection_mode_summary">Select the timer inspection mode</string>
-  <string name="hold_and_release">Hold and release</string>
-  <string name="automatic">Automatic</string>
+  <string name="hold_and_release_inspection_mode">Hold and release: <i>Push and release once to start</i></string>
+  <string name="automatic_inspection_mode">Automatic: <i>Automatic start when inspection is over</i></string>
+  <string name="official_inspection_mode">Official: <i>Push for 0.5s to start, use official +2/DNF inspection rules</i></string>
   <string name="inspection_time">Inspection time</string>
   <string name="inspection_time_summary">Select the timer inspection time</string>
   <string name="inspection_sounds">Inspection sounds</string>
   <string name="inspection_sounds_summary">Enable / disable inspection sounds</string>
   <string name="inspection_sounds_type">Inspection warnings type</string>
   <string name="inspection_sounds_type_summary">Select the type of warnings</string>
-  <string name="classic">Classic (warn 3 seconds before end)</string>
-  <string name="official">Official (warn at 8 and 12 seconds)</string>
+  <string name="classic_inspection_sound_type">Classic (warn 3 seconds before end)</string>
+  <string name="official_inspection_sound_type">Official (warn at 8 and 12 seconds)</string>
   <string name="show_time_when_running">Display time when running</string>
   <string name="show_time_when_running_summary">Display time when timer is running</string>
   <string name="keep_screen_on">Keep screen on</string>
@@ -160,6 +161,7 @@
   <string name="stopping_generation">Stopping generation&#8230;</string>
   <string name="new_record">New record!</string>
   <string name="inspection">Inspection</string>
+  <string name="ready">Ready</string>
 
   <string name="rate_message">If you like Nano Timer, please take a moment to rate it.\nThanks for your support.</string>
   <string name="rate">Rate</string>

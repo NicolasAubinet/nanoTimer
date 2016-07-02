@@ -87,9 +87,13 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
 
   private final long REFRESH_INTERVAL = 30;
   private Timer timer;
+  private Timer holdToStartTimer;
   private Handler timerHandler = new Handler();
+  private Handler holdToStartTimerHandler = new Handler();
   private Object timerSync = new Object();
   private long timerStartTs;
+  private long holdToStartTs;
+  private final long HOLD_TO_START_MIN_DURATION = 500;
   private volatile TimerState timerState = TimerState.STOPPED;
   private boolean showMenu = true;
 
@@ -130,9 +134,9 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
 
     initViews();
 
+    defaultTextColor = tvSolvesCount.getTextColors();
     resetTimer();
     setDefaultBannerText();
-    defaultTextColor = tvSolvesCount.getTextColors();
 
     if (!solveType.hasSteps()) {
       App.INSTANCE.getService().getSessionTimes(solveType, new DataCallback<List<Long>>() {
@@ -277,6 +281,7 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
       sb.append(" (").append(solveType.getName()).append(")");
     }
     setTitle(sb.toString());
+    setTitleColor(defaultTextColor.getDefaultColor());
   }
 
   public void setTitle(String s) {
@@ -713,7 +718,7 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
     long curTime = System.currentTimeMillis() - timerStartTs;
     int seconds = (int) (curTime / 1000);
     tvTimer.setText(String.valueOf(seconds));
-    boolean automaticMode = inspectionMode == InspectionMode.AUTOMATIC;
+    boolean automaticMode = (inspectionMode == InspectionMode.AUTOMATIC);
     if (soundsEnabled) {
       if (Options.INSTANCE.getInspectionSoundsType() == Options.InspectionSoundsType.CLASSIC) {
         if (inspectionTime > 0 && seconds > 0 && seconds >= inspectionTime - 3 && (seconds < inspectionTime || (automaticMode && seconds == inspectionTime))) {
@@ -729,18 +734,61 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
         }
       }
     }
-    if (seconds == inspectionTime) {
+
+    boolean mustDnfTime = false;
+    if (seconds >= inspectionTime) {
       if (automaticMode) {
         stopInspectionTimer();
         startTimer();
+      } else if (inspectionMode == InspectionMode.OFFICIAL) {
+        if (seconds == inspectionTime + 2) {
+          mustDnfTime = true;
+        } else if (seconds >= inspectionTime) {
+          tvTimer.setText(R.string.plus_two);
+          // TODO add +2 seconds to time when it's completed (or start at 2s), find a way to display it clearly
+        }
       } else {
         if (inspectionTime > 0) {
-          stopInspectionTimer();
-          updateTimerText(-1); // DNF
-          Utils.playSound(R.raw.error);
-          saveTime(-1);
+          mustDnfTime = true;
         }
       }
+    }
+
+    if (mustDnfTime) {
+      stopInspectionTimer();
+      updateTimerText(-1); // DNF
+      Utils.playSound(R.raw.error);
+      saveTime(-1);
+    }
+  }
+
+  private void startHoldToStartTimer() {
+    holdToStartTs = System.currentTimeMillis();
+    holdToStartTimer = new Timer();
+    TimerTask timerTask = new TimerTask() {
+      public void run() {
+        holdToStartTimerHandler.post(new Runnable() {
+          public void run() {
+            long remainingHoldTime = Math.max(0, HOLD_TO_START_MIN_DURATION - (System.currentTimeMillis() - holdToStartTs));
+            //Log.i("NanoTimer", "htsTs: " + holdToStartTs + " curTime: " + System.currentTimeMillis() + " remaining: " + remainingHoldTime + " result: " + ((float) remainingHoldTime / 1000));
+            setTitle(String.format("%.1f", ((float) remainingHoldTime / 1000)));
+            if (remainingHoldTime == 0) {
+              holdToStartTs = 0;
+              stopHoldToStartTimer();
+              setTitle(R.string.ready);
+              setTitleColor(getResources().getColor(R.color.green));
+            }
+          }
+        });
+      }
+    };
+    holdToStartTimer.schedule(timerTask, 1, REFRESH_INTERVAL);
+  }
+
+  private void stopHoldToStartTimer() {
+    if (holdToStartTimer != null) {
+      holdToStartTimer.cancel();
+      holdToStartTimer.purge();
     }
   }
 
@@ -938,22 +986,42 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
         stopTimer(true);
       }
       ignoreActionUp = true; // to avoid starting timer again when releasing
-    } else if (solveType.isBlind() && parMotionEventAction == MotionEvent.ACTION_UP) {
-      // no inspection for blind solve types
-      startTimer();
-    } else if (inspectionMode == InspectionMode.HOLD_AND_RELEASE && !solveType.isBlind()) {
+    } else if (solveType.isBlind()) {
+      if (parMotionEventAction == MotionEvent.ACTION_UP) {
+        // no inspection for blind solve types
+        startTimer();
+      }
+    } else if (inspectionMode == InspectionMode.HOLD_AND_RELEASE) {
       if (timerState == TimerState.STOPPED && parMotionEventAction == MotionEvent.ACTION_DOWN) {
         startInspectionTimer();
       } else if (timerState == TimerState.INSPECTING && parMotionEventAction == MotionEvent.ACTION_UP) {
         stopInspectionTimer();
         startTimer();
       }
-    } else if (inspectionMode == InspectionMode.AUTOMATIC && !solveType.isBlind()) {
+    } else if (inspectionMode == InspectionMode.AUTOMATIC) {
       if (timerState == TimerState.STOPPED && parMotionEventAction == MotionEvent.ACTION_UP) {
         startInspectionTimer();
       } else if (timerState == TimerState.INSPECTING && parMotionEventAction == MotionEvent.ACTION_UP) {
         stopInspectionTimer();
         startTimer();
+      }
+    } else if (inspectionMode == InspectionMode.OFFICIAL) {
+      if (timerState == TimerState.STOPPED && parMotionEventAction == MotionEvent.ACTION_UP) {
+        startInspectionTimer();
+      } else if (timerState == TimerState.INSPECTING) {
+        if (parMotionEventAction == KeyEvent.ACTION_DOWN) {
+          startHoldToStartTimer();
+        } else if (parMotionEventAction == MotionEvent.ACTION_UP) {
+          stopHoldToStartTimer();
+          if (System.currentTimeMillis() - holdToStartTs > HOLD_TO_START_MIN_DURATION) { // if screen pushed for long enough
+            stopInspectionTimer();
+            startTimer();
+            setDefaultBannerText();
+          } else {
+            setTitle(R.string.inspection);
+          }
+          holdToStartTs = 0;
+        }
       }
     }
     return true;

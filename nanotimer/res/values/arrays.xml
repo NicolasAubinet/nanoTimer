@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string-array name="entries_inspection_modes">
-    <item>@string/hold_and_release</item>
-    <item>@string/automatic</item>
+    <item>@string/hold_and_release_inspection_mode</item>
+    <item>@string/automatic_inspection_mode</item>
+    <item>@string/official_inspection_mode</item>
   </string-array>
   <string-array name="entryvalues_inspection_modes">
     <item>1</item>
     <item>2</item>
+    <item>3</item>
   </string-array>
   <string-array name="entries_inspection_sounds_type">
-    <item>@string/classic</item>
-    <item>@string/official</item>
+    <item>@string/classic_inspection_sound_type</item>
+    <item>@string/official_inspection_sound_type</item>
   </string-array>
   <string-array name="entryvalues_inspection_sounds_type">
     <item>1</item>

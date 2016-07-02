@@ -7,7 +7,7 @@ import android.preference.PreferenceManager;
 public enum Options {
   INSTANCE;
 
-  public enum InspectionMode { HOLD_AND_RELEASE, AUTOMATIC }
+  public enum InspectionMode { HOLD_AND_RELEASE, AUTOMATIC, OFFICIAL }
   public enum InspectionSoundsType { CLASSIC, OFFICIAL }
   public enum AdsStyle { BANNER, INTERSTITIAL, MIXED }
   public enum BigCubesNotation { RUF, RWUWFW }
@@ -53,6 +53,8 @@ public enum Options {
         return InspectionMode.HOLD_AND_RELEASE;
       case 2:
         return InspectionMode.AUTOMATIC;
+      case 3:
+        return InspectionMode.OFFICIAL;
       default:
         return InspectionMode.HOLD_AND_RELEASE;
     }
