@@ -726,12 +726,14 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
 
   private synchronized void updateInspectionTimerText() {
     long curTime = System.currentTimeMillis() - timerStartTs;
+    final int officialInspectionDnfTime = 2;
     int seconds = (int) (curTime / 1000);
     tvTimer.setText(String.valueOf(seconds));
     boolean automaticMode = (inspectionMode == InspectionMode.AUTOMATIC);
     if (soundsEnabled) {
       if (Options.INSTANCE.getInspectionSoundsType() == Options.InspectionSoundsType.CLASSIC) {
-        if (inspectionTime > 0 && seconds > 0 && seconds >= inspectionTime - 3 && (seconds < inspectionTime || (automaticMode && seconds == inspectionTime))) {
+        if (inspectionTime > 0 && seconds > 0 && seconds >= inspectionTime - 3
+        && (seconds < inspectionTime || (automaticMode && seconds == inspectionTime) || (inspectionMode == InspectionMode.OFFICIAL && seconds < inspectionTime + officialInspectionDnfTime))) {
           Utils.playSound(R.raw.beep);
         }
       } else if (Options.INSTANCE.getInspectionSoundsType() == Options.InspectionSoundsType.OFFICIAL) {
@@ -751,7 +753,7 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
         stopInspectionTimer();
         startTimer();
       } else if (inspectionMode == InspectionMode.OFFICIAL) {
-        if (seconds == inspectionTime + 2) {
+        if (seconds == inspectionTime + officialInspectionDnfTime) {
           mustDnfTime = true;
         } else if (seconds >= inspectionTime) {
           tvTimer.setText(R.string.plus_two);
