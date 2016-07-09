@@ -6,7 +6,9 @@ import com.cube.nanotimer.session.TimesStatistics;
 import junit.framework.Assert;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class TimesStatisticsTest extends AndroidTestCase {
 
@@ -226,6 +228,48 @@ public class TimesStatisticsTest extends AndroidTestCase {
     Assert.assertEquals(-2, new TimesStatistics(getTimesList(-1, -1, 790, -1)).getDeviation(4));
     Assert.assertEquals(-2, new TimesStatistics(getTimesList()).getDeviation(0));
     Assert.assertEquals(-2, new TimesStatistics(getTimesList(300)).getDeviation(1));
+  }
+
+  @SmallTest
+  public void testBigAverages() {
+    // Test averages of 50 and 100: only the 90% middle times should be considered (avg100 drops best 5 and world 5 times, to avoid DNF avg if less than 5 DNF times in last 100 solves)
+    List<Long> orderedTimes = new ArrayList<>();
+    for (int i = 1; i <= 100; i++) {
+      orderedTimes.add((long) i * 1000);
+    }
+    List<Long> times = new ArrayList<>(orderedTimes);
+    TimesStatistics timesStatistics = new TimesStatistics(times);
+    Assert.assertEquals(3000, timesStatistics.getAverageOf(5));
+    Assert.assertEquals(25500, timesStatistics.getAverageOf(50));
+    Assert.assertEquals(50500, timesStatistics.getAverageOf(100));
+
+    Collections.shuffle(timesStatistics.getTimes(), new Random(1000l));
+    Assert.assertEquals(50500, timesStatistics.getAverageOf(100));
+
+    List<Long> reversedTimes = new ArrayList<>(orderedTimes);
+    Collections.reverse(reversedTimes);
+
+    timesStatistics = new TimesStatistics(reversedTimes);
+    Assert.assertEquals(75500, timesStatistics.getAverageOf(50));
+    timesStatistics.getTimes().set(0, -1l);
+    Assert.assertEquals(75500, timesStatistics.getAverageOf(50));
+    timesStatistics.getTimes().set(1, -1l);
+    Assert.assertEquals(75500, timesStatistics.getAverageOf(50));
+    timesStatistics.getTimes().set(2, -1l);
+    Assert.assertEquals(-1, timesStatistics.getAverageOf(50));
+    timesStatistics.getTimes().set(3, -1l);
+    timesStatistics.getTimes().set(4, -1l);
+    Assert.assertEquals(50500, timesStatistics.getAverageOf(100));
+    timesStatistics.getTimes().set(5, -1l);
+    Assert.assertEquals(-1, timesStatistics.getAverageOf(100));
+
+    timesStatistics = new TimesStatistics(orderedTimes);
+    timesStatistics.getTimes().set(10, -1l);
+    Assert.assertEquals(26326, timesStatistics.getAverageOf(50));
+    timesStatistics.getTimes().set(20, -1l);
+    Assert.assertEquals(26956, timesStatistics.getAverageOf(50));
+    timesStatistics.getTimes().set(30, -1l);
+    Assert.assertEquals(-1, timesStatistics.getAverageOf(50));
   }
 
   private List<Long> getTimesList(int... times) {

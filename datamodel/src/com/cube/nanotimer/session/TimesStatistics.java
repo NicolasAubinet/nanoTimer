@@ -1,6 +1,8 @@
 package com.cube.nanotimer.session;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,9 +23,10 @@ public class TimesStatistics {
    * Returns the best time index.
    * @param count number of times to parse
    * @param blind indicates whether this is a blind type or not. if true, it will return -1 if there are not enough successes
+   * @param bannedIndexes indexes that can not be chosen as best time index
    * @return the best time index
    */
-  public int getBestTimeInd(int count, boolean blind) {
+  private int getBestTimeInd(int count, boolean blind, Collection<Integer> bannedIndexes) {
     int bestInd = -1;
     int specificTimesSize = getTimes(blind).size();
     if (specificTimesSize >= count && count >= MIN_TIMES_FOR_AVERAGE) {
@@ -32,7 +35,7 @@ public class TimesStatistics {
       int parsed = 0;
       for (int i = 0; i < times.size(); i++) {
         long t = times.get(i);
-        if (t > 0 && (t < best || best == 0)) {
+        if ((t > 0 && (t < best || best == 0)) && !bannedIndexes.contains(i)) {
           best = t;
           bestInd = i;
         }
@@ -46,6 +49,10 @@ public class TimesStatistics {
     return bestInd;
   }
 
+  public int getBestTimeInd(int count, boolean blind) {
+    return getBestTimeInd(count, blind, Collections.emptyList());
+  }
+
   public int getBestTimeInd(boolean blind) {
     return getBestTimeInd(getTimes(blind).size(), blind);
   }
@@ -54,14 +61,26 @@ public class TimesStatistics {
     return getBestTimeInd(count, false);
   }
 
+  private List<Integer> getBestTimeIndexes(int count, int indexesCount) {
+    List<Integer> bestTimeIndexes = new ArrayList<>();
+    for (int i = 0; i < indexesCount; i++) {
+      int bestTimeInd = getBestTimeInd(count, false, bestTimeIndexes);
+      if (bestTimeInd >= 0) {
+        bestTimeIndexes.add(bestTimeInd);
+      }
+    }
+    return bestTimeIndexes;
+  }
+
   /**
    * Returns the worst time index.
    * If blind is true, it will not return the index of a DNF
    * @param count number of times to parse
    * @param blind if true, it will only take non-DNF times into account
+   * @param bannedIndexes indexes that can not be chosen as worst time index
    * @return the worst time index
    */
-  public int getWorstTimeInd(int count, boolean blind) {
+  private int getWorstTimeInd(int count, boolean blind, Collection<Integer> bannedIndexes) {
     int worstInd = -1;
     int specificTimesSize = getTimes(blind).size();
     if (specificTimesSize >= count && count >= MIN_TIMES_FOR_AVERAGE) {
@@ -70,7 +89,7 @@ public class TimesStatistics {
       int parsed = 0;
       for (int i = 0; i < times.size(); i++) {
         long t = times.get(i);
-        if (t > worst || (t == -1 && !blind)) {
+        if ((t > worst || (t == -1 && !blind)) && !bannedIndexes.contains(i)) {
           worst = t;
           worstInd = i;
           if (t == -1) {
@@ -87,8 +106,23 @@ public class TimesStatistics {
     return worstInd;
   }
 
+  public int getWorstTimeInd(int count, boolean blind) {
+    return getWorstTimeInd(count, blind, Collections.emptyList());
+  }
+
   public int getWorstTimeInd(boolean blind) {
     return getWorstTimeInd(getTimes(blind).size(), blind);
+  }
+
+  private List<Integer> getWorstTimeIndexes(int count, int indexesCount) {
+    List<Integer> worstTimeIndexes = new ArrayList<>();
+    for (int i = 0; i < indexesCount; i++) {
+      int worstTimeInd = getWorstTimeInd(count, false, worstTimeIndexes);
+      if (worstTimeInd >= 0) {
+        worstTimeIndexes.add(worstTimeInd);
+      }
+    }
+    return worstTimeIndexes;
   }
 
   public int getWorstTimeInd(int count) {
@@ -101,23 +135,24 @@ public class TimesStatistics {
       return -2;
     }
     if (times.size() >= n) {
-      int bestInd = getBestTimeInd(n);
-      int worstInd = getWorstTimeInd(n);
+      int excludedCount = Math.max(1, n / 20); // only consider 90% middle times (mostly for avg50 and avg100)
+      List<Integer> bestIndexes = getBestTimeIndexes(n, excludedCount);
+      List<Integer> worstIndexes = getWorstTimeIndexes(n, excludedCount);
       int validTimesCount = 0;
-      long avg = 0;
-      if (bestInd >= 0 && worstInd >= 0) {
+      long sum = 0;
+      if (bestIndexes.size() > 0 && worstIndexes.size() > 0) {
         for (int i = 0; i < n; i++) {
-          if (i != bestInd && i != worstInd) {
+          if (!bestIndexes.contains(i) && !worstIndexes.contains(i)) {
             if (times.get(i) > 0) {
-              avg += times.get(i);
+              sum += times.get(i);
               validTimesCount++;
             }
           }
         }
       }
-      if (validTimesCount >= (n - 2)) { // -2 because of best/worst times not used
+      if (validTimesCount >= (n - (excludedCount * 2))) { // -2 because of best/worst times not used
         if (validTimesCount > 0) {
-          return (avg / validTimesCount);
+          return (sum / validTimesCount);
         }
       } else {
         return -1;
@@ -234,7 +269,7 @@ public class TimesStatistics {
     }
     int validTimesCount = 0;
     long mean = 0;
-    // calculate mean manually because we don't want a DNF mean if there is a DNF time (DNF's are just ignored)
+    // calculate mean manually because we don't want a DNFï¿½mean if there is a DNF time (DNF's are just ignored)
     for (int i = 0; i < n; i++) {
       long time = times.get(i);
       if (time > 0) {
