@@ -110,6 +110,8 @@
   <string name="scrambles">Scrambles</string>
   <string name="big_cubes_notation">Big cubes notation</string>
   <string name="big_cubes_notation_summary">Choose the big cubes notation system</string>
+  <string name="use_new_clock_notation">Use new Clock notation (beta)</string>
+  <string name="use_new_clock_notation_summary">Use new official Clock notation system</string>
   <string name="use_modern_scrambles">Use random-state scrambles</string>
   <string name="use_modern_scrambles_summary">Use new \"random-state\" scrambles</string>
   <string name="scrambles_quality">Scrambles quality</string>

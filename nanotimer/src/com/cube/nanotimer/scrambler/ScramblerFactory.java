@@ -1,9 +1,11 @@
 package com.cube.nanotimer.scrambler;
 
+import com.cube.nanotimer.Options;
 import com.cube.nanotimer.scrambler.basic.ClockScrambler;
 import com.cube.nanotimer.scrambler.basic.FiveScrambler;
 import com.cube.nanotimer.scrambler.basic.FourScrambler;
 import com.cube.nanotimer.scrambler.basic.MegaminxScrambler;
+import com.cube.nanotimer.scrambler.basic.NewClockScrambler;
 import com.cube.nanotimer.scrambler.basic.PyraminxScrambler;
 import com.cube.nanotimer.scrambler.basic.SevenScrambler;
 import com.cube.nanotimer.scrambler.basic.SixScrambler;
@@ -50,7 +52,11 @@ public class ScramblerFactory {
         scrambler = new Square1Scrambler();
         break;
       case CLOCK:
-        scrambler = new ClockScrambler();
+        if (Options.INSTANCE.isUsingNewClockNotationSystem()) {
+          scrambler = new NewClockScrambler();
+        } else {
+          scrambler = new ClockScrambler();
+        }
         break;
       default:
         throw new RuntimeException("Could not find timer type " + type.getName());

@@ -86,6 +86,12 @@
        android:defaultValue="@integer/big_cubes_notation"/>
 
     <CheckBoxPreference
+       android:key="use_new_clock_notation"
+       android:title="@string/use_new_clock_notation"
+       android:summary="@string/use_new_clock_notation_summary"
+       android:defaultValue="@bool/use_new_clock_notation"/>
+
+    <CheckBoxPreference
        android:key="randomstate_scrambles"
        android:title="@string/use_modern_scrambles"
        android:summary="@string/use_modern_scrambles_summary"

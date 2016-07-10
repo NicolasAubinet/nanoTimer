@@ -26,6 +26,7 @@ public enum Options {
   public static final String BIG_CUBES_NOTATION_KEY = "big_cubes_notation";
   public static final String SOLVE_TYPES_SHORTCUT_KEY = "solve_types_shortcut";
 
+  public static final String USE_NEW_CLOCK_NOTATION_SYSTEM = "use_new_clock_notation";
   public static final String RANDOMSTATE_SCRAMBLES_KEY = "randomstate_scrambles";
   public static final String SCRAMBLES_QUALITY_KEY = "scrambles_quality";
   public static final String SCRAMBLE_NOTIFICATION_MODE_KEY = "scramble_notification_mode";
@@ -115,6 +116,11 @@ public enum Options {
   public boolean isSolveTypesShortcutEnabled() {
     Boolean defaultValue = context.getResources().getBoolean(R.bool.solve_types_shortcut);
     return sharedPreferences.getBoolean(SOLVE_TYPES_SHORTCUT_KEY, defaultValue);
+  }
+
+  public boolean isUsingNewClockNotationSystem() {
+    Boolean defaultValue = context.getResources().getBoolean(R.bool.use_new_clock_notation);
+    return sharedPreferences.getBoolean(USE_NEW_CLOCK_NOTATION_SYSTEM, defaultValue);
   }
 
   public boolean isRandomStateScrambles() {
