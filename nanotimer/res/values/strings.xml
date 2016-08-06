@@ -266,7 +266,14 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.2.0 <i>(New version)</i></b></u>
+    <u><b>v1.2.1 <i>(New version)</i></b></u>
+    <ul>
+      <li>Add support for 3 different Clock scramble styles (via Settings)</li>
+      <li>Generate new scramble when inspection results in DNF</li>
+      <li>Allow to use official inspection mode with no inspection time</li>
+      <li>Fix official inspection bug when inspection resulted in DNF</li>
+    </ul>
+    <u><b>v1.2.0</b></u>
     <ul>
       <li>Add scramble to \"Share time\" content</li>
       <li>Add new \"Official\" inspection mode (push for 0.5s to start, use official +2/DNF inspection rules)</li>
