@@ -1035,9 +1035,9 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
       if (parMotionEventAction == MotionEvent.ACTION_DOWN && ignoreActionUp) {
         ignoreActionUp = false;
       }
-      if (timerState == TimerState.STOPPED && parMotionEventAction == MotionEvent.ACTION_UP) {
+      if (timerState == TimerState.STOPPED && parMotionEventAction == MotionEvent.ACTION_UP && inspectionTime > 0) {
         startInspectionTimer();
-      } else if (timerState == TimerState.INSPECTING) {
+      } else if (timerState == TimerState.INSPECTING || inspectionTime == 0) {
         synchronized (holdToStartTimerSync) {
           if (parMotionEventAction == KeyEvent.ACTION_DOWN) {
             startHoldToStartTimer();
@@ -1048,7 +1048,11 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
               startTimer();
               setDefaultBannerText();
             } else {
-              setTitle(R.string.inspection);
+              if (inspectionTime > 0) {
+                setTitle(R.string.inspection);
+              } else {
+                setDefaultBannerText();
+              }
             }
             holdToStartTs = 0;
           }
