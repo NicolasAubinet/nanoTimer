@@ -109,6 +109,9 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
   private boolean soundsEnabled;
   private boolean keepScreenOnWhenTimerOff;
 
+  private int defaultBackgroundColor = R.color.graybg;
+  private int pushedBackgroundColor = R.color.gray850;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -768,6 +771,14 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
 
     if (mustDnfTime) {
       stopInspectionTimer();
+      layout.setBackgroundResource(defaultBackgroundColor);
+      if (inspectionMode == InspectionMode.OFFICIAL) {
+        synchronized (holdToStartTimerSync) {
+          stopHoldToStartTimer();
+          holdToStartTs = 0;
+        }
+        ignoreActionUp = true;
+      }
       updateTimerText(-1); // DNF
       Utils.playSound(R.raw.error);
       saveTime(-1);
@@ -979,12 +990,12 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
     // change bg color
     if (parMotionEventAction == MotionEvent.ACTION_DOWN) {
       if (System.currentTimeMillis() - lastTimerStopTs >= STOP_START_DELAY) {
-        layout.setBackgroundResource(R.color.gray850);
+        layout.setBackgroundResource(pushedBackgroundColor);
       } else {
         return false; // to avoid receiving the ACTION_UP
       }
     } else if (parMotionEventAction == MotionEvent.ACTION_UP) {
-      layout.setBackgroundResource(R.color.graybg);
+      layout.setBackgroundResource(defaultBackgroundColor);
       if (ignoreActionUp) {
         ignoreActionUp = false;
         return true;
@@ -1021,6 +1032,9 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
         startTimer();
       }
     } else if (inspectionMode == InspectionMode.OFFICIAL) {
+      if (parMotionEventAction == MotionEvent.ACTION_DOWN && ignoreActionUp) {
+        ignoreActionUp = false;
+      }
       if (timerState == TimerState.STOPPED && parMotionEventAction == MotionEvent.ACTION_UP) {
         startInspectionTimer();
       } else if (timerState == TimerState.INSPECTING) {
