@@ -771,6 +771,7 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
       updateTimerText(-1); // DNF
       Utils.playSound(R.raw.error);
       saveTime(-1);
+      generateScramble();
     }
   }
 
