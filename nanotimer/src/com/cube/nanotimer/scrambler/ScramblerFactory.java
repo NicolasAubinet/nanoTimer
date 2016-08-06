@@ -1,11 +1,13 @@
 package com.cube.nanotimer.scrambler;
 
 import com.cube.nanotimer.Options;
-import com.cube.nanotimer.scrambler.basic.ClockScrambler;
+import com.cube.nanotimer.Options.ClockNotation;
+import com.cube.nanotimer.scrambler.basic.ClockURxDRxDLxScrambler;
+import com.cube.nanotimer.scrambler.basic.ClockUUdUxxScrambler;
+import com.cube.nanotimer.scrambler.basic.ClockUUdduxdxScrambler;
 import com.cube.nanotimer.scrambler.basic.FiveScrambler;
 import com.cube.nanotimer.scrambler.basic.FourScrambler;
 import com.cube.nanotimer.scrambler.basic.MegaminxScrambler;
-import com.cube.nanotimer.scrambler.basic.NewClockScrambler;
 import com.cube.nanotimer.scrambler.basic.PyraminxScrambler;
 import com.cube.nanotimer.scrambler.basic.SevenScrambler;
 import com.cube.nanotimer.scrambler.basic.SixScrambler;
@@ -52,10 +54,20 @@ public class ScramblerFactory {
         scrambler = new Square1Scrambler();
         break;
       case CLOCK:
-        if (Options.INSTANCE.isUsingNewClockNotationSystem()) {
-          scrambler = new NewClockScrambler();
-        } else {
-          scrambler = new ClockScrambler();
+        ClockNotation clockNotation = Options.INSTANCE.getClockNotation();
+        switch (clockNotation) {
+          case UUdU_x_x:
+            scrambler = new ClockUUdUxxScrambler();
+            break;
+          case UUdd_ux_dx:
+            scrambler = new ClockUUdduxdxScrambler();
+            break;
+          case URx_DRx_DLx:
+            scrambler = new ClockURxDRxDLxScrambler();
+            break;
+          default:
+            scrambler = new ClockUUdUxxScrambler();
+            break;
         }
         break;
       default:

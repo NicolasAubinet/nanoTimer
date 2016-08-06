@@ -26,6 +26,16 @@
     <item>1</item>
     <item>2</item>
   </string-array>
+  <string-array name="entries_clock_notation">
+    <item>@string/clock_UUdU_x_x</item>
+    <item>@string/clock_UUdd_ux_dx</item>
+    <item>@string/clock_URx_DRx_DLx</item>
+  </string-array>
+  <string-array name="entryvalues_clock_notation">
+    <item>1</item>
+    <item>2</item>
+    <item>3</item>
+  </string-array>
   <string-array name="entries_scrambles_quality">
     <item>@string/high_quality</item>
     <item>@string/normal_quality</item>

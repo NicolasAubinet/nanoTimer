@@ -4,11 +4,9 @@ import com.cube.nanotimer.scrambler.Scrambler;
 
 import java.util.Random;
 
-public class NewClockScrambler implements Scrambler {
+public class ClockUUdduxdxScrambler implements Scrambler {
 
-  // Example:
-  //   UUdd u=-3,d=2 / dUdU u=0,d=6 / ddUU u=6,d=-1 / UdUd u=3,d=3 / dUUU u=-3 /
-  //   UdUU u=1 / UUUd u=-2 / UUdU u=6 / UUUU u=-4 / dddd d=1 / UUUd
+  // Style: UUdd u=-3,d=2 / dUdU u=0,d=6 / ddUU u=6,d=-1 / UdUd u=3,d=3 ... / UUUU u=-4 / dddd d=1 / UUUd
   // Scrambler: https://www.worldcubeassociation.org/regulations/history/files/scrambles/scramble_clock.htm
 
   private static final PinMoveType[] PINS_MOVE_TYPES = new PinMoveType[] {
@@ -32,6 +30,7 @@ public class NewClockScrambler implements Scrambler {
     for (int i = 0; i < PINS_MOVE_TYPES.length; i++) {
       PinMoveType pinMoveType = PINS_MOVE_TYPES[i];
       StringBuilder pinMoves = new StringBuilder();
+      pinMoves.append("(");
       pinMoves.append(pinMoveType.pinStates).append(" ");
       if (pinMoveType.moveUpPin) {
         pinMoves.append("u=").append(getRandomMove(random));
@@ -42,10 +41,11 @@ public class NewClockScrambler implements Scrambler {
       if (pinMoveType.moveDownPin) {
         pinMoves.append("d=").append(getRandomMove(random));
       }
+      pinMoves.append(")");
       scramble[i] = formatToFixedLength(pinMoves.toString());
     }
 
-    String lastPinState = "";
+    String lastPinState = "(";
     for (int i = 0; i < 4; i++) {
       String nextState;
       if (random.nextBoolean()) {
@@ -55,6 +55,7 @@ public class NewClockScrambler implements Scrambler {
       }
       lastPinState += nextState;
     }
+    lastPinState += ")";
     scramble[scramble.length - 1] = formatLastPinState(lastPinState);
 
     return scramble;

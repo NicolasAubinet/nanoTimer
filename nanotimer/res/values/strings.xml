@@ -110,8 +110,8 @@
   <string name="scrambles">Scrambles</string>
   <string name="big_cubes_notation">Big cubes notation</string>
   <string name="big_cubes_notation_summary">Choose the big cubes notation system</string>
-  <string name="use_new_clock_notation">Use new Clock notation (beta)</string>
-  <string name="use_new_clock_notation_summary">Use new official Clock notation system</string>
+  <string name="clock_notation">Clock notation</string>
+  <string name="clock_notation_summary">Choose the Clock notation system</string>
   <string name="use_modern_scrambles">Use random-state scrambles</string>
   <string name="use_modern_scrambles_summary">Use new \"random-state\" scrambles</string>
   <string name="scrambles_quality">Scrambles quality</string>
@@ -123,6 +123,9 @@
   <string name="pregen_scrambles_summary">Manually generate random-state scrambles</string>
   <string name="r_u_f">r u f</string>
   <string name="rw_uw_fw">Rw Uw Fw</string>
+  <string name="clock_UUdU_x_x">(UUdU, 2, -4)</string>
+  <string name="clock_UUdd_ux_dx">UUdd u=-3,d=2</string>
+  <string name="clock_URx_DRx_DLx">UR1+ DR6+ DL5- UL3+</string>
   <string name="ads">Advertisements</string>
   <string name="ads_style">Advertisements style</string>
   <string name="ads_style_summary">Choose between banner, interstitial or mixed</string>

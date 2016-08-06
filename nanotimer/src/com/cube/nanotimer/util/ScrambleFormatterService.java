@@ -7,6 +7,7 @@ import android.text.style.ForegroundColorSpan;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.Options.BigCubesNotation;
+import com.cube.nanotimer.Options.ClockNotation;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.vo.CubeType;
 
@@ -203,7 +204,11 @@ public enum ScrambleFormatterService {
         movesPerLine = 4;
         break;
       case CLOCK:
-        movesPerLine = (orientation == Configuration.ORIENTATION_PORTRAIT) ? 3 : 2;
+        if (Options.INSTANCE.getClockNotation() == ClockNotation.URx_DRx_DLx) {
+          movesPerLine = 5;
+        } else {
+          movesPerLine = (orientation == Configuration.ORIENTATION_PORTRAIT) ? 3 : 2;
+        }
         break;
       case FOUR_BY_FOUR:
         if (Options.INSTANCE.getBigCubesNotation() == BigCubesNotation.RUF && orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -261,14 +266,17 @@ public enum ScrambleFormatterService {
 
   private char getScrambleDelimiter(CubeType cubeType) {
     char delimiter;
-    switch (cubeType) {
-      case SQUARE1:
-      case CLOCK:
+    if (cubeType == CubeType.SQUARE1) {
+      delimiter = ')';
+    } else if (cubeType == CubeType.CLOCK) {
+      ClockNotation clockNotation = Options.INSTANCE.getClockNotation();
+      if (clockNotation == ClockNotation.UUdU_x_x || clockNotation == ClockNotation.UUdd_ux_dx) {
         delimiter = ')';
-        break;
-      default:
+      } else {
         delimiter = ' ';
-        break;
+      }
+    } else {
+      delimiter = ' ';
     }
     return delimiter;
   }

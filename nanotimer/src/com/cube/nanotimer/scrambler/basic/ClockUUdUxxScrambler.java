@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class ClockScrambler implements Scrambler {
+public class ClockUUdUxxScrambler implements Scrambler {
+
+  // Style: (UUdU, 2, -4) (UUdd, 1, 4) (dUdU, 3, -4) ...
 
   private static final int MOVES_COUNT = 12;
 
