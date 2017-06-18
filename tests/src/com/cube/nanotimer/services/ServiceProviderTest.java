@@ -53,7 +53,7 @@ public class ServiceProviderTest extends AndroidTestCase {
       }
     }
     if (solveTypeBlind == null) {
-      provider.addSolveType(new SolveType("BLD", true, cubeType1.getId()));
+      provider.addSolveType(new SolveType("BLD", true, null, cubeType1.getId()));
       for (SolveType st : provider.getSolveTypes(cubeType1)) {
         if ("BLD".equals(st.getName())) {
           solveTypeBlind = st;

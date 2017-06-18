@@ -1,36 +1,11 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
+import com.cube.nanotimer.vo.ThreeCubeState;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ThreeSolver {
-
-  static class CubeState {
-    public byte[] cornerPermutations = new byte[8];
-    public byte[] cornerOrientations = new byte[8];
-    public byte[] edgePermutations = new byte[12];
-    public byte[] edgeOrientations = new byte[12];
-
-    public CubeState() {
-    }
-
-    public CubeState(CubeState cubeState) {
-      System.arraycopy(cubeState.cornerPermutations, 0, this.cornerPermutations, 0, 8);
-      System.arraycopy(cubeState.cornerOrientations, 0, this.cornerOrientations, 0, 8);
-      System.arraycopy(cubeState.edgePermutations, 0, this.edgePermutations, 0, 12);
-      System.arraycopy(cubeState.edgeOrientations, 0, this.edgeOrientations, 0, 12);
-    }
-
-    public String toString() {
-      StringBuilder sb = new StringBuilder();
-      sb.append("Corner permutations: ").append(Arrays.toString(cornerPermutations)).append("\n");
-      sb.append("Corner orientations: ").append(Arrays.toString(cornerOrientations)).append("\n");
-      sb.append("Edge permutations: ").append(Arrays.toString(edgePermutations)).append("\n");
-      sb.append("Edge orientations: ").append(Arrays.toString(edgeOrientations));
-      return sb.toString();
-    }
-  }
 
   private static final int DEFAULT_MAX_SOLUTION_LENGTH = 23;
   private static final int MAX_PHASE2_SOLUTION_LENGTH = 12;
@@ -39,7 +14,7 @@ public class ThreeSolver {
 
   public static final boolean SHOW_PHASE_SEPARATOR = false; // for debug
 
-  private CubeState initialState;
+  private ThreeCubeState initialState;
   private List<Byte> solution1;
   private List<Byte> solution2;
   private List<Byte> bestSolution1;
@@ -125,7 +100,7 @@ public class ThreeSolver {
           }
         }
         // generate phase 2 state
-        CubeState state = new CubeState(initialState);
+        ThreeCubeState state = new ThreeCubeState(initialState);
         applyMoves(state, solution1);
 
         byte[] udEdgePermutation = new byte[8];
@@ -231,11 +206,11 @@ public class ThreeSolver {
     return false;
   }
 
-  public String[] getSolution(CubeState cubeState) {
+  public String[] getSolution(ThreeCubeState cubeState) {
     return getSolution(cubeState, null);
   }
 
-  public String[] getSolution(CubeState cubeState, ScrambleConfig config) {
+  public String[] getSolution(ThreeCubeState cubeState, ScrambleConfig config) {
     running = true;
     synchronized (solutionSyncHelper) {
       solutionSearchCount++;
@@ -336,7 +311,7 @@ public class ThreeSolver {
   }
 
   // Performs moves on a cube state, and also modifies the first cubies positions
-  private void applyMoves(CubeState state, List<Byte> moves) {
+  private void applyMoves(ThreeCubeState state, List<Byte> moves) {
     for (Byte m : moves) {
       Move move = ThreeSolver.moves[m];
       state.edgePermutations = StateTables.getPermResult(state.edgePermutations, move.edgPerm);

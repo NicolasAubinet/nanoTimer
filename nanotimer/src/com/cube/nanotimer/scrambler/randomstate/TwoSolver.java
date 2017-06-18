@@ -1,7 +1,8 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
+import com.cube.nanotimer.vo.TwoCubeState;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class TwoSolver {
@@ -14,22 +15,6 @@ public class TwoSolver {
   // #########  #########
   // # 1 # 2 #  # 4 # 5 #
   // #########  #########
-
-  static class CubeState {
-
-    public byte[] permutations = new byte[7];
-    public byte[] orientations = new byte[7];
-
-    public CubeState() {
-    }
-
-    public String toString() {
-      StringBuilder sb = new StringBuilder();
-      sb.append("Corner permutations: ").append(Arrays.toString(permutations)).append("\n");
-      sb.append("Corner orientations: ").append(Arrays.toString(orientations)).append("\n");
-      return sb.toString();
-    }
-  }
 
   enum Move {
     U("U", new byte[] { 1, 2, 3, 0, 4, 5, 6 }, new byte[] { 0, 0, 0, 0, 0, 0, 0 }),
@@ -143,11 +128,11 @@ public class TwoSolver {
     return foundSolution;
   }
 
-  public String[] getSolution(CubeState cubeState) {
+  public String[] getSolution(TwoCubeState cubeState) {
     return getSolution(cubeState, null);
   }
 
-  public String[] getSolution(CubeState cubeState, ScrambleConfig config) {
+  public String[] getSolution(TwoCubeState cubeState, ScrambleConfig config) {
     running = true;
     synchronized (solutionSyncHelper) {
       solutionSearchCount++;

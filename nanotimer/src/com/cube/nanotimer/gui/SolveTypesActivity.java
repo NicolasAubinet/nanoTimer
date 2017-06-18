@@ -33,6 +33,7 @@ import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.SolveTypeStep;
+import com.cube.nanotimer.vo.ThreeScrambleType;
 import com.cube.nanotimer.vo.TimesSort;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
@@ -131,7 +132,7 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
   }
 
   private void showAddDialog() {
-    SolveTypeAddDialog dialog = SolveTypeAddDialog.newInstance(this);
+    SolveTypeAddDialog dialog = SolveTypeAddDialog.newInstance(this, curCubeType);
     DialogUtils.showFragment(this, dialog);
   }
 
@@ -260,7 +261,14 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
       return false;
     }
     boolean blindMode = Boolean.valueOf(props.getProperty(SolveTypeAddDialog.KEY_BLD, String.valueOf(false)));
-    SolveType st = new SolveType(name, blindMode, curCubeType.getId());
+
+    ThreeScrambleType scrambleType = null;
+    int threeScrambleTypeIndex = Integer.parseInt(props.getProperty(SolveTypeAddDialog.KEY_SCRAMBLE_TYPE));
+    if (threeScrambleTypeIndex >= 0) {
+      scrambleType = ThreeScrambleType.values()[threeScrambleTypeIndex];
+    }
+    SolveType st = new SolveType(name, blindMode, scrambleType, curCubeType.getId());
+
     liSolveTypes.add(st);
     App.INSTANCE.getService().addSolveType(st, new DataCallback<Integer>() {
       @Override

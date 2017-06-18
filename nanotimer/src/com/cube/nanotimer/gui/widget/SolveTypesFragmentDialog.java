@@ -27,7 +27,7 @@ public class SolveTypesFragmentDialog extends SelectorFragmentDialog {
     bundle.putBoolean(ARG_SHORTCUT, showShortcut);
 
     if (Options.INSTANCE.isSolveTypesShortcutEnabled()) {
-      items.add(App.INSTANCE.getContext().getString(R.string.add_more_solve_types));
+      items.add(App.INSTANCE.getContext().getString(R.string.edit_solve_types_dots));
     }
     bundle.putStringArrayList(ARG_ITEMS, items);
 

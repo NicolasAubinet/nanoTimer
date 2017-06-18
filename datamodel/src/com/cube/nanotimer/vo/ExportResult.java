@@ -11,26 +11,29 @@ public class ExportResult {
   private long timestamp;
   private boolean plusTwo;
   private boolean blindType;
+  private ThreeScrambleType scrambleType;
   private String scramble;
 
   private String[] stepsNames;
   private Long[] stepsTimes;
 
   public ExportResult(int solveTimeId, int cubeTypeId, String cubeTypeName, int solveTypeId, String solveTypeName,
-                      long time, long timestamp, boolean plusTwo, boolean blindType, String scramble) {
-    this(cubeTypeName, solveTypeName, time, timestamp, plusTwo, blindType, scramble);
+                      long time, long timestamp, boolean plusTwo, boolean blindType, ThreeScrambleType scrambleType, String scramble) {
+    this(cubeTypeName, solveTypeName, time, timestamp, plusTwo, blindType, scrambleType, scramble);
     this.solveTimeId = solveTimeId;
     this.cubeTypeId = cubeTypeId;
     this.solveTypeId = solveTypeId;
   }
 
-  public ExportResult(String cubeTypeName, String solveTypeName, long time, long timestamp, boolean plusTwo, boolean blindType, String scramble) {
+  public ExportResult(String cubeTypeName, String solveTypeName, long time, long timestamp, boolean plusTwo, boolean blindType,
+                      ThreeScrambleType scrambleType, String scramble) {
     this.cubeTypeName = cubeTypeName;
     this.solveTypeName = solveTypeName;
     this.time = time;
     this.timestamp = timestamp;
     this.plusTwo = plusTwo;
     this.blindType = blindType;
+    this.scrambleType = scrambleType;
     this.scramble = scramble;
   }
 
@@ -112,6 +115,14 @@ public class ExportResult {
 
   public void setBlindType(boolean blindType) {
     this.blindType = blindType;
+  }
+
+  public ThreeScrambleType getScrambleType() {
+    return scrambleType;
+  }
+
+  public void setScrambleType(ThreeScrambleType scrambleType) {
+    this.scrambleType = scrambleType;
   }
 
   public String[] getStepsNames() {

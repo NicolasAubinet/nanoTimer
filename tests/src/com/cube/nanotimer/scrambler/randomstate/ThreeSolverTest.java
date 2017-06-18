@@ -3,8 +3,8 @@ package com.cube.nanotimer.scrambler.randomstate;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
-import com.cube.nanotimer.scrambler.randomstate.ThreeSolver.CubeState;
 import com.cube.nanotimer.util.helper.Utils;
+import com.cube.nanotimer.vo.ThreeCubeState;
 import junit.framework.Assert;
 
 import java.util.Arrays;
@@ -13,7 +13,7 @@ public class ThreeSolverTest extends AndroidTestCase {
 
   @SmallTest
   public void testSolvedCubeSolving() {
-    CubeState cubeState = new CubeState();
+    ThreeCubeState cubeState = new ThreeCubeState();
     cubeState.cornerPermutations = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
     cubeState.edgePermutations = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
     cubeState.cornerOrientations = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -26,7 +26,7 @@ public class ThreeSolverTest extends AndroidTestCase {
 
   @SmallTest
   public void testVeryEasy() {
-    CubeState cubeState = new CubeState();
+    ThreeCubeState cubeState = new ThreeCubeState();
     //  F
     cubeState.cornerPermutations = new byte[] { 0, 5, 1, 3, 4, 6, 2, 7 };
     cubeState.edgePermutations = new byte[] { 4, 1, 2, 8, 3, 5, 6, 7, 0, 9, 10, 11 };
@@ -41,7 +41,7 @@ public class ThreeSolverTest extends AndroidTestCase {
 
   @SmallTest
   public void testOrientedAndCombined() {
-    CubeState cubeState = new CubeState();
+    ThreeCubeState cubeState = new ThreeCubeState();
     // R2 U F2 D' B2 F2 U2 D L2 D
     cubeState.cornerPermutations = new byte[] { 0, 1, 4, 2, 3, 6, 7, 5 };
     cubeState.edgePermutations = new byte[] { 1, 2, 3, 0, 11, 4, 5, 7, 6, 9, 8, 10 };
@@ -57,7 +57,7 @@ public class ThreeSolverTest extends AndroidTestCase {
 
   @SmallTest
   public void testEasy() {
-    CubeState cubeState = new CubeState();
+    ThreeCubeState cubeState = new ThreeCubeState();
     //  F L2 R' D2
     cubeState.cornerPermutations = new byte[] { 6, 4, 3, 7, 1, 2, 5, 0 };
     cubeState.edgePermutations = new byte[] { 5, 9, 8, 2, 3, 1, 6, 11, 10, 7, 0, 4 };
@@ -72,7 +72,7 @@ public class ThreeSolverTest extends AndroidTestCase {
 
   @SmallTest
   public void testRealScramble() {
-    CubeState cubeState = new CubeState();
+    ThreeCubeState cubeState = new ThreeCubeState();
     //  F L2 R' D2 R2 D' U' R D' B2 U2 F' U2 L2 D L R' U' F2 L R D2 B R' U2
     cubeState.cornerPermutations = new byte[] { 3, 0, 4, 1, 6, 2, 5, 7 };
     cubeState.edgePermutations = new byte[] { 1, 9, 8, 0, 11, 7, 6, 10, 4, 5, 3, 2 };
@@ -87,7 +87,7 @@ public class ThreeSolverTest extends AndroidTestCase {
 
   @SmallTest
   public void testInvertedScramble() {
-    CubeState cubeState = new CubeState();
+    ThreeCubeState cubeState = new ThreeCubeState();
     //  F L2 R' D2 R2 D' U' R D' B2 U2 F' U2 L2 D L R' U' F2 L R D2 B R' U2
     cubeState.cornerPermutations = new byte[] { 3, 0, 4, 1, 6, 2, 5, 7 };
     cubeState.edgePermutations = new byte[] { 1, 9, 8, 0, 11, 7, 6, 10, 4, 5, 3, 2 };
@@ -108,7 +108,7 @@ public class ThreeSolverTest extends AndroidTestCase {
 
   @SmallTest
   public void testRealScramble2() {
-    CubeState cubeState = new CubeState();
+    ThreeCubeState cubeState = new ThreeCubeState();
     //  L2 R D L D2 B' U2 R F' D' U' L' R' D2 F L D2 B F' L' F2 L' R D' L2
     cubeState.cornerPermutations = new byte[] { 2, 4, 6, 1, 0, 3, 5, 7 };
     cubeState.edgePermutations = new byte[] { 8, 3, 9, 11, 10, 7, 5, 0, 2, 1, 4, 6 };

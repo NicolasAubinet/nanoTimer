@@ -3,7 +3,7 @@ package com.cube.nanotimer.scrambler.randomstate;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
-import com.cube.nanotimer.scrambler.randomstate.ThreeSolver.CubeState;
+import com.cube.nanotimer.vo.ThreeCubeState;
 import junit.framework.Assert;
 
 import java.io.ByteArrayOutputStream;
@@ -16,7 +16,7 @@ public class StateTablesTest extends AndroidTestCase {
 
   @SmallTest
   public void testCubeStateMoves() {
-    CubeState state = new CubeState();
+    ThreeCubeState state = new ThreeCubeState();
     byte[] state12 = new byte[12];
     IndexConvertor.unpackPermutation(0, state12);
     state.edgePermutations = state12;
@@ -410,7 +410,7 @@ public class StateTablesTest extends AndroidTestCase {
     return -1;
   }
 
-  private void applyMove(CubeState state, Move move) {
+  private void applyMove(ThreeCubeState state, Move move) {
     state.edgePermutations = StateTables.getPermResult(state.edgePermutations, move.edgPerm);
     state.cornerPermutations = StateTables.getPermResult(state.cornerPermutations, move.corPerm);
     state.edgeOrientations = StateTables.getOrientResult(state.edgeOrientations, move.edgPerm, move.edgOrient, 2);

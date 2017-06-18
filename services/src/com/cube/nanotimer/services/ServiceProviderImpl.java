@@ -16,6 +16,7 @@ import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveTimeAverages;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.SolveTypeStep;
+import com.cube.nanotimer.vo.ThreeScrambleType;
 import com.cube.nanotimer.vo.TimesSort;
 
 import java.util.ArrayList;
@@ -79,6 +80,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("SELECT ").append(DB.COL_ID);
     q.append(", ").append(DB.COL_SOLVETYPE_NAME);
     q.append(", ").append(DB.COL_SOLVETYPE_BLIND);
+    q.append(", ").append(DB.COL_SOLVETYPE_SCRAMBLE_TYPE);
     q.append(", ").append(DB.COL_SOLVETYPE_CUBETYPE_ID);
     q.append(" FROM ").append(DB.TABLE_SOLVETYPE);
     q.append(" WHERE ").append(DB.COL_SOLVETYPE_CUBETYPE_ID).append(" = ?");
@@ -86,7 +88,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     Cursor cursor = db.rawQuery(q.toString(), getStringArray(cubeType.getId()));
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-        SolveType st = new SolveType(cursor.getInt(0), cursor.getString(1), (cursor.getInt(2) == 1), cursor.getInt(3));
+        SolveType st = new SolveType(cursor.getInt(0), cursor.getString(1), (cursor.getInt(2) == 1), toScrambleType(cursor.getString(3)), cursor.getInt(4));
         st.setSteps(getSolveTypeSteps(st.getId()).toArray(new SolveTypeStep[0]));
         solveTypes.add(st);
       }
@@ -742,6 +744,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     values.put(DB.COL_SOLVETYPE_POSITION, position);
     values.put(DB.COL_SOLVETYPE_CUBETYPE_ID, solveType.getCubeTypeId());
     values.put(DB.COL_SOLVETYPE_BLIND, solveType.isBlind() ? 1 : 0);
+    values.put(DB.COL_SOLVETYPE_SCRAMBLE_TYPE, (solveType.getScrambleType() != null ? solveType.getScrambleType().toString() : ""));
     int id = (int) db.insert(DB.TABLE_SOLVETYPE, null, values);
     solveType.setId(id);
 
@@ -919,6 +922,7 @@ public class ServiceProviderImpl implements ServiceProvider {
       q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_TIMESTAMP);
       q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_PLUSTWO);
       q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_BLIND);
+      q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_SCRAMBLE_TYPE);
       q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_SCRAMBLE);
       q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
       q.append(" JOIN ").append(DB.TABLE_SOLVETYPE);
@@ -939,7 +943,8 @@ public class ServiceProviderImpl implements ServiceProvider {
       if (cursor != null) {
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
           ExportResult result = new ExportResult(cursor.getInt(0), cursor.getInt(1), cursor.getString(2), cursor.getInt(3),
-              cursor.getString(4), cursor.getLong(5), cursor.getLong(6), (cursor.getInt(7) == 1), (cursor.getInt(8) == 1), cursor.getString(9));
+              cursor.getString(4), cursor.getLong(5), cursor.getLong(6), (cursor.getInt(7) == 1), (cursor.getInt(9) == 1),
+              toScrambleType(cursor.getString(8)), cursor.getString(10));
           curResults.add(result);
         }
         cursor.close();
@@ -972,6 +977,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_ID);
     q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_NAME);
     q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_BLIND);
+    q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_SCRAMBLE_TYPE);
     q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_CUBETYPE_ID);
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
     q.append(" JOIN ").append(DB.TABLE_SOLVETYPE);
@@ -989,7 +995,7 @@ public class ServiceProviderImpl implements ServiceProvider {
         st.setScramble(cursor.getString(3));
         st.setPlusTwo(cursor.getInt(4) == 1);
         st.setPb(cursor.getInt(5) == 1);
-        st.setSolveType(new SolveType(cursor.getInt(6), cursor.getString(7), (cursor.getInt(8) == 1), cursor.getInt(9)));
+        st.setSolveType(new SolveType(cursor.getInt(6), cursor.getString(7), (cursor.getInt(8) == 1), toScrambleType(cursor.getString(9)), cursor.getInt(10)));
       }
       cursor.close();
     }
@@ -1270,6 +1276,10 @@ public class ServiceProviderImpl implements ServiceProvider {
       }
     }
     return times;
+  }
+
+  private ThreeScrambleType toScrambleType(String scrambleTypeStr) {
+    return ThreeScrambleType.fromString(scrambleTypeStr);
   }
 
   boolean fakeTimesInserted = false;

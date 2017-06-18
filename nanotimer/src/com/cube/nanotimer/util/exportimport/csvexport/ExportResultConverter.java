@@ -6,6 +6,7 @@ import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.exportimport.CSVFormatException;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.ExportResult;
+import com.cube.nanotimer.vo.ThreeScrambleType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,8 @@ public class ExportResultConverter {
     sb.append(",");
     sb.append(result.isBlindType() ? "y" : "n");
     sb.append(",");
+    sb.append(result.getScrambleType().toString());
+    sb.append(",");
     if (result.getScramble() != null) {
       sb.append(escapeString(result.getScramble()));
     }
@@ -38,7 +41,7 @@ public class ExportResultConverter {
 
   public static ExportResult fromCSVLine(Context context, String line) throws CSVFormatException {
     List<String> fields = getFieldsFromCSVLine(line);
-    if (fields.size() != 8) {
+    if (fields.size() != 8 && fields.size() != 9) { // 8 fields is older version, 9 fields contains the scramble type
       throw new CSVFormatException(context.getString(R.string.import_invalid_columns_count));
     }
     String cubeTypeName = fields.get(0);
@@ -53,12 +56,21 @@ public class ExportResultConverter {
     }
     boolean plusTwo = (fields.get(5).equals("y"));
     boolean blindType = (fields.get(6).equals("y"));
-    String scramble = fields.get(7);
+
+    int scrambleFieldIndex;
+    ThreeScrambleType scrambleType = null;
+    if (fields.size() == 8) {
+      scrambleFieldIndex = 7;
+    } else {
+      scrambleType = ThreeScrambleType.fromString(fields.get(7));
+      scrambleFieldIndex = 8;
+    }
+    String scramble = fields.get(scrambleFieldIndex);
     if ("".equals(scramble.trim())) {
       scramble = null;
     }
 
-    ExportResult exportResult = new ExportResult(cubeTypeName, solveTypeName, time, timestamp, plusTwo, blindType, scramble);
+    ExportResult exportResult = new ExportResult(cubeTypeName, solveTypeName, time, timestamp, plusTwo, blindType, scrambleType, scramble);
     String stepsField = fields.get(4);
     exportResult.setStepsTimes(getStepsTimes(context, stepsField));
     exportResult.setStepsNames(getStepsNames(context, stepsField));

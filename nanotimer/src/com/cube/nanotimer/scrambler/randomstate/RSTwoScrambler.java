@@ -1,7 +1,7 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
-import com.cube.nanotimer.scrambler.randomstate.TwoSolver.CubeState;
 import com.cube.nanotimer.util.helper.Utils;
+import com.cube.nanotimer.vo.TwoCubeState;
 
 import java.util.Random;
 
@@ -13,7 +13,7 @@ public class RSTwoScrambler implements RSScrambler {
   public String[] getNewScramble(ScrambleConfig config) {
     String[] scramble;
     do {
-      CubeState randomState = getRandomState();
+      TwoCubeState randomState = getRandomState();
 //      Log.i("[NanoTimer]", "Random state:\n" + randomState.toString());
       scramble = Utils.invertMoves(twoSolver.getSolution(randomState, config));
 //      Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
@@ -36,13 +36,13 @@ public class RSTwoScrambler implements RSScrambler {
     twoSolver.stop();
   }
 
-  private CubeState getRandomState() {
-    CubeState cubeState;
+  private TwoCubeState getRandomState() {
+    TwoCubeState cubeState;
     Random r = Utils.getRandom();
 
     byte[] state;
 
-    cubeState = new CubeState();
+    cubeState = new TwoCubeState();
 
     state = new byte[7];
     IndexConvertor.unpackPermutation(r.nextInt(TwoSolver.N_PERM), state);

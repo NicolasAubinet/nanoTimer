@@ -87,7 +87,7 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
       if (cubeType == null) {
         throw new CSVFormatException(context.getString(R.string.could_not_find_cube_type, exportResult.getCubeTypeName()));
       }
-      SolveType solveType = new SolveType(exportResult.getSolveTypeName(), exportResult.isBlindType(), cubeType.getId());
+      SolveType solveType = new SolveType(exportResult.getSolveTypeName(), exportResult.isBlindType(), exportResult.getScrambleType(), cubeType.getId());
       if (exportResult.hasSteps()) {
         SolveTypeStep[] steps = new SolveTypeStep[exportResult.getStepsNames().length];
         for (int i = 0; i < exportResult.getStepsNames().length; i++) {

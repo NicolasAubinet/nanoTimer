@@ -1,6 +1,4 @@
-package com.cube.nanotimer.scrambler.randomstate;
-
-import com.cube.nanotimer.scrambler.randomstate.ThreeSolver.CubeState;
+package com.cube.nanotimer.vo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,18 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public enum ThreeScrambleStyle {
+public enum ThreeScrambleType {
   RANDOM {
-    @Override
-    protected CubeState getUncheckedParityRandomState() {
-      CubeState cubeState = new CubeState();
-      Random r = new Random();
-      cubeState.cornerPermutations = IndexConvertor.unpackPermutation(r.nextInt(StateTables.N_CORNER_PERMUTATIONS), new byte[8]);
-      cubeState.edgePermutations = IndexConvertor.unpackPermutation(r.nextInt(StateTables.N_EDGE_PERMUTATIONS), new byte[12]);
-      cubeState.cornerOrientations = IndexConvertor.unpackOrientation(r.nextInt(StateTables.N_CORNER_ORIENTATIONS), new byte[8], (byte) 3);
-      cubeState.edgeOrientations = IndexConvertor.unpackOrientation(r.nextInt(StateTables.N_EDGE_ORIENTATIONS), new byte[12], (byte) 2);
-      return cubeState;
-    }
   },
   F2L {
     @Override
@@ -308,20 +296,15 @@ public enum ThreeScrambleStyle {
     return false;
   }
 
-  protected CubeState getUncheckedParityRandomState() {
-    CubeState cubeState = new CubeState();
-    cubeState.cornerPermutations = getRandomPermutation(getFixedCornerPermutationIndices(), 8);
-    cubeState.edgePermutations = getRandomPermutation(getFixedEdgePermutationIndices(), 12);
-    cubeState.cornerOrientations = getRandomOrientation(getFixedCornerOrientationIndices(), 8, 3);
-    cubeState.edgeOrientations = getRandomOrientation(getFixedEdgeOrientationIndices(), 12, 2);
-    return cubeState;
-  }
-
-  public CubeState getRandomState() {
-    CubeState cubeState;
+  public ThreeCubeState getRandomState() {
+    ThreeCubeState cubeState;
 
     do {
-      cubeState = getUncheckedParityRandomState();
+      cubeState = new ThreeCubeState();
+      cubeState.cornerPermutations = getRandomPermutation(getFixedCornerPermutationIndices(), 8);
+      cubeState.edgePermutations = getRandomPermutation(getFixedEdgePermutationIndices(), 12);
+      cubeState.cornerOrientations = getRandomOrientation(getFixedCornerOrientationIndices(), 8, 3);
+      cubeState.edgeOrientations = getRandomOrientation(getFixedEdgeOrientationIndices(), 12, 2);
     } while (hasParity(cubeState.cornerPermutations) != hasParity(cubeState.edgePermutations));
 
     return cubeState;
@@ -331,7 +314,7 @@ public enum ThreeScrambleStyle {
     return scramble;
   }
 
-  static boolean hasParity(byte[] perm) {
+  public static boolean hasParity(byte[] perm) {
     int inversion = 0;
     for (int i = 0; i < perm.length; i++) {
       for (int j = i + 1; j < perm.length; j++) {
@@ -341,5 +324,13 @@ public enum ThreeScrambleStyle {
       }
     }
     return (inversion % 2 != 0);
+  }
+
+  public static ThreeScrambleType fromString(String scrambleTypeStr) {
+    ThreeScrambleType scrambleType = null;
+    if (scrambleTypeStr != null && !scrambleTypeStr.equals("")) {
+      scrambleType = ThreeScrambleType.valueOf(scrambleTypeStr);
+    }
+    return scrambleType;
   }
 }

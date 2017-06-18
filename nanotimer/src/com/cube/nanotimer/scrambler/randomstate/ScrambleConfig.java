@@ -1,29 +1,27 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
+import com.cube.nanotimer.vo.ThreeScrambleType;
+
 public class ScrambleConfig {
 
   private int maxLength;
-  private ThreeScrambleStyle threeScrambleStyle;
+  private ThreeScrambleType threeScrambleType;
 
   public ScrambleConfig(int maxLength) {
-    this(maxLength, ThreeScrambleStyle.RANDOM);
+    this(maxLength, ThreeScrambleType.RANDOM);
   }
 
-  public ScrambleConfig(int maxLength, ThreeScrambleStyle threeScrambleStyle) {
+  public ScrambleConfig(int maxLength, ThreeScrambleType threeScrambleType) {
     this.maxLength = maxLength;
-    this.threeScrambleStyle = threeScrambleStyle;
+    this.threeScrambleType = threeScrambleType;
   }
 
   public int getMaxLength() {
     return maxLength;
   }
 
-  public void setMaxLength(int maxLength) {
-    this.maxLength = maxLength;
-  }
-
-  public ThreeScrambleStyle getThreeScrambleStyle() {
-    return threeScrambleStyle;
+  public ThreeScrambleType getThreeScrambleType() {
+    return threeScrambleType;
   }
 
 }

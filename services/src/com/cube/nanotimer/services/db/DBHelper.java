@@ -42,6 +42,7 @@ public class DBHelper extends SQLiteOpenHelper {
         DB.COL_SOLVETYPE_NAME + " TEXT NOT NULL, " +
         DB.COL_SOLVETYPE_POSITION + " INTEGER DEFAULT 0, " +
         DB.COL_SOLVETYPE_BLIND + " INTEGER DEFAULT 0, " +
+        DB.COL_SOLVETYPE_SCRAMBLE_TYPE + " TEXT, " +
         DB.COL_SOLVETYPE_CUBETYPE_ID + " INTEGER, " +
         "FOREIGN KEY (" + DB.COL_SOLVETYPE_CUBETYPE_ID + ") REFERENCES " + DB.TABLE_CUBETYPE + " (" + DB.COL_ID + ") " +
       ");"
@@ -143,6 +144,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
       // Move solvetype.sessionstart field to the new session table
       DBUpgradeScripts.updateSessionStarts(db);
+    }
+
+    if (oldVersion < 13) {
+      // Add "scramble type" column to solve types
+      db.execSQL("ALTER TABLE " + DB.TABLE_SOLVETYPE + " ADD COLUMN " + DB.COL_SOLVETYPE_SCRAMBLE_TYPE + " TEXT");
     }
 
 //    progressDialog.hide();

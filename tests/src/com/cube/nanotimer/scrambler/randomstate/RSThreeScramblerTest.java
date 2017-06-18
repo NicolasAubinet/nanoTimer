@@ -5,6 +5,7 @@ import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 import com.cube.nanotimer.util.ScrambleFormatterService;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.ThreeScrambleType;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -62,7 +63,7 @@ public class RSThreeScramblerTest extends AndroidTestCase {
   @SmallTest
   public void testCustomScrambles() {
     RSThreeScrambler scrambler = new RSThreeScrambler();
-    String[] scramble = scrambler.getNewScramble(new ScrambleConfig(23, ThreeScrambleStyle.ROUX_LAST_10_PIECES));
+    String[] scramble = scrambler.getNewScramble(new ScrambleConfig(23, ThreeScrambleType.ROUX_LAST_10_PIECES));
     String formattedScramble = ScrambleFormatterService.INSTANCE.formatScrambleAsSingleLine(scramble, CubeType.THREE_BY_THREE);
     Log.i("[NanoTimer]", formattedScramble);
   }
@@ -85,7 +86,7 @@ public class RSThreeScramblerTest extends AndroidTestCase {
   }
 
   private void displaySign(byte[] pos) {
-    Log.i("[NanoTimer]", Arrays.toString(pos) + " parity? " + ThreeScrambleStyle.hasParity(pos));
+    Log.i("[NanoTimer]", Arrays.toString(pos) + " parity? " + ThreeScrambleType.hasParity(pos));
   }
 
 }

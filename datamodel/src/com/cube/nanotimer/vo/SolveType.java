@@ -9,19 +9,18 @@ public class SolveType implements Serializable {
   private String name;
   private int cubeTypeId;
   private SolveTypeStep[] steps = new SolveTypeStep[0];
+  private ThreeScrambleType scrambleType;
   private boolean blind = false;
 
-  public SolveType() {
-  }
-
-  public SolveType(String name, boolean blind, int cubeTypeId) {
+  public SolveType(String name, boolean blind, ThreeScrambleType scrambleType, int cubeTypeId) {
     this.name = name;
     this.blind = blind;
+    this.scrambleType = scrambleType;
     this.cubeTypeId = cubeTypeId;
   }
 
-  public SolveType(int id, String name, boolean blind, int cubeTypeId) {
-    this(name, blind, cubeTypeId);
+  public SolveType(int id, String name, boolean blind, ThreeScrambleType scrambleType, int cubeTypeId) {
+    this(name, blind, scrambleType, cubeTypeId);
     this.id = id;
   }
 
@@ -45,8 +44,8 @@ public class SolveType implements Serializable {
     return cubeTypeId;
   }
 
-  public void setCubeTypeId(int cubeTypeId) {
-    this.cubeTypeId = cubeTypeId;
+  public ThreeScrambleType getScrambleType() {
+    return scrambleType;
   }
 
   public boolean isBlind() {
@@ -67,10 +66,28 @@ public class SolveType implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof SolveType)) {
-      return false;
-    }
-    SolveType st = (SolveType) o;
-    return this.id == st.id && this.name.equals(st.name) && this.cubeTypeId == st.cubeTypeId && Arrays.equals(this.steps, st.steps) && this.blind == st.blind;
+    if (this == o) return true;
+    if (!(o instanceof SolveType)) return false;
+
+    SolveType solveType = (SolveType) o;
+
+    if (id != solveType.id) return false;
+    if (cubeTypeId != solveType.cubeTypeId) return false;
+    if (blind != solveType.blind) return false;
+    if (!name.equals(solveType.name)) return false;
+    // Probably incorrect - comparing Object[] arrays with Arrays.equals
+    if (!Arrays.equals(steps, solveType.steps)) return false;
+    return scrambleType == solveType.scrambleType;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = id;
+    result = 31 * result + name.hashCode();
+    result = 31 * result + cubeTypeId;
+    result = 31 * result + (steps != null ? Arrays.hashCode(steps) : 0);
+    result = 31 * result + (scrambleType != null ? scrambleType.hashCode() : 0);
+    result = 31 * result + (blind ? 1 : 0);
+    return result;
   }
 }

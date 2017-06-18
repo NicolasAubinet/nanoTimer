@@ -3,7 +3,7 @@ package com.cube.nanotimer.scrambler.randomstate;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
-import com.cube.nanotimer.scrambler.randomstate.TwoSolver.CubeState;
+import com.cube.nanotimer.vo.TwoCubeState;
 import junit.framework.Assert;
 
 import java.io.ByteArrayOutputStream;
@@ -15,7 +15,7 @@ public class TwoSolverTest extends AndroidTestCase {
 
   @SmallTest
   public void testVeryEasy() {
-    CubeState cubeState = new CubeState();
+    TwoCubeState cubeState = new TwoCubeState();
     //  F
     cubeState.permutations = new byte[] { 0, 4, 1, 3, 5, 2, 6 };
     cubeState.orientations = new byte[] { 0, 2, 1, 0, 1, 2, 0 };
@@ -28,7 +28,7 @@ public class TwoSolverTest extends AndroidTestCase {
 
   @SmallTest
   public void testEasy() {
-    CubeState cubeState = new CubeState();
+    TwoCubeState cubeState = new TwoCubeState();
     // F U2
     cubeState.permutations = new byte[] { 1, 3, 0, 4, 5, 2, 6 };
     cubeState.orientations = new byte[] { 1, 0, 0, 2, 1, 2, 0 };
@@ -42,7 +42,7 @@ public class TwoSolverTest extends AndroidTestCase {
 
   @SmallTest
   public void testNormal() {
-    CubeState cubeState = new CubeState();
+    TwoCubeState cubeState = new TwoCubeState();
     // U F2 R U2 R' F R F' U' R2
     cubeState.permutations = new byte[] { 4, 2, 0, 1, 3, 6, 5 };
     cubeState.orientations = new byte[] { 0, 2, 2, 1, 0, 2, 2 };
@@ -56,7 +56,7 @@ public class TwoSolverTest extends AndroidTestCase {
 
   @SmallTest
   public void testCubeStateMoves() {
-    CubeState state = new CubeState();
+    TwoCubeState state = new TwoCubeState();
     byte[] state7 = new byte[7];
     IndexConvertor.unpackPermutation(0, state7);
     state.permutations = state7;
@@ -150,7 +150,7 @@ public class TwoSolverTest extends AndroidTestCase {
     Log.i("[NanoTimer]", "pruningOrient: " + getSize(TwoSolver.pruningOrient));
   }
 
-  private void applyMove(CubeState state, TwoSolver.Move move) {
+  private void applyMove(TwoCubeState state, TwoSolver.Move move) {
     state.permutations = StateTables.getPermResult(state.permutations, move.corPerm);
     state.orientations = StateTables.getOrientResult(state.orientations, move.corPerm, move.corOrient, 3);
   }

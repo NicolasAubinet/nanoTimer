@@ -14,6 +14,25 @@
      android:inputType="textCapSentences"
      android:layout_marginTop="6dp"/>
 
+  <LinearLayout
+     android:id="@+id/scrambleTypeLayout"
+     android:orientation="horizontal"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="10dp">
+
+    <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="@string/scramble_typeC"/>
+
+    <Spinner
+       android:id="@+id/spScrambleType"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"/>
+
+  </LinearLayout>
+
   <CheckBox
      android:id="@+id/cbBlind"
      android:layout_width="match_parent"

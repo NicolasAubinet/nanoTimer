@@ -1,7 +1,10 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
-import com.cube.nanotimer.scrambler.randomstate.ThreeSolver.CubeState;
 import com.cube.nanotimer.util.helper.Utils;
+import com.cube.nanotimer.vo.ThreeCubeState;
+import com.cube.nanotimer.vo.ThreeScrambleType;
+
+import java.util.Random;
 
 public class RSThreeScrambler implements RSScrambler {
 
@@ -10,16 +13,26 @@ public class RSThreeScrambler implements RSScrambler {
   @Override
   public String[] getNewScramble(ScrambleConfig config) {
     String[] scramble;
-    ThreeScrambleStyle threeScrambleStyle = config.getThreeScrambleStyle();
+    ThreeScrambleType threeScrambleType = config.getThreeScrambleType();
 
     do {
-      CubeState randomState = threeScrambleStyle.getRandomState();
+      ThreeCubeState randomState;
+      if (threeScrambleType == null || threeScrambleType == ThreeScrambleType.RANDOM) {
+        Random r = new Random();
+        randomState = new ThreeCubeState();
+        randomState.cornerPermutations = IndexConvertor.unpackPermutation(r.nextInt(StateTables.N_CORNER_PERMUTATIONS), new byte[8]);
+        randomState.edgePermutations = IndexConvertor.unpackPermutation(r.nextInt(StateTables.N_EDGE_PERMUTATIONS), new byte[12]);
+        randomState.cornerOrientations = IndexConvertor.unpackOrientation(r.nextInt(StateTables.N_CORNER_ORIENTATIONS), new byte[8], (byte) 3);
+        randomState.edgeOrientations = IndexConvertor.unpackOrientation(r.nextInt(StateTables.N_EDGE_ORIENTATIONS), new byte[12], (byte) 2);
+      } else {
+        randomState = threeScrambleType.getRandomState();
+      }
 //      Log.i("[NanoTimer]", "Random state:\n" + randomState.toString());
       scramble = Utils.invertMoves(threeSolver.getSolution(randomState, config));
 //      Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
-    } while (scramble != null && scramble.length < 12 && threeScrambleStyle == ThreeScrambleStyle.RANDOM);
+    } while (scramble != null && scramble.length < 12 && threeScrambleType == ThreeScrambleType.RANDOM);
 
-    scramble = threeScrambleStyle.finalizeScramble(scramble);
+    scramble = threeScrambleType.finalizeScramble(scramble);
     return scramble;
   }
 
