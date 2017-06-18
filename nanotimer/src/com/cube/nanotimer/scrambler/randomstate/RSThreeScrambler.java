@@ -3,8 +3,6 @@ package com.cube.nanotimer.scrambler.randomstate;
 import com.cube.nanotimer.scrambler.randomstate.ThreeSolver.CubeState;
 import com.cube.nanotimer.util.helper.Utils;
 
-import java.util.Random;
-
 public class RSThreeScrambler implements RSScrambler {
 
   private ThreeSolver threeSolver = new ThreeSolver();
@@ -12,12 +10,16 @@ public class RSThreeScrambler implements RSScrambler {
   @Override
   public String[] getNewScramble(ScrambleConfig config) {
     String[] scramble;
+    ThreeScrambleStyle threeScrambleStyle = config.getThreeScrambleStyle();
+
     do {
-      CubeState randomState = getRandomState();
+      CubeState randomState = threeScrambleStyle.getRandomState();
 //      Log.i("[NanoTimer]", "Random state:\n" + randomState.toString());
       scramble = Utils.invertMoves(threeSolver.getSolution(randomState, config));
 //      Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
-    } while (scramble != null && scramble.length < 12);
+    } while (scramble != null && scramble.length < 12 && threeScrambleStyle == ThreeScrambleStyle.RANDOM);
+
+    scramble = threeScrambleStyle.finalizeScramble(scramble);
     return scramble;
   }
 
@@ -34,47 +36,6 @@ public class RSThreeScrambler implements RSScrambler {
   @Override
   public void stop() {
     threeSolver.stop();
-  }
-
-  private CubeState getRandomState() {
-    CubeState cubeState;
-    Random r = Utils.getRandom();
-
-    byte[] state;
-
-    do {
-      cubeState = new CubeState();
-
-      state = new byte[8];
-      IndexConvertor.unpackPermutation(r.nextInt(StateTables.N_CORNER_PERMUTATIONS), state);
-      cubeState.cornerPermutations = state;
-
-      state = new byte[12];
-      IndexConvertor.unpackPermutation(r.nextInt(StateTables.N_EDGE_PERMUTATIONS), state);
-      cubeState.edgePermutations = state;
-
-      state = new byte[8];
-      IndexConvertor.unpackOrientation(r.nextInt(StateTables.N_CORNER_ORIENTATIONS), state, (byte) 3);
-      cubeState.cornerOrientations = state;
-
-      state = new byte[12];
-      IndexConvertor.unpackOrientation(r.nextInt(StateTables.N_EDGE_ORIENTATIONS), state, (byte) 2);
-      cubeState.edgeOrientations = state;
-    } while (hasParity(cubeState.cornerPermutations) != hasParity(cubeState.edgePermutations));
-
-    return cubeState;
-  }
-
-  static boolean hasParity(byte[] perm) {
-    int inversion = 0;
-    for (int i = 0; i < perm.length; i++) {
-      for (int j = i + 1; j < perm.length; j++) {
-        if (perm[i] > perm[j]) {
-          inversion++;
-        }
-      }
-    }
-    return (inversion % 2 != 0);
   }
 
 }
