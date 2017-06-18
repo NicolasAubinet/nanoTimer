@@ -30,10 +30,10 @@ import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.ScrambleType;
 import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.SolveTypeStep;
-import com.cube.nanotimer.vo.ThreeScrambleType;
 import com.cube.nanotimer.vo.TimesSort;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
@@ -262,10 +262,10 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
     }
     boolean blindMode = Boolean.valueOf(props.getProperty(SolveTypeAddDialog.KEY_BLD, String.valueOf(false)));
 
-    ThreeScrambleType scrambleType = null;
-    int threeScrambleTypeIndex = Integer.parseInt(props.getProperty(SolveTypeAddDialog.KEY_SCRAMBLE_TYPE));
-    if (threeScrambleTypeIndex >= 0) {
-      scrambleType = ThreeScrambleType.values()[threeScrambleTypeIndex];
+    ScrambleType scrambleType = null;
+    int scrambleTypeIndex = Integer.parseInt(props.getProperty(SolveTypeAddDialog.KEY_SCRAMBLE_TYPE));
+    if (scrambleTypeIndex >= 0) {
+      scrambleType = curCubeType.getScrambleTypes()[scrambleTypeIndex];
     }
     SolveType st = new SolveType(name, blindMode, scrambleType, curCubeType.getId());
 

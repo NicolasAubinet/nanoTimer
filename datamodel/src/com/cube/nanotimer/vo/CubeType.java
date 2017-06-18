@@ -5,7 +5,7 @@ import java.io.Serializable;
 public enum CubeType implements Serializable {
 
   TWO_BY_TWO(1, "2x2x2"),
-  THREE_BY_THREE(2, "3x3x3"),
+  THREE_BY_THREE(2, "3x3x3", ScrambleTypes.THREE_BY_THREE),
   FOUR_BY_FOUR(3, "4x4x4"),
   FIVE_BY_FIVE(4, "5x5x5"),
   SIX_BY_SIX(5, "6x6x6"),
@@ -18,10 +18,16 @@ public enum CubeType implements Serializable {
 
   private int id;
   private String name;
+  private ScrambleType[] scrambleTypes = new ScrambleType[0];
 
   CubeType(int id, String name) {
     this.id = id;
     this.name = name;
+  }
+
+  CubeType(int id, String name, ScrambleType[] scrambleTypes) {
+    this(id, name);
+    this.scrambleTypes = scrambleTypes;
   }
 
   public int getId() {
@@ -30,6 +36,10 @@ public enum CubeType implements Serializable {
 
   public String getName() {
     return name;
+  }
+
+  public ScrambleType[] getScrambleTypes() {
+    return scrambleTypes;
   }
 
   public static CubeType getCubeType(int id) {
@@ -45,6 +55,15 @@ public enum CubeType implements Serializable {
     for (CubeType t : values()) {
       if (t.getName().equals(cubeTypeName)) {
         return t;
+      }
+    }
+    return null;
+  }
+
+  public ScrambleType getScrambleTypeFromString(String parScrambleTypeName) {
+    for (ScrambleType scrambleType : scrambleTypes) {
+      if (scrambleType.getName().equals(parScrambleTypeName)) {
+        return scrambleType;
       }
     }
     return null;

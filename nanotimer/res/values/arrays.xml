@@ -79,6 +79,6 @@
     <item>@string/scramble_type_corners</item>
     <item>@string/scramble_type_edges</item>
     <item>@string/scramble_type_roux_last_10_pieces</item>
-    <item>@string/scramble_type_roux_last_6_pieces</item>
+    <item>@string/scramble_type_roux_last_6_edges</item>
   </string-array>
 </resources>

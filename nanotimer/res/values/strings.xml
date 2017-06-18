@@ -269,7 +269,7 @@
   <string name="scramble_type_corners">Corners only</string>
   <string name="scramble_type_edges">Edges only</string>
   <string name="scramble_type_roux_last_10_pieces">Roux last 10 pieces</string>
-  <string name="scramble_type_roux_last_6_pieces">Roux last 6 pieces</string>
+  <string name="scramble_type_roux_last_6_edges">Roux last 6 edges</string>
 
   <string name="pro_version_features">- Times export/import\n- Graphs (progression, frequency)\n- Manual times creation\n- Previous sessions details visualization\n- No ads</string>
 

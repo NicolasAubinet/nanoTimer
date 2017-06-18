@@ -9,17 +9,17 @@ public class SolveType implements Serializable {
   private String name;
   private int cubeTypeId;
   private SolveTypeStep[] steps = new SolveTypeStep[0];
-  private ThreeScrambleType scrambleType;
+  private ScrambleType scrambleType;
   private boolean blind = false;
 
-  public SolveType(String name, boolean blind, ThreeScrambleType scrambleType, int cubeTypeId) {
+  public SolveType(String name, boolean blind, ScrambleType scrambleType, int cubeTypeId) {
     this.name = name;
     this.blind = blind;
     this.scrambleType = scrambleType;
     this.cubeTypeId = cubeTypeId;
   }
 
-  public SolveType(int id, String name, boolean blind, ThreeScrambleType scrambleType, int cubeTypeId) {
+  public SolveType(int id, String name, boolean blind, ScrambleType scrambleType, int cubeTypeId) {
     this(name, blind, scrambleType, cubeTypeId);
     this.id = id;
   }
@@ -44,7 +44,7 @@ public class SolveType implements Serializable {
     return cubeTypeId;
   }
 
-  public ThreeScrambleType getScrambleType() {
+  public ScrambleType getScrambleType() {
     return scrambleType;
   }
 

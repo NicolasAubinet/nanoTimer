@@ -5,8 +5,9 @@ import com.cube.nanotimer.R;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.exportimport.CSVFormatException;
 import com.cube.nanotimer.util.helper.Utils;
+import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ExportResult;
-import com.cube.nanotimer.vo.ThreeScrambleType;
+import com.cube.nanotimer.vo.ScrambleType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,11 +59,12 @@ public class ExportResultConverter {
     boolean blindType = (fields.get(6).equals("y"));
 
     int scrambleFieldIndex;
-    ThreeScrambleType scrambleType = null;
+    ScrambleType scrambleType = null;
     if (fields.size() == 8) {
       scrambleFieldIndex = 7;
     } else {
-      scrambleType = ThreeScrambleType.fromString(fields.get(7));
+      String scrambleTypeName = fields.get(7);
+      scrambleType = CubeType.getCubeTypeFromName(cubeTypeName).getScrambleTypeFromString(scrambleTypeName);
       scrambleFieldIndex = 8;
     }
     String scramble = fields.get(scrambleFieldIndex);
