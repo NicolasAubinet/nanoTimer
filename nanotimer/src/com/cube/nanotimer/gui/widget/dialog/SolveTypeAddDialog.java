@@ -11,7 +11,10 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.ScrambleType;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public class SolveTypeAddDialog extends ConfirmDialog {
@@ -44,14 +47,23 @@ public class SolveTypeAddDialog extends ConfirmDialog {
 
     scrambleTypeLayout = (LinearLayout) view.findViewById(R.id.scrambleTypeLayout);
 
-    if (!CubeType.THREE_BY_THREE.toString().equals(getArguments().getString(ARG_CUBE_TYPE))) {
-      scrambleTypeLayout.setVisibility(View.GONE);
+    CubeType cubeType = CubeType.valueOf(getArguments().getString(ARG_CUBE_TYPE));
+    ScrambleType[] scrambleTypes = cubeType.getScrambleTypes();
+    if (scrambleTypes.length > 0) {
+      scrambleTypeLayout.setVisibility(View.VISIBLE);
+
+      List<CharSequence> scrambleTypesNames = new ArrayList<>();
+      for (ScrambleType locScrambleType : scrambleTypes) {
+        scrambleTypesNames.add(locScrambleType.getName());
+      }
 
       spScrambleType = (Spinner) view.findViewById(R.id.spScrambleType);
-      ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), R.array.scramble_type, R.layout.spinner_item);
+      ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, scrambleTypesNames);
       adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
       spScrambleType.setAdapter(adapter);
       spScrambleType.setSelection(0);
+    } else {
+      scrambleTypeLayout.setVisibility(View.GONE);
     }
 
     return dialog;
