@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ScrambleType;
 
@@ -54,7 +55,8 @@ public class SolveTypeAddDialog extends ConfirmDialog {
 
       List<CharSequence> scrambleTypesNames = new ArrayList<>();
       for (ScrambleType locScrambleType : scrambleTypes) {
-        scrambleTypesNames.add(locScrambleType.getName());
+        int nameStringResourceId = Utils.getStringIdentifier(getContext(), "scramble_type_" + locScrambleType.getName());
+        scrambleTypesNames.add(getString(nameStringResourceId));
       }
 
       spScrambleType = (Spinner) view.findViewById(R.id.spScrambleType);

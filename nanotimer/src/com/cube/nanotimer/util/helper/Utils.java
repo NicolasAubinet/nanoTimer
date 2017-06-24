@@ -171,4 +171,8 @@ public class Utils {
     return forbiddenChar;
   }
 
+  public static int getStringIdentifier(Context context, String name) {
+    return context.getResources().getIdentifier(name, "string", context.getPackageName());
+  }
+
 }
