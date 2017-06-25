@@ -6,6 +6,7 @@ import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ExportResult;
 import com.cube.nanotimer.vo.FrequencyData;
+import com.cube.nanotimer.vo.ScrambleType;
 import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveHistory;
@@ -15,6 +16,7 @@ import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.TimesSort;
 
 import java.util.List;
+import java.util.Map;
 
 public class ServiceImpl extends DBHelper implements Service {
 
@@ -326,6 +328,16 @@ public class ServiceImpl extends DBHelper implements Service {
       @Override
       public void run() {
         callback.onData(provider.getFrequencyData(solveType, from));
+      }
+    });
+  }
+
+  @Override
+  public void getAllUsedScrambleTypes(final DataCallback<Map<CubeType, List<ScrambleType>>> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        callback.onData(provider.getAllUsedScrambleTypes());
       }
     });
   }

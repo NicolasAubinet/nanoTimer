@@ -1033,6 +1033,33 @@ public class ServiceProviderImpl implements ServiceProvider {
     return frequencyData;
   }
 
+  public Map<CubeType, List<ScrambleType>> getAllUsedScrambleTypes() {
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_ID);
+    q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_SCRAMBLE_TYPE);
+    q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_CUBETYPE_ID);
+    q.append(" FROM ").append(DB.TABLE_SOLVETYPE);
+    Cursor cursor = db.rawQuery(q.toString(), null);
+    Map<CubeType, List<ScrambleType>> scrambleTypes = new HashMap<>();
+    if (cursor != null) {
+      if (cursor.moveToFirst()) {
+        String scrambleTypeStr = cursor.getString(1);
+        CubeType cubeType = CubeType.getCubeType(cursor.getInt(2));
+        ScrambleType scrambleType = toScrambleType(cubeType, scrambleTypeStr);
+        if (scrambleType != null && !scrambleType.isDefault()) {
+          List<ScrambleType> cubeScrambleTypes = scrambleTypes.get(cubeType);
+          if (cubeScrambleTypes == null) {
+            cubeScrambleTypes = new ArrayList<>();
+            scrambleTypes.put(cubeType, cubeScrambleTypes);
+          }
+          cubeScrambleTypes.add(scrambleType);
+        }
+      }
+      cursor.close();
+    }
+    return scrambleTypes;
+  }
+
   private long getDayStart(long ts) {
     Calendar cal = Calendar.getInstance(TimeZone.getDefault());
     cal.setTimeInMillis(ts);
@@ -1043,7 +1070,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     return cal.getTimeInMillis();
   }
 
-  private void recalculateAverages(long timestamp, SolveType solveType) { // TODO see if can improve�(very slow, makes updating 100 times take from 1.2s (when method disabled) to 36s!) (see ServiceProviderTest.testDBPerfs())
+  private void recalculateAverages(long timestamp, SolveType solveType) { // TODO see if can improve (very slow, makes updating 100 times take from 1.2s (when method disabled) to 36s!) (see ServiceProviderTest.testDBPerfs())
     List<CachedTime> timesBefore = getTimesAroundTs(timestamp, solveType, true);
     List<CachedTime> timesAfter = getTimesAroundTs(timestamp, solveType, false);
 

@@ -1,6 +1,8 @@
 package com.cube.nanotimer.vo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public enum CubeType implements Serializable {
 
@@ -18,16 +20,17 @@ public enum CubeType implements Serializable {
 
   private int id;
   private String name;
-  private ScrambleType[] scrambleTypes = new ScrambleType[0];
+  private ScrambleType[] availableScrambleTypes = new ScrambleType[0];
+  private final List<ScrambleType> usedScrambleTypes = new ArrayList<>();
 
   CubeType(int id, String name) {
     this.id = id;
     this.name = name;
   }
 
-  CubeType(int id, String name, ScrambleType[] scrambleTypes) {
+  CubeType(int id, String name, ScrambleType[] availableScrambleTypes) {
     this(id, name);
-    this.scrambleTypes = scrambleTypes;
+    this.availableScrambleTypes = availableScrambleTypes;
   }
 
   public int getId() {
@@ -38,8 +41,27 @@ public enum CubeType implements Serializable {
     return name;
   }
 
-  public ScrambleType[] getScrambleTypes() {
+  public List<ScrambleType> getUsedScrambledTypes() {
+    List<ScrambleType> scrambleTypes;
+    synchronized (usedScrambleTypes) {
+      scrambleTypes = new ArrayList<>(usedScrambleTypes);
+    }
     return scrambleTypes;
+  }
+
+  public boolean addUsedScrambleType(ScrambleType scrambleType) {
+    boolean added = false;
+    synchronized (usedScrambleTypes) {
+      if (!usedScrambleTypes.contains(scrambleType)) {
+        usedScrambleTypes.add(scrambleType);
+        added = true;
+      }
+    }
+    return added;
+  }
+
+  public ScrambleType[] getAvailableScrambleTypes() {
+    return availableScrambleTypes;
   }
 
   public static CubeType getCubeType(int id) {
@@ -61,7 +83,7 @@ public enum CubeType implements Serializable {
   }
 
   public ScrambleType getScrambleTypeFromString(String parScrambleTypeName) {
-    for (ScrambleType scrambleType : scrambleTypes) {
+    for (ScrambleType scrambleType : availableScrambleTypes) {
       if (scrambleType.getName().equals(parScrambleTypeName)) {
         return scrambleType;
       }

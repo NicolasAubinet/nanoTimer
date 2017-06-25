@@ -10,15 +10,13 @@ import com.cube.nanotimer.vo.CubeType;
 public class ChargingStateService extends Service {
 
   public static final String CUBE_TYPE_KEY = "cube_type";
-  public static final String SCRAMBLES_COUNT_KEY = "scrambles_count";
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
     CubeType cubeType = (CubeType) intent.getSerializableExtra(CUBE_TYPE_KEY);
-    int nScrambles = intent.getIntExtra(SCRAMBLES_COUNT_KEY, -1);
-    if (cubeType != null && nScrambles > 0) {
+    if (cubeType != null) {
       try {
-        ScramblerService.INSTANCE.generateAndAddToCache(cubeType, nScrambles, GenerationLaunch.PLUGGED);
+        ScramblerService.INSTANCE.generateAndAddToCache(cubeType, -1, GenerationLaunch.PLUGGED);
       } catch (AlreadyGeneratingException e) {
         // already generating, skip
       }

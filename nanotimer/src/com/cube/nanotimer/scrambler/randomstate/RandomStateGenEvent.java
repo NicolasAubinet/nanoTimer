@@ -4,8 +4,8 @@ import com.cube.nanotimer.vo.CubeType;
 
 public class RandomStateGenEvent {
 
-  public enum State { PREPARING, GENERATING, IDLE, STOPPING };
-  public enum GenerationLaunch { AUTO, MANUAL, PLUGGED };
+  public enum State { PREPARING, GENERATING, IDLE, STOPPING, GENERATED }
+  public enum GenerationLaunch { AUTO, MANUAL, PLUGGED }
 
   private State state;
   private CubeType cubeType;

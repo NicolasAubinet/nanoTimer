@@ -271,12 +271,18 @@
   <string name="scramble_type_roux_last_10_pieces">Roux last 10 pieces</string>
   <string name="scramble_type_roux_last_6_edges">Roux last 6 edges</string>
 
+  <string name="scramble_generating">Scramble is generating\nPlease wait&#8230;</string>
+
   <string name="pro_version_features">- Times export/import\n- Graphs (progression, frequency)\n- Manual times creation\n- Previous sessions details visualization\n- No ads</string>
 
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.2.1 <i>(New version)</i></b></u>
+    <u><b>v1.2.2 <i>(New version)</i></b></u>
+    <ul>
+      <li>Add support for special 3x3x3 scramble types to practice only F2L, last layer, PLL, edges and more</li>
+    </ul>
+    <u><b>v1.2.1</b></u>
     <ul>
       <li>Add support for 3 different Clock scramble styles (via Settings)</li>
       <li>Generate new scramble when inspection results in DNF</li>

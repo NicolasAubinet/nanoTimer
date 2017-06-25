@@ -138,7 +138,7 @@ public class PreGenerateScramblesDialog extends DialogPreference implements Rand
     new Thread(new Runnable() {
       @Override
       public void run() {
-        final int scramblesCount = ScramblerService.INSTANCE.getScramblesCount(cubeType);
+        final int scramblesCount = ScramblerService.INSTANCE.getScramblesCount(cubeType, null);
 //        Log.i("[NanoTimer]", "Total count: " + scramblesCount);
         getActivity().runOnUiThread(new Runnable() {
           @Override

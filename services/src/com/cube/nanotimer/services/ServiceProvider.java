@@ -4,6 +4,7 @@ import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ExportResult;
 import com.cube.nanotimer.vo.FrequencyData;
 import com.cube.nanotimer.vo.ProgressListener;
+import com.cube.nanotimer.vo.ScrambleType;
 import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveHistory;
@@ -13,6 +14,7 @@ import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.TimesSort;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ServiceProvider {
   List<CubeType> getCubeTypes(boolean getEmpty);
@@ -37,6 +39,7 @@ public interface ServiceProvider {
   List<ExportResult> getExportResults(List<Integer> solveTypeIds, int limit);
   SolveTime getSolveTime(int solveTimeId);
   List<FrequencyData> getFrequencyData(SolveType solveType, Long from);
+  Map<CubeType, List<ScrambleType>> getAllUsedScrambleTypes();
 
   int addSolveType(SolveType solveType);
   void addSolveTypeSteps(SolveType solveType);

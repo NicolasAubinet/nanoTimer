@@ -5,9 +5,11 @@ import android.content.Context;
 import android.os.AsyncTask;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.util.exportimport.ErrorListener;
 import com.cube.nanotimer.util.exportimport.csvimport.ImportResultListener;
 import com.cube.nanotimer.util.exportimport.csvimport.ImportTimesData;
+import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveType;
 
 import java.util.List;
@@ -30,8 +32,20 @@ public class SolveTypesInserter extends AsyncTask<List<SolveType>, Void, String>
   @Override
   protected String doInBackground(List<SolveType>... missingSolveTypesParams) {
     List<SolveType> missingSolveTypes = missingSolveTypesParams[0];
+    boolean addedSpecialScrambleType = false;
+
     for (SolveType missingSolveType : missingSolveTypes){
+      if (!missingSolveType.getScrambleType().isDefault()) {
+        CubeType cubeType = CubeType.getCubeType(missingSolveType.getCubeTypeId());
+        if (cubeType != null) {
+          addedSpecialScrambleType |= cubeType.addUsedScrambleType(missingSolveType.getScrambleType());
+        }
+      }
       App.INSTANCE.getService().getProviderAccess().addSolveType(missingSolveType);
+
+      if (addedSpecialScrambleType) {
+        ScramblerService.INSTANCE.checkScrambleCaches();
+      }
     }
     return null;
   }

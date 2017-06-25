@@ -25,6 +25,7 @@ import com.cube.nanotimer.gui.widget.dialog.FieldCreator;
 import com.cube.nanotimer.gui.widget.dialog.FieldEditDialog;
 import com.cube.nanotimer.gui.widget.dialog.FieldRenamer;
 import com.cube.nanotimer.gui.widget.dialog.SolveTypeAddDialog;
+import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.util.helper.DialogUtils;
@@ -265,7 +266,13 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
     ScrambleType scrambleType = null;
     int scrambleTypeIndex = Integer.parseInt(props.getProperty(SolveTypeAddDialog.KEY_SCRAMBLE_TYPE));
     if (scrambleTypeIndex >= 0) {
-      scrambleType = curCubeType.getScrambleTypes()[scrambleTypeIndex];
+      scrambleType = curCubeType.getAvailableScrambleTypes()[scrambleTypeIndex];
+
+      if (!scrambleType.isDefault()) {
+        if (curCubeType.addUsedScrambleType(scrambleType)) {
+          ScramblerService.INSTANCE.checkScrambleCaches();
+        }
+      }
     }
     SolveType st = new SolveType(name, blindMode, scrambleType, curCubeType.getId());
 

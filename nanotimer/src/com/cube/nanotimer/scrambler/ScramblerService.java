@@ -16,6 +16,7 @@ import com.cube.nanotimer.scrambler.randomstate.ScrambleConfig;
 import com.cube.nanotimer.util.helper.FileUtils;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.ScrambleType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +32,7 @@ public enum ScramblerService {
   public static final int MAX_SCRAMBLES_IN_MEMORY = 500;
 
   private Context context;
-  private Map<Integer, LinkedList<String[]>> cachedScrambles = new HashMap<Integer, LinkedList<String[]>>(); // id: cube type id | value: scrambles
+  private Map<ScrambleCacheKey, LinkedList<String[]>> cachedScrambles = new HashMap<ScrambleCacheKey, LinkedList<String[]>>();
   private Map<Integer, RSScrambler> scramblers = new HashMap<Integer, RSScrambler>();
   private volatile Thread generationThread = null;
 
@@ -46,14 +47,6 @@ public enum ScramblerService {
 
   public void init(Context context) {
     this.context = context;
-    if (Options.INSTANCE.isRandomStateScrambles()) {
-      new Thread(new Runnable() {
-        @Override
-        public void run() {
-          checkScrambleCaches();
-        }
-      }).start();
-    }
   }
 
   public void checkScrambleCaches() {
@@ -82,12 +75,19 @@ public enum ScramblerService {
     }
   }
 
-  private int loadCacheAndGetToGenCount(CubeType cubeType) {
+  private int loadCacheAndGetToGenCount(CubeType cubeType, ScrambleType scrambleType, boolean isFromPhonePlugged) {
     int minCacheSize = Options.INSTANCE.getScramblesMinCacheSize();
-    if (getCache(cubeType).size() < minCacheSize) {
-      loadCacheFromFile(cubeType); // see if there are some more scrambles in the file
-      if (getCache(cubeType).size() < minCacheSize) {
-        return Math.max(Options.INSTANCE.getScramblesMaxCacheSize() - getCache(cubeType).size(), 0);
+    if (isFromPhonePlugged) {
+      minCacheSize = Options.INSTANCE.getPluggedInScramblesGenerateCount();
+    }
+    if (getCache(cubeType, scrambleType).size() < minCacheSize) {
+      loadCacheFromFile(cubeType, scrambleType); // see if there are some more scrambles in the file
+      if (getCache(cubeType, scrambleType).size() < minCacheSize) {
+        int maxCacheSize = Options.INSTANCE.getScramblesMaxCacheSize();
+        if (isFromPhonePlugged) {
+          maxCacheSize = Options.INSTANCE.getPluggedInScramblesGenerateCount();
+        }
+        return Math.max(maxCacheSize - getCache(cubeType, scrambleType).size(), 0);
       }
     }
     return 0;
@@ -107,9 +107,18 @@ public enum ScramblerService {
     return new Thread() {
       @Override
       public void run() {
-        generateScrambles(cubeType, scramblesCount);
+        if (Options.INSTANCE.isRandomStateScrambles()) {
+          generateScrambles(cubeType, null, scramblesCount);
+          for (CubeType rsCubeType : getRandomStateCubeTypes()) {
+            generateScrambles(rsCubeType, null, -1);
+          }
+        }
         for (CubeType rsCubeType : getRandomStateCubeTypes()) {
-          generateScrambles(rsCubeType, -1);
+          for (ScrambleType scrambleType : rsCubeType.getUsedScrambledTypes()) {
+            if (!scrambleType.isDefault()) {
+              generateScrambles(rsCubeType, scrambleType, -1);
+            }
+          }
         }
         sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.IDLE, null, null, 0, 0));
         if (generationThread == Thread.currentThread()) {
@@ -118,16 +127,16 @@ public enum ScramblerService {
         }
       }
 
-      private void generateScrambles(CubeType cubeType, int scramblesCount) {
+      private void generateScrambles(CubeType cubeType, ScrambleType scrambleType, int scramblesCount) {
         final RSScrambler rsScrambler = getScrambler(cubeType);
-        if (generationThread != Thread.currentThread() || rsScrambler == null || !Options.INSTANCE.isRandomStateScrambles()) {
+        if (generationThread != Thread.currentThread() || rsScrambler == null || (!Options.INSTANCE.isRandomStateScrambles() && (scrambleType == null || scrambleType.isDefault()))) {
           return;
         }
         int n;
         if (scramblesCount > 0) {
           n = scramblesCount;
         } else {
-          n = loadCacheAndGetToGenCount(cubeType);
+          n = loadCacheAndGetToGenCount(cubeType, scrambleType, (generationLaunch == GenerationLaunch.PLUGGED));
         }
         if (n == 0) {
           return;
@@ -141,25 +150,26 @@ public enum ScramblerService {
           String[] scramble;
           synchronized (scramblerHelper) {
             sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.GENERATING, cubeType, generationLaunch, i + 1, n));
-            scramble = rsScrambler.getNewScramble(new ScrambleConfig(Utils.getRSScrambleLengthFromQuality(cubeType)));
+            scramble = rsScrambler.getNewScramble(new ScrambleConfig(Utils.getRSScrambleLengthFromQuality(cubeType), scrambleType));
+            sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.GENERATED, cubeType, generationLaunch, i + 1, n));
           }
           if (scramble == null) { // was interrupted
             break;
           }
-          if (getCache(cubeType).size() < MAX_SCRAMBLES_IN_MEMORY) {
+          if (getCache(cubeType, scrambleType).size() < MAX_SCRAMBLES_IN_MEMORY) {
             synchronized (cacheMemHelper) {
-              getCache(cubeType).add(scramble);
+              getCache(cubeType, scrambleType).add(scramble);
 //              Log.i("[NanoTimer]", "generate. size: " + getCache(cubeType).size());
             }
           }
           toSave.add(scramble);
           if (toSave.size() >= 10) {
-            saveNewScramblesToFile(cubeType, toSave); // write new scrambles to file by batches
+            saveNewScramblesToFile(cubeType, scrambleType, toSave); // write new scrambles to file by batches
             toSave.clear();
           }
         }
         if (!toSave.isEmpty()) {
-          saveNewScramblesToFile(cubeType, toSave);
+          saveNewScramblesToFile(cubeType, scrambleType, toSave);
         }
       }
 
@@ -190,21 +200,21 @@ public enum ScramblerService {
     }
   }
 
-  private void loadCacheFromFile(CubeType cubeType) {
+  private void loadCacheFromFile(CubeType cubeType, ScrambleType scrambleType) {
     List<String> scramblesStr;
     synchronized (cacheFileHelper) {
-      scramblesStr = FileUtils.readLinesFromFile(context, getFileName(cubeType), MAX_SCRAMBLES_IN_MEMORY);
+      scramblesStr = FileUtils.readLinesFromFile(context, getFileName(cubeType, scrambleType), MAX_SCRAMBLES_IN_MEMORY);
     }
     synchronized (cacheMemHelper) {
-      getCache(cubeType).clear();
+      getCache(cubeType, scrambleType).clear();
       for (String l : scramblesStr) {
         String[] scramble = l.split(" ");
-        getCache(cubeType).add(scramble);
+        getCache(cubeType, scrambleType).add(scramble);
       }
     }
   }
 
-  private void saveNewScramblesToFile(CubeType cubeType, List<String[]> scramblesToSave) {
+  private void saveNewScramblesToFile(CubeType cubeType, ScrambleType scrambleType, List<String[]> scramblesToSave) {
     List<String> scramblesStr = new ArrayList<String>(scramblesToSave.size());
     for (String[] scramble : scramblesToSave) {
       StringBuilder sb = new StringBuilder();
@@ -214,30 +224,34 @@ public enum ScramblerService {
       scramblesStr.add(sb.toString());
     }
     synchronized (cacheFileHelper) {
-      FileUtils.appendLinesToFile(context, getFileName(cubeType), scramblesStr.toArray(new String[scramblesStr.size()]));
+      FileUtils.appendLinesToFile(context, getFileName(cubeType, scrambleType), scramblesStr.toArray(new String[scramblesStr.size()]));
     }
   }
 
-  private void removeFirstScrambleFromFile(CubeType cubeType) {
+  private void removeFirstScrambleFromFile(CubeType cubeType, ScrambleType scrambleType) {
     synchronized (cacheFileHelper) {
-      FileUtils.removeFirstLineFromFile(context, getFileName(cubeType));
+      FileUtils.removeFirstLineFromFile(context, getFileName(cubeType, scrambleType));
     }
   }
 
-  public String[] getScramble(final CubeType cubeType) {
-    if (Options.INSTANCE.isRandomStateScrambles() && getRandomStateCubeTypes().contains(cubeType)) {
+  public String[] getScramble(final CubeType cubeType, final ScrambleType scrambleType) {
+    if (getRandomStateCubeTypes().contains(cubeType) && (Options.INSTANCE.isRandomStateScrambles() || (scrambleType != null && !scrambleType.isDefault()))) {
       String[] scramble;
-      if (!getCache(cubeType).isEmpty()) {
+      if (getCache(cubeType, scrambleType).size() > 0) {
         synchronized (cacheMemHelper) {
-          scramble = getCache(cubeType).remove();
+          scramble = getCache(cubeType, scrambleType).remove();
         }
       } else {
-        scramble = ScramblerFactory.getScrambler(cubeType).getNewScramble();
+        if (scrambleType == null || scrambleType.isDefault()) {
+          scramble = ScramblerFactory.getScrambler(cubeType).getNewScramble();
+        } else {
+          scramble = null;
+        }
       }
       new Thread(new Runnable() {
         @Override
         public void run() {
-          removeFirstScrambleFromFile(cubeType);
+          removeFirstScrambleFromFile(cubeType, scrambleType);
           checkCache(cubeType);
         }
       }).start();
@@ -247,10 +261,10 @@ public enum ScramblerService {
     }
   }
 
-  public int getScramblesCount(CubeType cubeType) {
+  public int getScramblesCount(CubeType cubeType, ScrambleType scrambleType) {
     int scramblesCount;
     synchronized (cacheFileHelper) {
-      scramblesCount = FileUtils.getFileLinesCount(context, getFileName(cubeType));
+      scramblesCount = FileUtils.getFileLinesCount(context, getFileName(cubeType, scrambleType));
     }
     return scramblesCount;
   }
@@ -276,10 +290,15 @@ public enum ScramblerService {
   public void deleteCaches() {
     for (CubeType cubeType : getRandomStateCubeTypes()) {
       synchronized (cacheFileHelper) {
-        FileUtils.deleteFile(context, getFileName(cubeType));
+        for (ScrambleType usedScrambleType : cubeType.getUsedScrambledTypes()) {
+          FileUtils.deleteFile(context, getFileName(cubeType, usedScrambleType));
+        }
       }
       synchronized (cacheMemHelper) {
-        getCache(cubeType).clear();
+        getCache(cubeType, null).clear();
+        for (ScrambleType usedScrambleType : cubeType.getUsedScrambledTypes()) {
+          getCache(cubeType, usedScrambleType).clear();
+        }
       }
     }
   }
@@ -315,15 +334,22 @@ public enum ScramblerService {
     return Arrays.asList(CubeType.THREE_BY_THREE, CubeType.TWO_BY_TWO);
   }
 
-  private String getFileName(CubeType cubeType) {
-    return "randomstate_scrambles_" + cubeType.getId();
+  private String getFileName(CubeType cubeType, ScrambleType scrambleType) {
+    String fileName = "randomstate_scrambles_" + cubeType.getId();
+    if (scrambleType != null && !scrambleType.isDefault()) {
+      fileName += "_" + scrambleType.getName();
+    }
+    return fileName;
   }
 
-  private Queue<String[]> getCache(CubeType cubeType) {
-    if (cachedScrambles.get(cubeType.getId()) == null) {
-      cachedScrambles.put(cubeType.getId(), new LinkedList<String[]>());
+  private Queue<String[]> getCache(CubeType cubeType, ScrambleType scrambleType) {
+    ScrambleCacheKey scrambleCacheKey = new ScrambleCacheKey(cubeType.getId(), scrambleType);
+    LinkedList<String[]> scrambles = cachedScrambles.get(scrambleCacheKey);
+    if (scrambles == null) {
+      scrambles = new LinkedList<>();
+      cachedScrambles.put(scrambleCacheKey, scrambles);
     }
-    return cachedScrambles.get(cubeType.getId());
+    return scrambles;
   }
 
   private RSScrambler getScrambler(CubeType cubeType) {
@@ -332,6 +358,34 @@ public enum ScramblerService {
         scramblers.put(cubeType.getId(), getNewRandomStateScrambler(cubeType));
       }
       return scramblers.get(cubeType.getId());
+    }
+  }
+
+  private class ScrambleCacheKey {
+    private int cubeTypeId;
+    private ScrambleType scrambleType;
+
+    public ScrambleCacheKey(int cubeTypeId, ScrambleType scrambleType) {
+      this.cubeTypeId = cubeTypeId;
+      this.scrambleType = scrambleType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (!(o instanceof ScrambleCacheKey)) return false;
+
+      ScrambleCacheKey that = (ScrambleCacheKey) o;
+
+      if (cubeTypeId != that.cubeTypeId) return false;
+      return !(scrambleType != null ? !scrambleType.equals(that.scrambleType) : that.scrambleType != null);
+    }
+
+    @Override
+    public int hashCode() {
+      int result = cubeTypeId;
+      result = 31 * result + (scrambleType != null ? scrambleType.hashCode() : 0);
+      return result;
     }
   }
 

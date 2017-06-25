@@ -1,12 +1,13 @@
 package com.cube.nanotimer.vo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public abstract class ScrambleType {
+public abstract class ScrambleType implements Serializable {
 
   public static final String DEFAULT_NAME = "default";
 

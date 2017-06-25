@@ -9,6 +9,9 @@ import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.GenerationLaunch;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.ScrambleType;
+
+import java.util.List;
 
 public class ChargingStateReceiver extends BroadcastReceiver {
 
@@ -29,16 +32,40 @@ public class ChargingStateReceiver extends BroadcastReceiver {
   }
 
   private void startPlugGeneration() {
-    int max = Options.INSTANCE.getPluggedInScramblesGenerateCount();
-    for (CubeType cubeType : ScramblerService.INSTANCE.getRandomStateCubeTypes()) {
-      int nScrambles = Math.max(max - ScramblerService.INSTANCE.getScramblesCount(cubeType), 0);
-      if (nScrambles > 0) {
-        Intent i = new Intent(context, ChargingStateService.class);
-        i.putExtra(ChargingStateService.CUBE_TYPE_KEY, cubeType);
-        i.putExtra(ChargingStateService.SCRAMBLES_COUNT_KEY, nScrambles);
-        context.startService(i);
+    CubeType firstCubeTypeToGenerateScrambles = null;
+    List<CubeType> randomStateCubeTypes = ScramblerService.INSTANCE.getRandomStateCubeTypes();
+    for (int i = 0; i < randomStateCubeTypes.size() && firstCubeTypeToGenerateScrambles == null; i++) {
+      CubeType cubeType = randomStateCubeTypes.get(i);
+      List<ScrambleType> usedScrambledTypes = cubeType.getUsedScrambledTypes();
+      if (usedScrambledTypes.isEmpty()) {
+        if (isMissingScrambles(cubeType, null)) {
+          firstCubeTypeToGenerateScrambles = cubeType;
+        }
+      } else {
+        for (ScrambleType scrambleType : usedScrambledTypes) {
+          if (isMissingScrambles(cubeType, scrambleType)) {
+            firstCubeTypeToGenerateScrambles = cubeType;
+            break;
+          }
+        }
       }
     }
+
+    if (firstCubeTypeToGenerateScrambles != null) {
+      Intent i = new Intent(context, ChargingStateService.class);
+      i.putExtra(ChargingStateService.CUBE_TYPE_KEY, firstCubeTypeToGenerateScrambles);
+      context.startService(i);
+    }
+  }
+
+  private boolean isMissingScrambles(CubeType cubeType, ScrambleType scrambleType) {
+    boolean isMissingScrambles = false;
+    int max = Options.INSTANCE.getPluggedInScramblesGenerateCount();
+    int nScrambles = Math.max(max - ScramblerService.INSTANCE.getScramblesCount(cubeType, scrambleType), 0);
+    if (nScrambles > 0) {
+      isMissingScrambles = true;
+    }
+    return isMissingScrambles;
   }
 
   private void stopGenerationIfStartedFromPlug() {

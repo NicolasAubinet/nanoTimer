@@ -14,7 +14,13 @@ import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.State;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenListener;
 import com.cube.nanotimer.services.Service;
 import com.cube.nanotimer.services.ServiceImpl;
+import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.helper.GUIUtils;
+import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.ScrambleType;
+
+import java.util.List;
+import java.util.Map;
 
 public enum App {
   INSTANCE;
@@ -49,6 +55,19 @@ public enum App {
       Options.INSTANCE.setContext(context);
       ScramblerService.INSTANCE.init(context);
       initRandomStateGenListener(context);
+
+      getService().getAllUsedScrambleTypes(new DataCallback<Map<CubeType, List<ScrambleType>>>() {
+        @Override
+        public void onData(Map<CubeType, List<ScrambleType>> data) {
+          for (Map.Entry<CubeType, List<ScrambleType>> locEntry : data.entrySet()) {
+            CubeType cubeType = locEntry.getKey();
+            for (ScrambleType scrambleType : locEntry.getValue()) {
+              cubeType.addUsedScrambleType(scrambleType);
+            }
+          }
+          ScramblerService.INSTANCE.checkScrambleCaches();
+        }
+      });
     }
     if (!appGUILaunched && !fromService) { // app GUI started
       appGUILaunched(context);

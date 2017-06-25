@@ -33,6 +33,9 @@ import com.cube.nanotimer.gui.widget.SessionDetailDialog;
 import com.cube.nanotimer.gui.widget.ads.AdProvider;
 import com.cube.nanotimer.gui.widget.dialog.AddNewTimeDialog;
 import com.cube.nanotimer.scrambler.ScramblerService;
+import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent;
+import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.State;
+import com.cube.nanotimer.scrambler.randomstate.RandomStateGenListener;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.session.CubeSession;
 import com.cube.nanotimer.util.FormatterService;
@@ -111,6 +114,18 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
 
   private int defaultBackgroundColor = R.color.graybg;
   private int pushedBackgroundColor = R.color.gray850;
+
+  private RandomStateGenListener randomStateGenListener = new RandomStateGenListener() {
+    @Override
+    public void onStateUpdate(RandomStateGenEvent event) {
+      if (event.getState() == State.GENERATED) {
+        boolean foundScramble = getAndDisplayNewScramble();
+        if (foundScramble) {
+          ScramblerService.INSTANCE.removeRandomStateGenListener(this);
+        }
+      }
+    }
+  };
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -822,9 +837,24 @@ public class TimerActivity extends ActionBarActivity implements ResultListener {
 
   private void generateScramble() {
     if (cubeType != null) {
-      currentScramble = ScramblerService.INSTANCE.getScramble(cubeType);
-      tvScramble.setText(ScrambleFormatterService.INSTANCE.formatToColoredScramble(currentScramble, cubeType, currentOrientation));
+      boolean foundScramble = getAndDisplayNewScramble();
+      if (!foundScramble) {
+        tvScramble.setText(R.string.scramble_generating);
+        // couldn't find scramble in cache (for special scrambles like f2l, edges only etc), wait for a GENERATED event to check again
+        ScramblerService.INSTANCE.addRandomStateGenListener(randomStateGenListener);
+      }
     }
+  }
+
+  private boolean getAndDisplayNewScramble() {
+    boolean foundScramble = false;
+    String[] scramble = ScramblerService.INSTANCE.getScramble(cubeType, solveType.getScrambleType());
+    if (scramble != null) {
+      currentScramble = scramble;
+      tvScramble.setText(ScrambleFormatterService.INSTANCE.formatToColoredScramble(currentScramble, cubeType, currentOrientation));
+      foundScramble = true;
+    }
+    return foundScramble;
   }
 
   private void timerStarted() {

@@ -49,7 +49,7 @@ public class SolveTypeAddDialog extends ConfirmDialog {
     scrambleTypeLayout = (LinearLayout) view.findViewById(R.id.scrambleTypeLayout);
 
     CubeType cubeType = CubeType.valueOf(getArguments().getString(ARG_CUBE_TYPE));
-    ScrambleType[] scrambleTypes = cubeType.getScrambleTypes();
+    ScrambleType[] scrambleTypes = cubeType.getAvailableScrambleTypes();
     if (scrambleTypes.length > 0) {
       scrambleTypeLayout.setVisibility(View.VISIBLE);
 
