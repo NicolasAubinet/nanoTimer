@@ -4,6 +4,8 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -27,6 +29,7 @@ public class SolveTypeAddDialog extends ConfirmDialog {
 
   private FieldCreator fieldCreator;
 
+  private EditText tfName;
   private LinearLayout scrambleTypeLayout;
   private Spinner spScrambleType;
 
@@ -46,17 +49,18 @@ public class SolveTypeAddDialog extends ConfirmDialog {
   public Dialog onCreateDialog(Bundle savedInstanceState) {
     dialog = getDialog(R.string.add);
 
+    tfName = view.findViewById(R.id.tfName);
+
     scrambleTypeLayout = (LinearLayout) view.findViewById(R.id.scrambleTypeLayout);
 
-    CubeType cubeType = CubeType.valueOf(getArguments().getString(ARG_CUBE_TYPE));
+    final CubeType cubeType = CubeType.valueOf(getArguments().getString(ARG_CUBE_TYPE));
     ScrambleType[] scrambleTypes = cubeType.getAvailableScrambleTypes();
     if (scrambleTypes.length > 0) {
       scrambleTypeLayout.setVisibility(View.VISIBLE);
 
       List<CharSequence> scrambleTypesNames = new ArrayList<>();
       for (ScrambleType locScrambleType : scrambleTypes) {
-        int nameStringResourceId = Utils.getStringIdentifier(getContext(), "scramble_type_" + locScrambleType.getName());
-        scrambleTypesNames.add(getString(nameStringResourceId));
+        scrambleTypesNames.add(getScrambleTypeTextString(locScrambleType));
       }
 
       spScrambleType = (Spinner) view.findViewById(R.id.spScrambleType);
@@ -64,6 +68,20 @@ public class SolveTypeAddDialog extends ConfirmDialog {
       adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
       spScrambleType.setAdapter(adapter);
       spScrambleType.setSelection(0);
+
+      spScrambleType.setOnItemSelectedListener(new OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+          if (pos > 0 && tfName.getText().toString().trim().isEmpty()) {
+            ScrambleType scrambleType = cubeType.getAvailableScrambleTypes()[pos];
+            tfName.setText(getScrambleTypeTextString(scrambleType));
+          }
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+        }
+      });
     } else {
       scrambleTypeLayout.setVisibility(View.GONE);
     }
@@ -71,18 +89,22 @@ public class SolveTypeAddDialog extends ConfirmDialog {
     return dialog;
   }
 
+  private String getScrambleTypeTextString(ScrambleType scrambleType) {
+    int nameStringResourceId = Utils.getStringIdentifier(getContext(), "scramble_type_" + scrambleType.getName());
+    return getString(nameStringResourceId);
+  }
+
   @Override
   protected void onConfirm() {
-    EditText tfName = (EditText) view.findViewById(R.id.tfName);
-    CheckBox cbBlind = (CheckBox) view.findViewById(R.id.cbBlind);
+    CheckBox cbBlind = view.findViewById(R.id.cbBlind);
 
     Properties props = new Properties();
     props.put(KEY_BLD, String.valueOf(cbBlind.isChecked()));
+    int scrambleTypeItemPosition = -1;
     if (spScrambleType != null) {
-      props.put(KEY_SCRAMBLE_TYPE, spScrambleType.getSelectedItemPosition());
-    } else {
-      props.put(KEY_SCRAMBLE_TYPE, -1);
+      scrambleTypeItemPosition = spScrambleType.getSelectedItemPosition();
     }
+    props.put(KEY_SCRAMBLE_TYPE, String.valueOf(scrambleTypeItemPosition));
 
     if (fieldCreator.createField(tfName.getText().toString(), props)) {
       dialog.dismiss();

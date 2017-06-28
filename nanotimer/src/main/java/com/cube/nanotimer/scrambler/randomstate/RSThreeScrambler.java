@@ -6,6 +6,8 @@ import com.cube.nanotimer.vo.ThreeCubeState;
 
 import java.util.Random;
 
+import static com.cube.nanotimer.R.string.scramble;
+
 public class RSThreeScrambler implements RSScrambler {
 
   private ThreeSolver threeSolver = new ThreeSolver();
@@ -20,10 +22,12 @@ public class RSThreeScrambler implements RSScrambler {
       if (scrambleType == null || scrambleType.isDefault()) {
         Random r = new Random();
         randomState = new ThreeCubeState();
-        randomState.cornerPermutations = IndexConvertor.unpackPermutation(r.nextInt(StateTables.N_CORNER_PERMUTATIONS), new byte[8]);
-        randomState.edgePermutations = IndexConvertor.unpackPermutation(r.nextInt(StateTables.N_EDGE_PERMUTATIONS), new byte[12]);
-        randomState.cornerOrientations = IndexConvertor.unpackOrientation(r.nextInt(StateTables.N_CORNER_ORIENTATIONS), new byte[8], (byte) 3);
-        randomState.edgeOrientations = IndexConvertor.unpackOrientation(r.nextInt(StateTables.N_EDGE_ORIENTATIONS), new byte[12], (byte) 2);
+        do {
+          randomState.cornerPermutations = IndexConvertor.unpackPermutation(r.nextInt(StateTables.N_CORNER_PERMUTATIONS), new byte[8]);
+          randomState.edgePermutations = IndexConvertor.unpackPermutation(r.nextInt(StateTables.N_EDGE_PERMUTATIONS), new byte[12]);
+          randomState.cornerOrientations = IndexConvertor.unpackOrientation(r.nextInt(StateTables.N_CORNER_ORIENTATIONS), new byte[8], (byte) 3);
+          randomState.edgeOrientations = IndexConvertor.unpackOrientation(r.nextInt(StateTables.N_EDGE_ORIENTATIONS), new byte[12], (byte) 2);
+        } while (ScrambleType.hasParity(randomState.cornerPermutations) != ScrambleType.hasParity(randomState.edgePermutations));
       } else {
         randomState = scrambleType.getRandomState();
       }
@@ -32,7 +36,7 @@ public class RSThreeScrambler implements RSScrambler {
 //      Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
     } while (scramble != null && scramble.length < 12 && scrambleType.isDefault());
 
-    if (scrambleType != null) {
+    if (scrambleType != null && scramble != null) {
       scramble = scrambleType.finalizeScramble(scramble);
     }
     return scramble;

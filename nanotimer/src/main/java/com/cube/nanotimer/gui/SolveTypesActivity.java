@@ -3,7 +3,7 @@ package com.cube.nanotimer.gui;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-public class SolveTypesActivity extends ActionBarActivity implements SelectionHandler, FieldRenamer, FieldCreator, StepsCreator {
+public class SolveTypesActivity extends AppCompatActivity implements SelectionHandler, FieldRenamer, FieldCreator, StepsCreator {
 
   private DragSortListView lvSolveTypes;
   private SolveTypeListAdapter adapter;
@@ -264,7 +264,7 @@ public class SolveTypesActivity extends ActionBarActivity implements SelectionHa
     boolean blindMode = Boolean.valueOf(props.getProperty(SolveTypeAddDialog.KEY_BLD, String.valueOf(false)));
 
     ScrambleType scrambleType = null;
-    int scrambleTypeIndex = Integer.parseInt(props.getProperty(SolveTypeAddDialog.KEY_SCRAMBLE_TYPE));
+    int scrambleTypeIndex = Integer.parseInt(props.getProperty(SolveTypeAddDialog.KEY_SCRAMBLE_TYPE, String.valueOf(-1)));
     if (scrambleTypeIndex >= 0) {
       scrambleType = curCubeType.getAvailableScrambleTypes()[scrambleTypeIndex];
 

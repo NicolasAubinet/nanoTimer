@@ -8,7 +8,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.cube.nanotimer.App;
@@ -23,7 +23,7 @@ import com.cube.nanotimer.scrambler.randomstate.RandomStateGenListener;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.util.helper.DialogUtils;
 
-public class OptionsActivity extends ActionBarActivity {
+public class OptionsActivity extends AppCompatActivity {
 
   private static final int MIN_DELTA_BETWEEN_SCRAMBLES_CACHE_MIN_MAX = 10;
 

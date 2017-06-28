@@ -3,7 +3,7 @@ package com.cube.nanotimer.gui;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class GraphActivity extends ActionBarActivity {
+public class GraphActivity extends AppCompatActivity {
 
   private CubeType cubeType;
   private SolveType solveType;

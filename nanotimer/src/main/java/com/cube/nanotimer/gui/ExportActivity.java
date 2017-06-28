@@ -2,15 +2,13 @@ package com.cube.nanotimer.gui;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.ShareCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,7 +43,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ExportActivity extends ActionBarActivity {
+public class ExportActivity extends AppCompatActivity {
 
   private ExportListAdapter adapter;
   private final List<ListItem> liItems = new ArrayList<ListItem>();

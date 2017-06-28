@@ -10,7 +10,6 @@
       <module fileurl="file://$PROJECT_DIR$/nanotimer/nanotimer.iml" filepath="$PROJECT_DIR$/nanotimer/nanotimer.iml" />
       <module fileurl="file://$PROJECT_DIR$/nanotimerpro/nanotimerpro.iml" filepath="$PROJECT_DIR$/nanotimerpro/nanotimerpro.iml" />
       <module fileurl="file://$PROJECT_DIR$/services/services.iml" filepath="$PROJECT_DIR$/services/services.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tests/tests.iml" filepath="$PROJECT_DIR$/tests/tests.iml" />
       <module fileurl="file://$PROJECT_DIR$/wheel/wheel.iml" filepath="$PROJECT_DIR$/wheel/wheel.iml" />
     </modules>
   </component>

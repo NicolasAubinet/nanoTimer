@@ -154,7 +154,6 @@ public enum ScramblerService {
           synchronized (scramblerHelper) {
             sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.GENERATING, cubeType, generationLaunch, i + 1, n));
             scramble = rsScrambler.getNewScramble(new ScrambleConfig(Utils.getRSScrambleLengthFromQuality(cubeType), scrambleType));
-            sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.GENERATED, cubeType, generationLaunch, i + 1, n));
           }
           if (scramble == null) { // was interrupted
             break;
@@ -170,6 +169,7 @@ public enum ScramblerService {
             saveNewScramblesToFile(cubeType, scrambleType, toSave); // write new scrambles to file by batches
             toSave.clear();
           }
+          sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.GENERATED, cubeType, generationLaunch, i + 1, n));
         }
         Log.i("NanoTimer", "generated scrambles!");
         if (!toSave.isEmpty()) {

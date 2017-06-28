@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -101,16 +102,21 @@ public class FileBrowser extends LinearLayout {
       tvCurrentFolder.setText(rootFolderDisplayName);
     }
 
-    List<File> files = new ArrayList<File>(Arrays.asList(folder.listFiles()));
-    Iterator<File> iterator = files.iterator();
-    while (iterator.hasNext()) {
-      File file = iterator.next();
-      if (!showHiddenFiles && file.getName().startsWith(".")) {
-        iterator.remove();
+    File[] locFolderContent = folder.listFiles();
+    if (locFolderContent != null) {
+      List<File> files = new ArrayList<File>(Arrays.asList(locFolderContent));
+      Iterator<File> iterator = files.iterator();
+      while (iterator.hasNext()) {
+        File file = iterator.next();
+        if (!showHiddenFiles && file.getName().startsWith(".")) {
+          iterator.remove();
+        }
       }
+      Collections.sort(files, fileComparator);
+      liFiles.addAll(files);
+    } else {
+      Toast.makeText(getContext(), R.string.can_not_retrieve_files, Toast.LENGTH_LONG).show();
     }
-    Collections.sort(files, fileComparator);
-    liFiles.addAll(files);
     adapter.notifyDataSetChanged();
   }
 

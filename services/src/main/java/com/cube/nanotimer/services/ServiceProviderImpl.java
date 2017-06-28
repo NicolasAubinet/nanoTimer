@@ -744,7 +744,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     values.put(DB.COL_SOLVETYPE_POSITION, position);
     values.put(DB.COL_SOLVETYPE_CUBETYPE_ID, solveType.getCubeTypeId());
     values.put(DB.COL_SOLVETYPE_BLIND, solveType.isBlind() ? 1 : 0);
-    values.put(DB.COL_SOLVETYPE_SCRAMBLE_TYPE, (solveType.getScrambleType() != null ? solveType.getScrambleType().toString() : ""));
+    values.put(DB.COL_SOLVETYPE_SCRAMBLE_TYPE, (solveType.getScrambleType() != null ? solveType.getScrambleType().getName() : ""));
     int id = (int) db.insert(DB.TABLE_SOLVETYPE, null, values);
     solveType.setId(id);
 
@@ -1042,7 +1042,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     Cursor cursor = db.rawQuery(q.toString(), null);
     Map<CubeType, List<ScrambleType>> scrambleTypes = new HashMap<>();
     if (cursor != null) {
-      if (cursor.moveToFirst()) {
+      for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         String scrambleTypeStr = cursor.getString(1);
         CubeType cubeType = CubeType.getCubeType(cursor.getInt(2));
         ScrambleType scrambleType = toScrambleType(cubeType, scrambleTypeStr);

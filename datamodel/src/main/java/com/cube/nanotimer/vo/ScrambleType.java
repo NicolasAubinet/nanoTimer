@@ -199,4 +199,24 @@ public abstract class ScrambleType implements Serializable {
     return false;
   }
 
+  @Override
+  public String toString() {
+    return name;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof ScrambleType)) return false;
+
+    ScrambleType that = (ScrambleType) o;
+
+    return name.equals(that.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return name.hashCode();
+  }
+
 }
