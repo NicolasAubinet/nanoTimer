@@ -1,16 +1,18 @@
 package com.cube.nanotimer.util;
 
-import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.SmallTest;
 import com.cube.nanotimer.session.CubeSession;
 import junit.framework.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CubeSessionTest extends AndroidTestCase {
+@RunWith(JUnit4.class)
+public class CubeSessionTest {
 
-  @SmallTest
+  @Test
   public void testBestWorst() {
     List<Long> sessionTimes = new ArrayList<Long>();
     sessionTimes.add(5000l);
@@ -187,7 +189,7 @@ public class CubeSessionTest extends AndroidTestCase {
     Assert.assertEquals(-1, cs.getWorstTimeInd(12));
   }
 
-  @SmallTest
+  @Test
   public void testAverages() {
     List<Long> sessionTimes = new ArrayList<Long>();
     sessionTimes.add(6l);
@@ -244,7 +246,7 @@ public class CubeSessionTest extends AndroidTestCase {
     Assert.assertEquals(7, cs.getAverageOfTwelve()); // 7.??? (not an int)
   }
 
-  @SmallTest
+  @Test
   public void testMean() {
     List<Long> sessionTimes = new ArrayList<Long>();
     sessionTimes.add(6l);
@@ -280,7 +282,7 @@ public class CubeSessionTest extends AndroidTestCase {
     Assert.assertEquals(5, cs.getMeanOf(5));
   }
 
-  @SmallTest
+  @Test
   public void testAverageBug() {
     List<Long> sessionTimes = new ArrayList<Long>();
     CubeSession cs = new CubeSession(sessionTimes);

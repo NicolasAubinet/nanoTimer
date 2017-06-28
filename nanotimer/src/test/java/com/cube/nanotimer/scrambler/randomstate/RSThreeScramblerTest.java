@@ -1,20 +1,21 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
-import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.SmallTest;
-import android.util.Log;
 import com.cube.nanotimer.util.ScrambleFormatterService;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ScrambleType;
 import com.cube.nanotimer.vo.ScrambleTypes;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RSThreeScramblerTest extends AndroidTestCase {
+@RunWith(JUnit4.class)
+public class RSThreeScramblerTest {
 
-  @SmallTest
+  @Test
   public void testGenerateScrambles() {
     RSThreeScrambler scrambler = new RSThreeScrambler();
     int nScrambles = 100;
@@ -24,11 +25,11 @@ public class RSThreeScramblerTest extends AndroidTestCase {
     int maxLength = 0;
     int totalLength = 0;
     Map<Integer, Integer> lengthRepartition = new HashMap<Integer, Integer>();
-    Log.i("[NanoTimer]", "Generating first scramble to generate tables (not counting this time)");
+    System.out.println("Generating first scramble to generate tables (not counting this time)");
     long startTs = System.currentTimeMillis();
     scrambler.genTables();
-    Log.i("[NanoTimer]", "Tables generated in " + (System.currentTimeMillis() - startTs) + "ms");
-    Log.i("[NanoTimer]", "Generating " + nScrambles + " scrambles...");
+    System.out.println("Tables generated in " + (System.currentTimeMillis() - startTs) + "ms");
+    System.out.println("Generating " + nScrambles + " scrambles...");
     for (int i = 0; i < nScrambles; i++) {
       long ts = System.currentTimeMillis();
       String[] scramble = scrambler.getNewScramble(new ScrambleConfig(23));
@@ -53,25 +54,26 @@ public class RSThreeScramblerTest extends AndroidTestCase {
       totalLength += scramble.length;
     }
     long total = System.currentTimeMillis() - startTs;
-    Log.i("[NanoTimer]", "Total time: " + total + " avg: " + (total / nScrambles) + " min: " + min + " max: " + max);
-    Log.i("[NanoTimer]", "Scramble min: " + minLength + " max: " + maxLength + " avg length: " + (((float) totalLength) / nScrambles));
-    Log.i("[NanoTimer]", "Length repartition:");
+    System.out.println("Total time: " + total + " avg: " + (total / nScrambles) + " min: " + min + " max: " + max);
+    System.out.println("Scramble min: " + minLength + " max: " + maxLength + " avg length: " + (((float) totalLength) / nScrambles));
+    System.out.println("Length repartition:");
     for (Integer s : lengthRepartition.keySet()) {
-      Log.i("[NanoTimer]", "  length " + s + ": " + lengthRepartition.get(s));
+      System.out.println("  length " + s + ": " + lengthRepartition.get(s));
     }
   }
 
-  @SmallTest
+  @Test
   public void testCustomScrambles() {
     RSThreeScrambler scrambler = new RSThreeScrambler();
+    System.out.println("getNewScramble...");
     String[] scramble = scrambler.getNewScramble(new ScrambleConfig(23, ScrambleTypes.DEFAULT));
     String formattedScramble = ScrambleFormatterService.INSTANCE.formatScrambleAsSingleLine(scramble, CubeType.THREE_BY_THREE);
-    Log.i("[NanoTimer]", formattedScramble);
+    System.out.println("Custom scramble: " + formattedScramble);
   }
 
-  @SmallTest
+  @Test
   public void testHasParity() {
-    Log.i("[NanoTimer]", "No parity:");
+    System.out.println("No parity:");
     displaySign(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 });
     displaySign(new byte[] { 4, 1, 0, 3, 5, 6, 2, 7 });
     displaySign(new byte[] { 0, 6, 5, 3, 4, 2, 1, 7 }); // F2
@@ -79,7 +81,7 @@ public class RSThreeScramblerTest extends AndroidTestCase {
     displaySign(new byte[] { 2, 4, 6, 1, 0, 3, 5, 7 }); //  L2 R D L D2 B' U2 R F' D' U' L' R' D2 F L D2 B F' L' F2 L' R D' L2
     displaySign(new byte[] { 8, 3, 9, 11, 10, 7, 5, 0, 2, 1, 4, 6 }); //  L2 R D L D2 B' U2 R F' D' U' L' R' D2 F L D2 B F' L' F2 L' R D' L2
 
-    Log.i("[NanoTimer]", "Parity:");
+    System.out.println("Parity:");
     displaySign(new byte[] { 0, 1, 6, 2, 4, 5, 7, 3 });
     displaySign(new byte[] { 0, 1, 6, 2, 4, 5, 7, 3 });
     displaySign(new byte[] { 3, 0, 4, 1, 6, 2, 5, 7 }); //  F L2 R' D2 R2 D' U' R D' B2 U2 F' U2 L2 D L R' U' F2 L R D2 B R' U2
@@ -87,7 +89,7 @@ public class RSThreeScramblerTest extends AndroidTestCase {
   }
 
   private void displaySign(byte[] pos) {
-    Log.i("[NanoTimer]", Arrays.toString(pos) + " parity? " + ScrambleType.hasParity(pos));
+    System.out.println(Arrays.toString(pos) + " parity? " + ScrambleType.hasParity(pos));
   }
 
 }

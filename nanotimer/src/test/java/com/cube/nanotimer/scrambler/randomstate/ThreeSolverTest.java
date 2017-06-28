@@ -1,17 +1,18 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
-import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.SmallTest;
-import android.util.Log;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.ThreeCubeState;
 import junit.framework.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.util.Arrays;
 
-public class ThreeSolverTest extends AndroidTestCase {
+@RunWith(JUnit4.class)
+public class ThreeSolverTest {
 
-  @SmallTest
+  @Test
   public void testSolvedCubeSolving() {
     ThreeCubeState cubeState = new ThreeCubeState();
     cubeState.cornerPermutations = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
@@ -24,7 +25,7 @@ public class ThreeSolverTest extends AndroidTestCase {
     Assert.assertEquals(0, scramble.length);
   }
 
-  @SmallTest
+  @Test
   public void testVeryEasy() {
     ThreeCubeState cubeState = new ThreeCubeState();
     //  F
@@ -35,11 +36,11 @@ public class ThreeSolverTest extends AndroidTestCase {
 
     ThreeSolver solver = new ThreeSolver();
     String[] scramble = solver.getSolution(cubeState);
-    Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
+    System.out.println("Scramble: " + Arrays.toString(scramble));
     Assert.assertTrue(scramble.length > 0);
   }
 
-  @SmallTest
+  @Test
   public void testOrientedAndCombined() {
     ThreeCubeState cubeState = new ThreeCubeState();
     // R2 U F2 D' B2 F2 U2 D L2 D
@@ -50,12 +51,12 @@ public class ThreeSolverTest extends AndroidTestCase {
 
     ThreeSolver solver = new ThreeSolver();
     String[] scramble = solver.getSolution(cubeState);
-    Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
+    System.out.println("Scramble: " + Arrays.toString(scramble));
     Assert.assertTrue(scramble.length > 0);
     // Found: [D', L2, U2, D', F2, B2, D, F2, U', R2]
   }
 
-  @SmallTest
+  @Test
   public void testEasy() {
     ThreeCubeState cubeState = new ThreeCubeState();
     //  F L2 R' D2
@@ -66,11 +67,11 @@ public class ThreeSolverTest extends AndroidTestCase {
 
     ThreeSolver solver = new ThreeSolver();
     String[] scramble = solver.getSolution(cubeState);
-    Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
+    System.out.println("Scramble: " + Arrays.toString(scramble));
     Assert.assertTrue(scramble.length > 0);
   }
 
-  @SmallTest
+  @Test
   public void testRealScramble() {
     ThreeCubeState cubeState = new ThreeCubeState();
     //  F L2 R' D2 R2 D' U' R D' B2 U2 F' U2 L2 D L R' U' F2 L R D2 B R' U2
@@ -81,11 +82,11 @@ public class ThreeSolverTest extends AndroidTestCase {
 
     ThreeSolver solver = new ThreeSolver();
     String[] scramble = solver.getSolution(cubeState);
-    Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble) + " (length: " + scramble.length + ")");
+    System.out.println("Scramble: " + Arrays.toString(scramble) + " (length: " + scramble.length + ")");
     //  found: [U, D', L, F, R', B', R2, F2, D2, R', F', ., D, F2, U', L2, D', R2, L2, F2, D2, F2, D2]
   }
 
-  @SmallTest
+  @Test
   public void testInvertedScramble() {
     ThreeCubeState cubeState = new ThreeCubeState();
     //  F L2 R' D2 R2 D' U' R D' B2 U2 F' U2 L2 D L R' U' F2 L R D2 B R' U2
@@ -96,7 +97,7 @@ public class ThreeSolverTest extends AndroidTestCase {
 
     ThreeSolver solver = new ThreeSolver();
     String[] scramble = Utils.invertMoves(solver.getSolution(cubeState));
-    Log.i("[NanoTimer]", "Inverted scramble: " + Arrays.toString(scramble) + " (length: " + scramble.length + ")");
+    System.out.println("Inverted scramble: " + Arrays.toString(scramble) + " (length: " + scramble.length + ")");
     //  Original non-inverted solution: [U, D', L, F, R', B', R2, F2, D2, R', F', ., D, F2, U', L2, D', R2, L2, F2, D2, F2, D2]
     String[] expectedScramble = new String[] { "D2", "F2", "D2", "F2", "L2", "R2", "D", "L2", "U", "F2", "D'",
         "F", "R", "D2", "F2", "R2", "B", "R", "F'", "L'", "D", "U'" };
@@ -106,7 +107,7 @@ public class ThreeSolverTest extends AndroidTestCase {
     }
   }
 
-  @SmallTest
+  @Test
   public void testRealScramble2() {
     ThreeCubeState cubeState = new ThreeCubeState();
     //  L2 R D L D2 B' U2 R F' D' U' L' R' D2 F L D2 B F' L' F2 L' R D' L2
@@ -117,7 +118,7 @@ public class ThreeSolverTest extends AndroidTestCase {
 
     ThreeSolver solver = new ThreeSolver();
     String[] scramble = solver.getSolution(cubeState);
-    Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble) + " (length: " + scramble.length + ")");
+    System.out.println("Scramble: " + Arrays.toString(scramble) + " (length: " + scramble.length + ")");
     //  found: [U, R2, B2, R2, F', B', D2, L, U', R2, F, D', F2, B2, U', L2, U, B2, U', L2, D2, F2, R2]
   }
 

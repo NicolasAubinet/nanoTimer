@@ -1,18 +1,21 @@
 package com.cube.nanotimer.util;
 
 import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.SmallTest;
 import com.cube.nanotimer.session.TimesStatistics;
 import junit.framework.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+@RunWith(JUnit4.class)
 public class TimesStatisticsTest extends AndroidTestCase {
 
-  @SmallTest
+  @Test
   public void testEmptyTimes() {
     List<Long> times = new ArrayList<Long>();
     TimesStatistics timesStatistics = new TimesStatistics(times);
@@ -23,7 +26,7 @@ public class TimesStatisticsTest extends AndroidTestCase {
     Assert.assertEquals(-2, timesStatistics.getAccuracy(5, false));
   }
 
-  @SmallTest
+  @Test
   public void testTimesSizeSmaller() {
     List<Long> times = new ArrayList<Long>();
     times.add(1000l);
@@ -37,7 +40,7 @@ public class TimesStatisticsTest extends AndroidTestCase {
     Assert.assertEquals(-2, timesStatistics.getAccuracy(5, false));
   }
 
-  @SmallTest
+  @Test
   public void testCalculateAverageWithNotEnoughTimes() {
     List<Long> times = new ArrayList<Long>();
     times.add(1000l);
@@ -49,7 +52,7 @@ public class TimesStatisticsTest extends AndroidTestCase {
     Assert.assertEquals(-2, timesStatistics.getSuccessAverageOf(3, false));
   }
 
-  @SmallTest
+  @Test
   public void testCalculateAllWithSmaller() {
     List<Long> times = new ArrayList<Long>();
     times.add(1000l);
@@ -63,7 +66,7 @@ public class TimesStatisticsTest extends AndroidTestCase {
     Assert.assertEquals(100, timesStatistics.getAccuracy(10, true));
   }
 
-  @SmallTest
+  @Test
   public void testAverage() {
     Assert.assertEquals(3000, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getAverageOf(5));
     Assert.assertEquals(3000, new TimesStatistics(getTimesList(200, 2000, 3000, 4000, 5000)).getAverageOf(5));
@@ -75,7 +78,7 @@ public class TimesStatisticsTest extends AndroidTestCase {
     Assert.assertEquals(-1, new TimesStatistics(getTimesList(-1, -1, 6000, 3000, 1000, 4000, 2000, 5000)).getAverageOf(5));
   }
 
-  @SmallTest
+  @Test
   public void testMean() {
     Assert.assertEquals(3000, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getMeanOf(5));
     Assert.assertEquals(2840, new TimesStatistics(getTimesList(200, 2000, 3000, 4000, 5000)).getMeanOf(5));
@@ -86,7 +89,7 @@ public class TimesStatisticsTest extends AndroidTestCase {
     Assert.assertEquals(-1, new TimesStatistics(getTimesList(-1, 6000, 3000, 1000, 4000, 2000, 5000)).getMeanOf(5));
   }
 
-  @SmallTest
+  @Test
   public void testSuccessAverage() {
     Assert.assertEquals(3000, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getSuccessAverageOf(5, false));
     Assert.assertEquals(3000, new TimesStatistics(getTimesList(200, 2000, 3000, 4000, 5000)).getSuccessAverageOf(5, false));
@@ -109,7 +112,7 @@ public class TimesStatisticsTest extends AndroidTestCase {
 //    Assert.assertEquals(6000, new TimesStatistics(times).getSuccessAverageOf(3, 3, true));
   }
 
-  @SmallTest
+  @Test
   public void testSuccessMean() {
     Assert.assertEquals(3000, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getSuccessMeanOf(5, false));
     Assert.assertEquals(2840, new TimesStatistics(getTimesList(200, 2000, 3000, 4000, 5000)).getSuccessMeanOf(5, false));
@@ -130,7 +133,7 @@ public class TimesStatisticsTest extends AndroidTestCase {
     Assert.assertEquals(5666, new TimesStatistics(times).getSuccessMeanOf(3, true));
   }
 
-  @SmallTest
+  @Test
   public void testAccuracy() {
     Assert.assertEquals(100, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getAccuracy(5, false));
     Assert.assertEquals(100, new TimesStatistics(getTimesList(1000)).getAccuracy(1, false));
@@ -148,7 +151,7 @@ public class TimesStatisticsTest extends AndroidTestCase {
     Assert.assertEquals(50, new TimesStatistics(getTimesList(-1, 1000, -1, 1000)).getAccuracy(10, true));
   }
 
-  @SmallTest
+  @Test
   public void testBestTimeInd() {
     Assert.assertEquals(-1, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getBestTimeInd(4, false));
     Assert.assertEquals(-1, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getBestTimeInd(4, true));
@@ -173,7 +176,7 @@ public class TimesStatisticsTest extends AndroidTestCase {
     Assert.assertEquals(-1, new TimesStatistics(getTimesList(2000, 4000, 5000, 1000, -1, 500)).getBestTimeInd(6, true));
   }
 
-  @SmallTest
+  @Test
   public void testWorstTimeInd() {
     Assert.assertEquals(-1, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getWorstTimeInd(4, false));
     Assert.assertEquals(-1, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getWorstTimeInd(4, true));
@@ -193,7 +196,7 @@ public class TimesStatisticsTest extends AndroidTestCase {
     Assert.assertEquals(-1, new TimesStatistics(getTimesList(2000, 4000, 5000, 1000, -1, 6000)).getWorstTimeInd(6, true));
   }
 
-  @SmallTest
+  @Test
   public void testBestTime() {
     Assert.assertEquals(10, new TimesStatistics(getTimesList(10, 20, 30)).getBestTime(3));
     Assert.assertEquals(10, new TimesStatistics(getTimesList(20, 10, 30)).getBestTime(3));
@@ -208,7 +211,7 @@ public class TimesStatisticsTest extends AndroidTestCase {
     Assert.assertEquals(-2, new TimesStatistics(getTimesList()).getBestTime(1));
   }
 
-  @SmallTest
+  @Test
   public void testDeviation() {
     Assert.assertEquals(0, new TimesStatistics(getTimesList(10, 10, 10)).getDeviation(3));
     Assert.assertEquals(100, new TimesStatistics(getTimesList(100, 200, 300)).getDeviation(3));
@@ -230,7 +233,7 @@ public class TimesStatisticsTest extends AndroidTestCase {
     Assert.assertEquals(-2, new TimesStatistics(getTimesList(300)).getDeviation(1));
   }
 
-  @SmallTest
+  @Test
   public void testBigAverages() {
     // Test averages of 50 and 100: only the 90% middle times should be considered (avg100 drops best 5 and world 5 times, to avoid DNF avg if less than 5 DNF times in last 100 solves)
     List<Long> orderedTimes = new ArrayList<>();

@@ -1,15 +1,16 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
-import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.SmallTest;
-import android.util.Log;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class RSTwoScramblerTest extends AndroidTestCase {
+@RunWith(JUnit4.class)
+public class RSTwoScramblerTest {
 
-  @SmallTest
+  @Test
   public void testGenerateScrambles() {
     RSTwoScrambler scrambler = new RSTwoScrambler();
     int nScrambles = 100;
@@ -19,11 +20,11 @@ public class RSTwoScramblerTest extends AndroidTestCase {
     int maxLength = 0;
     int totalLength = 0;
     Map<Integer, Integer> lengthRepartition = new HashMap<Integer, Integer>();
-    Log.i("[NanoTimer]", "Generating first scramble to generate tables (not counting this time)");
+    System.out.println("Generating first scramble to generate tables (not counting this time)");
     long startTs = System.currentTimeMillis();
     scrambler.genTables();
-    Log.i("[NanoTimer]", "Tables generated in " + (System.currentTimeMillis() - startTs) + "ms");
-    Log.i("[NanoTimer]", "Generating " + nScrambles + " scrambles...");
+    System.out.println("Tables generated in " + (System.currentTimeMillis() - startTs) + "ms");
+    System.out.println("Generating " + nScrambles + " scrambles...");
     for (int i = 0; i < nScrambles; i++) {
       long ts = System.currentTimeMillis();
       String[] scramble = scrambler.getNewScramble(new ScrambleConfig(11));
@@ -48,11 +49,11 @@ public class RSTwoScramblerTest extends AndroidTestCase {
       totalLength += scramble.length;
     }
     long total = System.currentTimeMillis() - startTs;
-    Log.i("[NanoTimer]", "Total time: " + total + " avg: " + (total / nScrambles) + " min: " + min + " max: " + max);
-    Log.i("[NanoTimer]", "Scramble min: " + minLength + " max: " + maxLength + " avg length: " + (((float) totalLength) / nScrambles));
-    Log.i("[NanoTimer]", "Length repartition:");
+    System.out.println("Total time: " + total + " avg: " + (total / nScrambles) + " min: " + min + " max: " + max);
+    System.out.println("Scramble min: " + minLength + " max: " + maxLength + " avg length: " + (((float) totalLength) / nScrambles));
+    System.out.println("Length repartition:");
     for (Integer s : lengthRepartition.keySet()) {
-      Log.i("[NanoTimer]", "  length " + s + ": " + lengthRepartition.get(s));
+      System.out.println("  length " + s + ": " + lengthRepartition.get(s));
     }
   }
 

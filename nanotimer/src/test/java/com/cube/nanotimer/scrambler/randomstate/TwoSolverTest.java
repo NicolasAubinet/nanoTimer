@@ -1,19 +1,20 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
-import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.SmallTest;
-import android.util.Log;
 import com.cube.nanotimer.vo.TwoCubeState;
 import junit.framework.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
-public class TwoSolverTest extends AndroidTestCase {
+@RunWith(JUnit4.class)
+public class TwoSolverTest {
 
-  @SmallTest
+  @Test
   public void testVeryEasy() {
     TwoCubeState cubeState = new TwoCubeState();
     //  F
@@ -22,11 +23,11 @@ public class TwoSolverTest extends AndroidTestCase {
 
     TwoSolver solver = new TwoSolver();
     String[] scramble = solver.getSolution(cubeState);
-    Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
+    System.out.println("Scramble: " + Arrays.toString(scramble));
     Assert.assertTrue(scramble.length > 0);
   }
 
-  @SmallTest
+  @Test
   public void testEasy() {
     TwoCubeState cubeState = new TwoCubeState();
     // F U2
@@ -35,12 +36,12 @@ public class TwoSolverTest extends AndroidTestCase {
 
     TwoSolver solver = new TwoSolver();
     String[] scramble = solver.getSolution(cubeState);
-    Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
+    System.out.println("Scramble: " + Arrays.toString(scramble));
     Assert.assertTrue(scramble.length > 0);
     // Found:
   }
 
-  @SmallTest
+  @Test
   public void testNormal() {
     TwoCubeState cubeState = new TwoCubeState();
     // U F2 R U2 R' F R F' U' R2
@@ -49,12 +50,12 @@ public class TwoSolverTest extends AndroidTestCase {
 
     TwoSolver solver = new TwoSolver();
     String[] scramble = solver.getSolution(cubeState);
-    Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
+    System.out.println("Scramble: " + Arrays.toString(scramble));
     Assert.assertTrue(scramble.length > 0);
     // Found:
   }
 
-  @SmallTest
+  @Test
   public void testCubeStateMoves() {
     TwoCubeState state = new TwoCubeState();
     byte[] state7 = new byte[7];
@@ -76,7 +77,7 @@ public class TwoSolverTest extends AndroidTestCase {
     Assert.assertTrue(Arrays.equals(new byte[] { 2, 2, 1, 0, 2, 1, 1 }, state.orientations));
   }
 
-  @SmallTest
+  @Test
   public void testTransit() {
     TwoSolver.genTables();
 
@@ -113,7 +114,7 @@ public class TwoSolverTest extends AndroidTestCase {
 
   }
 
-  @SmallTest
+  @Test
   public void testPruning() {
     TwoSolver.genTables();
 
@@ -141,13 +142,13 @@ public class TwoSolverTest extends AndroidTestCase {
     Assert.assertEquals(3, pruningOrient[IndexConvertor.packOrientation(new byte[] { 2, 1, 2, 0, 1, 1, 2 }, 3)]); // F R U
   }
 
-  @SmallTest
+  @Test
   public void testTableSizes() {
     TwoSolver.genTables();
-    Log.i("[NanoTimer]", "transitPerm: " + getSize(TwoSolver.transitPerm));
-    Log.i("[NanoTimer]", "transitOrient: " + getSize(TwoSolver.transitOrient));
-    Log.i("[NanoTimer]", "pruningPerm: " + getSize(TwoSolver.pruningPerm));
-    Log.i("[NanoTimer]", "pruningOrient: " + getSize(TwoSolver.pruningOrient));
+    System.out.println("transitPerm: " + getSize(TwoSolver.transitPerm));
+    System.out.println("transitOrient: " + getSize(TwoSolver.transitOrient));
+    System.out.println("pruningPerm: " + getSize(TwoSolver.pruningPerm));
+    System.out.println("pruningOrient: " + getSize(TwoSolver.pruningOrient));
   }
 
   private void applyMove(TwoCubeState state, TwoSolver.Move move) {

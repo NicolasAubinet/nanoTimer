@@ -1,10 +1,10 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
-import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.SmallTest;
-import android.util.Log;
 import com.cube.nanotimer.vo.ThreeCubeState;
 import junit.framework.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -12,9 +12,10 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Random;
 
-public class StateTablesTest extends AndroidTestCase {
+@RunWith(JUnit4.class)
+public class StateTablesTest {
 
-  @SmallTest
+  @Test
   public void testCubeStateMoves() {
     ThreeCubeState state = new ThreeCubeState();
     byte[] state12 = new byte[12];
@@ -82,7 +83,7 @@ public class StateTablesTest extends AndroidTestCase {
     Assert.assertTrue(Arrays.equals(new byte[] { 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1 }, state.edgeOrientations));
   }
 
-  @SmallTest
+  @Test
   public void testTransit() {
     StateTables.generateTables(ThreeSolver.moves1, ThreeSolver.moves2);
 
@@ -176,7 +177,7 @@ public class StateTablesTest extends AndroidTestCase {
     Assert.assertEquals(0, ind); // back to solved state
   }
 
-  @SmallTest
+  @Test
   public void testPrunings() {
     StateTables.generateTables(ThreeSolver.moves1, ThreeSolver.moves2);
 
@@ -337,7 +338,7 @@ public class StateTablesTest extends AndroidTestCase {
     oos.flush();
     oos.close();
     fos.close();
-    Log.i("[NanoTimer]", "Time to write tables: " + (System.currentTimeMillis() - ts));
+    System.out.println("Time to write tables: " + (System.currentTimeMillis() - ts));
   }
 
   public void testReadTables() throws IOException, ClassNotFoundException {
@@ -359,27 +360,27 @@ public class StateTablesTest extends AndroidTestCase {
 
     ois.close();
     fis.close();
-    Log.i("[NanoTimer]", "Time to read tables: " + (System.currentTimeMillis() - ts));
+    System.out.println("Time to read tables: " + (System.currentTimeMillis() - ts));
   }*/
 
-  @SmallTest
+  @Test
   public void testTableSizes() {
     StateTables.generateTables(ThreeSolver.moves1, ThreeSolver.moves2);
 
-    Log.i("[NanoTimer]", "trCorPerm size: " + getSize(StateTables.transitCornerPermutation));
-    Log.i("[NanoTimer]", "trCorOri size: " + getSize(StateTables.transitCornerOrientation));
-    Log.i("[NanoTimer]", "trEEComb size: " + getSize(StateTables.transitEEdgeCombination));
-    Log.i("[NanoTimer]", "trEEPerm size: " + getSize(StateTables.transitEEdgePermutation));
-    Log.i("[NanoTimer]", "trUDEPerm size: " + getSize(StateTables.transitUDEdgePermutation));
-    Log.i("[NanoTimer]", "trEOri size: " + getSize(StateTables.transitEdgeOrientation));
+    System.out.println("trCorPerm size: " + getSize(StateTables.transitCornerPermutation));
+    System.out.println("trCorOri size: " + getSize(StateTables.transitCornerOrientation));
+    System.out.println("trEEComb size: " + getSize(StateTables.transitEEdgeCombination));
+    System.out.println("trEEPerm size: " + getSize(StateTables.transitEEdgePermutation));
+    System.out.println("trUDEPerm size: " + getSize(StateTables.transitUDEdgePermutation));
+    System.out.println("trEOri size: " + getSize(StateTables.transitEdgeOrientation));
 
-    Log.i("[NanoTimer]", "prCorOri size: " + getSize(StateTables.pruningCornerOrientation));
-    Log.i("[NanoTimer]", "prEOri size: " + getSize(StateTables.pruningEdgeOrientation));
-    Log.i("[NanoTimer]", "prCorPerm size: " + getSize(StateTables.pruningCornerPermutation));
-    Log.i("[NanoTimer]", "prUDEPerm size: " + getSize(StateTables.pruningUDEdgePermutation));
+    System.out.println("prCorOri size: " + getSize(StateTables.pruningCornerOrientation));
+    System.out.println("prEOri size: " + getSize(StateTables.pruningEdgeOrientation));
+    System.out.println("prCorPerm size: " + getSize(StateTables.pruningCornerPermutation));
+    System.out.println("prUDEPerm size: " + getSize(StateTables.pruningUDEdgePermutation));
   }
 
-  @SmallTest
+  @Test
   public void testPermPerformance() {
     Random r = new Random();
     byte[] perms;
@@ -393,7 +394,7 @@ public class StateTablesTest extends AndroidTestCase {
       perms = Move.values()[r.nextInt(18)].corPerm;
       StateTables.getPermResult(dest, perms);
     }
-    Log.i("[NanoTimer]", "corner perm time: " + (System.currentTimeMillis() - ts));
+    System.out.println("corner perm time: " + (System.currentTimeMillis() - ts));
   }
 
   private int getSize(Object obj) {

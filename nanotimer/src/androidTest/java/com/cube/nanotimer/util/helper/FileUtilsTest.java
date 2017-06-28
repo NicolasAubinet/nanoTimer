@@ -1,16 +1,20 @@
 package com.cube.nanotimer.util.helper;
 
-import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.SmallTest;
+import android.support.test.runner.AndroidJUnit4;
 import junit.framework.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.List;
 
-public class FileUtilsTest extends AndroidTestCase {
+import static android.support.test.InstrumentationRegistry.getContext;
+
+@RunWith(AndroidJUnit4.class)
+public class FileUtilsTest {
 
   private static final String FILENAME = "TestFile";
 
-  @SmallTest
+  @Test
   public void testFileReadWrite() {
     FileUtils.deleteFile(getContext(), FILENAME);
 

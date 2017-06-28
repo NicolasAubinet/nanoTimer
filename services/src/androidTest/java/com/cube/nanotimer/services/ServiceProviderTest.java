@@ -1,7 +1,7 @@
 package com.cube.nanotimer.services;
 
+import android.support.test.runner.AndroidJUnit4;
 import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.SmallTest;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.FrequencyData;
 import com.cube.nanotimer.vo.SolveAverages;
@@ -11,12 +11,15 @@ import com.cube.nanotimer.vo.SolveTimeAverages;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.TimesSort;
 import junit.framework.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+@RunWith(AndroidJUnit4.class)
 public class ServiceProviderTest extends AndroidTestCase {
 
   private ServiceProviderImpl provider;
@@ -68,7 +71,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     provider.deleteHistory();
   }
 
-  @SmallTest
+  @Test
   public void testBasicAverage() {
     provider.deleteHistory();
     SolveAverages averages = provider.getSolveAverages(solveType1);
@@ -108,7 +111,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertAvgEquals(null, null, null, null, 505, null, null, null, null, 10, averages);
   }
 
-  @SmallTest
+  @Test
   public void testTimeDeletion() {
     provider.deleteHistory();
     SolveAverages averages = saveTimes(1000, 4);
@@ -188,7 +191,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertAvgEquals(433, null, null, null, 450, 433, null, null, null, 150, averages); // 150, 250, 450, 800, 600
   }
 
-  @SmallTest
+  @Test
   public void testTimeModification() {
     provider.deleteHistory();
     SolveAverages averages = saveTimes(1000, 5);
@@ -230,7 +233,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertAvgEquals(-1, null, null, null, 2583, 2166, null, null, null, 1000, averages); // 4000, 1000(x2), -1, 3000, 2500, -1, 4000
   }
 
-  @SmallTest
+  @Test
   public void testDNF() {
     provider.deleteHistory();
     SolveAverages averages = saveTimes(1000, 5);
@@ -353,7 +356,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertAvgEquals(1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, averages);
   }
 
-  @SmallTest
+  @Test
   public void testLifetimeAverage() {
     provider.deleteHistory();
     saveTime(1000);
@@ -372,7 +375,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertAvgEquals(5000, 5000, 5000, 5000, 4996, 3666, 4600, 4916, 4959, 1000, averages); // 1000(x2), 5000(x999)
   }
 
-  @SmallTest
+  @Test
   public void testAvg50AndRecalculation() {
     provider.deleteHistory();
     SolveAverages averages = saveTimes(5000, 25);
@@ -413,7 +416,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertAvgEquals(10000, 10200, 8166, null, 8040, 5000, 5500, 8020, null, 5000, averages); // (5000(x4), 10000)(x5), 10000(x20), 12000, 10000(x4), DNF
   }
 
-  @SmallTest
+  @Test
   public void testSolveTimeAveragesAndRecalculation() {
     provider.deleteHistory();
     saveTimes(1000, 5);
@@ -554,7 +557,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertSolveTimeAveragesEquals(1000, -1, -1, -1, provider.getSolveTimeAverages(times.get(102)));
   }
 
-  @SmallTest
+  @Test
   public void testStepsAverages() {
     provider.deleteHistory();
     SolveAverages averages = saveStepTimes(10, 20, 30, 40);
@@ -600,7 +603,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertStepsEquals(averages.getStepsAvgOf100(), 40, 44, 34, 49);
   }
 
-  @SmallTest
+  @Test
   public void testBlindMeanOf3() {
     provider.deleteHistory();
 
@@ -629,7 +632,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertEquals(Long.valueOf(2000), averages.getMeanOf3());
   }
 
-  @SmallTest
+  @Test
   public void testHistory() {
     provider.deleteHistory();
     for (int i = 65; i >= 1; i--) {
@@ -685,7 +688,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertEquals(solveTimes.get(29).getTime(), 3000);
   }
 
-  @SmallTest
+  @Test
   public void testPb() {
     provider.deleteHistory();
     saveTime(100);
@@ -762,7 +765,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertPBsInIndices(14, 17);
   }
 
-  @SmallTest
+  @Test
   public void testPbUpdateAndDelete() {
     provider.deleteHistory();
     for (int i = 1; i <= 15; i++) {
@@ -830,7 +833,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertPBsInIndices(11, 12); // -1 150 250 350 400 450 500 550 600 650 700 45(b) 25(b)
   }
 
-  @SmallTest
+  @Test
   public void testHistorySort() {
     provider.deleteHistory();
     // Initialize arrays
@@ -888,7 +891,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertEquals(solveTimes.get(times.length).getTime(), bestTime);
   }
 
-  @SmallTest
+  @Test
   public void testFrequencyData() {
     provider.deleteHistory();
     saveTime(50, 1440057600000L); // 20/08 10:00
@@ -916,7 +919,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertFrequencyDataEquals(frequencyData.get(15), 1440885600000L, 4); // 30/08
   }
 
-  @SmallTest
+  @Test
   public void testImportOldTimesAveragesBug() {
     provider.deleteHistory();
     long ts = 1440057600000L; // 20/08 10:00
@@ -938,7 +941,7 @@ public class ServiceProviderTest extends AndroidTestCase {
     assertEquals((long) solveAverages.getMeanOf3(), 30l);
   }
 
-  /*@SmallTest
+  /*@Test
   public void testPBPerfs() {
     provider.deleteHistory();
     int size = 100;

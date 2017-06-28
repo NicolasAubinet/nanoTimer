@@ -4,13 +4,17 @@ import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 import com.cube.nanotimer.util.chart.ChartData;
 import com.cube.nanotimer.util.chart.ChartUtils;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@RunWith(JUnit4.class)
 public class GraphSmoothTest extends AndroidTestCase {
 
-  @SmallTest
+  @Test
   public void testSmooth() {
     List<ChartData> chartDataList = new ArrayList<ChartData>();
     chartDataList.add(new ChartData(0, 10));
@@ -30,7 +34,7 @@ public class GraphSmoothTest extends AndroidTestCase {
     assertEquals(2.0f, smoothed.get(5).getData());
   }
 
-  @SmallTest
+  @Test
   public void testSmoothWithOneNonZeroTime() {
     List<ChartData> chartDataList = new ArrayList<ChartData>();
     for (int i = 0; i < 15; i++) {

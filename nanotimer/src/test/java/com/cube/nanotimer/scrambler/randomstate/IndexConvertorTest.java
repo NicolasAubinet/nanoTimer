@@ -1,18 +1,20 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
 import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.SmallTest;
-import android.util.Log;
 import junit.framework.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+@RunWith(JUnit4.class)
 public class IndexConvertorTest extends AndroidTestCase {
 
-  @SmallTest
+  @Test
   public void testFixedConversion() {
     // Corner orientation
     byte[] state = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -93,7 +95,7 @@ public class IndexConvertorTest extends AndroidTestCase {
     assertArrayEquals(comb, unpackEEdgeCombination(packEEdgeCombination(comb)));
   }
 
-  @SmallTest
+  @Test
   public void testMultConversion() {
     int res = IndexConvertor.packPermutation(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 });
     Assert.assertEquals(res, IndexConvertor.packPermMult(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 }, new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 }));
@@ -119,7 +121,7 @@ public class IndexConvertorTest extends AndroidTestCase {
   /**
    * Test random permutations and orientations unpacking to make sure that it's valid
    */
-  @SmallTest
+  @Test
   public void testRandomConversions() {
     Random r = new Random();
     byte[] state8 = new byte[8];
@@ -133,7 +135,7 @@ public class IndexConvertorTest extends AndroidTestCase {
       for (byte j = 0; j < 8; j++) { avail.add(j); }
       for (byte b : state8) { avail.remove((Byte) b); }
       Assert.assertEquals(0, avail.size());
-//      Log.i("[NanoTimer]", "Unpack cor perm " + n + ": " + Arrays.toString(state8));
+//      System.out.println("Unpack cor perm " + n + ": " + Arrays.toString(state8));
 
       // Edge permutations
       n = r.nextInt(StateTables.N_EDGE_PERMUTATIONS);
@@ -142,7 +144,7 @@ public class IndexConvertorTest extends AndroidTestCase {
       for (byte j = 0; j < 12; j++) { avail.add(j); }
       for (byte b : state12) { avail.remove((Byte) b); }
       Assert.assertEquals(0, avail.size());
-//      Log.i("[NanoTimer]", "Unpack edge perm " + n + ": " + Arrays.toString(state12));
+//      System.out.println("Unpack edge perm " + n + ": " + Arrays.toString(state12));
 
       // Corner orientations
       n = r.nextInt(StateTables.N_CORNER_ORIENTATIONS);
@@ -152,7 +154,7 @@ public class IndexConvertorTest extends AndroidTestCase {
         sum += state8[j];
       }
       Assert.assertEquals(0, sum % 3);
-//      Log.i("[NanoTimer]", "Unpack cor ori " + n + ": " + Arrays.toString(state8));
+//      System.out.println("Unpack cor ori " + n + ": " + Arrays.toString(state8));
 
       // Edge orientations
       n = r.nextInt(StateTables.N_EDGE_ORIENTATIONS);
@@ -162,11 +164,11 @@ public class IndexConvertorTest extends AndroidTestCase {
         sum += state12[j];
       }
       Assert.assertEquals(0, sum % 2);
-//      Log.i("[NanoTimer]", "Unpack edge ori " + n + ": " + Arrays.toString(state12));
+//      System.out.println("Unpack edge ori " + n + ": " + Arrays.toString(state12));
     }
   }
 
-  @SmallTest
+  @Test
   public void testRandomConversion() {
     Random r = new Random();
     byte[] state;
@@ -223,7 +225,7 @@ public class IndexConvertorTest extends AndroidTestCase {
     }
   }
 
-  @SmallTest
+  @Test
   public void testPerformance() {
     int[] rands = new int[40320];
     for (int i = 0; i < rands.length; i++) {
@@ -234,12 +236,12 @@ public class IndexConvertorTest extends AndroidTestCase {
     for (int i = 0; i < rands.length; i++) {
       IndexConvertor.unpackPermutation(rands[i], dest);
     }
-    Log.i("[NanoTimerPerf]", "unpackPermutation: " + (System.currentTimeMillis() - ts));
+    System.out.println("unpackPermutation: " + (System.currentTimeMillis() - ts));
     ts = System.currentTimeMillis();
     for (int i = 0; i < rands.length; i++) {
       IndexConvertor.packPermutation(dest);
     }
-    Log.i("[NanoTimerPerf]", "packPermutation: " + (System.currentTimeMillis() - ts));
+    System.out.println("packPermutation: " + (System.currentTimeMillis() - ts));
   }
 
   public static int packCornerPermutation(byte[] perm) {
