@@ -85,7 +85,7 @@ public class FileBrowser extends LinearLayout {
     displayFolder(defaultFolder);
   }
 
-  protected File getDefaultFolder() {
+  private File getDefaultFolder() {
     return Environment.getExternalStorageDirectory();
   }
 

@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId "com.cube.nanotimer"
         minSdkVersion 14
-        targetSdkVersion 20
+        targetSdkVersion 26
         versionCode 30
         versionName "1.2.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

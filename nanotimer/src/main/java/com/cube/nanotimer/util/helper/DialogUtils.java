@@ -37,17 +37,21 @@ public class DialogUtils {
 
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
     return builder.setMessage(message)
-        .setPositiveButton("Yes", clickListener)
-        .setNegativeButton("No", clickListener).show();
+        .setPositiveButton(R.string.yes, clickListener)
+        .setNegativeButton(R.string.no, clickListener).show();
   }
 
   public static AlertDialog showYesNoConfirmation(Context context, int messageId, final YesNoListener listener) {
+    return showConfirmCancelDialog(context, messageId, R.string.yes, R.string.no, listener);
+  }
+
+  public static AlertDialog showConfirmCancelDialog(Context context, int messageId, int parConfirmMessageId, int parCancelMessageId, final YesNoListener listener) {
     DialogInterface.OnClickListener clickListener = getYesNoClickListener(listener);
 
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
     return builder.setMessage(messageId)
-        .setPositiveButton("Yes", clickListener)
-        .setNegativeButton("No", clickListener).show();
+        .setPositiveButton(parConfirmMessageId, clickListener)
+        .setNegativeButton(parCancelMessageId, clickListener).show();
   }
 
   public static AlertDialog showOkDialog(Context context, String title, String message) {

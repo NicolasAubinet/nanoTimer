@@ -1,12 +1,17 @@
 package com.cube.nanotimer.gui;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.media.AudioManager;
+import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -92,6 +97,8 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
   private static final int ID_IMPORTEXPORT = 3;
 
   private static final int IMPORT_REQUEST_CODE = 1;
+
+  private static final int REQUEST_READ_PERMISSIONS_CODE = 10;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -530,7 +537,7 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
         }
       } else if (id == ID_IMPORTEXPORT) {
         if (position == 0) {
-          startActivityForResult(new Intent(this, ImportActivity.class), IMPORT_REQUEST_CODE);
+          tryLaunchImportActivity();
         } else if (position == 1) {
           startActivity(new Intent(this, ExportActivity.class));
         }
@@ -554,6 +561,48 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
         }
       }).importData(file);
     }
+  }
+
+  private void tryLaunchImportActivity() {
+    if (VERSION.SDK_INT >= 19) {
+      final String permission = Manifest.permission.READ_EXTERNAL_STORAGE;
+      if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+//        if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
+//          DialogUtils.showConfirmCancelDialog(MainScreenActivity.this, R.string.import_requires_read_permissions,
+//            R.string.confirm, R.string.cancel, new YesNoListener() {
+//            @Override
+//            public void onYes() {
+//              ActivityCompat.requestPermissions(MainScreenActivity.this, new String[] { permission }, REQUEST_READ_PERMISSIONS_CODE);
+//            }
+//          });
+//        } else {
+        ActivityCompat.requestPermissions(this, new String[] { permission }, REQUEST_READ_PERMISSIONS_CODE);
+//        }
+      } else {
+        launchImportActivity();
+      }
+    } else {
+      launchImportActivity();
+    }
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    switch (requestCode) {
+      case REQUEST_READ_PERMISSIONS_CODE:
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+          launchImportActivity();
+        } else {
+          Toast.makeText(this, R.string.read_permission_denied_cant_import, Toast.LENGTH_SHORT).show();
+        }
+        break;
+      default:
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+  }
+
+  private void launchImportActivity() {
+    startActivityForResult(new Intent(this, ImportActivity.class), IMPORT_REQUEST_CODE);
   }
 
   private void setSolvesCount(int solvesCount) {
