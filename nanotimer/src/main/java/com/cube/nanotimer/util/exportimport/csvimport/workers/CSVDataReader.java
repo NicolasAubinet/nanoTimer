@@ -13,6 +13,7 @@ import com.cube.nanotimer.util.exportimport.csvimport.ImportResultListener;
 import com.cube.nanotimer.util.exportimport.csvimport.ImportTimesData;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ExportResult;
+import com.cube.nanotimer.vo.ScrambleType;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.SolveTypeStep;
@@ -87,7 +88,17 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
       if (cubeType == null) {
         throw new CSVFormatException(context.getString(R.string.could_not_find_cube_type, exportResult.getCubeTypeName()));
       }
-      SolveType solveType = new SolveType(exportResult.getSolveTypeName(), exportResult.isBlindType(), exportResult.getScrambleType(), cubeType.getId());
+
+      ScrambleType scrambleType = null;
+      String scrambleTypeName = exportResult.getScrambleTypeName();
+      if (scrambleTypeName != null) {
+        scrambleType = cubeType.getScrambleTypeFromString(scrambleTypeName);
+        if (scrambleType == null) {
+          throw new CSVFormatException(context.getString(R.string.could_not_find_scramble_type, scrambleTypeName, cubeType.getName()));
+        }
+      }
+
+      SolveType solveType = new SolveType(exportResult.getSolveTypeName(), exportResult.isBlindType(), scrambleType, cubeType.getId());
       if (exportResult.hasSteps()) {
         SolveTypeStep[] steps = new SolveTypeStep[exportResult.getStepsNames().length];
         for (int i = 0; i < exportResult.getStepsNames().length; i++) {
@@ -115,7 +126,9 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
       int i = 0;
       while (fileScanner.hasNextLine()) {
         String line = fileScanner.nextLine();
-        if (i == 0 && !line.equals(ExportCSVGenerator.CSV_HEADER_LINE)) {
+        if (i == 0
+        && !line.toLowerCase().equals(ExportCSVGenerator.CSV_HEADER_LINE.toLowerCase())
+        && !line.toLowerCase().equals(ExportCSVGenerator.CSV_HEADER_LINE_OLD.toLowerCase())) {
           throw new CSVFormatException(context.getString(R.string.invalid_import_file_format));
         }
         lines.add(line);

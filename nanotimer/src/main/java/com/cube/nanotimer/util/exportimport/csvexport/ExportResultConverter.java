@@ -5,9 +5,7 @@ import com.cube.nanotimer.R;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.exportimport.CSVFormatException;
 import com.cube.nanotimer.util.helper.Utils;
-import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ExportResult;
-import com.cube.nanotimer.vo.ScrambleType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +30,8 @@ public class ExportResultConverter {
     sb.append(",");
     sb.append(result.isBlindType() ? "y" : "n");
     sb.append(",");
-    if (result.getScrambleType() != null) {
-      sb.append(result.getScrambleType().getName());
+    if (result.getScrambleTypeName() != null) {
+      sb.append(result.getScrambleTypeName());
     }
     sb.append(",");
     if (result.getScramble() != null) {
@@ -61,12 +59,11 @@ public class ExportResultConverter {
     boolean blindType = (fields.get(6).equals("y"));
 
     int scrambleFieldIndex;
-    ScrambleType scrambleType = null;
+    String scrambleTypeName = null;
     if (fields.size() == 8) {
       scrambleFieldIndex = 7;
     } else {
-      String scrambleTypeName = fields.get(7);
-      scrambleType = CubeType.getCubeTypeFromName(cubeTypeName).getScrambleTypeFromString(scrambleTypeName);
+      scrambleTypeName = fields.get(7);
       scrambleFieldIndex = 8;
     }
     String scramble = fields.get(scrambleFieldIndex);
@@ -74,7 +71,7 @@ public class ExportResultConverter {
       scramble = null;
     }
 
-    ExportResult exportResult = new ExportResult(cubeTypeName, solveTypeName, time, timestamp, plusTwo, blindType, scrambleType, scramble);
+    ExportResult exportResult = new ExportResult(cubeTypeName, solveTypeName, time, timestamp, plusTwo, blindType, scrambleTypeName, scramble);
     String stepsField = fields.get(4);
     exportResult.setStepsTimes(getStepsTimes(context, stepsField));
     exportResult.setStepsNames(getStepsNames(context, stepsField));

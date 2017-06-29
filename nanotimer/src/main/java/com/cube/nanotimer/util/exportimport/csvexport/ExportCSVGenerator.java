@@ -6,7 +6,8 @@ import java.util.List;
 
 public class ExportCSVGenerator implements CSVGenerator {
 
-  public static final String CSV_HEADER_LINE = "cubetype,solvetype,time,date,steps,plustwo,blind,scramble";
+  public static final String CSV_HEADER_LINE = "cubetype,solvetype,time,date,steps,plustwo,blind,scrambleType,scramble";
+  public static final String CSV_HEADER_LINE_OLD = "cubetype,solvetype,time,date,steps,plustwo,blind,scramble";
 
   private List<ExportResult> results;
 

@@ -87,6 +87,9 @@ public class SolveTypesVerifier extends AsyncTask<ImportTimesData, Void, List<So
       for (SolveType importSolveType : importSolveTypes) {
         boolean foundSolveType = false;
         for (SolveType dbSolveType : dbSolveTypes) {
+//          if (importSolveType.getName().toUpperCase().equals(dbSolveType.getName().toUpperCase()) // no need to check scramble types as solve type names are unique
+//            && ((importSolveType.getScrambleType() == null && dbSolveType.getScrambleType() == null)
+//            || (importSolveType.getScrambleType() != null && importSolveType.getScrambleType().equals(dbSolveType.getScrambleType())))) {
           if (importSolveType.getName().toUpperCase().equals(dbSolveType.getName().toUpperCase())) {
             foundSolveType = true;
             importSolveType.setId(dbSolveType.getId());

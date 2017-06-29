@@ -11,29 +11,29 @@ public class ExportResult {
   private long timestamp;
   private boolean plusTwo;
   private boolean blindType;
-  private ScrambleType scrambleType;
+  private String scrambleTypeName;
   private String scramble;
 
   private String[] stepsNames;
   private Long[] stepsTimes;
 
   public ExportResult(int solveTimeId, int cubeTypeId, String cubeTypeName, int solveTypeId, String solveTypeName,
-                      long time, long timestamp, boolean plusTwo, boolean blindType, ScrambleType scrambleType, String scramble) {
-    this(cubeTypeName, solveTypeName, time, timestamp, plusTwo, blindType, scrambleType, scramble);
+                      long time, long timestamp, boolean plusTwo, boolean blindType, String scrambleTypeName, String scramble) {
+    this(cubeTypeName, solveTypeName, time, timestamp, plusTwo, blindType, scrambleTypeName, scramble);
     this.solveTimeId = solveTimeId;
     this.cubeTypeId = cubeTypeId;
     this.solveTypeId = solveTypeId;
   }
 
   public ExportResult(String cubeTypeName, String solveTypeName, long time, long timestamp, boolean plusTwo, boolean blindType,
-                      ScrambleType scrambleType, String scramble) {
+                      String scrambleTypeName, String scramble) {
     this.cubeTypeName = cubeTypeName;
     this.solveTypeName = solveTypeName;
     this.time = time;
     this.timestamp = timestamp;
     this.plusTwo = plusTwo;
     this.blindType = blindType;
-    this.scrambleType = scrambleType;
+    this.scrambleTypeName = scrambleTypeName;
     this.scramble = scramble;
   }
 
@@ -117,12 +117,12 @@ public class ExportResult {
     this.blindType = blindType;
   }
 
-  public ScrambleType getScrambleType() {
-    return scrambleType;
+  public String getScrambleTypeName() {
+    return scrambleTypeName;
   }
 
-  public void setScrambleType(ScrambleType scrambleType) {
-    this.scrambleType = scrambleType;
+  public void setScrambleTypeName(String scrambleTypeName) {
+    this.scrambleTypeName = scrambleTypeName;
   }
 
   public String[] getStepsNames() {

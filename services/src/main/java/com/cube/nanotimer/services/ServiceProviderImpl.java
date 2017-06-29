@@ -943,10 +943,9 @@ public class ServiceProviderImpl implements ServiceProvider {
       if (cursor != null) {
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
           int cubeTypeId = cursor.getInt(1);
-          CubeType cubeType = CubeType.getCubeType(cubeTypeId);
           ExportResult result = new ExportResult(cursor.getInt(0), cubeTypeId, cursor.getString(2), cursor.getInt(3),
-              cursor.getString(4), cursor.getLong(5), cursor.getLong(6), (cursor.getInt(7) == 1), (cursor.getInt(9) == 1),
-              toScrambleType(cubeType, cursor.getString(8)), cursor.getString(10));
+              cursor.getString(4), cursor.getLong(5), cursor.getLong(6), (cursor.getInt(7) == 1), (cursor.getInt(8) == 1),
+              cursor.getString(9), cursor.getString(10));
           curResults.add(result);
         }
         cursor.close();
