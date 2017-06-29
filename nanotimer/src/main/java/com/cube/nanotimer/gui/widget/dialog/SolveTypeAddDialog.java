@@ -33,6 +33,8 @@ public class SolveTypeAddDialog extends ConfirmDialog {
   private LinearLayout scrambleTypeLayout;
   private Spinner spScrambleType;
 
+  private ScrambleType previousScrambleType;
+
   public static SolveTypeAddDialog newInstance(FieldCreator fieldCreator, CubeType cubeType) {
     SolveTypeAddDialog frag = new SolveTypeAddDialog(fieldCreator);
     Bundle args = new Bundle();
@@ -72,9 +74,12 @@ public class SolveTypeAddDialog extends ConfirmDialog {
       spScrambleType.setOnItemSelectedListener(new OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-          if (pos > 0 && tfName.getText().toString().trim().isEmpty()) {
+          String tfNameText = tfName.getText().toString().trim();
+          // adapt solve type name automatically if the field is empty, or if it contains the value of the previously selected scramble type
+          if (pos > 0 && (tfNameText.isEmpty() || (previousScrambleType != null && tfNameText.equals(getScrambleTypeTextString(previousScrambleType))))) {
             ScrambleType scrambleType = cubeType.getAvailableScrambleTypes()[pos];
             tfName.setText(getScrambleTypeTextString(scrambleType));
+            previousScrambleType = scrambleType;
           }
         }
 
