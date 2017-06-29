@@ -91,7 +91,7 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
 
       ScrambleType scrambleType = null;
       String scrambleTypeName = exportResult.getScrambleTypeName();
-      if (scrambleTypeName != null) {
+      if (scrambleTypeName != null && !scrambleTypeName.trim().isEmpty()) {
         scrambleType = cubeType.getScrambleTypeFromString(scrambleTypeName);
         if (scrambleType == null) {
           throw new CSVFormatException(context.getString(R.string.could_not_find_scramble_type, scrambleTypeName, cubeType.getName()));
