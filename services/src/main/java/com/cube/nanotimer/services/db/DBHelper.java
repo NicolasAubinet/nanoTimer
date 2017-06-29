@@ -4,7 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.R;
+import com.cube.nanotimer.vo.ScrambleType;
 
 public class DBHelper extends SQLiteOpenHelper {
 
@@ -155,8 +157,10 @@ public class DBHelper extends SQLiteOpenHelper {
   }
 
   private void insertDefaultValues() {
+    final int THREE_BY_THREE_ID = 2;
+
     insertSolveType(getString(R.string.def), insertCubeType(1, getString(R.string.two_by_two)));
-    insertSolveType(getString(R.string.def), insertCubeType(2, getString(R.string.three_by_three)));
+    insertSolveType(getString(R.string.def), insertCubeType(THREE_BY_THREE_ID, getString(R.string.three_by_three)));
     insertSolveType(getString(R.string.def), insertCubeType(3, getString(R.string.four_by_four)));
     insertSolveType(getString(R.string.def), insertCubeType(4, getString(R.string.five_by_five)));
     insertSolveType(getString(R.string.def), insertCubeType(5, getString(R.string.six_by_six)));
@@ -167,9 +171,9 @@ public class DBHelper extends SQLiteOpenHelper {
     insertSolveType(getString(R.string.def), insertCubeType(10, getString(R.string.square1)));
     insertSolveType(getString(R.string.def), insertCubeType(11, getString(R.string.clock)));
 
-    insertSolveType(getString(R.string.one_handed), 2);
+    insertSolveType(getString(R.string.one_handed), THREE_BY_THREE_ID);
 
-    int solveTypeId = insertSolveType(getString(R.string.CFOP_steps), 2);
+    int solveTypeId = insertSolveType(getString(R.string.CFOP_steps), THREE_BY_THREE_ID);
     ContentValues values = new ContentValues();
     values.put(DB.COL_SOLVETYPESTEP_SOLVETYPE_ID, solveTypeId);
     values.put(DB.COL_SOLVETYPESTEP_POSITION, 1);
@@ -184,6 +188,8 @@ public class DBHelper extends SQLiteOpenHelper {
     values.put(DB.COL_SOLVETYPESTEP_POSITION, 4);
     values.put(DB.COL_SOLVETYPESTEP_NAME, "PLL");
     db.insert(DB.TABLE_SOLVETYPESTEP, null, values);
+
+    insertSolveType(getString(R.string.last_layer), THREE_BY_THREE_ID, CubeType.THREE_BY_THREE.getScrambleTypeFromString("last_layer"));
   }
 
   private int insertCubeType(int id, String name) {
@@ -194,9 +200,16 @@ public class DBHelper extends SQLiteOpenHelper {
   }
 
   private int insertSolveType(String name, int cubeTypeId) {
+    return insertSolveType(name, cubeTypeId, null);
+  }
+
+  private int insertSolveType(String name, int cubeTypeId, ScrambleType scrambleType) {
     ContentValues values = new ContentValues();
     values.put(DB.COL_SOLVETYPE_NAME, name);
     values.put(DB.COL_SOLVETYPE_CUBETYPE_ID, cubeTypeId);
+    if (scrambleType != null) {
+      values.put(DB.COL_SOLVETYPE_SCRAMBLE_TYPE, scrambleType.getName());
+    }
     return (int) db.insert(DB.TABLE_SOLVETYPE, null, values);
   }
 
