@@ -418,9 +418,13 @@ public class TimerActivity extends AppCompatActivity implements ResultListener {
           break;
         case R.id.itAddTime:
           if (Utils.checkProFeature(this)) {
-            String scramble = ScrambleFormatterService.INSTANCE.formatScrambleAsSingleLine(currentScramble, cubeType);
-            AddNewTimeDialog dialog = AddNewTimeDialog.newInstance(this, solveType, scramble);
-            DialogUtils.showFragment(this, dialog);
+            if (currentScramble != null) {
+              String scramble = ScrambleFormatterService.INSTANCE.formatScrambleAsSingleLine(currentScramble, cubeType);
+              AddNewTimeDialog dialog = AddNewTimeDialog.newInstance(this, solveType, scramble);
+              DialogUtils.showFragment(this, dialog);
+            } else {
+              DialogUtils.showShortInfoMessage(this, R.string.can_not_add_time_while_generating);
+            }
           }
           break;
         case R.id.itShareTime:
@@ -712,7 +716,13 @@ public class TimerActivity extends AppCompatActivity implements ResultListener {
     solveTime.setTime(time);
     solveTime.setTimestamp(System.currentTimeMillis());
     solveTime.setSolveType(solveType);
-    solveTime.setScramble(ScrambleFormatterService.INSTANCE.formatScrambleAsSingleLine(currentScramble, cubeType));
+
+    String scramble = "";
+    if (currentScramble != null) { // should never be null here, but let's make sure
+      scramble = ScrambleFormatterService.INSTANCE.formatScrambleAsSingleLine(currentScramble, cubeType);
+    }
+
+    solveTime.setScramble(scramble);
     if (solveType.hasSteps()) {
       solveTime.setStepsTimes(stepsTimes.toArray(new Long[0]));
     }
@@ -1026,6 +1036,11 @@ public class TimerActivity extends AppCompatActivity implements ResultListener {
   }
 
   private boolean onTouchEvent(int parMotionEventAction) {
+    if (currentScramble == null) {
+      // don't allow to do anything if there is no scramble (can happen for special scramble types when scrambles are not yet generated)
+      return false;
+    }
+
     // change bg color
     if (parMotionEventAction == MotionEvent.ACTION_DOWN) {
       if (System.currentTimeMillis() - lastTimerStopTs >= STOP_START_DELAY) {

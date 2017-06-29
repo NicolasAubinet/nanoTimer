@@ -32,6 +32,10 @@ public class DialogUtils {
     Toast.makeText(context, messageId, Toast.LENGTH_LONG).show();
   }
 
+  public static void showShortInfoMessage(Context context, int messageId) {
+    Toast.makeText(context, messageId, Toast.LENGTH_SHORT).show();
+  }
+
   public static AlertDialog showYesNoConfirmation(Context context, String message, final YesNoListener listener) {
     DialogInterface.OnClickListener clickListener = getYesNoClickListener(listener);
 

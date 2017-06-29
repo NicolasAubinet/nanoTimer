@@ -593,7 +593,7 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
           launchImportActivity();
         } else {
-          Toast.makeText(this, R.string.read_permission_denied_cant_import, Toast.LENGTH_SHORT).show();
+          DialogUtils.showShortInfoMessage(this, R.string.read_permission_denied_cant_import);
         }
         break;
       default:
