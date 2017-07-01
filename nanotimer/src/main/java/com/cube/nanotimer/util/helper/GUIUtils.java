@@ -145,7 +145,7 @@ public class GUIUtils {
 
   public static void showNotification(Context c, int id, String title, String message, Class resultClass) {
     NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(c)
-        .setSmallIcon(R.drawable.icon)
+        .setSmallIcon(R.drawable.generating_scrambles)
         .setContentTitle(title)
         .setContentText(message);
 
