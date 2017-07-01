@@ -6,6 +6,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.Html;
@@ -144,8 +146,14 @@ public class GUIUtils {
   }
 
   public static void showNotification(Context c, int id, String title, String message, Class resultClass) {
+    int notificationIcon;
+    if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
+      notificationIcon = R.drawable.generating_scrambles;
+    } else {
+      notificationIcon = R.drawable.icon;
+    }
     NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(c)
-        .setSmallIcon(R.drawable.generating_scrambles)
+        .setSmallIcon(notificationIcon)
         .setContentTitle(title)
         .setContentText(message);
 
