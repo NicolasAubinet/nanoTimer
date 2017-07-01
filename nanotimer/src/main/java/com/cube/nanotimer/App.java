@@ -92,7 +92,7 @@ public enum App {
             (scrambleNotificationMode == ScrambleNotificationMode.MANUAL &&
                 (event.getGenerationLaunch() == GenerationLaunch.MANUAL || event.getGenerationLaunch() == GenerationLaunch.PLUGGED)));
         if (event.getState() == State.PREPARING && showNotif) {
-          GUIUtils.showNotification(context, SCRAMBLE_NOTIF_ID, title, "", MainScreenActivity.class);
+          GUIUtils.showNotification(context, SCRAMBLE_NOTIF_ID, title, context.getString(R.string.preparing_generation), MainScreenActivity.class);
         } else if (event.getState() == State.GENERATING && showNotif) {
           GUIUtils.showNotification(context, SCRAMBLE_NOTIF_ID, title,
               context.getString(R.string.generating_scramble, event.getCurScramble(), event.getTotalToGenerate()), MainScreenActivity.class);
