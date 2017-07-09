@@ -1,110 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <com.cube.nanotimer.util.view.ScalingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
    android:id="@+id/mainLayout"
    android:layout_height="match_parent"
    android:layout_width="match_parent"
    android:orientation="vertical">
 
-  <com.startapp.android.publish.banner.Banner
-     android:id="@+id/bannerAd"
-     android:layout_width="match_parent"
-     android:layout_height="wrap_content"
-     android:gravity="center"/>
-
-  <TextView
-     android:id="@+id/tvUpdateProApp"
-     android:layout_width="match_parent"
-     android:layout_height="wrap_content"
-     android:text="@string/upgrade_pro_app"
-     android:textSize="26px"
-     android:textColor="@color/warning"
-     android:visibility="gone"
-     android:gravity="center"/>
-
   <RelativeLayout
      android:layout_width="match_parent"
-     android:layout_height="wrap_content"
-     android:padding="8px">
-
-    <TableLayout
-       android:id="@+id/layoutTypes"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:stretchColumns="1"
-       android:layout_alignParentTop="true">
-      <TableRow>
-        <TextView
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:text="@string/cube_type"
-           style="@style/SimpleTextField"/>
-        <Button
-           android:id="@+id/buCubeType"
-           android:layout_marginLeft="15px"
-           android:layout_weight="1"
-           style="@style/CustomButton"/> <!-- weight to avoid going off-screen -->
-      </TableRow>
-      <TableRow android:layout_marginTop="8px">
-        <TextView
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:text="@string/solve_type"
-           style="@style/SimpleTextField"/>
-        <Button
-           android:id="@+id/buSolveType"
-           android:layout_marginLeft="15px"
-           style="@style/CustomButton"
-           android:layout_weight="1"/>
-      </TableRow>
-    </TableLayout>
+     android:layout_height="wrap_content">
 
     <LinearLayout
-       android:id="@+id/layoutHistory"
+       android:id="@+id/layoutTop"
        android:layout_width="match_parent"
-       android:layout_height="match_parent"
+       android:layout_height="wrap_content"
        android:orientation="vertical"
-       android:layout_marginTop="8px"
-       android:layout_marginBottom="8px"
-       android:padding="12px"
-       android:background="@drawable/layout_border"
-       android:layout_below="@id/layoutTypes"
-       android:layout_above="@+id/buStart">
-      <RelativeLayout
+       android:background="@color/color_primary">
+
+      <!-- nested toolbar -->
+      <android.support.v7.widget.Toolbar
+         android:id="@+id/toolbar"
          android:layout_width="match_parent"
-         android:layout_height="wrap_content">
-        <TextView
-           android:id="@+id/tvHistory"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:text="@string/history"
-           android:layout_marginBottom="3px"
-           android:layout_alignParentStart="true"
-           android:layout_alignParentLeft="true"
-           style="@style/SimpleTextField"/>
-        <TextView
-           android:id="@+id/tvSolvesCount"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_marginEnd="5px"
-           android:layout_marginRight="5px"
-           android:layout_alignParentRight="true"
-           android:layout_alignParentEnd="true"
-           android:layout_alignBottom="@+id/tvHistory"
-           style="@style/SmallTextField"/>
-      </RelativeLayout>
-      <ListView
-         android:id="@+id/lvHistory"
+         android:layout_height="wrap_content"
+         android:title="@string/app_name"
+         app:titleTextAppearance="@style/Toolbar.TitleText"/>
+
+      <TableLayout
          android:layout_width="match_parent"
-         android:layout_height="match_parent"
-         android:alwaysDrawnWithCache="false"/>
+         android:layout_height="wrap_content"
+         android:stretchColumns="*"
+         android:layout_alignParentTop="true"
+         android:paddingLeft="12px"
+         android:paddingRight="12px"
+         android:paddingBottom="5px">
+        <TableRow>
+          <TextView
+             android:layout_width="0px"
+             android:layout_height="wrap_content"
+             android:text="@string/cube_type"
+             android:textColor="@color/white"
+             android:gravity="start"
+             style="@style/SmallTextField"/>
+          <TextView
+             android:layout_width="0px"
+             android:layout_height="wrap_content"
+             android:text="@string/solve_type"
+             android:textColor="@color/white"
+             android:gravity="start"
+             style="@style/SmallTextField"/>
+        </TableRow>
+        <TableRow android:layout_marginTop="9px">
+          <Spinner
+             android:id="@+id/spCubeType"
+             android:layout_width="0px"
+             android:layout_marginRight="3px"
+             android:gravity="start"
+             style="@style/CustomSpinner"/>
+          <Spinner
+             android:id="@+id/spSolveType"
+             android:layout_width="0px"
+             android:layout_marginRight="3px"
+             android:gravity="start"
+             style="@style/CustomSpinner"/>
+        </TableRow>
+      </TableLayout>
+
     </LinearLayout>
 
-    <Button
+    <com.startapp.android.publish.banner.Banner
+       android:id="@+id/bannerAd"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:gravity="center"/>
+
+    <TextView
+       android:id="@+id/tvUpdateProApp"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:text="@string/upgrade_pro_app"
+       android:textSize="26px"
+       android:textColor="@color/warning"
+       android:visibility="gone"
+       android:gravity="center"/>
+
+    <android.support.v7.widget.CardView
+       android:id="@+id/cardHistory"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_below="@id/layoutTop"
+       android:layout_above="@+id/buStart"
+       android:layout_marginTop="10px"
+       android:layout_marginRight="8px"
+       android:layout_marginLeft="8px"
+       app:cardCornerRadius="5px"
+       app:cardElevation="6px">
+      <!--app:cardBackgroundColor="@color/color_accent"-->
+
+      <LinearLayout
+         android:id="@+id/layoutHistory"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:orientation="vertical">
+
+        <RelativeLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:padding="3px"
+           android:layout_marginLeft="5px"
+           android:layout_marginRight="5px"
+           android:layout_marginBottom="7px">
+          <TextView
+             android:id="@+id/tvHistory"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="@string/history"
+             android:layout_alignParentStart="true"
+             android:layout_alignParentLeft="true"
+             style="@style/SimpleTextField"/>
+          <TextView
+             android:id="@+id/tvSolvesCount"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:textColor="@color/secondary_text"
+             android:layout_alignParentRight="true"
+             android:layout_alignParentEnd="true"
+             android:layout_alignBottom="@+id/tvHistory"
+             style="@style/SmallTextField"/>
+        </RelativeLayout>
+
+        <View
+           android:id="@+id/cardDivider"
+           android:layout_width="match_parent"
+           android:layout_height="2px"
+           android:background="@color/card_divider"
+           android:visibility="visible"/>
+
+        <ListView
+           android:id="@+id/lvHistory"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:layout_marginLeft="8px"
+           android:layout_marginRight="8px"
+           android:layout_marginBottom="3px"
+           android:background="@color/color_accent"
+           android:divider="@color/listview_divider"
+           android:paddingRight="3px"
+           android:alwaysDrawnWithCache="false"/>
+
+      </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.AppCompatButton
        android:id="@+id/buStart"
        android:text="@string/start"
        android:layout_alignParentBottom="true"
        style="@style/CustomButton"/>
+    <!--android:layout_marginLeft="2px"-->
+    <!--android:layout_marginRight="2px"-->
 
   </RelativeLayout>
 

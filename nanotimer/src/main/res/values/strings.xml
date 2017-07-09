@@ -10,8 +10,8 @@
   <string name="about">About</string>
   <string name="backspace_exit">Press back again to exit</string>
 
-  <string name="cube_type">Cube type:</string>
-  <string name="solve_type">Solve type:</string>
+  <string name="cube_type">Cube type</string>
+  <string name="solve_type">Solve type</string>
   <string name="history">History</string>
   <string name="solves">solves</string>
   <string name="scramble">Scramble</string>

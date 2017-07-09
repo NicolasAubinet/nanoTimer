@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,9 +24,11 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.cube.nanotimer.App;
@@ -38,7 +41,6 @@ import com.cube.nanotimer.gui.widget.HistoryDetailDialog;
 import com.cube.nanotimer.gui.widget.ResultListener;
 import com.cube.nanotimer.gui.widget.SelectionHandler;
 import com.cube.nanotimer.gui.widget.SelectorFragmentDialog;
-import com.cube.nanotimer.gui.widget.SolveTypesFragmentDialog;
 import com.cube.nanotimer.gui.widget.TimeChangedHandler;
 import com.cube.nanotimer.gui.widget.ads.AdProvider;
 import com.cube.nanotimer.services.db.DataCallback;
@@ -49,6 +51,7 @@ import com.cube.nanotimer.util.exportimport.csvimport.CSVImporter;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.NameHolder;
 import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
@@ -58,15 +61,14 @@ import com.startapp.android.publish.banner.Banner;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
 public class MainScreenActivity extends AppCompatActivity implements TimeChangedHandler, SelectionHandler, ResultListener {
 
-  private Button buCubeType;
-  private Button buSolveType;
+  private Spinner spCubeType;
+  private Spinner spSolveType;
   private ListView lvHistory;
   private TextView tvSolvesCount;
   private TextView tvHistory;
@@ -74,14 +76,17 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
 
   private CubeType curCubeType;
   private SolveType curSolveType;
-  private List<CubeType> cubeTypes;
-  private List<SolveType> solveTypes;
+  private final List<CubeType> cubeTypes = new ArrayList<>();
+  private final List<SolveType> solveTypes = new ArrayList<>();
+  private NameHolderSpinnerAdapter cubeTypesSpinnerAdapter;
+  private NameHolderSpinnerAdapter solveTypesSpinnerAdapter;
+
   private int solvesCount;
   private TimesSort timesSort = TimesSort.TIMESTAMP;
   private boolean refreshingHistory;
 
-  private List<SolveTime> liHistory = new ArrayList<SolveTime>();
-  private HistoryListAdapter adapter;
+  private final List<SolveTime> liHistory = new ArrayList<>();
+  private HistoryListAdapter historyListAdapter;
 
   private int previousLastItem = 0;
 
@@ -114,38 +119,45 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
   }
 
   private void initViews() {
-    buCubeType = (Button) findViewById(R.id.buCubeType);
-    buCubeType.setOnClickListener(new OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        if (cubeTypes != null) {
-          ArrayList<String> types = new ArrayList<String>();
-          for (CubeType t : cubeTypes) {
-            types.add(t.getName());
-          }
-          DialogUtils.showFragment(MainScreenActivity.this,
-              SelectorFragmentDialog.newInstance(ID_CUBETYPE, types, true, MainScreenActivity.this));
-        }
-      }
-    });
-    buCubeType.setShadowLayer(1, 3f, 3f, getResources().getColor(R.color.black));
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+//    toolbar.setTitle(R.string.app_name);
+//    toolbar.setNavigationIcon(R.drawable.file);
+//    toolbar.setNavigationOnClickListener(new OnClickListener() {
+//      @Override
+//      public void onClick(View view) {
+//      }
+//    });
 
-    buSolveType = (Button) findViewById(R.id.buSolveType);
-    buSolveType.setOnClickListener(new OnClickListener() {
+    spCubeType = (Spinner) findViewById(R.id.spCubeType);
+    cubeTypesSpinnerAdapter = new NameHolderSpinnerAdapter(this, R.id.spCubeType, cubeTypes, false);
+    cubeTypesSpinnerAdapter.setDropDownViewResource(R.layout.spinner_item_scaling_layout);
+    spCubeType.setAdapter(cubeTypesSpinnerAdapter);
+    spCubeType.setOnItemSelectedListener(new OnItemSelectedListener() {
       @Override
-      public void onClick(View view) {
-        if (solveTypes != null) {
-          ArrayList<String> types = new ArrayList<String>();
-          for (SolveType t : solveTypes) {
-            types.add(t.getName());
-          }
-          DialogUtils.showFragment(MainScreenActivity.this,
-            SolveTypesFragmentDialog.newInstance(ID_SOLVETYPE, types, true, MainScreenActivity.this,
-              Options.INSTANCE.isSolveTypesShortcutEnabled()));
-        }
+      public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        itemSelected(ID_CUBETYPE, i);
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> adapterView) {
       }
     });
-    buSolveType.setShadowLayer(1, 3f, 3f, getResources().getColor(R.color.black));
+
+    spSolveType = (Spinner) findViewById(R.id.spSolveType);
+    solveTypesSpinnerAdapter = new NameHolderSpinnerAdapter(this, R.id.spSolveType, solveTypes, true);
+    solveTypesSpinnerAdapter.setDropDownViewResource(R.layout.spinner_item_scaling_layout);
+    spSolveType.setAdapter(solveTypesSpinnerAdapter);
+    spSolveType.setOnItemSelectedListener(new OnItemSelectedListener() {
+      @Override
+      public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        itemSelected(ID_SOLVETYPE, i);
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> adapterView) {
+      }
+    });
 
     tvSolvesCount = (TextView) findViewById(R.id.tvSolvesCount);
     tvHistory = (TextView) findViewById(R.id.tvHistory);
@@ -153,7 +165,7 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
     initHistoryList();
 
     Button buStart = (Button) findViewById(R.id.buStart);
-    buStart.setShadowLayer(1, 3f, 3f, getResources().getColor(R.color.black));
+//    buStart.setShadowLayer(1, 3f, 3f, getResources().getColor(R.color.black));
     buStart.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -167,9 +179,9 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
   }
 
   private void initHistoryList() {
-    adapter = new HistoryListAdapter(MainScreenActivity.this, R.id.lvHistory, liHistory);
+    historyListAdapter = new HistoryListAdapter(MainScreenActivity.this, R.id.lvHistory, liHistory);
     lvHistory = (ListView) findViewById(R.id.lvHistory);
-    lvHistory.setAdapter(adapter);
+    lvHistory.setAdapter(historyListAdapter);
     lvHistory.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -202,7 +214,7 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
                   public void run() {
                     setSolvesCount(data.getSolvesCount());
                     liHistory.addAll(data.getSolveTimes());
-                    adapter.notifyDataSetChanged();
+                    historyListAdapter.notifyDataSetChanged();
                   }
                 });
               }
@@ -328,16 +340,16 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
-    String cubeTypeText = buCubeType.getText().toString();
-    String solveTypeText = buSolveType.getText().toString();
+    int cubeTypeItemPosition = spCubeType.getSelectedItemPosition();
+    int solveTypeItemPosition = spSolveType.getSelectedItemPosition();
     String solvesCountText = tvSolvesCount.getText().toString();
     String historyText = tvHistory.getText().toString();
 
     setContentView(R.layout.mainscreen_screen);
     initViews();
 
-    buCubeType.setText(cubeTypeText);
-    buSolveType.setText(solveTypeText);
+    spCubeType.setSelection(cubeTypeItemPosition);
+    spSolveType.setSelection(solveTypeItemPosition);
     tvSolvesCount.setText(solvesCountText);
     tvHistory.setText(historyText);
     showHideBannerAd();
@@ -347,10 +359,13 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
     App.INSTANCE.getService().getCubeTypes(false, new DataCallback<List<CubeType>>() {
       @Override
       public void onData(List<CubeType> data) {
-        cubeTypes = data;
-        if (cubeTypes != null && !cubeTypes.isEmpty()) {
+        cubeTypes.clear();
+        cubeTypes.addAll(data);
+
+        if (!cubeTypes.isEmpty()) {
           CubeType defaultCubeType = null;
           CubeType newCubeType = null;
+
           for (CubeType ct : cubeTypes) {
             if (curCubeType != null && curCubeType.getId() == ct.getId()) {
               newCubeType = ct;
@@ -359,10 +374,21 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
               defaultCubeType = ct;
             }
           }
-          setCurCubeType(newCubeType != null ? newCubeType : defaultCubeType != null ? defaultCubeType : cubeTypes.get(0));
+
+          final CubeType newCurCubeType = newCubeType != null ? newCubeType : defaultCubeType != null ? defaultCubeType : cubeTypes.get(0);
+          setCurCubeType(newCurCubeType);
+
+          runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              cubeTypesSpinnerAdapter.notifyDataSetChanged();
+              spCubeType.setSelection(cubeTypes.indexOf(newCurCubeType));
+            }
+          });
         } else {
           setCurCubeType(null);
         }
+        cubeTypesSpinnerAdapter.notifyDataSetChanged();
         refreshSolveTypes();
       }
     });
@@ -373,31 +399,45 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
       App.INSTANCE.getService().getSolveTypes(curCubeType, new DataCallback<List<SolveType>>() {
         @Override
         public void onData(List<SolveType> data) {
-          solveTypes = data;
-          if (solveTypes != null && !solveTypes.isEmpty()) {
+          solveTypes.clear();
+          solveTypes.addAll(data);
+          SolveType newCurSolveType = null;
+
+          if (!solveTypes.isEmpty()) {
             boolean foundType = false;
             if (curSolveType != null) {
               for (SolveType st : solveTypes) {
                 if (curSolveType.getId() == st.getId()) {
-                  setCurSolveType(st);
+                  newCurSolveType = st;
                   foundType = true;
                 }
               }
             }
             if (!foundType) {
-              setCurSolveType(solveTypes.get(0));
+              newCurSolveType = solveTypes.get(0);
             }
+
+            setCurSolveType(newCurSolveType);
+            final SolveType finalCurSolveType = newCurSolveType;
+
+            runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                solveTypesSpinnerAdapter.notifyDataSetChanged();
+                spSolveType.setSelection(solveTypes.indexOf(finalCurSolveType));
+              }
+            });
           } else {
             setCurSolveType(null);
+            solveTypesSpinnerAdapter.notifyDataSetChanged();
           }
-          refreshButtonTexts();
           refreshHistory();
         }
       });
     } else {
       setCurSolveType(null);
-      solveTypes = Collections.EMPTY_LIST;
-      refreshButtonTexts();
+      solveTypes.clear();
+      solveTypesSpinnerAdapter.notifyDataSetChanged();
       refreshHistory();
     }
   }
@@ -415,7 +455,7 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
               setSolvesCount(data.getSolvesCount());
               liHistory.clear();
               liHistory.addAll(data.getSolveTimes());
-              adapter.notifyDataSetChanged();
+              historyListAdapter.notifyDataSetChanged();
               lvHistory.setSelection(0);
               refreshingHistory = false;
             }
@@ -427,7 +467,7 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
         @Override
         public void run() {
           liHistory.clear();
-          adapter.notifyDataSetChanged();
+          historyListAdapter.notifyDataSetChanged();
         }
       });
     }
@@ -437,24 +477,6 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
   public void onResult(Object... params) {
     refreshHistory();
     refreshSolveTypes();
-  }
-
-  private void refreshButtonTexts() {
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        if (curCubeType != null) {
-          buCubeType.setText(curCubeType.getName());
-        } else {
-          buCubeType.setText("");
-        }
-        if (curSolveType != null) {
-          buSolveType.setText(curSolveType.getName());
-        } else {
-          buSolveType.setText("");
-        }
-      }
-    });
   }
 
   private void setSortMode(TimesSort timesSort) {
@@ -497,7 +519,7 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
           public void run() {
             solveTime.setTime(data.getTime());
             solveTime.setPb(data.isPb());
-            adapter.notifyDataSetChanged();
+            historyListAdapter.notifyDataSetChanged();
           }
         });
       }
@@ -510,7 +532,7 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
       SolveTime st = it.next();
       if (st.getId() == solveTime.getId()) {
         it.remove();
-        adapter.notifyDataSetChanged();
+        historyListAdapter.notifyDataSetChanged();
         setSolvesCount(solvesCount - 1);
         break;
       }
@@ -522,12 +544,10 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
     if (position >= 0) {
       if (id == ID_CUBETYPE) {
         setCurCubeType(cubeTypes.get(position));
-        buCubeType.setText(curCubeType.getName());
         refreshSolveTypes();
       } else if (id == ID_SOLVETYPE) {
         if (position >= 0 && position < solveTypes.size()) {
           setCurSolveType(solveTypes.get(position));
-          buSolveType.setText(curSolveType.getName());
           refreshHistory();
         } else {
           // solve types shortcut
@@ -662,6 +682,66 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
         }
       }
       return view;
+    }
+  }
+
+  private class NameHolderSpinnerAdapter<T extends NameHolder> extends ArrayAdapter<T> {
+    private LayoutInflater inflater;
+    private List<T> nameHolders;
+    private boolean isSolveTypes;
+    private View previousView;
+
+    public NameHolderSpinnerAdapter(Context context, int resource, List<T> objects, boolean isSolveTypes) {
+      super(context, resource, objects);
+      this.inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+      this.nameHolders = objects;
+      this.isSolveTypes = isSolveTypes;
+    }
+
+    @Override
+    public int getCount() {
+      int count = super.getCount();
+      if (isShowingEditSolveTypesShortcut()) {
+        count += 1;
+      }
+      return count;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+      View view;
+      if (position >= 0 && position < nameHolders.size()) {
+        view = getView(R.layout.spinner_item, position, convertView);
+      } else {
+        view = previousView;
+      }
+      previousView = view;
+      return view;
+    }
+
+    @Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+      return getView(R.layout.spinner_dropdown_item, position, convertView);
+    }
+
+    private View getView(int itemResourceId, int position, View convertView) {
+      TextView view = (TextView) convertView;
+      if (view == null) {
+        view = (TextView) inflater.inflate(itemResourceId, null);
+      }
+
+      if (position >= 0 && position < nameHolders.size()) {
+        T nameHolder = nameHolders.get(position);
+        view.setText(nameHolder.getName());
+      } else if (position >= nameHolders.size() && isShowingEditSolveTypesShortcut()) {
+        view.setText(R.string.edit_solve_types_dots);
+      }
+
+      return view;
+    }
+
+    private boolean isShowingEditSolveTypesShortcut() {
+      return isSolveTypes && Options.INSTANCE.isSolveTypesShortcutEnabled();
     }
   }
 

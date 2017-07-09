@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public abstract class ScrambleType implements Serializable {
+public abstract class ScrambleType implements Serializable, NameHolder {
 
   public static final String DEFAULT_NAME = "default";
 
@@ -47,6 +47,7 @@ public abstract class ScrambleType implements Serializable {
     return (inversion % 2 != 0);
   }
 
+  @Override
   public String getName() {
     return name;
   }

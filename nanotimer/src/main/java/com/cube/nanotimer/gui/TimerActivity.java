@@ -113,7 +113,7 @@ public class TimerActivity extends AppCompatActivity implements ResultListener {
   private boolean keepScreenOnWhenTimerOff;
 
   private int defaultBackgroundColor = R.color.graybg;
-  private int pushedBackgroundColor = R.color.gray850;
+  private int pushedBackgroundColor = R.color.pushedbg;
 
   private RandomStateGenListener randomStateGenListener = new RandomStateGenListener() {
     @Override

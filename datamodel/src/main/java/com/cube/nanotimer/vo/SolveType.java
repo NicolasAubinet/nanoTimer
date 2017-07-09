@@ -3,7 +3,7 @@ package com.cube.nanotimer.vo;
 import java.io.Serializable;
 import java.util.Arrays;
 
-public class SolveType implements Serializable {
+public class SolveType implements Serializable, NameHolder {
 
   private int id;
   private String name;
@@ -32,6 +32,7 @@ public class SolveType implements Serializable {
     this.id = id;
   }
 
+  @Override
   public String getName() {
     return name;
   }

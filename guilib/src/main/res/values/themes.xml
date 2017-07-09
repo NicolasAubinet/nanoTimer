@@ -1,35 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-  <style name="NanoTimerTheme" parent="@style/Theme.AppCompat">
-    <item name="android:actionBarStyle">@style/NanoTimerActionBar</item>
-    <item name="actionBarStyle">@style/NanoTimerActionBar</item>
-    <item name="android:actionOverflowButtonStyle">@style/NanoTimerActionButtonOverflow</item>
-    <item name="actionOverflowButtonStyle">@style/NanoTimerActionButtonOverflow</item>
-    <item name="android:listViewStyle">@style/NanoTimerListView</item>
-    <item name="android:windowBackground">@color/graybg</item>
+  <!--<style name="NanoTimerTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->
+  <style name="NanoTimerTheme" parent="Theme.AppCompat">
+    <item name="colorPrimary">@color/color_primary</item>
+    <item name="colorPrimaryDark">@color/color_primary_dark</item>
+    <item name="colorAccent">@color/color_accent</item>
+
+    <!--<item name="android:actionBarStyle">@style/NanoTimerActionBar</item>-->
+    <!--<item name="actionBarStyle">@style/NanoTimerActionBar</item>-->
+    <!--<item name="android:actionOverflowButtonStyle">@style/NanoTimerActionButtonOverflow</item>-->
+    <!--<item name="actionOverflowButtonStyle">@style/NanoTimerActionButtonOverflow</item>-->
+    <!--<item name="android:listViewStyle">@style/NanoTimerListView</item>-->
+    <!--<item name="android:windowBackground">@color/graybg</item>-->
   </style>
 
-  <style name="NanoTimerThemeNoActionBar" parent="@style/Theme.AppCompat.NoActionBar">
+  <style name="NanoTimerThemeNoActionBar" parent="Theme.AppCompat.NoActionBar">
+    <item name="colorPrimary">@color/color_primary</item>
+    <item name="colorPrimaryDark">@color/color_primary_dark</item>
+    <item name="colorAccent">@color/color_accent</item>
+
     <item name="android:listViewStyle">@style/NanoTimerListView</item>
-    <item name="android:windowBackground">@color/graybg</item>
+    <!--<item name="android:windowBackground">@color/graybg</item>-->
   </style>
 
-  <style name="NanoTimerActionBar" parent="@style/Widget.AppCompat.ActionBar">
+  <!--<style name="NanoTimerActionBar" parent="Widget.AppCompat.ActionBar">
     <item name="android:background">@drawable/actionbar_bg</item>
     <item name="background">@drawable/actionbar_bg</item>
-    <!--<item name="icon">@drawable/actionbar_icon</item>-->
-    <!--<item name="android:icon">@drawable/actionbar_icon</item>-->
-    <!--<item name="android:displayOptions">showHome|showTitle</item>-->
-    <!--<item name="displayOptions">showHome|showTitle</item>-->
-  </style>
+  </style>-->
 
-  <style name="NanoTimerActionButtonOverflow" parent="@style/Widget.AppCompat.ActionButton.Overflow">
+  <style name="NanoTimerActionButtonOverflow" parent="Widget.AppCompat.ActionButton.Overflow">
     <item name="android:minWidth">48dp</item>
     <item name="android:padding">0dp</item>
   </style>
 
-  <style name="NanoTimerListView" parent="@style/Widget.AppCompat.ListView.Menu">
+  <style name="NanoTimerListView" parent="Widget.AppCompat.ListView.Menu">
     <item name="android:cacheColorHint">@color/transparent</item>
     <item name="android:divider">@color/gray800</item>
     <item name="android:dividerHeight">1dp</item>

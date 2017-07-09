@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public enum CubeType implements Serializable {
+public enum CubeType implements Serializable, NameHolder {
 
   TWO_BY_TWO(1, "2x2x2"),
   THREE_BY_THREE(2, "3x3x3", ScrambleTypes.THREE_BY_THREE),
@@ -37,6 +37,7 @@ public enum CubeType implements Serializable {
     return id;
   }
 
+  @Override
   public String getName() {
     return name;
   }
