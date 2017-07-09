@@ -355,6 +355,15 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
     showHideBannerAd();
   }
 
+  private void refreshDataSet(final ArrayAdapter arrayAdapter) {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        arrayAdapter.notifyDataSetChanged();
+      }
+    });
+  }
+
   private void refreshCubeTypes() {
     App.INSTANCE.getService().getCubeTypes(false, new DataCallback<List<CubeType>>() {
       @Override
@@ -381,14 +390,14 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
           runOnUiThread(new Runnable() {
             @Override
             public void run() {
-              cubeTypesSpinnerAdapter.notifyDataSetChanged();
+              refreshDataSet(cubeTypesSpinnerAdapter);
               spCubeType.setSelection(cubeTypes.indexOf(newCurCubeType));
             }
           });
         } else {
           setCurCubeType(null);
         }
-        cubeTypesSpinnerAdapter.notifyDataSetChanged();
+        refreshDataSet(cubeTypesSpinnerAdapter);
         refreshSolveTypes();
       }
     });
@@ -423,13 +432,13 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
             runOnUiThread(new Runnable() {
               @Override
               public void run() {
-                solveTypesSpinnerAdapter.notifyDataSetChanged();
+                refreshDataSet(solveTypesSpinnerAdapter);
                 spSolveType.setSelection(solveTypes.indexOf(finalCurSolveType));
               }
             });
           } else {
             setCurSolveType(null);
-            solveTypesSpinnerAdapter.notifyDataSetChanged();
+            refreshDataSet(solveTypesSpinnerAdapter);
           }
           refreshHistory();
         }
@@ -437,7 +446,7 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
     } else {
       setCurSolveType(null);
       solveTypes.clear();
-      solveTypesSpinnerAdapter.notifyDataSetChanged();
+      refreshDataSet(solveTypesSpinnerAdapter);
       refreshHistory();
     }
   }
