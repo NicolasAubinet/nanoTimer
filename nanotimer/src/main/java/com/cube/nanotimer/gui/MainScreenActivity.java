@@ -12,8 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -120,18 +118,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
 
   @Override
   protected void initViews() {
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
     super.initViews();
-
-    toolbar.setNavigationOnClickListener(new OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        drawerLayout.openDrawer(GravityCompat.START);
-      }
-    });
-
     spCubeType = (Spinner) findViewById(R.id.spCubeType);
     cubeTypesSpinnerAdapter = new NameHolderSpinnerAdapter(this, R.id.spCubeType, cubeTypes, false);
     cubeTypesSpinnerAdapter.setDropDownViewResource(R.layout.spinner_item_scaling_layout);
@@ -167,7 +154,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
 
     initHistoryList();
 
-    miSortMode = navigationView.getMenu().findItem(R.id.itSortMode);
+    miSortMode = findMenuItem(R.id.itSortMode);
     setSortMode(TimesSort.TIMESTAMP);
 
     Button buStart = (Button) findViewById(R.id.buStart);

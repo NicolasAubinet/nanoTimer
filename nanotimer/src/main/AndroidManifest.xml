@@ -22,7 +22,6 @@
 
     <activity
        android:name=".gui.MainScreenActivity"
-       android:theme="@style/NanoTimerThemeNoActionBar"
        android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
        android:launchMode="singleTask">
       <intent-filter>
@@ -35,7 +34,6 @@
        android:configChanges="orientation|screenSize|keyboard|keyboardHidden"/>
     <activity android:name=".gui.OptionsActivity"/>
     <activity android:name=".gui.GraphActivity"
-       android:theme="@style/NanoTimerThemeNoActionBar"
        android:screenOrientation="landscape"/>
     <activity
        android:name=".gui.SolveTypesActivity"

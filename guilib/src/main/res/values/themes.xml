@@ -2,7 +2,8 @@
 <resources>
 
   <!--<style name="NanoTimerTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->
-  <style name="NanoTimerTheme" parent="Theme.AppCompat">
+  <!--<style name="NanoTimerTheme" parent="Theme.AppCompat">-->
+  <style name="NanoTimerTheme" parent="Theme.AppCompat.NoActionBar">
     <item name="colorPrimary">@color/color_primary</item>
     <item name="colorPrimaryDark">@color/color_primary_dark</item>
     <item name="colorAccent">@color/color_accent</item>
@@ -18,14 +19,13 @@
     <!--<item name="android:windowBackground">@color/graybg</item>-->
   </style>
 
-  <style name="NanoTimerThemeNoActionBar" parent="Theme.AppCompat.NoActionBar">
+  <!--<style name="NanoTimerThemeNoActionBar" parent="Theme.AppCompat.NoActionBar">
     <item name="colorPrimary">@color/color_primary</item>
     <item name="colorPrimaryDark">@color/color_primary_dark</item>
     <item name="colorAccent">@color/color_accent</item>
 
     <item name="android:listViewStyle">@style/NanoTimerListView</item>
-    <!--<item name="android:windowBackground">@color/graybg</item>-->
-  </style>
+  </style>-->
 
   <!--<style name="NanoTimerActionBar" parent="Widget.AppCompat.ActionBar">
     <item name="android:background">@drawable/actionbar_bg</item>
