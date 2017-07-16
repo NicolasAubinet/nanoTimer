@@ -12,10 +12,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -65,13 +64,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-public class MainScreenActivity extends AppCompatActivity implements TimeChangedHandler, SelectionHandler, ResultListener {
+public class MainScreenActivity extends DrawerLayoutActivity implements TimeChangedHandler, SelectionHandler, ResultListener {
 
   private Spinner spCubeType;
   private Spinner spSolveType;
   private ListView lvHistory;
   private TextView tvSolvesCount;
   private TextView tvHistory;
+
   private MenuItem miSortMode;
 
   private CubeType curCubeType;
@@ -118,16 +118,19 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
     initViews();
   }
 
-  private void initViews() {
+  @Override
+  protected void initViews() {
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
-//    toolbar.setTitle(R.string.app_name);
-//    toolbar.setNavigationIcon(R.drawable.file);
-//    toolbar.setNavigationOnClickListener(new OnClickListener() {
-//      @Override
-//      public void onClick(View view) {
-//      }
-//    });
+
+    super.initViews();
+
+    toolbar.setNavigationOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        drawerLayout.openDrawer(GravityCompat.START);
+      }
+    });
 
     spCubeType = (Spinner) findViewById(R.id.spCubeType);
     cubeTypesSpinnerAdapter = new NameHolderSpinnerAdapter(this, R.id.spCubeType, cubeTypes, false);
@@ -163,6 +166,9 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
     tvHistory = (TextView) findViewById(R.id.tvHistory);
 
     initHistoryList();
+
+    miSortMode = navigationView.getMenu().findItem(R.id.itSortMode);
+    setSortMode(TimesSort.TIMESTAMP);
 
     Button buStart = (Button) findViewById(R.id.buStart);
 //    buStart.setShadowLayer(1, 3f, 3f, getResources().getColor(R.color.black));
@@ -281,14 +287,6 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
   }
 
   @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    getMenuInflater().inflate(R.menu.mainscreen_menu, menu);
-    miSortMode = menu.findItem(R.id.itSortMode);
-    setSortMode(TimesSort.TIMESTAMP);
-    return true;
-  }
-
-  @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
       case R.id.itClearHistory:
@@ -340,6 +338,7 @@ public class MainScreenActivity extends AppCompatActivity implements TimeChanged
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
+
     int cubeTypeItemPosition = spCubeType.getSelectedItemPosition();
     int solveTypeItemPosition = spSolveType.getSelectedItemPosition();
     String solvesCountText = tvSolvesCount.getText().toString();

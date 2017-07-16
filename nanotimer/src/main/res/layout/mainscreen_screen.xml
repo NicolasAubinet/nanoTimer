@@ -7,159 +7,192 @@
    android:layout_width="match_parent"
    android:orientation="vertical">
 
-  <RelativeLayout
+  <android.support.v4.widget.DrawerLayout
+     android:id="@+id/drawerLayout"
      android:layout_width="match_parent"
-     android:layout_height="wrap_content">
+     android:layout_height="match_parent">
 
-    <LinearLayout
-       android:id="@+id/layoutTop"
+    <RelativeLayout
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:orientation="vertical"
-       android:background="@color/color_primary">
-
-      <!-- nested toolbar -->
-      <android.support.v7.widget.Toolbar
-         android:id="@+id/toolbar"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:title="@string/app_name"
-         app:titleTextAppearance="@style/Toolbar.TitleText"/>
-
-      <TableLayout
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:stretchColumns="*"
-         android:layout_alignParentTop="true"
-         android:paddingLeft="12px"
-         android:paddingRight="12px"
-         android:paddingBottom="5px">
-        <TableRow>
-          <TextView
-             android:layout_width="0px"
-             android:layout_height="wrap_content"
-             android:text="@string/cube_type"
-             android:textColor="@color/white"
-             android:gravity="start"
-             style="@style/SmallTextField"/>
-          <TextView
-             android:layout_width="0px"
-             android:layout_height="wrap_content"
-             android:text="@string/solve_type"
-             android:textColor="@color/white"
-             android:gravity="start"
-             style="@style/SmallTextField"/>
-        </TableRow>
-        <TableRow android:layout_marginTop="9px">
-          <Spinner
-             android:id="@+id/spCubeType"
-             android:layout_width="0px"
-             android:layout_marginRight="3px"
-             android:gravity="start"
-             style="@style/CustomSpinner"/>
-          <Spinner
-             android:id="@+id/spSolveType"
-             android:layout_width="0px"
-             android:layout_marginRight="3px"
-             android:gravity="start"
-             style="@style/CustomSpinner"/>
-        </TableRow>
-      </TableLayout>
-
-    </LinearLayout>
-
-    <com.startapp.android.publish.banner.Banner
-       android:id="@+id/bannerAd"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:gravity="center"/>
-
-    <TextView
-       android:id="@+id/tvUpdateProApp"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:text="@string/upgrade_pro_app"
-       android:textSize="26px"
-       android:textColor="@color/warning"
-       android:visibility="gone"
-       android:gravity="center"/>
-
-    <android.support.v7.widget.CardView
-       android:id="@+id/cardHistory"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:layout_below="@id/layoutTop"
-       android:layout_above="@+id/buStart"
-       android:layout_marginTop="10px"
-       android:layout_marginRight="8px"
-       android:layout_marginLeft="8px"
-       app:cardCornerRadius="5px"
-       app:cardElevation="6px">
-      <!--app:cardBackgroundColor="@color/color_accent"-->
+       android:layout_marginBottom="@dimen/mainscreen_margin">
 
       <LinearLayout
-         android:id="@+id/layoutHistory"
+         android:id="@+id/layoutTop"
          android:layout_width="match_parent"
-         android:layout_height="match_parent"
-         android:orientation="vertical">
+         android:layout_height="wrap_content"
+         android:orientation="vertical"
+         android:background="@color/color_primary">
 
-        <RelativeLayout
+        <!-- nested toolbar -->
+        <android.support.v7.widget.Toolbar
+           android:id="@+id/toolbar"
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
-           android:padding="3px"
-           android:layout_marginLeft="5px"
-           android:layout_marginRight="5px"
-           android:layout_marginBottom="7px">
-          <TextView
-             android:id="@+id/tvHistory"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:text="@string/history"
-             android:layout_alignParentStart="true"
-             android:layout_alignParentLeft="true"
-             style="@style/SimpleTextField"/>
-          <TextView
-             android:id="@+id/tvSolvesCount"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:textColor="@color/secondary_text"
-             android:layout_alignParentRight="true"
-             android:layout_alignParentEnd="true"
-             android:layout_alignBottom="@+id/tvHistory"
-             style="@style/SmallTextField"/>
-        </RelativeLayout>
+           android:title="@string/app_name"
+           app:titleTextAppearance="@style/Toolbar.TitleText"/>
 
-        <View
-           android:id="@+id/cardDivider"
+        <TableLayout
            android:layout_width="match_parent"
-           android:layout_height="2px"
-           android:background="@color/card_divider"
-           android:visibility="visible"/>
+           android:layout_height="wrap_content"
+           android:stretchColumns="*"
+           android:layout_alignParentTop="true"
+           android:paddingLeft="12px"
+           android:paddingRight="12px"
+           android:paddingBottom="5px">
 
-        <ListView
-           android:id="@+id/lvHistory"
-           android:layout_width="match_parent"
-           android:layout_height="match_parent"
-           android:layout_marginLeft="8px"
-           android:layout_marginRight="8px"
-           android:layout_marginBottom="3px"
-           android:background="@color/color_accent"
-           android:divider="@color/listview_divider"
-           android:paddingRight="3px"
-           android:alwaysDrawnWithCache="false"/>
+          <TableRow>
+
+            <TextView
+               android:layout_width="0px"
+               android:layout_height="wrap_content"
+               android:text="@string/cube_type"
+               android:textColor="@color/white"
+               android:gravity="start"
+               style="@style/SmallTextField"/>
+
+            <TextView
+               android:layout_width="0px"
+               android:layout_height="wrap_content"
+               android:text="@string/solve_type"
+               android:textColor="@color/white"
+               android:gravity="start"
+               style="@style/SmallTextField"/>
+          </TableRow>
+
+          <TableRow android:layout_marginTop="9px">
+
+            <Spinner
+               android:id="@+id/spCubeType"
+               android:layout_width="0px"
+               android:layout_marginRight="3px"
+               android:gravity="start"
+               style="@style/CustomSpinner"/>
+
+            <Spinner
+               android:id="@+id/spSolveType"
+               android:layout_width="0px"
+               android:layout_marginRight="3px"
+               android:gravity="start"
+               style="@style/CustomSpinner"/>
+          </TableRow>
+        </TableLayout>
 
       </LinearLayout>
 
-    </android.support.v7.widget.CardView>
+      <com.startapp.android.publish.banner.Banner
+         android:id="@+id/bannerAd"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:gravity="center"/>
 
-    <android.support.v7.widget.AppCompatButton
-       android:id="@+id/buStart"
-       android:text="@string/start"
-       android:layout_alignParentBottom="true"
-       style="@style/CustomButton"/>
-    <!--android:layout_marginLeft="2px"-->
-    <!--android:layout_marginRight="2px"-->
+      <TextView
+         android:id="@+id/tvUpdateProApp"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:text="@string/upgrade_pro_app"
+         android:textSize="26px"
+         android:textColor="@color/warning"
+         android:visibility="gone"
+         android:gravity="center"/>
 
-  </RelativeLayout>
+      <android.support.v7.widget.CardView
+         android:id="@+id/cardHistory"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_below="@id/layoutTop"
+         android:layout_above="@+id/buStart"
+         android:layout_margin="@dimen/mainscreen_margin"
+         app:cardCornerRadius="@dimen/mainscreen_radius"
+         app:cardElevation="@dimen/mainscreen_card_elevation">
+        <!--app:cardBackgroundColor="@color/color_accent"-->
+
+        <LinearLayout
+           android:id="@+id/layoutHistory"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:orientation="vertical">
+
+          <RelativeLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:padding="3px"
+             android:layout_marginLeft="7px"
+             android:layout_marginRight="7px"
+             android:layout_marginBottom="7px">
+
+            <TextView
+               android:id="@+id/tvHistory"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:text="@string/history"
+               android:layout_alignParentStart="true"
+               android:layout_alignParentLeft="true"
+               style="@style/SimpleTextField"/>
+
+            <TextView
+               android:id="@+id/tvSolvesCount"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:textColor="@color/secondary_text"
+               android:layout_alignParentRight="true"
+               android:layout_alignParentEnd="true"
+               android:layout_alignBottom="@+id/tvHistory"
+               style="@style/SmallTextField"/>
+          </RelativeLayout>
+
+          <View
+             android:id="@+id/cardDivider"
+             android:layout_width="match_parent"
+             android:layout_height="2px"
+             android:background="@color/card_divider"
+             android:visibility="visible"/>
+
+          <ListView
+             android:id="@+id/lvHistory"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:layout_marginLeft="@dimen/mainscreen_margin"
+             android:layout_marginRight="@dimen/mainscreen_margin"
+             android:layout_marginBottom="3px"
+             android:background="@color/listview_background"
+             android:divider="@color/listview_divider"
+             android:paddingRight="3px"
+             android:alwaysDrawnWithCache="false"/>
+
+        </LinearLayout>
+
+      </android.support.v7.widget.CardView>
+
+      <!--<FrameLayout
+         android:id="@+id/startButtonLayout"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:background="@color/color_primary"
+         android:layout_alignParentBottom="true">-->
+      <android.support.v7.widget.AppCompatButton
+         android:id="@+id/buStart"
+         android:text="@string/start"
+         android:layout_marginLeft="@dimen/mainscreen_margin"
+         android:layout_marginRight="@dimen/mainscreen_margin"
+         android:layout_alignParentBottom="true"
+         android:background="@drawable/button_selector"
+         style="@style/CustomButton"/>
+      <!--android:background="?android:attr/selectableItemBackground"-->
+      <!--android:layout_marginLeft="2px"-->
+      <!--android:layout_marginRight="2px"-->
+      <!--</FrameLayout>-->
+
+    </RelativeLayout>
+
+    <android.support.design.widget.NavigationView
+       android:id="@+id/navigationView"
+       android:layout_width="wrap_content"
+       android:layout_height="match_parent"
+       android:layout_gravity="start"
+       app:menu="@menu/mainscreen_menu"/>
+    <!--app:headerLayout="@layout/drawer_header"-->
+
+  </android.support.v4.widget.DrawerLayout>
 
 </com.cube.nanotimer.util.view.ScalingLinearLayout>

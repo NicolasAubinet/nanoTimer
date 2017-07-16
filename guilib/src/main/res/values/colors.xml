@@ -19,15 +19,16 @@
   <!--<color name="main">#285393</color>-->
 
   <!-- Indigo dark theme -->
-  <color name="color_primary">@color/color_accent</color>
+  <color name="color_primary">#424242</color>
   <color name="color_primary_dark">#333333</color>
-  <color name="color_accent">#424242</color>
+  <color name="color_accent">#9e9e9e</color>
 
   <!--<color name="secondary_text">#c5cae9</color>-->
   <color name="secondary_text">#AAAAAA</color>
 
   <!--<color name="card_divider">#DDDDDD</color>-->
   <color name="card_divider">@color/iceblue</color>
+  <color name="listview_background">#424242</color>
   <color name="listview_divider">#FF565656</color>
 
   <color name="scramblealternate">#FFC0B9F9</color>
@@ -42,6 +43,7 @@
   <color name="gray200">#FFEEEEEE</color>
   <color name="gray400">#FFBDBDBD</color>
   <color name="gray600">#FF757575</color>
+  <color name="gray700">#FF606060</color>
   <color name="gray800">#FF424242</color>
   <color name="gray850">#FF323232</color>
   <color name="gray900">#FF212121</color>
