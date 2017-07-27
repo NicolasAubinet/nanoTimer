@@ -19,17 +19,21 @@
   <!--<color name="main">#285393</color>-->
 
   <!-- Indigo dark theme -->
-  <color name="color_primary">#424242</color>
-  <color name="color_primary_dark">#333333</color>
+  <!--<color name="color_primary">#424242</color>-->
+  <!--<color name="color_primary_dark">#222222</color>-->
   <color name="color_accent">#9e9e9e</color>
+  <color name="color_primary">#282828</color>
+  <color name="color_primary_dark">#2F2F2F</color>
 
+  <color name="toolbar_background_color">@color/color_primary_dark</color>
   <!--<color name="secondary_text">#c5cae9</color>-->
   <color name="secondary_text">#AAAAAA</color>
+  <color name="main_element">#424242</color>
 
   <!--<color name="card_divider">#DDDDDD</color>-->
   <color name="card_divider">@color/iceblue</color>
-  <color name="listview_background">#424242</color>
-  <color name="listview_divider">#FF565656</color>
+  <!--<color name="listview_background">@color/main_element</color>-->
+  <color name="listview_divider">#424242</color>
 
   <color name="scramblealternate">#FFC0B9F9</color>
   <color name="white">#FFFFFFFF</color>
@@ -52,7 +56,7 @@
   <color name="lightblue">#FF6CCCEC</color>
   <color name="iceblue">#FF0883AC</color>
   <!--<color name="graybg">#FF1C1E20</color>-->
-  <color name="graybg">@color/color_primary_dark</color>
+  <color name="graybg">#333333</color>
   <color name="pushedbg">#454545</color>
   <color name="transparent">#00000000</color>
 

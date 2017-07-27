@@ -244,12 +244,14 @@ public class TimerActivity extends DrawerLayoutActivity implements ResultListene
     } else {
       setKeepScreenOn(true);
     }
+
+    setBackgroundColor(defaultBackgroundColor);
   }
 
   @Override
   public void onDrawerStateChangedCustom(int newState) {
     super.onDrawerStateChangedCustom(newState);
-    layout.setBackgroundResource(defaultBackgroundColor);
+    setBackgroundColor(defaultBackgroundColor);
 
     findMenuItem(R.id.itShareTime).setVisible(lastSolveTime != null);
     findMenuItem(R.id.itSessionDetails).setVisible(hasNewSession);
@@ -259,6 +261,10 @@ public class TimerActivity extends DrawerLayoutActivity implements ResultListene
       findMenuItem(R.id.itNewSession).setVisible(false);
       findMenuItem(R.id.itAddTime).setVisible(false);
     }
+  }
+
+  private void setBackgroundColor(int colorResId) {
+    layout.setBackgroundResource(colorResId);
   }
 
   private Float getCubeTypeScrambleTextSize() {
@@ -785,7 +791,7 @@ public class TimerActivity extends DrawerLayoutActivity implements ResultListene
 
     if (mustDnfTime) {
       stopInspectionTimer();
-      layout.setBackgroundResource(defaultBackgroundColor);
+      setBackgroundColor(defaultBackgroundColor);
       if (inspectionMode == InspectionMode.OFFICIAL) {
         synchronized (holdToStartTimerSync) {
           stopHoldToStartTimer();
@@ -1029,12 +1035,12 @@ public class TimerActivity extends DrawerLayoutActivity implements ResultListene
     // change bg color
     if (parMotionEventAction == MotionEvent.ACTION_DOWN) {
       if (System.currentTimeMillis() - lastTimerStopTs >= STOP_START_DELAY) {
-        layout.setBackgroundResource(pushedBackgroundColor);
+        setBackgroundColor(pushedBackgroundColor);
       } else {
         return false; // to avoid receiving the ACTION_UP
       }
     } else if (parMotionEventAction == MotionEvent.ACTION_UP) {
-      layout.setBackgroundResource(defaultBackgroundColor);
+      setBackgroundColor(defaultBackgroundColor);
       if (ignoreActionUp) {
         ignoreActionUp = false;
         return true;

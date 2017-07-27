@@ -18,7 +18,7 @@
   <item>
     <shape android:shape="rectangle">
       <solid android:color="@color/gray700"/>
-      <corners android:radius="@dimen/mainscreen_radius" />
+      <!--<corners android:radius="@dimen/mainscreen_radius" />-->
     </shape>
   </item>
 </layer-list>

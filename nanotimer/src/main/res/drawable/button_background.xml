@@ -17,8 +17,8 @@
      android:bottom="1.5dp">-->
   <item>
     <shape android:shape="rectangle">
-      <solid android:color="@color/color_primary"/>
-      <corners android:radius="@dimen/mainscreen_radius" />
+      <solid android:color="@color/main_element"/>
+      <!--<corners android:radius="@dimen/mainscreen_radius" />-->
     </shape>
   </item>
 </layer-list>

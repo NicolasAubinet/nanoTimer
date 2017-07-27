@@ -15,14 +15,14 @@
     <RelativeLayout
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_marginBottom="@dimen/mainscreen_margin">
+       android:background="@color/color_primary">
 
       <LinearLayout
          android:id="@+id/layoutTop"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
          android:orientation="vertical"
-         android:background="@color/color_primary">
+         android:background="@color/toolbar_background_color">
 
         <!-- nested toolbar -->
         <android.support.v7.widget.Toolbar
@@ -37,8 +37,8 @@
            android:layout_height="wrap_content"
            android:stretchColumns="*"
            android:layout_alignParentTop="true"
-           android:paddingLeft="12px"
-           android:paddingRight="12px"
+           android:paddingLeft="6px"
+           android:paddingRight="6px"
            android:paddingBottom="5px">
 
           <TableRow>
@@ -46,6 +46,7 @@
             <TextView
                android:layout_width="0px"
                android:layout_height="wrap_content"
+               android:layout_marginLeft="6px"
                android:text="@string/cube_type"
                android:textColor="@color/white"
                android:gravity="start"
@@ -65,17 +66,17 @@
             <Spinner
                android:id="@+id/spCubeType"
                android:layout_width="0px"
-               android:layout_marginRight="3px"
                android:gravity="start"
                style="@style/CustomSpinner"/>
 
             <Spinner
                android:id="@+id/spSolveType"
                android:layout_width="0px"
-               android:layout_marginRight="3px"
                android:gravity="start"
                style="@style/CustomSpinner"/>
+
           </TableRow>
+
         </TableLayout>
 
       </LinearLayout>
@@ -96,29 +97,32 @@
          android:visibility="gone"
          android:gravity="center"/>
 
-      <android.support.v7.widget.CardView
+      <!--<android.support.v7.widget.CardView
          android:id="@+id/cardHistory"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
          android:layout_below="@id/layoutTop"
          android:layout_above="@+id/buStart"
          android:layout_margin="@dimen/mainscreen_margin"
+         app:cardBackgroundColor="@color/main_element"
          app:cardCornerRadius="@dimen/mainscreen_radius"
-         app:cardElevation="@dimen/mainscreen_card_elevation">
-        <!--app:cardBackgroundColor="@color/color_accent"-->
+         app:cardElevation="@dimen/mainscreen_card_elevation">-->
 
         <LinearLayout
            android:id="@+id/layoutHistory"
            android:layout_width="match_parent"
            android:layout_height="match_parent"
-           android:orientation="vertical">
+           android:layout_marginLeft="@dimen/mainscreen_margin"
+           android:layout_marginRight="@dimen/mainscreen_margin"
+           android:orientation="vertical"
+           android:layout_below="@id/layoutTop"
+           android:layout_above="@+id/buStart"
+           android:layout_margin="5px">
 
           <RelativeLayout
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:padding="3px"
-             android:layout_marginLeft="7px"
-             android:layout_marginRight="7px"
              android:layout_marginBottom="7px">
 
             <TextView
@@ -144,7 +148,7 @@
           <View
              android:id="@+id/cardDivider"
              android:layout_width="match_parent"
-             android:layout_height="2px"
+             android:layout_height="@dimen/divider_height"
              android:background="@color/card_divider"
              android:visibility="visible"/>
 
@@ -152,17 +156,15 @@
              android:id="@+id/lvHistory"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             android:layout_marginLeft="@dimen/mainscreen_margin"
-             android:layout_marginRight="@dimen/mainscreen_margin"
              android:layout_marginBottom="3px"
-             android:background="@color/listview_background"
              android:divider="@color/listview_divider"
-             android:paddingRight="3px"
+             android:dividerHeight="@dimen/divider_height"
              android:alwaysDrawnWithCache="false"/>
+          <!--android:background="@color/listview_background"-->
 
         </LinearLayout>
 
-      </android.support.v7.widget.CardView>
+      <!--</android.support.v7.widget.CardView>-->
 
       <!--<FrameLayout
          android:id="@+id/startButtonLayout"
@@ -173,11 +175,12 @@
       <android.support.v7.widget.AppCompatButton
          android:id="@+id/buStart"
          android:text="@string/start"
-         android:layout_marginLeft="@dimen/mainscreen_margin"
-         android:layout_marginRight="@dimen/mainscreen_margin"
          android:layout_alignParentBottom="true"
          android:background="@drawable/button_selector"
          style="@style/CustomButton"/>
+      <!--android:layout_marginLeft="@dimen/mainscreen_margin"-->
+      <!--android:layout_marginRight="@dimen/mainscreen_margin"-->
+
       <!--android:background="?android:attr/selectableItemBackground"-->
       <!--android:layout_marginLeft="2px"-->
       <!--android:layout_marginRight="2px"-->
