@@ -322,7 +322,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
     return true;
   }
 
-  @Override
+  /*@Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
 
@@ -339,7 +339,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
     tvSolvesCount.setText(solvesCountText);
     tvHistory.setText(historyText);
     showHideBannerAd();
-  }
+  }*/
 
   private void refreshDataSet(final ArrayAdapter arrayAdapter) {
     runOnUiThread(new Runnable() {
