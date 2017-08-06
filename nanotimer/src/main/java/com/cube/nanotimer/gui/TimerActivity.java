@@ -6,8 +6,11 @@ import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,6 +18,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -53,11 +57,10 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class TimerActivity extends DrawerLayoutActivity implements ResultListener {
+public class TimerActivity extends AppCompatActivity implements ResultListener {
 
   enum TimerState {STOPPED, RUNNING, INSPECTING}
 
-  private TextView tvTitle;
   private TextView tvTimer;
   private TextView tvScramble;
   private TextView tvSolvesCount;
@@ -95,6 +98,7 @@ public class TimerActivity extends DrawerLayoutActivity implements ResultListene
   private volatile long holdToStartTs;
   private final long HOLD_TO_START_MIN_DURATION = 500;
   private volatile TimerState timerState = TimerState.STOPPED;
+  private boolean showMenu = true;
   private boolean oversteppedInspection = false;
 
   private long lastTimerStartTs;
@@ -139,6 +143,8 @@ public class TimerActivity extends DrawerLayoutActivity implements ResultListene
     }
     cubeSession = new CubeSession();
     App.INSTANCE.getService().getSolveAverages(solveType, solveAverageCallback);
+
+    initActionBar();
 
     inspectionTime = Options.INSTANCE.getInspectionTime();
     inspectionMode = Options.INSTANCE.getInspectionMode();
@@ -188,14 +194,13 @@ public class TimerActivity extends DrawerLayoutActivity implements ResultListene
     App.INSTANCE.onResume();
   }
 
-  @Override
-  protected void initViews() {
-    super.initViews();
-//    getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-//    getSupportActionBar().setCustomView(R.layout.textcentered_actionbar);
-    getSupportActionBar().setDisplayShowTitleEnabled(false);
+  private void initActionBar() {
+    ActionBar actionBar = getSupportActionBar();
+    actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+    actionBar.setCustomView(R.layout.textcentered_actionbar);
+  }
 
-    tvTitle = (TextView) findViewById(R.id.tvTitle);
+  private void initViews() {
     tvTimer = (TextView) findViewById(R.id.tvTimer);
     tvScramble = (TextView) findViewById(R.id.tvScramble);
     tvSolvesCount = (TextView) findViewById(R.id.tvSolvesCount);
@@ -234,37 +239,16 @@ public class TimerActivity extends DrawerLayoutActivity implements ResultListene
       findViewById(R.id.trAvgOfLife).setVisibility(View.GONE);
     }
 
-    findViewById(R.id.toolbar).setOnTouchListener(layoutTouchListener);
+    LinearLayout actionBarLayout = (LinearLayout) findViewById(R.id.actionbarLayout);
+    actionBarLayout.setOnTouchListener(layoutTouchListener);
 
     layout = (ViewGroup) findViewById(R.id.mainLayout);
     layout.setOnTouchListener(layoutTouchListener);
-
     if (timerState == TimerState.STOPPED) {
       setKeepScreenOn(keepScreenOnWhenTimerOff);
     } else {
       setKeepScreenOn(true);
     }
-
-    setBackgroundColor(defaultBackgroundColor);
-  }
-
-  @Override
-  public void onDrawerStateChangedCustom(int newState) {
-    super.onDrawerStateChangedCustom(newState);
-    setBackgroundColor(defaultBackgroundColor);
-
-    findMenuItem(R.id.itShareTime).setVisible(lastSolveTime != null);
-    findMenuItem(R.id.itSessionDetails).setVisible(hasNewSession);
-
-    if (solveType.hasSteps()) {
-      findMenuItem(R.id.itSessionDetails).setVisible(false);
-      findMenuItem(R.id.itNewSession).setVisible(false);
-      findMenuItem(R.id.itAddTime).setVisible(false);
-    }
-  }
-
-  private void setBackgroundColor(int colorResId) {
-    layout.setBackgroundResource(colorResId);
   }
 
   private Float getCubeTypeScrambleTextSize() {
@@ -320,11 +304,11 @@ public class TimerActivity extends DrawerLayoutActivity implements ResultListene
   }
 
   public void setTitle(String s) {
-    tvTitle.setText(s);
+    ((TextView) findViewById(R.id.tvTitle)).setText(s);
   }
 
   public void setTitle(int res) {
-    tvTitle.setText(res);
+    ((TextView) findViewById(R.id.tvTitle)).setText(res);
   }
 
   public synchronized void setTitle(String s, int textColor) {
@@ -334,7 +318,7 @@ public class TimerActivity extends DrawerLayoutActivity implements ResultListene
 
   @Override
   public void setTitleColor(int textColor) {
-    tvTitle.setTextColor(textColor);
+    ((TextView) findViewById(R.id.tvTitle)).setTextColor(textColor);
   }
 
   @Override
@@ -356,6 +340,32 @@ public class TimerActivity extends DrawerLayoutActivity implements ResultListene
       }
       super.onBackPressed();
     }
+  }
+
+  @Override
+  public boolean onPrepareOptionsMenu(Menu menu) {
+    menu.findItem(R.id.itShareTime).setVisible(showMenu && lastSolveTime != null);
+    menu.findItem(R.id.itSessionDetails).setVisible(showMenu && hasNewSession);
+    return super.onPrepareOptionsMenu(menu);
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.timer_menu, menu);
+    for (int i = 0; i < menu.size(); i++) {
+      menu.getItem(i).setVisible(showMenu);
+    }
+    if (solveType.hasSteps()) {
+      menu.findItem(R.id.itSessionDetails).setVisible(false);
+      menu.findItem(R.id.itNewSession).setVisible(false);
+      menu.findItem(R.id.itAddTime).setVisible(false);
+    }
+    return true;
+  }
+
+  private void showMenuButton(boolean show) {
+    this.showMenu = show;
+    supportInvalidateOptionsMenu();
   }
 
   @Override
@@ -791,7 +801,7 @@ public class TimerActivity extends DrawerLayoutActivity implements ResultListene
 
     if (mustDnfTime) {
       stopInspectionTimer();
-      setBackgroundColor(defaultBackgroundColor);
+      layout.setBackgroundResource(defaultBackgroundColor);
       if (inspectionMode == InspectionMode.OFFICIAL) {
         synchronized (holdToStartTimerSync) {
           stopHoldToStartTimer();
@@ -869,12 +879,12 @@ public class TimerActivity extends DrawerLayoutActivity implements ResultListene
 
   private void timerStarted() {
     setKeepScreenOn(true);
-    showDrawerMenuIcon(false);
+    showMenuButton(false);
   }
 
   private void timerStopped() {
     setKeepScreenOn(keepScreenOnWhenTimerOff);
-    showDrawerMenuIcon(true);
+    showMenuButton(true);
   }
 
   private void setKeepScreenOn(boolean keepOn) {
@@ -1035,12 +1045,12 @@ public class TimerActivity extends DrawerLayoutActivity implements ResultListene
     // change bg color
     if (parMotionEventAction == MotionEvent.ACTION_DOWN) {
       if (System.currentTimeMillis() - lastTimerStopTs >= STOP_START_DELAY) {
-        setBackgroundColor(pushedBackgroundColor);
+        layout.setBackgroundResource(pushedBackgroundColor);
       } else {
         return false; // to avoid receiving the ACTION_UP
       }
     } else if (parMotionEventAction == MotionEvent.ACTION_UP) {
-      setBackgroundColor(defaultBackgroundColor);
+      layout.setBackgroundResource(defaultBackgroundColor);
       if (ignoreActionUp) {
         ignoreActionUp = false;
         return true;
