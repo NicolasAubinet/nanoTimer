@@ -72,6 +72,10 @@ public class DrawerLayoutActivity extends AppCompatActivity {
     };
     drawerLayout.addDrawerListener(drawerToggle);
 
+    // allows to always display a custom up indicator:
+//    drawerToggle.setDrawerIndicatorEnabled(false);
+//    getSupportActionBar().setHomeAsUpIndicator(R.drawable.menu_icon);
+
     showDrawerMenuIcon(true);
 
     navigationView = (NavigationView) findViewById(R.id.navigationView);
