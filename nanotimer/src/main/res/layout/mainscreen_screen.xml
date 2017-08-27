@@ -21,6 +21,10 @@
          android:id="@+id/layoutTop"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
+         android:layout_marginTop="@dimen/card_margin_vertical"
+         android:layout_marginBottom="@dimen/card_margin_vertical"
+         android:layout_marginLeft="@dimen/card_margin_horizontal"
+         android:layout_marginRight="@dimen/card_margin_horizontal"
          app:cardElevation="@dimen/mainscreen_card_elevation"
          app:cardCornerRadius="0dp"
          android:background="@color/toolbar_background_color">
@@ -93,7 +97,8 @@
          android:id="@+id/bannerAd"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:gravity="center"/>
+         android:gravity="center"
+         android:layout_below="@id/layoutTop"/>
 
       <TextView
          android:id="@+id/tvUpdateProApp"
@@ -103,7 +108,8 @@
          android:textSize="26px"
          android:textColor="@color/warning"
          android:visibility="gone"
-         android:gravity="center"/>
+         android:gravity="center"
+         android:layout_below="@id/bannerAd"/>
 
       <!--<android.support.v7.widget.CardView
          android:id="@+id/cardHistory"
@@ -121,7 +127,7 @@
            android:layout_width="match_parent"
            android:layout_height="match_parent"
            android:orientation="vertical"
-           android:layout_below="@id/layoutTop"
+           android:layout_below="@id/tvUpdateProApp"
            android:layout_above="@+id/buStart">
 
           <RelativeLayout
