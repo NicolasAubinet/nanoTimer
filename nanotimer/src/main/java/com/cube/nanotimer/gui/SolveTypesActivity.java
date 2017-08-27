@@ -265,7 +265,7 @@ public class SolveTypesActivity extends AppCompatActivity implements SelectionHa
 
     ScrambleType scrambleType = null;
     int scrambleTypeIndex = Integer.parseInt(props.getProperty(SolveTypeAddDialog.KEY_SCRAMBLE_TYPE, String.valueOf(-1)));
-    if (scrambleTypeIndex >= 0) {
+    if (scrambleTypeIndex > 0) {
       scrambleType = curCubeType.getAvailableScrambleTypes()[scrambleTypeIndex];
 
       if (!scrambleType.isDefault()) {
