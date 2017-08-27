@@ -21,7 +21,7 @@
        android:inputType="textCapSentences"
        style="@style/SmallTextField"/>
 
-    <Button
+    <android.support.v7.widget.AppCompatButton
        android:id="@+id/buAddStep"
        android:layout_width="100px"
        android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
        android:layout_alignParentRight="true"
        android:layout_alignTop="@+id/tfStepName"
        android:layout_alignBottom="@+id/tfStepName"
-       android:layout_marginLeft="5px"
+       android:gravity="center"
        android:textSize="25px"/>
 
   </RelativeLayout>
