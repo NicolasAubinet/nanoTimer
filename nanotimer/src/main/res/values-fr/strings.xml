@@ -36,18 +36,18 @@
   <string name="add_step">Ajouter une étape</string>
   <string name="add_steps">Ajouter des étapes</string>
 
-  <string name="last_avg_of">Dernière moyenne sur</string>
-  <string name="best_avg_of">Meilleure moyenne sur</string>
-  <string name="success_avg">Moyenne des réussites</string>
+  <string name="last_avg_of">Dernière moy. sur</string>
+  <string name="best_avg_of">Meilleure moy. sur</string>
+  <string name="success_avg">Moy. des réussites</string>
   <string name="accuracy">Réussites</string>
   <string name="life">Tous</string>
 
   <string name="lifetime_best">Meilleur temps:</string>
-  <string name="lifetime_avg">Moyenne sur 1000:</string>
+  <string name="lifetime_avg">Moy. sur 1000:</string>
   <string name="lifetime_accuracy">Réussite globale:</string>
-  <string name="last_mean_of_three">Dernier mean of 3:</string>
-  <string name="best_mean_of_three">Meilleur mean of 3:</string>
-  <string name="solves_count">Nombre de résolutions:</string>
+  <string name="last_mean_of_three">Dernier Mo3:</string>
+  <string name="best_mean_of_three">Meilleur Mo3:</string>
+  <string name="solves_count">Résolutions:</string>
   <string name="mean_of_three">Mean sur 3:</string>
 
   <string name="plus_two">+2</string>
@@ -90,7 +90,7 @@
   <string name="timer_screen">Écran du chronomètre</string>
   <string name="inspection_mode">Mode d\'inspection</string>
   <string name="inspection_mode_summary">Sélectionner le mode d\'inspection du timer</string>
-  <string name="hold_and_release_inspection_mode">Appuie et relache: <i>Appuie et relache une fois pour démarrer</i></string>
+  <string name="hold_and_release_inspection_mode">Hold and release: <i>Appuier et relacher une fois pour démarrer</i></string>
   <string name="automatic_inspection_mode">Automatique: <i>Démarrage automatique quand inspection terminée</i></string>
   <string name="official_inspection_mode">Officiel: <i>Appuyer pendant 0.5s pour démarrer, utilise les règles d\'inspection officielles +2/DNF</i></string>
   <string name="inspection_time">Temps d\'inspection</string>
@@ -122,7 +122,7 @@
   <string name="scrambles_quality">Qualité des mélanges</string>
   <string name="scrambles_quality_summary">Sélectionner la qualité des mélanges</string>
   <string name="high_quality">Haute (moins de mouvements, plus lent à générer)</string>
-  <string name="normal_quality">Normal</string>
+  <string name="normal_quality">Normale</string>
   <string name="low_quality">Basse (plus de mouvements, plus rapide à générer)</string>
   <string name="pregen_scrambles">Générer des mélanges manuellement</string>
   <string name="pregen_scrambles_summary">Gérérer manuellement des mélanges d\'état aléatoire</string>
@@ -200,7 +200,7 @@
   <string name="steps_can_not_be_added_to_blind_types">Impossible d\'ajouter des étapes aux types blind.\nUtilisez un type non-blind à la place.</string>
 
   <string name="import_export">Importer / exporter</string>
-  <string name="export_times">Exportation</string>
+  <string name="export_times">Exporter</string>
   <string name="export_summary">Historique des temps d\'export</string>
   <string name="select_all">Tout sélectionner</string>
   <string name="times_limit">Limite du nombre de temps:</string>
@@ -243,10 +243,10 @@
   <string name="progression">Progression</string>
   <string name="smooth">Lisser</string>
   <string name="day">Jour</string>
-  <string name="week">Semaines</string>
+  <string name="week">Semaine</string>
   <string name="month">Mois</string>
   <string name="year">Année</string>
-  <string name="all">Tous</string>
+  <string name="all">Tout</string>
   <string name="no_data_found">Pas de données trouvées</string>
   <string name="chart_type_progression">Progression</string>
   <string name="chart_type_frequency">Fréquence</string>
