@@ -2,13 +2,18 @@ package com.cube.nanotimer.util.helper;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.BatteryManager;
+import android.os.Build.VERSION;
+import android.os.LocaleList;
 import android.preference.PreferenceManager;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
@@ -18,11 +23,15 @@ import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveType;
 
 import java.security.SecureRandom;
+import java.util.Locale;
 import java.util.Random;
 
 public class Utils {
 
   public static final char[] FORBIDDEN_NAME_CHARACTERS = new char[] { '"', ',', ';', '|', '=' };
+
+  public static final String LANGUAGE_PREFS_NAME = "language";
+  public static final String LANGUAGE_PREF_KEY = "picked";
 
   public static String parseFloatToString(Float f) {
     return f == null ? null : String.valueOf(f);
@@ -173,6 +182,42 @@ public class Utils {
 
   public static int getStringIdentifier(Context context, String name) {
     return context.getResources().getIdentifier(name, "string", context.getPackageName());
+  }
+
+  public static Context getLocaleContextFromPrefs(Context newBase) {
+    SharedPreferences prefs = newBase.getSharedPreferences(LANGUAGE_PREFS_NAME, 0);
+    String localeString = prefs.getString(LANGUAGE_PREF_KEY, null);
+
+    Locale newLocale;
+    if (localeString == null) {
+      newLocale = Locale.getDefault();
+    } else {
+      newLocale = new Locale(localeString);
+    }
+    return Utils.wrapLocaleContext(newBase, newLocale);
+  }
+
+  private static ContextWrapper wrapLocaleContext(Context context, Locale newLocale) {
+    Resources res = context.getResources();
+    Configuration configuration = res.getConfiguration();
+
+    if (VERSION.SDK_INT >= 24) {
+      configuration.setLocale(newLocale);
+
+      LocaleList localeList = new LocaleList(newLocale);
+      LocaleList.setDefault(localeList);
+      configuration.setLocales(localeList);
+
+      context = context.createConfigurationContext(configuration);
+    } else if (VERSION.SDK_INT >= 17) {
+      configuration.setLocale(newLocale);
+      context = context.createConfigurationContext(configuration);
+    } else {
+      configuration.locale = newLocale;
+      res.updateConfiguration(configuration, res.getDisplayMetrics());
+    }
+
+    return new ContextWrapper(context);
   }
 
 }

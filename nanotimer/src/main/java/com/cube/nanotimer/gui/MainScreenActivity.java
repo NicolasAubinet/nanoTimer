@@ -3,18 +3,14 @@ package com.cube.nanotimer.gui;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.media.AudioManager;
 import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.LocaleList;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -65,7 +61,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
 
 public class MainScreenActivity extends DrawerLayoutActivity implements TimeChangedHandler, SelectionHandler, ResultListener {
@@ -105,9 +100,6 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
   private static final int ID_SOLVETYPE = 2;
   private static final int ID_IMPORTEXPORT = 3;
   private static final int ID_LANGUAGE = 4;
-
-  private static final String LANGUAGE_PREFS_NAME = "language";
-  private static final String LANGUAGE_PREF_KEY = "picked";
 
   private static final int IMPORT_REQUEST_CODE = 1;
 
@@ -576,53 +568,14 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
           localeCode = null;
         }
 
-        SharedPreferences prefs = getApplicationContext().getSharedPreferences(LANGUAGE_PREFS_NAME, 0);
+        SharedPreferences prefs = getApplicationContext().getSharedPreferences(Utils.LANGUAGE_PREFS_NAME, 0);
         Editor editor = prefs.edit();
-        editor.putString(LANGUAGE_PREF_KEY, localeCode);
+        editor.putString(Utils.LANGUAGE_PREF_KEY, localeCode);
         editor.apply();
 
         recreate();
       }
     }
-  }
-
-	@Override
-  protected void attachBaseContext(Context newBase) {
-    SharedPreferences prefs = newBase.getSharedPreferences(LANGUAGE_PREFS_NAME, 0);
-    String localeString = prefs.getString(LANGUAGE_PREF_KEY, null);
-
-    Locale newLocale;
-    if (localeString == null) {
-      newLocale = Locale.getDefault();
-    } else {
-      newLocale = new Locale(localeString);
-    }
-    Context context = wrapLocaleContext(newBase, newLocale);
-
-    super.attachBaseContext(context);
-  }
-
-	public static ContextWrapper wrapLocaleContext(Context context, Locale newLocale) {
-    Resources res = context.getResources();
-    Configuration configuration = res.getConfiguration();
-
-    if (VERSION.SDK_INT >= 24) {
-        configuration.setLocale(newLocale);
-
-        LocaleList localeList = new LocaleList(newLocale);
-        LocaleList.setDefault(localeList);
-        configuration.setLocales(localeList);
-
-        context = context.createConfigurationContext(configuration);
-    } else if (VERSION.SDK_INT >= 17) {
-        configuration.setLocale(newLocale);
-        context = context.createConfigurationContext(configuration);
-    } else {
-        configuration.locale = newLocale;
-        res.updateConfiguration(configuration, res.getDisplayMetrics());
-    }
-
-    return new ContextWrapper(context);
   }
 
   @Override

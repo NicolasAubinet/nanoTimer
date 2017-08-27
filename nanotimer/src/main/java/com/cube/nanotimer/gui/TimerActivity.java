@@ -7,7 +7,6 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -57,7 +56,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class TimerActivity extends AppCompatActivity implements ResultListener {
+public class TimerActivity extends NanoTimerActivity implements ResultListener {
 
   enum TimerState {STOPPED, RUNNING, INSPECTING}
 

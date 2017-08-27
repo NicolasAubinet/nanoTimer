@@ -35,7 +35,7 @@ import com.mobeta.android.dslv.DragSortListView.DropListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddStepsDialog extends DialogFragment implements FieldRenamer {
+public class AddStepsDialog extends NanoTimerDialogFragment implements FieldRenamer {
 
   private int pos;
   private Dialog dialog;

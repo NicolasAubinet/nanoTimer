@@ -3,7 +3,6 @@ package com.cube.nanotimer.gui.widget;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -16,7 +15,7 @@ import android.widget.TextView;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.util.helper.Utils;
 
-public class AboutDialog extends DialogFragment {
+public class AboutDialog extends NanoTimerDialogFragment {
 
   public static AboutDialog newInstance() {
     return new AboutDialog();

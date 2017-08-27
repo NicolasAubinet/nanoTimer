@@ -9,8 +9,9 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.gui.widget.NanoTimerDialogFragment;
 
-public abstract class ConfirmDialog extends DialogFragment {
+public abstract class ConfirmDialog extends NanoTimerDialogFragment {
 
   protected Dialog dialog;
   protected View view;

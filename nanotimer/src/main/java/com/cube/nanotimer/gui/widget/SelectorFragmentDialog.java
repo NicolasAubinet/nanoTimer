@@ -20,7 +20,7 @@ import com.cube.nanotimer.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelectorFragmentDialog extends DialogFragment {
+public class SelectorFragmentDialog extends NanoTimerDialogFragment {
 
   protected static final String ARG_ID = "id";
   protected static final String ARG_TITLE = "title";

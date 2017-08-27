@@ -4,14 +4,20 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.RelativeLayout;
+import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.services.db.DataCallback;
@@ -25,7 +31,7 @@ import com.cube.nanotimer.vo.SolveType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SessionDetailDialog extends DialogFragment {
+public class SessionDetailDialog extends NanoTimerDialogFragment {
 
   private static final int PAGE_LINES_COUNT = 10;
   private static final int TIMES_PER_LINE = 4;

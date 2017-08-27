@@ -3,7 +3,6 @@ package com.cube.nanotimer.gui;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-public class SolveTypesActivity extends AppCompatActivity implements SelectionHandler, FieldRenamer, FieldCreator, StepsCreator {
+public class SolveTypesActivity extends NanoTimerActivity implements SelectionHandler, FieldRenamer, FieldCreator, StepsCreator {
 
   private DragSortListView lvSolveTypes;
   private SolveTypeListAdapter adapter;

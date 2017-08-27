@@ -25,7 +25,7 @@ import com.cube.nanotimer.vo.SolveTimeAverages;
 
 import java.util.Arrays;
 
-public class HistoryDetailDialog extends DialogFragment {
+public class HistoryDetailDialog extends NanoTimerDialogFragment {
 
   private static final String ARG_SOLVETIME = "solvetime";
   private static final String ARG_CUBETYPE = "cubetype";
