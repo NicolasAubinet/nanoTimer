@@ -347,7 +347,11 @@ public enum ScramblerService {
   }
 
   private Queue<String[]> getCache(CubeType cubeType, ScrambleType scrambleType) {
-    ScrambleCacheKey scrambleCacheKey = new ScrambleCacheKey(cubeType.getId(), scrambleType);
+    ScrambleType cacheScrambleType = scrambleType;
+    if (cacheScrambleType != null && cacheScrambleType.isDefault()) {
+      cacheScrambleType = null;
+    }
+    ScrambleCacheKey scrambleCacheKey = new ScrambleCacheKey(cubeType.getId(), cacheScrambleType);
     LinkedList<String[]> scrambles = cachedScrambles.get(scrambleCacheKey);
     if (scrambles == null) {
       scrambles = new LinkedList<>();
