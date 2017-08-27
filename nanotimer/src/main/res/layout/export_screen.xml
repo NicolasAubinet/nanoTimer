@@ -52,7 +52,7 @@
      android:id="@+id/buExport"
      android:text="@string/export_times"
      android:layout_alignParentBottom="true"
-     android:textSize="22sp"
+     android:textSize="20sp"
      android:background="@drawable/button_selector"
      style="@style/CustomButton"/>
 

@@ -203,7 +203,7 @@
   <string name="export_times">Exporter</string>
   <string name="export_summary">Historique des temps d\'export</string>
   <string name="select_all">Tout sélectionner</string>
-  <string name="times_limit">Limite du nombre de temps:</string>
+  <string name="times_limit">Nombre de temps max:</string>
   <string name="no_limit">&lt;Pas de limite&gt;</string>
   <string name="export_mail_subject">Exportation d\'historique Nano Timer</string>
   <string name="export_mail_body">Exportation d\'historique à partir de %1$s</string>
@@ -215,7 +215,7 @@
   <string name="read_permission_denied_cant_import">Les permissions de lectures ont été refusées, impossible d\'importer.</string>
 
   <string name="import_times">Importer</string>
-  <string name="storage">Stockage</string>
+  <string name="storage">Disque</string>
   <string name="line">ligne</string>
   <string name="error_in_line">Erreur dans la ligne %1$d</string>
   <string name="import_invalid_columns_count">Nombre de colonnes invalide. Vérifiez le fichier d\'import ou essayez de ré-exporter.</string>
