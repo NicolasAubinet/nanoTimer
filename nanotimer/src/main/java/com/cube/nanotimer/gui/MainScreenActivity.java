@@ -569,11 +569,16 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
         }
 
         SharedPreferences prefs = getApplicationContext().getSharedPreferences(Utils.LANGUAGE_PREFS_NAME, 0);
-        Editor editor = prefs.edit();
-        editor.putString(Utils.LANGUAGE_PREF_KEY, localeCode);
-        editor.apply();
 
-        recreate();
+        if (!prefs.getString(Utils.LANGUAGE_PREF_KEY, "").equals(localeCode)) {
+          Editor editor = prefs.edit();
+          editor.putString(Utils.LANGUAGE_PREF_KEY, localeCode);
+          editor.apply();
+
+          Intent intent = getIntent();
+          finish();
+          startActivity(intent);
+        }
       }
     }
   }
