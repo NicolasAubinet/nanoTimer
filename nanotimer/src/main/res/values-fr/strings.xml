@@ -282,7 +282,7 @@
   <string name="scramble_generating">Mélange en cours de génération\nMerci de patienter&#8230;</string>
   <string name="can_not_add_time_while_generating">Impossible d\'ajouter un temps quand il n\'y a pas de mélange</string>
 
-  <string name="pro_version_features">- Export/import des temps\n- Graphiques (progression, fréquence\n- Création de temps manuellement\n- Visualisation des détails des sessions précédentes\n- Pas de pubs</string>
+  <string name="pro_version_features">- Export/import des temps\n- Graphiques (progression, fréquence)\n- Création manuelle de temps\n- Visualisation des détails des sessions précédentes\n- Pas de pubs</string>
 
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
