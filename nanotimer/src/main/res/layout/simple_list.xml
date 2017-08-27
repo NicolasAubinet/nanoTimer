@@ -7,11 +7,14 @@
    android:paddingRight="8px"
    android:paddingLeft="8px"
    android:paddingTop="2px"
-   android:paddingBottom="4px">
+   android:paddingBottom="4px"
+   android:background="@color/color_primary_dark">
 
   <ListView
      android:id="@+id/lvItems"
      android:layout_width="match_parent"
-     android:layout_height="wrap_content"/>
+     android:layout_height="wrap_content"
+     android:divider="@color/listview_divider"
+     android:dividerHeight="@dimen/divider_height"/>
 
 </com.cube.nanotimer.util.view.ScalingLinearLayout>
