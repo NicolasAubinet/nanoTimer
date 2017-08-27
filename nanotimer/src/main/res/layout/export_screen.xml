@@ -48,13 +48,12 @@
        android:enabled="false"/>
   </LinearLayout>
 
-  <Button
+  <android.support.v7.widget.AppCompatButton
      android:id="@+id/buExport"
-     android:layout_width="match_parent"
-     android:layout_height="40dp"
-     android:layout_alignParentBottom="true"
      android:text="@string/export_times"
-     android:textSize="18sp"
+     android:layout_alignParentBottom="true"
+     android:textSize="22sp"
+     android:background="@drawable/button_selector"
      style="@style/CustomButton"/>
 
 </RelativeLayout>
