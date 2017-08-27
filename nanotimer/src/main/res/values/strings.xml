@@ -81,7 +81,7 @@
   <string name="clear_all_history_confirmation">Are you sure you want to delete the whole history?</string>
 
   <string name="language">Language</string>
-  <string name="os_default">OS default</string>
+  <string name="os_default">Default</string>
   <string name="english">English</string>
   <string name="french">French</string>
   <string name="spanish">Spanish</string>
