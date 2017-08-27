@@ -69,8 +69,8 @@ public class SelectorFragmentDialog extends DialogFragment {
     lvItems.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        handler.itemSelected(id, i);
         dialog.dismiss();
+        handler.itemSelected(id, i);
       }
     });
 

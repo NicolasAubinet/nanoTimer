@@ -80,6 +80,12 @@
   <string name="clear_history_solve_type_confirmation">Êtes-vous sûr de vouloir supprimer tous les temps pour ce type de résolution?</string>
   <string name="clear_all_history_confirmation">Êtes-vous sûr de vouloir supprimer tout l\'historique?</string>
 
+  <string name="language">Langue</string>
+  <string name="os_default">Défault de l\'OS</string>
+  <string name="english">Anglais</string>
+  <string name="french">Français</string>
+  <string name="spanish">Espagnol</string>
+
   <string name="settings">Réglages</string>
   <string name="timer_screen">Écran du chronomètre</string>
   <string name="inspection_mode">Mode d\'inspection</string>
@@ -186,7 +192,7 @@
   <string name="upgrade_pro_app">Mettez à jour Nano Timer Pro pour continuer d\'accéder aux fonctionnalités Pro</string>
   <string name="open_page">Ouvrir la page</string>
 
-  <string name="edit_solve_types_dots">Éditer les types de résolutions&#8230;</string>
+  <string name="edit_solve_types_dots">Éditer les types&#8230;</string>
   <string name="solve_types_shortcut">Raccourci vers temps de résolution</string>
   <string name="solve_types_shortcut_summary">Affiche \"Éditer les temps de résolution\" dans la liste</string>
   <string name="blind">Blind</string>
@@ -218,7 +224,7 @@
   <string name="could_not_convert_date">Impossible to convertir la date \'%1$s\'</string>
   <string name="could_not_find_cube_type">Impossible de trouver le type de cube \'%1$s\'.\nVérifiez le fichier importé, ou essayez de mettre à jour.</string>
   <string name="could_not_find_scramble_type">Impossible de trouver le type de mélange \'%1$s\' pour le cube \'%2$s\'.\nVérifiez le fichier importé, ou essayez de mettre à jour.</string>
-  <string name="solve_type_conflict">Incohérence trouvée dans le type de résolution \'%1$s\' du cube type \'%2$s\'.\nVérifiez le fichier importé ou contactez le support à %3$s.</string>
+  <string name="solve_type_conflict">Incohérence trouvée dans le type de résolution \'%1$s\' du type de cube \'%2$s\'.\nVérifiez le fichier importé ou contactez le support à %3$s.</string>
   <string name="invalid_step_format">Format d\'étape invalide \'%1$s\'</string>
   <string name="could_not_convert_step_time">Impossible de convertir le temps d\'étape \'%1$s\'</string>
   <string name="error_reading_import_file">Impossible de lire le fichier d\'import: %1$s</string>
@@ -260,8 +266,8 @@
 
   <string name="share_time">Partager le temps</string>
   <string name="share_time_subject">Nouveau temps de résolution: %1$s</string>
-  <string name="share_time_text">Je viens de résoudre le cube %1$s en %2$s!\n\nMélange:\n%3$s\n\nChronométré le %4$s avec l'application android Nano Timer:\n%5$s</string>
-  <string name="share_time_steps_text">Je viens de résoudre le cube %1$s en %2$s avec les temps d\'étapes suivants:\n%3$s\nMélange:\n%4$s\n\nChonométré le %5$s avec l'application android Nano Timer:\n%6$s</string>
+  <string name="share_time_text">Je viens de résoudre le cube %1$s en %2$s!\n\nMélange:\n%3$s\n\nChronométré le %4$s avec l\'application android Nano Timer:\n%5$s</string>
+  <string name="share_time_steps_text">Je viens de résoudre le cube %1$s en %2$s avec les temps d\'étapes suivants:\n%3$s\nMélange:\n%4$s\n\nChonométré le %5$s avec l\'application android Nano Timer:\n%6$s</string>
 
   <string name="scramble_typeC">Type de mélange:</string>
   <string name="scramble_type_default">Aléatoire</string>

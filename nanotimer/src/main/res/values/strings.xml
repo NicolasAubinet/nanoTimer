@@ -80,6 +80,12 @@
   <string name="clear_history_solve_type_confirmation">Are you sure you want to delete all the times for this solve type?</string>
   <string name="clear_all_history_confirmation">Are you sure you want to delete the whole history?</string>
 
+  <string name="language">Language</string>
+  <string name="os_default">OS default</string>
+  <string name="english">English</string>
+  <string name="french">French</string>
+  <string name="spanish">Spanish</string>
+
   <string name="settings">Settings</string>
   <string name="timer_screen">Timer screen</string>
   <string name="inspection_mode">Inspection mode</string>
