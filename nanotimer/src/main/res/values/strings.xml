@@ -17,7 +17,6 @@
   <string name="scramble">Scramble</string>
   <string name="scrambleC">Scramble:</string>
   <string name="start">Start</string>
-  <string name="practice">Practice</string>
 
   <string name="add">Add</string>
   <string name="add_solvetype">Add solve type</string>
@@ -44,7 +43,7 @@
   <string name="life">Life</string>
 
   <string name="lifetime_best">Lifetime best:</string>
-  <string name="lifetime_avg">Global avg:</string>
+  <string name="lifetime_avg">Avg of 1000:</string>
   <string name="lifetime_accuracy">Global accur:</string>
   <string name="last_mean_of_three">Last mean of 3:</string>
   <string name="best_mean_of_three">Best mean of 3:</string>
@@ -285,6 +284,8 @@
     <u><b>v1.2.2 <i>(New version)</i></b></u>
     <ul>
       <li>Add support for special 3x3x3 scramble types to practice only F2L, last layer, PLL, edges and more</li>
+      <li>Rework main screen the user interface</li>
+      <li>Add support for French and Spanish languages</li>
       <li>Adapt import permissions for Android Kitkat and above</li>
       <li>Adapt scrambles generating notification icon for Android Lollipop and above</li>
     </ul>
