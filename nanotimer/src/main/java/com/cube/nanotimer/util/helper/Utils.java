@@ -184,20 +184,20 @@ public class Utils {
     return context.getResources().getIdentifier(name, "string", context.getPackageName());
   }
 
-  public static Context getLocaleContextFromPrefs(Context newBase) {
-    SharedPreferences prefs = newBase.getSharedPreferences(LANGUAGE_PREFS_NAME, 0);
-    String localeString = prefs.getString(LANGUAGE_PREF_KEY, null);
+  public static void updateContextWithPrefsLocale(Context context) {
+    SharedPreferences prefs = context.getSharedPreferences(LANGUAGE_PREFS_NAME, 0);
+    String localeString = prefs.getString(LANGUAGE_PREF_KEY, Locale.getDefault().getLanguage());
+    Locale newLocale = new Locale(localeString);
+    Locale.setDefault(newLocale);
 
-    Locale newLocale;
-    if (localeString == null) {
-      newLocale = Locale.getDefault();
-    } else {
-      newLocale = new Locale(localeString);
-    }
-    return Utils.wrapLocaleContext(newBase, newLocale);
+    Configuration config = new Configuration();
+    config.locale = newLocale;
+    context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
+
+//    return Utils.wrapLocaleContext(context, newLocale);
   }
 
-  private static ContextWrapper wrapLocaleContext(Context context, Locale newLocale) {
+  /*private static ContextWrapper wrapLocaleContext(Context context, Locale newLocale) {
     Resources res = context.getResources();
     Configuration configuration = res.getConfiguration();
 
@@ -218,6 +218,6 @@ public class Utils {
     }
 
     return new ContextWrapper(context);
-  }
+  }*/
 
 }
