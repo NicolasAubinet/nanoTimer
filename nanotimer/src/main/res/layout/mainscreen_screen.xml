@@ -17,12 +17,18 @@
        android:layout_height="wrap_content"
        android:background="@color/color_primary">
 
-      <LinearLayout
+      <android.support.v7.widget.CardView
          android:id="@+id/layoutTop"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:orientation="vertical"
+         app:cardElevation="@dimen/mainscreen_card_elevation"
+         app:cardCornerRadius="0dp"
          android:background="@color/toolbar_background_color">
+
+        <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="vertical">
 
         <!-- nested toolbar -->
         <android.support.v7.widget.Toolbar
@@ -79,7 +85,9 @@
 
         </TableLayout>
 
-      </LinearLayout>
+        </LinearLayout>
+
+      </android.support.v7.widget.CardView>
 
       <com.startapp.android.publish.banner.Banner
          android:id="@+id/bannerAd"
@@ -112,18 +120,18 @@
            android:id="@+id/layoutHistory"
            android:layout_width="match_parent"
            android:layout_height="match_parent"
-           android:layout_marginLeft="@dimen/mainscreen_margin"
-           android:layout_marginRight="@dimen/mainscreen_margin"
            android:orientation="vertical"
            android:layout_below="@id/layoutTop"
-           android:layout_above="@+id/buStart"
-           android:layout_margin="5px">
+           android:layout_above="@+id/buStart">
 
           <RelativeLayout
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
-             android:padding="3px"
-             android:layout_marginBottom="7px">
+             android:background="@color/gray850"
+             android:paddingTop="5px"
+             android:paddingLeft="@dimen/mainscreen_margin"
+             android:paddingRight="@dimen/mainscreen_margin"
+             android:paddingBottom="7px">
 
             <TextView
                android:id="@+id/tvHistory"
@@ -145,18 +153,21 @@
                style="@style/SmallTextField"/>
           </RelativeLayout>
 
-          <View
+          <!--<View
              android:id="@+id/cardDivider"
              android:layout_width="match_parent"
              android:layout_height="@dimen/divider_height"
              android:background="@color/card_divider"
-             android:visibility="visible"/>
+             android:visibility="visible"/>-->
 
           <ListView
              android:id="@+id/lvHistory"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             android:layout_marginBottom="3px"
+             android:paddingTop="5px"
+             android:paddingLeft="@dimen/mainscreen_margin"
+             android:paddingRight="@dimen/mainscreen_margin"
+             android:paddingBottom="3px"
              android:divider="@color/listview_divider"
              android:dividerHeight="@dimen/divider_height"
              android:alwaysDrawnWithCache="false"/>

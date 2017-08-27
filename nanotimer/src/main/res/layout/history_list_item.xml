@@ -19,9 +19,18 @@
        android:id="@+id/imgPb"
        android:layout_width="26px"
        android:layout_height="26px"
+       android:layout_marginRight="12px"
+       android:layout_centerVertical="true"
+       android:layout_toLeftOf="@+id/imgCircle"
+       android:src="@drawable/star"/>
+
+    <ImageView
+       android:id="@+id/imgCircle"
+       android:layout_width="10px"
+       android:layout_height="10px"
        android:layout_centerVertical="true"
        android:layout_toLeftOf="@+id/tvTime"
-       android:src="@drawable/star"/>
+       android:src="@drawable/history_circle"/>
 
     <TextView
        android:id="@+id/tvTime"
