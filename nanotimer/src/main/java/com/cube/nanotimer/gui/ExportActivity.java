@@ -356,7 +356,7 @@ public class ExportActivity extends AppCompatActivity {
     SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
     Editor editor = prefs.edit();
     editor.putInt(EXPORT_LIMIT_KEY, limit);
-    editor.commit();
+    editor.apply();
   }
 
   static class ListItem {

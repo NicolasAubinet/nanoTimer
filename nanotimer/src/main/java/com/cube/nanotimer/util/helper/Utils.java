@@ -59,13 +59,13 @@ public class Utils {
   public static void setCurrentCubeType(Context c, CubeType cubeType) {
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
     int id = (cubeType == null) ? CubeType.THREE_BY_THREE.getId() : cubeType.getId();
-    prefs.edit().putInt("cubeTypeId", id).commit();
+    prefs.edit().putInt("cubeTypeId", id).apply();
   }
 
   public static void setCurrentSolveType(Context c, SolveType solveType) {
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
     int id = (solveType == null) ? -1 : solveType.getId();
-    prefs.edit().putInt("solveTypeId", id).commit();
+    prefs.edit().putInt("solveTypeId", id).apply();
   }
 
   public static int getRSScrambleLengthFromQuality(CubeType cubeType) {

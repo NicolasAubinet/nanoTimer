@@ -50,7 +50,7 @@ public class AppRater {
       @Override
       public void onCancel(DialogInterface dialogInterface) {
         editor.putLong("date_asklater", System.currentTimeMillis());
-        editor.commit();
+        editor.apply();
       }
     });
 
@@ -60,7 +60,7 @@ public class AppRater {
         if (openStoreForRating(context)) {
           // avoid asking again if the user rated the app (there's no way to know for sure if he actually rated it)
           editor.putBoolean("dontshowagain", true);
-          editor.commit();
+          editor.apply();
         }
         dialog.dismiss();
       }
@@ -72,7 +72,7 @@ public class AppRater {
       public void onClick(View view) {
         if (editor != null) {
           editor.putLong("date_asklater", System.currentTimeMillis());
-          editor.commit();
+          editor.apply();
         }
         dialog.dismiss();
       }
@@ -84,7 +84,7 @@ public class AppRater {
       public void onClick(View view) {
         if (editor != null) {
           editor.putBoolean("dontshowagain", true);
-          editor.commit();
+          editor.apply();
         }
         dialog.dismiss();
       }

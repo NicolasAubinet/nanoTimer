@@ -20,7 +20,7 @@ public class ProVersionWelcome {
         showWelcomeDialog(context);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(ACTIVATED_KEY, true);
-        editor.commit();
+        editor.apply();
       }
     }
   }

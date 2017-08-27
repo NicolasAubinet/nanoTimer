@@ -21,7 +21,7 @@ public class AppLaunchStats {
     long launchCount = prefs.getLong(LAUNCH_COUNT_KEY, 0);
     editor.putLong(LAUNCH_COUNT_KEY, launchCount + 1);
 
-    editor.commit();
+    editor.apply();
   }
 
   public static int getLaunchCount(Context context) {
@@ -60,7 +60,7 @@ public class AppLaunchStats {
       long firstLaunchDate = appRaterPrefs.getLong(FIRST_LAUNCH_KEY, System.currentTimeMillis());
       editor.putLong(FIRST_LAUNCH_KEY, firstLaunchDate);
     }
-    editor.commit();
+    editor.apply();
   }
 
 }

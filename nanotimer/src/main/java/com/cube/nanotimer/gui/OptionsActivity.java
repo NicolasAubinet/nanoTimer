@@ -114,7 +114,7 @@ public class OptionsActivity extends AppCompatActivity {
           min = newValue;
           Editor editor = pref.edit();
           editor.putInt(key, min);
-          editor.commit();
+          editor.apply();
         }
         ScramblerService.INSTANCE.checkScrambleCaches();
       } else if (key.equals(Options.SCRAMBLES_MAX_CACHE_SIZE_KEY)) {
@@ -129,7 +129,7 @@ public class OptionsActivity extends AppCompatActivity {
           max = newValue;
           Editor editor = pref.edit();
           editor.putInt(key, max);
-          editor.commit();
+          editor.apply();
         }
       } else if (key.equals(Options.SCRAMBLES_GEN_WHEN_PLUGGED_IN_KEY) ||
         key.equals(Options.SCRAMBLES_GEN_COUNT_WHEN_PLUGGED_IN_KEY)) {

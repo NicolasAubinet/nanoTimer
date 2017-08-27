@@ -66,7 +66,7 @@ public class ProVersionAd {
       editor.putLong(NEXT_SHOW_DATE_KEY, nextShowDate);
     }
 
-    editor.commit();
+    editor.apply();
   }
 
   public static void showProVersionAdDialog(Context context) {

@@ -125,7 +125,7 @@ public class GraphActivity extends AppCompatActivity {
       public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
         Editor editor = prefs.edit();
         editor.putBoolean("smooth", b);
-        editor.commit();
+        editor.apply();
         if (chartData != null) {
           getData();
         }
@@ -174,7 +174,7 @@ public class GraphActivity extends AppCompatActivity {
       public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         Editor editor = prefs.edit();
         editor.putInt(prefsKey, pos);
-        editor.commit();
+        editor.apply();
         getData();
       }
 

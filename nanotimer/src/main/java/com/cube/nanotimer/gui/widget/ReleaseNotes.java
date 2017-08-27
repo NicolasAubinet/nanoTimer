@@ -23,13 +23,13 @@ public class ReleaseNotes {
     if (prefVersion == null) {
       // first launch
       editor.putString(VERSION_KEY, curVersion);
-      editor.commit();
+      editor.apply();
     } else {
       if (!prefVersion.equals(curVersion)) {
         // app upgrade
         editor.putString(VERSION_KEY, curVersion);
         showReleaseNotesDialog(context);
-        editor.commit();
+        editor.apply();
       }
     }
   }
