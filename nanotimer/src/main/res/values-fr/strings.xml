@@ -251,7 +251,7 @@
   <string name="chart_type_progression">Progression</string>
   <string name="chart_type_frequency">Fréquence</string>
 
-  <string name="show_best_times">Tried par meilleurs temps</string>
+  <string name="show_best_times">Trier par meilleurs temps</string>
   <string name="show_history">Trier par date</string>
   <string name="best_times">Meilleurs temps</string>
 
