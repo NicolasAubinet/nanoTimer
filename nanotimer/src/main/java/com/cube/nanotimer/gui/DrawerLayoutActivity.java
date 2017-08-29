@@ -104,4 +104,8 @@ public class DrawerLayoutActivity extends NanoTimerActivity {
     return getMenu().findItem(parResId);
   }
 
+  protected void closeDrawer() {
+    drawerLayout.closeDrawers();
+  }
+
 }

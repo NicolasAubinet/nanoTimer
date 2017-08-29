@@ -83,4 +83,13 @@
     <item>fr</item>
     <item>sp</item>
   </string-array>
+  <string-array name="mainscreen_menu_items">
+    <item>@string/settings</item>
+    <item>@string/show_best_times</item>
+    <item>@string/graphs</item>
+    <item>@string/import_export</item>
+    <item>@string/clear_history</item>
+    <item>@string/language</item>
+    <item>@string/about</item>
+  </string-array>
 </resources>

@@ -11,6 +11,8 @@ import android.media.AudioManager;
 import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -25,6 +27,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -71,8 +74,6 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
   private TextView tvSolvesCount;
   private TextView tvHistory;
 
-  private MenuItem miSortMode;
-
   private CubeType curCubeType;
   private SolveType curSolveType;
   private final List<CubeType> cubeTypes = new ArrayList<>();
@@ -86,6 +87,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
 
   private final List<SolveTime> liHistory = new ArrayList<>();
   private HistoryListAdapter historyListAdapter;
+  private MenuListAdapter menuListAdapter;
 
   private int previousLastItem = 0;
 
@@ -156,7 +158,17 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
 
     initHistoryList();
 
-    miSortMode = findMenuItem(R.id.itSortMode);
+    menuListAdapter = new MenuListAdapter(this, R.id.lvMenuItems, getResources().getStringArray(R.array.mainscreen_menu_items));
+    ListView lvMenuItems = (ListView) findViewById(R.id.lvMenuItems);
+    lvMenuItems.setAdapter(menuListAdapter);
+    lvMenuItems.setOnItemClickListener(new OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        closeDrawer();
+        onMenuItemClick(i);
+      }
+    });
+
     setSortMode(TimesSort.TIMESTAMP);
 
     Button buStart = (Button) findViewById(R.id.buStart);
@@ -220,6 +232,57 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
     });
   }
 
+  private void onMenuItemClick(int index) {
+    switch (index) {
+      case 0:
+        startActivity(new Intent(this, OptionsActivity.class));
+        break;
+      case 1:
+        if (timesSort == TimesSort.TIMESTAMP) {
+          setSortMode(TimesSort.TIME);
+        } else if (timesSort == TimesSort.TIME) {
+          setSortMode(TimesSort.TIMESTAMP);
+        }
+        break;
+      case 2:
+        if (Utils.checkProFeature(this)) {
+          Intent i = new Intent(this, GraphActivity.class);
+          i.putExtra("cubeType", curCubeType);
+          i.putExtra("solveType", curSolveType);
+          startActivity(i);
+        }
+        break;
+      case 3:
+        if (Utils.checkProFeature(this)) {
+          ArrayList<String> items = new ArrayList(Arrays.asList(getResources().getStringArray(R.array.import_export)));
+          DialogUtils.showFragment(this, SelectorFragmentDialog.newInstance(ID_IMPORTEXPORT, items, true, this));
+        }
+        break;
+      case 4:
+        DialogUtils.showYesNoConfirmation(this, R.string.clear_history_solve_type_confirmation, new YesNoListener() {
+          @Override
+          public void onYes() {
+            if (curSolveType != null) {
+              App.INSTANCE.getService().deleteHistory(curSolveType, new DataCallback<Void>() {
+                @Override
+                public void onData(Void data) {
+                  refreshHistory();
+                }
+              });
+            }
+          }
+        });
+        break;
+      case 5:
+        ArrayList<String> items = new ArrayList(Arrays.asList(getResources().getStringArray(R.array.languages)));
+        DialogUtils.showFragment(this, SelectorFragmentDialog.newInstance(ID_LANGUAGE, items, true, this));
+        break;
+      case 6:
+        DialogUtils.showFragment(this, AboutDialog.newInstance());
+        break;
+    }
+  }
+
   @Override
   protected void onResume() {
     super.onResume();
@@ -273,59 +336,6 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
         }
       }, QUIT_MODE_DELAY);
     }
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case R.id.itClearHistory:
-        DialogUtils.showYesNoConfirmation(this, R.string.clear_history_solve_type_confirmation, new YesNoListener() {
-          @Override
-          public void onYes() {
-            if (curSolveType != null) {
-              App.INSTANCE.getService().deleteHistory(curSolveType, new DataCallback<Void>() {
-                @Override
-                public void onData(Void data) {
-                  refreshHistory();
-                }
-              });
-            }
-          }
-        });
-        break;
-      case R.id.itSettings:
-        startActivity(new Intent(this, OptionsActivity.class));
-        break;
-      case R.id.itSortMode:
-        if (timesSort == TimesSort.TIMESTAMP) {
-          setSortMode(TimesSort.TIME);
-        } else if (timesSort == TimesSort.TIME) {
-          setSortMode(TimesSort.TIMESTAMP);
-        }
-        break;
-      case R.id.itGraphs:
-        if (Utils.checkProFeature(this)) {
-          Intent i = new Intent(this, GraphActivity.class);
-          i.putExtra("cubeType", curCubeType);
-          i.putExtra("solveType", curSolveType);
-          startActivity(i);
-        }
-        break;
-      case R.id.itImportExport:
-        if (Utils.checkProFeature(this)) {
-          ArrayList<String> items = new ArrayList(Arrays.asList(getResources().getStringArray(R.array.import_export)));
-          DialogUtils.showFragment(this, SelectorFragmentDialog.newInstance(ID_IMPORTEXPORT, items, true, this));
-        }
-        break;
-      case R.id.itLanguage:
-        ArrayList<String> items = new ArrayList(Arrays.asList(getResources().getStringArray(R.array.languages)));
-        DialogUtils.showFragment(this, SelectorFragmentDialog.newInstance(ID_LANGUAGE, items, true, this));
-        break;
-      case R.id.itAbout:
-        DialogUtils.showFragment(this, AboutDialog.newInstance());
-        break;
-    }
-    return true;
   }
 
   /*@Override
@@ -481,16 +491,13 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
   }
 
   private void setSortMode(TimesSort timesSort) {
-    if (miSortMode == null) {
-      return;
-    }
     if (timesSort == TimesSort.TIMESTAMP) {
       tvHistory.setText(R.string.history);
-      miSortMode.setTitle(R.string.show_best_times);
     } else {
       tvHistory.setText(R.string.best_times);
-      miSortMode.setTitle(R.string.show_history);
     }
+    menuListAdapter.notifyDataSetChanged();
+
     if (this.timesSort != timesSort) {
       this.timesSort = timesSort;
       refreshHistory();
@@ -669,6 +676,67 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
       bannerAd.showBanner();
     } else {
       bannerAd.hideBanner();
+    }
+  }
+
+  private class MenuListAdapter extends ArrayAdapter<String> {
+    private LayoutInflater inflater;
+    private String[] objects;
+
+    public MenuListAdapter(Context context, int id, String[] objects) {
+      super(context, id, objects);
+      inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+      this.objects = objects;
+    }
+
+    public View getView(final int position, View convertView, ViewGroup parent) {
+      View view = convertView;
+      if (view == null) {
+        view = inflater.inflate(R.layout.menu_item_with_icon, null);
+      }
+
+      if (position >= 0 && position < objects.length) {
+        ImageView icon = (ImageView) view.findViewById(R.id.imgIcon);
+        Integer imageResource = null;
+        switch (position) {
+          case 0:
+            imageResource = R.drawable.menu_settings;
+            break;
+          case 1:
+            imageResource = R.drawable.menu_sort_history;
+            break;
+          case 2:
+            imageResource = R.drawable.menu_graph;
+            break;
+          case 3:
+            imageResource = R.drawable.menu_import_export;
+            break;
+          case 4:
+            imageResource = R.drawable.menu_clear;
+            break;
+          case 5:
+            imageResource = R.drawable.menu_language;
+            break;
+          case 6:
+            imageResource = R.drawable.menu_about;
+            break;
+        }
+        if (imageResource != null) {
+          icon.setImageResource(imageResource);
+        }
+
+        TextView tvName = (TextView) view.findViewById(R.id.tvText);
+        if (position == 1) {
+          if (timesSort == TimesSort.TIMESTAMP) {
+            tvName.setText(R.string.show_best_times);
+          } else {
+            tvName.setText(R.string.show_history);
+          }
+        } else {
+          tvName.setText(objects[position]);
+        }
+      }
+      return view;
     }
   }
 

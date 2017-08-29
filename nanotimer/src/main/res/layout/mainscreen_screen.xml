@@ -174,9 +174,8 @@
              android:paddingLeft="@dimen/mainscreen_margin"
              android:paddingRight="@dimen/mainscreen_margin"
              android:paddingBottom="3px"
-             android:divider="@color/listview_divider"
-             android:dividerHeight="@dimen/divider_height"
-             android:alwaysDrawnWithCache="false"/>
+             android:alwaysDrawnWithCache="false"
+             style="@style/ListView"/>
           <!--android:background="@color/listview_background"-->
 
         </LinearLayout>
@@ -209,9 +208,10 @@
        android:id="@+id/navigationView"
        android:layout_width="wrap_content"
        android:layout_height="match_parent"
-       android:layout_gravity="start"
-       app:menu="@menu/mainscreen_menu"/>
-    <!--app:headerLayout="@layout/drawer_header"-->
+       android:layout_gravity="start">
+
+      <include layout="@layout/mainscreen_drawer_menu"/>
+    </android.support.design.widget.NavigationView>
 
   </android.support.v4.widget.DrawerLayout>
 

@@ -14,7 +14,6 @@
      android:id="@+id/lvItems"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
-     android:divider="@color/listview_divider"
-     android:dividerHeight="@dimen/divider_height"/>
+     style="@style/ListView"/>
 
 </com.cube.nanotimer.util.view.ScalingLinearLayout>

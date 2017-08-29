@@ -41,6 +41,11 @@
     <item name="android:layout_width">40px</item>
   </style>
 
+  <style name="ListView">
+    <item name="android:divider">@color/listview_divider</item>
+    <item name="android:dividerHeight">2px</item>
+  </style>
+
   <style name="ListViewItem">
     <item name="android:textSize">26px</item>
     <item name="android:layout_width">wrap_content</item>
