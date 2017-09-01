@@ -22,19 +22,20 @@ public class AddNewTimeDialog extends ConfirmDialog {
   private EditText tfSeconds;
   private EditText tfHundreds;
 
-  private ResultListener resultListener;
-  private SolveType solveType;
-  private String scramble;
+  private static final String ARG_RESULT_LISTENER = "resultListener";
+  private static final String ARG_SOLVE_TYPE = "solveType";
+  private static final String ARG_SCRAMBLE = "scramble";
 
   public static AddNewTimeDialog newInstance(ResultListener resultListener, SolveType solveType, String scramble) {
-    AddNewTimeDialog frag = new AddNewTimeDialog(resultListener, solveType, scramble);
-    return frag;
-  }
+    AddNewTimeDialog frag = new AddNewTimeDialog();
 
-  private AddNewTimeDialog(ResultListener resultListener, SolveType solveType, String scramble) {
-    this.resultListener = resultListener;
-    this.solveType = solveType;
-    this.scramble = scramble;
+    Bundle args = new Bundle();
+    args.putSerializable(ARG_RESULT_LISTENER, resultListener);
+    args.putSerializable(ARG_SOLVE_TYPE, solveType);
+    args.putString(ARG_SCRAMBLE, scramble);
+    frag.setArguments(args);
+
+    return frag;
   }
 
   @Override
@@ -62,6 +63,11 @@ public class AddNewTimeDialog extends ConfirmDialog {
     long time = minutes * 60000;
     time += seconds * 1000;
     time += hundreds * 10;
+
+    Bundle args = getArguments();
+    final ResultListener resultListener = (ResultListener) args.getSerializable(ARG_RESULT_LISTENER) ;
+    SolveType solveType = (SolveType) args.getSerializable(ARG_SOLVE_TYPE);
+    String scramble = args.getString(ARG_SCRAMBLE);
 
     SolveTime solveTime = new SolveTime();
     solveTime.setTime(time);

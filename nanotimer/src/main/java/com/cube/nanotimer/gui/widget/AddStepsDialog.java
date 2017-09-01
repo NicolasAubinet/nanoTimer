@@ -39,7 +39,6 @@ public class AddStepsDialog extends NanoTimerDialogFragment implements FieldRena
 
   private int pos;
   private Dialog dialog;
-  private StepsCreator stepsCreator;
   private List<String> liSteps;
   private StepsListAdapter stepsAdapter;
   private DragSortListView lvSteps;
@@ -47,18 +46,16 @@ public class AddStepsDialog extends NanoTimerDialogFragment implements FieldRena
   private static final int ACTION_RENAME = 0;
   private static final int ACTION_DELETE = 1;
 
+  private static final String ARG_STEPS_CREATOR = "stepsCreator";
   private static final String ARG_POS = "pos";
 
   public static AddStepsDialog newInstance(StepsCreator stepsCreator, int pos) {
-    AddStepsDialog frag = new AddStepsDialog(stepsCreator);
+    AddStepsDialog frag = new AddStepsDialog();
     Bundle args = new Bundle();
+    args.putSerializable(ARG_STEPS_CREATOR, stepsCreator);
     args.putInt(ARG_POS, pos);
     frag.setArguments(args);
     return frag;
-  }
-
-  private AddStepsDialog(StepsCreator stepsCreator) {
-    this.stepsCreator = stepsCreator;
   }
 
   @Override
@@ -175,6 +172,7 @@ public class AddStepsDialog extends NanoTimerDialogFragment implements FieldRena
     if (liSteps.size() < 2) {
       DialogUtils.showInfoMessage(getActivity(), R.string.min_steps_count_not_reached);
     } else {
+      StepsCreator stepsCreator = (StepsCreator) getArguments().getSerializable(ARG_STEPS_CREATOR);
       stepsCreator.addSteps(liSteps, pos);
       dismiss();
     }

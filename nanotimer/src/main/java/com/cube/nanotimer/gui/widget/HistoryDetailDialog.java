@@ -27,30 +27,30 @@ import java.util.Arrays;
 
 public class HistoryDetailDialog extends NanoTimerDialogFragment {
 
+  private static final String ARG_TIME_CHANGED_HANDLER = "timeChangedHandler";
   private static final String ARG_SOLVETIME = "solvetime";
   private static final String ARG_CUBETYPE = "cubetype";
 
   private TimeChangedHandler handler;
 
   public static HistoryDetailDialog newInstance(SolveTime solveTime, CubeType cubeType, TimeChangedHandler handler) {
-    HistoryDetailDialog hd = new HistoryDetailDialog(handler);
+    HistoryDetailDialog hd = new HistoryDetailDialog();
     Bundle bundle = new Bundle();
+    bundle.putSerializable(ARG_TIME_CHANGED_HANDLER, handler);
     bundle.putSerializable(ARG_SOLVETIME, solveTime);
     bundle.putSerializable(ARG_CUBETYPE, cubeType);
     hd.setArguments(bundle);
     return hd;
   }
 
-  private HistoryDetailDialog(TimeChangedHandler handler) {
-    this.handler = handler;
-  }
-
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
     final View v = getActivity().getLayoutInflater().inflate(R.layout.historydetail_dialog, null);
 
-    final SolveTime solveTime = (SolveTime) getArguments().getSerializable(ARG_SOLVETIME);
-    final CubeType cubeType = (CubeType) getArguments().getSerializable(ARG_CUBETYPE);
+    Bundle args = getArguments();
+    final SolveTime solveTime = (SolveTime) args.getSerializable(ARG_SOLVETIME);
+    final CubeType cubeType = (CubeType) args.getSerializable(ARG_CUBETYPE);
+    handler = (TimeChangedHandler) args.getSerializable(ARG_TIME_CHANGED_HANDLER);
     if (solveTime.getSolveType().isBlind()) {
       v.findViewById(R.id.averagesTable).setVisibility(View.GONE);
       v.findViewById(R.id.trMeanOfThree).setVisibility(View.VISIBLE);

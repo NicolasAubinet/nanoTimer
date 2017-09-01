@@ -7,15 +7,16 @@ import com.cube.nanotimer.R;
 
 public class FieldAddDialog extends ConfirmDialog {
 
-  private FieldCreator fieldCreator;
+  private static final String FIELD_CREATOR_KEY = "fieldCreator";
 
   public static FieldAddDialog newInstance(FieldCreator fieldCreator) {
-    FieldAddDialog frag = new FieldAddDialog(fieldCreator);
-    return frag;
-  }
+    FieldAddDialog frag = new FieldAddDialog();
 
-  private FieldAddDialog(FieldCreator fieldCreator) {
-    this.fieldCreator = fieldCreator;
+    Bundle args = new Bundle();
+    args.putSerializable(FIELD_CREATOR_KEY, fieldCreator);
+    frag.setArguments(args);
+
+    return frag;
   }
 
   @Override
@@ -27,6 +28,7 @@ public class FieldAddDialog extends ConfirmDialog {
   @Override
   protected void onConfirm() {
     EditText tfName = (EditText) view.findViewById(R.id.tfName);
+    FieldCreator fieldCreator = (FieldCreator) getArguments().getSerializable(FIELD_CREATOR_KEY);
     if (fieldCreator.createField(tfName.getText().toString(), null)) {
       dialog.dismiss();
     }

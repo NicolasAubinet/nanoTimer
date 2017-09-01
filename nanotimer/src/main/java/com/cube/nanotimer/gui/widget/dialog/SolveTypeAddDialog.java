@@ -25,9 +25,8 @@ public class SolveTypeAddDialog extends ConfirmDialog {
   public static final String KEY_BLD = "key_bld";
   public static final String KEY_SCRAMBLE_TYPE = "key_scrambleType";
 
+  private static final String ARG_FIELD_CREATOR = "fieldCreator";
   private static final String ARG_CUBE_TYPE = "cubeType";
-
-  private FieldCreator fieldCreator;
 
   private EditText tfName;
   private LinearLayout scrambleTypeLayout;
@@ -36,15 +35,12 @@ public class SolveTypeAddDialog extends ConfirmDialog {
   private ScrambleType previousScrambleType;
 
   public static SolveTypeAddDialog newInstance(FieldCreator fieldCreator, CubeType cubeType) {
-    SolveTypeAddDialog frag = new SolveTypeAddDialog(fieldCreator);
+    SolveTypeAddDialog frag = new SolveTypeAddDialog();
     Bundle args = new Bundle();
+    args.putSerializable(ARG_FIELD_CREATOR, fieldCreator);
     args.putString(ARG_CUBE_TYPE, cubeType.toString());
     frag.setArguments(args);
     return frag;
-  }
-
-  private SolveTypeAddDialog(FieldCreator fieldCreator) {
-    this.fieldCreator = fieldCreator;
   }
 
   @Override
@@ -111,6 +107,7 @@ public class SolveTypeAddDialog extends ConfirmDialog {
     }
     props.put(KEY_SCRAMBLE_TYPE, String.valueOf(scrambleTypeItemPosition));
 
+    FieldCreator fieldCreator = (FieldCreator) getArguments().getSerializable(ARG_FIELD_CREATOR);
     if (fieldCreator.createField(tfName.getText().toString(), props)) {
       dialog.dismiss();
     }

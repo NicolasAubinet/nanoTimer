@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources
+   xmlns:tools="http://schemas.android.com/tools"
+   tools:ignore="MissingTranslation">
   <string-array name="entries_inspection_modes">
     <item>@string/hold_and_release_inspection_mode</item>
     <item>@string/automatic_inspection_mode</item>

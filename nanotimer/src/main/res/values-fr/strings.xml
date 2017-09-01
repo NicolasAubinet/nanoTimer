@@ -133,10 +133,10 @@
   <string name="clock_URx_DRx_DLx">UR1+ DR6+ DL5- UL3+</string>
   <string name="ads">Publicités</string>
   <string name="ads_style">Type de publicités</string>
-  <!--<string name="ads_style_summary">Choose between banner, interstitial or mixed</string>-->
-  <!--<string name="banner">Bannière</string>-->
-  <!--<string name="interstitial">Interstitial</string>-->
-  <!--<string name="mixed">Mixed</string>-->
+  <string name="ads_style_summary">Choiser entre bannière, intersticial ou mixed</string>
+  <string name="banner">Bannière</string>
+  <string name="interstitial">Intersticial</string>
+  <string name="mixed">Mixed</string>
   <string name="want_to_clear_scramble_cache">Voulez-vous effacer le cache de mélanges?</string>
   <string name="modern_scrambles_settings">Réglages des mélanges d\'état aléatoire</string>
   <string name="modern_scrambles_settings_summary">Choisir quant / comment les mélanges sont générés</string>
