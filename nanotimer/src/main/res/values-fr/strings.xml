@@ -287,12 +287,12 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.2.2 <i>(Nouvelle version)</i></b></u>
+    <u><b>v1.3.0 <i>(Nouvelle version)</i></b></u>
     <ul>
       <li>Support de types de mélange spéciaux pour le 3x3x3 pour entraînement sur F2L, Last Layer, PLL, arêtes et plus</li>
       <li>Refonte de l\'interface de l\'écran principal</li>
       <li>Ajout de la langue française et espagnole</li>
-      <li>Adaptation des permissions d\'import pour Android Kitkat and au-delà</li>
+      <li>Adaptation des permissions d\'import pour Android Kitkat et au-delà</li>
       <li>Adaptation de l\'icône de notification de génération des mélanges pour Android Lollipop et au-delà</li>
     </ul>
     <u><b>v1.2.1</b></u>

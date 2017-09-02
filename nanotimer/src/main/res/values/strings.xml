@@ -287,7 +287,7 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.2.2 <i>(New version)</i></b></u>
+    <u><b>v1.3.0 <i>(New version)</i></b></u>
     <ul>
       <li>Add support for special 3x3x3 scramble types to practice only F2L, last layer, PLL, edges and more</li>
       <li>Rework the main screen user interface</li>
