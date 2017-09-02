@@ -19,26 +19,23 @@
      android:layout_height="wrap_content"
      android:layout_marginTop="15dp"
      android:orientation="horizontal">
-    <Button
+    <android.support.v7.widget.AppCompatButton
        android:id="@+id/buRateNow"
-       android:layout_height="35dp"
        android:layout_weight="1"
        android:layout_marginRight="3dp"
        android:text="@string/rate_now"
        android:textSize="15sp"
        style="@style/MenuButton"/>
-    <Button
+    <android.support.v7.widget.AppCompatButton
        android:id="@+id/buAskLater"
-       android:layout_height="35dp"
        android:layout_weight="1"
        android:layout_marginLeft="3dp"
        android:layout_marginRight="3dp"
        android:text="@string/ask_later"
        android:textSize="15sp"
        style="@style/MenuButton"/>
-    <Button
+    <android.support.v7.widget.AppCompatButton
        android:id="@+id/buDontAskAgain"
-       android:layout_height="35dp"
        android:layout_weight="1"
        android:layout_marginLeft="3dp"
        android:text="@string/dont_ask_again"
