@@ -125,7 +125,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
     super.initViews();
     spCubeType = (Spinner) findViewById(R.id.spCubeType);
     cubeTypesSpinnerAdapter = new NameHolderSpinnerAdapter(this, R.id.spCubeType, cubeTypes, false);
-    cubeTypesSpinnerAdapter.setDropDownViewResource(R.layout.spinner_item_scaling_layout);
+    cubeTypesSpinnerAdapter.setDropDownViewResource(R.layout.spinner_item);
     spCubeType.setAdapter(cubeTypesSpinnerAdapter);
     spCubeType.setOnItemSelectedListener(new OnItemSelectedListener() {
       @Override
@@ -140,7 +140,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
 
     spSolveType = (Spinner) findViewById(R.id.spSolveType);
     solveTypesSpinnerAdapter = new NameHolderSpinnerAdapter(this, R.id.spSolveType, solveTypes, true);
-    solveTypesSpinnerAdapter.setDropDownViewResource(R.layout.spinner_item_scaling_layout);
+    solveTypesSpinnerAdapter.setDropDownViewResource(R.layout.spinner_item);
     spSolveType.setAdapter(solveTypesSpinnerAdapter);
     spSolveType.setOnItemSelectedListener(new OnItemSelectedListener() {
       @Override

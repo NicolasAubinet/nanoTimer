@@ -4,8 +4,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingRight="8px"
-    android:paddingLeft="8px">
+    android:paddingRight="6dp"
+    android:paddingLeft="6dp">
 
   <EditText android:id="@+id/tfName"
       android:layout_width="match_parent"

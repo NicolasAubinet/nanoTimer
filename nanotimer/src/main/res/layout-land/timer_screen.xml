@@ -31,7 +31,7 @@
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
          android:text="@string/scrambleC"
-         style="@style/ScrambleTextField"/>
+         style="@style/ScrambleTextFieldPx"/>
       <com.cube.nanotimer.util.view.FontFitTextView
          android:id="@+id/tvScramble"
          android:layout_width="match_parent"
@@ -39,7 +39,7 @@
          android:layout_marginTop="8px"
          android:gravity="center_horizontal"
          app:myfont="MONOSPACE"
-         style="@style/ScrambleTextField"/>
+         style="@style/ScrambleTextFieldPx"/>
     </LinearLayout>
 
     <RelativeLayout
@@ -60,22 +60,22 @@
            android:stretchColumns="*"
            android:layout_marginBottom="3px">
           <TableRow>
-            <TextView style="@style/TableCell"/>
-            <TextView style="@style/TableCell"/>
-            <TextView style="@style/TableCell"/>
-            <TextView style="@style/TableCell"/>
+            <TextView style="@style/TableCellPx"/>
+            <TextView style="@style/TableCellPx"/>
+            <TextView style="@style/TableCellPx"/>
+            <TextView style="@style/TableCellPx"/>
           </TableRow>
           <TableRow>
-            <TextView style="@style/TableCell"/>
-            <TextView style="@style/TableCell"/>
-            <TextView style="@style/TableCell"/>
-            <TextView style="@style/TableCell"/>
+            <TextView style="@style/TableCellPx"/>
+            <TextView style="@style/TableCellPx"/>
+            <TextView style="@style/TableCellPx"/>
+            <TextView style="@style/TableCellPx"/>
           </TableRow>
           <TableRow>
-            <TextView style="@style/TableCell"/>
-            <TextView style="@style/TableCell"/>
-            <TextView style="@style/TableCell"/>
-            <TextView style="@style/TableCell"/>
+            <TextView style="@style/TableCellPx"/>
+            <TextView style="@style/TableCellPx"/>
+            <TextView style="@style/TableCellPx"/>
+            <TextView style="@style/TableCellPx"/>
           </TableRow>
         </TableLayout>
 
@@ -95,42 +95,42 @@
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:text="@string/solves_count"
-                 style="@style/SmallTextField"/>
+                 style="@style/SmallTextFieldPx"/>
               <TextView
                  android:id="@+id/tvSolvesCount"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="5px"
                  android:textColor="@color/white"
-                 style="@style/SmallTextField"/>
+                 style="@style/SmallTextFieldPx"/>
             </TableRow>
             <TableRow android:id="@+id/trLifetimeAccuracy" android:layout_marginTop="2px" android:visibility="gone">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:text="@string/lifetime_accuracy"
-                 style="@style/SmallTextField"/>
+                 style="@style/SmallTextFieldPx"/>
               <TextView
                  android:id="@+id/tvLifetimeAccuracy"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="5px"
                  android:textColor="@color/white"
-                 style="@style/SmallTextField"/>
+                 style="@style/SmallTextFieldPx"/>
             </TableRow>
             <TableRow android:layout_marginTop="2px">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:text="@string/last_mean_of_three"
-                 style="@style/SmallTextField"/>
+                 style="@style/SmallTextFieldPx"/>
               <TextView
                  android:id="@+id/tvMeanOfThree"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="5px"
                  android:textColor="@color/white"
-                 style="@style/SmallTextField"/>
+                 style="@style/SmallTextFieldPx"/>
             </TableRow>
           </TableLayout>
           <TableLayout
@@ -142,42 +142,42 @@
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:text="@string/lifetime_best"
-                 style="@style/SmallTextField"/>
+                 style="@style/SmallTextFieldPx"/>
               <TextView
                  android:id="@+id/tvLifetimeBest"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="5px"
                  android:textColor="@color/white"
-                 style="@style/SmallTextField"/>
+                 style="@style/SmallTextFieldPx"/>
             </TableRow>
             <TableRow android:layout_marginTop="2px">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:text="@string/lifetime_avg"
-                 style="@style/SmallTextField"/>
+                 style="@style/SmallTextFieldPx"/>
               <TextView
                  android:id="@+id/tvLifetimeAvg"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="5px"
                  android:textColor="@color/white"
-                 style="@style/SmallTextField"/>
+                 style="@style/SmallTextFieldPx"/>
             </TableRow>
             <TableRow android:id="@+id/trBestMeanOfThree" android:layout_marginTop="2px" android:visibility="gone">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:text="@string/best_mean_of_three"
-                 style="@style/SmallTextField"/>
+                 style="@style/SmallTextFieldPx"/>
               <TextView
                  android:id="@+id/tvBestMeanOfThree"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="5px"
                  android:textColor="@color/white"
-                 style="@style/SmallTextField"/>
+                 style="@style/SmallTextFieldPx"/>
             </TableRow>
           </TableLayout>
         </LinearLayout>
@@ -196,28 +196,28 @@
          android:visibility="gone"
          android:stretchColumns="*">
         <TableRow>
-          <TextView style="@style/SolveStepTextField" android:gravity="right"/>
-          <TextView style="@style/SolveStepTextField" android:gravity="left"/>
-          <TextView style="@style/SolveStepTextField" android:gravity="right"/>
-          <TextView style="@style/SolveStepTextField" android:gravity="left"/>
+          <TextView style="@style/SolveStepTextFieldPx" android:gravity="right"/>
+          <TextView style="@style/SolveStepTextFieldPx" android:gravity="left"/>
+          <TextView style="@style/SolveStepTextFieldPx" android:gravity="right"/>
+          <TextView style="@style/SolveStepTextFieldPx" android:gravity="left"/>
         </TableRow>
         <TableRow>
-          <TextView style="@style/SolveStepTextField" android:gravity="right"/>
-          <TextView style="@style/SolveStepTextField" android:gravity="left"/>
-          <TextView style="@style/SolveStepTextField" android:gravity="right"/>
-          <TextView style="@style/SolveStepTextField" android:gravity="left"/>
+          <TextView style="@style/SolveStepTextFieldPx" android:gravity="right"/>
+          <TextView style="@style/SolveStepTextFieldPx" android:gravity="left"/>
+          <TextView style="@style/SolveStepTextFieldPx" android:gravity="right"/>
+          <TextView style="@style/SolveStepTextFieldPx" android:gravity="left"/>
         </TableRow>
         <TableRow>
-          <TextView style="@style/SolveStepTextField" android:gravity="right"/>
-          <TextView style="@style/SolveStepTextField" android:gravity="left"/>
-          <TextView style="@style/SolveStepTextField" android:gravity="right"/>
-          <TextView style="@style/SolveStepTextField" android:gravity="left"/>
+          <TextView style="@style/SolveStepTextFieldPx" android:gravity="right"/>
+          <TextView style="@style/SolveStepTextFieldPx" android:gravity="left"/>
+          <TextView style="@style/SolveStepTextFieldPx" android:gravity="right"/>
+          <TextView style="@style/SolveStepTextFieldPx" android:gravity="left"/>
         </TableRow>
         <TableRow>
-          <TextView style="@style/SolveStepTextField" android:gravity="right"/>
-          <TextView style="@style/SolveStepTextField" android:gravity="left"/>
-          <TextView style="@style/SolveStepTextField" android:gravity="right"/>
-          <TextView style="@style/SolveStepTextField" android:gravity="left"/>
+          <TextView style="@style/SolveStepTextFieldPx" android:gravity="right"/>
+          <TextView style="@style/SolveStepTextFieldPx" android:gravity="left"/>
+          <TextView style="@style/SolveStepTextFieldPx" android:gravity="right"/>
+          <TextView style="@style/SolveStepTextFieldPx" android:gravity="left"/>
         </TableRow>
       </TableLayout>
 
@@ -232,33 +232,33 @@
          android:layout_marginBottom="3px">
         <TableRow>
           <TextView android:textSize="21px" android:textStyle="bold" android:padding="2px" android:layout_width="50px"/>
-          <TextView android:id="@+id/tvAvgOf" android:text="@string/last_avg_of" android:layout_weight="1" style="@style/AverageTableHeaderField" android:padding="2px"/>
-          <TextView android:id="@+id/tvBestOf" android:text="@string/best_avg_of" android:layout_weight="1" style="@style/AverageTableHeaderField" android:padding="2px"/>
+          <TextView android:id="@+id/tvAvgOf" android:text="@string/last_avg_of" android:layout_weight="1" style="@style/AverageTableHeaderFieldPx" android:padding="2px"/>
+          <TextView android:id="@+id/tvBestOf" android:text="@string/best_avg_of" android:layout_weight="1" style="@style/AverageTableHeaderFieldPx" android:padding="2px"/>
         </TableRow>
         <TableRow android:id="@+id/trAvgOfFive">
-          <TextView android:text="5" style="@style/AverageTableFirstField" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFive" android:layout_weight="1" style="@style/TableCell" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFive" android:layout_weight="1" style="@style/TableCell" android:padding="2px"/>
+          <TextView android:text="5" style="@style/AverageTableFirstFieldPx" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFive" android:layout_weight="1" style="@style/TableCellPx" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFive" android:layout_weight="1" style="@style/TableCellPx" android:padding="2px"/>
         </TableRow>
         <TableRow android:id="@+id/trAvgOfTwelve">
-          <TextView android:text="12" style="@style/AverageTableFirstField" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfTwelve" android:layout_weight="1" style="@style/TableCell" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfTwelve" android:layout_weight="1" style="@style/TableCell" android:padding="2px"/>
+          <TextView android:text="12" style="@style/AverageTableFirstFieldPx" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfTwelve" android:layout_weight="1" style="@style/TableCellPx" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfTwelve" android:layout_weight="1" style="@style/TableCellPx" android:padding="2px"/>
         </TableRow>
         <TableRow android:id="@+id/trAvgOfFifty">
-          <TextView android:text="50" style="@style/AverageTableFirstField" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFifty" android:layout_weight="1" style="@style/TableCell" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFifty" android:layout_weight="1" style="@style/TableCell" android:padding="2px"/>
+          <TextView android:text="50" style="@style/AverageTableFirstFieldPx" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFifty" android:layout_weight="1" style="@style/TableCellPx" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFifty" android:layout_weight="1" style="@style/TableCellPx" android:padding="2px"/>
         </TableRow>
         <TableRow android:id="@+id/trAvgOfHundred">
-          <TextView android:text="100" style="@style/AverageTableFirstField" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfHundred" android:layout_weight="1" style="@style/TableCell" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfHundred" android:layout_weight="1" style="@style/TableCell" android:padding="2px"/>
+          <TextView android:text="100" style="@style/AverageTableFirstFieldPx" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfHundred" android:layout_weight="1" style="@style/TableCellPx" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfHundred" android:layout_weight="1" style="@style/TableCellPx" android:padding="2px"/>
         </TableRow>
         <TableRow android:id="@+id/trAvgOfLife" android:visibility="gone">
-          <TextView android:text="@string/life" style="@style/AverageTableFirstField" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfLife" android:layout_weight="1" style="@style/TableCell" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:layout_weight="1" style="@style/TableCell" android:padding="2px"/>
+          <TextView android:text="@string/life" style="@style/AverageTableFirstFieldPx" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfLife" android:layout_weight="1" style="@style/TableCellPx" android:padding="2px"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:layout_weight="1" style="@style/TableCellPx" android:padding="2px"/>
         </TableRow>
       </TableLayout>
     </RelativeLayout>

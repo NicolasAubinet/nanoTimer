@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.cube.nanotimer.util.view.ScalingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
    android:orientation="vertical"
    android:layout_width="match_parent"
    android:layout_height="match_parent"
-   android:paddingRight="8px"
-   android:paddingLeft="8px"
-   android:paddingTop="2px"
-   android:paddingBottom="4px"
+   android:paddingRight="6dp"
+   android:paddingLeft="5dp"
+   android:paddingTop="2dp"
+   android:paddingBottom="3dp"
    android:background="@color/color_primary_dark">
 
   <ListView
@@ -16,4 +16,4 @@
      android:layout_height="wrap_content"
      style="@style/ListView"/>
 
-</com.cube.nanotimer.util.view.ScalingLinearLayout>
+</LinearLayout>

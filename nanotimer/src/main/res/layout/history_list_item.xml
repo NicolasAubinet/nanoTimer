@@ -1,46 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.cube.nanotimer.util.view.ScalingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  android:paddingLeft="@dimen/mainscreen_margin"
-  android:paddingRight="@dimen/mainscreen_margin">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   android:paddingLeft="@dimen/mainscreen_margin"
+   android:paddingRight="@dimen/mainscreen_margin">
 
-  <RelativeLayout
-     android:layout_width="match_parent"
-     android:layout_height="match_parent">
+  <TextView
+     android:id="@+id/tvDate"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_alignParentLeft="true"
+     style="@style/SmallListViewItem"/>
 
-    <TextView
-       android:id="@+id/tvDate"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_alignParentLeft="true"
-       style="@style/SmallListViewItem"/>
+  <ImageView
+     android:id="@+id/imgPb"
+     android:layout_width="16dp"
+     android:layout_height="16dp"
+     android:layout_marginRight="8dp"
+     android:layout_centerVertical="true"
+     android:layout_toLeftOf="@+id/imgCircle"
+     android:src="@drawable/star"/>
 
-    <ImageView
-       android:id="@+id/imgPb"
-       android:layout_width="26px"
-       android:layout_height="26px"
-       android:layout_marginRight="12px"
-       android:layout_centerVertical="true"
-       android:layout_toLeftOf="@+id/imgCircle"
-       android:src="@drawable/star"/>
+  <ImageView
+     android:id="@+id/imgCircle"
+     android:layout_width="7dp"
+     android:layout_height="7dp"
+     android:layout_centerVertical="true"
+     android:layout_toLeftOf="@+id/tvTime"
+     android:src="@drawable/history_circle"/>
 
-    <ImageView
-       android:id="@+id/imgCircle"
-       android:layout_width="10px"
-       android:layout_height="10px"
-       android:layout_centerVertical="true"
-       android:layout_toLeftOf="@+id/tvTime"
-       android:src="@drawable/history_circle"/>
+  <TextView
+     android:id="@+id/tvTime"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_alignParentRight="true"
+     style="@style/SmallListViewItem"/>
 
-    <TextView
-       android:id="@+id/tvTime"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_alignParentRight="true"
-       style="@style/SmallListViewItem"/>
-
-  </RelativeLayout>
-
-</com.cube.nanotimer.util.view.ScalingLinearLayout>
+</RelativeLayout>

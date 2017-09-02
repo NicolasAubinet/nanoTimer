@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.cube.nanotimer.util.view.ScalingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
    xmlns:dslv="http://schemas.android.com/apk/res-auto"
    android:orientation="vertical"
    android:layout_width="match_parent"
    android:layout_height="match_parent"
-   android:padding="9px">
+   android:padding="6dp">
 
   <RelativeLayout
      android:orientation="horizontal"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
-     android:layout_marginTop="5px">
+     android:layout_marginTop="4dp">
 
     <EditText
        android:id="@+id/tfStepName"
@@ -23,14 +23,14 @@
 
     <android.support.v7.widget.AppCompatButton
        android:id="@+id/buAddStep"
-       android:layout_width="100px"
+       android:layout_width="65dp"
        android:layout_height="wrap_content"
        android:text="+"
        android:layout_alignParentRight="true"
        android:layout_alignTop="@+id/tfStepName"
        android:layout_alignBottom="@+id/tfStepName"
        android:gravity="center"
-       android:textSize="25px"/>
+       android:textSize="15sp"/>
 
   </RelativeLayout>
 
@@ -39,7 +39,7 @@
        android:layout_width="match_parent"
        android:layout_height="match_parent"
        android:longClickable="true"
-       android:layout_marginTop="5px"
+       android:layout_marginTop="4dp"
        dslv:drag_handle_id="@drawable/listmove"
        dslv:drag_enabled="true"
        dslv:drag_scroll_start="0.33"
@@ -51,4 +51,4 @@
        dslv:track_drag_sort="false"
        dslv:use_default_controller="true"/>
 
-</com.cube.nanotimer.util.view.ScalingLinearLayout>
+</LinearLayout>

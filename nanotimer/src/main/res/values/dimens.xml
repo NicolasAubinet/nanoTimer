@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <dimen name="mainscreen_card_elevation">12px</dimen>
-  <dimen name="mainscreen_margin">8px</dimen>
-  <dimen name="mainscreen_radius">5px</dimen>
-  <dimen name="divider_height">2px</dimen>
+  <dimen name="mainscreen_card_elevation">8dp</dimen>
+  <dimen name="mainscreen_margin">6dp</dimen>
+  <dimen name="mainscreen_radius">4dp</dimen>
+  <dimen name="divider_height">2dp</dimen>
   <dimen name="card_margin_horizontal">-8dp</dimen>
   <dimen name="card_margin_vertical">-12dp</dimen>
 </resources>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.cube.nanotimer.util.view.ScalingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
    xmlns:dslv="http://schemas.android.com/apk/res-auto"
    android:orientation="vertical"
    android:layout_width="match_parent"
@@ -11,9 +11,9 @@
      android:layout_width="match_parent"
      android:layout_height="match_parent"
      android:longClickable="true"
-     android:layout_marginTop="5px"
-     android:layout_marginLeft="9px"
-     android:layout_marginRight="9px"
+     android:layout_marginTop="4dp"
+     android:layout_marginLeft="6dp"
+     android:layout_marginRight="6dp"
      dslv:drag_handle_id="@drawable/listmove"
      dslv:drag_enabled="true"
      dslv:drag_scroll_start="0.33"
@@ -25,4 +25,4 @@
      dslv:track_drag_sort="false"
      dslv:use_default_controller="true"/>
 
-</com.cube.nanotimer.util.view.ScalingLinearLayout>
+</LinearLayout>

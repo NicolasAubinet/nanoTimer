@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.cube.nanotimer.util.view.ScalingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
    xmlns:app="http://schemas.android.com/apk/res-auto"
    android:id="@+id/mainLayout"
    android:layout_height="match_parent"
@@ -47,23 +47,23 @@
            android:layout_height="wrap_content"
            android:stretchColumns="*"
            android:layout_alignParentTop="true"
-           android:paddingLeft="6px"
-           android:paddingRight="6px"
-           android:paddingBottom="5px">
+           android:paddingLeft="4dp"
+           android:paddingRight="4dp"
+           android:paddingBottom="4dp">
 
           <TableRow>
 
             <TextView
-               android:layout_width="0px"
+               android:layout_width="0dp"
                android:layout_height="wrap_content"
-               android:layout_marginLeft="6px"
+               android:layout_marginLeft="4dp"
                android:text="@string/cube_type"
                android:textColor="@color/white"
                android:gravity="start"
                style="@style/SmallTextField"/>
 
             <TextView
-               android:layout_width="0px"
+               android:layout_width="0dp"
                android:layout_height="wrap_content"
                android:text="@string/solve_type"
                android:textColor="@color/white"
@@ -71,17 +71,17 @@
                style="@style/SmallTextField"/>
           </TableRow>
 
-          <TableRow android:layout_marginTop="4px">
+          <TableRow android:layout_marginTop="3dp">
 
             <Spinner
                android:id="@+id/spCubeType"
-               android:layout_width="0px"
+               android:layout_width="0dp"
                android:gravity="start"
                style="@style/CustomSpinner"/>
 
             <Spinner
                android:id="@+id/spSolveType"
-               android:layout_width="0px"
+               android:layout_width="0dp"
                android:gravity="start"
                style="@style/CustomSpinner"/>
 
@@ -105,7 +105,7 @@
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
          android:text="@string/upgrade_pro_app"
-         android:textSize="26px"
+         android:textSize="18sp"
          android:textColor="@color/warning"
          android:visibility="gone"
          android:gravity="center"
@@ -144,10 +144,10 @@
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
                android:background="@color/darkblue"
-               android:paddingTop="6px"
+               android:paddingTop="4dp"
                android:paddingLeft="@dimen/mainscreen_margin"
                android:paddingRight="@dimen/mainscreen_margin"
-               android:paddingBottom="8px">
+               android:paddingBottom="7dp">
 
               <TextView
                  android:id="@+id/tvHistory"
@@ -175,7 +175,7 @@
              android:id="@+id/lvHistory"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             android:paddingBottom="3px"
+             android:paddingBottom="2dp"
              android:alwaysDrawnWithCache="false"/>
           <!--android:background="@color/listview_background"-->
 
@@ -199,8 +199,8 @@
       <!--android:layout_marginRight="@dimen/mainscreen_margin"-->
 
       <!--android:background="?android:attr/selectableItemBackground"-->
-      <!--android:layout_marginLeft="2px"-->
-      <!--android:layout_marginRight="2px"-->
+      <!--android:layout_marginLeft="2dp"-->
+      <!--android:layout_marginRight="2dp"-->
       <!--</FrameLayout>-->
 
     </RelativeLayout>
@@ -216,4 +216,4 @@
 
   </android.support.v4.widget.DrawerLayout>
 
-</com.cube.nanotimer.util.view.ScalingLinearLayout>
+</LinearLayout>
