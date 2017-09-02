@@ -4,6 +4,6 @@
   <dimen name="mainscreen_margin">8px</dimen>
   <dimen name="mainscreen_radius">5px</dimen>
   <dimen name="divider_height">2px</dimen>
-  <dimen name="card_margin_horizontal">-3dp</dimen>
-  <dimen name="card_margin_vertical">-6dp</dimen>
+  <dimen name="card_margin_horizontal">-8dp</dimen>
+  <dimen name="card_margin_vertical">-12dp</dimen>
 </resources>
