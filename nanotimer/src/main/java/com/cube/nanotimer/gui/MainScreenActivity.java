@@ -766,6 +766,14 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
             view.findViewById(R.id.imgPb).setVisibility(View.GONE);
           }
         }
+
+        int backgroundResourceId;
+        if (position % 2 == 0) {
+          backgroundResourceId = R.drawable.listview_item_alternate_1;
+        } else {
+          backgroundResourceId = R.drawable.listview_item_alternate_2;
+        }
+        view.setBackgroundResource(backgroundResourceId);
       }
       return view;
     }

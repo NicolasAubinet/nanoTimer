@@ -55,10 +55,19 @@
   <color name="darkgray">#FF333333</color>
   <color name="lightblue">#FF6CCCEC</color>
   <color name="iceblue">#FF0883AC</color>
+  <!--<color name="iceblue">#FF0CABDF</color>-->
+  <!--<color name="darkblue">#FF263238</color>-->
+  <color name="darkblue">#FF303E4A</color>
   <!--<color name="graybg">#FF1C1E20</color>-->
   <color name="graybg">#333333</color>
   <color name="pushedbg">#454545</color>
   <color name="transparent">#00000000</color>
+
+  <color name="history_item_background_1">@color/color_primary</color>
+  <color name="history_item_background_2">@color/color_primary_dark</color>
+  <color name="history_item_pressed_background">#4B4B4B</color>
+  <!--<color name="history_item_background_1">#FF25252A</color>-->
+  <!--<color name="history_item_background_2">#FF26262F</color>-->
 
   <color name="button_pressed">#FF1976D2</color>
   <color name="button_disabled">@color/gray850</color>

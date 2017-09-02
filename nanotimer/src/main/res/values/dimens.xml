@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <dimen name="mainscreen_card_elevation">6px</dimen>
+  <dimen name="mainscreen_card_elevation">12px</dimen>
   <dimen name="mainscreen_margin">8px</dimen>
   <dimen name="mainscreen_radius">5px</dimen>
   <dimen name="divider_height">2px</dimen>
