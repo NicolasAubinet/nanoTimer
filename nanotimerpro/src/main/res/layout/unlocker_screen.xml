@@ -49,8 +49,8 @@
 
     <android.support.v7.widget.AppCompatButton
        android:id="@+id/buAction"
+       android:layout_height="wrap_content"
        android:layout_width="wrap_content"
-       android:layout_height="40dp"
        android:layout_marginTop="20dp"
        android:layout_marginBottom="15dp"
        android:paddingRight="25dp"
