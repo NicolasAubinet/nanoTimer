@@ -13,7 +13,9 @@
     <item name="android:textSize">21px</item>
   </style>
 
-  <style name="SolveStepTextField" parent="ScrambleTextField">
+  <style name="SolveStepTextField">
+    <item name="android:textSize">24px</item>
+    <item name="android:gravity">center</item>
     <item name="android:layout_weight">1</item>
     <item name="android:layout_width">0px</item>
     <item name="android:layout_marginLeft">2px</item>
