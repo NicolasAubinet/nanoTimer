@@ -175,7 +175,7 @@
 
   <string name="rate_message">Si vous aimez Nano Timer, n\'hésitez pas à laisser une évaluation.\nMerci pour votre soutien!</string>
   <string name="rate">Évaluer</string>
-  <string name="rate_now">Évaluer maintenant</string>
+  <string name="rate_now">Évaluer</string>
   <string name="ask_later">Plus tard</string>
   <string name="dont_ask_again">Jamais</string>
   <string name="could_not_find_market">Impossible de trouver l\'app du market</string>
