@@ -290,7 +290,7 @@
     <u><b>v1.3.0 <i>(New version)</i></b></u>
     <ul>
       <li>Add support for special 3x3x3 scramble types to practice only F2L, last layer, PLL, edges and more</li>
-      <li>Rework the main screen user interface</li>
+      <li>Rework the history screen user interface</li>
       <li>Add support for French and Spanish languages</li>
       <li>Adapt import permissions for Android Kitkat and above</li>
       <li>Adapt scrambles generating notification icon for Android Lollipop and above</li>

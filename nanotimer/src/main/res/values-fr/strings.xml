@@ -289,11 +289,11 @@
     <font color=\"white\">
     <u><b>v1.3.0 <i>(Nouvelle version)</i></b></u>
     <ul>
-      <li>Support de types de mélange spéciaux pour le 3x3x3 pour entraînement sur F2L, Last Layer, PLL, arêtes et plus</li>
-      <li>Refonte de l\'interface de l\'écran principal</li>
-      <li>Ajout de la langue française et espagnole</li>
-      <li>Adaptation des permissions d\'import pour Android Kitkat et au-delà</li>
-      <li>Adaptation de l\'icône de notification de génération des mélanges pour Android Lollipop et au-delà</li>
+      <li>Support de types de m&eacute;lange sp&eacute;ciaux pour le 3x3x3 pour entra&icirc;nement sur F2L, Last Layer, PLL, ar&ecirc;tes et autres</li>
+      <li>Refonte de l\'interface de l\'&eacute;cran d\'historique</li>
+      <li>Ajout de la langue fran&ccedil;aise et espagnole</li>
+      <li>Adaptation des permissions d\'import pour Android Kitkat et au-del&agrave;</li>
+      <li>Adaptation de l\'ic&ocirc;ne de notification de g&eacute;n&eacute;ration des m&eacute;langes pour Android Lollipop et au-del&agrave;</li>
     </ul>
     <u><b>v1.2.1</b></u>
     <ul>
