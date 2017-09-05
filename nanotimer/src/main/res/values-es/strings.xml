@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">Nano Timer</string>
+  <string name="app_name_copyright">&#169; 2014-2017 Nano Timer</string>
+  <string name="app_description">Temporizador de Cubo de Rubik para Android</string>
+  <string name="app_license">Esta app usa librerías drag-sort-listview, MPAndroidChart y android-wheel licenciadas bajo Apache 2.0.</string>
+  <string name="feedback_message">Si encuentras un error o tienes sugerencias o comentarios, no dudes en enviar un email al siguiente correo.</string>
+  <string name="dev_name">Nicolas Aubinet</string>
+  <string name="email">NanoTimerCube@gmail.com</string>
+  <string name="about">Sobre</string>
+  <string name="backspace_exit">Pulsar atrás otra vez para salir</string>
+
+  <string name="cube_type">Tipo de cubo</string>
+  <string name="solve_type">Método</string>
+  <string name="history">Historial</string>
+  <string name="solves">Resoluciones</string>
+  <string name="scramble">Mezcla</string>
+  <string name="scrambleC">Mezcla:</string>
+  <string name="start">Comenzar</string>
+  <string name="practice">Práctica</string>
+
+  <string name="add">Añadir</string>
+  <string name="add_solvetype">Añadir método</string>
+  <string name="save">Guardar</string>
+  <string name="action">Acción</string>
+  <string name="rename">Renomnbrar</string>
+  <string name="cancel">Cancelar</string>
+  <string name="confirm">Confirmar</string>
+  <string name="solve_type_already_exists">Método ya existente con el mismo nombre</string>
+  <string name="step_already_exists">Paso ya existente con el mismo nombre para este método</string>
+  <string name="name_contains_forbidden_char">Carácter inválido en nombre: \'%1$s\'</string>
+  <string name="delete_solve_type_confirmation">¿Estás seguro que quieres eliminar el método \'%1$s\' y todos sus tiempos?</string>
+  <string name="new_session_confirmation">¿Estás seguro que deseas comenzar una nueva sesión?</string>
+  <string name="solvetype_has_times_addsteps">Este método tiene varios tiempos. Añadir pasos los eliminará. ¿Estás seguro que quieres continuar?</string>
+  <string name="min_steps_count_not_reached">Debes crear al menos dos pasos</string>
+  <string name="max_steps_count_reached">Se ha alcanzado el límite de pasos</string>
+  <string name="add_step">Añadir paso</string>
+  <string name="add_steps">Añadir pasos</string>
+
+  <string name="last_avg_of">Última media de</string>
+  <string name="best_avg_of">Mejor media de</string>
+  <string name="success_avg">Media de éxitos</string>
+  <string name="accuracy">Éxito</string>
+  <string name="life">Vida</string>
+
+  <string name="lifetime_best">Mejor de todos los tiempos:</string>
+  <string name="lifetime_avg">Media global:</string>
+  <string name="lifetime_accuracy">Éxito global:</string>
+  <string name="last_mean_of_three">Última media de 3:</string>
+  <string name="best_mean_of_three">Mejor media de 3:</string>
+  <string name="solves_count">Cuenta de resoluciones:</string>
+  <string name="mean_of_three">Media de 3:</string>
+
+  <string name="plus_two">+2</string>
+  <string name="DNF">DNF</string>
+  <string name="delete">Eliminar</string>
+  <string name="session_details">Detalles de sesión</string>
+  <string name="new_session">Nueva sesión</string>
+  <string name="time">Tiempo:</string>
+  <string name="averages">Medias</string>
+  <string name="steps">Pasos</string>
+  <string name="stepsC">Pasos:</string>
+  <string name="NA">N/D</string>
+  <string name="no_scramble">Sin mezcla\n(el tiempo fue insertado manualmente)</string>
+
+  <string name="session_avg">Media:</string>
+  <string name="session_mean">Media:</string>
+  <string name="session_solves">Resoluciones:</string>
+  <string name="session_best">Mejor:</string>
+  <string name="session_deviation">Desviación:</string>
+  <string name="total_solves">Resoluciones totales:</string>
+  <string name="more">Más</string>
+  <string name="best_averages">Mejores medias</string>
+  <string name="times">Tiempos</string>
+  <string name="session_best_mean_of_three">Mejor Mo3:</string>
+  <string name="session_success_average">Media de éxitos:</string>
+  <string name="session_accuracy">Éxito:</string>
+  <string name="session_start">Comenzar:</string>
+
+  <string name="clear_history">Limpiar historial</string>
+  <string name="clear_history_solve_type_confirmation">¿Estás seguro que quieres eliminar todos los tiempos para este método?</string>
+  <string name="clear_all_history_confirmation">¿Estás seguro que quieres eliminar el historial completo?</string>
+
+  <string name="settings">Ajustes</string>
+  <string name="timer_screen">Pantalla del temporizador</string>
+  <string name="inspection_mode">Modo de inspección</string>
+  <string name="inspection_mode_summary">Seleccionar el modo de inspección</string>
+  <string name="hold_and_release_inspection_mode">Pulsar y mantener: <i>Pulsar y soltar otra vez para comenzar</i></string>
+  <string name="automatic_inspection_mode">Automático: <i>Comienzo automático cuando la inspección ha terminado</i></string>
+  <string name="official_inspection_mode">Oficial: <i>Pulsar 0.5s para comenzar, usar reglas oficiales +2/DNF</i></string>
+  <string name="inspection_time">Tiempo de inspección</string>
+  <string name="inspection_time_summary">Seleccionar el tiempo de inspección</string>
+  <string name="inspection_sounds">Sonido de inspección</string>
+  <string name="inspection_sounds_summary">Activar / desactivar sonido de inspección</string>
+  <string name="inspection_sounds_type">Tipo de aviso de inspección</string>
+  <string name="inspection_sounds_type_summary">Seleccionar tipo de aviso</string>
+  <string name="classic_inspection_sound_type">Clasico (aviso de 3 segundos antes del acabar)</string>
+  <string name="official_inspection_sound_type">Official (aviso a los 8 y 12 segundos)</string>
+  <string name="show_time_when_running">Mostrar tiempo mientras cuenta</string>
+  <string name="show_time_when_running_summary">Mostrar tiempo mientras el temporizador está contando</string>
+  <string name="keep_screen_on">Mantener pantalla encendida</string>
+  <string name="keep_screen_on_summary">Cuando el temporizador no está contando</string>
+  <string name="solve_types">Métodos</string>
+  <string name="edit_solve_types">Editar métodos</string>
+  <string name="edit_solve_types_summary">Editar, crear y eliminar métodos</string>
+  <string name="clear_all_history">Eliminar todos los tiempos</string>
+  <string name="yes">Sí</string>
+  <string name="no">No</string>
+  <string name="choose_cube_type">Elegir tipo de cubo:</string>
+  <string name="scrambles">Mezclas</string>
+  <string name="big_cubes_notation">Notación de cubos grandes</string>
+  <string name="big_cubes_notation_summary">Elegir sistema de notación de cubos grandes</string>
+  <string name="clock_notation">Notación de Clock</string>
+  <string name="clock_notation_summary">Elegir sistema de notación de Clock</string>
+  <string name="use_modern_scrambles">Utilizar mezclas aleatorias</string>
+  <string name="use_modern_scrambles_summary">Utiliza mezclas aleatorias nuevas</string>
+  <string name="scrambles_quality">Calidad de mezclas</string>
+  <string name="scrambles_quality_summary">Selecciona la calidad de las mezclas</string>
+  <string name="high_quality">Alta (menos movimientos, más lenta de generar)</string>
+  <string name="normal_quality">Normal</string>
+  <string name="low_quality">Baja (más movimientos, más rápida de generar)</string>
+  <string name="pregen_scrambles">Generar mezclas manualmente</string>
+  <string name="pregen_scrambles_summary">Genera mezclas aleatorias manualmente</string>
+  <string name="r_u_f">r u f</string>
+  <string name="rw_uw_fw">Rw Uw Fw</string>
+  <string name="clock_UUdU_x_x">(UUdU, 2, -4)</string>
+  <string name="clock_UUdd_ux_dx">UUdd u=-3,d=2</string>
+  <string name="clock_URx_DRx_DLx">UR1+ DR6+ DL5- UL3+</string>
+  <string name="ads">Anuncios</string>
+  <string name="ads_style">Estilo de anuncios</string>
+  <string name="ads_style_summary">Elige entre banner between banner, intersticial or mixto</string>
+  <string name="banner">Banner</string>
+  <string name="interstitial">Intersticial</string>
+  <string name="mixed">Mixto</string>
+  <string name="want_to_clear_scramble_cache">¿Quieres limpiar la cache de mezclas?</string>
+  <string name="modern_scrambles_settings">Ajustes de mezclas aleatorias</string>
+  <string name="modern_scrambles_settings_summary">Elige cuándo / cómo se generan las mezclas</string>
+  <string name="notification_mode">Modo de notificación</string>
+  <string name="notification_mode_summary">Elige cuándo mostrar la notificación de generación</string>
+  <string name="when_generating">Siempre</string>
+  <string name="when_generating_manually">Sólo en manual</string>
+  <string name="never_show_notif">Nunca (no recomendado)</string>
+  <string name="generate_when_plugged_in">Generar en carga</string>
+  <string name="generate_when_plugged_in_summary">Generar automáticamente en carga</string>
+  <string name="gen_count_when_plugged_in">Cuenta de mezclas en carga</string>
+  <string name="gen_count_when_plugged_in_summary">Número de mezclas a generar en carga</string>
+  <string name="min_cache_size">Tamaño de caché mínimo</string>
+  <string name="min_cache_size_summary">Comienza la generación automática cuando se alcance</string>
+  <string name="max_cache_size">Tamaño de caché máximo</string>
+  <string name="max_cache_size_summary">Para la generación automática cuando se alcance</string>
+  <string name="min_scramble_cache_bigger_than_max">El tamaño de caché mínimo es mayor que el máximo. Min se forzará a %1$d.</string>
+  <string name="min_scramble_cache_too_close_to_max">El tamaño de caché mínimo está próximo al máximo. Min se forzará a %1$d.</string>
+  <string name="max_scramble_cache_smaller_than_min">El tamaño de caché máximo es menor que el mínimo. Max se forzará a %1$d.</string>
+  <string name="max_scramble_cache_too_close_to_min">El tamaño de caché máximo está próximo al mínimo. Max se forzará a %1$d.</string>
+
+  <string name="total_scrambles_count">Total de mezclas generadas: %1$d</string>
+  <string name="scrambles_already_generating">Ya se están generando mezclas.</string>
+  <string name="scrambles_count_not_valid">La cuenta de mezclas no es válida.</string>
+  <string name="scrambles_count">Cuenta de mezclas:</string>
+  <string name="generate">Generar</string>
+  <string name="stop_generation">Parar generación</string>
+  <string name="preparing_generation">Preparando generación&#8230;</string>
+  <string name="scrambles_being_generated">%1$s mezclas generándose</string>
+  <string name="generating_scramble">Mezclas generadas %1$d de %2$d</string>
+  <string name="generating_cube_scramble">%1$s mezclas generándose&#8230;\n%2$d de %3$d</string>
+  <string name="stopping_generation">Parar generación&#8230;</string>
+  <string name="new_record">¿Nuevo record!</string>
+  <string name="inspection">Inspección</string>
+  <string name="ready">Listo</string>
+
+  <string name="rate_message">Si te gusta Nano Timer, por favor toma un momento para valorarla.\nGracias por tu apoyo.</string>
+  <string name="rate">Valorar</string>
+  <string name="rate_now">Valora ahora</string>
+  <string name="ask_later">Pregúntame más tarde</string>
+  <string name="dont_ask_again">Nunca</string>
+  <string name="could_not_find_market">No se encuentra la market app</string>
+  <string name="could_not_launch_market">No se puede lanzar la market app</string>
+  <string name="release_notes">Notas de revisión</string>
+  <string name="close">Cerrar</string>
+
+  <string name="pro_version_welcome_title">Bienvenido a la versión Pro</string>
+  <string name="pro_version_welcome_message">Gracias por comprar Nano Timer Pro!\nLas siguientes características están desbloqueadas:</string>
+  <string name="pro_version_promotion_title">Nano Timer Pro</string>
+  <string name="pro_version_available">¡Nano Timer Pro está ahora disponible en Play Store!</string>
+  <string name="pro_version_install">Instalándola se desbloquearan las siguientes características:</string>
+  <string name="need_pro_version">Descarga Nano Timer Pro para acceder a esta característica</string>
+  <string name="upgrade_pro_app">Por favor actualiza a Nano Timer Pro para continuar teniendo acceso a las características Pro</string>
+  <string name="open_page">Abrir página</string>
+
+  <string name="edit_solve_types_dots">Editar métodos&#8230;</string>
+  <string name="solve_types_shortcut">Atajo a métodos</string>
+  <string name="solve_types_shortcut_summary">Mostrar \"Editar más métodos\" en la lista</string>
+  <string name="blind">A ciegas</string>
+  <string name="blind_mode">Modo a ciegas</string>
+  <string name="steps_can_not_be_added_to_blind_types">No se pueden añadir pasos a tipos de a ciegas.\nUtiliza tipos diferentes de a ciegas.</string>
+
+  <string name="import_export">Importar / exportar</string>
+  <string name="export_times">Exportar</string>
+  <string name="export_summary">Exporta historial de tiempos</string>
+  <string name="select_all">Seleccionar todo</string>
+  <string name="times_limit">Límite de tiempo:</string>
+  <string name="no_limit">&lt;Sin límite&gt;</string>
+  <string name="export_mail_subject">Exportar historia Nano Timer</string>
+  <string name="export_mail_body">Exportar historial desde %1$s</string>
+  <string name="send_via">Enviar via:</string>
+  <string name="no_data_to_export">No se encuentra datos a exportar</string>
+  <string name="select_at_least_one_solve_type">Por favor selecciona al menos un método a exportar</string>
+  <string name="exporting_history">Exportando historial…</string>
+  <string name="import_requires_read_permissions">Necesitas permitir permisos de lectura para importar</string>
+  <string name="read_permission_denied_cant_import">Permiso de lectura denegado, no puedes importar.</string>
+
+  <string name="import_times">Importar</string>
+  <string name="storage">Almacenamiento</string>
+  <string name="line">línia</string>
+  <string name="error_in_line">Error en línea %1$d</string>
+  <string name="import_invalid_columns_count">Cuenta de columnas inválida. Por favor revisa el formato del archivo a importar e inténtalo de nuevo.</string>
+  <string name="import_error">Error al importar</string>
+  <string name="could_not_convert_time">No se pudo convertir el tiempo \'%1$s\'</string>
+  <string name="could_not_convert_date">No se pudo convertir la fecha \'%1$s\'</string>
+  <string name="could_not_find_cube_type">No se reconoce el método \'%1$s\'.\nPor favor revisa el archivo de entrada e inténtalo de nuevo.</string>
+  <string name="could_not_find_scramble_type">No se reconoce el tipo de mezcla \'%1$s\' para el tipo de cubo \'%2$s\'.\nPor favor revisa el archivo de entrada e inténtalo de nuevo.</string>
+  <string name="solve_type_conflict">Inconsistencias encontradas en el método \'%1$s\' de tipo de cubo \'%2$s\'.\nPor favor revisa el archivo de entrada o contacta con soporte en %3$s.</string>
+  <string name="invalid_step_format">Formáto inválido para un paso \'%1$s\'</string>
+  <string name="could_not_convert_step_time">No se pudo convertir el tiempo de paso \'%1$s\'</string>
+  <string name="error_reading_import_file">No se pudo leer el archivo a importar: %1$s</string>
+  <string name="reading_import_file">Leyendo archivo a importar…\n(puede que le lleve unos minutos según el tamaño)</string>
+  <string name="solve_types_do_not_exist">Los siguientes métodos no existen:\n%1$s\n¿Quieres crearlos?</string>
+  <string name="fetching_solve_types">Colectando métodos…</string>
+  <string name="inserting_solve_types">Insertando métodos…</string>
+  <string name="inserting_times">Insertando tiempos en base de datos…</string>
+  <string name="times_imported_successfully">¡Tiempos importados satisfactoriamente!\n%1$d Nuevos tiempos importados.</string>
+  <string name="no_new_times_inserted">No se insertaron nuevos tiempos por estar ya en la base de datos.</string>
+  <string name="no_import_data_found">No se han encontrado datos a importar.</string>
+  <string name="invalid_import_file_format">Formato de archivo a importar inválido. Por favor selecciona un archivo a importar válido o intenta reexportar.</string>
+  <string name="ok">OK</string>
+
+  <string name="graphs">Gráficas</string>
+  <string name="progression">Progresión</string>
+  <string name="smooth">Suavizado</string>
+  <string name="day">Día</string>
+  <string name="week">Semana</string>
+  <string name="month">Mes</string>
+  <string name="year">Año</string>
+  <string name="all">Todo</string>
+  <string name="no_data_found">Datos no encontrados</string>
+  <string name="chart_type_progression">Progresión</string>
+  <string name="chart_type_frequency">Frecuencia</string>
+
+  <string name="show_best_times">Mostrar mejores tiempos</string>
+  <string name="show_history">Mostrar historial</string>
+  <string name="best_times">Mejores tiempos</string>
+
+  <string name="add_time">Añadir tiempo</string>
+  <string name="select_time_to_add">Selecciona tiempo a añadir:</string>
+  <string name="invalid_integer_value">Valor inválido. Por favor introduzca un número entero.</string>
+  <string name="invalid_value_for_field">Valor inválido para %1$s</string>
+  <string name="please_set_a_value">Por favor especifica un valor</string>
+  <string name="minutes">minutos</string>
+  <string name="seconds">segundos</string>
+  <string name="hundreds">cientos</string>
+
+  <string name="share_time">Compartir tiempo</string>
+  <string name="share_time_subject">Nuevo tiempo: %1$s</string>
+  <string name="share_time_text">Acabo de resolver el cubo %1$s en %2$s!\n\nMezcla:\n%3$s\n\nMedido en %4$s con la app de android Nano Timer:\n%5$s</string>
+  <string name="share_time_steps_text">Acabo de resolver el cubo %1$s en %2$s with the following steps times:\n%3$s\nScramble:\n%4$s\n\nTimed on %5$s with Nano Timer android app:\n%6$s</string>
+
+  <string name="scramble_typeC">Tipo de mezcla:</string>
+  <string name="scramble_type_default">Aleatoria</string>
+  <string name="scramble_type_f2l">F2L</string>
+  <string name="scramble_type_last_layer">Última capa</string>
+  <string name="scramble_type_pll">PLL</string>
+  <string name="scramble_type_corners">Sólo esquinas</string>
+  <string name="scramble_type_edges">Sólo aristas</string>
+  <string name="scramble_type_roux_last_10_pieces">Roux últimas 10 piezas</string>
+  <string name="scramble_type_roux_last_6_edges">Roux últimas 6 aristas</string>
+
+  <string name="scramble_generating">Mezcla generándose\nPor favor espera&#8230;</string>
+  <string name="can_not_add_time_while_generating">No es posible añadir un tiempo cuando no hay mezcla</string>
+
+  <string name="pro_version_features">- Exportar/importar tiempos\n- Gráficas (progresión, frecuencia)\n- Creación de tiempos manual\n- Detalles de visualización de la sesión anterior\n- Sin anuncios</string>
+
+  <string name="release_notes_features_html">
+    <![CDATA[<html><body>
+    <font color=\"white\">
+    <u><b>v1.2.2 <i>(Nueva versión)</i></b></u>
+    <ul>
+      <li>Añadido soporte para tipos de mezclas 3x3x3 especiales para practicar sólo F2L, última capa, PLL, aristas y más</li>
+      <li>Rediseño de la pantalla pricipal de usuario</li>
+      <li>Añadido soporte de francés y español</li>
+      <li>Adaptación de permisos para importar para Android Kitkat y posterior</li>
+      <li>Adaptación del icono de notificación de generación de mezclas para Android Lollipop y superior</li>
+    </ul>
+    <u><b>v1.2.1</b></u>
+    <ul>
+      <li>Add support for 3 different Clock scramble styles (via Settings)</li>
+      <li>Generate new scramble when inspection results in DNF</li>
+      <li>Allow to use official inspection mode with no inspection time</li>
+      <li>Fix official inspection bug when inspection resulted in DNF</li>
+    </ul>
+    <u><b>v1.2.0</b></u>
+    <ul>
+      <li>Add scramble to \"Share time\" content</li>
+      <li>Add new \"Official\" inspection mode (push for 0.5s to start, use official +2/DNF inspection rules)</li>
+      <li>Support new Clock scramble notation style (enable in Settings)</li>
+      <li>Only consider the middle 90% of times for avg50 and avg100</li>
+      <li>Fix inspection time setting</li>
+    </ul>
+    <u><b>v1.1.9</b></u>
+    <ul>
+      <li>Fix averages table layout that did not display correctly on some devices</li>
+      <li>Fix incorrect last averages when importing old times</li>
+      <li>Other minor fixes and improvements</li>
+    </ul>
+    <u><b>v1.1.8</b></u>
+    <ul>
+      <li>Hide action bar menu button when timer is running</li>
+      <li>Fix import bug that was causing PB flag to be incorrect</li>
+      <li>Fix PB flag recalculation after time deletion</li>
+      <li>Fix crash that was sometimes happening when changing options</li>
+    </ul>
+    <u><b>v1.1.7</b></u>
+    <ul>
+      <li>New \"Share time\" feature allowing to share times with your friends</li>
+      <li>Moved \"Add time\" menu to timer screen to save with current scramble, and switched to text entries instead of wheels</li>
+      <li>Minor fixes and improvements</li>
+    </ul>
+    <u><b>v1.1.6</b></u>
+    <ul>
+      <li>Pro: Import times from CSV (synchronization handled to avoid inserting times that already exist). Requires a re-export.</li>
+      <li>Pro: Enter times manually</li>
+      <li>Pro: New frequency graph (solves count over time)</li>
+      <li>Pro: Allow to export times with and without steps all at once</li>
+      <li>Moved export/import buttons to main menu</li>
+      <li>Improved graphs smoothing</li>
+      <li>Various fixes and improvements</li>
+    </ul>
+    <u><b>v1.1.5</b></u>
+    <ul>
+      <li>Show best times (accessible from history screen menu)</li>
+      <li>Show session start in session details</li>
+      <li>Pro: Allow to see previous sessions details (not retro-active)</li>
+      <li>Pro app update check</li>
+      <li>Improved Android 5.0 UI</li>
+    </ul>
+    <u><b>v1.1.4</b></u>
+    <ul>
+      <li>Added icon next to best times in history</li>
+      <li>New setting to hide time when timer is running</li>
+      <li>New official inspection warning sounds and setting</li>
+      <li>Adapted automatic inspection mode to start on release</li>
+      <li>Added standard deviation and best time to session details</li>
+      <li>Scrambles generation when plugged in is now on by default</li>
+      <li>Disabled inspection for blind solve types</li>
+      <li>Updated app theme</li>
+    </ul>
+    <u><b>v1.1.3</b></u>
+    <ul>
+      <li>Pro: added progression graph</li>
+      <li>Fixed crash sometimes happening when device is plugged in/out</li>
+      <li>Removed non-used permissions</li>
+    </ul>
+    <u><b>v1.1.2</b></u>
+    <ul>
+      <li>Added random-state scrambles customization options</li>
+      <li>Option to automatically generate scrambles when device is charging</li>
+      <li>Added support for Pro version</li>
+      <li>Pro: export history to CSV by mail</li>
+    </ul>
+    <u><b>v1.1.1</b></u>
+    <ul>
+      <li>New random-state scrambles for 3x3x3 and 2x2x2</li>
+      <li>Scrambles pre-generation</li>
+      <li>Timer screen fields changes (means to averages)</li>
+      <li>New blind solve mode with additional blind-related statistics</li>
+      <li>Session details window improvements</li>
+    </ul>
+    <u><b>v1.1.0</b></u>
+    <ul>
+      <li>Improved graphical interface</li>
+      <li>New \"session details\" timer window</li>
+      <li>Total solves count now shown in history</li>
+    </ul>
+    <u><b>v1.0.2</b></u>
+    <ul>
+      <li>Scrambles for Square-1 and Clock</li>
+      <li>Average of 50</li>
+      <li>Shortcut to solve types editing from solve types list</li>
+      <li>Improved scrambles format based on type and orientation</li>
+      <li>Displayed averages in history details</li>
+      <li>Option to choose big cubes notation system</li>
+      <li>Set Skewb and Pyraminx scramble sizes to 15</li>
+    </ul>
+    <u><b>v1.0.1</b></u>
+    <ul>
+      <li>Changed session times grid order (the latest time is now in the top-left cell)</li>
+      <li>Reduced length of pyraminx and skewb scrambles from 25 to 20</li>
+      <li>Pyraminx corner moves are now at the end of the scramble</li>
+      <li>Minor GUI improvements</li>
+    </ul>
+    </body></html>]]>
+  </string>
+</resources>
