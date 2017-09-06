@@ -61,11 +61,8 @@
   <color name="iceblue">#FF0883AC</color>
   <!--<color name="button_color">@color/darkblue</color>-->
   <!--<color name="darkblue">#FF303E4A</color>-->
-  <color name="button_color">@color/testblue</color>
-  <color name="darkblue">@color/testblue</color>
-  <!--<color name="testblue">#3D4F65</color>-->
-  <!--<color name="testblue">#324B6E</color>-->
-  <color name="testblue">#36454F</color>
+  <color name="button_color">@color/darkblue</color>
+  <color name="darkblue">#36454F</color>
 
   <color name="graybg">#333333</color>
   <!--<color name="graybg">#FF1C1E20</color>-->
