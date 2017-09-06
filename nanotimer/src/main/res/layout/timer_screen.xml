@@ -93,28 +93,29 @@
          android:layout_marginLeft="2px"
          android:layout_marginRight="2px">
 
-        <TextView style="@style/DividerRow"
-           android:layout_marginLeft="3px"/>
+        <!--<TextView style="@style/DividerRow"-->
+           <!--android:layout_marginLeft="3px"/>-->
 
         <TableLayout
            android:id="@+id/sessionTimesLayout"
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
            android:shrinkColumns="*"
-           android:stretchColumns="*">
-          <TableRow>
+           android:stretchColumns="*"
+           style="@style/TableBorder">
+          <TableRow style="@style/TableBorder">
             <TextView style="@style/TableCellPx"/>
             <TextView style="@style/TableCellPx"/>
             <TextView style="@style/TableCellPx"/>
             <TextView style="@style/TableCellPx"/>
           </TableRow>
-          <TableRow>
+          <TableRow style="@style/TableBorder">
             <TextView style="@style/TableCellPx"/>
             <TextView style="@style/TableCellPx"/>
             <TextView style="@style/TableCellPx"/>
             <TextView style="@style/TableCellPx"/>
           </TableRow>
-          <TableRow>
+          <TableRow style="@style/TableBorder">
             <TextView style="@style/TableCellPx"/>
             <TextView style="@style/TableCellPx"/>
             <TextView style="@style/TableCellPx"/>
@@ -122,8 +123,8 @@
           </TableRow>
         </TableLayout>
 
-        <TextView style="@style/DividerRow"
-           android:layout_marginLeft="3px"/>
+        <!--<TextView style="@style/DividerRow"-->
+           <!--android:layout_marginLeft="3px"/>-->
 
         <LinearLayout
            android:layout_width="match_parent"
@@ -237,33 +238,34 @@
        android:gravity="bottom"
        android:layout_marginLeft="2px"
        android:layout_marginRight="2px"
-       android:layout_marginBottom="2px">
-      <TableRow>
+       android:layout_marginBottom="2px"
+       style="@style/TableBorder">
+      <TableRow style="@style/TableBorder">
         <TextView android:textSize="21px" android:textStyle="bold" android:layout_width="50px"/>
         <TextView android:id="@+id/tvAvgOf" android:text="@string/last_avg_of" android:layout_weight="1" style="@style/AverageTableHeaderFieldPx"/>
         <TextView android:id="@+id/tvBestOf" android:text="@string/best_avg_of" android:layout_weight="1" style="@style/AverageTableHeaderFieldPx"/>
       </TableRow>
-      <TableRow android:id="@+id/trAvgOfFive">
+      <TableRow android:id="@+id/trAvgOfFive" style="@style/TableBorder">
         <TextView android:text="5" style="@style/AverageTableFirstFieldPx"/>
         <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFive" android:layout_weight="1" style="@style/TableCellPx"/>
         <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFive" android:layout_weight="1" style="@style/TableCellPx"/>
       </TableRow>
-      <TableRow android:id="@+id/trAvgOfTwelve">
+      <TableRow android:id="@+id/trAvgOfTwelve" style="@style/TableBorder">
         <TextView android:text="12" style="@style/AverageTableFirstFieldPx"/>
         <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfTwelve" android:layout_weight="1" style="@style/TableCellPx"/>
         <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfTwelve" android:layout_weight="1" style="@style/TableCellPx"/>
       </TableRow>
-      <TableRow android:id="@+id/trAvgOfFifty">
+      <TableRow android:id="@+id/trAvgOfFifty" style="@style/TableBorder">
         <TextView android:text="50" style="@style/AverageTableFirstFieldPx"/>
         <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFifty" android:layout_weight="1" style="@style/TableCellPx"/>
         <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFifty" android:layout_weight="1" style="@style/TableCellPx"/>
       </TableRow>
-      <TableRow android:id="@+id/trAvgOfHundred">
+      <TableRow android:id="@+id/trAvgOfHundred" style="@style/TableBorder">
         <TextView android:text="100" style="@style/AverageTableFirstFieldPx"/>
         <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfHundred" android:layout_weight="1" style="@style/TableCellPx"/>
         <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfHundred" android:layout_weight="1" style="@style/TableCellPx"/>
       </TableRow>
-      <TableRow android:id="@+id/trAvgOfLife" android:visibility="gone">
+      <TableRow android:id="@+id/trAvgOfLife" android:visibility="gone" style="@style/TableBorder">
         <TextView android:text="@string/life" style="@style/AverageTableFirstFieldPx"/>
         <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfLife" android:layout_weight="1" style="@style/TableCellPx"/>
         <com.cube.nanotimer.util.view.FontFitTextView android:layout_weight="1" style="@style/TableCellPx"/>
