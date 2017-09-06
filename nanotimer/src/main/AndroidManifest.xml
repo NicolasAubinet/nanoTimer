@@ -22,7 +22,6 @@
 
     <activity
        android:name=".gui.MainScreenActivity"
-       android:theme="@style/NanoTimerThemeNoActionBar"
        android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
        android:launchMode="singleTask">
       <intent-filter>
