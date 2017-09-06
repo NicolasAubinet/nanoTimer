@@ -26,8 +26,7 @@
          android:layout_marginLeft="@dimen/card_margin_horizontal"
          android:layout_marginRight="@dimen/card_margin_horizontal"
          app:cardElevation="@dimen/mainscreen_card_elevation"
-         app:cardCornerRadius="0dp"
-         android:background="@color/toolbar_background_color">
+         app:cardCornerRadius="0dp">
 
         <LinearLayout
            android:layout_width="match_parent"
@@ -40,38 +39,41 @@
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
            android:title="@string/app_name"
-           app:titleTextAppearance="@style/Toolbar.TitleText"/>
+           app:titleTextAppearance="@style/Toolbar.CustomTitleText"
+           android:background="@color/color_primary_dark"/>
 
         <TableLayout
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
            android:stretchColumns="*"
            android:layout_alignParentTop="true"
-           android:paddingLeft="4dp"
-           android:paddingRight="4dp"
-           android:paddingBottom="4dp">
+           android:paddingTop="8dp"
+           android:paddingBottom="2dp">
 
           <TableRow>
 
             <TextView
                android:layout_width="0dp"
                android:layout_height="wrap_content"
-               android:layout_marginLeft="4dp"
+               android:layout_marginLeft="10dp"
                android:text="@string/cube_type"
-               android:textColor="@color/white"
+               android:textColor="@color/verylightblue"
+               android:textStyle="bold"
                android:gravity="start"
                style="@style/SmallTextField"/>
 
             <TextView
                android:layout_width="0dp"
                android:layout_height="wrap_content"
+               android:layout_marginLeft="10dp"
                android:text="@string/solve_type"
-               android:textColor="@color/white"
+               android:textColor="@color/verylightblue"
+               android:textStyle="bold"
                android:gravity="start"
                style="@style/SmallTextField"/>
           </TableRow>
 
-          <TableRow android:layout_marginTop="3dp">
+          <TableRow>
 
             <Spinner
                android:id="@+id/spCubeType"
@@ -175,8 +177,8 @@
              android:id="@+id/lvHistory"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             android:paddingBottom="2dp"
-             android:alwaysDrawnWithCache="false"/>
+             android:alwaysDrawnWithCache="false"
+             style="@style/ListView"/>
           <!--android:background="@color/listview_background"-->
 
         </LinearLayout>

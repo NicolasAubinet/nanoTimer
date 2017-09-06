@@ -12,7 +12,9 @@
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
      android:gravity="center"
-     android:layout_margin="5dp">
+     android:layout_marginTop="5dp"
+     android:layout_marginLeft="5dp"
+     android:layout_marginRight="5dp">
     <android.support.v7.widget.AppCompatButton
        android:id="@+id/buPlusTwo"
        android:text="@string/plus_two"
@@ -38,7 +40,8 @@
      android:id="@+id/layoutTypes"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
-     android:padding="6dp"
+     android:paddingLeft="6dp"
+     android:paddingRight="6dp"
      android:stretchColumns="1"
      android:layout_alignParentTop="true">
     <TableRow>
@@ -127,7 +130,7 @@
          custom:myfont="MONOSPACE"
          android:layout_marginTop="6dp"
          android:layout_marginBottom="6dp"
-         android:padding="4dp"
+         android:paddingBottom="4dp"
          style="@style/ScrambleTextField"/>
 
       <LinearLayout

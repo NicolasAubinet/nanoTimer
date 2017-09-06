@@ -251,8 +251,8 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
         break;
       case 3:
         if (Utils.checkProFeature(this)) {
-          ArrayList<String> items = new ArrayList(Arrays.asList(getResources().getStringArray(R.array.import_export)));
-          DialogUtils.showFragment(this, SelectorFragmentDialog.newInstance(ID_IMPORTEXPORT, items, true, this));
+          ArrayList<String> items = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.import_export)));
+          DialogUtils.showFragment(this, SelectorFragmentDialog.newInstance(ID_IMPORTEXPORT, items, null, true, this));
         }
         break;
       case 4:
@@ -271,8 +271,9 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
         });
         break;
       case 5:
-        ArrayList<String> items = new ArrayList(Arrays.asList(getResources().getStringArray(R.array.languages)));
-        DialogUtils.showFragment(this, SelectorFragmentDialog.newInstance(ID_LANGUAGE, items, true, this));
+        ArrayList<String> items = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.languages)));
+        ArrayList<Integer> flagIcons = new ArrayList<>(Arrays.asList(R.drawable.flag_uk, R.drawable.flag_france, R.drawable.flag_spain));
+        DialogUtils.showFragment(this, SelectorFragmentDialog.newInstance(ID_LANGUAGE, items, flagIcons, null, true, this));
         break;
       case 6:
         DialogUtils.showFragment(this, AboutDialog.newInstance());

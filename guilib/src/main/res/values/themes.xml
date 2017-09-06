@@ -19,6 +19,11 @@
     <!--<item name="android:windowBackground">@color/graybg</item>-->
   </style>
 
+  <style name="Toolbar.CustomTitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+    <item name="android:textSize">21sp</item>
+    <item name="android:textStyle">bold</item>
+  </style>
+
   <style name="NanoTimerThemeNoActionBar" parent="Theme.AppCompat.NoActionBar">
     <item name="colorPrimary">@color/color_primary</item>
     <item name="colorPrimaryDark">@color/color_primary_dark</item>

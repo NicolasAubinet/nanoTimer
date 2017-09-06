@@ -74,16 +74,14 @@
     <item>@string/export_times</item>
   </string-array>
   <string-array name="languages">
-    <item>@string/os_default</item>
     <item>@string/english</item>
     <item>@string/french</item>
     <item>@string/spanish</item>
   </string-array>
   <string-array name="language_codes">
-    <item></item>
     <item>en</item>
     <item>fr</item>
-    <item>sp</item>
+    <item>es</item>
   </string-array>
   <string-array name="mainscreen_menu_items">
     <item>@string/settings</item>
