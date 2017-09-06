@@ -48,7 +48,7 @@ public class OptionsActivity extends NanoTimerActivity {
         ReleaseNotes.showReleaseNotesDialog(this);
         break;
     }
-    return true;
+    return super.onOptionsItemSelected(item);
   }
 
   public static class OptionsFragment extends PreferenceFragment {

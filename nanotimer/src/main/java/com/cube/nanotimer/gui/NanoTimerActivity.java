@@ -2,7 +2,9 @@ package com.cube.nanotimer.gui;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import com.cube.nanotimer.util.helper.Utils;
 
 public class NanoTimerActivity extends AppCompatActivity {
@@ -11,11 +13,26 @@ public class NanoTimerActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     Utils.updateContextWithPrefsLocale(getBaseContext());
+
+    ActionBar actionBar = getSupportActionBar();
+    if (actionBar != null) {
+      actionBar.setDisplayHomeAsUpEnabled(true);
+    }
   }
 
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
     Utils.updateContextWithPrefsLocale(getBaseContext());
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        finish();
+        break;
+    }
+    return super.onOptionsItemSelected(item);
   }
 }

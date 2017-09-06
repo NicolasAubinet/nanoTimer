@@ -17,7 +17,6 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
-import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -197,6 +196,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     ActionBar actionBar = getSupportActionBar();
     actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
     actionBar.setCustomView(R.layout.textcentered_actionbar);
+    actionBar.setDisplayHomeAsUpEnabled(true);
   }
 
   private void initViews() {
@@ -238,7 +238,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
       findViewById(R.id.trAvgOfLife).setVisibility(View.GONE);
     }
 
-    LinearLayout actionBarLayout = (LinearLayout) findViewById(R.id.actionbarLayout);
+    View actionBarLayout = findViewById(R.id.actionbarLayout);
     actionBarLayout.setOnTouchListener(layoutTouchListener);
 
     layout = (ViewGroup) findViewById(R.id.mainLayout);
@@ -365,6 +365,9 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
   private void showMenuButton(boolean show) {
     this.showMenu = show;
     supportInvalidateOptionsMenu();
+
+    getSupportActionBar().setDisplayHomeAsUpEnabled(show);
+    findViewById(R.id.fillerView).setVisibility(show ? View.VISIBLE : View.GONE);
   }
 
   @Override
@@ -434,7 +437,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
           break;
       }
     }
-    return true;
+    return super.onOptionsItemSelected(item);
   }
 
   @Override

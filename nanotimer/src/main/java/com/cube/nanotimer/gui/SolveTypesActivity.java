@@ -212,7 +212,7 @@ public class SolveTypesActivity extends NanoTimerActivity implements SelectionHa
         showAddDialog();
         break;
     }
-    return true;
+    return super.onOptionsItemSelected(item);
   }
 
   @Override
