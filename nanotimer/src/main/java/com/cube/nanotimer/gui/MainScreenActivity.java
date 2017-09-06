@@ -2,6 +2,7 @@ package com.cube.nanotimer.gui;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -580,9 +581,13 @@ public class MainScreenActivity extends DrawerLayoutActivity implements TimeChan
           editor.putString(Utils.LANGUAGE_PREF_KEY, localeCode);
           editor.apply();
 
-          Intent intent = getIntent();
-          finish();
-          startActivity(intent);
+          Context context = getBaseContext();
+          PackageManager packageManager = context.getPackageManager();
+          Intent intent = packageManager.getLaunchIntentForPackage(context.getPackageName());
+          ComponentName componentName = intent.getComponent();
+          Intent mainIntent = Intent.makeRestartActivityTask(componentName);
+          context.startActivity(mainIntent);
+          System.exit(0);
         }
       }
     }
