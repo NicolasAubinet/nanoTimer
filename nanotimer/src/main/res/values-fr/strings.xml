@@ -164,7 +164,7 @@
   <string name="generate">Générer</string>
   <string name="stop_generation">Arrêter la génération</string>
   <string name="preparing_generation">Préparation de la génération&#8230;</string>
-  <string name="scrambles_being_generated">%1$s mélanges en génération</string>
+  <string name="scrambles_being_generated">Génération de mélanges %1$s</string>
   <string name="generating_scramble">Génération du mélange %1$d de %2$d</string>
   <string name="generating_cube_scramble">%1$s mélanges en génération&#8230;\n%2$d de %3$d</string>
   <string name="stopping_generation">Arrêt de la génération&#8230;</string>
@@ -289,8 +289,9 @@
     <u><b>v1.3.0 <i>(Nouvelle version)</i></b></u>
     <ul>
       <li>Support de types de m&eacute;lange sp&eacute;ciaux pour le 3x3x3 pour entra&icirc;nement sur F2L, Last Layer, PLL, ar&ecirc;tes et autres</li>
-      <li>Refonte de l\'interface de l\'&eacute;cran d\'historique</li>
+      <li>Refonte de l\'interface utilisateur</li>
       <li>Ajout de la langue fran&ccedil;aise et espagnole</li>
+      <li>Tirer avantage des processeurs multi-coeurs pour la génération de mélanges</li>
       <li>Adaptation des permissions d\'import pour Android Kitkat et au-del&agrave;</li>
       <li>Adaptation de l\'ic&ocirc;ne de notification de g&eacute;n&eacute;ration des m&eacute;langes pour Android Lollipop et au-del&agrave;</li>
     </ul>
