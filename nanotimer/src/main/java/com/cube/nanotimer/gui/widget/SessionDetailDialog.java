@@ -200,7 +200,6 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
     tv.setTextColor(getResources().getColor(R.color.lightblue));
     tv.setText(String.valueOf(avgHeader));
     tv.setTypeface(null, Typeface.BOLD);
-    tv.setTextAppearance(getContext(), R.style.TableCell);
     trHeaders.addView(tv);
 
     tv = getNewSolveTimeTextView();
