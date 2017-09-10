@@ -38,7 +38,7 @@ public enum ScramblerService {
   private volatile Thread generationThread = null;
 
   private List<RandomStateGenListener> listeners = new ArrayList<RandomStateGenListener>();
-  private RandomStateGenEvent curState = new RandomStateGenEvent(State.IDLE, null, null, 0, 0);
+  private RandomStateGenEvent curState = new RandomStateGenEvent(State.IDLE, null, 0, 0);
 
   final private Object genThreadHelper = new Object();
   final private Object listenersHelper = new Object();
@@ -121,7 +121,7 @@ public enum ScramblerService {
             }
           }
         }
-        sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.IDLE, null, null, 0, 0));
+        sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.IDLE, null, 0, 0));
         if (generationThread == Thread.currentThread()) {
           checkPluggedIn();
           generationThread = null;
@@ -145,14 +145,14 @@ public enum ScramblerService {
           return;
         }
         List<String[]> toSave = new ArrayList<String[]>();
-        sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.PREPARING, cubeType, generationLaunch, 0, n));
+        sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.PREPARING, cubeType, scrambleType, generationLaunch, 0, n));
         synchronized (scramblerHelper) {
           rsScrambler.genTables();
         }
         for (int i = 0; i < n && generationThread == Thread.currentThread(); i++) {
           String[] scramble;
           synchronized (scramblerHelper) {
-            sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.GENERATING, cubeType, generationLaunch, i + 1, n));
+            sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.GENERATING, cubeType, scrambleType, generationLaunch, i + 1, n));
             scramble = rsScrambler.getNewScramble(new ScrambleConfig(Utils.getRSScrambleLengthFromQuality(cubeType), scrambleType));
           }
           if (scramble == null) { // was interrupted
@@ -169,7 +169,7 @@ public enum ScramblerService {
             saveNewScramblesToFile(cubeType, scrambleType, toSave); // write new scrambles to file by batches
             toSave.clear();
           }
-          sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.GENERATED, cubeType, generationLaunch, i + 1, n));
+          sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.GENERATED, cubeType, scrambleType, generationLaunch, i + 1, n));
         }
         Log.i("NanoTimer", "generated scrambles!");
         if (!toSave.isEmpty()) {
@@ -283,7 +283,7 @@ public enum ScramblerService {
     synchronized (genThreadHelper) {
       if (generationThread != null) {
         generationThread = null;
-        sendGenStateToListeners(new RandomStateGenEvent(State.STOPPING, null, null, 0, 0));
+        sendGenStateToListeners(new RandomStateGenEvent(State.STOPPING, null, 0, 0));
       }
     }
     for (RSScrambler scrambler : scramblers.values()) {

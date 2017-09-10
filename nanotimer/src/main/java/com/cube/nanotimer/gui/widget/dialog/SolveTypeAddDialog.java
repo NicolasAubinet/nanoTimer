@@ -91,8 +91,7 @@ public class SolveTypeAddDialog extends ConfirmDialog {
   }
 
   private String getScrambleTypeTextString(ScrambleType scrambleType) {
-    int nameStringResourceId = Utils.getStringIdentifier(getContext(), "scramble_type_" + scrambleType.getName());
-    return getString(nameStringResourceId);
+    return Utils.toScrambleTypeLocalizedName(getContext(), scrambleType);
   }
 
   @Override

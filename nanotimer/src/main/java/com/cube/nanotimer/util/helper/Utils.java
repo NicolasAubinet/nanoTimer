@@ -2,24 +2,21 @@ package com.cube.nanotimer.util.helper;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.BatteryManager;
-import android.os.Build.VERSION;
-import android.os.LocaleList;
 import android.preference.PreferenceManager;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.ProVersionFeature;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.ScrambleType;
 import com.cube.nanotimer.vo.SolveType;
 
 import java.security.SecureRandom;
@@ -178,6 +175,11 @@ public class Utils {
       }
     }
     return forbiddenChar;
+  }
+
+  public static String toScrambleTypeLocalizedName(Context context, ScrambleType scrambleType) {
+    int nameStringResourceId = Utils.getStringIdentifier(context, "scramble_type_" + scrambleType.getName());
+    return context.getString(nameStringResourceId);
   }
 
   public static int getStringIdentifier(Context context, String name) {

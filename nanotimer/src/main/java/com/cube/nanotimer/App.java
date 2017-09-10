@@ -16,6 +16,7 @@ import com.cube.nanotimer.services.Service;
 import com.cube.nanotimer.services.ServiceImpl;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.helper.GUIUtils;
+import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ScrambleType;
 
@@ -94,8 +95,12 @@ public enum App {
         if (event.getState() == State.PREPARING && showNotif) {
           GUIUtils.showNotification(context, SCRAMBLE_NOTIF_ID, title, context.getString(R.string.preparing_generation), MainScreenActivity.class);
         } else if (event.getState() == State.GENERATING && showNotif) {
-          GUIUtils.showNotification(context, SCRAMBLE_NOTIF_ID, title,
-              context.getString(R.string.generating_scramble, event.getCurScramble(), event.getTotalToGenerate()), MainScreenActivity.class);
+          String text = context.getString(R.string.generating_scramble, event.getCurScramble(), event.getTotalToGenerate());
+          ScrambleType scrambleType = event.getScrambleType();
+          if (scrambleType != null && !event.getScrambleType().isDefault()) {
+            text += " (" + Utils.toScrambleTypeLocalizedName(context, scrambleType) + ")";
+          }
+          GUIUtils.showNotification(context, SCRAMBLE_NOTIF_ID, title, text, MainScreenActivity.class);
         } else if (event.getState() == State.IDLE || !showNotif) {
           GUIUtils.hideNotification(context, SCRAMBLE_NOTIF_ID);
         }

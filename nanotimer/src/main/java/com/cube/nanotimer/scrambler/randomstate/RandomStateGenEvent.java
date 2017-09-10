@@ -1,6 +1,7 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.ScrambleType;
 
 public class RandomStateGenEvent {
 
@@ -9,13 +10,19 @@ public class RandomStateGenEvent {
 
   private State state;
   private CubeType cubeType;
+  private ScrambleType scrambleType;
   private GenerationLaunch generationLaunch;
   private int curScramble;
   private int totToGen;
 
-  public RandomStateGenEvent(State state, CubeType cubeType, GenerationLaunch generationLaunch, int curScramble, int totToGen) {
+  public RandomStateGenEvent(State state, GenerationLaunch generationLaunch, int curScramble, int totToGen) {
+    this(state, null, null, generationLaunch, curScramble, totToGen);
+  }
+
+  public RandomStateGenEvent(State state, CubeType cubeType, ScrambleType scrambleType, GenerationLaunch generationLaunch, int curScramble, int totToGen) {
     this.state = state;
     this.cubeType = cubeType;
+    this.scrambleType = scrambleType;
     this.generationLaunch = generationLaunch;
     this.curScramble = curScramble;
     this.totToGen = totToGen;
@@ -27,6 +34,10 @@ public class RandomStateGenEvent {
 
   public CubeType getCubeType() {
     return cubeType;
+  }
+
+  public ScrambleType getScrambleType() {
+    return scrambleType;
   }
 
   public GenerationLaunch getGenerationLaunch() {
