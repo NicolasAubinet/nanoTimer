@@ -136,8 +136,7 @@
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:layout_margin="3dp"
-       android:shrinkColumns="*"
-       android:stretchColumns="*">
+       style="@style/EqualSizeColumnsTable">
     </TableLayout>
 
   </LinearLayout>
@@ -158,8 +157,8 @@
          android:id="@+id/sessionTimesLayout"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:shrinkColumns="*"
-         android:stretchColumns="*">
+         style="@style/EqualSizeColumnsTable">
+        <!--style="@style/TableBorder">-->
       </TableLayout>
 
   </ScrollView>

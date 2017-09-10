@@ -118,14 +118,14 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
 
     int sessionTimesCount = sessionTimes.size();
     if (sessionTimesCount == 0) {
-      TableRow tr = new TableRow(getActivity());
+      TableRow tr = getNewTableRow();
       for (int i = 0; i < TIMES_PER_LINE; i++) {
         TextView tv = getNewSolveTimeTextView();
         tr.addView(tv);
       }
       sessionTimesLayout.addView(tr);
     } else if (sessionTimesCount < TIMES_PER_LINE) {
-      TableRow tr = new TableRow(getActivity());
+      TableRow tr = getNewTableRow();
       for (Long time : sessionTimes) {
         TextView tv = getNewSolveTimeTextView();
         tv.setText(FormatterService.INSTANCE.formatSolveTime(time));
@@ -175,8 +175,9 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
     }
     TableLayout bestAveragesTableLayout = (TableLayout) v.findViewById(R.id.bestAveragesTableLayout);
     bestAveragesTableLayout.removeAllViews();
-    TableRow trHeaders = new TableRow(getActivity());
-    TableRow trAverages = new TableRow(getActivity());
+
+    TableRow trHeaders = getNewTableRow();
+    TableRow trAverages = getNewTableRow();
     if (avg5 > 0) {
       addToBestAveragesTable(trHeaders, trAverages, 5, avg5);
     }
@@ -199,6 +200,7 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
     tv.setTextColor(getResources().getColor(R.color.lightblue));
     tv.setText(String.valueOf(avgHeader));
     tv.setTypeface(null, Typeface.BOLD);
+    tv.setTextAppearance(getContext(), R.style.TableCell);
     trHeaders.addView(tv);
 
     tv = getNewSolveTimeTextView();
@@ -207,7 +209,7 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
   }
 
   private void addSolveTimesPage() {
-    TableRow tr = new TableRow(getActivity());
+    TableRow tr = getNewTableRow();
     int sessionTimesCount = sessionTimes.size();
     for (int i = 0; i < sessionTimesCount; i++) {
       TextView tv = getNewSolveTimeTextView();
@@ -215,7 +217,7 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
       tr.addView(tv);
       if (i % TIMES_PER_LINE == 3) {
         sessionTimesLayout.addView(tr);
-        tr = new TableRow(getActivity());
+        tr = getNewTableRow();
       }
     }
     // add remaining cells to have the same cells count than the above lines
@@ -243,10 +245,12 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
     }
   }
 
+  private TableRow getNewTableRow() {
+    return (TableRow) inflater.inflate(R.layout.tablerow_border, null);
+  }
+
   private TextView getNewSolveTimeTextView() {
-    TextView tv = (TextView) inflater.inflate(R.layout.timecell_textview, null);
-    tv.setTextSize(15);
-    return tv;
+    return (TextView) inflater.inflate(R.layout.textview_border, null);
   }
 
   private void initSessionsList(final View v) {
@@ -303,7 +307,7 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
     view.setOrientation(LinearLayout.VERTICAL);
 
     RelativeLayout titleLayout = new RelativeLayout(getActivity());
-    titleLayout.setPadding(10, 10, 10, 10);
+    titleLayout.setPadding(10, 0, 10, 0);
     titleLayout.setGravity(Gravity.CENTER_VERTICAL);
     titleLayout.setBackgroundColor(getResources().getColor(R.color.graybg));
 
@@ -313,6 +317,7 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
     tvStart.setText(R.string.session_start);
     RelativeLayout.LayoutParams tvStartParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     tvStartParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+    tvStartParams.addRule(RelativeLayout.CENTER_VERTICAL);
 
     View sessionView;
     if (App.INSTANCE.isProEnabled()) {
@@ -323,7 +328,7 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
       tvSessionStart.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
       sessionView = tvSessionStart;
     }
-    sessionView.setPadding(0, 0, 5, 0);
+    sessionView.setPadding(0, 0, 0, 3);
     RelativeLayout.LayoutParams sessionViewParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     sessionViewParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
