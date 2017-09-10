@@ -231,7 +231,7 @@
          android:layout_marginBottom="3px"
          style="@style/TableBorder">
         <TableRow style="@style/TableBorder">
-          <TextView android:textSize="21px" android:textStyle="bold" android:padding="2px" android:layout_width="50px"/>
+          <TextView android:textSize="21px" android:textStyle="bold" android:padding="2px" android:layout_width="60px"/>
           <TextView android:id="@+id/tvAvgOf" android:text="@string/last_avg_of" style="@style/AverageTableHeaderFieldPx" android:padding="2px"/>
           <TextView android:id="@+id/tvBestOf" android:text="@string/best_avg_of" style="@style/AverageTableHeaderFieldPx" android:padding="2px"/>
         </TableRow>

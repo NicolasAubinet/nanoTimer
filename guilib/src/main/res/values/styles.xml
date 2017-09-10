@@ -59,13 +59,13 @@
   </style>
 
   <style name="AverageTableHeaderField" parent="TableCell">
-    <item name="android:textColor">@color/lightblue</item>
+    <item name="android:textColor">@color/verylightblue</item>
     <item name="android:textStyle">bold</item>
     <item name="android:background">@color/darkblue</item>
   </style>
 
   <style name="AverageTableHeaderFieldPx" parent="TableCellPx">
-    <item name="android:textColor">@color/lightblue</item>
+    <item name="android:textColor">@color/verylightblue</item>
     <item name="android:textStyle">bold</item>
     <item name="android:background">@color/darkblue</item>
   </style>

@@ -74,7 +74,7 @@
   <string name="session_best_mean_of_three">Meilleur Mo3:</string>
   <string name="session_success_average">Moy. des réussites:</string>
   <string name="session_accuracy">Réussites:</string>
-  <string name="session_start">Démarrer:</string>
+  <string name="session_start">Début:</string>
 
   <string name="clear_history">Effacer l\'historique</string>
   <string name="clear_history_solve_type_confirmation">Êtes-vous sûr de vouloir supprimer tous les temps pour ce type de résolution?</string>
