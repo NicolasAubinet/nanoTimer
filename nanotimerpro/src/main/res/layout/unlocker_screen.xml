@@ -49,16 +49,13 @@
 
     <android.support.v7.widget.AppCompatButton
        android:id="@+id/buAction"
-       android:layout_height="wrap_content"
-       android:layout_width="wrap_content"
        android:layout_marginTop="20dp"
        android:layout_marginBottom="15dp"
        android:paddingRight="25dp"
        android:paddingLeft="25dp"
        android:textSize="16sp"
        android:text="@string/open"
-       android:background="@drawable/button_selector"
-       style="@style/CustomButton"/>
+       style="@style/BigButton"/>
 
   </LinearLayout>
 
