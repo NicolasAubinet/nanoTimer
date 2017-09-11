@@ -64,7 +64,7 @@
          android:layout_marginRight="3dp"
          android:text="@string/open_page"
          android:textSize="15sp"
-         style="@style/MenuButton"/>
+         style="@style/CustomButton"/>
     </LinearLayout>
 
   </LinearLayout>

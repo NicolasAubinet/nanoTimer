@@ -179,8 +179,8 @@
          android:id="@+id/buStart"
          android:text="@string/start"
          android:layout_alignParentBottom="true"
-         android:background="@drawable/button_selector"
-         style="@style/CustomButton"/>
+         style="@style/BigButton"/>
+      <!--android:background="@drawable/button_selector"-->
       <!--android:layout_marginLeft="@dimen/mainscreen_margin"-->
       <!--android:layout_marginRight="@dimen/mainscreen_margin"-->
 

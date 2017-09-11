@@ -20,20 +20,20 @@
        android:text="@string/plus_two"
        android:layout_marginRight="3dp"
        android:layout_weight="1"
-       style="@style/MenuButton"/>
+       style="@style/CustomButton"/>
     <android.support.v7.widget.AppCompatButton
        android:id="@+id/buDNF"
        android:text="@string/DNF"
        android:layout_marginLeft="3dp"
        android:layout_marginRight="3dp"
        android:layout_weight="1"
-       style="@style/MenuButton"/>
+       style="@style/CustomButton"/>
     <android.support.v7.widget.AppCompatButton
        android:id="@+id/buDelete"
        android:text="@string/delete"
        android:layout_marginLeft="3dp"
        android:layout_weight="1"
-       style="@style/MenuButton"/>
+       style="@style/CustomButton"/>
   </LinearLayout>
 
   <TableLayout

@@ -25,7 +25,7 @@
        android:layout_marginRight="3dp"
        android:text="@string/rate_now"
        android:textSize="15sp"
-       style="@style/MenuButton"/>
+       style="@style/CustomButton"/>
     <android.support.v7.widget.AppCompatButton
        android:id="@+id/buAskLater"
        android:layout_weight="1"
@@ -33,14 +33,14 @@
        android:layout_marginRight="3dp"
        android:text="@string/ask_later"
        android:textSize="15sp"
-       style="@style/MenuButton"/>
+       style="@style/CustomButton"/>
     <android.support.v7.widget.AppCompatButton
        android:id="@+id/buDontAskAgain"
        android:layout_weight="1"
        android:layout_marginLeft="3dp"
        android:text="@string/dont_ask_again"
        android:textSize="15sp"
-       style="@style/MenuButton"/>
+       style="@style/CustomButton"/>
   </LinearLayout>
 
 </LinearLayout>
