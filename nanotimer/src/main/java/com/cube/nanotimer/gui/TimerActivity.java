@@ -296,7 +296,8 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
   private void setDefaultBannerText() {
     StringBuilder sb = new StringBuilder();
     sb.append(cubeType.getName());
-    if (!solveType.getName().equals(getString(R.string.def))) {
+
+    if (!Utils.isDefaultSolveTypeName(solveType.getName())) {
       sb.append(" (").append(solveType.getName()).append(")");
     }
     setTitle(sb.toString(), defaultTextColor.getDefaultColor());

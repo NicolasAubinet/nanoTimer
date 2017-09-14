@@ -241,6 +241,7 @@ public class SolveTypesActivity extends NanoTimerActivity implements SelectionHa
 
   @Override
   public boolean renameField(int index, String newName) {
+    newName = newName.trim();
     if (!checkSolveTypeName(newName, index)) {
       return false;
     }
@@ -257,6 +258,7 @@ public class SolveTypesActivity extends NanoTimerActivity implements SelectionHa
 
   @Override
   public boolean createField(String name, Properties props) {
+    name = name.trim();
     if (!checkSolveTypeName(name, null)) {
       return false;
     }
@@ -286,14 +288,21 @@ public class SolveTypesActivity extends NanoTimerActivity implements SelectionHa
   }
 
   private boolean checkSolveTypeName(String name, Integer index) {
-    if ("".equals(name.trim())) {
+    if ("".equals(name)) {
       return false;
     }
+
     Character forbiddenChar = Utils.checkForForbiddenCharacters(name);
     if (forbiddenChar != null) {
       DialogUtils.showInfoMessage(this, getString(R.string.name_contains_forbidden_char, forbiddenChar));
       return false;
     }
+
+    if (Utils.isDefaultSolveTypeName(name)) {
+      DialogUtils.showInfoMessage(this, R.string.solve_type_name_reserved);
+      return false;
+    }
+
     for (int i = 0; i < liSolveTypes.size(); i++) {
       if (liSolveTypes.get(i).getName().equals(name)) {
         if (index == null || i != index) {

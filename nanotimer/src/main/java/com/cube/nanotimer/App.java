@@ -20,6 +20,7 @@ import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ScrambleType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ public enum App {
   private Context context;
   private Service service;
   private boolean appGUILaunched;
+  private List<String> defaultSolveTypeStrings = new ArrayList<>();
 
   public static final String PRO_PACKAGE_NAME = "com.cube.nanotimerpro";
 
@@ -51,6 +53,7 @@ public enum App {
     if (appStarted || !fromService) {
       this.context = context;
     }
+
     if (appStarted) { // app started (either from GUI or from service)
       service = ServiceImpl.getInstance(context);
       Options.INSTANCE.setContext(context);
@@ -69,6 +72,13 @@ public enum App {
           ScramblerService.INSTANCE.checkScrambleCaches();
         }
       });
+
+      if (defaultSolveTypeStrings.isEmpty()) {
+        for (String languageCode : context.getResources().getStringArray(R.array.language_codes)) {
+          String defaultSolveTypeName = Utils.getLocalizedString(context, languageCode, R.string.def);
+          defaultSolveTypeStrings.add(defaultSolveTypeName);
+        }
+      }
     }
     if (!appGUILaunched && !fromService) { // app GUI started
       appGUILaunched(context);
@@ -119,6 +129,10 @@ public enum App {
 
   public void onResume() {
     ProVersionWelcome.onResume(context, isProEnabled());
+  }
+
+  public List<String> getDefaultSolveTypeStrings() {
+    return defaultSolveTypeStrings;
   }
 
 }

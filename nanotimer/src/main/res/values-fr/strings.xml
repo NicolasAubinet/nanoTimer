@@ -35,6 +35,7 @@
   <string name="max_steps_count_reached">La limite de nombre d\'étapes a été atteinte</string>
   <string name="add_step">Ajouter une étape</string>
   <string name="add_steps">Ajouter des étapes</string>
+  <string name="solve_type_name_reserved">Ce nom de type de résolution est réservé.\nVeuillez en choisir un autre.</string>
 
   <string name="last_avg_of">Dernière moy. sur</string>
   <string name="best_avg_of">Meilleure moy. sur</string>
