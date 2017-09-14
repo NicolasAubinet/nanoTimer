@@ -18,7 +18,7 @@
   <!-- filler to center TextView correctly (because of back button) -->
   <View
      android:id="@+id/fillerView"
-     android:layout_width="20dp"
+     android:layout_width="30dp"
      android:layout_height="10dp"
      android:layout_alignParentRight="true"/>
 
