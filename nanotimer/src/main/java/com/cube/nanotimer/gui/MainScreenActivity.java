@@ -64,7 +64,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-public class MainScreenActivity extends DrawerLayoutActivity implements SelectionHandler, ResultListener {
+public class MainScreenActivity extends DrawerLayoutActivity implements SelectionHandler, ResultListener, TimeChangedHandler {
 
   private Spinner spCubeType;
   private Spinner spSolveType;
@@ -78,7 +78,6 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   private final List<SolveType> solveTypes = new ArrayList<>();
   private NameHolderSpinnerAdapter cubeTypesSpinnerAdapter;
   private NameHolderSpinnerAdapter solveTypesSpinnerAdapter;
-  private OnTimeChangedHandler onTimeChangedHandler;
 
   private int solvesCount;
   private TimesSort timesSort = TimesSort.TIMESTAMP;
@@ -185,14 +184,14 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   }
 
   private void initHistoryList() {
-    historyListAdapter = new HistoryListAdapter(MainScreenActivity.this, R.id.lvHistory, liHistory);
+    historyListAdapter = new HistoryListAdapter(this, R.id.lvHistory, liHistory);
     lvHistory = (ListView) findViewById(R.id.lvHistory);
     lvHistory.setAdapter(historyListAdapter);
     lvHistory.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         DialogUtils.showFragment(MainScreenActivity.this,
-          HistoryDetailDialog.newInstance(liHistory.get(i), curCubeType, onTimeChangedHandler));
+          HistoryDetailDialog.newInstance(liHistory.get(i), curCubeType, MainScreenActivity.this));
       }
     });
     lvHistory.setOnScrollListener(new OnScrollListener() {
@@ -640,49 +639,47 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
     }
   }
 
-  private class OnTimeChangedHandler implements TimeChangedHandler {
-    @Override
-    public void onTimeChanged(SolveTime solveTime) {
-      SolveTime historyTime = null;
-      for (SolveTime st : liHistory) {
-        if (st.getId() == solveTime.getId()) {
-          historyTime = st;
-          break;
-        }
-      }
-      if (solveTime != null) {
-        updateListTime(historyTime);
+  @Override
+  public void onTimeChanged(SolveTime solveTime) {
+    SolveTime historyTime = null;
+    for (SolveTime st : liHistory) {
+      if (st.getId() == solveTime.getId()) {
+        historyTime = st;
+        break;
       }
     }
+    if (solveTime != null) {
+      updateListTime(historyTime);
+    }
+  }
 
-    @Override
-    public void onTimeDeleted(SolveTime solveTime) {
-      for (Iterator<SolveTime> it = liHistory.iterator(); it.hasNext(); ) {
-        SolveTime st = it.next();
-        if (st.getId() == solveTime.getId()) {
-          it.remove();
-          historyListAdapter.notifyDataSetChanged();
-          setSolvesCount(solvesCount - 1);
-          break;
-        }
+  @Override
+  public void onTimeDeleted(SolveTime solveTime) {
+    for (Iterator<SolveTime> it = liHistory.iterator(); it.hasNext(); ) {
+      SolveTime st = it.next();
+      if (st.getId() == solveTime.getId()) {
+        it.remove();
+        historyListAdapter.notifyDataSetChanged();
+        setSolvesCount(solvesCount - 1);
+        break;
       }
     }
+  }
 
-    private void updateListTime(final SolveTime solveTime) {
-      App.INSTANCE.getService().getSolveTime(solveTime.getId(), new DataCallback<SolveTime>() {
-        @Override
-        public void onData(final SolveTime data) {
-          runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              solveTime.setTime(data.getTime());
-              solveTime.setPb(data.isPb());
-              historyListAdapter.notifyDataSetChanged();
-            }
-          });
-        }
-      });
-    }
+  private void updateListTime(final SolveTime solveTime) {
+    App.INSTANCE.getService().getSolveTime(solveTime.getId(), new DataCallback<SolveTime>() {
+      @Override
+      public void onData(final SolveTime data) {
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            solveTime.setTime(data.getTime());
+            solveTime.setPb(data.isPb());
+            historyListAdapter.notifyDataSetChanged();
+          }
+        });
+      }
+    });
   }
 
   private class MenuListAdapter extends ArrayAdapter<String> {

@@ -3,7 +3,6 @@ package com.cube.nanotimer.gui.widget;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -27,7 +26,6 @@ import java.util.Arrays;
 
 public class HistoryDetailDialog extends NanoTimerDialogFragment {
 
-  private static final String ARG_TIME_CHANGED_HANDLER = "timeChangedHandler";
   private static final String ARG_SOLVETIME = "solvetime";
   private static final String ARG_CUBETYPE = "cubetype";
 
@@ -35,8 +33,9 @@ public class HistoryDetailDialog extends NanoTimerDialogFragment {
 
   public static HistoryDetailDialog newInstance(SolveTime solveTime, CubeType cubeType, TimeChangedHandler handler) {
     HistoryDetailDialog hd = new HistoryDetailDialog();
+    hd.handler = handler;
+
     Bundle bundle = new Bundle();
-    bundle.putSerializable(ARG_TIME_CHANGED_HANDLER, handler);
     bundle.putSerializable(ARG_SOLVETIME, solveTime);
     bundle.putSerializable(ARG_CUBETYPE, cubeType);
     hd.setArguments(bundle);
@@ -50,7 +49,7 @@ public class HistoryDetailDialog extends NanoTimerDialogFragment {
     Bundle args = getArguments();
     final SolveTime solveTime = (SolveTime) args.getSerializable(ARG_SOLVETIME);
     final CubeType cubeType = (CubeType) args.getSerializable(ARG_CUBETYPE);
-    handler = (TimeChangedHandler) args.getSerializable(ARG_TIME_CHANGED_HANDLER);
+
     if (solveTime.getSolveType().isBlind()) {
       v.findViewById(R.id.averagesTable).setVisibility(View.GONE);
       v.findViewById(R.id.trMeanOfThree).setVisibility(View.VISIBLE);
