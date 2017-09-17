@@ -146,25 +146,30 @@
            android:text="@string/averages"
            android:textSize="15sp"/>
 
-        <TableLayout
+        <android.support.v7.widget.CardView
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
            android:layout_margin="4dp"
            android:padding="1dp"
-           style="@style/EqualSizeColumnsTable">
-          <TableRow style="@style/TableBorder">
-            <TextView style="@style/AverageTableHeaderField" android:text="5"/>
-            <TextView style="@style/AverageTableHeaderField" android:text="12"/>
-            <TextView style="@style/AverageTableHeaderField" android:text="50"/>
-            <TextView style="@style/AverageTableHeaderField" android:text="100"/>
-          </TableRow>
-          <TableRow style="@style/TableBorder">
-            <TextView android:id="@+id/tvAvgOfFive" style="@style/TableCell"/>
-            <TextView android:id="@+id/tvAvgOfTwelve" style="@style/TableCell"/>
-            <TextView android:id="@+id/tvAvgOfFifty" style="@style/TableCell"/>
-            <TextView android:id="@+id/tvAvgOfHundred" style="@style/TableCell"/>
-          </TableRow>
-        </TableLayout>
+           style="@style/TableCardView">
+          <TableLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             style="@style/EqualSizeColumnsTable">
+            <TableRow style="@style/TableBorder">
+              <TextView style="@style/AverageTableHeaderField" android:text="5"/>
+              <TextView style="@style/AverageTableHeaderField" android:text="12"/>
+              <TextView style="@style/AverageTableHeaderField" android:text="50"/>
+              <TextView style="@style/AverageTableHeaderField" android:text="100"/>
+            </TableRow>
+            <TableRow style="@style/TableBorder">
+              <TextView android:id="@+id/tvAvgOfFive" style="@style/TableCell"/>
+              <TextView android:id="@+id/tvAvgOfTwelve" style="@style/TableCell"/>
+              <TextView android:id="@+id/tvAvgOfFifty" style="@style/TableCell"/>
+              <TextView android:id="@+id/tvAvgOfHundred" style="@style/TableCell"/>
+            </TableRow>
+          </TableLayout>
+        </android.support.v7.widget.CardView>
 
       </LinearLayout>
 

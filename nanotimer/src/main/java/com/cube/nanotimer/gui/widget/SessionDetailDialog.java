@@ -136,7 +136,7 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
       addSolveTimesPage();
     }
 
-    adjustTableLayoutParams(sessionTimesLayout, SESSION_TIMES_HEIGHT_DP);
+    adjustTableLayoutParams(sessionTimesLayout, SESSION_TIMES_HEIGHT_DP, 0);
   }
 
   private long getBestMeanOf(List<Long> times, int n) {
@@ -192,12 +192,13 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
     }
     bestAveragesTableLayout.addView(trHeaders);
     bestAveragesTableLayout.addView(trAverages);
-    adjustTableLayoutParams(bestAveragesTableLayout, BEST_AVERAGES_HEIGHT_DP);
+    adjustTableLayoutParams(bestAveragesTableLayout, BEST_AVERAGES_HEIGHT_DP, 1);
   }
 
   private void addToBestAveragesTable(TableRow trHeaders, TableRow trAverages, int avgHeader, long average) {
     TextView tv = getNewSolveTimeTextView();
-    tv.setTextColor(getResources().getColor(R.color.lightblue));
+//    tv.setTextColor(getResources().getColor(R.color.lightblue));
+    tv.setBackgroundColor(getResources().getColor(R.color.darkblue));
     tv.setText(String.valueOf(avgHeader));
     tv.setTypeface(null, Typeface.BOLD);
     trHeaders.addView(tv);
@@ -229,8 +230,8 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
     }
   }
 
-  private void adjustTableLayoutParams(TableLayout tableLayout, int tvHeightDp) {
-    for (int i = 0; i < tableLayout.getChildCount(); i++) {
+  private void adjustTableLayoutParams(TableLayout tableLayout, int tvHeightDp, int startingRowIndex) {
+    for (int i = startingRowIndex; i < tableLayout.getChildCount(); i++) {
       if (tableLayout.getChildAt(i) instanceof TableRow) {
         TableRow tr = (TableRow) tableLayout.getChildAt(i);
         for (int j = 0; j < tr.getChildCount(); j++) {

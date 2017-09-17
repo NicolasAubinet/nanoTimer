@@ -131,13 +131,18 @@
        android:text="@string/best_averages"
        android:textSize="16sp"/>
 
-    <TableLayout
-       android:id="@+id/bestAveragesTableLayout"
+    <android.support.v7.widget.CardView
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:layout_margin="3dp"
-       style="@style/EqualSizeColumnsTable">
-    </TableLayout>
+       style="@style/TableCardView">
+      <TableLayout
+         android:id="@+id/bestAveragesTableLayout"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         style="@style/EqualSizeColumnsTable">
+      </TableLayout>
+    </android.support.v7.widget.CardView>
 
   </LinearLayout>
 
@@ -153,6 +158,10 @@
      android:layout_width="match_parent"
      android:layout_height="wrap_content">
 
+    <android.support.v7.widget.CardView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       style="@style/TableCardView">
       <TableLayout
          android:id="@+id/sessionTimesLayout"
          android:layout_width="match_parent"
@@ -160,6 +169,7 @@
          style="@style/EqualSizeColumnsTable">
         <!--style="@style/TableBorder">-->
       </TableLayout>
+    </android.support.v7.widget.CardView>
 
   </ScrollView>
 
