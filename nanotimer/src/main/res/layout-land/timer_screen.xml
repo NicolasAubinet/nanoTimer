@@ -46,45 +46,51 @@
        android:layout_width="wrap_content"
        android:layout_height="match_parent"
        android:layout_weight="5">
+
       <LinearLayout
          android:id="@+id/sessionLayout"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:orientation="vertical"
-         android:layout_margin="3px">
-        <TableLayout
-           android:id="@+id/sessionTimesLayout"
+         android:orientation="vertical">
+
+        <android.support.v7.widget.CardView
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
-           android:layout_marginBottom="3px"
-           style="@style/EqualSizeColumnsTable">
-          <TableRow style="@style/TableBorder">
-            <TextView style="@style/TableCellPx"/>
-            <TextView style="@style/TableCellPx"/>
-            <TextView style="@style/TableCellPx"/>
-            <TextView style="@style/TableCellPx"/>
-          </TableRow>
-          <TableRow style="@style/TableBorder">
-            <TextView style="@style/TableCellPx"/>
-            <TextView style="@style/TableCellPx"/>
-            <TextView style="@style/TableCellPx"/>
-            <TextView style="@style/TableCellPx"/>
-          </TableRow>
-          <TableRow style="@style/TableBorder">
-            <TextView style="@style/TableCellPx"/>
-            <TextView style="@style/TableCellPx"/>
-            <TextView style="@style/TableCellPx"/>
-            <TextView style="@style/TableCellPx"/>
-          </TableRow>
-        </TableLayout>
+           style="@style/TableCardView">
+          <TableLayout
+             android:id="@+id/sessionTimesLayout"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             style="@style/EqualSizeColumnsTable">
+            <TableRow style="@style/TableBorder">
+              <TextView style="@style/TableCellPx"/>
+              <TextView style="@style/TableCellPx"/>
+              <TextView style="@style/TableCellPx"/>
+              <TextView style="@style/TableCellPx"/>
+            </TableRow>
+            <TableRow style="@style/TableBorder">
+              <TextView style="@style/TableCellPx"/>
+              <TextView style="@style/TableCellPx"/>
+              <TextView style="@style/TableCellPx"/>
+              <TextView style="@style/TableCellPx"/>
+            </TableRow>
+            <TableRow style="@style/TableBorder">
+              <TextView style="@style/TableCellPx"/>
+              <TextView style="@style/TableCellPx"/>
+              <TextView style="@style/TableCellPx"/>
+              <TextView style="@style/TableCellPx"/>
+            </TableRow>
+          </TableLayout>
+        </android.support.v7.widget.CardView>
 
         <!--<TextView style="@style/DividerRow" android:layout_marginTop="1px" android:layout_marginBottom="1px" />-->
 
         <LinearLayout
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
-           android:layout_marginLeft="2px"
-           android:orientation="horizontal">
+           android:orientation="horizontal"
+           android:layout_marginLeft="6px"
+           android:layout_marginRight="6px">
           <TableLayout
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
@@ -179,6 +185,7 @@
                  style="@style/SmallTextFieldPx"/>
             </TableRow>
           </TableLayout>
+
         </LinearLayout>
 
         <!--<TextView style="@style/DividerRow" android:layout_marginTop="3px" />-->
@@ -189,7 +196,7 @@
          android:id="@+id/timerStepsLayout"
          android:layout_width="match_parent"
          android:layout_height="match_parent"
-         android:layout_above="@+id/averagesLayout"
+         android:layout_above="@+id/averagesCardView"
          android:gravity="center"
          android:paddingTop="8px"
          android:visibility="gone"
@@ -220,47 +227,50 @@
         </TableRow>
       </TableLayout>
 
-      <TableLayout
-         android:id="@+id/averagesLayout"
+      <android.support.v7.widget.CardView
+         android:id="@+id/averagesCardView"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
          android:layout_alignParentBottom="true"
          android:gravity="bottom"
-         android:layout_marginLeft="5px"
-         android:layout_marginRight="5px"
-         android:layout_marginBottom="3px"
-         style="@style/TableBorder">
-        <TableRow style="@style/TableBorder">
-          <TextView android:textSize="21px" android:textStyle="bold" android:padding="2px" android:layout_width="60px"/>
-          <TextView android:id="@+id/tvAvgOf" android:text="@string/last_avg_of" style="@style/AverageTableHeaderFieldPx" android:padding="2px"/>
-          <TextView android:id="@+id/tvBestOf" android:text="@string/best_avg_of" style="@style/AverageTableHeaderFieldPx" android:padding="2px"/>
-        </TableRow>
-        <TableRow android:id="@+id/trAvgOfFive" style="@style/TableBorder">
-          <TextView android:text="5" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFive" style="@style/TableCellPx" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFive" style="@style/TableCellPx" android:padding="2px"/>
-        </TableRow>
-        <TableRow android:id="@+id/trAvgOfTwelve" style="@style/TableBorder">
-          <TextView android:text="12" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfTwelve" style="@style/TableCellPx" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfTwelve" style="@style/TableCellPx" android:padding="2px"/>
-        </TableRow>
-        <TableRow android:id="@+id/trAvgOfFifty" style="@style/TableBorder">
-          <TextView android:text="50" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFifty" style="@style/TableCellPx" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFifty" style="@style/TableCellPx" android:padding="2px"/>
-        </TableRow>
-        <TableRow android:id="@+id/trAvgOfHundred" style="@style/TableBorder">
-          <TextView android:text="100" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfHundred" style="@style/TableCellPx" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfHundred" style="@style/TableCellPx" android:padding="2px"/>
-        </TableRow>
-        <TableRow android:id="@+id/trAvgOfLife" android:visibility="gone" style="@style/TableBorder">
-          <TextView android:text="@string/life" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfLife" style="@style/TableCellPx" android:padding="2px"/>
-          <com.cube.nanotimer.util.view.FontFitTextView style="@style/TableCellPx" android:padding="2px"/>
-        </TableRow>
-      </TableLayout>
+         style="@style/TableCardView">
+        <TableLayout
+           android:id="@+id/averagesLayout"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           style="@style/TableBorder">
+          <TableRow style="@style/TableBorder">
+            <TextView android:textSize="21px" android:textStyle="bold" android:padding="2px" android:layout_width="60px"/>
+            <TextView android:id="@+id/tvAvgOf" android:text="@string/last_avg_of" style="@style/AverageTableHeaderFieldPx" android:padding="2px"/>
+            <TextView android:id="@+id/tvBestOf" android:text="@string/best_avg_of" style="@style/AverageTableHeaderFieldPx" android:padding="2px"/>
+          </TableRow>
+          <TableRow android:id="@+id/trAvgOfFive" style="@style/TableBorder">
+            <TextView android:text="5" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFive" style="@style/TableCellPx" android:padding="2px"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFive" style="@style/TableCellPx" android:padding="2px"/>
+          </TableRow>
+          <TableRow android:id="@+id/trAvgOfTwelve" style="@style/TableBorder">
+            <TextView android:text="12" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfTwelve" style="@style/TableCellPx" android:padding="2px"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfTwelve" style="@style/TableCellPx" android:padding="2px"/>
+          </TableRow>
+          <TableRow android:id="@+id/trAvgOfFifty" style="@style/TableBorder">
+            <TextView android:text="50" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFifty" style="@style/TableCellPx" android:padding="2px"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFifty" style="@style/TableCellPx" android:padding="2px"/>
+          </TableRow>
+          <TableRow android:id="@+id/trAvgOfHundred" style="@style/TableBorder">
+            <TextView android:text="100" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfHundred" style="@style/TableCellPx" android:padding="2px"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfHundred" style="@style/TableCellPx" android:padding="2px"/>
+          </TableRow>
+          <TableRow android:id="@+id/trAvgOfLife" android:visibility="gone" style="@style/TableBorder">
+            <TextView android:text="@string/life" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfLife" style="@style/TableCellPx" android:padding="2px"/>
+            <com.cube.nanotimer.util.view.FontFitTextView style="@style/TableCellPx" android:padding="2px"/>
+          </TableRow>
+        </TableLayout>
+      </android.support.v7.widget.CardView>
     </RelativeLayout>
 
   </LinearLayout>
