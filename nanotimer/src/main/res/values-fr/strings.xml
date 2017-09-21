@@ -37,19 +37,19 @@
   <string name="add_steps">Ajouter des étapes</string>
   <string name="solve_type_name_reserved">Ce nom de type de résolution est réservé.\nVeuillez en choisir un autre.</string>
 
-  <string name="last_avg_of">Dernière moy. sur</string>
-  <string name="best_avg_of">Meilleure moy. sur</string>
+  <string name="last_avg_of">Dernière moy. de</string>
+  <string name="best_avg_of">Meilleure moy. de</string>
   <string name="success_avg">Moy. des réussites</string>
   <string name="accuracy">Réussites</string>
   <string name="life">Tous</string>
 
   <string name="lifetime_best">Meilleur temps:</string>
-  <string name="lifetime_avg">Moy. sur 1000:</string>
+  <string name="lifetime_avg">Moy. de 1000:</string>
   <string name="lifetime_accuracy">Réussis sur 1000:</string>
   <string name="last_mean_of_three">Dernier Mo3:</string>
   <string name="best_mean_of_three">Meilleur Mo3:</string>
   <string name="solves_count">Résolutions:</string>
-  <string name="mean_of_three">Mean sur 3:</string>
+  <string name="mean_of_three">Mean de 3:</string>
 
   <string name="plus_two">+2</string>
   <string name="DNF">DNF</string>
