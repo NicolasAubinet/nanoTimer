@@ -97,31 +97,27 @@
         <android.support.v7.widget.CardView
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
-           style="@style/TableCardView">
-          <TableLayout
+           style="@style/TableCardViewPx">
+
+          <android.support.v7.widget.GridLayout
              android:id="@+id/sessionTimesLayout"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
-             style="@style/EqualSizeColumnsTable">
-            <TableRow style="@style/TableBorder">
-              <TextView style="@style/TableCellPx"/>
-              <TextView style="@style/TableCellPx"/>
-              <TextView style="@style/TableCellPx"/>
-              <TextView style="@style/TableCellPx"/>
-            </TableRow>
-            <TableRow style="@style/TableBorder">
-              <TextView style="@style/TableCellPx"/>
-              <TextView style="@style/TableCellPx"/>
-              <TextView style="@style/TableCellPx"/>
-              <TextView style="@style/TableCellPx"/>
-            </TableRow>
-            <TableRow style="@style/TableBorder">
-              <TextView style="@style/TableCellPx"/>
-              <TextView style="@style/TableCellPx"/>
-              <TextView style="@style/TableCellPx"/>
-              <TextView style="@style/TableCellPx"/>
-            </TableRow>
-          </TableLayout>
+             app:columnCount="4">
+            <TextView style="@style/GridCellPx" android:background="@drawable/grid_background_1"/>
+            <TextView style="@style/GridCellPx" android:background="@drawable/grid_background_2"/>
+            <TextView style="@style/GridCellPx" android:background="@drawable/grid_background_1"/>
+            <TextView style="@style/GridCellPx" android:background="@drawable/grid_background_2"/>
+            <TextView style="@style/GridCellPx" android:background="@drawable/grid_background_2"/>
+            <TextView style="@style/GridCellPx" android:background="@drawable/grid_background_1"/>
+            <TextView style="@style/GridCellPx" android:background="@drawable/grid_background_2"/>
+            <TextView style="@style/GridCellPx" android:background="@drawable/grid_background_1"/>
+            <TextView style="@style/GridCellPx" android:background="@drawable/grid_background_1"/>
+            <TextView style="@style/GridCellPx" android:background="@drawable/grid_background_2"/>
+            <TextView style="@style/GridCellPx" android:background="@drawable/grid_background_1"/>
+            <TextView style="@style/GridCellPx" android:background="@drawable/grid_background_2"/>
+          </android.support.v7.widget.GridLayout>
+
         </android.support.v7.widget.CardView>
 
         <!--<TextView style="@style/DividerRow"-->
@@ -239,7 +235,8 @@
        android:layout_height="wrap_content"
        android:layout_alignParentBottom="true"
        android:gravity="bottom"
-       style="@style/TableCardView">
+       android:layout_marginBottom="@dimen/grid_margin_px"
+       style="@style/TableCardViewPx">
       <TableLayout
          android:id="@+id/averagesLayout"
          android:layout_width="match_parent"
@@ -250,27 +247,27 @@
           <TextView android:id="@+id/tvAvgOf" android:text="@string/last_avg_of" style="@style/AverageTableHeaderFieldPx"/>
           <TextView android:id="@+id/tvBestOf" android:text="@string/best_avg_of" style="@style/AverageTableHeaderFieldPx"/>
         </TableRow>
-        <TableRow android:id="@+id/trAvgOfFive" style="@style/TableBorder">
+        <TableRow android:id="@+id/trAvgOfFive" style="@style/TableBorder" android:background="@color/grid_background_1">
           <TextView android:text="5" style="@style/AverageTableFirstFieldPx" android:layout_weight="0"/>
           <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFive" style="@style/TableCellPx"/>
           <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFive" style="@style/TableCellPx"/>
         </TableRow>
-        <TableRow android:id="@+id/trAvgOfTwelve" style="@style/TableBorder">
+        <TableRow android:id="@+id/trAvgOfTwelve" style="@style/TableBorder" android:background="@color/grid_background_2">
           <TextView android:text="12" style="@style/AverageTableFirstFieldPx" android:layout_weight="0"/>
           <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfTwelve" style="@style/TableCellPx"/>
           <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfTwelve" style="@style/TableCellPx"/>
         </TableRow>
-        <TableRow android:id="@+id/trAvgOfFifty" style="@style/TableBorder">
+        <TableRow android:id="@+id/trAvgOfFifty" style="@style/TableBorder" android:background="@color/grid_background_1">
           <TextView android:text="50" style="@style/AverageTableFirstFieldPx" android:layout_weight="0"/>
           <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFifty" style="@style/TableCellPx"/>
           <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFifty" style="@style/TableCellPx"/>
         </TableRow>
-        <TableRow android:id="@+id/trAvgOfHundred" style="@style/TableBorder">
+        <TableRow android:id="@+id/trAvgOfHundred" style="@style/TableBorder" android:background="@color/grid_background_2">
           <TextView android:text="100" style="@style/AverageTableFirstFieldPx" android:layout_weight="0"/>
           <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfHundred" style="@style/TableCellPx"/>
           <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfHundred" style="@style/TableCellPx"/>
         </TableRow>
-        <TableRow android:id="@+id/trAvgOfLife" android:visibility="gone" style="@style/TableBorder">
+        <TableRow android:id="@+id/trAvgOfLife" android:visibility="gone" style="@style/TableBorder" android:background="@color/grid_background_1">
           <TextView android:text="@string/life" style="@style/AverageTableFirstFieldPx" android:layout_weight="0"/>
           <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfLife" style="@style/TableCellPx"/>
           <com.cube.nanotimer.util.view.FontFitTextView style="@style/TableCellPx"/>

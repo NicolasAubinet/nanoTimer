@@ -32,5 +32,6 @@ dependencies {
     })
     compile "com.android.support:appcompat-v7:${libSupportVersion}"
     compile "com.android.support:cardview-v7:${libSupportVersion}"
+    compile "com.android.support:gridlayout-v7:${libSupportVersion}"
     testCompile 'junit:junit:4.12'
 }

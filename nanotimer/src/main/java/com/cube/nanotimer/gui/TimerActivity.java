@@ -7,6 +7,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.GridLayout;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -64,7 +65,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
   private TextView tvSolvesCount;
   private TextView tvAccuracy;
   private ViewGroup layout;
-  private TableLayout sessionTimesLayout;
+  private GridLayout sessionTimesLayout;
   private TableLayout timerStepsLayout;
 
   private CubeType cubeType;
@@ -204,7 +205,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     tvScramble = (TextView) findViewById(R.id.tvScramble);
     tvSolvesCount = (TextView) findViewById(R.id.tvSolvesCount);
     tvAccuracy = (TextView) findViewById(R.id.tvLifetimeAccuracy);
-    sessionTimesLayout = (TableLayout) findViewById(R.id.sessionTimesLayout);
+    sessionTimesLayout = (GridLayout) findViewById(R.id.sessionTimesLayout);
     TableLayout averagesLayout = (TableLayout) findViewById(R.id.averagesLayout);
     timerStepsLayout = (TableLayout) findViewById(R.id.timerStepsLayout);
 
@@ -540,22 +541,13 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
 
   private void clearSessionTextViews() {
     for (int i = 0; i < sessionTimesLayout.getChildCount(); i++) {
-      TableRow tr = (TableRow) sessionTimesLayout.getChildAt(i);
-      for (int j = 0; j < tr.getChildCount(); j++) {
-        ((TextView) tr.getChildAt(j)).setText("");
-      }
+      TextView tr = (TextView) sessionTimesLayout.getChildAt(i);
+      tr.setText("");
     }
   }
 
   private TextView getSessionTextView(int i) {
-    View v = null;
-    if (i >= 0 && i < 4) {
-      v = ((TableRow) sessionTimesLayout.getChildAt(0)).getChildAt(i);
-    } else if (i >= 4 && i < 8) {
-      v = ((TableRow) sessionTimesLayout.getChildAt(1)).getChildAt(i - 4);
-    } else if (i >= 8 && i < 12) {
-      v = ((TableRow) sessionTimesLayout.getChildAt(2)).getChildAt(i - 8);
-    }
+    View v = sessionTimesLayout.getChildAt(i);
     return (TextView) v;
   }
 

@@ -34,7 +34,7 @@
   <style name="TableCell">
     <item name="android:textSize">15sp</item>
     <item name="android:gravity">center</item>
-    <item name="android:layout_height">22dp</item>
+    <item name="android:layout_height">20dp</item>
     <item name="android:layout_width">0dp</item>
     <item name="android:padding">1dp</item>
     <item name="android:layout_weight">1</item>
@@ -43,13 +43,19 @@
 
   <style name="TableCellPx" parent="TableCell">
     <item name="android:textSize">21px</item>
-    <item name="android:layout_height">35px</item>
+    <item name="android:layout_height">33px</item>
     <item name="android:padding">2px</item>
   </style>
 
+  <style name="GridCellPx" parent="TableCellPx">
+    <item name="android:layout_width">0px</item>
+    <item name="layout_columnWeight">1</item>
+    <!--<item name="gravity">center</item>-->
+  </style>
+
   <style name="TableBorder">
-    <item name="android:showDividers">middle|beginning|end</item>
-    <item name="android:divider">?android:attr/dividerVertical</item>
+    <!--<item name="android:showDividers">middle|beginning|end</item>-->
+    <!--<item name="android:divider">?android:attr/dividerVertical</item>-->
   </style>
 
   <style name="EqualSizeColumnsTable" parent="TableBorder">
@@ -58,15 +64,15 @@
   </style>
 
   <style name="AverageTableHeaderField" parent="TableCell">
-    <!--<item name="android:textColor">@color/verylightblue</item>-->
-    <item name="android:background">@color/darkblue</item>
-    <item name="android:textStyle">bold</item>
+    <item name="android:textColor">@color/lightblue</item>
+    <item name="android:background">@color/table_header</item>
+    <!--<item name="android:textStyle">bold</item>-->
   </style>
 
   <style name="AverageTableHeaderFieldPx" parent="TableCellPx">
-    <!--<item name="android:textColor">@color/verylightblue</item>-->
-    <item name="android:background">@color/darkblue</item>
-    <item name="android:textStyle">bold</item>
+    <item name="android:textColor">@color/lightblue</item>
+    <item name="android:background">@color/table_header</item>
+    <!--<item name="android:textStyle">bold</item>-->
   </style>
 
   <style name="AverageTableFirstFieldPx" parent="AverageTableHeaderFieldPx">
@@ -136,10 +142,20 @@
   </style>
 
   <style name="TableCardView">
-    <item name="android:layout_margin">5px</item>
+    <!--<item name="android:layout_marginTop">2dp</item>-->
+    <!--<item name="android:layout_marginBottom">2dp</item>-->
+    <item name="android:layout_marginLeft">4dp</item>
+    <item name="android:layout_marginRight">4dp</item>
+    <item name="cardBackgroundColor">@color/timercardbg</item>
     <!--<item name="cardCornerRadius">6px</item>-->
     <!--<item name="cardElevation">6px</item>-->
-    <item name="cardBackgroundColor">@color/timercardbg</item>
+  </style>
+
+  <style name="TableCardViewPx" parent="TableCardView">
+    <!--<item name="android:layout_marginTop">2px</item>-->
+    <!--<item name="android:layout_marginBottom">2px</item>-->
+    <item name="android:layout_marginLeft">@dimen/grid_margin_px</item>
+    <item name="android:layout_marginRight">@dimen/grid_margin_px</item>
   </style>
 
   <style name="ScrambleTextField">
