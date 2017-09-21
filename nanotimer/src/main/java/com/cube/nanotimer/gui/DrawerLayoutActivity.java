@@ -4,15 +4,19 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import com.cube.nanotimer.R;
 
 public class DrawerLayoutActivity extends NanoTimerActivity {
-//  private Toolbar toolbar;
+  private Toolbar toolbar;
   private DrawerLayout drawerLayout;
   private ActionBarDrawerToggle drawerToggle;
   private NavigationView navigationView;
@@ -47,15 +51,15 @@ public class DrawerLayoutActivity extends NanoTimerActivity {
   }
 
   protected void initViews() {
-//    toolbar = (Toolbar) findViewById(R.id.toolbar);
-//    setSupportActionBar(toolbar);
+    toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
 
-//    toolbar.setNavigationOnClickListener(new OnClickListener() {
-//      @Override
-//      public void onClick(View view) {
-//        drawerLayout.openDrawer(GravityCompat.START);
-//      }
-//    });
+    toolbar.setNavigationOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        drawerLayout.openDrawer(GravityCompat.START);
+      }
+    });
 
     drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
     drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.app_name, R.string.app_name) {

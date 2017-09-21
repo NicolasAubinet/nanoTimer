@@ -15,7 +15,7 @@
     <RelativeLayout
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:background="@color/color_primary">
+       android:background="@color/graybg">
 
       <LinearLayout
          android:orientation="vertical"
@@ -23,6 +23,16 @@
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
          android:layout_above="@+id/buStart">
+
+        <android.support.design.widget.AppBarLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"> <!-- for the elevation shadow -->
+          <android.support.v7.widget.Toolbar
+             android:id="@+id/toolbar"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:background="@color/color_primary"/>
+        </android.support.design.widget.AppBarLayout>
 
         <com.startapp.android.publish.banner.Banner
            android:id="@+id/bannerAd"
@@ -65,7 +75,7 @@
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="10dp"
                  android:text="@string/cube_type"
-                 android:textColor="@color/verylightblue"
+                 android:textColor="@color/lightblue"
                  android:textStyle="bold"
                  android:gravity="start"
                  style="@style/SmallTextField"/>
@@ -75,7 +85,7 @@
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="10dp"
                  android:text="@string/solve_type"
-                 android:textColor="@color/verylightblue"
+                 android:textColor="@color/lightblue"
                  android:textStyle="bold"
                  android:gravity="start"
                  style="@style/SmallTextField"/>
