@@ -63,7 +63,6 @@
   <string name="no_scramble">Sin mezcla\n(el tiempo fue insertado manualmente)</string>
 
   <string name="session_avg">Media:</string>
-  <string name="session_mean">Media:</string>
   <string name="session_solves">Resoluciones:</string>
   <string name="session_best">Mejor:</string>
   <string name="session_deviation">Desviación:</string>

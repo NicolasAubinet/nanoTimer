@@ -64,7 +64,6 @@
   <string name="no_scramble">No scramble\n(time was inserted manually)</string>
 
   <string name="session_avg">Average:</string>
-  <string name="session_mean">Mean:</string>
   <string name="session_solves">Solves:</string>
   <string name="session_best">Best:</string>
   <string name="session_deviation">Deviation:</string>
