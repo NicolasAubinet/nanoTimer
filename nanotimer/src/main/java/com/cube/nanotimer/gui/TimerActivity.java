@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
@@ -50,6 +51,7 @@ import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.SolveTypeStep;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -208,6 +210,19 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     sessionTimesLayout = (GridLayout) findViewById(R.id.sessionTimesLayout);
     TableLayout averagesLayout = (TableLayout) findViewById(R.id.averagesLayout);
     timerStepsLayout = (TableLayout) findViewById(R.id.timerStepsLayout);
+
+    try {
+      // Always show the menu icon in top bar, even for devices that have a hardware menu key.
+      // This is so that the top bar title is always centered (needed on devices like Galaxy S2)
+      ViewConfiguration config = ViewConfiguration.get(this);
+      Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+      if (menuKeyField != null) {
+        menuKeyField.setAccessible(true);
+        menuKeyField.setBoolean(config, false);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
     if (currentOrientation == Configuration.ORIENTATION_PORTRAIT && cubeType == CubeType.SEVEN_BY_SEVEN) {
       tvTimer.setTextSize(TypedValue.COMPLEX_UNIT_PX, tvTimer.getTextSize() - 5);
