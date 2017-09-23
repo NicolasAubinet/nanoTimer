@@ -29,6 +29,8 @@ public class ImportActivity extends Activity {
   }
 
   private void initViews() {
+    Utils.updateContextWithPrefsLocale(getBaseContext());
+
     fileBrowser = (FileBrowser) findViewById(R.id.fileBrowser);
     fileBrowser.setRootFolderDisplayName(getString(R.string.storage));
     fileBrowser.setOnFileSelectedListener(new OnFileSelectedListener() {
