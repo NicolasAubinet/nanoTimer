@@ -28,18 +28,8 @@
   <!--<color name="color_primary_dark">#414141</color>-->
   <color name="spinner_background">#505050</color>
 
-  <!--<color name="toolbar_background_color">@color/color_primary_dark</color>-->
-  <!--<color name="secondary_text">#c5cae9</color>-->
   <color name="secondary_text">#AAAAAA</color>
-  <!--<color name="main_element">#626262</color>-->
 
-  <!--<color name="card_divider">#DDDDDD</color>-->
-  <color name="card_divider">@color/iceblue</color>
-  <!--<color name="listview_background">@color/main_element</color>-->
-  <color name="listview_divider">@color/gray800</color>
-
-  <!--<color name="timercardbg">@color/darkblue</color>-->
-  <!--<color name="timercardbg">#3A3A3A</color>-->
   <color name="timercardbg">#33383B</color>
   <color name="scramblealternate">#FFC0B9F9</color>
   <color name="white">#FFFFFFFF</color>
@@ -63,16 +53,9 @@
   <!--<color name="verylightblue">#99CDFF</color>-->
   <color name="lightblue">#FF6CCCEC</color>
   <color name="iceblue">#FF0883AC</color>
-  <!--<color name="button_color">@color/darkblue</color>-->
-  <!--<color name="darkblue">#FF303E4A</color>-->
-  <color name="button_color">@color/darkblue</color>
   <color name="darkblue">#36454F</color>
   <color name="table_header">#346CCCEC</color>
   <!--<color name="darkblue">#003466</color>-->
-
-  <color name="grid_background_1">@color/darkblue</color>
-  <color name="grid_background_2">@color/table_header</color>
-  <color name="grid_divider">@color/gray600</color>
 
   <color name="graybg">#323232</color>
   <!--<color name="graybg">#FF1C1E20</color>-->
@@ -87,4 +70,15 @@
 
   <color name="button_pressed">#FF1976D2</color>
   <color name="button_disabled">@color/gray850</color>
+
+  <color name="mainscreen_top_card">@color/gray800</color>
+
+  <color name="card_divider">@color/iceblue</color>
+  <!--<color name="listview_background">@color/main_element</color>-->
+  <color name="listview_divider">@color/gray800</color>
+  <color name="button_color">@color/table_header</color>
+  <!--<color name="button_color">@color/darkblue</color>-->
+  <color name="grid_background_1">@color/darkblue</color>
+  <color name="grid_background_2">@color/table_header</color>
+  <color name="grid_divider">@color/gray600</color>
 </resources>

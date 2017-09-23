@@ -58,6 +58,7 @@
            android:layout_marginBottom="@dimen/card_margin_vertical"
            android:layout_marginLeft="@dimen/card_margin_horizontal"
            android:layout_marginRight="@dimen/card_margin_horizontal"
+           app:cardBackgroundColor="@color/mainscreen_top_card"
            app:cardElevation="@dimen/mainscreen_card_elevation"
            app:cardCornerRadius="0dp">
 
@@ -130,11 +131,11 @@
             <RelativeLayout
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
-               android:background="@color/darkblue"
-               android:paddingTop="4dp"
+               android:background="@color/button_color"
+               android:paddingTop="6dp"
                android:paddingLeft="@dimen/mainscreen_margin"
                android:paddingRight="@dimen/mainscreen_margin"
-               android:paddingBottom="7dp">
+               android:paddingBottom="8dp">
 
               <TextView
                  android:id="@+id/tvHistory"
