@@ -36,12 +36,10 @@ public class ChargingStateReceiver extends BroadcastReceiver {
     List<CubeType> randomStateCubeTypes = ScramblerService.INSTANCE.getRandomStateCubeTypes();
     for (int i = 0; i < randomStateCubeTypes.size() && firstCubeTypeToGenerateScrambles == null; i++) {
       CubeType cubeType = randomStateCubeTypes.get(i);
-      List<ScrambleType> usedScrambledTypes = cubeType.getUsedScrambledTypes();
-      if (usedScrambledTypes.isEmpty()) {
-        if (isMissingScrambles(cubeType, null)) {
-          firstCubeTypeToGenerateScrambles = cubeType;
-        }
+      if (isMissingScrambles(cubeType, null)) {
+        firstCubeTypeToGenerateScrambles = cubeType;
       } else {
+        List<ScrambleType> usedScrambledTypes = cubeType.getUsedScrambledTypes();
         for (ScrambleType scrambleType : usedScrambledTypes) {
           if (isMissingScrambles(cubeType, scrambleType)) {
             firstCubeTypeToGenerateScrambles = cubeType;
