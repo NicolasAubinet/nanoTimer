@@ -253,7 +253,8 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
       case 3:
         if (Utils.checkProFeature(this)) {
           ArrayList<String> items = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.import_export)));
-          DialogUtils.showFragment(this, SelectorFragmentDialog.newInstance(ID_IMPORTEXPORT, items, null, true, this));
+          ArrayList<Integer> icons = new ArrayList<>(Arrays.asList(R.drawable.import_icon, R.drawable.export_icon));
+          DialogUtils.showFragment(this, SelectorFragmentDialog.newInstance(ID_IMPORTEXPORT, items, icons, null, true, this));
         }
         break;
       case 4:

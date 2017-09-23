@@ -8,7 +8,7 @@
    android:paddingLeft="5dp"
    android:paddingTop="2dp"
    android:paddingBottom="3dp"
-   android:background="@color/color_primary_dark">
+   android:background="@color/gray850">
 
   <ListView
      android:id="@+id/lvItems"
