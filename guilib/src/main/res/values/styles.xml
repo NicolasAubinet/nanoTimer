@@ -53,12 +53,7 @@
     <!--<item name="gravity">center</item>-->
   </style>
 
-  <style name="TableBorder">
-    <!--<item name="android:showDividers">middle|beginning|end</item>-->
-    <!--<item name="android:divider">?android:attr/dividerVertical</item>-->
-  </style>
-
-  <style name="EqualSizeColumnsTable" parent="TableBorder">
+  <style name="EqualSizeColumnsTable">
     <item name="android:shrinkColumns">*</item>
     <item name="android:stretchColumns">*</item>
   </style>

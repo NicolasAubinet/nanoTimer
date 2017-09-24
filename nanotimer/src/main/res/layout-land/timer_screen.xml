@@ -235,34 +235,33 @@
         <TableLayout
            android:id="@+id/averagesLayout"
            android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           style="@style/TableBorder">
-          <TableRow style="@style/TableBorder">
+           android:layout_height="wrap_content">
+          <TableRow>
             <TextView android:textSize="21px" android:textStyle="bold" android:padding="2px" android:layout_width="60px"/>
             <TextView android:id="@+id/tvAvgOf" android:text="@string/last_avg_of" style="@style/AverageTableHeaderFieldPx" android:padding="2px"/>
             <TextView android:id="@+id/tvBestOf" android:text="@string/best_avg_of" style="@style/AverageTableHeaderFieldPx" android:padding="2px"/>
           </TableRow>
-          <TableRow android:id="@+id/trAvgOfFive" style="@style/TableBorder" android:background="@color/grid_background_1">
+          <TableRow android:id="@+id/trAvgOfFive" android:background="@color/grid_background_1">
             <TextView android:text="5" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
             <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFive" style="@style/TableCellPx" android:padding="2px"/>
             <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFive" style="@style/TableCellPx" android:padding="2px"/>
           </TableRow>
-          <TableRow android:id="@+id/trAvgOfTwelve" style="@style/TableBorder" android:background="@color/grid_background_2">
+          <TableRow android:id="@+id/trAvgOfTwelve" android:background="@color/grid_background_2">
             <TextView android:text="12" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
             <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfTwelve" style="@style/TableCellPx" android:padding="2px"/>
             <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfTwelve" style="@style/TableCellPx" android:padding="2px"/>
           </TableRow>
-          <TableRow android:id="@+id/trAvgOfFifty" style="@style/TableBorder" android:background="@color/grid_background_1">
+          <TableRow android:id="@+id/trAvgOfFifty" android:background="@color/grid_background_1">
             <TextView android:text="50" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
             <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFifty" style="@style/TableCellPx" android:padding="2px"/>
             <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFifty" style="@style/TableCellPx" android:padding="2px"/>
           </TableRow>
-          <TableRow android:id="@+id/trAvgOfHundred" style="@style/TableBorder" android:background="@color/grid_background_2">
+          <TableRow android:id="@+id/trAvgOfHundred" android:background="@color/grid_background_2">
             <TextView android:text="100" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
             <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfHundred" style="@style/TableCellPx" android:padding="2px"/>
             <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfHundred" style="@style/TableCellPx" android:padding="2px"/>
           </TableRow>
-          <TableRow android:id="@+id/trAvgOfLife" android:visibility="gone" style="@style/TableBorder" android:background="@color/grid_background_1">
+          <TableRow android:id="@+id/trAvgOfLife" android:visibility="gone" android:background="@color/grid_background_1">
             <TextView android:text="@string/life" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
             <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfLife" style="@style/TableCellPx" android:padding="2px"/>
             <com.cube.nanotimer.util.view.FontFitTextView style="@style/TableCellPx" android:padding="2px"/>

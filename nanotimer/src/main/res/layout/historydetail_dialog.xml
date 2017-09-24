@@ -156,13 +156,13 @@
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              style="@style/EqualSizeColumnsTable">
-            <TableRow style="@style/TableBorder">
+            <TableRow>
               <TextView style="@style/AverageTableHeaderField" android:text="5"/>
               <TextView style="@style/AverageTableHeaderField" android:text="12"/>
               <TextView style="@style/AverageTableHeaderField" android:text="50"/>
               <TextView style="@style/AverageTableHeaderField" android:text="100"/>
             </TableRow>
-            <TableRow style="@style/TableBorder">
+            <TableRow>
               <TextView android:id="@+id/tvAvgOfFive" style="@style/TableCell"/>
               <TextView android:id="@+id/tvAvgOfTwelve" style="@style/TableCell"/>
               <TextView android:id="@+id/tvAvgOfFifty" style="@style/TableCell"/>
