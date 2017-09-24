@@ -246,11 +246,11 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
   }
 
   private TableRow getNewTableRow() {
-    return (TableRow) inflater.inflate(R.layout.tablerow_border, null);
+    return (TableRow) inflater.inflate(R.layout.session_tablerow, null);
   }
 
   private TextView getNewSolveTimeTextView() {
-    return (TextView) inflater.inflate(R.layout.textview_border, null);
+    return (TextView) inflater.inflate(R.layout.session_textview, null);
   }
 
   private void initSessionsList(final View v) {
