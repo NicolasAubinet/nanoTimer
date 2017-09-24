@@ -166,7 +166,7 @@
   <string name="preparing_generation">Préparation de la génération&#8230;</string>
   <string name="scrambles_being_generated">Génération de mélanges %1$s</string>
   <string name="generating_scramble">Génération du mélange %1$d de %2$d</string>
-  <string name="generating_cube_scramble">%1$s mélanges en génération&#8230;\n%2$d de %3$d</string>
+  <string name="generating_cube_scramble">Mélanges %1$s en génération&#8230;\n%2$d de %3$d</string>
   <string name="stopping_generation">Arrêt de la génération&#8230;</string>
   <string name="new_record">Nouveau record!</string>
   <string name="inspection">Inspection</string>
