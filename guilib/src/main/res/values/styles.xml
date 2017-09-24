@@ -34,7 +34,7 @@
   <style name="TableCell">
     <item name="android:textSize">15sp</item>
     <item name="android:gravity">center</item>
-    <item name="android:layout_height">20dp</item>
+    <item name="android:layout_height">22dp</item>
     <item name="android:layout_width">0dp</item>
     <item name="android:padding">1dp</item>
     <item name="android:layout_weight">1</item>
@@ -66,13 +66,13 @@
   <style name="AverageTableHeaderField" parent="TableCell">
     <item name="android:textColor">@color/lightblue</item>
     <item name="android:background">@color/table_header</item>
-    <!--<item name="android:textStyle">bold</item>-->
+    <item name="android:textStyle">bold</item>
   </style>
 
   <style name="AverageTableHeaderFieldPx" parent="TableCellPx">
     <item name="android:textColor">@color/lightblue</item>
     <item name="android:background">@color/table_header</item>
-    <!--<item name="android:textStyle">bold</item>-->
+    <item name="android:textStyle">bold</item>
   </style>
 
   <style name="AverageTableFirstFieldPx" parent="AverageTableHeaderFieldPx">
