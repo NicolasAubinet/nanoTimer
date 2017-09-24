@@ -148,20 +148,6 @@
                  android:textColor="@color/white"
                  style="@style/SmallTextFieldPx"/>
             </TableRow>
-            <TableRow android:id="@+id/trLifetimeAccuracy" android:layout_marginTop="2px" android:visibility="gone">
-              <TextView
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:text="@string/lifetime_accuracy"
-                 style="@style/SmallTextFieldPx"/>
-              <TextView
-                 android:id="@+id/tvLifetimeAccuracy"
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:layout_marginLeft="5px"
-                 android:textColor="@color/white"
-                 style="@style/SmallTextFieldPx"/>
-            </TableRow>
             <TableRow android:layout_marginTop="2px">
               <TextView
                  android:layout_width="wrap_content"
@@ -170,6 +156,20 @@
                  style="@style/SmallTextFieldPx"/>
               <TextView
                  android:id="@+id/tvMeanOfThree"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_marginLeft="5px"
+                 android:textColor="@color/white"
+                 style="@style/SmallTextFieldPx"/>
+            </TableRow>
+            <TableRow android:id="@+id/trBestMeanOfThree" android:layout_marginTop="2px" android:visibility="gone">
+              <TextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="@string/best_mean_of_three"
+                 style="@style/SmallTextFieldPx"/>
+              <TextView
+                 android:id="@+id/tvBestMeanOfThree"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="5px"
@@ -210,14 +210,14 @@
                  android:textColor="@color/white"
                  style="@style/SmallTextFieldPx"/>
             </TableRow>
-            <TableRow android:id="@+id/trBestMeanOfThree" android:layout_marginTop="2px" android:visibility="gone">
+            <TableRow android:id="@+id/trLifetimeAccuracy" android:layout_marginTop="2px" android:visibility="gone">
               <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:text="@string/best_mean_of_three"
+                 android:text="@string/lifetime_accuracy"
                  style="@style/SmallTextFieldPx"/>
               <TextView
-                 android:id="@+id/tvBestMeanOfThree"
+                 android:id="@+id/tvLifetimeAccuracy"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="5px"
