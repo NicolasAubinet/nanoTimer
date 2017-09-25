@@ -35,6 +35,7 @@
   <string name="max_steps_count_reached">Se ha alcanzado el límite de pasos</string>
   <string name="add_step">Añadir paso</string>
   <string name="add_steps">Añadir pasos</string>
+  <string name="solve_type_name_reserved">This solve type name is reserved.\nPlease pick an other one.</string>
 
   <string name="last_avg_of">Última media de</string>
   <string name="best_avg_of">Mejor media de</string>
