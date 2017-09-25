@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayout;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -24,7 +25,6 @@ import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.session.TimesStatistics;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.helper.GUIUtils;
-import com.cube.nanotimer.util.helper.ScreenUtils;
 import com.cube.nanotimer.vo.SessionDetails;
 import com.cube.nanotimer.vo.SolveType;
 
@@ -33,23 +33,18 @@ import java.util.List;
 
 public class SessionDetailDialog extends NanoTimerDialogFragment {
 
-  private static final int PAGE_LINES_COUNT = 10;
   private static final int TIMES_PER_LINE = 4;
-  private static final int SESSION_TIMES_HEIGHT_DP = 26;
-  private static final int BEST_AVERAGES_HEIGHT_DP = 22;
   private static final String ARG_SOLVETYPE = "solvetype";
 
   private LayoutInflater inflater;
   private TextView tvSessionStart;
   private Spinner spSessionsList;
   private ArrayAdapter<String> spinnerAdapter;
-  private TableLayout sessionTimesLayout;
+  private GridLayout sessionTimesLayout;
   private List<Long> sessionStarts;
   private boolean sessionStartsInitialized;
   private List<Long> sessionTimes;
   private SolveType solveType;
-  private int bestInd;
-  private int worstInd;
 
   public static SessionDetailDialog newInstance(SolveType solveType) {
     SessionDetailDialog sessionDetailDialog = new SessionDetailDialog();
@@ -89,8 +84,6 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
   private void displaySessionDetails(View v, SessionDetails sessionDetails) {
     sessionTimes = sessionDetails.getSessionTimes();
     TimesStatistics session = new TimesStatistics(sessionTimes);
-    bestInd = session.getBestTimeInd(solveType.isBlind());
-    worstInd = session.getWorstTimeInd(solveType.isBlind());
 
     if (!App.INSTANCE.isProEnabled()) { // pro uses a spinner, not a textview
       tvSessionStart.setText(FormatterService.INSTANCE.formatDateTimeWithoutSeconds(sessionDetails.getSessionStart()));
@@ -113,30 +106,29 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
     ((TextView) v.findViewById(R.id.tvSolves)).setText(String.valueOf(sessionDetails.getSessionSolvesCount()));
     ((TextView) v.findViewById(R.id.tvBest)).setText(FormatterService.INSTANCE.formatSolveTime(session.getBestTime(sessionTimes.size())));
     ((TextView) v.findViewById(R.id.tvDeviation)).setText(FormatterService.INSTANCE.formatSolveTime(session.getDeviation(sessionTimes.size())));
-    sessionTimesLayout = (TableLayout) v.findViewById(R.id.sessionTimesLayout);
+    sessionTimesLayout = (GridLayout) v.findViewById(R.id.sessionTimesLayout);
     sessionTimesLayout.removeAllViews();
 
+    int bestInd = session.getBestTimeInd(solveType.isBlind());
+    int worstInd = session.getWorstTimeInd(solveType.isBlind());
     int sessionTimesCount = sessionTimes.size();
-    if (sessionTimesCount == 0) {
-      TableRow tr = getNewTableRow();
-      for (int i = 0; i < TIMES_PER_LINE; i++) {
-        TextView tv = getNewSolveTimeTextView();
-        tr.addView(tv);
-      }
-      sessionTimesLayout.addView(tr);
-    } else if (sessionTimesCount < TIMES_PER_LINE) {
-      TableRow tr = getNewTableRow();
-      for (Long time : sessionTimes) {
-        TextView tv = getNewSolveTimeTextView();
-        tv.setText(FormatterService.INSTANCE.formatSolveTime(time));
-        tr.addView(tv);
-      }
-      sessionTimesLayout.addView(tr);
-    } else {
-      addSolveTimesPage();
-    }
 
-    adjustTableLayoutParams(sessionTimesLayout, SESSION_TIMES_HEIGHT_DP, 0);
+    if (sessionTimesCount == 0) {
+      for (int i = 0; i < TIMES_PER_LINE; i++) {
+        addNewSolveTimeTextView(sessionTimesLayout);
+      }
+    } else {
+      for (int i = 0; i < sessionTimesCount; i++) {
+        TextView tv = addNewSolveTimeTextView(sessionTimesLayout);
+        GUIUtils.setSessionTimeCellText(tv, sessionTimes.get(i), i, bestInd, worstInd, solveType.isBlind());
+      }
+      // add remaining cells to have the same cells count than the above lines
+      if (sessionTimesCount > TIMES_PER_LINE && sessionTimesCount % TIMES_PER_LINE != 0) {
+        for (int i = 0; i < TIMES_PER_LINE - (sessionTimesCount % TIMES_PER_LINE); i++) {
+          addNewSolveTimeTextView(sessionTimesLayout);
+        }
+      }
+    }
   }
 
   private long getBestMeanOf(List<Long> times, int n) {
@@ -192,7 +184,6 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
     }
     bestAveragesTableLayout.addView(trHeaders);
     bestAveragesTableLayout.addView(trAverages);
-    adjustTableLayoutParams(bestAveragesTableLayout, BEST_AVERAGES_HEIGHT_DP, 1);
   }
 
   private void addToBestAveragesTable(TableRow trHeaders, TableRow trAverages, int avgHeader, long average) {
@@ -208,49 +199,38 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
     trAverages.addView(tv);
   }
 
-  private void addSolveTimesPage() {
-    TableRow tr = getNewTableRow();
-    int sessionTimesCount = sessionTimes.size();
-    for (int i = 0; i < sessionTimesCount; i++) {
-      TextView tv = getNewSolveTimeTextView();
-      GUIUtils.setSessionTimeCellText(tv, sessionTimes.get(i), i, bestInd, worstInd, solveType.isBlind());
-      tr.addView(tv);
-      if (i % TIMES_PER_LINE == 3) {
-        sessionTimesLayout.addView(tr);
-        tr = getNewTableRow();
-      }
-    }
-    // add remaining cells to have the same cells count than the above lines
-    if (sessionTimesCount % TIMES_PER_LINE != 0) {
-      sessionTimesLayout.addView(tr);
-      for (int i = 0; i < TIMES_PER_LINE - (sessionTimesCount % TIMES_PER_LINE); i++) {
-        TextView tv = getNewSolveTimeTextView();
-        tr.addView(tv);
-      }
-    }
-  }
-
-  private void adjustTableLayoutParams(TableLayout tableLayout, int tvHeightDp, int startingRowIndex) {
-    for (int i = startingRowIndex; i < tableLayout.getChildCount(); i++) {
-      if (tableLayout.getChildAt(i) instanceof TableRow) {
-        TableRow tr = (TableRow) tableLayout.getChildAt(i);
-        for (int j = 0; j < tr.getChildCount(); j++) {
-          TextView tv = (TextView) tr.getChildAt(j);
-          LayoutParams params = (LayoutParams) tv.getLayoutParams();
-          params.setMargins(2, 2, 2, 2);
-          params.height = ScreenUtils.dipToPixels(tvHeightDp);
-          tv.setLayoutParams(params);
-        }
-      }
-    }
-  }
-
   private TableRow getNewTableRow() {
     return (TableRow) inflater.inflate(R.layout.session_tablerow, null);
   }
 
   private TextView getNewSolveTimeTextView() {
     return (TextView) inflater.inflate(R.layout.session_textview, null);
+  }
+
+  private TextView addNewSolveTimeTextView(GridLayout gridLayout) {
+    TextView textView = getNewSolveTimeTextView();
+
+    int backgroundColorIndex = gridLayout.getChildCount();
+    if ((backgroundColorIndex / TIMES_PER_LINE) % 2 == 1) {
+      backgroundColorIndex += 1; // offset for odd lines
+    }
+
+    int resource;
+    if (backgroundColorIndex % 2 == 0) {
+      resource = R.drawable.grid_background_1;
+    } else {
+      resource = R.drawable.grid_background_2;
+    }
+    textView.setBackgroundResource(resource);
+
+    GridLayout.LayoutParams param = new GridLayout.LayoutParams(
+      GridLayout.spec(GridLayout.UNDEFINED, 1f),
+      GridLayout.spec(GridLayout.UNDEFINED, 1f)
+    );
+    textView.setLayoutParams(param);
+
+    gridLayout.addView(textView);
+    return textView;
   }
 
   private void initSessionsList(final View v) {

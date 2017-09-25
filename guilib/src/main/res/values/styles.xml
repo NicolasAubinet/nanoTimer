@@ -47,6 +47,12 @@
     <item name="android:padding">2px</item>
   </style>
 
+  <style name="GridCell" parent="TableCell">
+    <item name="android:layout_width">0dp</item>
+    <item name="layout_columnWeight">1</item>
+    <!--<item name="gravity">center</item>-->
+  </style>
+
   <style name="GridCellPx" parent="TableCellPx">
     <item name="android:layout_width">0px</item>
     <item name="layout_columnWeight">1</item>

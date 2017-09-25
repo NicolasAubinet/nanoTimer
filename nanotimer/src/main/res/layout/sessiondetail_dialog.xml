@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
    android:orientation="vertical"
    android:layout_width="match_parent"
    android:layout_height="match_parent"
@@ -129,7 +130,8 @@
        android:layout_height="wrap_content"
        android:layout_gravity="center"
        android:text="@string/best_averages"
-       android:textSize="16sp"/>
+       android:textSize="16sp"
+       android:layout_marginBottom="3dp"/>
 
     <android.support.v7.widget.CardView
        android:layout_width="match_parent"
@@ -152,7 +154,8 @@
      android:layout_marginTop="5dp"
      android:layout_gravity="center"
      android:text="@string/times"
-     android:textSize="16sp"/>
+     android:textSize="16sp"
+     android:layout_marginBottom="3dp"/>
 
   <ScrollView
      android:layout_width="match_parent"
@@ -162,13 +165,12 @@
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        style="@style/TableCardView">
-      <TableLayout
+      <android.support.v7.widget.GridLayout
          android:id="@+id/sessionTimesLayout"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         style="@style/EqualSizeColumnsTable">
-        <!--style="@style/TableBorder">-->
-      </TableLayout>
+         app:columnCount="4">
+      </android.support.v7.widget.GridLayout>
     </android.support.v7.widget.CardView>
 
   </ScrollView>
