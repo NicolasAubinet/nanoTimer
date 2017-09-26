@@ -35,4 +35,5 @@ public class NanoTimerActivity extends AppCompatActivity {
     }
     return super.onOptionsItemSelected(item);
   }
+
 }
