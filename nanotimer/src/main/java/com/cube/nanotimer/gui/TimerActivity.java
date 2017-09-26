@@ -314,7 +314,8 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     sb.append(cubeType.getName());
 
     if (!Utils.isDefaultSolveTypeName(solveType.getName())) {
-      sb.append(" (").append(solveType.getName()).append(")");
+      String localizedSolveTypeName = Utils.toSolveTypeLocalizedName(this, solveType.getName());
+      sb.append(" (").append(localizedSolveTypeName).append(")");
     }
     setTitle(sb.toString(), defaultTextColor.getDefaultColor());
   }

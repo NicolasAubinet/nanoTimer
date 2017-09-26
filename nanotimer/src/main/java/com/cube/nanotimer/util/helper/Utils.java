@@ -183,8 +183,17 @@ public class Utils {
     return context.getString(nameStringResourceId);
   }
 
+  public static String toSolveTypeLocalizedName(Context context, String solveTypeName) {
+    String localizedName = solveTypeName;
+    Integer locTranslationId = App.INSTANCE.getDynamicTranslations().getSolveTypeNameResourceId(localizedName);
+    if (locTranslationId != null) {
+      localizedName = context.getString(locTranslationId);
+    }
+    return localizedName;
+  }
+
   public static boolean isDefaultSolveTypeName(String solveTypeName) {
-    for (String defaultSolveTypeName : App.INSTANCE.getDefaultSolveTypeStrings()) {
+    for (String defaultSolveTypeName : App.INSTANCE.getDynamicTranslations().getDefaultSolveTypeStrings()) {
       if (defaultSolveTypeName.equals(solveTypeName)) {
         return true;
       }
@@ -194,34 +203,6 @@ public class Utils {
 
   public static int getStringIdentifier(Context context, String name) {
     return context.getResources().getIdentifier(name, "string", context.getPackageName());
-  }
-
-  public static String getLocalizedString(Context context, String localeString, int stringId) {
-    String locLocalizedString;
-
-    /*if (VERSION.SDK_INT >= 17) {
-      Configuration conf = context.getResources().getConfiguration();
-      conf = new Configuration(conf);
-      conf.setLocale(desiredLocale);
-      Context localizedContext = context.createConfigurationContext(conf);
-
-      locLocalizedString = localizedContext.getResources().getString(stringId);
-    } else {*/
-      Resources res = context.getResources();
-      Configuration conf = res.getConfiguration();
-      Locale savedLocale = conf.locale;
-      conf.locale = new Locale(localeString);
-      res.updateConfiguration(conf, null); // second arg null means don't change
-
-      // retrieve resources from desired locale
-      locLocalizedString = res.getString(stringId);
-
-      // restore original locale
-      conf.locale = savedLocale;
-      res.updateConfiguration(conf, null);
-//    }
-
-    return locLocalizedString;
   }
 
   public static void updateContextWithPrefsLocale(Context context) {

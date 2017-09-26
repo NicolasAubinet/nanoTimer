@@ -336,7 +336,8 @@ public class ExportActivity extends NanoTimerActivity {
             // found corresponding cube type
             for (int j = solveTypes.size() - 1; j >= 0; j--) {
               SolveType solveType = solveTypes.get(j);
-              liItems.add(i + 1, new ListItem(Type.SOLVETYPE, solveType.getId(), solveType.getName(), solveType.hasSteps()));
+              String localizedSolveTypeName = Utils.toSolveTypeLocalizedName(this, solveType.getName());
+              liItems.add(i + 1, new ListItem(Type.SOLVETYPE, solveType.getId(), localizedSolveTypeName, solveType.hasSteps()));
             }
             break;
           }

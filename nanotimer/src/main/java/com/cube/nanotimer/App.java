@@ -20,7 +20,6 @@ import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ScrambleType;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +29,7 @@ public enum App {
   private Context context;
   private Service service;
   private boolean appGUILaunched;
-  private List<String> defaultSolveTypeStrings = new ArrayList<>();
+  private DynamicTranslations dynamicTranslations;
 
   public static final String PRO_PACKAGE_NAME = "com.cube.nanotimerpro";
 
@@ -73,11 +72,9 @@ public enum App {
         }
       });
 
-      if (defaultSolveTypeStrings.isEmpty()) {
-        for (String languageCode : context.getResources().getStringArray(R.array.language_codes)) {
-          String defaultSolveTypeName = Utils.getLocalizedString(context, languageCode, R.string.def);
-          defaultSolveTypeStrings.add(defaultSolveTypeName);
-        }
+      if (dynamicTranslations == null) {
+        dynamicTranslations = new DynamicTranslations();
+        dynamicTranslations.init(context);
       }
     }
     if (!appGUILaunched && !fromService) { // app GUI started
@@ -131,8 +128,8 @@ public enum App {
     ProVersionWelcome.onResume(context, isProEnabled());
   }
 
-  public List<String> getDefaultSolveTypeStrings() {
-    return defaultSolveTypeStrings;
+  public DynamicTranslations getDynamicTranslations() {
+    return dynamicTranslations;
   }
 
 }

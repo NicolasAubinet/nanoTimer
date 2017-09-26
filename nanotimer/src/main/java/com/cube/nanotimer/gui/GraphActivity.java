@@ -18,6 +18,7 @@ import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.chart.ChartData;
 import com.cube.nanotimer.util.chart.ChartUtils;
+import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.FrequencyData;
 import com.cube.nanotimer.vo.SolveHistory;
@@ -113,7 +114,8 @@ public class GraphActivity extends NanoTimerActivity {
     solveType = (SolveType) getIntent().getSerializableExtra("solveType");
 
     ((TextView) findViewById(R.id.tvCubeType)).setText(cubeType.getName());
-    ((TextView) findViewById(R.id.tvSolveType)).setText(solveType.getName());
+    String solveTypeName = Utils.toSolveTypeLocalizedName(this, solveType.getName());
+    ((TextView) findViewById(R.id.tvSolveType)).setText(solveTypeName);
 
     prefs = getSharedPreferences("graph", 0);
 

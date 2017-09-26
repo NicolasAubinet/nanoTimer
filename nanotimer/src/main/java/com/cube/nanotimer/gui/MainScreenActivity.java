@@ -830,7 +830,11 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
 
       if (position >= 0 && position < nameHolders.size()) {
         T nameHolder = nameHolders.get(position);
-        view.setText(nameHolder.getName());
+        String name = nameHolder.getName();
+        if (isSolveTypes) {
+          name = Utils.toSolveTypeLocalizedName(getContext(), name);
+        }
+        view.setText(name);
       } else if (position >= nameHolders.size() && isShowingEditSolveTypesShortcut()) {
         view.setText(R.string.edit_solve_types_dots);
       }
