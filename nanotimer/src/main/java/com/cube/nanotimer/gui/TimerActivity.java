@@ -254,6 +254,8 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
       findViewById(R.id.trAvgOfLife).setVisibility(View.GONE);
     }
 
+    updateAveragesTableBackgroundColors();
+
     View actionBarLayout = findViewById(R.id.actionbarLayout);
     actionBarLayout.setOnTouchListener(layoutTouchListener);
 
@@ -263,6 +265,27 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
       setKeepScreenOn(keepScreenOnWhenTimerOff);
     } else {
       setKeepScreenOn(true);
+    }
+  }
+
+  private void updateAveragesTableBackgroundColors() {
+    TableLayout averagesTable = (TableLayout) findViewById(R.id.averagesLayout);
+
+    int visibleTableRowsCount = 0;
+    for (int i = 1; i < averagesTable.getChildCount(); i++) {
+      TableRow tableRow = (TableRow) averagesTable.getChildAt(i);
+
+      if (tableRow.getVisibility() == View.VISIBLE) {
+        int backgroundColorId;
+        if (visibleTableRowsCount % 2 == 0) {
+          backgroundColorId = R.color.grid_background_1;
+        } else {
+          backgroundColorId = R.color.grid_background_2;
+        }
+        tableRow.setBackgroundResource(backgroundColorId);
+
+        visibleTableRowsCount++;
+      }
     }
   }
 
