@@ -63,4 +63,21 @@ public class DynamicTranslations {
     return solveTypeNamesToResourceId.get(str);
   }
 
+  public List<String> getSolveTypeNameVariants(String solveTypeName) {
+    List<String> solveTypeNameVariants = new ArrayList<>();
+
+    Integer resourceId = solveTypeNamesToResourceId.get(solveTypeName);
+    if (resourceId == null) {
+      solveTypeNameVariants.add(solveTypeName);
+    } else {
+      for (Map.Entry<String, Integer> entry : solveTypeNamesToResourceId.entrySet()) {
+        if (resourceId.equals(entry.getValue())) {
+          solveTypeNameVariants.add(entry.getKey());
+        }
+      }
+    }
+
+    return solveTypeNameVariants;
+  }
+
 }

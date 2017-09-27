@@ -140,10 +140,12 @@ public class SolveTypesActivity extends NanoTimerActivity implements SelectionHa
   public boolean onContextItemSelected(MenuItem menuItem) {
     final int position = ((AdapterContextMenuInfo) menuItem.getMenuInfo()).position;
     if (menuItem.getItemId() == ACTION_RENAME) {
-      FieldEditDialog fieldDialog = FieldEditDialog.newInstance(this, position, liSolveTypes.get(position).getName());
+      String solveTypeName = Utils.toSolveTypeLocalizedName(this, liSolveTypes.get(position).getName());
+      FieldEditDialog fieldDialog = FieldEditDialog.newInstance(this, position, solveTypeName);
       DialogUtils.showFragment(this, fieldDialog);
     } else if (menuItem.getItemId() == ACTION_DELETE) {
-      DialogUtils.showYesNoConfirmation(this, getString(R.string.delete_solve_type_confirmation, liSolveTypes.get(position).getName()),
+      String solveTypeName = Utils.toSolveTypeLocalizedName(this, liSolveTypes.get(position).getName());
+      DialogUtils.showYesNoConfirmation(this, getString(R.string.delete_solve_type_confirmation, solveTypeName),
           new YesNoListener() {
             @Override
             public void onYes() {
@@ -304,13 +306,16 @@ public class SolveTypesActivity extends NanoTimerActivity implements SelectionHa
     }
 
     for (int i = 0; i < liSolveTypes.size(); i++) {
-      if (liSolveTypes.get(i).getName().equals(name)) {
-        if (index == null || i != index) {
-          DialogUtils.showInfoMessage(this, R.string.solve_type_already_exists);
-          return false;
-        } else {
-          // The name was not changed, do nothing
-          return true;
+      String solveTypeName = liSolveTypes.get(i).getName();
+      for (String solveTypeNameVariant : App.INSTANCE.getDynamicTranslations().getSolveTypeNameVariants(solveTypeName)) {
+        if (solveTypeNameVariant.equals(name)) {
+          if (index == null || i != index) {
+            DialogUtils.showInfoMessage(this, R.string.solve_type_already_exists);
+            return false;
+          } else {
+            // The name was not changed, do nothing
+            return true;
+          }
         }
       }
     }
@@ -368,17 +373,18 @@ public class SolveTypesActivity extends NanoTimerActivity implements SelectionHa
       }
 
       if (position >= 0 && position < liSolveTypes.size()) {
-        SolveType item = liSolveTypes.get(position);
-        if (item != null) {
+        SolveType solveType = liSolveTypes.get(position);
+        if (solveType != null) {
           TextView tvName = (TextView) view.findViewById(R.id.tvSolveType);
-          tvName.setText(item.getName());
+          String solveTypeName = Utils.toSolveTypeLocalizedName(getContext(), solveType.getName());
+          tvName.setText(solveTypeName);
 
           TextView tvAdditionalInfo = (TextView) view.findViewById(R.id.tvAdditionalInfo);
-          if (item.hasSteps()) {
+          if (solveType.hasSteps()) {
             StringBuilder stepsCount = new StringBuilder();
-            stepsCount.append("(").append(item.getSteps().length).append(" ").append(getString(R.string.steps)).append(")");
+            stepsCount.append("(").append(solveType.getSteps().length).append(" ").append(getString(R.string.steps)).append(")");
             tvAdditionalInfo.setText(stepsCount.toString());
-          } else if (item.isBlind()) {
+          } else if (solveType.isBlind()) {
             tvAdditionalInfo.setText(R.string.blind);
           } else {
             tvAdditionalInfo.setText("");
