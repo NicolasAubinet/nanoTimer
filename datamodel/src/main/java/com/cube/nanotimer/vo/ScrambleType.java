@@ -47,6 +47,10 @@ public abstract class ScrambleType implements Serializable, NameHolder {
     return (inversion % 2 != 0);
   }
 
+  public int getRSScrambleLengthFromQuality(ScramblesQuality scramblesQuality) {
+    return 0;
+  }
+
   @Override
   public String getName() {
     return name;

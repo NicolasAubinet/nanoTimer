@@ -3,6 +3,7 @@ package com.cube.nanotimer;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import com.cube.nanotimer.vo.ScramblesQuality;
 
 public enum Options {
   INSTANCE;
@@ -12,7 +13,6 @@ public enum Options {
   public enum AdsStyle { BANNER, INTERSTITIAL, MIXED }
   public enum BigCubesNotation { RUF, RWUWFW }
   public enum ClockNotation { UUdU_x_x, UUdd_ux_dx, URx_DRx_DLx }
-  public enum ScramblesQuality { LOW, MEDIUM, HIGH }
   public enum ScrambleNotificationMode { ALWAYS, MANUAL, NEVER }
 
   private Context context;

@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.BatteryManager;
 import android.preference.PreferenceManager;
 import com.cube.nanotimer.App;
-import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.ProVersionFeature;
 import com.cube.nanotimer.vo.CubeType;
@@ -73,32 +72,6 @@ public class Utils {
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
     int id = (solveType == null) ? -1 : solveType.getId();
     prefs.edit().putInt("solveTypeId", id).apply();
-  }
-
-  public static int getRSScrambleLengthFromQuality(CubeType cubeType) {
-    switch (cubeType) {
-      case TWO_BY_TWO:
-        switch (Options.INSTANCE.getScramblesQuality()) {
-          case HIGH:
-            return 11;
-          case MEDIUM:
-            return 11;
-          case LOW:
-            return 12;
-        }
-        break;
-      case THREE_BY_THREE:
-        switch (Options.INSTANCE.getScramblesQuality()) {
-          case HIGH:
-            return 21;
-          case MEDIUM:
-            return 23;
-          case LOW:
-            return 24;
-        }
-        break;
-    }
-    return -1;
   }
 
   public static String[] invertMoves(String[] moves) {

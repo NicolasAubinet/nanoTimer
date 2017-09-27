@@ -15,9 +15,9 @@ import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.State;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenListener;
 import com.cube.nanotimer.scrambler.randomstate.ScrambleConfig;
 import com.cube.nanotimer.util.helper.FileUtils;
-import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ScrambleType;
+import com.cube.nanotimer.vo.ScramblesQuality;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -145,6 +145,7 @@ public enum ScramblerService {
           return;
         }
         List<String[]> toSave = new ArrayList<String[]>();
+        int maxScrambleLength = getRSScrambleLength(cubeType, scrambleType, Options.INSTANCE.getScramblesQuality());
         sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.PREPARING, cubeType, scrambleType, generationLaunch, 0, n));
         synchronized (scramblerHelper) {
           rsScrambler.genTables();
@@ -153,7 +154,7 @@ public enum ScramblerService {
           String[] scramble;
           synchronized (scramblerHelper) {
             sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.GENERATING, cubeType, scrambleType, generationLaunch, i + 1, n));
-            scramble = rsScrambler.getNewScramble(new ScrambleConfig(Utils.getRSScrambleLengthFromQuality(cubeType), scrambleType));
+            scramble = rsScrambler.getNewScramble(new ScrambleConfig(maxScrambleLength, scrambleType));
           }
           if (scramble == null) { // was interrupted
             break;
@@ -175,6 +176,45 @@ public enum ScramblerService {
         if (!toSave.isEmpty()) {
           saveNewScramblesToFile(cubeType, scrambleType, toSave);
         }
+      }
+
+      public int getRSScrambleLength(CubeType cubeType, ScrambleType scrambleType, ScramblesQuality scramblesQuality) {
+        int maxScrambleLength = 0;
+
+        if (scrambleType != null) {
+          maxScrambleLength = scrambleType.getRSScrambleLengthFromQuality(scramblesQuality);
+        }
+
+        if (maxScrambleLength == 0) {
+          switch (cubeType) {
+            case TWO_BY_TWO:
+              switch (scramblesQuality) {
+                case HIGH:
+                  maxScrambleLength = 11;
+                  break;
+                case MEDIUM:
+                  maxScrambleLength = 11;
+                  break;
+                case LOW:
+                  maxScrambleLength = 12;
+                  break;
+              }
+            case THREE_BY_THREE:
+              switch (scramblesQuality) {
+                case HIGH:
+                  maxScrambleLength = 21;
+                  break;
+                case MEDIUM:
+                  maxScrambleLength = 23;
+                  break;
+                case LOW:
+                  maxScrambleLength = 24;
+                  break;
+              }
+          }
+        }
+
+        return maxScrambleLength;
       }
 
       private void checkPluggedIn() {
