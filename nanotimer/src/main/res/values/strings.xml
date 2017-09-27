@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="app_name">Nano Timer</string>
-  <string name="app_name_copyright">&#169; 2014-2016 Nano Timer</string>
+  <string name="app_name_copyright">&#169; 2014-2017 Nano Timer</string>
   <string name="app_description">Rubik\'s Cube timer for Android</string>
   <string name="app_license">This app uses drag-sort-listview, MPAndroidChart and android-wheel libraries licensed under Apache 2.0.</string>
   <string name="feedback_message">If you encounter a bug or have any suggestions or comments, don\'t hesitate to send an email to the address below.</string>
