@@ -185,7 +185,7 @@
   <string name="pro_version_welcome_title">Bienvenido a la versión Pro</string>
   <string name="pro_version_welcome_message">Gracias por comprar Nano Timer Pro!\nLas siguientes características están desbloqueadas:</string>
   <string name="pro_version_promotion_title">Nano Timer Pro</string>
-  <string name="pro_version_available">¡Nano Timer Pro está ahora disponible en Play Store!</string>
+  <string name="pro_version_available">¡Nano Timer Pro está disponible en Play Store!</string>
   <string name="pro_version_install">Instalándola se desbloquearan las siguientes características:</string>
   <string name="need_pro_version">Descarga Nano Timer Pro para acceder a esta característica</string>
   <string name="upgrade_pro_app">Por favor actualiza a Nano Timer Pro para continuar teniendo acceso a las características Pro</string>

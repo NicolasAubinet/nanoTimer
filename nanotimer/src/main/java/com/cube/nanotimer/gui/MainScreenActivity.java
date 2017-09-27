@@ -16,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -38,6 +39,8 @@ import com.cube.nanotimer.ProChecker;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.AboutDialog;
 import com.cube.nanotimer.gui.widget.HistoryDetailDialog;
+import com.cube.nanotimer.gui.widget.ProVersionAd;
+import com.cube.nanotimer.gui.widget.ProVersionWelcome;
 import com.cube.nanotimer.gui.widget.ResultListener;
 import com.cube.nanotimer.gui.widget.SelectionHandler;
 import com.cube.nanotimer.gui.widget.SelectorFragmentDialog;
@@ -200,10 +203,17 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   }
 
   @Override
-  public boolean onPrepareOptionsMenu(Menu menu) {
-    menu.findItem(R.id.itAppIcon).setEnabled(false);
-
-    return super.onPrepareOptionsMenu(menu);
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case R.id.itAppIcon:
+        if (App.INSTANCE.isProEnabled()) {
+          ProVersionWelcome.showWelcomeDialog(this);
+        } else {
+          ProVersionAd.showProVersionAdDialog(this);
+        }
+        break;
+    }
+    return super.onOptionsItemSelected(item);
   }
 
   private void initHistoryList() {

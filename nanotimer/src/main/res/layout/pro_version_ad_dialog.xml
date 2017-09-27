@@ -38,6 +38,7 @@
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:layout_gravity="center"
+         android:gravity="center"
          android:textSize="18sp"
          android:text="@string/pro_version_install"
          android:textColor="@color/white"/>
