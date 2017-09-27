@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -181,6 +182,28 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
         startActivity(i);
       }
     });
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.mainscreen_menu, menu);
+
+    int drawableIcon;
+    if (App.INSTANCE.isProEnabled()) {
+      drawableIcon = R.drawable.icon_pro;
+    } else {
+      drawableIcon = R.drawable.icon;
+    }
+    menu.findItem(R.id.itAppIcon).setIcon(drawableIcon);
+
+    return super.onCreateOptionsMenu(menu);
+  }
+
+  @Override
+  public boolean onPrepareOptionsMenu(Menu menu) {
+    menu.findItem(R.id.itAppIcon).setEnabled(false);
+
+    return super.onPrepareOptionsMenu(menu);
   }
 
   private void initHistoryList() {
