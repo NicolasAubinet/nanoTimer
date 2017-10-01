@@ -1,36 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
    android:layout_width="match_parent"
    android:layout_height="match_parent"
-   android:padding="3dp">
+   android:orientation="vertical">
 
   <LinearLayout
-     android:orientation="vertical"
      android:layout_width="match_parent"
-     android:layout_height="match_parent"
-     android:layout_margin="10dp"
-     android:gravity="center">
+     android:layout_height="wrap_content"
+     android:background="@color/color_primary"
+     android:padding="6dp">
 
     <TextView
-       android:id="@+id/tvWelcomeMessage"
-       android:layout_width="wrap_content"
+       android:id="@+id/tvText"
+       android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_gravity="center"
        android:gravity="center"
-       android:text="@string/pro_version_welcome_message"
-       android:textSize="16sp"
+       android:textSize="22sp"
+       android:text="@string/pro_version_thanks"
        android:textColor="@color/white"/>
-
-    <TextView
-       android:id="@+id/tvProFeatures"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_marginTop="10dp"
-       android:text="@string/pro_version_features"
-       android:textSize="16sp"
-       android:textColor="@color/white"/>
-
   </LinearLayout>
 
-</ScrollView>
+  <ScrollView
+     android:layout_width="match_parent"
+     android:layout_height="match_parent">
+
+    <LinearLayout
+       android:orientation="vertical"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:layout_marginTop="5dp"
+       android:padding="8dp"
+       android:gravity="center">
+
+      <TextView
+         android:id="@+id/tvWelcomeMessage"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_gravity="center"
+         android:gravity="center"
+         android:text="@string/pro_version_following_features_unlocked"
+         android:textSize="16sp"
+         android:textColor="@color/white"/>
+
+      <TextView
+         android:id="@+id/wvProFeatures"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="8dp"
+         android:layout_marginLeft="8dp"
+         android:layout_marginRight="8dp"
+         android:textSize="16sp"
+         android:textColor="@color/white"/>
+
+    </LinearLayout>
+
+  </ScrollView>
+
+</LinearLayout>

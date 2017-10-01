@@ -12,7 +12,7 @@
      android:layout_margin="5dp">
 
     <WebView
-       android:id="@+id/tvInfo"
+       android:id="@+id/wvInfo"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:textSize="15sp"/>

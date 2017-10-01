@@ -1,73 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
    android:layout_width="match_parent"
-   android:layout_height="match_parent">
+   android:layout_height="match_parent"
+   android:orientation="vertical">
 
   <LinearLayout
-     android:orientation="vertical"
      android:layout_width="match_parent"
-     android:layout_height="match_parent"
-     android:padding="8dp"
-     android:gravity="center">
-
+     android:layout_height="wrap_content"
+     android:background="@color/color_primary"
+     android:padding="6dp">
     <TextView
        android:id="@+id/tvText"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:gravity="center"
-       android:textSize="18sp"
-       android:text="@string/pro_version_available"
-       android:textColor="@color/white"/>
-
-    <ImageView
-       android:layout_width="60dp"
-       android:layout_height="60dp"
-       android:layout_marginTop="3dp"
-       android:layout_marginBottom="3dp"
-       android:src="@drawable/icon_pro_hires"/>
-
-    <LinearLayout
-       android:id="@+id/layoutFeatures"
-       android:orientation="vertical"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_gravity="center">
-
-      <TextView
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_gravity="center"
-         android:gravity="center"
-         android:textSize="18sp"
-         android:text="@string/pro_version_install"
-         android:textColor="@color/white"/>
-
-      <TextView
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_gravity="center"
-         android:layout_marginTop="6dp"
-         android:text="@string/pro_version_features"
-         android:textSize="16sp"
-         android:textColor="@color/white"/>
-
-    </LinearLayout>
-
-    <LinearLayout
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_marginTop="7dp"
-       android:orientation="horizontal">
-      <android.support.v7.widget.AppCompatButton
-         android:id="@+id/buOpenPage"
-         android:layout_weight="1"
-         android:layout_marginRight="3dp"
-         android:text="@string/open_page"
-         android:textSize="15sp"
-         style="@style/CustomButton"/>
-    </LinearLayout>
-
+       android:gravity="center"
+       android:textSize="22sp"
+       android:text="@string/pro_version_available"
+       android:textColor="@color/white"/>
   </LinearLayout>
 
-</ScrollView>
+  <ScrollView
+     android:layout_width="match_parent"
+     android:layout_height="match_parent">
+
+    <LinearLayout
+       android:orientation="vertical"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:layout_marginTop="5dp"
+       android:padding="8dp"
+       android:gravity="center">
+
+      <ImageView
+         android:layout_width="60dp"
+         android:layout_height="60dp"
+         android:layout_marginTop="3dp"
+         android:layout_marginBottom="3dp"
+         android:src="@drawable/icon_pro_hires"/>
+
+      <LinearLayout
+         android:id="@+id/layoutFeatures"
+         android:orientation="vertical"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:layout_gravity="center">
+
+        <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_gravity="center"
+           android:gravity="center"
+           android:textSize="18sp"
+           android:text="@string/pro_version_install"
+           android:textColor="@color/white"/>
+
+        <TextView
+           android:id="@+id/tvProFeatures"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_gravity="center"
+           android:layout_marginTop="6dp"
+           android:layout_marginLeft="8dp"
+           android:layout_marginRight="8dp"
+           android:textSize="16sp"
+           android:textColor="@color/white"/>
+
+      </LinearLayout>
+
+      <android.support.v7.widget.AppCompatButton
+         android:id="@+id/buOpenPage"
+         android:text="@string/open_page"
+         android:textSize="16sp"
+         style="@style/CustomButton"/>
+
+    </LinearLayout>
+
+  </ScrollView>
+
+</LinearLayout>

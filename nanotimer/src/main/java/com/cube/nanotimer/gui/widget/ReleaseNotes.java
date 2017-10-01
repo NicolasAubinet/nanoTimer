@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.util.helper.GUIUtils;
 import com.cube.nanotimer.util.helper.Utils;
 
 public class ReleaseNotes {
@@ -42,9 +43,8 @@ public class ReleaseNotes {
     dialog.setTitle(context.getString(R.string.release_notes));
     dialog.setCanceledOnTouchOutside(true);
 
-    WebView tvInfo = (WebView) v.findViewById(R.id.tvInfo);
-    tvInfo.setBackgroundColor(context.getResources().getColor(R.color.transparent));
-    tvInfo.loadData(context.getString(R.string.release_notes_features_html), "text/html", "utf-8");
+    WebView wvInfo = (WebView) v.findViewById(R.id.wvInfo);
+    GUIUtils.setWebViewText(wvInfo, context.getString(R.string.release_notes_features_html));
 
     dialog.show();
   }

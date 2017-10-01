@@ -182,8 +182,8 @@
   <string name="release_notes">Notes de version</string>
   <string name="close">Fermer</string>
 
-  <string name="pro_version_welcome_title">Bienvenue dans la version Pro</string>
-  <string name="pro_version_welcome_message">Merci d\'avoir acheté Nano Timer Pro!\nLes fonctionnalités suivantes ont été débloquées:</string>
+  <string name="pro_version_thanks">Merci d\'avoir acheté Nano Timer Pro!</string>
+  <string name="pro_version_following_features_unlocked">Les fonctionnalités suivantes ont été débloquées:</string>
   <string name="pro_version_promotion_title">Nano Timer Pro</string>
   <string name="pro_version_available">Nano Timer Pro est disponible dans le Play Store!</string>
   <string name="pro_version_install">L\'installer débloquera les fonctionnalités suivantes:</string>
@@ -281,7 +281,17 @@
   <string name="scramble_generating">Mélange en cours de génération\nMerci de patienter&#8230;</string>
   <string name="can_not_add_time_while_generating">Impossible d\'ajouter un temps quand il n\'y a pas de mélange</string>
 
-  <string name="pro_version_features">- Export/import des temps\n- Graphiques (progression, fréquence)\n- Création manuelle de temps\n- Visualisation des détails des sessions précédentes\n- Pas de pubs</string>
+  <string name="pro_version_features">
+    <![CDATA[<html><body>
+    <font color=\"white\">
+      &#8226; Export/import des temps<br/>
+      &#8226; Graphiques (progression, fréquence)<br/>
+      &#8226; Création manuelle de temps<br/>
+      &#8226; Visualisation des détails des sessions précédentes<br/>
+      &#8226; Pas de pubs<br/>
+    </font>
+    </body></html>]]>
+  </string>
 
   <string name="release_notes_features_html">
     <![CDATA[<html><body>

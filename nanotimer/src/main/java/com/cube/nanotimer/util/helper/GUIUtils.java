@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
@@ -15,6 +16,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ProgressBar;
@@ -134,6 +137,14 @@ public class GUIUtils {
     } else {
       tv.setText(strTime);
     }
+  }
+
+  public static void setWebViewText(WebView webView, String text) {
+    WebSettings settings = webView.getSettings();
+    settings.setDefaultTextEncodingName("utf-8");
+
+    webView.setBackgroundColor(Color.TRANSPARENT);
+    webView.loadData(text, "text/html; charset=utf-8", "utf-8");
   }
 
   public static AlertDialog showLoadingIndicator(Context context) {

@@ -4,11 +4,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.AppLaunchStats;
 import com.cube.nanotimer.ProChecker;
@@ -86,6 +88,9 @@ public class ProVersionAd {
         Utils.openPlayStorePage(context, App.PRO_PACKAGE_NAME);
       }
     });
+
+    TextView tvProFeatures = (TextView) v.findViewById(R.id.tvProFeatures);
+    tvProFeatures.setText(Html.fromHtml(context.getString(R.string.pro_version_features)));
 
     return v;
   }

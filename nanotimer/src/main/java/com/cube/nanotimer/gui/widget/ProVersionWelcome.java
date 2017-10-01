@@ -3,8 +3,10 @@ package com.cube.nanotimer.gui.widget;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import com.cube.nanotimer.R;
 
 public class ProVersionWelcome {
@@ -33,8 +35,10 @@ public class ProVersionWelcome {
       dialog.dismiss();
     }
 
+    TextView tvProFeatures = (TextView) v.findViewById(R.id.wvProFeatures);
+    tvProFeatures.setText(Html.fromHtml(context.getString(R.string.pro_version_features)));
+
     dialog = new AlertDialog.Builder(context).setView(v).create();
-    dialog.setTitle(context.getString(R.string.pro_version_welcome_title));
     dialog.setCanceledOnTouchOutside(true);
     dialog.show();
   }

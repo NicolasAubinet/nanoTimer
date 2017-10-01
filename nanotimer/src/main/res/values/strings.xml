@@ -182,8 +182,8 @@
   <string name="release_notes">Release notes</string>
   <string name="close">Close</string>
 
-  <string name="pro_version_welcome_title">Welcome to Pro version</string>
-  <string name="pro_version_welcome_message">Thanks for purchasing Nano Timer Pro!\nThe following features have been unlocked:</string>
+  <string name="pro_version_thanks">Thanks for purchasing Nano Timer Pro!</string>
+  <string name="pro_version_following_features_unlocked">The following features have been unlocked:</string>
   <string name="pro_version_promotion_title">Nano Timer Pro</string>
   <string name="pro_version_available">Nano Timer Pro is available on Play Store!</string>
   <string name="pro_version_install">Installing it will unlock the following features:</string>
@@ -281,7 +281,17 @@
   <string name="scramble_generating">Scramble is generating\nPlease wait&#8230;</string>
   <string name="can_not_add_time_while_generating">Can not add a time when there is no scramble</string>
 
-  <string name="pro_version_features">- Times export/import\n- Graphs (progression, frequency)\n- Manual times creation\n- Previous sessions details visualization\n- No ads</string>
+  <string name="pro_version_features">
+    <![CDATA[<html><body>
+    <font color=\"white\">
+      &#8226; Times export/import<br/>
+      &#8226; Graphs (progression, frequency)<br/>
+      &#8226; Manual times creation<br/>
+      &#8226; Previous sessions details visualization<br/>
+      &#8226; No ads<br/>
+    </font>
+    </body></html>]]>
+  </string>
 
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
@@ -402,6 +412,7 @@
       <li>Pyraminx corner moves are now at the end of the scramble</li>
       <li>Minor GUI improvements</li>
     </ul>
+    </font>
     </body></html>]]>
   </string>
 </resources>
