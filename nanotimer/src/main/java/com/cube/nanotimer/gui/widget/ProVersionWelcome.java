@@ -35,7 +35,7 @@ public class ProVersionWelcome {
       dialog.dismiss();
     }
 
-    TextView tvProFeatures = (TextView) v.findViewById(R.id.wvProFeatures);
+    TextView tvProFeatures = (TextView) v.findViewById(R.id.tvProFeatures);
     tvProFeatures.setText(Html.fromHtml(context.getString(R.string.pro_version_features)));
 
     dialog = new AlertDialog.Builder(context).setView(v).create();
