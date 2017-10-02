@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.preference.PreferenceManager;
@@ -45,11 +44,6 @@ public class Utils {
 
   public static Random getRandom() {
     return new SecureRandom();
-  }
-
-  public static void playSound(int soundId) {
-    MediaPlayer mp = MediaPlayer.create(App.INSTANCE.getContext(), soundId);
-    mp.start();
   }
 
   public static CubeType getCurrentCubeType(Context c) {

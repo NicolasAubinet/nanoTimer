@@ -28,6 +28,7 @@ import com.cube.nanotimer.Options.AdsStyle;
 import com.cube.nanotimer.Options.BigCubesNotation;
 import com.cube.nanotimer.Options.InspectionMode;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.SoundManager;
 import com.cube.nanotimer.gui.widget.ResultListener;
 import com.cube.nanotimer.gui.widget.SessionDetailDialog;
 import com.cube.nanotimer.gui.widget.ads.AdProvider;
@@ -797,19 +798,21 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     int seconds = (int) (curTime / 1000);
     tvTimer.setText(String.valueOf(seconds));
     boolean automaticMode = (inspectionMode == InspectionMode.AUTOMATIC);
+    SoundManager soundManager = App.INSTANCE.getSoundManager();
+
     if (soundsEnabled) {
       if (Options.INSTANCE.getInspectionSoundsType() == Options.InspectionSoundsType.CLASSIC) {
         if (inspectionTime > 0 && seconds > 0 && seconds >= inspectionTime - 3
         && (seconds < inspectionTime || (automaticMode && seconds == inspectionTime) || (inspectionMode == InspectionMode.OFFICIAL && seconds < inspectionTime + officialInspectionDnfTime))) {
-          Utils.playSound(R.raw.beep);
+          soundManager.playSound(this, R.raw.beep);
         }
       } else if (Options.INSTANCE.getInspectionSoundsType() == Options.InspectionSoundsType.OFFICIAL) {
         if (seconds == 8) {
-          Utils.playSound(R.raw.eight);
+          soundManager.playSound(this, R.raw.eight);
         } else if (seconds == 12) {
-          Utils.playSound(R.raw.twelve);
+          soundManager.playSound(this, R.raw.twelve);
         } else if (automaticMode && seconds == inspectionTime) {
-          Utils.playSound(R.raw.beep);
+          soundManager.playSound(this, R.raw.beep);
         }
       }
     }
@@ -844,7 +847,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
         ignoreActionUp = true;
       }
       updateTimerText(-1); // DNF
-      Utils.playSound(R.raw.error);
+      App.INSTANCE.getSoundManager().playSound(this, R.raw.error);
       saveTime(-1);
       generateScramble();
     }

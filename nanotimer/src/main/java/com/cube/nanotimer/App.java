@@ -30,6 +30,7 @@ public enum App {
   private Service service;
   private boolean appGUILaunched;
   private DynamicTranslations dynamicTranslations;
+  private SoundManager soundManager;
 
   public static final String PRO_PACKAGE_NAME = "com.cube.nanotimerpro";
 
@@ -75,6 +76,11 @@ public enum App {
       if (dynamicTranslations == null) {
         dynamicTranslations = new DynamicTranslations();
         dynamicTranslations.init(context);
+      }
+
+      if (soundManager == null) {
+        soundManager = new SoundManager();
+        soundManager.init();
       }
     }
     if (!appGUILaunched && !fromService) { // app GUI started
@@ -132,4 +138,7 @@ public enum App {
     return dynamicTranslations;
   }
 
+  public SoundManager getSoundManager() {
+    return soundManager;
+  }
 }
