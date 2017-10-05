@@ -274,7 +274,6 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
     view.setOrientation(LinearLayout.VERTICAL);
 
     RelativeLayout titleLayout = new RelativeLayout(getActivity());
-    titleLayout.setPadding(10, 0, 10, 0);
     titleLayout.setGravity(Gravity.CENTER_VERTICAL);
     titleLayout.setBackgroundColor(getResources().getColor(R.color.graybg));
 
@@ -288,14 +287,16 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
 
     View sessionView;
     if (App.INSTANCE.isProEnabled()) {
+      titleLayout.setPadding(10, 0, 0, 0);
       spSessionsList = new Spinner(getActivity());
       sessionView = spSessionsList;
     } else {
+      titleLayout.setPadding(10, 0, 10, 0);
       tvSessionStart = new TextView(getActivity());
       tvSessionStart.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
+      tvSessionStart.setPadding(0, 6, 10, 6);
       sessionView = tvSessionStart;
     }
-    sessionView.setPadding(0, 0, 0, 3);
     RelativeLayout.LayoutParams sessionViewParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     sessionViewParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
