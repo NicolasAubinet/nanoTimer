@@ -15,8 +15,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.TableLayout;
@@ -52,7 +52,6 @@ import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.SolveTypeStep;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -67,6 +66,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
   private TextView tvScramble;
   private TextView tvSolvesCount;
   private TextView tvAccuracy;
+  private TextView tvTitle;
   private ViewGroup layout;
   private GridLayout sessionTimesLayout;
   private TableLayout timerStepsLayout;
@@ -208,22 +208,10 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     tvScramble = (TextView) findViewById(R.id.tvScramble);
     tvSolvesCount = (TextView) findViewById(R.id.tvSolvesCount);
     tvAccuracy = (TextView) findViewById(R.id.tvLifetimeAccuracy);
+    tvTitle = (TextView) findViewById(R.id.tvTitle);
     sessionTimesLayout = (GridLayout) findViewById(R.id.sessionTimesLayout);
     TableLayout averagesLayout = (TableLayout) findViewById(R.id.averagesLayout);
     timerStepsLayout = (TableLayout) findViewById(R.id.timerStepsLayout);
-
-    try {
-      // Always show the menu icon in top bar, even for devices that have a hardware menu key.
-      // This is so that the top bar title is always centered (needed on devices like Galaxy S2)
-      ViewConfiguration config = ViewConfiguration.get(this);
-      Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
-      if (menuKeyField != null) {
-        menuKeyField.setAccessible(true);
-        menuKeyField.setBoolean(config, false);
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
 
     if (currentOrientation == Configuration.ORIENTATION_PORTRAIT && cubeType == CubeType.SEVEN_BY_SEVEN) {
       tvTimer.setTextSize(TypedValue.COMPLEX_UNIT_PX, tvTimer.getTextSize() - 5);
@@ -345,11 +333,11 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
   }
 
   public void setTitle(String s) {
-    ((TextView) findViewById(R.id.tvTitle)).setText(s);
+    tvTitle.setText(s);
   }
 
   public void setTitle(int res) {
-    ((TextView) findViewById(R.id.tvTitle)).setText(res);
+    tvTitle.setText(res);
   }
 
   public synchronized void setTitle(String s, int textColor) {
@@ -359,7 +347,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
 
   @Override
   public void setTitleColor(int textColor) {
-    ((TextView) findViewById(R.id.tvTitle)).setTextColor(textColor);
+    tvTitle.setTextColor(textColor);
   }
 
   @Override
@@ -405,11 +393,23 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
   }
 
   private void showMenuButton(boolean show) {
-    this.showMenu = show;
-    supportInvalidateOptionsMenu();
+    if (this.showMenu != show) {
+      this.showMenu = show;
+      supportInvalidateOptionsMenu();
 
-    getSupportActionBar().setDisplayHomeAsUpEnabled(show);
-    findViewById(R.id.fillerView).setVisibility(show ? View.VISIBLE : View.GONE);
+      getSupportActionBar().setDisplayHomeAsUpEnabled(show);
+
+      // adjust action bar layout so that the text is always centered
+      // and to allow to stop the timer by pushing anywhere on the action bar
+      View actionBarLayout = findViewById(R.id.actionbarLayout);
+      ViewGroup.LayoutParams actionBarLayoutParams = actionBarLayout.getLayoutParams();
+
+      if (show) {
+        actionBarLayoutParams.width = LayoutParams.WRAP_CONTENT;
+      } else {
+        actionBarLayoutParams.width = LayoutParams.MATCH_PARENT;
+      }
+    }
   }
 
   @Override
