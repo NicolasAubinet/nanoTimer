@@ -28,7 +28,7 @@
        android:layout_toLeftOf="@+id/cbSmooth"
        android:layout_marginLeft="10dp"
        android:layout_centerVertical="true"
-       android:singleLine="true"
+       android:maxLines="1"
        android:textSize="18sp"/>
 
     <CheckBox

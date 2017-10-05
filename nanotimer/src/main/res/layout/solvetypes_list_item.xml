@@ -17,7 +17,7 @@
        android:layout_toLeftOf="@+id/tvAdditionalInfo"
        android:layout_centerVertical="true"
        android:layout_alignParentLeft="true"
-       android:singleLine="true"
+       android:maxLines="1"
        style="@style/SimpleTextField"/>
 
     <TextView
@@ -26,7 +26,7 @@
        android:layout_height="wrap_content"
        android:layout_toLeftOf="@+id/imgMove"
        android:layout_centerVertical="true"
-       android:singleLine="true"
+       android:maxLines="1"
        android:layout_marginLeft="6dp"
        android:layout_marginRight="6dp"
        style="@style/SmallTextField"/>

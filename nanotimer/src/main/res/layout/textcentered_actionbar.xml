@@ -14,7 +14,7 @@
      android:layout_height="wrap_content"
      android:layout_gravity="center"
      android:gravity="center"
-     android:singleLine="true"
+     android:maxLines="1"
      android:textColor="@color/white"
      android:textSize="24sp"/>
 
