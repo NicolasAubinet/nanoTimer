@@ -35,7 +35,7 @@
   <string name="max_steps_count_reached">Se ha alcanzado el límite de pasos</string>
   <string name="add_step">Añadir paso</string>
   <string name="add_steps">Añadir pasos</string>
-  <string name="solve_type_name_reserved">This solve type name is reserved.\nPlease pick an other one.</string>
+  <string name="solve_type_name_reserved">Este método nombre esta reservado.\nPor favor elegir un otro.</string>
 
   <string name="last_avg_of">Última media de</string>
   <string name="best_avg_of">Mejor media de</string>
@@ -74,16 +74,16 @@
   <string name="session_best_mean_of_three">Mejor Mo3:</string>
   <string name="session_success_average">Media de éxitos:</string>
   <string name="session_accuracy">Éxito:</string>
-  <string name="session_start">Comenzar:</string>
+  <string name="session_start">Inicio:</string>
 
   <string name="clear_history">Limpiar historial</string>
   <string name="clear_history_solve_type_confirmation">¿Estás seguro que quieres eliminar todos los tiempos para este método?</string>
   <string name="clear_all_history_confirmation">¿Estás seguro que quieres eliminar el historial completo?</string>
 
-  <string name="language">Language</string>
-  <string name="english">English</string>
-  <string name="french">French</string>
-  <string name="spanish">Spanish</string>
+  <string name="language">Lengua</string>
+  <string name="english">Inglés</string>
+  <string name="french">Francés</string>
+  <string name="spanish">Español</string>
 
   <string name="settings">Ajustes</string>
   <string name="timer_screen">Pantalla del temporizador</string>
