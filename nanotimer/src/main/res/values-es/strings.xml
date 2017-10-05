@@ -43,12 +43,12 @@
   <string name="accuracy">Éxito</string>
   <string name="life">Vida</string>
 
-  <string name="lifetime_best">Mejor de todos los tiempos:</string>
-  <string name="lifetime_avg">Media global:</string>
-  <string name="lifetime_accuracy">Éxito global:</string>
-  <string name="last_mean_of_three">Última media de 3:</string>
-  <string name="best_mean_of_three">Mejor media de 3:</string>
-  <string name="solves_count">Cuenta de resoluciones:</string>
+  <string name="lifetime_best">Mejor tiempo:</string>
+  <string name="lifetime_avg">Media de 1000:</string>
+  <string name="lifetime_accuracy">Éxito de 1000:</string>
+  <string name="last_mean_of_three">Media de 3:</string>
+  <string name="best_mean_of_three">Mejor Mo3:</string>
+  <string name="solves_count">Resoluciones:</string>
   <string name="mean_of_three">Media de 3:</string>
 
   <string name="plus_two">+2</string>
@@ -168,7 +168,7 @@
   <string name="generating_scramble">Mezclas generadas %1$d de %2$d</string>
   <string name="generating_cube_scramble">%1$s mezclas generándose&#8230;\n%2$d de %3$d</string>
   <string name="stopping_generation">Parar generación&#8230;</string>
-  <string name="new_record">¿Nuevo record!</string>
+  <string name="new_record">¡Nuevo record!</string>
   <string name="inspection">Inspección</string>
   <string name="ready">Listo</string>
 
@@ -182,7 +182,7 @@
   <string name="release_notes">Notas de revisión</string>
   <string name="close">Cerrar</string>
 
-  <string name="pro_version_thanks">Gracias por comprar Nano Timer Pro!</string>
+  <string name="pro_version_thanks">¡Gracias por comprar Nano Timer Pro!</string>
   <string name="pro_version_following_features_unlocked">Las siguientes características están desbloqueadas:</string>
   <string name="pro_version_promotion_title">Nano Timer Pro</string>
   <string name="pro_version_available">¡Nano Timer Pro está disponible en Play Store!</string>
@@ -265,7 +265,7 @@
 
   <string name="share_time">Compartir tiempo</string>
   <string name="share_time_subject">Nuevo tiempo: %1$s</string>
-  <string name="share_time_text">Acabo de resolver el cubo %1$s en %2$s!\n\nMezcla:\n%3$s\n\nMedido en %4$s con la app de android Nano Timer:\n%5$s</string>
+  <string name="share_time_text">¡Acabo de resolver el cubo %1$s en %2$s!\n\nMezcla:\n%3$s\n\nMedido en %4$s con la app de android Nano Timer:\n%5$s</string>
   <string name="share_time_steps_text">Acabo de resolver el cubo %1$s en %2$s with the following steps times:\n%3$s\nScramble:\n%4$s\n\nTimed on %5$s with Nano Timer android app:\n%6$s</string>
 
   <string name="scramble_typeC">Tipo de mezcla:</string>
