@@ -52,8 +52,8 @@ public class TwoSolver {
   private volatile boolean running = false;
   private volatile boolean mustStop = false;
 
-  private final Object solutionSyncHelper = new Object();
-  private int solutionSearchCount = 0;
+  private static final Object solutionSyncHelper = new Object();
+  private static volatile int solutionSearchCount = 0;
 
   private static Move[] moves;
   private static Move[] allMoves;
@@ -136,9 +136,9 @@ public class TwoSolver {
     running = true;
     synchronized (solutionSyncHelper) {
       solutionSearchCount++;
-      if (transitPerm == null) {
-        genTables();
-      }
+//      if (transitPerm == null) { // (now generated from ScramblerService)
+//        genTables();
+//      }
     }
     if (config != null && config.getMaxLength() > 0) {
       maxSolutionLength = config.getMaxLength();
@@ -237,7 +237,7 @@ public class TwoSolver {
     }
   }
 
-  public void freeMemory() {
+  public static void freeMemory() {
     synchronized (solutionSyncHelper) {
       while (solutionSearchCount > 0) {
         try {

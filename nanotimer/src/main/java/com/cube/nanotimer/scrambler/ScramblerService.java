@@ -14,6 +14,7 @@ import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.GenerationLa
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.State;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenListener;
 import com.cube.nanotimer.scrambler.randomstate.ScrambleConfig;
+import com.cube.nanotimer.util.helper.CpuUtils;
 import com.cube.nanotimer.util.helper.FileUtils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ScrambleType;
@@ -26,6 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public enum ScramblerService {
   INSTANCE;
@@ -33,17 +36,15 @@ public enum ScramblerService {
   public static final int MAX_SCRAMBLES_IN_MEMORY = 500;
 
   private Context context;
-  private Map<ScrambleCacheKey, LinkedList<String[]>> cachedScrambles = new HashMap<ScrambleCacheKey, LinkedList<String[]>>();
-  private Map<Integer, RSScrambler> scramblers = new HashMap<Integer, RSScrambler>();
+  private final Map<ScrambleCacheKey, LinkedList<String[]>> cachedScrambles = new HashMap<ScrambleCacheKey, LinkedList<String[]>>();
+  private final List<RSScrambler> scramblers = new ArrayList<>();
   private volatile Thread generationThread = null;
 
-  private List<RandomStateGenListener> listeners = new ArrayList<RandomStateGenListener>();
+  private final List<RandomStateGenListener> listeners = new ArrayList<RandomStateGenListener>();
   private RandomStateGenEvent curState = new RandomStateGenEvent(State.IDLE, null, 0, 0);
 
   final private Object genThreadHelper = new Object();
-  final private Object listenersHelper = new Object();
   final private Object cacheMemHelper = new Object();
-  final private Object scramblerHelper = new Object();
   final private Object cacheFileHelper = new Object();
 
   public void init(Context context) {
@@ -55,14 +56,13 @@ public enum ScramblerService {
   }
 
   private void stopRandomState() {
-    if (!Options.INSTANCE.isRandomStateScrambles() && !scramblers.isEmpty()) {
-      synchronized (scramblerHelper) {
-        for (RSScrambler scrambler : scramblers.values()) {
-          scrambler.freeMemory();
-        }
-        scramblers.clear();
+    stopGeneration();
+
+    if (!Options.INSTANCE.isRandomStateScrambles()) {
+      for (CubeType cubeType : getRandomStateCubeTypes()) {
+        getNewRandomStateScrambler(cubeType).freeMemory();
       }
-      synchronized (cacheMemHelper) {
+      synchronized (cachedScrambles) {
         cachedScrambles.clear();
       }
     }
@@ -81,14 +81,16 @@ public enum ScramblerService {
     if (isFromPhonePlugged) {
       minCacheSize = Options.INSTANCE.getPluggedInScramblesGenerateCount();
     }
-    if (getCache(cubeType, scrambleType).size() < minCacheSize) {
+
+    Queue<String[]> scramblesCache = getCache(cubeType, scrambleType);
+    if (scramblesCache.size() < minCacheSize) {
       loadCacheFromFile(cubeType, scrambleType); // see if there are some more scrambles in the file
-      if (getCache(cubeType, scrambleType).size() < minCacheSize) {
+      if (scramblesCache.size() < minCacheSize) {
         int maxCacheSize = Options.INSTANCE.getScramblesMaxCacheSize();
         if (isFromPhonePlugged) {
           maxCacheSize = Options.INSTANCE.getPluggedInScramblesGenerateCount();
         }
-        return Math.max(maxCacheSize - getCache(cubeType, scrambleType).size(), 0);
+        return Math.max(maxCacheSize - scramblesCache.size(), 0);
       }
     }
     return 0;
@@ -122,57 +124,105 @@ public enum ScramblerService {
           }
         }
         sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.IDLE, null, 0, 0));
-        if (generationThread == Thread.currentThread()) {
-          checkPluggedIn();
-          generationThread = null;
+
+        synchronized (genThreadHelper) {
+          if (generationThread == Thread.currentThread()) {
+            checkPluggedIn();
+            generationThread = null;
+          }
         }
       }
 
-      private void generateScrambles(CubeType cubeType, ScrambleType scrambleType, int scramblesCount) {
-        final RSScrambler rsScrambler = getScrambler(cubeType);
+      private void generateScrambles(final CubeType cubeType, final ScrambleType scrambleType, int scramblesCount) {
+        RSScrambler rsScrambler = getNewRandomStateScrambler(cubeType);
         if (generationThread != Thread.currentThread() || rsScrambler == null || (!Options.INSTANCE.isRandomStateScrambles() && (scrambleType == null || scrambleType.isDefault()))) {
           return;
         }
         int n;
-        Log.i("NanoTimer", "generate scrambles for " + cubeType + " | " + scrambleType);
         if (scramblesCount > 0) {
           n = scramblesCount;
         } else {
           n = loadCacheAndGetToGenCount(cubeType, scrambleType, (generationLaunch == GenerationLaunch.PLUGGED));
         }
-        Log.i("NanoTimer", "n: " + n);
         if (n == 0) {
           return;
         }
-        List<String[]> toSave = new ArrayList<String[]>();
         int maxScrambleLength = getRSScrambleLength(cubeType, scrambleType, Options.INSTANCE.getScramblesQuality());
+
         sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.PREPARING, cubeType, scrambleType, generationLaunch, 0, n));
-        synchronized (scramblerHelper) {
-          rsScrambler.genTables();
-        }
-        for (int i = 0; i < n && generationThread == Thread.currentThread(); i++) {
-          String[] scramble;
-          synchronized (scramblerHelper) {
-            sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.GENERATING, cubeType, scrambleType, generationLaunch, i + 1, n));
-            scramble = rsScrambler.getNewScramble(new ScrambleConfig(maxScrambleLength, scrambleType));
-          }
-          if (scramble == null) { // was interrupted
-            break;
-          }
-          if (getCache(cubeType, scrambleType).size() < MAX_SCRAMBLES_IN_MEMORY) {
-            synchronized (cacheMemHelper) {
-              getCache(cubeType, scrambleType).add(scramble);
-//              Log.i("[NanoTimer]", "generate. size: " + getCache(cubeType).size());
+        rsScrambler.genTables();
+
+        final int threadsCount = CpuUtils.getNumberOfCores();
+        Log.i("NanoTimer", "Generate " + n + " " + cubeType + "|" + scrambleType + " scrambles on " + threadsCount + " threads");
+
+        final List<String[]> toSave = new ArrayList<>();
+        final Semaphore threadsSemaphore = new Semaphore(threadsCount);
+        final List<ScrambleGeneratedThread> scrambleGenerationThreads = new ArrayList<>();
+        final AtomicInteger generatedScramblesCount = new AtomicInteger(1);
+        final ScrambleConfig scrambleConfig = new ScrambleConfig(maxScrambleLength, scrambleType);
+
+        sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.GENERATING, cubeType, scrambleType,
+          generationLaunch, generatedScramblesCount.get(), n));
+
+        final ScrambleGeneratedHandler scrambleGeneratedHandler = new ScrambleGeneratedHandler() {
+          @Override
+          public void scrambleGenerated(String[] scramble, int toGenerateCount) {
+            threadsSemaphore.release();
+
+            if (scramble == null) { // was interrupted
+              return;
             }
+
+            synchronized (cacheMemHelper) {
+              Queue<String[]> scramblesCache = getCache(cubeType, scrambleType);
+              if (scramblesCache.size() < MAX_SCRAMBLES_IN_MEMORY) {
+                scramblesCache.add(scramble);
+              }
+            }
+
+            synchronized (toSave) {
+              toSave.add(scramble);
+              if (toSave.size() >= 10) {
+                saveNewScramblesToFile(cubeType, scrambleType, toSave); // write new scrambles to file by batches
+                toSave.clear();
+              }
+            }
+
+            sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.GENERATED, cubeType, scrambleType,
+              generationLaunch, generatedScramblesCount.get(), toGenerateCount));
+
+            sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.GENERATING, cubeType, scrambleType,
+              generationLaunch, generatedScramblesCount.incrementAndGet(), toGenerateCount));
           }
-          toSave.add(scramble);
-          if (toSave.size() >= 10) {
-            saveNewScramblesToFile(cubeType, scrambleType, toSave); // write new scrambles to file by batches
-            toSave.clear();
+        };
+
+        try {
+          for (int i = 0; i < n && generationThread == Thread.currentThread(); i++) {
+            threadsSemaphore.acquire();
+
+            rsScrambler = getNewRandomStateScrambler(cubeType);
+            synchronized (scramblers) {
+              scramblers.add(rsScrambler);
+            }
+
+            ScrambleGeneratedThread scrambleGeneratedThread = new ScrambleGeneratedThread(rsScrambler, scrambleConfig, scrambleGeneratedHandler, n);
+            scrambleGenerationThreads.add(scrambleGeneratedThread);
+            scrambleGeneratedThread.start();
           }
-          sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.GENERATED, cubeType, scrambleType, generationLaunch, i + 1, n));
+        } catch (InterruptedException e) {
+          e.printStackTrace();
         }
-        Log.i("NanoTimer", "generated scrambles!");
+
+        try {
+          for (ScrambleGeneratedThread scrambleGenerationThread : scrambleGenerationThreads) {
+            scrambleGenerationThread.join();
+          }
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+
+        Log.i("NanoTimer", "Generated " + (generatedScramblesCount.get()-1) + " scrambles for cube type " + cubeType + "!");
+
         if (!toSave.isEmpty()) {
           saveNewScramblesToFile(cubeType, scrambleType, toSave);
         }
@@ -226,7 +276,7 @@ public enum ScramblerService {
 
   private void sendGenStateToListeners(RandomStateGenEvent state) {
     curState = state;
-    synchronized (listenersHelper) {
+    synchronized (listeners) {
       for (int i = 0; i < listeners.size(); i++) {
         listeners.get(i).onStateUpdate(state);
       }
@@ -249,16 +299,18 @@ public enum ScramblerService {
     synchronized (cacheFileHelper) {
       scramblesStr = FileUtils.readLinesFromFile(context, getFileName(cubeType, scrambleType), MAX_SCRAMBLES_IN_MEMORY);
     }
+
     synchronized (cacheMemHelper) {
-      getCache(cubeType, scrambleType).clear();
+      Queue<String[]> scramblesCache = getCache(cubeType, scrambleType);
+      scramblesCache.clear();
       for (String l : scramblesStr) {
         String[] scramble = l.split(" ");
-        getCache(cubeType, scrambleType).add(scramble);
+        scramblesCache.add(scramble);
       }
     }
   }
 
-  private void saveNewScramblesToFile(CubeType cubeType, ScrambleType scrambleType, List<String[]> scramblesToSave) {
+  private synchronized void saveNewScramblesToFile(CubeType cubeType, ScrambleType scrambleType, List<String[]> scramblesToSave) {
     List<String> scramblesStr = new ArrayList<String>(scramblesToSave.size());
     for (String[] scramble : scramblesToSave) {
       StringBuilder sb = new StringBuilder();
@@ -280,18 +332,23 @@ public enum ScramblerService {
 
   public String[] getScramble(final CubeType cubeType, final ScrambleType scrambleType) {
     if (getRandomStateCubeTypes().contains(cubeType) && (Options.INSTANCE.isRandomStateScrambles() || (scrambleType != null && !scrambleType.isDefault()))) {
-      String[] scramble;
-      if (getCache(cubeType, scrambleType).size() > 0) {
-        synchronized (cacheMemHelper) {
-          scramble = getCache(cubeType, scrambleType).remove();
-        }
-      } else {
-        if (scrambleType == null || scrambleType.isDefault()) {
-          scramble = ScramblerFactory.getScrambler(cubeType).getNewScramble();
-        } else {
-          scramble = null;
+      String[] scramble = null;
+      boolean foundScrambleInCache = false;
+
+      synchronized (cacheMemHelper) {
+        Queue<String[]> scramblesCache = getCache(cubeType, scrambleType);
+        if (scramblesCache.size() > 0) {
+          scramble = scramblesCache.remove();
+          foundScrambleInCache = true;
         }
       }
+
+      if (!foundScrambleInCache) {
+        if (scrambleType == null || scrambleType.isDefault()) {
+          scramble = ScramblerFactory.getScrambler(cubeType).getNewScramble();
+        }
+      }
+
       new Thread(new Runnable() {
         @Override
         public void run() {
@@ -326,8 +383,11 @@ public enum ScramblerService {
         sendGenStateToListeners(new RandomStateGenEvent(State.STOPPING, null, 0, 0));
       }
     }
-    for (RSScrambler scrambler : scramblers.values()) {
-      scrambler.stop();
+    synchronized (scramblers) {
+      for (RSScrambler scrambler : scramblers) {
+        scrambler.stop();
+      }
+      scramblers.clear();
     }
   }
 
@@ -338,6 +398,7 @@ public enum ScramblerService {
           FileUtils.deleteFile(context, getFileName(cubeType, usedScrambleType));
         }
       }
+
       synchronized (cacheMemHelper) {
         getCache(cubeType, null).clear();
         for (ScrambleType usedScrambleType : cubeType.getUsedScrambledTypes()) {
@@ -354,7 +415,6 @@ public enum ScramblerService {
         if (activate) {
           checkScrambleCaches();
         } else {
-          stopGeneration();
           stopRandomState();
         }
       }
@@ -362,14 +422,14 @@ public enum ScramblerService {
   }
 
   public void addRandomStateGenListener(RandomStateGenListener listener) {
-    synchronized (listenersHelper) {
+    synchronized (listeners) {
       listeners.add(listener);
     }
     listener.onStateUpdate(curState);
   }
 
   public void removeRandomStateGenListener(RandomStateGenListener listener) {
-    synchronized (listenersHelper) {
+    synchronized (listeners) {
       listeners.remove(listener);
     }
   }
@@ -392,21 +452,16 @@ public enum ScramblerService {
       cacheScrambleType = null;
     }
     ScrambleCacheKey scrambleCacheKey = new ScrambleCacheKey(cubeType.getId(), cacheScrambleType);
-    LinkedList<String[]> scrambles = cachedScrambles.get(scrambleCacheKey);
-    if (scrambles == null) {
-      scrambles = new LinkedList<>();
-      cachedScrambles.put(scrambleCacheKey, scrambles);
+
+    LinkedList<String[]> scrambles;
+    synchronized (cachedScrambles) {
+      scrambles = cachedScrambles.get(scrambleCacheKey);
+      if (scrambles == null) {
+        scrambles = new LinkedList<>();
+        cachedScrambles.put(scrambleCacheKey, scrambles);
+      }
     }
     return scrambles;
-  }
-
-  private RSScrambler getScrambler(CubeType cubeType) {
-    synchronized (scramblerHelper) {
-      if (scramblers.get(cubeType.getId()) == null) {
-        scramblers.put(cubeType.getId(), getNewRandomStateScrambler(cubeType));
-      }
-      return scramblers.get(cubeType.getId());
-    }
   }
 
   private class ScrambleCacheKey {
@@ -435,6 +490,34 @@ public enum ScramblerService {
       result = 31 * result + (scrambleType != null ? scrambleType.hashCode() : 0);
       return result;
     }
+  }
+
+  private class ScrambleGeneratedThread extends Thread {
+    private RSScrambler rsScrambler;
+    private ScrambleConfig scrambleConfig;
+    private ScrambleGeneratedHandler scrambleGeneratedHandler;
+    private int toGenerateCount;
+
+    public ScrambleGeneratedThread(RSScrambler rsScrambler, ScrambleConfig scrambleConfig,
+                                   ScrambleGeneratedHandler scrambleGeneratedHandler, int toGenerateCount) {
+      this.rsScrambler = rsScrambler;
+      this.scrambleConfig = scrambleConfig;
+      this.scrambleGeneratedHandler = scrambleGeneratedHandler;
+      this.toGenerateCount = toGenerateCount;
+    }
+
+    @Override
+    public void run() {
+      String[] scramble = rsScrambler.getNewScramble(scrambleConfig);
+      synchronized (scramblers) {
+        scramblers.remove(rsScrambler);
+      }
+      scrambleGeneratedHandler.scrambleGenerated(scramble, toGenerateCount);
+    }
+  }
+
+  private abstract class ScrambleGeneratedHandler {
+    public abstract void scrambleGenerated(String[] scramble, int toGenerateCount);
   }
 
 }

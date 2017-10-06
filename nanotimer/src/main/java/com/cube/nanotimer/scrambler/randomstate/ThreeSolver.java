@@ -25,15 +25,15 @@ public class ThreeSolver {
   private volatile boolean running = false;
   private volatile boolean mustStop = false;
 
-  private final Object solutionSyncHelper = new Object();
-  private int solutionSearchCount = 0;
+  private static final Object solutionSyncHelper = new Object();
+  private static volatile int solutionSearchCount = 0;
 
-  static Move[] moves;
-  static Move[] moves1;
-  static Move[] moves2;
-  static Move[] allMoves2;
-  private static byte[] slices;
-  private static byte[] opposites;
+  static final Move[] moves;
+  static final Move[] moves1;
+  static final Move[] moves2;
+  static final Move[] allMoves2;
+  private static final byte[] slices;
+  private static final byte[] opposites;
 
   static {
     // Moves
@@ -214,7 +214,7 @@ public class ThreeSolver {
     running = true;
     synchronized (solutionSyncHelper) {
       solutionSearchCount++;
-      genTables();
+//      genTables(); // (now generated from ScramblerService)
     }
     if (config != null && config.getMaxLength() > 0) {
       maxSolutionLength = config.getMaxLength();
@@ -281,7 +281,7 @@ public class ThreeSolver {
     }
   }
 
-  public void freeMemory() {
+  public static void freeMemory() {
     synchronized (solutionSyncHelper) {
       while (solutionSearchCount > 0) {
         try {
