@@ -21,6 +21,12 @@ public class NanoTimerActivity extends AppCompatActivity {
   }
 
   @Override
+  protected void onResume() {
+    super.onResume();
+    Utils.updateContextWithPrefsLocale(getBaseContext());
+  }
+
+  @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
     Utils.updateContextWithPrefsLocale(getBaseContext());
