@@ -49,7 +49,6 @@ public class TwoSolver {
   private long searchStartTs;
   private int maxSolutionLength;
 
-  private volatile boolean running = false;
   private volatile boolean mustStop = false;
 
   private static final Object solutionSyncHelper = new Object();
@@ -133,7 +132,6 @@ public class TwoSolver {
   }
 
   public String[] getSolution(TwoCubeState cubeState, ScrambleConfig config) {
-    running = true;
     synchronized (solutionSyncHelper) {
       solutionSearchCount++;
 //      if (transitPerm == null) { // (now generated from ScramblerService)
@@ -177,7 +175,6 @@ public class TwoSolver {
       solutionSearchCount--;
       solutionSyncHelper.notify();
     }
-    running = false;
     mustStop = false;
 
     return solution;
@@ -254,7 +251,7 @@ public class TwoSolver {
   }
 
   public void stop() {
-    if (running) {
+    if (solutionSearchCount > 0) {
       mustStop = true;
     }
   }

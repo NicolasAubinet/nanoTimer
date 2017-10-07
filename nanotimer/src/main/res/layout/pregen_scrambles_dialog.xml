@@ -45,6 +45,12 @@
          android:layout_height="wrap_content"
          android:layout_marginTop="3dp"
          android:text="@string/two_by_two"/>
+      <RadioButton
+         android:id="@+id/rbSquare1"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="3dp"
+         android:text="@string/square1"/>
     </RadioGroup>
 
     <TextView

@@ -22,7 +22,6 @@ public class ThreeSolver {
   private long searchStartTs;
   private int maxSolutionLength;
 
-  private volatile boolean running = false;
   private volatile boolean mustStop = false;
 
   private static final Object solutionSyncHelper = new Object();
@@ -211,7 +210,6 @@ public class ThreeSolver {
   }
 
   public String[] getSolution(ThreeCubeState cubeState, ScrambleConfig config) {
-    running = true;
     synchronized (solutionSyncHelper) {
       solutionSearchCount++;
 //      genTables(); // (now generated from ScramblerService)
@@ -269,13 +267,12 @@ public class ThreeSolver {
       solutionSearchCount--;
       solutionSyncHelper.notify();
     }
-    running = false;
     mustStop = false;
 
     return solution;
   }
 
-  public void genTables() {
+  public static void genTables() {
     if (StateTables.transitCornerPermutation == null) {
       StateTables.generateTables(moves1, moves2);
     }
@@ -305,7 +302,7 @@ public class ThreeSolver {
   }
 
   public void stop() {
-    if (running) {
+    if (solutionSearchCount > 0) {
       mustStop = true;
     }
   }

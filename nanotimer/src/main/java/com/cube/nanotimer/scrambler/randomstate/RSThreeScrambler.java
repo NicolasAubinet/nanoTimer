@@ -6,8 +6,6 @@ import com.cube.nanotimer.vo.ThreeCubeState;
 
 import java.util.Random;
 
-import static com.cube.nanotimer.R.string.scramble;
-
 public class RSThreeScrambler implements RSScrambler {
 
   private ThreeSolver threeSolver = new ThreeSolver();
@@ -44,12 +42,12 @@ public class RSThreeScrambler implements RSScrambler {
 
   @Override
   public void freeMemory() {
-    threeSolver.freeMemory();
+    ThreeSolver.freeMemory();
   }
 
   @Override
   public void genTables() {
-    threeSolver.genTables();
+    ThreeSolver.genTables();
   }
 
   @Override

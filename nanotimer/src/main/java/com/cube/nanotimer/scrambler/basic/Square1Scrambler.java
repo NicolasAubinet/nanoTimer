@@ -169,7 +169,8 @@ public class Square1Scrambler implements Scrambler {
 
     @Override
     public String toString() {
-      return "(" + String.format("%2d", top) + "," + String.format("%2d", bottom) + ")";
+//      return "(" + String.format("%2d", top) + "," + String.format("%2d", bottom) + ")";
+      return String.format("(%2d,%2d)", top, bottom);
     }
   }
 

@@ -23,12 +23,12 @@ public class RSTwoScrambler implements RSScrambler {
 
   @Override
   public void freeMemory() {
-    twoSolver.freeMemory();
+    TwoSolver.freeMemory();
   }
 
   @Override
   public void genTables() {
-    twoSolver.genTables();
+    TwoSolver.genTables();
   }
 
   @Override

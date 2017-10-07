@@ -14,6 +14,7 @@ import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.GenerationLa
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.State;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenListener;
 import com.cube.nanotimer.scrambler.randomstate.ScrambleConfig;
+import com.cube.nanotimer.scrambler.randomstate.square1.Square1RandomScrambler;
 import com.cube.nanotimer.util.helper.CpuUtils;
 import com.cube.nanotimer.util.helper.FileUtils;
 import com.cube.nanotimer.vo.CubeType;
@@ -261,6 +262,8 @@ public enum ScramblerService {
                   maxScrambleLength = 24;
                   break;
               }
+            case SQUARE1:
+              break;
           }
         }
 
@@ -289,6 +292,8 @@ public enum ScramblerService {
         return new RSThreeScrambler();
       case TWO_BY_TWO:
         return new RSTwoScrambler();
+      case SQUARE1:
+        return new Square1RandomScrambler();
       default:
         return null;
     }
@@ -435,7 +440,7 @@ public enum ScramblerService {
   }
 
   public List<CubeType> getRandomStateCubeTypes() {
-    return Arrays.asList(CubeType.THREE_BY_THREE, CubeType.TWO_BY_TWO);
+    return Arrays.asList(CubeType.THREE_BY_THREE, CubeType.TWO_BY_TWO, CubeType.SQUARE1);
   }
 
   private String getFileName(CubeType cubeType, ScrambleType scrambleType) {
