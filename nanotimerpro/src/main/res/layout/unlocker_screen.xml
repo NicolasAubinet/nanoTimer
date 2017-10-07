@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
    android:layout_width="match_parent"
    android:layout_height="match_parent"
    android:background="@color/graybg">
+
+  <ScrollView
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:layout_above="@+id/buAction">
 
   <LinearLayout
      android:orientation="vertical"
@@ -47,16 +52,19 @@
        android:textSize="16sp"
        android:text="@string/open_nanotimer"/>
 
-    <android.support.v7.widget.AppCompatButton
-       android:id="@+id/buAction"
-       android:layout_marginTop="20dp"
-       android:layout_marginBottom="15dp"
-       android:paddingRight="25dp"
-       android:paddingLeft="25dp"
-       android:textSize="16sp"
-       android:text="@string/open"
-       style="@style/BigButton"/>
-
   </LinearLayout>
 
-</ScrollView>
+  </ScrollView>
+
+  <android.support.v7.widget.AppCompatButton
+     android:id="@+id/buAction"
+     android:layout_marginTop="3dp"
+     android:layout_marginBottom="3dp"
+     android:paddingRight="25dp"
+     android:paddingLeft="25dp"
+     android:textSize="16sp"
+     android:text="@string/open"
+     android:layout_alignParentBottom="true"
+     style="@style/BigButton"/>
+
+</RelativeLayout>
