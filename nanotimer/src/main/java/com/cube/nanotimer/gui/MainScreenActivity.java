@@ -334,6 +334,8 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
       AdProvider.resume();
     }
 
+    invalidateOptionsMenu();
+
     refreshCubeTypes();
 
     setSortMode(TimesSort.TIMESTAMP);
