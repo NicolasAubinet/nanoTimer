@@ -309,7 +309,20 @@ public enum ScramblerService {
       Queue<String[]> scramblesCache = getCache(cubeType, scrambleType);
       scramblesCache.clear();
       for (String l : scramblesStr) {
-        String[] scramble = l.split(" ");
+        String delimiterRegex = " ";
+
+        if (cubeType == CubeType.SQUARE1) {
+          delimiterRegex = "\\) ";
+        }
+
+        String[] scramble = l.split(delimiterRegex);
+
+        if (cubeType == CubeType.SQUARE1) {
+          for (int i = 0; i < scramble.length; i++) {
+            scramble[i] += ")";
+          }
+        }
+
         scramblesCache.add(scramble);
       }
     }
