@@ -5,5 +5,5 @@
   <dimen name="mainscreen_radius">4dp</dimen>
   <dimen name="divider_height">2dp</dimen>
   <dimen name="card_margin_horizontal">-8dp</dimen>
-  <dimen name="card_margin_vertical">-12dp</dimen>
+  <dimen name="card_margin_vertical">-4dp</dimen>
 </resources>
