@@ -33,6 +33,8 @@ public class Square1Solver {
   private static final Object solutionSyncHelper = new Object();
   private static volatile int solutionSearchCount = 0;
 
+  private static final int MAX_DEPTH = 17;
+
   public static void genTables() {
     if (moves1 != null) {
       return; // already initialized
@@ -488,7 +490,7 @@ public class Square1Solver {
 
     if (depth == 0) {
       if (isEvenPermutation && state.getShapeIndex() == Square1State.id.getShapeIndex()) {
-        int[] sequence2 = solution2(state.toCubeState(), 17);
+        int[] sequence2 = solution2(state.toCubeState(), MAX_DEPTH);
         if (sequence2 != null) {
           for (int m : sequence2) {
             solution2.add(m);
@@ -624,26 +626,6 @@ public class Square1Solver {
       random);
   }
 
-  public static void freeMemory() {
-    synchronized (solutionSyncHelper) {
-      while (solutionSearchCount > 0) {
-        try {
-          solutionSyncHelper.wait();
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-      }
-
-      moves2 = null;
-      cornersPermutationMove = null;
-      cornersCombinationMove = null;
-      edgesPermutationMove = null;
-      edgesCombinationMove = null;
-      cornersDistance = null;
-      edgesDistance = null;
-    }
-  }
-
   public void stop() {
     if (solutionSearchCount > 0) {
       mustStop = true;
@@ -653,6 +635,11 @@ public class Square1Solver {
   private static void logTimeDifference(long startTs, String msg) {
 //    Log.i("[NanoTimer]", msg + ": " + (System.currentTimeMillis() - startTs));
 //    System.out.println(msg + ": " + (System.currentTimeMillis() - startTs));
+  }
+
+  private static void log(String msg) {
+//    Log.i("[NanoTimer]", msg);
+//    System.out.println(msg);
   }
 
 }

@@ -29,9 +29,6 @@ public class RandomStateSquare1Test {
 //    saveToFile(Square1Solver.cornersDistance, "square1_corners_distance.dat");
 //    saveToFile(Square1Solver.edgesDistance, "square1_edges_distance.dat");
 
-//    Square1Scrambler normalScrambler = new Square1Scrambler();
-//    String[] scramble2 = normalScrambler.getNewScramble();
-
     System.out.println(/*Arrays.toString(scramble2) + "\n" +*/ Arrays.toString(scramble1));
   }
 
