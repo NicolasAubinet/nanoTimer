@@ -250,6 +250,7 @@ public enum ScramblerService {
                   maxScrambleLength = 12;
                   break;
               }
+              break;
             case THREE_BY_THREE:
               switch (scramblesQuality) {
                 case HIGH:
@@ -262,8 +263,10 @@ public enum ScramblerService {
                   maxScrambleLength = 24;
                   break;
               }
+              break;
             case PYRAMINX:
               maxScrambleLength = 11;
+              break;
             case SQUARE1:
               break;
           }
