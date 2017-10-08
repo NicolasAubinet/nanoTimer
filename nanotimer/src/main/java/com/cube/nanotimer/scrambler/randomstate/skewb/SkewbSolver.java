@@ -1,6 +1,5 @@
 package com.cube.nanotimer.scrambler.randomstate.skewb;
 
-import android.util.Log;
 import com.cube.nanotimer.scrambler.randomstate.WalterIndexMapping;
 
 import java.util.ArrayList;
@@ -19,6 +18,9 @@ public class SkewbSolver {
   private static int[][] freeCornersOrientationMove;
   private static int[][] fixedCornersOrientationMove;
   private static int[][][][] distance;
+//  private static int[][] freeCornersPermutationDistance;
+//  private static int[][] freeCornersOrientationDistance;
+//  private static int[][] fixedCornersOrientationDistance;
 
   public SkewbSolver() {
   }
@@ -110,6 +112,10 @@ public class SkewbSolver {
 
     ts = System.currentTimeMillis();
 
+//    freeCornersPermutationDistance = genDistanceTable(N_FREE_CORNERS_PERMUTATION, freeCornersPermutationMove);
+//    freeCornersOrientationDistance = genDistanceTable(N_FREE_CORNERS_ORIENTATION, freeCornersOrientationMove);
+//    fixedCornersOrientationDistance = genDistanceTable(N_FIXED_CORNERS_ORIENTATION, fixedCornersOrientationMove);
+
     // distance table
     distance = new int[N_FACES_PERMUTATIONS]
       [N_FREE_CORNERS_PERMUTATION]
@@ -168,6 +174,44 @@ public class SkewbSolver {
     logTimeDifference(startTs, "Skewb tables generation");
   }
 
+  /*private static int[][] genDistanceTable(final int size, int[][] moveTable) {
+    int[][] distance = new int[N_FACES_PERMUTATIONS][size];
+
+    for (int i = 0; i < distance.length; i++) {
+      for (int j = 0; j < distance[i].length; j++) {
+          distance[i][j] = -1;
+      }
+    }
+
+    distance[0][0] = 0;
+
+    int nVisited;
+    int depth = 0;
+    do {
+      nVisited = 0;
+
+      for (int i = 0; i < distance.length; i++) {
+        for (int j = 0; j < distance[i].length; j++) {
+          if (distance[i][j] == depth) {
+            for (int moveIndex = 0; moveIndex < moves.length; moveIndex++) {
+              int nextFacesPermutation = facesPermutationMove[i][moveIndex];
+              int nextMove = moveTable[j][moveIndex];
+
+              if (distance[nextFacesPermutation][nextMove] == -1) {
+                distance[nextFacesPermutation][nextMove] = depth + 1;
+                nVisited++;
+              }
+            }
+          }
+        }
+      }
+
+      depth++;
+    } while (nVisited > 0);
+
+    return distance;
+  }*/
+
   public String[] solve(SkewbState state) {
     String[] moveNames = { "L", "L'", "R", "R'", "D", "D'", "B", "B'" };
 
@@ -187,6 +231,9 @@ public class SkewbSolver {
         state.fixedCornersOrientation, 3);
 
     for (; ; ) {
+//      if (freeCornersPermutationDistance[facesPermutation][freeCornersPermutation] == 0
+//        && freeCornersOrientationDistance[facesPermutation][freeCornersOrientation] == 0
+//        && fixedCornersOrientationDistance[facesPermutation][fixedCornersOrientation] == 0) {
       if (distance[facesPermutation]
         [freeCornersPermutation]
         [freeCornersOrientation]
@@ -200,6 +247,9 @@ public class SkewbSolver {
         int nextFreeCornersOrientation = freeCornersOrientationMove[freeCornersOrientation][k];
         int nextFixedCornersOrientation = fixedCornersOrientationMove[fixedCornersOrientation][k];
 
+//        if (freeCornersPermutationDistance[nextFacesPermutation][nextFreeCornersPemutation] == freeCornersPermutationDistance[facesPermutation][freeCornersPermutation] - 1
+//          && freeCornersOrientationDistance[nextFacesPermutation][nextFreeCornersOrientation] == freeCornersOrientationDistance[facesPermutation][freeCornersOrientation] - 1
+//          && fixedCornersOrientationDistance[nextFacesPermutation][nextFixedCornersOrientation] == fixedCornersOrientationDistance[facesPermutation][fixedCornersOrientation] - 1) {
         if (distance[nextFacesPermutation]
           [nextFreeCornersPemutation]
           [nextFreeCornersOrientation]
@@ -256,6 +306,9 @@ public class SkewbSolver {
       int indexFixedCornersOrientation =
         random.nextInt(N_FIXED_CORNERS_ORIENTATION);
 
+//      if (freeCornersPermutationDistance[indexFacesPermutation][indexFreeCornersPermutation] == -1
+//        && freeCornersOrientationDistance[indexFacesPermutation][indexFreeCornersOrientation] == -1
+//        && fixedCornersOrientationDistance[indexFacesPermutation][indexFixedCornersOrientation] == -1) {
       if (distance[indexFacesPermutation]
         [indexFreeCornersPermutation]
         [indexFreeCornersOrientation]
@@ -276,6 +329,6 @@ public class SkewbSolver {
   }
 
   private static void logTimeDifference(long startTs, String msg) {
-    Log.i("[NanoTimer]", msg + ": " + (System.currentTimeMillis() - startTs));
+//    Log.i("[NanoTimer]", msg + ": " + (System.currentTimeMillis() - startTs));
   }
 }
