@@ -15,6 +15,7 @@ import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.State;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenListener;
 import com.cube.nanotimer.scrambler.randomstate.ScrambleConfig;
 import com.cube.nanotimer.scrambler.randomstate.square1.Square1RandomScrambler;
+import com.cube.nanotimer.util.ScrambleFormatterService;
 import com.cube.nanotimer.util.helper.CpuUtils;
 import com.cube.nanotimer.util.helper.FileUtils;
 import com.cube.nanotimer.vo.CubeType;
@@ -309,20 +310,7 @@ public enum ScramblerService {
       Queue<String[]> scramblesCache = getCache(cubeType, scrambleType);
       scramblesCache.clear();
       for (String l : scramblesStr) {
-        String delimiterRegex = " ";
-
-        if (cubeType == CubeType.SQUARE1) {
-          delimiterRegex = "\\) ";
-        }
-
-        String[] scramble = l.split(delimiterRegex);
-
-        if (cubeType == CubeType.SQUARE1) {
-          for (int i = 0; i < scramble.length; i++) {
-            scramble[i] += ")";
-          }
-        }
-
+        String[] scramble = ScrambleFormatterService.INSTANCE.parseStringScrambleToArray(l, cubeType);
         scramblesCache.add(scramble);
       }
     }

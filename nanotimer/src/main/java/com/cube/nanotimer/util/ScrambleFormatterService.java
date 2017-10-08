@@ -37,7 +37,7 @@ public enum ScrambleFormatterService {
    */
   public Spannable formatToColoredScramble(String scramble, CubeType cubeType) {
     if (!scramble.contains("\n")) {
-      String[] splitted = parseStringScrambleToArray(scramble, String.valueOf(getScrambleDelimiter(cubeType)));
+      String[] splitted = parseStringScrambleToArray(scramble, cubeType);
       if (getMovesPerLine(cubeType, splitted) > 0) {
         scramble = formatScramble(splitted, cubeType, null);
       }
@@ -45,7 +45,8 @@ public enum ScrambleFormatterService {
     return colorFormattedScramble(scramble, cubeType);
   }
 
-  private String[] parseStringScrambleToArray(String scramble, String delimiter) {
+  public String[] parseStringScrambleToArray(String scramble, CubeType cubeType) {
+    String delimiter = String.valueOf(getScrambleDelimiter(cubeType));
     String totalDelimiter = delimiter;
     if (!" ".equals(delimiter)) {
       totalDelimiter += " ";
@@ -122,7 +123,7 @@ public enum ScrambleFormatterService {
    */
   public String formatScrambleForExport(String scramble, CubeType cubeType) {
     if (cubeType == CubeType.MEGAMINX && !scramble.contains("\n")) { // only megaminx should be formatted when exporting
-      String[] splitted = parseStringScrambleToArray(scramble, String.valueOf(getScrambleDelimiter(cubeType)));
+      String[] splitted = parseStringScrambleToArray(scramble, cubeType);
       if (getMovesPerLine(cubeType, splitted) > 0) {
         scramble = formatScramble(splitted, cubeType, null);
       }
