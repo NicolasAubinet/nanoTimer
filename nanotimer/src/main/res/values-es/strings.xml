@@ -301,7 +301,7 @@
       <li>Rediseño de la pantalla pricipal de usuario</li>
       <li>Añadido soporte de francés y español</li>
       <li>Añadido soporte para tipos de mezclas 3x3x3 especiales para practicar sólo F2L, última capa, PLL, aristas y más</li>
-      <li>Añadido mezclas aleatorias para Square-1</li>
+      <li>Añadido mezclas aleatorias para Square-1 y Pyraminx</li>
       <li>Utilizar multi-cores CPU para mezclas generación</li>
       <li>Adaptación de permisos para importar para Android Kitkat y posterior</li>
       <li>Adaptación del icono de notificación de generación de mezclas para Android Lollipop y superior</li>

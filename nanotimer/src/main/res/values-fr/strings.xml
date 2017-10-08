@@ -301,7 +301,7 @@
       <li>Refonte de l\'interface utilisateur</li>
       <li>Ajout de la langue française et espagnole</li>
       <li>Support de types de mélange spéciaux pour le 3x3x3 pour entraînement sur F2L, Last Layer, PLL, arêtes et autres</li>
-      <li>Support des mélanges à état aléatoire pour Square-1</li>
+      <li>Support des mélanges à état aléatoire pour Square-1 et Pyraminx</li>
       <li>Tirer avantage des processeurs multi-coeurs pour la génération de mélanges</li>
       <li>Adaptation des permissions d\'import pour Android Kitkat et au-delà</li>
       <li>Adaptation de l\'icône de notification de génération des mélanges pour Android Lollipop et au-delà</li>
