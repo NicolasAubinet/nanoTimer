@@ -22,10 +22,7 @@ public class ThreeSolver {
   private long searchStartTs;
   private int maxSolutionLength;
 
-  private volatile boolean mustStop = false;
-
-  private static final Object solutionSyncHelper = new Object();
-  private static volatile int solutionSearchCount = 0;
+  private boolean mustStop = false;
 
   static final Move[] moves;
   static final Move[] moves1;
@@ -210,10 +207,7 @@ public class ThreeSolver {
   }
 
   public String[] getSolution(ThreeCubeState cubeState, ScrambleConfig config) {
-    synchronized (solutionSyncHelper) {
-      solutionSearchCount++;
-//      genTables(); // (now generated from ScramblerService)
-    }
+//    genTables(); // (now generated from ScramblerService)
     if (config != null && config.getMaxLength() > 0) {
       maxSolutionLength = config.getMaxLength();
     } else {
@@ -263,12 +257,6 @@ public class ThreeSolver {
     }
 //    Log.i("[NanoTimer]", "solution time: " + (System.currentTimeMillis() - searchStartTs));
 
-    synchronized (solutionSyncHelper) {
-      solutionSearchCount--;
-      solutionSyncHelper.notify();
-    }
-    mustStop = false;
-
     return solution;
   }
 
@@ -278,33 +266,8 @@ public class ThreeSolver {
     }
   }
 
-  public static void freeMemory() {
-    synchronized (solutionSyncHelper) {
-      while (solutionSearchCount > 0) {
-        try {
-          solutionSyncHelper.wait();
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-      }
-      StateTables.transitCornerPermutation = null;
-      StateTables.transitCornerOrientation = null;
-      StateTables.transitEEdgeCombination = null;
-      StateTables.transitEEdgePermutation = null;
-      StateTables.transitUDEdgePermutation = null;
-      StateTables.transitEdgeOrientation = null;
-
-      StateTables.pruningCornerOrientation = null;
-      StateTables.pruningEdgeOrientation = null;
-      StateTables.pruningCornerPermutation = null;
-      StateTables.pruningUDEdgePermutation = null;
-    }
-  }
-
   public void stop() {
-    if (solutionSearchCount > 0) {
-      mustStop = true;
-    }
+    mustStop = true;
   }
 
   // Performs moves on a cube state, and also modifies the first cubies positions

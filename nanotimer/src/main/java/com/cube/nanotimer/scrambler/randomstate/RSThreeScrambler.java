@@ -41,11 +41,6 @@ public class RSThreeScrambler implements RSScrambler {
   }
 
   @Override
-  public void freeMemory() {
-    ThreeSolver.freeMemory();
-  }
-
-  @Override
   public void genTables() {
     ThreeSolver.genTables();
   }

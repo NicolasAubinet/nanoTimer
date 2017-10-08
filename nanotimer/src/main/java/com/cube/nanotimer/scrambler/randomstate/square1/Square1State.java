@@ -1,5 +1,7 @@
 package com.cube.nanotimer.scrambler.randomstate.square1;
 
+import com.cube.nanotimer.scrambler.randomstate.WalterIndexMapping;
+
 public class Square1State {
   public byte[] permutation;
 
@@ -44,7 +46,7 @@ public class Square1State {
       }
     }
 
-    return Square1IndexMapping.orientationToIndex(cuts, 2);
+    return WalterIndexMapping.orientationToIndex(cuts, 2);
   }
 
   public byte[] getPiecesPermutation() {

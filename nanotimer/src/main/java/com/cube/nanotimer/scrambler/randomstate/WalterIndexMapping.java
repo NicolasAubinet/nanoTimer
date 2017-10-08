@@ -1,7 +1,6 @@
-package com.cube.nanotimer.scrambler.randomstate.square1;
+package com.cube.nanotimer.scrambler.randomstate;
 
-// Not really specific to Square-1, but different than other cubes (from puzzle-timer)
-public class Square1IndexMapping {
+public class WalterIndexMapping {
   // permutation
   public static int permutationToIndex(byte[] permutation) {
     int index = 0;

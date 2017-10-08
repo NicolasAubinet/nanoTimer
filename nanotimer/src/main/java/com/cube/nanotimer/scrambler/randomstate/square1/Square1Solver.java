@@ -1,6 +1,7 @@
 package com.cube.nanotimer.scrambler.randomstate.square1;
 
 import android.util.Log;
+import com.cube.nanotimer.scrambler.randomstate.WalterIndexMapping;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -149,10 +150,10 @@ public class Square1Solver {
         long ts = System.currentTimeMillis();
         cornersPermutationMove = new int[N_CORNERS_PERMUTATIONS][moves2.length];
         for (int i = 0; i < cornersPermutationMove.length; i++) {
-          Square1CubeState state = new Square1CubeState(Square1IndexMapping.indexToPermutation(i, 8), new byte[8]);
+          Square1CubeState state = new Square1CubeState(WalterIndexMapping.indexToPermutation(i, 8), new byte[8]);
           for (int j = 0; j < cornersPermutationMove[i].length; j++) {
             cornersPermutationMove[i][j] =
-              Square1IndexMapping.permutationToIndex(
+              WalterIndexMapping.permutationToIndex(
                 state.multiply(moves2[j]).cornersPermutation);
           }
         }
@@ -167,7 +168,7 @@ public class Square1Solver {
         long ts = System.currentTimeMillis();
         cornersCombinationMove = new int[N_CORNERS_COMBINATIONS][moves2.length];
         for (int i = 0; i < cornersCombinationMove.length; i++) {
-          boolean[] combination = Square1IndexMapping.indexToCombination(i, 4, 8);
+          boolean[] combination = WalterIndexMapping.indexToCombination(i, 4, 8);
 
           byte[] corners = new byte[8];
           byte nextTop = 0;
@@ -191,7 +192,7 @@ public class Square1Solver {
             }
 
             cornersCombinationMove[i][j] =
-              Square1IndexMapping.combinationToIndex(isTopCorner, 4);
+              WalterIndexMapping.combinationToIndex(isTopCorner, 4);
           }
         }
         logTimeDifference(ts, "corners comb");
@@ -205,10 +206,10 @@ public class Square1Solver {
         long ts = System.currentTimeMillis();
         edgesPermutationMove = new int[N_EDGES_PERMUTATIONS][moves2.length];
         for (int i = 0; i < edgesPermutationMove.length; i++) {
-          Square1CubeState state = new Square1CubeState(new byte[8], Square1IndexMapping.indexToPermutation(i, 8));
+          Square1CubeState state = new Square1CubeState(new byte[8], WalterIndexMapping.indexToPermutation(i, 8));
           for (int j = 0; j < edgesPermutationMove[i].length; j++) {
             edgesPermutationMove[i][j] =
-              Square1IndexMapping.permutationToIndex(
+              WalterIndexMapping.permutationToIndex(
                 state.multiply(moves2[j]).edgesPermutation);
           }
         }
@@ -223,7 +224,7 @@ public class Square1Solver {
         long ts = System.currentTimeMillis();
         edgesCombinationMove = new int[N_EDGES_COMBINATIONS][moves2.length];
         for (int i = 0; i < edgesCombinationMove.length; i++) {
-          boolean[] combination = Square1IndexMapping.indexToCombination(i, 4, 8);
+          boolean[] combination = WalterIndexMapping.indexToCombination(i, 4, 8);
 
           byte[] edges = new byte[8];
           byte nextTop = 0;
@@ -247,7 +248,7 @@ public class Square1Solver {
             }
 
             edgesCombinationMove[i][j] =
-              Square1IndexMapping.combinationToIndex(isTopEdge, 4);
+              WalterIndexMapping.combinationToIndex(isTopEdge, 4);
           }
         }
         logTimeDifference(ts, "edges comb");
@@ -533,22 +534,22 @@ public class Square1Solver {
       throw new InterruptedException("Scramble interruption requested.");
     }
 
-    int cornersPermutation = Square1IndexMapping.permutationToIndex(state.cornersPermutation);
+    int cornersPermutation = WalterIndexMapping.permutationToIndex(state.cornersPermutation);
 
     boolean[] isTopCorner= new boolean[8];
     for (int k = 0; k < isTopCorner.length; k++) {
       isTopCorner[k] = state.cornersPermutation[k] < 4;
     }
-    int cornersCombination = Square1IndexMapping.combinationToIndex(isTopCorner, 4);
+    int cornersCombination = WalterIndexMapping.combinationToIndex(isTopCorner, 4);
 
-    int edgesPermutation = Square1IndexMapping.permutationToIndex(state.edgesPermutation);
+    int edgesPermutation = WalterIndexMapping.permutationToIndex(state.edgesPermutation);
 
     boolean[] isTopEdge = new boolean[8];
     for (int k = 0; k < isTopEdge.length; k++) {
       isTopEdge[k] = state.edgesPermutation[k] < 4;
     }
 
-    int edgesCombination = Square1IndexMapping.combinationToIndex(isTopEdge, 4);
+    int edgesCombination = WalterIndexMapping.combinationToIndex(isTopEdge, 4);
 
     for (int depth = 0; depth <= maxDepth; depth++) {
       int[] solution = new int[depth];
@@ -594,11 +595,11 @@ public class Square1Solver {
 
   public Square1State getRandomState(Square1State shape, Random random) {
     byte[] cornersPermutation =
-      Square1IndexMapping.indexToPermutation(
+      WalterIndexMapping.indexToPermutation(
         random.nextInt(N_CORNERS_PERMUTATIONS), 8);
 
     byte[] edgesPermutation =
-      Square1IndexMapping.indexToPermutation(
+      WalterIndexMapping.indexToPermutation(
         random.nextInt(N_EDGES_PERMUTATIONS), 8);
 
     byte[] permutation = new byte[shape.permutation.length];
@@ -650,7 +651,8 @@ public class Square1Solver {
   }
 
   private static void logTimeDifference(long startTs, String msg) {
-    Log.i("[NanoTimer]", msg + ": " + (System.currentTimeMillis() - startTs));
+//    Log.i("[NanoTimer]", msg + ": " + (System.currentTimeMillis() - startTs));
+//    System.out.println(msg + ": " + (System.currentTimeMillis() - startTs));
   }
 
 }

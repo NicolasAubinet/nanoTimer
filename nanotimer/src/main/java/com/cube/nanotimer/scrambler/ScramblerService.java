@@ -14,7 +14,9 @@ import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.GenerationLa
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.State;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenListener;
 import com.cube.nanotimer.scrambler.randomstate.ScrambleConfig;
-import com.cube.nanotimer.scrambler.randomstate.square1.Square1RandomScrambler;
+import com.cube.nanotimer.scrambler.randomstate.pyraminx.RSPyraminxScrambler;
+import com.cube.nanotimer.scrambler.randomstate.skewb.RSSkewbScrambler;
+import com.cube.nanotimer.scrambler.randomstate.square1.RSSquare1Scrambler;
 import com.cube.nanotimer.util.ScrambleFormatterService;
 import com.cube.nanotimer.util.helper.CpuUtils;
 import com.cube.nanotimer.util.helper.FileUtils;
@@ -61,9 +63,6 @@ public enum ScramblerService {
     stopGeneration();
 
     if (!Options.INSTANCE.isRandomStateScrambles()) {
-      for (CubeType cubeType : getRandomStateCubeTypes()) {
-        getNewRandomStateScrambler(cubeType).freeMemory();
-      }
       synchronized (cachedScrambles) {
         cachedScrambles.clear();
       }
@@ -263,6 +262,8 @@ public enum ScramblerService {
                   maxScrambleLength = 24;
                   break;
               }
+            case PYRAMINX:
+              maxScrambleLength = 11;
             case SQUARE1:
               break;
           }
@@ -293,8 +294,12 @@ public enum ScramblerService {
         return new RSThreeScrambler();
       case TWO_BY_TWO:
         return new RSTwoScrambler();
+      case SKEWB:
+        return new RSSkewbScrambler();
+      case PYRAMINX:
+        return new RSPyraminxScrambler();
       case SQUARE1:
-        return new Square1RandomScrambler();
+        return new RSSquare1Scrambler();
       default:
         return null;
     }
@@ -441,7 +446,7 @@ public enum ScramblerService {
   }
 
   public List<CubeType> getRandomStateCubeTypes() {
-    return Arrays.asList(CubeType.THREE_BY_THREE, CubeType.TWO_BY_TWO, CubeType.SQUARE1);
+    return Arrays.asList(CubeType.THREE_BY_THREE, CubeType.TWO_BY_TWO, /*CubeType.SKEWB,*/ CubeType.PYRAMINX, CubeType.SQUARE1);
   }
 
   private String getFileName(CubeType cubeType, ScrambleType scrambleType) {

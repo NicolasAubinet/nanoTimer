@@ -49,10 +49,7 @@ public class TwoSolver {
   private long searchStartTs;
   private int maxSolutionLength;
 
-  private volatile boolean mustStop = false;
-
-  private static final Object solutionSyncHelper = new Object();
-  private static volatile int solutionSearchCount = 0;
+  private boolean mustStop = false;
 
   private static Move[] moves;
   private static Move[] allMoves;
@@ -132,12 +129,9 @@ public class TwoSolver {
   }
 
   public String[] getSolution(TwoCubeState cubeState, ScrambleConfig config) {
-    synchronized (solutionSyncHelper) {
-      solutionSearchCount++;
-//      if (transitPerm == null) { // (now generated from ScramblerService)
-//        genTables();
-//      }
-    }
+//    if (transitPerm == null) { // (now generated from ScramblerService)
+//      genTables();
+//    }
     if (config != null && config.getMaxLength() > 0) {
       maxSolutionLength = config.getMaxLength();
     } else {
@@ -170,12 +164,6 @@ public class TwoSolver {
       }
     }
 //    Log.i("[NanoTimer]", "solution time: " + (System.currentTimeMillis() - searchStartTs));
-
-    synchronized (solutionSyncHelper) {
-      solutionSearchCount--;
-      solutionSyncHelper.notify();
-    }
-    mustStop = false;
 
     return solution;
   }
@@ -234,26 +222,8 @@ public class TwoSolver {
     }
   }
 
-  public static void freeMemory() {
-    synchronized (solutionSyncHelper) {
-      while (solutionSearchCount > 0) {
-        try {
-          solutionSyncHelper.wait();
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-      }
-      transitPerm = null;
-      transitOrient = null;
-      pruningOrient = null;
-      pruningPerm = null;
-    }
-  }
-
   public void stop() {
-    if (solutionSearchCount > 0) {
-      mustStop = true;
-    }
+    mustStop = true;
   }
 
 }
