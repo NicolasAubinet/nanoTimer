@@ -18,7 +18,7 @@ public class AppRater {
 
   private final static int DAYS_UNTIL_PROMPT = 5;
   private final static int DAYS_ASK_LATER_PROMPT_AGAIN = 3;
-  private final static int LAUNCHES_UNTIL_PROMPT = 7;
+  private final static int LAUNCHES_UNTIL_PROMPT = 5;
 
   public static void appLaunched(Context context) {
     SharedPreferences prefs = context.getSharedPreferences("apprater", 0);
