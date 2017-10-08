@@ -120,7 +120,6 @@
   <string name="use_modern_scrambles_summary">Use new \"random-state\" scrambles</string>
   <string name="scrambles_quality">Scrambles quality</string>
   <string name="scrambles_quality_summary">Select scrambles quality</string>
-  <string name="high_quality">High (less moves, slower to generate)</string>
   <string name="normal_quality">Normal</string>
   <string name="low_quality">Low (more moves, quicker to generate)</string>
   <string name="pregen_scrambles">Manually generate scrambles</string>

@@ -142,13 +142,11 @@ public enum Options {
     int quality = Integer.parseInt(sharedPreferences.getString(SCRAMBLES_QUALITY_KEY, "-1"));
     switch (quality) {
       case 1:
-        return ScramblesQuality.HIGH;
-      case 2:
-        return ScramblesQuality.MEDIUM;
+        return ScramblesQuality.NORMAL;
       case 3:
         return ScramblesQuality.LOW;
       default:
-        return ScramblesQuality.MEDIUM;
+        return ScramblesQuality.NORMAL;
     }
   }
 

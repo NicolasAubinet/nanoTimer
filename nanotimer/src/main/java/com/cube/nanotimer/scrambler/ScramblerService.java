@@ -240,10 +240,7 @@ public enum ScramblerService {
           switch (cubeType) {
             case TWO_BY_TWO:
               switch (scramblesQuality) {
-                case HIGH:
-                  maxScrambleLength = 11;
-                  break;
-                case MEDIUM:
+                case NORMAL:
                   maxScrambleLength = 11;
                   break;
                 case LOW:
@@ -253,14 +250,11 @@ public enum ScramblerService {
               break;
             case THREE_BY_THREE:
               switch (scramblesQuality) {
-                case HIGH:
+                case NORMAL:
                   maxScrambleLength = 21;
                   break;
-                case MEDIUM:
-                  maxScrambleLength = 23;
-                  break;
                 case LOW:
-                  maxScrambleLength = 24;
+                  maxScrambleLength = 23;
                   break;
               }
               break;

@@ -120,7 +120,6 @@
   <string name="use_modern_scrambles_summary">Utiliza mezclas aleatorias nuevas</string>
   <string name="scrambles_quality">Calidad de mezclas</string>
   <string name="scrambles_quality_summary">Selecciona la calidad de las mezclas</string>
-  <string name="high_quality">Alta (menos movimientos, más lenta de generar)</string>
   <string name="normal_quality">Normal</string>
   <string name="low_quality">Baja (más movimientos, más rápida de generar)</string>
   <string name="pregen_scrambles">Generar mezclas manualmente</string>
