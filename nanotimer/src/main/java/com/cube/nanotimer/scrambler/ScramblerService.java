@@ -408,6 +408,7 @@ public enum ScramblerService {
   public void deleteCaches() {
     for (CubeType cubeType : getRandomStateCubeTypes()) {
       synchronized (cacheFileHelper) {
+        FileUtils.deleteFile(context, getFileName(cubeType, null));
         for (ScrambleType usedScrambleType : cubeType.getUsedScrambledTypes()) {
           FileUtils.deleteFile(context, getFileName(cubeType, usedScrambleType));
         }
