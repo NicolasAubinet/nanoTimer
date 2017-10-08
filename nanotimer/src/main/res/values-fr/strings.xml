@@ -302,6 +302,7 @@
       <li>Support de types de mélange spéciaux pour le 3x3x3 pour entraînement sur F2L, Last Layer, PLL, arêtes et autres</li>
       <li>Support des mélanges à état aléatoire pour Square-1 et Pyraminx</li>
       <li>Tirer avantage des processeurs multi-coeurs pour la génération de mélanges</li>
+      <li>Fusion des options de qualité de mélange haute et normale</li>
       <li>Adaptation des permissions d\'import pour Android Kitkat et au-delà</li>
       <li>Adaptation de l\'icône de notification de génération des mélanges pour Android Lollipop et au-delà</li>
     </ul>

@@ -302,6 +302,7 @@
       <li>Add support for special 3x3x3 scramble types to practice only F2L, last layer, PLL, edges and more</li>
       <li>Add support for Square-1 and Pyraminx random-state scrambles</li>
       <li>Take advantage of multi-cores for scrambles generation</li>
+      <li>Merge normal and high scramble qualities preferences</li>
       <li>Adapt import permissions for Android Kitkat and above</li>
       <li>Adapt scrambles generating notification icon for Android Lollipop and above</li>
     </ul>

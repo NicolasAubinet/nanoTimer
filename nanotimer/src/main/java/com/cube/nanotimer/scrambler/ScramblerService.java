@@ -113,14 +113,14 @@ public enum ScramblerService {
       public void run() {
         if (Options.INSTANCE.isRandomStateScrambles()) {
           generateScrambles(cubeType, null, scramblesCount);
+
           for (CubeType rsCubeType : getRandomStateCubeTypes()) {
             generateScrambles(rsCubeType, null, -1);
-          }
-        }
-        for (CubeType rsCubeType : getRandomStateCubeTypes()) {
-          for (ScrambleType scrambleType : rsCubeType.getUsedScrambledTypes()) {
-            if (!scrambleType.isDefault()) {
-              generateScrambles(rsCubeType, scrambleType, -1);
+
+            for (ScrambleType scrambleType : rsCubeType.getUsedScrambledTypes()) {
+              if (!scrambleType.isDefault()) {
+                generateScrambles(rsCubeType, scrambleType, -1);
+              }
             }
           }
         }
