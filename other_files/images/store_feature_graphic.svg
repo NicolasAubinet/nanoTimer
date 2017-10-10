@@ -3188,7 +3188,7 @@
        x2="576.42859"
        y2="501.4332"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.65228983,0,0,0.56068908,61.204668,126.60286)" />
+       gradientTransform="matrix(0.65228983,0,0,0.65242698,61.204668,103.73391)" />
     <filter
        id="filter4961"
        inkscape:label="Cutout"
@@ -3243,7 +3243,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -3255,9 +3255,9 @@
        style="fill:url(#linearGradient4915);fill-opacity:1;stroke:none"
        id="rect8300"
        width="669.52899"
-       height="281.14551"
+       height="327.14551"
        x="60.272823"
-       y="125.80188"
+       y="102.80188"
        inkscape:export-xdpi="137.649"
        inkscape:export-ydpi="137.649"
        inkscape:export-filename="/home/nico/feature_graphic.png" />
@@ -3268,7 +3268,7 @@
      id="layer1"
      transform="translate(0,-552.36218)">
     <g
-       transform="matrix(0.20001545,0.31794999,0.34643693,-0.18356851,-270.47109,804.84433)"
+       transform="matrix(0.20710305,0.33020168,0.35871301,-0.19064203,-296.98786,789.78055)"
        style="display:inline"
        id="g40539">
       <g
@@ -6958,7 +6958,7 @@
        y="279.28571"
        id="text4917"
        sodipodi:linespacing="125%"
-       transform="matrix(0.5708975,0,0,0.48448456,55.15738,151.51781)"
+       transform="matrix(0.5708975,0,0,0.48448456,51.15738,151.51781)"
        inkscape:export-filename="/home/nico/feature_graphic.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"><tspan
