@@ -15,10 +15,10 @@ public class Square1Solver {
   private static HashMap<Integer, Integer> oddShapeDistance;
 
   // phase 2
-  private static final int N_CORNERS_PERMUTATIONS = 40320;
-  private static final int N_CORNERS_COMBINATIONS = 70;
-  private static final int N_EDGES_PERMUTATIONS = 40320;
-  private static final int N_EDGES_COMBINATIONS = 70;
+  public static final int N_CORNERS_PERMUTATIONS = 40320;
+  public static final int N_EDGES_PERMUTATIONS = 40320;
+  public static final int N_CORNERS_COMBINATIONS = 70;
+  public static final int N_EDGES_COMBINATIONS = 70;
 
   private static Square1State[] moves1;
   private static Square1CubeState[] moves2;
@@ -36,7 +36,7 @@ public class Square1Solver {
   private static final int MAX_DEPTH = 17;
 
   public static void genTables() {
-    if (moves1 != null) {
+    if (isInitialised()) {
       return; // already initialized
     }
 
@@ -78,53 +78,56 @@ public class Square1Solver {
 
     // shape tables
 
-    Thread shapesThread = new Thread() {
-      @Override
-      public void run() {
-        long ts = System.currentTimeMillis();
-        shapes = new ArrayList<Square1State>();
+    Thread shapesThread = null;
+    if (shapes == null || evenShapeDistance == null || oddShapeDistance == null) {
+      shapesThread = new Thread() {
+        @Override
+        public void run() {
+          long ts = System.currentTimeMillis();
+          shapes = new ArrayList<Square1State>();
 
-        evenShapeDistance = new HashMap<Integer, Integer>();
-        oddShapeDistance = new HashMap<Integer, Integer>();
-        evenShapeDistance.put(Square1State.id.getShapeIndex(), 0);
+          evenShapeDistance = new HashMap<Integer, Integer>();
+          oddShapeDistance = new HashMap<Integer, Integer>();
+          evenShapeDistance.put(Square1State.id.getShapeIndex(), 0);
 
-        ArrayList<Square1State> fringe = new ArrayList<Square1State>();
-        fringe.add(Square1State.id);
+          ArrayList<Square1State> fringe = new ArrayList<Square1State>();
+          fringe.add(Square1State.id);
 
-        int depth = 0;
+          int depth = 0;
 
-        while (fringe.size() > 0) {
-          ArrayList<Square1State> newFringe = new ArrayList<Square1State>();
-          for (Square1State state : fringe) {
-            if (state.isTwistable()) {
-              shapes.add(state);
-            }
-
-            for (int i = 0; i < moves1.length; i++) {
-              if (i == 22 && !state.isTwistable()) {
-                continue;
+          while (fringe.size() > 0) {
+            ArrayList<Square1State> newFringe = new ArrayList<Square1State>();
+            for (Square1State state : fringe) {
+              if (state.isTwistable()) {
+                shapes.add(state);
               }
 
-              Square1State next = state.multiply(moves1[i]);
+              for (int i = 0; i < moves1.length; i++) {
+                if (i == 22 && !state.isTwistable()) {
+                  continue;
+                }
 
-              HashMap<Integer, Integer> distanceTable =
-                isEvenPermutation(next.getPiecesPermutation()) ?
-                  evenShapeDistance : oddShapeDistance;
+                Square1State next = state.multiply(moves1[i]);
 
-              if (!distanceTable.containsKey(next.getShapeIndex())) {
-                distanceTable.put(next.getShapeIndex(), depth + 1);
-                newFringe.add(next);
+                HashMap<Integer, Integer> distanceTable =
+                  isEvenPermutation(next.getPiecesPermutation()) ?
+                    evenShapeDistance : oddShapeDistance;
+
+                if (!distanceTable.containsKey(next.getShapeIndex())) {
+                  distanceTable.put(next.getShapeIndex(), depth + 1);
+                  newFringe.add(next);
+                }
               }
             }
+
+            fringe = newFringe;
+            depth++;
           }
-
-          fringe = newFringe;
-          depth++;
+          logTimeDifference(ts, "shapes thread");
         }
-        logTimeDifference(ts, "shapes thread");
-      }
-    };
-    shapesThread.start();
+      };
+      shapesThread.start();
+    }
 
     // -- phase 2 --
 
@@ -269,88 +272,100 @@ public class Square1Solver {
 
     // prune tables
 
-    Thread cornersDistanceThread = new Thread() {
-      @Override
-      public void run() {
-        long ts = System.currentTimeMillis();
-        cornersDistance = new byte[N_CORNERS_PERMUTATIONS][N_EDGES_COMBINATIONS];
-        for (int i = 0; i < cornersDistance.length; i++) {
-          for (int j = 0; j < cornersDistance[i].length; j++) {
-            cornersDistance[i][j] = -1;
-          }
-        }
-        cornersDistance[0][0] = 0;
-
-        int depth = 0;
-        int nVisited;
-        do {
-          nVisited = 0;
-
+    Thread cornersDistanceThread = null;
+    if (cornersDistance == null) {
+      cornersDistanceThread = new Thread() {
+        @Override
+        public void run() {
+          long ts = System.currentTimeMillis();
+          cornersDistance = new byte[N_CORNERS_PERMUTATIONS][N_EDGES_COMBINATIONS];
           for (int i = 0; i < cornersDistance.length; i++) {
             for (int j = 0; j < cornersDistance[i].length; j++) {
-              if (cornersDistance[i][j] == depth) {
-                for (int k = 0; k < moves2.length; k++) {
-                  int nextCornerPermutation = cornersPermutationMove[i][k];
-                  int nextEdgeCombination = edgesCombinationMove[j][k];
-                  if (cornersDistance[nextCornerPermutation][nextEdgeCombination] < 0) {
-                    cornersDistance[nextCornerPermutation][nextEdgeCombination] = (byte) (depth + 1);
-                    nVisited++;
+              cornersDistance[i][j] = -1;
+            }
+          }
+          cornersDistance[0][0] = 0;
+
+          int depth = 0;
+          int nVisited;
+          do {
+            nVisited = 0;
+
+            for (int i = 0; i < cornersDistance.length; i++) {
+              for (int j = 0; j < cornersDistance[i].length; j++) {
+                if (cornersDistance[i][j] == depth) {
+                  for (int k = 0; k < moves2.length; k++) {
+                    int nextCornerPermutation = cornersPermutationMove[i][k];
+                    int nextEdgeCombination = edgesCombinationMove[j][k];
+                    if (cornersDistance[nextCornerPermutation][nextEdgeCombination] < 0) {
+                      cornersDistance[nextCornerPermutation][nextEdgeCombination] = (byte) (depth + 1);
+                      nVisited++;
+                    }
                   }
                 }
               }
             }
-          }
 
-          depth++;
-        } while (nVisited > 0);
-        logTimeDifference(ts, "corners distance");
-      }
-    };
-    cornersDistanceThread.start();
-
-    Thread edgesDistanceThread = new Thread() {
-      @Override
-      public void run() {
-        long ts = System.currentTimeMillis();
-        edgesDistance = new byte[N_EDGES_PERMUTATIONS][N_CORNERS_COMBINATIONS];
-        for (int i = 0; i < edgesDistance.length; i++) {
-          for (int j = 0; j < edgesDistance[i].length; j++) {
-            edgesDistance[i][j] = -1;
-          }
+            depth++;
+          } while (nVisited > 0);
+          logTimeDifference(ts, "corners distance");
         }
-        edgesDistance[0][0] = 0;
+      };
+      cornersDistanceThread.start();
+    }
 
-        int depth = 0;
-        int nVisited;
-        do {
-          nVisited = 0;
-
+    Thread edgesDistanceThread = null;
+    if (edgesDistance == null) {
+      edgesDistanceThread = new Thread() {
+        @Override
+        public void run() {
+          long ts = System.currentTimeMillis();
+          edgesDistance = new byte[N_EDGES_PERMUTATIONS][N_CORNERS_COMBINATIONS];
           for (int i = 0; i < edgesDistance.length; i++) {
             for (int j = 0; j < edgesDistance[i].length; j++) {
-              if (edgesDistance[i][j] == depth) {
-                for (int k = 0; k < moves2.length; k++) {
-                  int nextEdgesPermutation = edgesPermutationMove[i][k];
-                  int nextCornersCombination = cornersCombinationMove[j][k];
-                  if (edgesDistance[nextEdgesPermutation][nextCornersCombination] < 0) {
-                    edgesDistance[nextEdgesPermutation][nextCornersCombination] = (byte) (depth + 1);
-                    nVisited++;
+              edgesDistance[i][j] = -1;
+            }
+          }
+          edgesDistance[0][0] = 0;
+
+          int depth = 0;
+          int nVisited;
+          do {
+            nVisited = 0;
+
+            for (int i = 0; i < edgesDistance.length; i++) {
+              for (int j = 0; j < edgesDistance[i].length; j++) {
+                if (edgesDistance[i][j] == depth) {
+                  for (int k = 0; k < moves2.length; k++) {
+                    int nextEdgesPermutation = edgesPermutationMove[i][k];
+                    int nextCornersCombination = cornersCombinationMove[j][k];
+                    if (edgesDistance[nextEdgesPermutation][nextCornersCombination] < 0) {
+                      edgesDistance[nextEdgesPermutation][nextCornersCombination] = (byte) (depth + 1);
+                      nVisited++;
+                    }
                   }
                 }
               }
             }
-          }
 
-          depth++;
-        } while (nVisited > 0);
-        logTimeDifference(ts, "edges distance");
-      }
-    };
-    edgesDistanceThread.start();
+            depth++;
+          } while (nVisited > 0);
+          logTimeDifference(ts, "edges distance");
+        }
+      };
+      edgesDistanceThread.start();
+    }
 
     try {
-      shapesThread.join();
-      cornersDistanceThread.join();
-      edgesDistanceThread.join();
+      if (shapesThread != null) {
+        shapesThread.join();
+      }
+      if (cornersDistanceThread != null) {
+        cornersDistanceThread.join();
+      }
+      if (edgesDistanceThread != null) {
+        edgesDistanceThread.join();
+      }
     } catch (InterruptedException e) {
       Log.e("[NanoTimer]", "Square-1 pruning tables generation interrupted");
     }
@@ -632,14 +647,33 @@ public class Square1Solver {
     }
   }
 
+  public static void setShapes(ArrayList<Square1State> shapes) {
+    Square1Solver.shapes = shapes;
+  }
+
+  public static void setEvenShapeDistance(HashMap<Integer, Integer> evenShapeDistance) {
+    Square1Solver.evenShapeDistance = evenShapeDistance;
+  }
+
+  public static void setOddShapeDistance(HashMap<Integer, Integer> oddShapeDistance) {
+    Square1Solver.oddShapeDistance = oddShapeDistance;
+  }
+
+  public static void setCornersDistance(byte[][] cornersDistance) {
+    Square1Solver.cornersDistance = cornersDistance;
+  }
+
+  public static void setEdgesDistance(byte[][] edgesDistance) {
+    Square1Solver.edgesDistance = edgesDistance;
+  }
+
   private static void logTimeDifference(long startTs, String msg) {
 //    Log.i("[NanoTimer]", msg + ": " + (System.currentTimeMillis() - startTs));
 //    System.out.println(msg + ": " + (System.currentTimeMillis() - startTs));
   }
 
-  private static void log(String msg) {
-//    Log.i("[NanoTimer]", msg);
-//    System.out.println(msg);
+  public static boolean isInitialised() {
+    return moves1 != null;
   }
 
 }

@@ -2,7 +2,9 @@ package com.cube.nanotimer.scrambler.randomstate.square1;
 
 import com.cube.nanotimer.scrambler.randomstate.WalterIndexMapping;
 
-public class Square1State {
+import java.io.Serializable;
+
+public class Square1State implements Serializable {
   public byte[] permutation;
 
   public Square1State(byte[] permutation) {

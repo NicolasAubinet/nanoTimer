@@ -1,5 +1,6 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
+import android.content.Context;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.TwoCubeState;
 
@@ -19,6 +20,10 @@ public class RSTwoScrambler implements RSScrambler {
 //      Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
     } while (scramble != null && scramble.length < 4);
     return scramble;
+  }
+
+  @Override
+  public void prepareGenTables(Context context) {
   }
 
   @Override

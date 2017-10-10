@@ -1,5 +1,6 @@
 package com.cube.nanotimer.scrambler.randomstate.pyraminx;
 
+import android.content.Context;
 import com.cube.nanotimer.scrambler.randomstate.RSScrambler;
 import com.cube.nanotimer.scrambler.randomstate.ScrambleConfig;
 
@@ -17,6 +18,10 @@ public class RSPyraminxScrambler implements RSScrambler {
 
     PyraminxState randomState = solver.getRandomState(new Random());
     return solver.generate(randomState);
+  }
+
+  @Override
+  public void prepareGenTables(Context context) {
   }
 
   @Override

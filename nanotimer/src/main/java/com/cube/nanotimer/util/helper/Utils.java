@@ -210,4 +210,22 @@ public class Utils {
     return new ContextWrapper(context);
   }*/
 
+  public static byte[] toSingleDimensionByteArray(byte[][] data) {
+    byte[] bytes = new byte[data.length * data[0].length];
+    for (int i = 0; i < data.length; i++) {
+      System.arraycopy(data[i], 0, bytes, i * data[0].length, data[0].length);
+    }
+    return bytes;
+  }
+
+  public static byte[][] toTwoDimensionalByteArray(byte[] data, int firstDimensionSize) {
+    byte[][] bytes = new byte[firstDimensionSize][data.length / firstDimensionSize];
+    for (int i = 0; i < bytes.length; i++) {
+      for (int j = 0; j < bytes[i].length; j++) {
+        bytes[i][j] = data[i*bytes[i].length+j];
+      }
+    }
+    return bytes;
+  }
+
 }

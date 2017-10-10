@@ -1,5 +1,6 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
+import android.content.Context;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.ScrambleType;
 import com.cube.nanotimer.vo.ThreeCubeState;
@@ -38,6 +39,10 @@ public class RSThreeScrambler implements RSScrambler {
       scramble = scrambleType.finalizeScramble(scramble);
     }
     return scramble;
+  }
+
+  @Override
+  public void prepareGenTables(Context context) {
   }
 
   @Override

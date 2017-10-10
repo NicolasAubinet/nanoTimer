@@ -4,16 +4,26 @@ import android.content.Context;
 import com.cube.nanotimer.util.exportimport.csvexport.CSVGenerator;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.RandomAccessFile;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.zip.DataFormatException;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class FileUtils {
 
@@ -177,6 +187,80 @@ public class FileUtils {
       e.printStackTrace();
     }
     return file;
+  }
+
+  public static byte[] loadCompressedGzip(String fileName) throws IOException, DataFormatException {
+    RandomAccessFile f = new RandomAccessFile(fileName, "r");
+    byte[] data = new byte[(int)f.length()];
+    f.readFully(data);
+    return decompressGzip(data);
+  }
+
+  public static byte[] loadCompressedGzip(InputStream is, int length) throws IOException, DataFormatException {
+    byte[] data = new byte[length];
+    is.read(data);
+    return decompressGzip(data);
+  }
+
+  private static byte[] decompressGzip(byte[] data) throws IOException, DataFormatException {
+    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    ByteArrayInputStream in = new ByteArrayInputStream(data);
+    try {
+      InputStream inflater = new GZIPInputStream(in);
+      byte[] bbuf = new byte[256];
+      while (true) {
+        int r = inflater.read(bbuf);
+        if (r < 0) {
+          break;
+        }
+        buffer.write(bbuf, 0, r);
+      }
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+    return buffer.toByteArray();
+  }
+
+  public static Object loadCompressedGzipSerializable(InputStream is) throws ClassNotFoundException {
+    Object serializable = null;
+    try {
+//      FileInputStream fis = new FileInputStream(fileName);
+      GZIPInputStream gz = new GZIPInputStream(is);
+      ObjectInputStream ois = new ObjectInputStream(gz);
+      serializable = ois.readObject();
+      ois.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return serializable;
+  }
+
+  // compression used by test classes (like RandomStateSquare1Test)
+  public static void compressToGzipAndPersist(byte[] bytes, String fileName) throws IOException {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try {
+      GZIPOutputStream zos = new GZIPOutputStream(baos);
+      zos.write(bytes);
+      zos.close();
+
+      OutputStream os = new FileOutputStream(fileName);
+      baos.writeTo(os);
+      os.close();
+    } finally {
+      baos.close();
+    }
+  }
+
+  public static void compressToGzipAndPersist(Serializable serializable, String fileName) {
+    try {
+      FileOutputStream fos = new FileOutputStream(fileName);
+      GZIPOutputStream gz = new GZIPOutputStream(fos);
+      ObjectOutputStream oos = new ObjectOutputStream(gz);
+      oos.writeObject(serializable);
+      oos.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
 }

@@ -151,6 +151,7 @@ public enum ScramblerService {
         int maxScrambleLength = getRSScrambleLength(cubeType, scrambleType, Options.INSTANCE.getScramblesQuality());
 
         sendGenStateToListeners(new RandomStateGenEvent(RandomStateGenEvent.State.PREPARING, cubeType, scrambleType, generationLaunch, 0, n));
+        rsScrambler.prepareGenTables(context);
         rsScrambler.genTables();
 
         final int threadsCount = CpuUtils.getNumberOfCores();
