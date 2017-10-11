@@ -204,7 +204,7 @@ public class ExportActivity extends NanoTimerActivity {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
       LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-      View view = inflater.inflate(R.layout.export_listitem, null); // inflating every time to avoid bugs in items on old htc (looks like caching bugs when selecting rows)
+      View view = inflater.inflate(R.layout.export_listitem, parent, false); // inflating every time to avoid bugs in items on old htc (looks like caching bugs when selecting rows)
 
       synchronized (liItems) {
         if (position >= 0 && position < liItems.size()) {

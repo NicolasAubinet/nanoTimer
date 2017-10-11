@@ -369,7 +369,7 @@ public class SolveTypesActivity extends NanoTimerActivity implements SelectionHa
       View view = convertView;
       if (view == null) {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        view = inflater.inflate(R.layout.solvetypes_list_item, null);
+        view = inflater.inflate(R.layout.solvetypes_list_item, parent, false);
       }
 
       if (position >= 0 && position < liSolveTypes.size()) {

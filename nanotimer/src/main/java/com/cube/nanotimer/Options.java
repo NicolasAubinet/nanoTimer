@@ -2,6 +2,7 @@ package com.cube.nanotimer;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import com.cube.nanotimer.vo.ScramblesQuality;
 
@@ -134,8 +135,15 @@ public enum Options {
   }
 
   public boolean isRandomStateScrambles() {
-    Boolean defaultValue = context.getResources().getBoolean(R.bool.randomstate_scrambles);
-    return sharedPreferences.getBoolean(RANDOMSTATE_SCRAMBLES_KEY, defaultValue);
+    boolean isRandomStateScrambles = true;
+    if (context != null) {
+      Resources resources = context.getResources();
+      if (resources != null) {
+        Boolean defaultValue = resources.getBoolean(R.bool.randomstate_scrambles);
+        isRandomStateScrambles = sharedPreferences.getBoolean(RANDOMSTATE_SCRAMBLES_KEY, defaultValue);
+      }
+    }
+    return isRandomStateScrambles;
   }
 
   public ScramblesQuality getScramblesQuality() {

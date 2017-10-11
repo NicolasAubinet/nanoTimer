@@ -731,7 +731,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
     public View getView(final int position, View convertView, ViewGroup parent) {
       View view = convertView;
       if (view == null) {
-        view = inflater.inflate(R.layout.menu_item_with_icon, null);
+        view = inflater.inflate(R.layout.menu_item_with_icon, parent, false);
       }
 
       if (position >= 0 && position < objects.length) {
@@ -791,7 +791,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
     public View getView(int position, View convertView, ViewGroup parent) {
       View view = convertView;
       if (view == null) {
-        view = inflater.inflate(R.layout.history_list_item, null);
+        view = inflater.inflate(R.layout.history_list_item, parent, false);
       }
 
       if (position >= 0 && position < liHistory.size()) {
@@ -844,7 +844,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
     public View getView(int position, View convertView, ViewGroup parent) {
       View view;
       if (position >= 0 && position < nameHolders.size()) {
-        view = getView(R.layout.spinner_item, position, convertView);
+        view = getView(R.layout.spinner_item, position, convertView, parent);
       } else {
         view = previousView;
       }
@@ -854,13 +854,13 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-      return getView(R.layout.spinner_dropdown_item, position, convertView);
+      return getView(R.layout.spinner_dropdown_item, position, convertView, parent);
     }
 
-    private View getView(int itemResourceId, int position, View convertView) {
+    private View getView(int itemResourceId, int position, View convertView, ViewGroup parent) {
       TextView view = (TextView) convertView;
       if (view == null) {
-        view = (TextView) inflater.inflate(itemResourceId, null);
+        view = (TextView) inflater.inflate(itemResourceId, parent, false);
       }
 
       if (position >= 0 && position < nameHolders.size()) {

@@ -163,26 +163,22 @@ public class FileUtils {
   }
 
   public static File createCSVFile(Context context, String fileName, CSVGenerator generator) {
-    StringBuilder sb = new StringBuilder();
-    if (generator.getExportLine(0) != null) {
-      String newLine = Utils.getNewLine();
-      sb.append(generator.getHeaderLine());
-      String line;
-      for (int i = 0; (line = generator.getExportLine(i)) != null; i++) {
-        sb.append(newLine);
-        sb.append(line);
-      }
-    }
-
     File file = new File(context.getCacheDir(), fileName);
     try {
       FileOutputStream fos = new FileOutputStream(file);
-      OutputStreamWriter osw = new OutputStreamWriter(fos);
-      osw.write(sb.toString(), 0, sb.length());
-      osw.close();
+      BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(fos));
+
+      if (generator.getExportLine(0) != null) {
+        bufferedWriter.write(generator.getHeaderLine());
+        String line;
+        for (int i = 0; (line = generator.getExportLine(i)) != null; i++) {
+          bufferedWriter.newLine();
+          bufferedWriter.write(line);
+        }
+      }
+
+      bufferedWriter.close();
       fos.close();
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -205,8 +201,8 @@ public class FileUtils {
   private static byte[] decompressGzip(byte[] data) throws IOException, DataFormatException {
     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
     ByteArrayInputStream in = new ByteArrayInputStream(data);
+    InputStream inflater = new GZIPInputStream(in);
     try {
-      InputStream inflater = new GZIPInputStream(in);
       byte[] bbuf = new byte[256];
       while (true) {
         int r = inflater.read(bbuf);
@@ -217,6 +213,10 @@ public class FileUtils {
       }
     } catch (IOException e) {
       throw new IllegalStateException(e);
+    } finally {
+      inflater.close();
+      in.close();
+      buffer.close();
     }
     return buffer.toByteArray();
   }
@@ -229,6 +229,7 @@ public class FileUtils {
       ObjectInputStream ois = new ObjectInputStream(gz);
       serializable = ois.readObject();
       ois.close();
+      gz.close();
     } catch (IOException e) {
       e.printStackTrace();
     }

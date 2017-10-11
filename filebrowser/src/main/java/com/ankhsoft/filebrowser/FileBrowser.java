@@ -218,7 +218,7 @@ public class FileBrowser extends LinearLayout {
     public View getView(final int position, View convertView, ViewGroup parent) {
       View view = convertView;
       if (view == null) {
-        view = inflater.inflate(R.layout.file_list_item, null);
+        view = inflater.inflate(R.layout.file_list_item, parent, false);
       }
 
       if (position >= 0 && position < liFiles.size()) {

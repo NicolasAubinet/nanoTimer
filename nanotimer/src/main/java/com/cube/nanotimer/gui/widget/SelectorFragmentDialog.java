@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -116,9 +115,9 @@ public class SelectorFragmentDialog extends NanoTimerDialogFragment {
       LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
       View view;
       if (liDrawableIds == null) {
-        view = inflater.inflate(R.layout.simple_list_item, null);
+        view = inflater.inflate(R.layout.simple_list_item, parent, false);
       } else {
-        view = inflater.inflate(R.layout.drawable_simple_list_item, null);
+        view = inflater.inflate(R.layout.drawable_simple_list_item, parent, false);
       }
 
       if (position >= 0 && position < liItems.size()) {
