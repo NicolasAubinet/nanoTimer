@@ -80,8 +80,9 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   private SolveType curSolveType;
   private final List<CubeType> cubeTypes = new ArrayList<>();
   private final List<SolveType> solveTypes = new ArrayList<>();
+  private final List<String> spinnerSolveTypeNames = new ArrayList<>();
   private NameHolderSpinnerAdapter cubeTypesSpinnerAdapter;
-  private NameHolderSpinnerAdapter solveTypesSpinnerAdapter;
+  private ArrayAdapter<String> solveTypesSpinnerAdapter;
 
   private int solvesCount;
   private TimesSort timesSort = TimesSort.TIMESTAMP;
@@ -126,7 +127,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   protected void initViews() {
     super.initViews();
     spCubeType = (Spinner) findViewById(R.id.spCubeType);
-    cubeTypesSpinnerAdapter = new NameHolderSpinnerAdapter(this, R.id.spCubeType, cubeTypes, false);
+    cubeTypesSpinnerAdapter = new NameHolderSpinnerAdapter(this, R.id.spCubeType, cubeTypes);
     cubeTypesSpinnerAdapter.setDropDownViewResource(R.layout.spinner_item);
     spCubeType.setAdapter(cubeTypesSpinnerAdapter);
     spCubeType.setOnItemSelectedListener(new OnItemSelectedListener() {
@@ -141,8 +142,8 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
     });
 
     spSolveType = (Spinner) findViewById(R.id.spSolveType);
-    solveTypesSpinnerAdapter = new NameHolderSpinnerAdapter(this, R.id.spSolveType, solveTypes, true);
-    solveTypesSpinnerAdapter.setDropDownViewResource(R.layout.spinner_item);
+    solveTypesSpinnerAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, spinnerSolveTypeNames);
+    solveTypesSpinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
     spSolveType.setAdapter(solveTypesSpinnerAdapter);
     spSolveType.setOnItemSelectedListener(new OnItemSelectedListener() {
       @Override
@@ -447,6 +448,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
         public void onData(List<SolveType> data) {
           solveTypes.clear();
           solveTypes.addAll(data);
+          refreshSpinnerSolveTypeNames();
           SolveType newCurSolveType = null;
 
           if (!solveTypes.isEmpty()) {
@@ -483,9 +485,19 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
     } else {
       setCurSolveType(null);
       solveTypes.clear();
+      refreshSpinnerSolveTypeNames();
       refreshDataSet(solveTypesSpinnerAdapter);
       refreshHistory();
     }
+  }
+
+  private void refreshSpinnerSolveTypeNames() {
+    spinnerSolveTypeNames.clear();
+    for (SolveType solveType : solveTypes) {
+      String name = solveType.getName();
+      spinnerSolveTypeNames.add(Utils.toSolveTypeLocalizedName(this, name));
+    }
+    spinnerSolveTypeNames.add(getString(R.string.edit_solve_types_dots));
   }
 
   public void refreshHistory() {
@@ -821,35 +833,16 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   private class NameHolderSpinnerAdapter<T extends NameHolder> extends ArrayAdapter<T> {
     private LayoutInflater inflater;
     private List<T> nameHolders;
-    private boolean isSolveTypes;
-    private View previousView;
 
-    public NameHolderSpinnerAdapter(Context context, int resource, List<T> objects, boolean isSolveTypes) {
+    public NameHolderSpinnerAdapter(Context context, int resource, List<T> objects) {
       super(context, resource, objects);
       this.inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
       this.nameHolders = objects;
-      this.isSolveTypes = isSolveTypes;
-    }
-
-    @Override
-    public int getCount() {
-      int count = super.getCount();
-      if (isShowingEditSolveTypesShortcut()) {
-        count += 1;
-      }
-      return count;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-      View view;
-      if (position >= 0 && position < nameHolders.size()) {
-        view = getView(R.layout.spinner_item, position, convertView, parent);
-      } else {
-        view = previousView;
-      }
-      previousView = view;
-      return view;
+      return getView(R.layout.spinner_item, position, convertView, parent);
     }
 
     @Override
@@ -863,22 +856,11 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
         view = (TextView) inflater.inflate(itemResourceId, parent, false);
       }
 
-      if (position >= 0 && position < nameHolders.size()) {
-        T nameHolder = nameHolders.get(position);
-        String name = nameHolder.getName();
-        if (isSolveTypes) {
-          name = Utils.toSolveTypeLocalizedName(getContext(), name);
-        }
-        view.setText(name);
-      } else if (position >= nameHolders.size() && isShowingEditSolveTypesShortcut()) {
-        view.setText(R.string.edit_solve_types_dots);
-      }
+      T nameHolder = nameHolders.get(position);
+      String name = nameHolder.getName();
+      view.setText(name);
 
       return view;
-    }
-
-    private boolean isShowingEditSolveTypesShortcut() {
-      return isSolveTypes && Options.INSTANCE.isSolveTypesShortcutEnabled();
     }
   }
 
