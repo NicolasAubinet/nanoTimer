@@ -295,7 +295,12 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.2.2 <i>(Nueva versión)</i></b></u>
+    <u><b>v1.3.1 <i>(New version)</i></b></u>
+    <ul>
+      <li>Arreglar crash cuándo lancéis app en algunes aparatos</li>
+      <li>Arreglar crash cuándo exportéis una grande cantidad de tiempos</li>
+    </ul>
+    <u><b>v1.3.0</b></u>
     <ul>
       <li>Rediseño de la pantalla pricipal de usuario</li>
       <li>Añadido soporte de francés y español</li>
