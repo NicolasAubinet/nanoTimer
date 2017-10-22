@@ -1125,6 +1125,9 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   private void syncCaches(SolveType solveType) {
+    if (solveType == null) {
+      return;
+    }
     if (cachedSolveTimes == null || currentSolveType == null || solveType.getId() != currentSolveType.getId()) {
       currentSolveType = solveType;
       loadSolveTimes(solveType.getId());
