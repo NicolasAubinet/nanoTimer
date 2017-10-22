@@ -300,10 +300,10 @@ public class SolveTypesActivity extends NanoTimerActivity implements SelectionHa
       return false;
     }
 
-    if (Utils.isDefaultSolveTypeName(name)) {
-      DialogUtils.showInfoMessage(this, R.string.solve_type_name_reserved);
-      return false;
-    }
+//    if (Utils.isDefaultSolveTypeName(name)) {
+//      DialogUtils.showInfoMessage(this, R.string.solve_type_name_reserved);
+//      return false;
+//    }
 
     for (int i = 0; i < liSolveTypes.size(); i++) {
       String solveTypeName = liSolveTypes.get(i).getName();
