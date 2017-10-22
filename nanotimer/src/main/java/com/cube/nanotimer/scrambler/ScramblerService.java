@@ -154,7 +154,7 @@ public enum ScramblerService {
         rsScrambler.prepareGenTables(context);
         rsScrambler.genTables();
 
-        final int threadsCount = CpuUtils.getNumberOfCores();
+        final int threadsCount = Math.max(1, CpuUtils.getNumberOfCores() - 1);
         Log.i("NanoTimer", "Generate " + n + " " + cubeType + "|" + scrambleType + " scrambles on " + threadsCount + " threads");
 
         final List<String[]> toSave = new ArrayList<>();
