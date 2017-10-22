@@ -513,7 +513,9 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
       tvSolvesCount.setText(String.valueOf(solvesCount));
 
       refreshSessionFields();
-      refreshAvgFields(false);
+      if (solveAverages != null) {
+        refreshAvgFields(false);
+      }
 
       if (solveType.hasSteps()) {
         Iterator<String> it = stepsText.iterator();
