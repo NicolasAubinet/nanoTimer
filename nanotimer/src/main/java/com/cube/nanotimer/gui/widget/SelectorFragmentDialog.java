@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.cube.nanotimer.R;
@@ -74,8 +77,17 @@ public class SelectorFragmentDialog extends NanoTimerDialogFragment {
 
     final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(v).create();
     dialog.setCanceledOnTouchOutside(cancelOnTouchOutside);
+
     if (title != null) {
-      dialog.setTitle(title);
+      TextView tvTitle = new TextView(getContext());
+//      tvTitle.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
+      tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
+      LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+      tvTitle.setPadding(20, 20, 20, 20);
+      tvTitle.setLayoutParams(lp);
+      tvTitle.setText(title);
+      tvTitle.setGravity(Gravity.CENTER_VERTICAL);
+      dialog.setCustomTitle(tvTitle);
     }
 
     lvItems.setOnItemClickListener(new OnItemClickListener() {
