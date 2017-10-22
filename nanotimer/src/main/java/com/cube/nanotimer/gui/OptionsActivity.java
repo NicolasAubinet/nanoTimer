@@ -70,6 +70,13 @@ public class OptionsActivity extends NanoTimerActivity {
       PreferenceManager.getDefaultSharedPreferences(getActivity()).registerOnSharedPreferenceChangeListener(prefChangedListener);
     }
 
+    @Override
+    public void onDestroy() {
+      super.onDestroy();
+
+      PreferenceManager.getDefaultSharedPreferences(getActivity()).unregisterOnSharedPreferenceChangeListener(prefChangedListener);
+    }
+
     private void preferenceChanged(SharedPreferences pref, String key) {
       Context context = getContext();
       if (context == null) {
