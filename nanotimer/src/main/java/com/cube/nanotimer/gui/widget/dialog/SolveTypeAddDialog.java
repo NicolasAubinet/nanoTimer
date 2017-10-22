@@ -65,7 +65,9 @@ public class SolveTypeAddDialog extends ConfirmDialog {
       ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, scrambleTypesNames);
       adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
       spScrambleType.setAdapter(adapter);
-      spScrambleType.setSelection(0);
+      if (scrambleTypesNames.size() > 0) {
+        spScrambleType.setSelection(0);
+      }
 
       spScrambleType.setOnItemSelectedListener(new OnItemSelectedListener() {
         @Override

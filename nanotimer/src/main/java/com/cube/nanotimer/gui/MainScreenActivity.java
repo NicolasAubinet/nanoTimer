@@ -374,25 +374,6 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
     }
   }
 
-  /*@Override
-  public void onConfigurationChanged(Configuration newConfig) {
-    super.onConfigurationChanged(newConfig);
-
-    int cubeTypeItemPosition = spCubeType.getSelectedItemPosition();
-    int solveTypeItemPosition = spSolveType.getSelectedItemPosition();
-    String solvesCountText = tvSolvesCount.getText().toString();
-    String historyText = tvHistory.getText().toString();
-
-    setContentView(R.layout.mainscreen_screen);
-    initViews();
-
-    spCubeType.setSelection(cubeTypeItemPosition);
-    spSolveType.setSelection(solveTypeItemPosition);
-    tvSolvesCount.setText(solvesCountText);
-    tvHistory.setText(historyText);
-    showHideBannerAd();
-  }*/
-
   private void refreshDataSet(final ArrayAdapter arrayAdapter) {
     runOnUiThread(new Runnable() {
       @Override
@@ -429,7 +410,10 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
             @Override
             public void run() {
               refreshDataSet(cubeTypesSpinnerAdapter);
-              spCubeType.setSelection(cubeTypes.indexOf(newCurCubeType));
+              int selectedIndex = cubeTypes.indexOf(newCurCubeType);
+              if (selectedIndex >= 0) {
+                spCubeType.setSelection(selectedIndex);
+              }
             }
           });
         } else {
@@ -472,7 +456,10 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
               @Override
               public void run() {
                 refreshDataSet(solveTypesSpinnerAdapter);
-                spSolveType.setSelection(solveTypes.indexOf(finalCurSolveType));
+                int selectedIndex = solveTypes.indexOf(finalCurSolveType);
+                if (selectedIndex >= 0) {
+                  spSolveType.setSelection(selectedIndex);
+                }
               }
             });
           } else {
