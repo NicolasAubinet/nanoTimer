@@ -12,7 +12,7 @@ public class NanoTimerActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    Utils.updateContextWithPrefsLocale(getBaseContext());
+    Utils.updateContextWithPrefsLocale(this);
 
     ActionBar actionBar = getSupportActionBar();
     if (actionBar != null) {
@@ -23,13 +23,13 @@ public class NanoTimerActivity extends AppCompatActivity {
   @Override
   protected void onResume() {
     super.onResume();
-    Utils.updateContextWithPrefsLocale(getBaseContext());
+    Utils.updateContextWithPrefsLocale(this);
   }
 
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
-    Utils.updateContextWithPrefsLocale(getBaseContext());
+    Utils.updateContextWithPrefsLocale(this);
   }
 
   @Override
