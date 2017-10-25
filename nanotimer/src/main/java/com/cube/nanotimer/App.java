@@ -83,6 +83,7 @@ public enum App {
         soundManager.init();
       }
     }
+
     if (!appGUILaunched && !fromService) { // app GUI started
       appGUILaunched(context);
     }
