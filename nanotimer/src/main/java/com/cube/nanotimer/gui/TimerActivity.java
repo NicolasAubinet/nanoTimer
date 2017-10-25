@@ -60,7 +60,7 @@ import java.util.TimerTask;
 
 public class TimerActivity extends NanoTimerActivity implements ResultListener {
 
-  enum TimerState {STOPPED, RUNNING, INSPECTING}
+  private enum TimerState {STOPPED, RUNNING, INSPECTING}
 
   private TextView tvTimer;
   private TextView tvScramble;
