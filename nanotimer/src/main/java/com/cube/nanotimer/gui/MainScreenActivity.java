@@ -571,7 +571,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
         if (!prefs.getString(Utils.LANGUAGE_PREF_KEY, "").equals(localeCode)) {
           Editor editor = prefs.edit();
           editor.putString(Utils.LANGUAGE_PREF_KEY, localeCode);
-          editor.apply();
+          editor.commit(); // MUST use commit instead of apply to make sure the pref is updated before restarting app
 
           Context context = getBaseContext();
           PackageManager packageManager = context.getPackageManager();
