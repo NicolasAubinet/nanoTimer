@@ -5,8 +5,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.Button;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.util.helper.GUIUtils;
 import com.cube.nanotimer.util.helper.Utils;
@@ -45,6 +48,14 @@ public class ReleaseNotes {
 
     WebView wvInfo = (WebView) v.findViewById(R.id.wvInfo);
     GUIUtils.setWebViewText(wvInfo, context.getString(R.string.release_notes_features_html));
+
+    Button buClose = (Button) v.findViewById(R.id.buClose);
+    buClose.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        dialog.dismiss();
+      }
+    });
 
     dialog.show();
   }
