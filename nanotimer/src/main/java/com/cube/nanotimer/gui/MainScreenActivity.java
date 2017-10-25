@@ -115,8 +115,12 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
     super.onCreate(savedInstanceState);
     App.INSTANCE.setContext(this);
     AdProvider.init(this);
+    Utils.updateContextWithPrefsLocale(this); // because ad provider somehow re-initializes the context
+
     setContentView(R.layout.mainscreen_screen);
+
     setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
     curCubeType = Utils.getCurrentCubeType(this);
     curSolveType = new SolveType(Utils.getCurrentSolveTypeId(this), "", false, null, curCubeType.getId());
 
