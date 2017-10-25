@@ -295,7 +295,17 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.1 <i>(New version)</i></b></u>
+    <u><b>v1.3.2 <i>(New version)</i></b></u>
+    <ul>
+      <li>Amélioration de l\'utilisation du CPU quand des mélanges sont générés pour éviter de ralentir l\'application</li>
+      <li>Réglage du changement de langue qui ne fonctionnait pas correctement sur certains périphériques</li>
+      <li>Amélioration de l\'UI de sélection du type de cube accédé via les réglages</li>
+      <li>Réglage d\'une fenêtre qui apparaissait parfois plusieurs fois après avoir changé la qualité des mélanges</li>
+      <li>Possibilité d\'ajouter à nouveau le type de résolution par défaut après l\'avoir supprimé</li>
+      <li>Ajout d\'un bouton de fermeture aux notes de version</li>
+      <li>Réglage de crashes occasionnels</li>
+    </ul>
+    <u><b>v1.3.1</b></u>
     <ul>
       <li>Réglage d\'un crash qui apparaissait au lancement de l\'application sur certains périphériques</li>
       <li>Réglage d\'un crash qui pouvait apparaître quand de grandes quantités de temps étaient exportées</li>

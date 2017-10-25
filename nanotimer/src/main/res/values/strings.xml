@@ -295,7 +295,17 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.1 <i>(New version)</i></b></u>
+    <u><b>v1.3.2 <i>(New version)</i></b></u>
+    <ul>
+      <li>Keep one CPU core idle when generating scrambles to avoid freezing app while timing</li>
+      <li>Fix language switching that did not work properly on some devices</li>
+      <li>Improve cube type selection screen UI when editing solve types via settings</li>
+      <li>Fix dialog that sometimes appeared multiple times when changing scrambles quality</li>
+      <li>Allow to add back the default solve type after deleting it</li>
+      <li>Add close button to release notes</li>
+      <li>Fix occasional app crashes</li>
+    </ul>
+    <u><b>v1.3.1</b></u>
     <ul>
       <li>Fix crash that happened upon launch on some devices</li>
       <li>Fix crash that could happen when exporting big amounts of times</li>
