@@ -680,15 +680,11 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
 
   @Override
   public void onTimeChanged(SolveTime solveTime) {
-    SolveTime historyTime = null;
     for (SolveTime st : liHistory) {
       if (st.getId() == solveTime.getId()) {
-        historyTime = st;
+        updateListTime(st);
         break;
       }
-    }
-    if (solveTime != null) {
-      updateListTime(historyTime);
     }
   }
 

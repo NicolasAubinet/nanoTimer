@@ -1,5 +1,6 @@
 package com.cube.nanotimer.gui.widget;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
@@ -56,12 +57,15 @@ public class HistoryDetailDialog extends NanoTimerDialogFragment {
       App.INSTANCE.getService().getSolveTimeAverages(solveTime, new DataCallback<SolveTimeAverages>() {
         @Override
         public void onData(final SolveTimeAverages data) {
-          getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              ((TextView) v.findViewById(R.id.tvMeanOfThree)).setText(FormatterService.INSTANCE.formatSolveTime(data.getAvgOf5())); // avg5 contains mean of 3 for blind type (same DB column)
-            }
-          });
+          Activity activity = getActivity();
+          if (activity != null) {
+            activity.runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                ((TextView) v.findViewById(R.id.tvMeanOfThree)).setText(FormatterService.INSTANCE.formatSolveTime(data.getAvgOf5())); // avg5 contains mean of 3 for blind type (same DB column)
+              }
+            });
+          }
         }
       });
     } else if (solveTime.hasSteps()) {
@@ -73,17 +77,20 @@ public class HistoryDetailDialog extends NanoTimerDialogFragment {
       App.INSTANCE.getService().getSolveTimeAverages(solveTime, new DataCallback<SolveTimeAverages>() {
         @Override
         public void onData(final SolveTimeAverages data) {
-          getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              if (data != null) {
-                ((TextView) v.findViewById(R.id.tvAvgOfFive)).setText(FormatterService.INSTANCE.formatSolveTime(data.getAvgOf5(), "-"));
-                ((TextView) v.findViewById(R.id.tvAvgOfTwelve)).setText(FormatterService.INSTANCE.formatSolveTime(data.getAvgOf12(), "-"));
-                ((TextView) v.findViewById(R.id.tvAvgOfFifty)).setText(FormatterService.INSTANCE.formatSolveTime(data.getAvgOf50(), "-"));
-                ((TextView) v.findViewById(R.id.tvAvgOfHundred)).setText(FormatterService.INSTANCE.formatSolveTime(data.getAvgOf100(), "-"));
+          Activity activity = getActivity();
+          if (activity != null) {
+            activity.runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                if (data != null) {
+                  ((TextView) v.findViewById(R.id.tvAvgOfFive)).setText(FormatterService.INSTANCE.formatSolveTime(data.getAvgOf5(), "-"));
+                  ((TextView) v.findViewById(R.id.tvAvgOfTwelve)).setText(FormatterService.INSTANCE.formatSolveTime(data.getAvgOf12(), "-"));
+                  ((TextView) v.findViewById(R.id.tvAvgOfFifty)).setText(FormatterService.INSTANCE.formatSolveTime(data.getAvgOf50(), "-"));
+                  ((TextView) v.findViewById(R.id.tvAvgOfHundred)).setText(FormatterService.INSTANCE.formatSolveTime(data.getAvgOf100(), "-"));
+                }
               }
-            }
-          });
+            });
+          }
         }
       });
     }

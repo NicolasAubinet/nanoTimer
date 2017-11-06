@@ -48,7 +48,7 @@ public enum App {
     init(context, true);
   }
 
-  public void init(Context context, boolean fromService) {
+  private void init(Context context, boolean fromService) {
     boolean appStarted = (this.context == null);
     if (appStarted || !fromService) {
       this.context = context;
