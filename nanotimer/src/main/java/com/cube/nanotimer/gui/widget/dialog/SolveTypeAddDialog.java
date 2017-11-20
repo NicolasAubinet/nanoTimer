@@ -47,7 +47,7 @@ public class SolveTypeAddDialog extends ConfirmDialog {
   public Dialog onCreateDialog(Bundle savedInstanceState) {
     dialog = getDialog(R.string.add);
 
-    tfName = view.findViewById(R.id.tfName);
+    tfName = (EditText) view.findViewById(R.id.tfName);
 
     scrambleTypeLayout = (LinearLayout) view.findViewById(R.id.scrambleTypeLayout);
 
@@ -98,7 +98,7 @@ public class SolveTypeAddDialog extends ConfirmDialog {
 
   @Override
   protected void onConfirm() {
-    CheckBox cbBlind = view.findViewById(R.id.cbBlind);
+    CheckBox cbBlind = (CheckBox) view.findViewById(R.id.cbBlind);
 
     Properties props = new Properties();
     props.put(KEY_BLD, String.valueOf(cbBlind.isChecked()));

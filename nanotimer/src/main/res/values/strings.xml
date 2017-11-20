@@ -295,7 +295,12 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.2 <i>(New version)</i></b></u>
+    <u><b>v1.3.3 <i>(New version)</i></b></u>
+    <ul>
+      <li>Make app compatible with Android 2.3.3 and above</li>
+      <li>Fix occasional app crashes</li>
+    </ul>
+    <u><b>v1.3.2</b></u>
     <ul>
       <li>Keep one CPU core idle when generating scrambles to avoid freezing app while timing</li>
       <li>Fix language switching that did not work properly on some devices</li>

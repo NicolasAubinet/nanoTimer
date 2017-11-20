@@ -295,7 +295,12 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.2 <i>(Nouvelle version)</i></b></u>
+    <u><b>v1.3.3 <i>(Nouvelle version)</i></b></u>
+    <ul>
+      <li>Rendre l\'app compatible avec Android 2.3.3 et au-delà</li>
+      <li>Réglage de crashes occasionnels</li>
+    </ul>
+    <u><b>v1.3.2</b></u>
     <ul>
       <li>Amélioration de l\'utilisation du CPU quand des mélanges sont générés pour éviter de ralentir l\'application</li>
       <li>Réglage du changement de langue qui ne fonctionnait pas correctement sur certains périphériques</li>
