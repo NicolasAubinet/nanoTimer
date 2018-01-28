@@ -7,7 +7,6 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.GridLayout;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -68,7 +67,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
   private TextView tvAccuracy;
   private TextView tvTitle;
   private ViewGroup layout;
-  private GridLayout sessionTimesLayout;
+  private TableLayout sessionTimesLayout;
   private TableLayout timerStepsLayout;
 
   private CubeType cubeType;
@@ -209,7 +208,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     tvSolvesCount = (TextView) findViewById(R.id.tvSolvesCount);
     tvAccuracy = (TextView) findViewById(R.id.tvLifetimeAccuracy);
     tvTitle = (TextView) findViewById(R.id.tvTitle);
-    sessionTimesLayout = (GridLayout) findViewById(R.id.sessionTimesLayout);
+    sessionTimesLayout = (TableLayout) findViewById(R.id.sessionTimesLayout);
     TableLayout averagesLayout = (TableLayout) findViewById(R.id.averagesLayout);
     timerStepsLayout = (TableLayout) findViewById(R.id.timerStepsLayout);
 
@@ -583,14 +582,22 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
 
   private void clearSessionTextViews() {
     for (int i = 0; i < sessionTimesLayout.getChildCount(); i++) {
-      TextView tr = (TextView) sessionTimesLayout.getChildAt(i);
-      tr.setText("");
+      TableRow tableRow = (TableRow) sessionTimesLayout.getChildAt(i);
+      for (int j = 0; j < tableRow.getChildCount(); j++) {
+        TextView tr = (TextView) tableRow.getChildAt(j);
+        tr.setText("");
+      }
     }
   }
 
-  private TextView getSessionTextView(int i) {
-    View v = sessionTimesLayout.getChildAt(i);
-    return (TextView) v;
+  private TextView getSessionTextView(int index) {
+    int elementsCountPerLine = ((TableRow) sessionTimesLayout.getChildAt(0)).getChildCount();
+
+    TableRow tableRow = (TableRow) sessionTimesLayout.getChildAt(index / elementsCountPerLine);
+    return (TextView) tableRow.getChildAt(index % elementsCountPerLine);
+
+//    View v = sessionTimesLayout.getChildAt(i); // for GridView
+//    return (TextView) v;
   }
 
   private void startTimer() {
