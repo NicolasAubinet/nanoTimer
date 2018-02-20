@@ -1,6 +1,7 @@
 package com.cube.nanotimer.util;
 
 import com.cube.nanotimer.App;
+import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 
 import java.text.ParseException;
@@ -31,14 +32,28 @@ public enum FormatterService {
     StringBuilder sb = new StringBuilder();
     int minutes = (int) (solveTime / 60000);
     int seconds = (int) (solveTime / 1000) % 60;
-    int hundreds = (int) (solveTime / 10) % 100;
+
+    int millis;
+    boolean displayMillis = Options.INSTANCE.isUsingHighPrecisionTimer();
+    if (displayMillis) {
+      millis = (int) (solveTime % 1000);
+    } else {
+      millis = (int) (solveTime / 10) % 100;
+    }
+
     if (minutes > 0) {
       sb.append(minutes).append(":");
       sb.append(String.format("%02d", seconds));
     } else {
       sb.append(seconds);
     }
-    sb.append(".").append(String.format("%02d", hundreds));
+
+    if (displayMillis) {
+      sb.append(".").append(String.format("%03d", millis));
+    } else {
+      sb.append(".").append(String.format("%02d", millis));
+    }
+
     return sb.toString();
   }
 

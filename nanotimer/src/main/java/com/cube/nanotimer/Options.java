@@ -25,6 +25,7 @@ public enum Options {
   public static final String INSPECTION_SOUNDS_TYPE_KEY = "inspection_sounds_type";
   public static final String SHOW_TIME_WHEN_RUNNING = "show_time_when_running";
   public static final String KEEP_TIMER_SCREEN_ON_KEY = "keep_timer_screen_on";
+  public static final String HIGH_PRECISION_TIMER_KEY = "high_precision_timer";
   public static final String BIG_CUBES_NOTATION_KEY = "big_cubes_notation";
   public static final String CLOCK_NOTATION_SYSTEM_KEY = "clock_notation";
   public static final String SOLVE_TYPES_SHORTCUT_KEY = "solve_types_shortcut";
@@ -93,6 +94,11 @@ public enum Options {
   public boolean isKeepTimerScreenOnWhenTimerOff() {
     Boolean defaultValue = context.getResources().getBoolean(R.bool.keep_timer_screen_on);
     return sharedPreferences.getBoolean(KEEP_TIMER_SCREEN_ON_KEY, defaultValue);
+  }
+
+  public boolean isUsingHighPrecisionTimer() {
+    Boolean defaultValue = context.getResources().getBoolean(R.bool.high_precision_timer);
+    return sharedPreferences.getBoolean(HIGH_PRECISION_TIMER_KEY, defaultValue);
   }
 
   public BigCubesNotation getBigCubesNotation() {

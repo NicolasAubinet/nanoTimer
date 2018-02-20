@@ -104,6 +104,8 @@
   <string name="show_time_when_running_summary">Afficher le temps pendant que le chronomètre tourne</string>
   <string name="keep_screen_on">Laisser l\'écran activé</string>
   <string name="keep_screen_on_summary">Quand le chronomètre ne tourne pas</string>
+  <string name="high_precision_timer">Chronomètre haute précision</string>
+  <string name="high_precision_timer_summary">Afficher les millisecondes</string>
   <string name="solve_types">Types de résolution</string>
   <string name="edit_solve_types">Éditer les types de résolutions</string>
   <string name="edit_solve_types_summary">Éditer, ajouter et supprimer des types de résolution</string>
@@ -295,7 +297,11 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.4 <i>(Nouvelle version)</i></b></u>
+    <u><b>v1.3.5 <i>(New version)</i></b></u>
+    <ul>
+      <li>Ajout de l\'option "Chronomètre haute précision"</li>
+    </ul>
+    <u><b>v1.3.4</b></u>
     <ul>
       <li>Réglage de l\'écran timer qui ne s\'affichait pas correctement sur les périphériques aux faibles résolutions</li>
     </ul>

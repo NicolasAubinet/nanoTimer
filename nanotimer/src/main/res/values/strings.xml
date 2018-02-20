@@ -104,6 +104,8 @@
   <string name="show_time_when_running_summary">Display time when timer is running</string>
   <string name="keep_screen_on">Keep screen on</string>
   <string name="keep_screen_on_summary">When timer is not running</string>
+  <string name="high_precision_timer">Use high precision timer</string>
+  <string name="high_precision_timer_summary">Show milliseconds</string>
   <string name="solve_types">Solve types</string>
   <string name="edit_solve_types">Edit solve types</string>
   <string name="edit_solve_types_summary">Edit, create and delete solve types</string>
@@ -295,7 +297,11 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.4 <i>(New version)</i></b></u>
+    <u><b>v1.3.5 <i>(New version)</i></b></u>
+    <ul>
+      <li>Add "High precision timer" option</li>
+    </ul>
+    <u><b>v1.3.4</b></u>
     <ul>
       <li>Fix timer layout that was not showing properly on low resolution devices</li>
     </ul>

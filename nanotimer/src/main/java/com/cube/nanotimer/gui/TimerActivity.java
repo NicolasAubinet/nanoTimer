@@ -729,7 +729,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
   }
 
   private void resetTimerText() {
-    String defaultText = "0.00";
+    String defaultText = FormatterService.INSTANCE.formatSolveTime(0L);
     tvTimer.setText(defaultText);
     if (solveType.hasSteps()) {
       for (int i = 0; i < Options.INSTANCE.getMaxStepsCount(); i++) {

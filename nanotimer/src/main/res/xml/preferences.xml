@@ -52,6 +52,12 @@
        android:summary="@string/keep_screen_on_summary"
        android:defaultValue="@bool/keep_timer_screen_on"/>
 
+    <CheckBoxPreference
+       android:key="high_precision_timer"
+       android:title="@string/high_precision_timer"
+       android:summary="@string/high_precision_timer_summary"
+       android:defaultValue="@bool/high_precision_timer"/>
+
   </PreferenceCategory>
 
   <PreferenceCategory
