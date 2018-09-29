@@ -1,13 +1,12 @@
 package com.cube.nanotimer.util;
 
-import android.test.AndroidTestCase;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-public class FormatterServiceTest extends AndroidTestCase {
+public class FormatterServiceTest {
   @Test
   public void testSolveTimeFormat() {
     long locTime = 2004;

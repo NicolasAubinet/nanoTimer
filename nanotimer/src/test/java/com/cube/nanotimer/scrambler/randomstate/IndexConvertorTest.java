@@ -1,6 +1,5 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
-import android.test.AndroidTestCase;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,7 +11,7 @@ import java.util.List;
 import java.util.Random;
 
 @RunWith(JUnit4.class)
-public class IndexConvertorTest extends AndroidTestCase {
+public class IndexConvertorTest {
 
   @Test
   public void testFixedConversion() {

@@ -1,7 +1,5 @@
 package com.cube.nanotimer.util;
 
-import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.SmallTest;
 import com.cube.nanotimer.util.chart.ChartData;
 import com.cube.nanotimer.util.chart.ChartUtils;
 import org.junit.Test;
@@ -11,8 +9,10 @@ import org.junit.runners.JUnit4;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 @RunWith(JUnit4.class)
-public class GraphSmoothTest extends AndroidTestCase {
+public class GraphSmoothTest {
 
   @Test
   public void testSmooth() {
@@ -26,12 +26,13 @@ public class GraphSmoothTest extends AndroidTestCase {
 
     List<ChartData> smoothed = ChartUtils.getSmoothedChartTimes(chartDataList);
     assertEquals(smoothed.size(), 6);
-    assertEquals(0.0f, smoothed.get(0).getData());
-    assertEquals(2.0f, smoothed.get(1).getData());
-    assertEquals(2.0f, smoothed.get(2).getData());
-    assertEquals(2.0f, smoothed.get(3).getData());
-    assertEquals(2.0f, smoothed.get(4).getData());
-    assertEquals(2.0f, smoothed.get(5).getData());
+    float locDelta = 0.001f;
+    assertEquals(0.0f, smoothed.get(0).getData(), locDelta);
+    assertEquals(2.0f, smoothed.get(1).getData(), locDelta);
+    assertEquals(2.0f, smoothed.get(2).getData(), locDelta);
+    assertEquals(2.0f, smoothed.get(3).getData(), locDelta);
+    assertEquals(2.0f, smoothed.get(4).getData(), locDelta);
+    assertEquals(2.0f, smoothed.get(5).getData(), locDelta);
   }
 
   @Test
@@ -45,16 +46,17 @@ public class GraphSmoothTest extends AndroidTestCase {
       chartDataList.add(new ChartData(0, 10));
     }
 
+    float locDelta = 0.001f;
     List<ChartData> smoothed = ChartUtils.getSmoothedChartTimes(chartDataList);
     assertEquals(smoothed.size(), 31);
     for (int i = 0; i < 13; i++) {
-      assertEquals(0.0f, smoothed.get(i).getData());
+      assertEquals(0.0f, smoothed.get(i).getData(), locDelta);
     }
     for (int i = 13; i < 18; i++) {
-      assertEquals(1.0f, smoothed.get(i).getData());
+      assertEquals(1.0f, smoothed.get(i).getData(), locDelta);
     }
     for (int i = 18; i < smoothed.size(); i++) {
-      assertEquals(0.0f, smoothed.get(i).getData());
+      assertEquals(0.0f, smoothed.get(i).getData(), locDelta);
     }
   }
 

@@ -1,6 +1,5 @@
 package com.cube.nanotimer.util;
 
-import android.test.AndroidTestCase;
 import com.cube.nanotimer.session.TimesStatistics;
 import junit.framework.Assert;
 import org.junit.Test;
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 @RunWith(JUnit4.class)
-public class TimesStatisticsTest extends AndroidTestCase {
+public class TimesStatisticsTest {
 
   @Test
   public void testEmptyTimes() {
