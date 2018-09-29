@@ -20,6 +20,10 @@ public enum FormatterService {
   }
 
   public String formatSolveTime(Long solveTime, String defaultValue) {
+    return formatSolveTime(solveTime, defaultValue, Options.INSTANCE.isUsingHighPrecisionTimer());
+  }
+
+  public String formatSolveTime(Long solveTime, String defaultValue, boolean parUseHighPrecision) {
     if (solveTime == null) {
       return defaultValue == null ? App.INSTANCE.getContext().getString(R.string.NA) : defaultValue;
     }
@@ -34,11 +38,10 @@ public enum FormatterService {
     int seconds = (int) (solveTime / 1000) % 60;
 
     int millis;
-    boolean displayMillis = Options.INSTANCE.isUsingHighPrecisionTimer();
-    if (displayMillis) {
+    if (parUseHighPrecision) {
       millis = (int) (solveTime % 1000);
     } else {
-      millis = (int) (solveTime / 10) % 100;
+      millis = (Math.round(((float) solveTime) / 10)) % 100;
     }
 
     if (minutes > 0) {
@@ -48,7 +51,7 @@ public enum FormatterService {
       sb.append(seconds);
     }
 
-    if (displayMillis) {
+    if (parUseHighPrecision) {
       sb.append(".").append(String.format("%03d", millis));
     } else {
       sb.append(".").append(String.format("%02d", millis));
