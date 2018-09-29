@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId "com.cube.nanotimerpro"
         minSdkVersion 10
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 6
         versionName "1.0.4"
 
