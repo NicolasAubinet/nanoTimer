@@ -152,6 +152,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     ContentValues values = new ContentValues();
     values.put(DB.COL_TIMEHISTORY_TIME, solveTime.getTime());
     values.put(DB.COL_TIMEHISTORY_PLUSTWO, solveTime.isPlusTwo() ? 1 : 0);
+    values.put(DB.COL_TIMEHISTORY_COMMENT, (solveTime.getComment() != null) ? solveTime.getComment() : "");
     long previousBestTime = getBestTimeBefore(solveTime);
     boolean recheckPBs = false;
     if (isTimeBetter(previousBestTime, solveTime.getTime())) {
@@ -312,6 +313,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     values.put(DB.COL_TIMEHISTORY_TIME, solveTime.getTime());
     values.put(DB.COL_TIMEHISTORY_SOLVETYPE_ID, solveTime.getSolveType().getId());
     values.put(DB.COL_TIMEHISTORY_SCRAMBLE, solveTime.getScramble());
+    values.put(DB.COL_TIMEHISTORY_COMMENT, solveTime.getComment());
     values.put(DB.COL_TIMEHISTORY_TIMESTAMP, solveTime.getTimestamp());
     values.put(DB.COL_TIMEHISTORY_PLUSTWO, solveTime.isPlusTwo() ? 1 : 0);
     values.put(DB.COL_TIMEHISTORY_PB, solveTime.isPb() ? 1 : 0);
@@ -545,6 +547,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("     , ").append(DB.COL_TIMEHISTORY_TIME);
     q.append("     , ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
     q.append("     , ").append(DB.COL_TIMEHISTORY_SCRAMBLE);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_COMMENT);
     q.append("     , ").append(DB.COL_TIMEHISTORY_PLUSTWO);
     q.append("     , ").append(DB.COL_TIMEHISTORY_PB);
     q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
@@ -581,8 +584,9 @@ public class ServiceProviderImpl implements ServiceProvider {
         st.setTime(cursor.getInt(1));
         st.setTimestamp(cursor.getLong(2));
         st.setScramble(cursor.getString(3));
-        st.setPlusTwo(cursor.getInt(4) == 1);
-        st.setPb(cursor.getInt(5) == 1);
+        st.setComment(cursor.getString(4));
+        st.setPlusTwo(cursor.getInt(5) == 1);
+        st.setPb(cursor.getInt(6) == 1);
         st.setSolveType(solveType);
         if (solveType.hasSteps()) {
           List<Long> stepTimes = getSolveTimeSteps(st.getId());
@@ -811,6 +815,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("     , ").append(DB.COL_TIMEHISTORY_TIME);
     q.append("     , ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
     q.append("     , ").append(DB.COL_TIMEHISTORY_SCRAMBLE);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_COMMENT);
     q.append("     , ").append(DB.COL_TIMEHISTORY_PLUSTWO);
     q.append("     , ").append(DB.COL_TIMEHISTORY_PB);
     q.append("     , ").append(DB.COL_TIMEHISTORY_AVG5);
@@ -828,15 +833,16 @@ public class ServiceProviderImpl implements ServiceProvider {
         sta.setTime(cursor.getInt(1));
         sta.setTimestamp(cursor.getLong(2));
         sta.setScramble(cursor.getString(3));
-        sta.setPlusTwo(cursor.getInt(4) == 1);
-        sta.setPb(cursor.getInt(5) == 1);
-        Long v = getCursorLong(cursor, 6);
+        sta.setComment(cursor.getString(4));
+        sta.setPlusTwo(cursor.getInt(5) == 1);
+        sta.setPb(cursor.getInt(6) == 1);
+        Long v = getCursorLong(cursor, 7);
         sta.setAvgOf5(v == null || v == -2 ? null : v);
-        v = getCursorLong(cursor, 7);
-        sta.setAvgOf12(v == null || v == -2 ? null : v);
         v = getCursorLong(cursor, 8);
-        sta.setAvgOf50(v == null || v == -2 ? null : v);
+        sta.setAvgOf12(v == null || v == -2 ? null : v);
         v = getCursorLong(cursor, 9);
+        sta.setAvgOf50(v == null || v == -2 ? null : v);
+        v = getCursorLong(cursor, 10);
         sta.setAvgOf100(v == null || v == -2 ? null : v);
         sta.setSolveType(solveTime.getSolveType());
       }
@@ -924,6 +930,7 @@ public class ServiceProviderImpl implements ServiceProvider {
       q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_BLIND);
       q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_SOLVETYPE_SCRAMBLE_TYPE);
       q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_SCRAMBLE);
+      q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_COMMENT);
       q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
       q.append(" JOIN ").append(DB.TABLE_SOLVETYPE);
       q.append("   ON ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID);
@@ -945,7 +952,7 @@ public class ServiceProviderImpl implements ServiceProvider {
           int cubeTypeId = cursor.getInt(1);
           ExportResult result = new ExportResult(cursor.getInt(0), cubeTypeId, cursor.getString(2), cursor.getInt(3),
               cursor.getString(4), cursor.getLong(5), cursor.getLong(6), (cursor.getInt(7) == 1), (cursor.getInt(8) == 1),
-              cursor.getString(9), cursor.getString(10));
+              cursor.getString(9), cursor.getString(10), cursor.getString(11));
           curResults.add(result);
         }
         cursor.close();
@@ -973,6 +980,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_TIME);
     q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_TIMESTAMP);
     q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_SCRAMBLE);
+    q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_COMMENT);
     q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_PLUSTWO);
     q.append("     , ").append(DB.TABLE_TIMEHISTORY).append(".").append(DB.COL_TIMEHISTORY_PB);
     q.append("     , ").append(DB.TABLE_SOLVETYPE).append(".").append(DB.COL_ID);
@@ -994,12 +1002,13 @@ public class ServiceProviderImpl implements ServiceProvider {
         st.setTime(cursor.getInt(1));
         st.setTimestamp(cursor.getLong(2));
         st.setScramble(cursor.getString(3));
-        st.setPlusTwo(cursor.getInt(4) == 1);
-        st.setPb(cursor.getInt(5) == 1);
+        st.setComment(cursor.getString(4));
+        st.setPlusTwo(cursor.getInt(5) == 1);
+        st.setPb(cursor.getInt(6) == 1);
 
-        int cubeTypeId = cursor.getInt(10);
+        int cubeTypeId = cursor.getInt(11);
         CubeType cubeType = CubeType.getCubeType(cubeTypeId);
-        st.setSolveType(new SolveType(cursor.getInt(6), cursor.getString(7), (cursor.getInt(8) == 1), toScrambleType(cubeType, cursor.getString(9)), cubeTypeId));
+        st.setSolveType(new SolveType(cursor.getInt(7), cursor.getString(8), (cursor.getInt(9) == 1), toScrambleType(cubeType, cursor.getString(10)), cubeTypeId));
       }
       cursor.close();
     }

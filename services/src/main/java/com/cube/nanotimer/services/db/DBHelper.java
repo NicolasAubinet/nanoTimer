@@ -55,6 +55,7 @@ public class DBHelper extends SQLiteOpenHelper {
         DB.COL_TIMEHISTORY_TIMESTAMP + " INTEGER, " +
         DB.COL_TIMEHISTORY_TIME + " INTEGER, " +
         DB.COL_TIMEHISTORY_SCRAMBLE + " TEXT, " +
+        DB.COL_TIMEHISTORY_COMMENT + " TEXT, " +
         DB.COL_TIMEHISTORY_AVG5 + " INTEGER, " +
         DB.COL_TIMEHISTORY_AVG12 + " INTEGER, " +
         DB.COL_TIMEHISTORY_AVG50 + " INTEGER, " +
@@ -151,6 +152,10 @@ public class DBHelper extends SQLiteOpenHelper {
     if (oldVersion < 13) {
       // Add "scramble type" column to solve types
       db.execSQL("ALTER TABLE " + DB.TABLE_SOLVETYPE + " ADD COLUMN " + DB.COL_SOLVETYPE_SCRAMBLE_TYPE + " TEXT");
+    }
+
+    if (oldVersion < 14) {
+      db.execSQL("ALTER TABLE " + DB.TABLE_TIMEHISTORY + " ADD COLUMN " + DB.COL_TIMEHISTORY_COMMENT + " TEXT");
     }
 
 //    progressDialog.hide();

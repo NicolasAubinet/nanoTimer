@@ -37,12 +37,16 @@ public class ExportResultConverter {
     if (result.getScramble() != null) {
       sb.append(escapeString(result.getScramble()));
     }
+    sb.append(",");
+    if (result.getComment() != null) {
+      sb.append(result.getComment());
+    }
     return sb.toString();
   }
 
   public static ExportResult fromCSVLine(Context context, String line) throws CSVFormatException {
     List<String> fields = getFieldsFromCSVLine(line);
-    if (fields.size() != 8 && fields.size() != 9) { // 8 fields is older version, 9 fields contains the scramble type
+    if (fields.size() < 8) { // 8 fields is older version, 9 fields contains the scramble type, 10 fields contains comment
       throw new CSVFormatException(context.getString(R.string.import_invalid_columns_count));
     }
     String cubeTypeName = fields.get(0);
@@ -71,7 +75,12 @@ public class ExportResultConverter {
       scramble = null;
     }
 
-    ExportResult exportResult = new ExportResult(cubeTypeName, solveTypeName, time, timestamp, plusTwo, blindType, scrambleTypeName, scramble);
+    String comment = null;
+    if (fields.size() > 9) {
+      comment = fields.get(9);
+    }
+
+    ExportResult exportResult = new ExportResult(cubeTypeName, solveTypeName, time, timestamp, plusTwo, blindType, scrambleTypeName, scramble, comment);
     String stepsField = fields.get(4);
     exportResult.setStepsTimes(getStepsTimes(context, stepsField));
     exportResult.setStepsNames(getStepsNames(context, stepsField));

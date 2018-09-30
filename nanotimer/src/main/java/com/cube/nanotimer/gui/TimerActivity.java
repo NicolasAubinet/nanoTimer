@@ -32,6 +32,7 @@ import com.cube.nanotimer.gui.widget.ResultListener;
 import com.cube.nanotimer.gui.widget.SessionDetailDialog;
 import com.cube.nanotimer.gui.widget.ads.AdProvider;
 import com.cube.nanotimer.gui.widget.dialog.AddNewTimeDialog;
+import com.cube.nanotimer.gui.widget.dialog.CommentSolveDialog;
 import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.State;
@@ -441,6 +442,11 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
             setSolvesCount(solvesCount - 1);
             refreshSessionFields();
             resetTimer();
+          }
+          break;
+        case R.id.itComment:
+          if (lastSolveTime != null) {
+            DialogUtils.showFragment(this, CommentSolveDialog.newInstance(lastSolveTime));
           }
           break;
         case R.id.itSessionDetails:

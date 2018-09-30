@@ -72,6 +72,15 @@
            android:src="@drawable/star"/>
       </LinearLayout>
       <ImageButton
+         android:id="@+id/buComment"
+         android:layout_gravity="center_vertical"
+         android:layout_width="48dp"
+         android:layout_height="48dp"
+         android:scaleType="fitCenter"
+         android:padding="8dp"
+         android:src="@drawable/comment"
+         android:contentDescription="@string/share_time"/>
+      <ImageButton
          android:id="@+id/buShareTime"
          android:layout_gravity="center_vertical"
          android:layout_width="48dp"

@@ -2,12 +2,15 @@ package com.cube.nanotimer.util.exportimport.csvexport;
 
 import com.cube.nanotimer.vo.ExportResult;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class ExportCSVGenerator implements CSVGenerator {
 
-  public static final String CSV_HEADER_LINE = "cubetype,solvetype,time,date,steps,plustwo,blind,scrambleType,scramble";
-  public static final String CSV_HEADER_LINE_OLD = "cubetype,solvetype,time,date,steps,plustwo,blind,scramble";
+  public static final String CSV_HEADER_LINE = "cubetype,solvetype,time,date,steps,plustwo,blind,scrambleType,scramble,comment";
+  public static final List<String> OLD_CSV_HEADER_LINES = Arrays.asList(
+    "cubetype,solvetype,time,date,steps,plustwo,blind,scramble",
+    "cubetype,solvetype,time,date,steps,plustwo,blind,scrambleType,scramble");
 
   private List<ExportResult> results;
 
@@ -27,6 +30,24 @@ public class ExportCSVGenerator implements CSVGenerator {
     }
     ExportResult line = results.get(n);
     return ExportResultConverter.toCSVLine(line);
+  }
+
+  public static boolean isHeaderLegit(String parHeaderLine) {
+    boolean locFoundValidHeader = false;
+
+    if (parHeaderLine.toLowerCase().equals(ExportCSVGenerator.CSV_HEADER_LINE.toLowerCase())) {
+      locFoundValidHeader = true;
+    }
+
+    if (!locFoundValidHeader) {
+      for (String locOldCsvHeaderLine : OLD_CSV_HEADER_LINES) {
+        if (locOldCsvHeaderLine.toLowerCase().equals(parHeaderLine.toLowerCase())) {
+          locFoundValidHeader = true;
+        }
+      }
+    }
+
+    return locFoundValidHeader;
   }
 
 }

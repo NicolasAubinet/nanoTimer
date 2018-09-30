@@ -113,6 +113,7 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
       SolveTime solveTime = new SolveTime(exportResult.getTimestamp(), exportResult.getTime(),
         exportResult.isPlusTwo(), exportResult.getScramble(), solveType);
       solveTime.setStepsTimes(exportResult.getStepsTimes());
+      solveTime.setComment(exportResult.getComment());
       importData.addSolveTime(solveType, solveTime);
     }
     return importData;
@@ -126,9 +127,7 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
       int i = 0;
       while (fileScanner.hasNextLine()) {
         String line = fileScanner.nextLine();
-        if (i == 0
-        && !line.toLowerCase().equals(ExportCSVGenerator.CSV_HEADER_LINE.toLowerCase())
-        && !line.toLowerCase().equals(ExportCSVGenerator.CSV_HEADER_LINE_OLD.toLowerCase())) {
+        if (i == 0 && !ExportCSVGenerator.isHeaderLegit(line)) {
           throw new CSVFormatException(context.getString(R.string.invalid_import_file_format));
         }
         lines.add(line);

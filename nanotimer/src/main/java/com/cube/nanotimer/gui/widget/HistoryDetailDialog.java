@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.gui.widget.dialog.CommentSolveDialog;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.ScrambleFormatterService;
@@ -101,6 +102,7 @@ public class HistoryDetailDialog extends NanoTimerDialogFragment {
     Button buDNF = (Button) v.findViewById(R.id.buDNF);
     Button buDelete = (Button) v.findViewById(R.id.buDelete);
     ImageButton buShareTime = (ImageButton) v.findViewById(R.id.buShareTime);
+    ImageButton buComment = (ImageButton) v.findViewById(R.id.buComment);
     ImageView imgPb = (ImageView) v.findViewById(R.id.imgPb);
 
     if (solveTime.isPlusTwo()) {
@@ -164,6 +166,13 @@ public class HistoryDetailDialog extends NanoTimerDialogFragment {
       @Override
       public void onClick(View v) {
         DialogUtils.shareTime(getActivity(), solveTime, cubeType);
+      }
+    });
+
+    buComment.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        DialogUtils.showFragment(getActivity(), CommentSolveDialog.newInstance(solveTime));
       }
     });
 

@@ -13,20 +13,21 @@ public class ExportResult {
   private boolean blindType;
   private String scrambleTypeName;
   private String scramble;
+  private String comment;
 
   private String[] stepsNames;
   private Long[] stepsTimes;
 
   public ExportResult(int solveTimeId, int cubeTypeId, String cubeTypeName, int solveTypeId, String solveTypeName,
-                      long time, long timestamp, boolean plusTwo, boolean blindType, String scrambleTypeName, String scramble) {
-    this(cubeTypeName, solveTypeName, time, timestamp, plusTwo, blindType, scrambleTypeName, scramble);
+                      long time, long timestamp, boolean plusTwo, boolean blindType, String scrambleTypeName, String scramble, String comment) {
+    this(cubeTypeName, solveTypeName, time, timestamp, plusTwo, blindType, scrambleTypeName, scramble, comment);
     this.solveTimeId = solveTimeId;
     this.cubeTypeId = cubeTypeId;
     this.solveTypeId = solveTypeId;
   }
 
   public ExportResult(String cubeTypeName, String solveTypeName, long time, long timestamp, boolean plusTwo, boolean blindType,
-                      String scrambleTypeName, String scramble) {
+                      String scrambleTypeName, String scramble, String comment) {
     this.cubeTypeName = cubeTypeName;
     this.solveTypeName = solveTypeName;
     this.time = time;
@@ -35,6 +36,7 @@ public class ExportResult {
     this.blindType = blindType;
     this.scrambleTypeName = scrambleTypeName;
     this.scramble = scramble;
+    this.comment = comment;
   }
 
   public int getSolveTimeId() {
@@ -67,6 +69,14 @@ public class ExportResult {
 
   public void setScramble(String scramble) {
     this.scramble = scramble;
+  }
+
+  public String getComment() {
+    return comment;
+  }
+
+  public void setComment(String comment) {
+    this.comment = comment;
   }
 
   public int getCubeTypeId() {

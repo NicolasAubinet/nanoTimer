@@ -11,6 +11,7 @@ public class SolveTime implements Serializable {
   private boolean plusTwo;
   private boolean pb;
   private String scramble;
+  private String comment;
   private SolveType solveType;
   private Long[] stepsTimes;
 
@@ -71,6 +72,14 @@ public class SolveTime implements Serializable {
 
   public void setScramble(String scramble) {
     this.scramble = scramble;
+  }
+
+  public String getComment() {
+    return comment;
+  }
+
+  public void setComment(String comment) {
+    this.comment = comment;
   }
 
   public SolveType getSolveType() {
