@@ -2,6 +2,7 @@ package com.cube.nanotimer.gui;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,8 +16,10 @@ import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.services.db.DataCallback;
+import com.cube.nanotimer.session.TimesStatistics;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.chart.ChartData;
+import com.cube.nanotimer.util.chart.ChartLineData;
 import com.cube.nanotimer.util.chart.ChartUtils;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
@@ -38,13 +41,15 @@ public class GraphActivity extends NanoTimerActivity {
 
   private CubeType cubeType;
   private SolveType solveType;
-  private List<ChartData> chartData;
+  private List<ChartLineData> chartData = new ArrayList<>();
 
   private LineChart chart;
   private Spinner spPeriod;
   private Spinner spGraphType;
   private CheckBox cbSmooth;
   private SharedPreferences prefs;
+
+  private int defaultColor = R.color.iceblue;
 
   enum Period {
     DAY(1),
@@ -95,6 +100,17 @@ public class GraphActivity extends NanoTimerActivity {
       public String formatXLabel(long value) {
         return FormatterService.INSTANCE.formatDate(value);
       }
+//    },
+//    DEVIATION {
+//      @Override
+//      public String formatValue(float value) {
+//        return FormatterService.INSTANCE.formatSolveTime(Math.round((double) value));
+//      }
+//
+//      @Override
+//      public String formatXLabel(long value) {
+//        return FormatterService.INSTANCE.formatDateTime(value);
+//      }
     };
 
     public abstract String formatValue(float value);
@@ -140,7 +156,7 @@ public class GraphActivity extends NanoTimerActivity {
 
     chart = (LineChart) findViewById(R.id.chart);
     chart.setDescription("");
-    chart.setDrawLegend(false);
+    chart.setDrawLegend(true);
     chart.setHighlightEnabled(false);
     chart.setGridColor(getResourceColor(R.color.gray800));
     chart.setBackgroundColor(getResourceColor(R.color.graybg));
@@ -202,7 +218,30 @@ public class GraphActivity extends NanoTimerActivity {
         runOnUiThread(new Runnable() {
           @Override
           public void run() {
-            chartData = getChartTimesFromSolveHistory(data);
+            chartData.clear();
+
+            List<ChartData> timesLineData = parseData(getChartTimesFromSolveHistory(data));
+            ChartLineData chartLineData = new ChartLineData(timesLineData, getString(R.string.times), defaultColor);
+            chartLineData.setLineWidth(2.5f);
+            chartLineData.setCircleSize(4f);
+            chartData.add(chartLineData);
+
+            int average = 5;
+            List<ChartData> averageLineData = getAverageOf(timesLineData, average);
+            chartLineData = new ChartLineData(averageLineData, getString(R.string.ao5), R.color.green);
+            chartLineData.setxOffset(average - 1);
+            chartLineData.setLineWidth(1f);
+            chartLineData.setCircleSize(2f);
+            chartData.add(chartLineData);
+
+            average = 12;
+            averageLineData = getAverageOf(timesLineData, average);
+            chartLineData = new ChartLineData(averageLineData, getString(R.string.ao12), R.color.darkred);
+            chartLineData.setxOffset(average - 1);
+            chartLineData.setLineWidth(1f);
+            chartLineData.setCircleSize(2f);
+            chartData.add(chartLineData);
+
             refreshData();
           }
         });
@@ -217,7 +256,8 @@ public class GraphActivity extends NanoTimerActivity {
         runOnUiThread(new Runnable() {
           @Override
           public void run() {
-            chartData = getChartDataFromFrequency(frequencyData);
+            chartData.clear();
+            chartData.add(new ChartLineData(parseData(getChartDataFromFrequency(frequencyData)), getString(R.string.chart_type_frequency), defaultColor));
             refreshData();
           }
         });
@@ -225,37 +265,55 @@ public class GraphActivity extends NanoTimerActivity {
     });
   }
 
-  private void refreshData() {
-    chart.setNoDataText(getString(R.string.no_data_found)); // done here to avoid displaying that message when data is loading
-    GraphType selectedGraphType = getSelectedGraphType();
+  private List<ChartData> parseData(List<ChartData> chartData) {
     List<ChartData> data;
     if (cbSmooth.isChecked()) {
       data = ChartUtils.getSmoothedChartTimes(chartData);
     } else {
       data = chartData;
     }
+    return data;
+  }
+
+  private void refreshData() {
+    chart.setNoDataText(getString(R.string.no_data_found)); // done here to avoid displaying that message when data is loading
+    GraphType selectedGraphType = getSelectedGraphType();
     chart.clear();
-    if (data.isEmpty()) {
+
+    if (chartData.isEmpty()) {
       return;
     }
-    ArrayList<Entry> times = new ArrayList<Entry>();
-    ArrayList<String> xLabels = new ArrayList<String>();
-    for (ChartData solveTime : data) {
-      times.add(new Entry(solveTime.getData(), times.size()));
-      xLabels.add(selectedGraphType.formatXLabel(solveTime.getTimestamp()));
-    }
-
-    LineDataSet dataSet = new LineDataSet(times, "");
-    dataSet.setColor(getResourceColor(R.color.iceblue));
-    dataSet.setCircleColor(getResourceColor(R.color.iceblue));
-    dataSet.setCircleSize(3f);
 
     ArrayList<LineDataSet> dataSets = new ArrayList<LineDataSet>();
-    dataSets.add(dataSet);
+    ArrayList<String> xLabels = new ArrayList<String>();
+
+    for (ChartLineData chartLineData : chartData) {
+      List<ChartData> data = chartLineData.getData();
+      boolean addLabels = (xLabels.size() == 0);
+
+      ArrayList<Entry> times = new ArrayList<Entry>();
+      for (ChartData solveTime : data) {
+        times.add(new Entry(solveTime.getData(), times.size() + chartLineData.getxOffset()));
+
+        if (addLabels) {
+          xLabels.add(selectedGraphType.formatXLabel(solveTime.getTimestamp()));
+        }
+      }
+
+      LineDataSet dataSet = new LineDataSet(times, chartLineData.getLabel());
+      dataSet.setColor(getResourceColor(chartLineData.getColor()));
+      dataSet.setLineWidth(chartLineData.getLineWidth());
+      dataSet.setCircleColor(getResourceColor(chartLineData.getColor()));
+      dataSet.setCircleSize(chartLineData.getCircleSize());
+
+      dataSets.add(dataSet);
+    }
 
     LineData chartData = new LineData(xLabels, dataSets);
     chart.setData(chartData);
     chart.invalidate();
+
+    chart.getLegend().setTextColor(Color.WHITE);
   }
 
   private int getResourceColor(int colorRes) {
@@ -291,6 +349,28 @@ public class GraphActivity extends NanoTimerActivity {
       }
     }
     return chartTimes;
+  }
+
+  private List<ChartData> getAverageOf(List<ChartData> chartDataList, int n) {
+    List<ChartData> averages = new ArrayList<ChartData>();
+    List<Long> averageTimes = new ArrayList<>();
+    for (int i = 0; i < chartDataList.size(); i++) {
+      if (averageTimes.size() >= n) {
+        averageTimes.remove(0);
+      }
+
+      ChartData chartData = chartDataList.get(i);
+      averageTimes.add((long) chartData.getData());
+
+      if (averageTimes.size() >= n) {
+        TimesStatistics timesStatistics = new TimesStatistics(averageTimes);
+        long avg = timesStatistics.getAverageOf(n);
+        if (avg > 0) {
+          averages.add(new ChartData(avg, chartData.getTimestamp()));
+        }
+      }
+    }
+    return averages;
   }
 
   private List<ChartData> getChartDataFromFrequency(List<FrequencyData> frequencyData) {

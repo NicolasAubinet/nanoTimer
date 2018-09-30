@@ -248,6 +248,8 @@
   <string name="year">Year</string>
   <string name="all">All</string>
   <string name="no_data_found">No data found</string>
+  <string name="ao5">Ao5</string>
+  <string name="ao12">Ao12</string>
   <string name="chart_type_progression">Progression</string>
   <string name="chart_type_frequency">Frequency</string>
 
