@@ -3,32 +3,28 @@ package com.cube.nanotimer.gui.widget.ads;
 import android.app.Activity;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.Options.AdsStyle;
-import com.startapp.android.publish.SDKAdPreferences;
-import com.startapp.android.publish.SDKAdPreferences.Gender;
-import com.startapp.android.publish.StartAppAd;
-import com.startapp.android.publish.StartAppSDK;
 
 import java.util.Random;
 
 public class AdProvider {
 
-	private static StartAppAd startAppAd;
+//	private static StartAppAd startAppAd;
 //  private static Appnext appnext;
   private static boolean interstitialShown; // true if the last call to showInterstitial did display an ad
 
   public static void init(Activity a) {
-    if (!isAdsEnabled()) {
-      return;
-    }
+//    if (!isAdsEnabled()) {
+//      return;
+//    }
     // Startapp
     // banner
-  	StartAppSDK.init(a, "108845167", "208524420",
-  			new SDKAdPreferences()
-  				.setAge(20)
-  				.setGender(Gender.MALE), false);
+//  	StartAppSDK.init(a, "108845167", "208524420",
+//  			new SDKAdPreferences()
+//  				.setAge(20)
+//  				.setGender(Gender.MALE), false);
   	// interstitial
-  	startAppAd = new StartAppAd(a);
-  	startAppAd.loadAd();
+//  	startAppAd = new StartAppAd(a);
+//  	startAppAd.loadAd();
   	
   	// Appnext
   	// interstitial
@@ -71,8 +67,8 @@ public class AdProvider {
     int adChoice = r.nextInt(2);
     if (adChoice == 0) {
       // startapp
-    	startAppAd.showAd();
-    	startAppAd.loadAd();
+//    	startAppAd.showAd();
+//    	startAppAd.loadAd();
     } else if (adChoice == 1) {
     	// appnext
 //      appnext.showBubble();
@@ -96,21 +92,21 @@ public class AdProvider {
   }
 
   public static void resume() {
-    if (!isAdsEnabled()) {
-      return;
-    }
-    if (startAppAd != null) {
-      startAppAd.onResume();
-    }
+//    if (!isAdsEnabled()) {
+//      return;
+//    }
+//    if (startAppAd != null) {
+//      startAppAd.onResume();
+//    }
   }
   
   public static void pause() {
-    if (!isAdsEnabled()) {
-      return;
-    }
-    if (startAppAd != null) {
-      startAppAd.onPause();
-    }
+//    if (!isAdsEnabled()) {
+//      return;
+//    }
+//    if (startAppAd != null) {
+//      startAppAd.onPause();
+//    }
   }
 
   public static boolean wasInterstitialShown() {

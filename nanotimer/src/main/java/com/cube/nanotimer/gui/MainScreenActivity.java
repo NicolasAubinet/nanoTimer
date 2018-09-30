@@ -34,7 +34,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
-import com.cube.nanotimer.Options.AdsStyle;
 import com.cube.nanotimer.ProChecker;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.AboutDialog;
@@ -59,7 +58,7 @@ import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.TimesSort;
-import com.startapp.android.publish.banner.Banner;
+import com.google.android.gms.ads.AdView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -672,16 +671,20 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   }
 
   private void showHideBannerAd() {
-    AdsStyle adsStyle = Options.INSTANCE.getAdsStyle();
-    Banner bannerAd = (Banner) findViewById(R.id.bannerAd);
-    if (Options.INSTANCE.isAdsEnabled() &&
-        (adsStyle == AdsStyle.BANNER ||
-        (adsStyle == AdsStyle.MIXED && !AdProvider.wasInterstitialShown() && !mixedAdBannerChance))) {
+//    AdsStyle adsStyle = Options.INSTANCE.getAdsStyle();
+    AdView adView = findViewById(R.id.adView);
+//    Banner bannerAd = (Banner) findViewById(R.id.bannerAd);
+    if (Options.INSTANCE.isAdsEnabled()) {
+//    if (Options.INSTANCE.isAdsEnabled() &&
+//        (adsStyle == AdsStyle.BANNER ||
+//        (adsStyle == AdsStyle.MIXED && !AdProvider.wasInterstitialShown() && !mixedAdBannerChance))) {
       // Show banner add if the "banner" option is selected,
       // or if "mixed" is selected and that an interstitial was not shown when coming back here, + 20% chances to not show anything
-      bannerAd.showBanner();
+//      bannerAd.showBanner();
+      adView.setVisibility(View.VISIBLE);
     } else {
-      bannerAd.hideBanner();
+//      bannerAd.hideBanner();
+      adView.setVisibility(View.GONE);
     }
   }
 
