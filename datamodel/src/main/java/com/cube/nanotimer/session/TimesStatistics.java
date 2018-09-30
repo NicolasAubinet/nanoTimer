@@ -269,7 +269,7 @@ public class TimesStatistics {
     }
     int validTimesCount = 0;
     long mean = 0;
-    // calculate mean manually because we don't want a DNF�mean if there is a DNF time (DNF's are just ignored)
+    // calculate mean manually because we don't want a DNF mean if there is a DNF time (DNF's are just ignored)
     for (int i = 0; i < n; i++) {
       long time = times.get(i);
       if (time > 0) {
