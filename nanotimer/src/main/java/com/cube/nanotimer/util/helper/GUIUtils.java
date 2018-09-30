@@ -1,12 +1,14 @@
 package com.cube.nanotimer.util.helper;
 
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.support.v4.app.NotificationCompat;
@@ -163,7 +165,20 @@ public class GUIUtils {
     } else {
       notificationIcon = R.drawable.icon;
     }
-    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(c)
+
+    String channelId = c.getPackageName() + ".notifications";
+    NotificationManager notifManager = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      String channelName = "Android channel";
+
+      int importance = NotificationManager.IMPORTANCE_DEFAULT;
+      NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
+      channel.setSound(null, null);
+      notifManager.createNotificationChannel(channel);
+    }
+
+    NotificationCompat.Builder builder = new NotificationCompat.Builder(c, channelId)
         .setSmallIcon(notificationIcon)
         .setContentTitle(title)
         .setContentText(message);
@@ -174,10 +189,9 @@ public class GUIUtils {
     stackBuilder.addNextIntent(resultIntent);
 
     PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-    mBuilder.setContentIntent(pendingIntent);
+    builder.setContentIntent(pendingIntent);
 
-    NotificationManager notifManager = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
-    notifManager.notify(id, mBuilder.build());
+    notifManager.notify(id, builder.build());
   }
 
   public static void hideNotification(Context c, int id) {

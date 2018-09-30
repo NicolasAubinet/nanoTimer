@@ -5,7 +5,8 @@
   <application
      android:icon="@drawable/icon_pro"
      android:label="@string/app_name"
-     android:theme="@style/NanoTimerTheme">
+     android:theme="@style/NanoTimerTheme"
+     android:allowBackup="true">
 
     <activity
        android:name=".UnlockerActivity"
