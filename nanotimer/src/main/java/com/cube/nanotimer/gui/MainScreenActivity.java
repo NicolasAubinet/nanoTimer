@@ -75,6 +75,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   private ListView lvHistory;
   private TextView tvSolvesCount;
   private TextView tvHistory;
+  private Button buStart;
 
   private CubeType curCubeType;
   private SolveType curSolveType;
@@ -178,11 +179,13 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
 
     setSortMode(TimesSort.TIMESTAMP);
 
-    Button buStart = (Button) findViewById(R.id.buStart);
+    buStart = findViewById(R.id.buStart);
 //    buStart.setShadowLayer(1, 3f, 3f, getResources().getColor(R.color.black));
     buStart.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
+        buStart.setEnabled(false);
+
         Intent i = new Intent(MainScreenActivity.this, TimerActivity.class);
         i.putExtra("cubeType", curCubeType);
         i.putExtra("solveType", curSolveType);
@@ -338,6 +341,8 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
       }
       AdProvider.resume();
     }
+
+    buStart.setEnabled(true);
 
     invalidateOptionsMenu();
 
