@@ -300,7 +300,15 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.5 <i>(New version)</i></b></u>
+    <u><b>v1.3.6 <i>(Nouvelle version)</i></b></u>
+    <ul>
+      <li>Ajout de commentaires aux résolutions</li>
+      <li>Ajout des ao5 et ao12 au graphique de progression</li>
+      <li>Réglage d\'un problème d\'arrondis sur les temps de résolution</li>
+      <li>Mise à jour de la version cible d\'Android</li>
+      <li>Changement du provider de publicités</li>
+    </ul>
+    <u><b>v1.3.5</b></u>
     <ul>
       <li>Ajout de l\'option "Chronomètre haute précision"</li>
     </ul>

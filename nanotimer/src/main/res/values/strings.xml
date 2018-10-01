@@ -304,7 +304,15 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.5 <i>(New version)</i></b></u>
+    <u><b>v1.3.6 <i>(New version)</i></b></u>
+    <ul>
+      <li>Allow to add comments to solves</li>
+      <li>Add ao5 and ao12 to progression graph</li>
+      <li>Fix solve times rounding</li>
+      <li>Upgrade target android version</li>
+      <li>Changed ad provider</li>
+    </ul>
+    <u><b>v1.3.5</b></u>
     <ul>
       <li>Add "High precision timer" option</li>
     </ul>
