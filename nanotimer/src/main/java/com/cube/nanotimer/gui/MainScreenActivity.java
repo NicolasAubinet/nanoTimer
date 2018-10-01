@@ -58,6 +58,7 @@ import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.TimesSort;
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
 import java.io.File;
@@ -681,6 +682,12 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
       // Show banner add if the "banner" option is selected,
       // or if "mixed" is selected and that an interstitial was not shown when coming back here, + 20% chances to not show anything
 //      bannerAd.showBanner();
+
+      AdRequest adRequest = new AdRequest.Builder()
+        .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+        .build();
+
+      adView.loadAd(adRequest);
       adView.setVisibility(View.VISIBLE);
     } else {
 //      bannerAd.hideBanner();

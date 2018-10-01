@@ -2,6 +2,10 @@
 <resources>
   <string name="app_name">Nano Timer</string>
   <string name="app_name_copyright">&#169; 2014-2017 Nano Timer</string>
+  <string name="admob_app_id" translatable="false">ca-app-pub-8294291525564683~7155145804</string>
+  <!--<string name="admob_app_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>-->
+  <string name="admob_banner_unit_id" translatable="false">ca-app-pub-8294291525564683/1182680112</string>
+  <!--<string name="admob_banner_unit_id" translatable="false">ca-app-pub-3940256099942544/6300978111</string>-->
   <string name="app_description">Rubik\'s Cube timer for Android</string>
   <string name="app_license">This app uses drag-sort-listview, MPAndroidChart and android-wheel libraries licensed under Apache 2.0.</string>
   <string name="feedback_message">If you encounter a bug or have any suggestions or comments, don\'t hesitate to send an email to the address below.</string>

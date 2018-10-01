@@ -3,6 +3,8 @@ package com.cube.nanotimer.gui.widget.ads;
 import android.app.Activity;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.Options.AdsStyle;
+import com.cube.nanotimer.R;
+import com.google.android.gms.ads.MobileAds;
 
 import java.util.Random;
 
@@ -13,9 +15,9 @@ public class AdProvider {
   private static boolean interstitialShown; // true if the last call to showInterstitial did display an ad
 
   public static void init(Activity a) {
-//    if (!isAdsEnabled()) {
-//      return;
-//    }
+    if (!isAdsEnabled()) {
+      return;
+    }
     // Startapp
     // banner
 //  	StartAppSDK.init(a, "108845167", "208524420",
@@ -37,6 +39,8 @@ public class AdProvider {
 //        appnext.cacheAd();
 //      }
 //    });
+
+    MobileAds.initialize(a, a.getString(R.string.admob_app_id));
   }
 
   public static void showInterstitial() {
