@@ -21,6 +21,7 @@
 
 package com.mobeta.android.dslv;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
@@ -2859,6 +2860,7 @@ public class DragSortListView extends ListView {
         }
 
         @Override
+        @SuppressLint("NewApi")
         public void run() {
             if (mAbort) {
                 mScrolling = false;

@@ -4,12 +4,12 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
 import android.util.TypedValue;
-import android.widget.TextView;
 import com.cube.nanotimer.R;
 
-public class FontFitTextView extends TextView {
+public class FontFitTextView extends AppCompatTextView {
 
   private Paint mTestPaint;
   private float initialTextSize;

@@ -2,10 +2,10 @@ package com.cube.nanotimer.util.view;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
-import android.widget.TextView;
 
-public class MonospacedTextView extends TextView {
+public class MonospacedTextView extends AppCompatTextView {
 
   public MonospacedTextView(Context context) {
     super(context);

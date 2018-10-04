@@ -2,11 +2,11 @@ package com.cube.nanotimer.util.view;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
-import android.widget.TextView;
 import com.cube.nanotimer.util.helper.GUIUtils;
 
-public class DigitalTextView extends TextView {
+public class DigitalTextView extends AppCompatTextView {
 
   public DigitalTextView(Context context) {
     super(context);
