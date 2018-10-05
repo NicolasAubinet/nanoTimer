@@ -689,7 +689,8 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
 //      bannerAd.showBanner();
 
       AdRequest adRequest = new AdRequest.Builder()
-        .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+//        .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+//        .setGender(Gender.MALE)
         .build();
 
       adView.loadAd(adRequest);

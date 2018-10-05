@@ -33,6 +33,11 @@ public enum FormatterService {
     if (solveTime == -2) {
       return App.INSTANCE.getContext().getString(R.string.NA);
     }
+
+    if (!parUseHighPrecision) {
+      solveTime = (long) Math.round(solveTime / 10f) * 10;
+    }
+
     StringBuilder sb = new StringBuilder();
     int minutes = (int) (solveTime / 60000);
     int seconds = (int) (solveTime / 1000) % 60;
@@ -41,7 +46,7 @@ public enum FormatterService {
     if (parUseHighPrecision) {
       millis = (int) (solveTime % 1000);
     } else {
-      millis = (Math.round(((float) solveTime) / 10)) % 100;
+      millis = (int) ((solveTime / 10) % 100);
     }
 
     if (minutes > 0) {
