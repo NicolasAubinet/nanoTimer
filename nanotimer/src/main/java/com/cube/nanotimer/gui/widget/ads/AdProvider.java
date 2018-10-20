@@ -3,8 +3,6 @@ package com.cube.nanotimer.gui.widget.ads;
 import android.app.Activity;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.Options.AdsStyle;
-import com.cube.nanotimer.R;
-import com.google.android.gms.ads.MobileAds;
 
 import java.util.Random;
 
@@ -40,7 +38,7 @@ public class AdProvider {
 //      }
 //    });
 
-    MobileAds.initialize(a, a.getString(R.string.admob_app_id));
+//    MobileAds.initialize(a, a.getString(R.string.admob_app_id));
   }
 
   public static void showInterstitial() {

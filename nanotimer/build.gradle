@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.1.0"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.2"
     defaultConfig {
         applicationId "com.cube.nanotimer"
         minSdkVersion 14
-        targetSdkVersion 26
+        targetSdkVersion 28
         versionCode 44
         versionName "1.3.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -19,10 +19,6 @@ android {
     }
 }
 
-ext {
-    libSupportVersion = '26.1.0'
-}
-
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -30,16 +26,13 @@ dependencies {
     })
     //implementation 'com.android.support:support-v4:${libSupportVersion}'
     //    implementation 'com.github.rey5137:material:1.2.4.1-SNAPSHOT'
-//        implementation 'com.android.support:appcompat-v7:28.0.0'
-//        implementation 'com.android.support:cardview-v7:28.0.0'
-//        implementation 'com.android.support:design:28.0.0'
 
     implementation "com.android.support:appcompat-v7:${libSupportVersion}"
     implementation "com.android.support:gridlayout-v7:${libSupportVersion}"
     implementation "com.android.support:cardview-v7:${libSupportVersion}"
     implementation "com.android.support:design:${libSupportVersion}"
 //    implementation "com.android.support:support-compat:28.0.0"
-    implementation 'com.google.android.gms:play-services-ads:16.0.0'
+//    implementation 'com.google.android.gms:play-services-ads:16.0.0'
 
     testImplementation 'junit:junit:4.12'
 
