@@ -300,7 +300,12 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.6 <i>(Nueva 	versión)</i></b></u>
+    <u><b>v1.3.7 <i>(Nueva 	versión)</i></b></u>
+    <ul>
+      <li>Quitar las anuncios</li>
+      <li>Arreglar Megaminx mezclas primero movimiento</li>
+    </ul>
+    <u><b>v1.3.6</b></u>
     <ul>
       <li>Añadir comentarios a las resoluciónes</li>
       <li>Añadir ao5 y ao12 a el gráfica de progresión</li>
