@@ -19,10 +19,9 @@ public class MegaminxScrambler implements Scrambler {
     List<String> scramble = new ArrayList<String>();
     Random rand = new Random();
     for (int i = 0; i < LINES_COUNT; i++) {
-      int firstMove = rand.nextInt(2);
       for (int j = 0; j < MOVES_PER_LINE; j++) {
         StringBuilder move = new StringBuilder();
-        move.append(mainMoves[(firstMove + j) % mainMoves.length]);
+        move.append(mainMoves[j % mainMoves.length]);
         if (rand.nextBoolean()) {
           move.append("++ ");
         } else {
@@ -30,6 +29,7 @@ public class MegaminxScrambler implements Scrambler {
         }
         scramble.add(move.toString());
       }
+
       StringBuilder move = new StringBuilder();
       move.append(endMove);
       if (rand.nextBoolean()) {
@@ -38,6 +38,7 @@ public class MegaminxScrambler implements Scrambler {
         move.append(" ");
       }
       scramble.add(move.toString());
+
       scramble.add("\n");
     }
     return scramble.toArray(new String[0]);
