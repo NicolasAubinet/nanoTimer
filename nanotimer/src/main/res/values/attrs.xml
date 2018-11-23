@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <declare-styleable name="FontFitTextView">
-    <attr name="myfont">
-      <enum name="MONOSPACE" value="0"/>
-    </attr>
-  </declare-styleable>
+  <!--<declare-styleable name="FontFitTextView">-->
+    <!--<attr name="myfont">-->
+      <!--<enum name="MONOSPACE" value="0"/>-->
+    <!--</attr>-->
+  <!--</declare-styleable>-->
   <declare-styleable name="NumberLimit">
     <attr name="min" format="integer"/>
     <attr name="max" format="integer"/>
