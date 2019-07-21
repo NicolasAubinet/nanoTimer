@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
-    buildToolsVersion "28.0.2"
+    buildToolsVersion "28.0.3"
     defaultConfig {
         applicationId "com.cube.nanotimer"
         minSdkVersion 14
@@ -24,15 +24,12 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    //implementation 'com.android.support:support-v4:${libSupportVersion}'
-    //    implementation 'com.github.rey5137:material:1.2.4.1-SNAPSHOT'
 
+    implementation "com.android.support:support-v4:28.0.0"
     implementation "com.android.support:appcompat-v7:${libSupportVersion}"
     implementation "com.android.support:gridlayout-v7:${libSupportVersion}"
     implementation "com.android.support:cardview-v7:${libSupportVersion}"
     implementation "com.android.support:design:${libSupportVersion}"
-//    implementation "com.android.support:support-compat:28.0.0"
-//    implementation 'com.google.android.gms:play-services-ads:16.0.0'
 
     testImplementation 'junit:junit:4.12'
 
@@ -40,13 +37,7 @@ dependencies {
     implementation project(':guilib')
     implementation project(':services')
     implementation project(':filebrowser')
-    implementation project(':dragsortlistview')
     implementation project(':wheel')
+    
+    implementation 'asia.ivity.android:drag-sort-listview:1.0'
 }
-
-//repositories {
-//    maven {
-//        // for rey5137 lib
-//        url "https://oss.sonatype.org/content/repositories/snapshots"
-//    }
-//}
