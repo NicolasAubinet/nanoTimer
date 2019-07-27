@@ -283,7 +283,12 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.8 <i>(New version)</i></b></u>
+    <u><b>v1.3.9 <i>(New version)</i></b></u>
+    <ul>
+      <li>Unlock all features for everyone (no more paying Pro version)</li>
+      <li>Nano Timer is now open source!</li>
+    </ul>
+    <u><b>v1.3.8</b></u>
     <ul>
       <li>Fix issue with some texts that were too small on some devices</li>
     </ul>
