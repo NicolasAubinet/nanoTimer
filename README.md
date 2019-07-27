@@ -4,7 +4,7 @@
        height="60"/>
 </a>
 
-Speedcubing timer app to keep track of your times and averages everywhere.
+Android speedcubing timer app to keep track of your times and averages everywhere.
 
 ## Features:
 
