@@ -1,3 +1,1 @@
-include ':nanotimer', ':datamodel', ':guilib', ':services', ':guilib', ':nanotimerpro', ':dragsortlistview'
-include ':filebrowser'
-include ':wheel'
+include ':nanotimer', ':datamodel', ':guilib', ':services', ':guilib', ':filebrowser', ':wheel'
