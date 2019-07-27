@@ -186,6 +186,14 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.mainscreen_menu, menu);
 
+    int drawableIcon;
+    if (App.INSTANCE.isProEnabled()) {
+      drawableIcon = R.drawable.icon_pro;
+    } else {
+      drawableIcon = R.drawable.icon;
+    }
+    menu.findItem(R.id.itAppIcon).setIcon(drawableIcon);
+
     return super.onCreateOptionsMenu(menu);
   }
 

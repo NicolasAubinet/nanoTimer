@@ -122,6 +122,10 @@ public enum App {
     return service;
   }
 
+  public boolean isProEnabled() {
+    return ProChecker.getProState(context) == ProChecker.ProState.ENABLED;
+  }
+
   public DynamicTranslations getDynamicTranslations() {
     return dynamicTranslations;
   }
