@@ -18,6 +18,7 @@ import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.ScrambleFormatterService;
 import com.cube.nanotimer.util.helper.DialogUtils;
+import com.cube.nanotimer.util.view.FontFitTextView;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
@@ -96,7 +97,7 @@ public class HistoryDetailDialog extends NanoTimerDialogFragment {
     }
 
     final TextView tvTime = (TextView) v.findViewById(R.id.tvTime);
-    TextView tvScramble = (TextView) v.findViewById(R.id.tvScramble);
+    FontFitTextView tvScramble = (FontFitTextView) v.findViewById(R.id.tvScramble);
     Button buPlusTwo = (Button) v.findViewById(R.id.buPlusTwo);
     Button buDNF = (Button) v.findViewById(R.id.buDNF);
     Button buDelete = (Button) v.findViewById(R.id.buDelete);

@@ -32,15 +32,13 @@
          android:layout_height="wrap_content"
          android:text="@string/scrambleC"
          style="@style/ScrambleTextFieldPx"/>
-      <!--<com.cube.nanotimer.util.view.FontFitTextView
-         app:myfont="MONOSPACE"-->
-      <TextView
+      <com.cube.nanotimer.util.view.FontFitTextView
          android:id="@+id/tvScramble"
          android:layout_width="match_parent"
          android:layout_height="match_parent"
          android:layout_marginTop="8px"
          android:gravity="center_horizontal"
-         app:fontFamily="monospace"
+         app:myfont="MONOSPACE"
          style="@style/ScrambleTextFieldPx"/>
     </LinearLayout>
 
@@ -250,28 +248,28 @@
           </TableRow>
           <TableRow android:id="@+id/trAvgOfFive" android:background="@color/grid_background_1">
             <TextView android:text="5" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
-            <TextView android:id="@+id/tvAvgOfFive" style="@style/TableCellPx" android:padding="2px"/>
-            <TextView android:id="@+id/tvBestOfFive" style="@style/TableCellPx" android:padding="2px"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFive" style="@style/TableCellPx" android:padding="2px"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFive" style="@style/TableCellPx" android:padding="2px"/>
           </TableRow>
           <TableRow android:id="@+id/trAvgOfTwelve" android:background="@color/grid_background_2">
             <TextView android:text="12" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
-            <TextView android:id="@+id/tvAvgOfTwelve" style="@style/TableCellPx" android:padding="2px"/>
-            <TextView android:id="@+id/tvBestOfTwelve" style="@style/TableCellPx" android:padding="2px"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfTwelve" style="@style/TableCellPx" android:padding="2px"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfTwelve" style="@style/TableCellPx" android:padding="2px"/>
           </TableRow>
           <TableRow android:id="@+id/trAvgOfFifty" android:background="@color/grid_background_1">
             <TextView android:text="50" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
-            <TextView android:id="@+id/tvAvgOfFifty" style="@style/TableCellPx" android:padding="2px"/>
-            <TextView android:id="@+id/tvBestOfFifty" style="@style/TableCellPx" android:padding="2px"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfFifty" style="@style/TableCellPx" android:padding="2px"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfFifty" style="@style/TableCellPx" android:padding="2px"/>
           </TableRow>
           <TableRow android:id="@+id/trAvgOfHundred" android:background="@color/grid_background_2">
             <TextView android:text="100" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
-            <TextView android:id="@+id/tvAvgOfHundred" style="@style/TableCellPx" android:padding="2px"/>
-            <TextView android:id="@+id/tvBestOfHundred" style="@style/TableCellPx" android:padding="2px"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfHundred" style="@style/TableCellPx" android:padding="2px"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvBestOfHundred" style="@style/TableCellPx" android:padding="2px"/>
           </TableRow>
           <TableRow android:id="@+id/trAvgOfLife" android:visibility="gone" android:background="@color/grid_background_1">
             <TextView android:text="@string/life" style="@style/AverageTableFirstFieldPx" android:padding="2px" android:layout_weight="0"/>
-            <TextView android:id="@+id/tvAvgOfLife" style="@style/TableCellPx" android:padding="2px"/>
-            <TextView style="@style/TableCellPx" android:padding="2px"/>
+            <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvAvgOfLife" style="@style/TableCellPx" android:padding="2px"/>
+            <com.cube.nanotimer.util.view.FontFitTextView style="@style/TableCellPx" android:padding="2px"/>
           </TableRow>
         </TableLayout>
       </android.support.v7.widget.CardView>
