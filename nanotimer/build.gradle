@@ -40,4 +40,5 @@ dependencies {
     implementation project(':wheel')
     
     implementation 'asia.ivity.android:drag-sort-listview:1.0'
+    implementation 'com.github.PhilJay:MPAndroidChart:v1.7.4'
 }
