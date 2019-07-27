@@ -70,9 +70,7 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
       }
     });
     View titleView = getTitleView();
-    if (App.INSTANCE.isProEnabled()) {
-      initSessionsList(v);
-    }
+    initSessionsList(v);
 
     final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(v).create();
     dialog.setCustomTitle(titleView);
@@ -83,10 +81,6 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
   private void displaySessionDetails(View v, SessionDetails sessionDetails) {
     sessionTimes = sessionDetails.getSessionTimes();
     TimesStatistics session = new TimesStatistics(sessionTimes);
-
-    if (!App.INSTANCE.isProEnabled()) { // pro uses a spinner, not a textview
-      tvSessionStart.setText(FormatterService.INSTANCE.formatDateTimeWithoutSeconds(sessionDetails.getSessionStart()));
-    }
 
     if (solveType.isBlind()) {
       v.findViewById(R.id.bestAveragesLayout).setVisibility(View.GONE);
@@ -285,18 +279,10 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
     tvStartParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
     tvStartParams.addRule(RelativeLayout.CENTER_VERTICAL);
 
-    View sessionView;
-    if (App.INSTANCE.isProEnabled()) {
-      titleLayout.setPadding(10, 0, 0, 0);
-      spSessionsList = new Spinner(getActivity());
-      sessionView = spSessionsList;
-    } else {
-      titleLayout.setPadding(10, 0, 10, 0);
-      tvSessionStart = new TextView(getActivity());
-      tvSessionStart.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
-      tvSessionStart.setPadding(0, 6, 10, 6);
-      sessionView = tvSessionStart;
-    }
+    titleLayout.setPadding(10, 0, 0, 0);
+    spSessionsList = new Spinner(getActivity());
+    View sessionView = spSessionsList;
+
     RelativeLayout.LayoutParams sessionViewParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     sessionViewParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 

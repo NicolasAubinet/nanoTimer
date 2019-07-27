@@ -16,7 +16,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -33,17 +32,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.cube.nanotimer.App;
-import com.cube.nanotimer.ProChecker;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.AboutDialog;
 import com.cube.nanotimer.gui.widget.HistoryDetailDialog;
-import com.cube.nanotimer.gui.widget.ProVersionAd;
-import com.cube.nanotimer.gui.widget.ProVersionWelcome;
 import com.cube.nanotimer.gui.widget.ResultListener;
 import com.cube.nanotimer.gui.widget.SelectionHandler;
 import com.cube.nanotimer.gui.widget.SelectorFragmentDialog;
 import com.cube.nanotimer.gui.widget.TimeChangedHandler;
-import com.cube.nanotimer.gui.widget.ads.AdProvider;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.YesNoListener;
@@ -63,7 +58,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 public class MainScreenActivity extends DrawerLayoutActivity implements SelectionHandler, ResultListener, TimeChangedHandler {
 
@@ -96,9 +90,6 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   private boolean inQuitMode;
   private static final long QUIT_MODE_DELAY = 3000;
 
-  private boolean mixedAdBannerChance; // chance to not display banner if in mixed ad mode
-                                       // used to avoid displaying/hiding the banner by changing the screen orientation
-
   private static final int ID_CUBETYPE = 1;
   private static final int ID_SOLVETYPE = 2;
   private static final int ID_IMPORTEXPORT = 3;
@@ -112,7 +103,6 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     App.INSTANCE.setContext(this);
-    AdProvider.init(this);
     Utils.updateContextWithPrefsLocale(this); // because ad provider somehow re-initializes the context
 
     setContentView(R.layout.mainscreen_screen);
@@ -196,29 +186,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.mainscreen_menu, menu);
 
-    int drawableIcon;
-    if (App.INSTANCE.isProEnabled()) {
-      drawableIcon = R.drawable.icon_pro;
-    } else {
-      drawableIcon = R.drawable.icon;
-    }
-    menu.findItem(R.id.itAppIcon).setIcon(drawableIcon);
-
     return super.onCreateOptionsMenu(menu);
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case R.id.itAppIcon:
-        if (App.INSTANCE.isProEnabled()) {
-          ProVersionWelcome.showWelcomeDialog(this);
-        } else {
-          ProVersionAd.showProVersionAdDialog(this);
-        }
-        break;
-    }
-    return super.onOptionsItemSelected(item);
   }
 
   private void initHistoryList() {
@@ -281,19 +249,15 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
         }
         break;
       case 2:
-        if (Utils.checkProFeature(this)) {
-          Intent i = new Intent(this, GraphActivity.class);
-          i.putExtra("cubeType", curCubeType);
-          i.putExtra("solveType", curSolveType);
-          startActivity(i);
-        }
+        Intent i = new Intent(this, GraphActivity.class);
+        i.putExtra("cubeType", curCubeType);
+        i.putExtra("solveType", curSolveType);
+        startActivity(i);
         break;
       case 3:
-        if (Utils.checkProFeature(this)) {
-          ArrayList<String> items = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.import_export)));
-          ArrayList<Integer> icons = new ArrayList<>(Arrays.asList(R.drawable.import_icon, R.drawable.export_icon));
-          DialogUtils.showFragment(this, SelectorFragmentDialog.newInstance(ID_IMPORTEXPORT, items, icons, null, true, this));
-        }
+        ArrayList<String> items = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.import_export)));
+        ArrayList<Integer> icons = new ArrayList<>(Arrays.asList(R.drawable.import_icon, R.drawable.export_icon));
+        DialogUtils.showFragment(this, SelectorFragmentDialog.newInstance(ID_IMPORTEXPORT, items, icons, null, true, this));
         break;
       case 4:
         DialogUtils.showYesNoConfirmation(this, R.string.clear_history_solve_type_confirmation, new YesNoListener() {
@@ -311,7 +275,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
         });
         break;
       case 5:
-        ArrayList<String> items = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.languages)));
+        items = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.languages)));
         ArrayList<Integer> flagIcons = new ArrayList<>(Arrays.asList(R.drawable.flag_uk, R.drawable.flag_france, R.drawable.flag_spain));
         DialogUtils.showFragment(this, SelectorFragmentDialog.newInstance(ID_LANGUAGE, items, flagIcons, null, true, this));
         break;
@@ -325,19 +289,6 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   protected void onResume() {
     super.onResume();
     App.INSTANCE.setContext(this);
-    App.INSTANCE.onResume();
-
-    ProChecker.ProState proState = ProChecker.getProState(this);
-    if (proState == ProChecker.ProState.ENABLED) {
-      findViewById(R.id.tvUpdateProApp).setVisibility(View.GONE);
-    } else {
-      if (proState == ProChecker.ProState.INVALID_VERSION) {
-        findViewById(R.id.tvUpdateProApp).setVisibility(View.VISIBLE);
-      } else {
-        findViewById(R.id.tvUpdateProApp).setVisibility(View.GONE);
-      }
-      AdProvider.resume();
-    }
 
     buStart.setEnabled(true);
 
@@ -346,20 +297,10 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
     refreshCubeTypes();
 
     setSortMode(TimesSort.TIMESTAMP);
-
-    mixedAdBannerChance = new Random().nextInt(10) < 2; // 20% chance to not show banner in mixed mode
-    showHideBannerAd();
   }
 
   @Override
   public void onBackPressed() {
-    if (AdProvider.isInterstialAppnextDisplayed()) {
-      // pressing backspace on appnext ad does not hide it by default.
-      // using this to "force" the user to click on the close button, otherwise he could select the "interstitial" option
-      // and just push 2 times on backspace to never really see the ads.
-      // with this condition, he can't do it as it would close the app.
-      return;
-    }
     if (inQuitMode) {
       if (quitMessage != null) {
         quitMessage.cancel();
@@ -671,33 +612,6 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   private void setCurSolveType(SolveType solveType) {
     this.curSolveType = solveType;
     Utils.setCurrentSolveType(this, solveType);
-  }
-
-  private void showHideBannerAd() {
-    /*
-//    AdsStyle adsStyle = Options.INSTANCE.getAdsStyle();
-    AdView adView = findViewById(R.id.adView);
-//    Banner bannerAd = (Banner) findViewById(R.id.bannerAd);
-    if (Options.INSTANCE.isAdsEnabled()) {
-//    if (Options.INSTANCE.isAdsEnabled() &&
-//        (adsStyle == AdsStyle.BANNER ||
-//        (adsStyle == AdsStyle.MIXED && !AdProvider.wasInterstitialShown() && !mixedAdBannerChance))) {
-      // Show banner add if the "banner" option is selected,
-      // or if "mixed" is selected and that an interstitial was not shown when coming back here, + 20% chances to not show anything
-//      bannerAd.showBanner();
-
-      AdRequest adRequest = new AdRequest.Builder()
-//        .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-//        .setGender(Gender.MALE)
-        .build();
-
-      adView.loadAd(adRequest);
-      adView.setVisibility(View.VISIBLE);
-    } else {
-//      bannerAd.hideBanner();
-      adView.setVisibility(View.GONE);
-    }
-    */
   }
 
   @Override

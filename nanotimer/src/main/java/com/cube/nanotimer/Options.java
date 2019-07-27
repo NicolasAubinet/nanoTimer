@@ -11,7 +11,6 @@ public enum Options {
 
   public enum InspectionMode { HOLD_AND_RELEASE, AUTOMATIC, OFFICIAL }
   public enum InspectionSoundsType { CLASSIC, OFFICIAL }
-  public enum AdsStyle { BANNER, INTERSTITIAL, MIXED }
   public enum BigCubesNotation { RUF, RWUWFW }
   public enum ClockNotation { UUdU_x_x, UUdd_ux_dx, URx_DRx_DLx }
   public enum ScrambleNotificationMode { ALWAYS, MANUAL, NEVER }
@@ -111,14 +110,6 @@ public enum Options {
       default:
         return BigCubesNotation.RUF;
     }
-  }
-
-  public AdsStyle getAdsStyle() {
-    return AdsStyle.BANNER;
-  }
-
-  public boolean isAdsEnabled() {
-    return !App.INSTANCE.isProEnabled();
   }
 
   public boolean isSolveTypesShortcutEnabled() {

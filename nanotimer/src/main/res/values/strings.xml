@@ -187,15 +187,6 @@
   <string name="release_notes">Release notes</string>
   <string name="close">Close</string>
 
-  <string name="pro_version_thanks">Thank you for purchasing Nano Timer Pro!</string>
-  <string name="pro_version_following_features_unlocked">The following features have been unlocked:</string>
-  <string name="pro_version_promotion_title">Nano Timer Pro</string>
-  <string name="pro_version_available">Nano Timer Pro is available on Play Store!</string>
-  <string name="pro_version_install">Installing it will unlock the following features:</string>
-  <string name="need_pro_version">Download Nano Timer Pro to access this feature</string>
-  <string name="upgrade_pro_app">Please update Nano Timer Pro to keep accessing Pro features</string>
-  <string name="open_page">Open page</string>
-
   <string name="edit_solve_types_dots">Edit solve types&#8230;</string>
   <string name="solve_types_shortcut">Solve types shortcut</string>
   <string name="solve_types_shortcut_summary">Show \"Edit more solve types\" in list</string>
@@ -288,17 +279,6 @@
 
   <string name="scramble_generating">Scramble is generating\nPlease wait&#8230;</string>
   <string name="can_not_add_time_while_generating">Can not add a time when there is no scramble</string>
-
-  <string name="pro_version_features">
-    <![CDATA[<html><body>
-    <font color=\"white\">
-      &#8226; Times export/import<br/>
-      &#8226; Graphs (progression, frequency)<br/>
-      &#8226; Manual times creation<br/>
-      &#8226; Previous sessions details visualization<br/>
-    </font>
-    </body></html>]]>
-  </string>
 
   <string name="release_notes_features_html">
     <![CDATA[<html><body>

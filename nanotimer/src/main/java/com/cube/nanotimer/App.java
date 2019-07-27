@@ -4,8 +4,6 @@ import android.content.Context;
 import com.cube.nanotimer.Options.ScrambleNotificationMode;
 import com.cube.nanotimer.gui.MainScreenActivity;
 import com.cube.nanotimer.gui.widget.AppRater;
-import com.cube.nanotimer.gui.widget.ProVersionAd;
-import com.cube.nanotimer.gui.widget.ProVersionWelcome;
 import com.cube.nanotimer.gui.widget.ReleaseNotes;
 import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent;
@@ -31,8 +29,6 @@ public enum App {
   private boolean appGUILaunched;
   private DynamicTranslations dynamicTranslations;
   private SoundManager soundManager;
-
-  public static final String PRO_PACKAGE_NAME = "com.cube.nanotimerpro";
 
   private static final int SCRAMBLE_NOTIF_ID = 1;
 
@@ -94,7 +90,6 @@ public enum App {
     AppLaunchStats.appLaunched(context);
     AppRater.appLaunched(context);
     ReleaseNotes.appLaunched(context);
-    ProVersionAd.appLaunched(context);
   }
 
   private void initRandomStateGenListener(final Context context) {
@@ -125,14 +120,6 @@ public enum App {
 
   public Service getService() {
     return service;
-  }
-
-  public boolean isProEnabled() {
-    return ProChecker.getProState(context) == ProChecker.ProState.ENABLED;
-  }
-
-  public void onResume() {
-    ProVersionWelcome.onResume(context, isProEnabled());
   }
 
   public DynamicTranslations getDynamicTranslations() {

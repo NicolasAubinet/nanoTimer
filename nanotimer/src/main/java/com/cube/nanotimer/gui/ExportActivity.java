@@ -58,10 +58,6 @@ public class ExportActivity extends NanoTimerActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.export_screen);
-    if (!Utils.checkProFeature(this)) {
-      finish();
-      return;
-    }
 
     setTitle(R.string.export_times);
     initViews();

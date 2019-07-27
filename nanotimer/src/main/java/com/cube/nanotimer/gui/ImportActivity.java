@@ -20,11 +20,6 @@ public class ImportActivity extends NanoTimerActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.import_screen);
-    if (!Utils.checkProFeature(this)) {
-      finish();
-      return;
-    }
-
     initViews();
   }
 

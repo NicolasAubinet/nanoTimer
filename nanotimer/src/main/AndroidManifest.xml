@@ -17,10 +17,6 @@
      android:theme="@style/NanoTimerTheme"
      android:allowBackup="true">
 
-    <!--<meta-data-->
-       <!--android:name="com.google.android.gms.ads.APPLICATION_ID"-->
-       <!--android:value="@string/admob_app_id"/>-->
-
     <activity
        android:name=".gui.MainScreenActivity"
        android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
@@ -75,15 +71,5 @@
          android:resource="@xml/fileprovider"/>
     </provider>
 
-    <!-- for startapp -->
-    <!--<activity-->
-       <!--android:name="com.startapp.android.publish.list3d.List3DActivity"-->
-       <!--android:theme="@android:style/Theme"/>-->
-
-    <!--<activity-->
-       <!--android:name="com.startapp.android.publish.AppWallActivity"-->
-       <!--android:theme="@android:style/Theme.Translucent"-->
-       <!--android:configChanges="orientation|keyboardHidden|screenSize"/>-->
-    
   </application>
 </manifest>

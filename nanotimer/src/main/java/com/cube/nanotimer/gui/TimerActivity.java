@@ -23,14 +23,12 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
-import com.cube.nanotimer.Options.AdsStyle;
 import com.cube.nanotimer.Options.BigCubesNotation;
 import com.cube.nanotimer.Options.InspectionMode;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.SoundManager;
 import com.cube.nanotimer.gui.widget.ResultListener;
 import com.cube.nanotimer.gui.widget.SessionDetailDialog;
-import com.cube.nanotimer.gui.widget.ads.AdProvider;
 import com.cube.nanotimer.gui.widget.dialog.AddNewTimeDialog;
 import com.cube.nanotimer.gui.widget.dialog.CommentSolveDialog;
 import com.cube.nanotimer.scrambler.ScramblerService;
@@ -193,7 +191,6 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
   protected void onResume() {
     super.onResume();
     App.INSTANCE.setContext(this);
-    App.INSTANCE.onResume();
   }
 
   private void initActionBar() {
@@ -363,10 +360,6 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
         timer.cancel();
         timer.purge();
       }
-      AdsStyle adsStyle = Options.INSTANCE.getAdsStyle();
-      if (Options.INSTANCE.isAdsEnabled() && (adsStyle == AdsStyle.INTERSTITIAL || adsStyle == AdsStyle.MIXED)) {
-        AdProvider.showInterstitial();
-      }
       super.onBackPressed();
     }
   }
@@ -467,14 +460,12 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
           });
           break;
         case R.id.itAddTime:
-          if (Utils.checkProFeature(this)) {
-            if (currentScramble != null) {
-              String scramble = ScrambleFormatterService.INSTANCE.formatScrambleAsSingleLine(currentScramble, cubeType);
-              AddNewTimeDialog dialog = AddNewTimeDialog.newInstance(this, solveType, scramble);
-              DialogUtils.showFragment(this, dialog);
-            } else {
-              DialogUtils.showShortInfoMessage(this, R.string.can_not_add_time_while_generating);
-            }
+          if (currentScramble != null) {
+            String scramble = ScrambleFormatterService.INSTANCE.formatScrambleAsSingleLine(currentScramble, cubeType);
+            AddNewTimeDialog dialog = AddNewTimeDialog.newInstance(this, solveType, scramble);
+            DialogUtils.showFragment(this, dialog);
+          } else {
+            DialogUtils.showShortInfoMessage(this, R.string.can_not_add_time_while_generating);
           }
           break;
         case R.id.itShareTime:

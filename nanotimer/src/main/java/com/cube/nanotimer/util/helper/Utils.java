@@ -13,7 +13,6 @@ import android.os.BatteryManager;
 import android.preference.PreferenceManager;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
-import com.cube.nanotimer.gui.widget.ProVersionFeature;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ScrambleType;
 import com.cube.nanotimer.vo.SolveType;
@@ -123,15 +122,6 @@ public class Utils {
 
   public static String getNewLine() {
     return System.getProperty("line.separator");
-  }
-
-  public static boolean checkProFeature(Context context) {
-    if (App.INSTANCE.isProEnabled()) {
-      return true;
-    } else {
-      ProVersionFeature.getDialog(context).show();
-      return false;
-    }
   }
 
   public static Character checkForForbiddenCharacters(String stepName) {

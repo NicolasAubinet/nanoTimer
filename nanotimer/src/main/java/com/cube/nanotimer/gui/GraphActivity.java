@@ -119,10 +119,6 @@ public class GraphActivity extends NanoTimerActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    if (!App.INSTANCE.isProEnabled()) {
-      finish();
-      return;
-    }
     super.onCreate(savedInstanceState);
     setContentView(R.layout.graph_screen);
 
