@@ -11,7 +11,7 @@ import com.cube.nanotimer.util.helper.Utils;
 
 import java.io.File;
 
-public class ImportActivity extends Activity {
+public class ImportActivity extends NanoTimerActivity {
   private FileBrowser fileBrowser;
 
   public static final String FILE_SELECTED_ACTION = "com.cube.nanotimer.FILE_SELECTED";
