@@ -283,7 +283,11 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.9 <i>(New version)</i></b></u>
+    <u><b>v1.3.10 <i>(New version)</i></b></u>
+    <ul>
+      <li>Fix crash that happened when trying to add steps to a solve type</li>
+    </ul>
+    <u><b>v1.3.9</b></u>
     <ul>
       <li>Unlock all features for everyone (no more paying Pro version)</li>
       <li>Nano Timer is now free and open source!</li>

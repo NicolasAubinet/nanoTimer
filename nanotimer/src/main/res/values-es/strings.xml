@@ -279,7 +279,11 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.9 <i>(Nueva 	versión)</i></b></u>
+    <u><b>v1.3.10 <i>(Nueva versión)</i></b></u>
+    <ul>
+      <li>Arreglar aplicación colgarse cuando probar de añadir pasos a un método</li>
+    </ul>
+    <u><b>v1.3.9</b></u>
     <ul>
       <li>Desbloqueo de todas las funcionalidades para todos (no mas pagado Pro versión)</li>
       <li>Nano Timer ahora esta libre y open source!</li>
