@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -21,6 +20,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
@@ -28,9 +28,6 @@ import com.cube.nanotimer.gui.widget.dialog.FieldEditDialog;
 import com.cube.nanotimer.gui.widget.dialog.FieldRenamer;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
-import com.mobeta.android.dslv.DragSortController;
-import com.mobeta.android.dslv.DragSortListView;
-import com.mobeta.android.dslv.DragSortListView.DropListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +38,7 @@ public class AddStepsDialog extends NanoTimerDialogFragment implements FieldRena
   private Dialog dialog;
   private List<String> liSteps;
   private StepsListAdapter stepsAdapter;
-  private DragSortListView lvSteps;
+  private ListView lvSteps;
 
   private static final int ACTION_RENAME = 0;
   private static final int ACTION_DELETE = 1;
@@ -82,25 +79,8 @@ public class AddStepsDialog extends NanoTimerDialogFragment implements FieldRena
     // Steps ListView
     liSteps = new ArrayList<String>();
     stepsAdapter = new StepsListAdapter(getActivity(), R.layout.simple_list_item, liSteps);
-    lvSteps = (DragSortListView) view.findViewById(R.id.lvSteps);
+    lvSteps = view.findViewById(R.id.lvSteps);
     lvSteps.setAdapter(stepsAdapter);
-
-    lvSteps.setDropListener(new DropListener() {
-      @Override
-      public void drop(int from, int to) {
-        if (from != to) {
-          String step = stepsAdapter.getItem(from);
-          liSteps.remove(step);
-          liSteps.add(to, step);
-          stepsAdapter.notifyDataSetChanged();
-        }
-      }
-    });
-
-    DragSortController controller = new DragSortController(lvSteps);
-    controller.setDragHandleId(R.id.imgMove);
-    lvSteps.setFloatViewManager(controller);
-    lvSteps.setOnTouchListener(controller);
 
     lvSteps.setOnItemClickListener(new OnItemClickListener() {
       @Override

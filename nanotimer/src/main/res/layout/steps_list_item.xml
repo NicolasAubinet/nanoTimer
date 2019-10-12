@@ -3,33 +3,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
    android:orientation="vertical"
    android:layout_width="match_parent"
-   android:layout_height="match_parent">
+   android:layout_height="match_parent"
+   android:padding="6dp">
 
-  <RelativeLayout
-     android:layout_width="match_parent"
-     android:layout_height="match_parent"
-     android:padding="6dp">
-
-    <TextView
-       android:id="@+id/tvStepName"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_toLeftOf="@+id/imgMove"
-       android:layout_centerVertical="true"
-       android:layout_alignParentLeft="true"
-       android:maxLines="1"
-       style="@style/SimpleTextField"/>
-
-    <ImageView
-       android:id="@+id/imgMove"
-       android:src="@drawable/listmove"
-       android:layout_width="30dp"
-       android:layout_height="30dp"
-       android:layout_centerVertical="true"
-       android:layout_alignParentRight="true"
-       android:layout_marginRight="6dp"
-       android:focusable="false"/>
-
-  </RelativeLayout>
+  <TextView
+     android:id="@+id/tvStepName"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_toLeftOf="@+id/imgMove"
+     android:layout_centerVertical="true"
+     android:layout_alignParentLeft="true"
+     android:maxLines="1"
+     style="@style/SimpleTextField"/>
 
 </LinearLayout>
