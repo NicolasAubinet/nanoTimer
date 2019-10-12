@@ -366,7 +366,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
             public void run() {
               refreshDataSet(cubeTypesSpinnerAdapter);
               int selectedIndex = cubeTypes.indexOf(newCurCubeType);
-              if (selectedIndex >= 0) {
+              if (selectedIndex >= 0 && selectedIndex < spCubeType.getCount()) {
                 spCubeType.setSelection(selectedIndex);
               }
             }
@@ -412,7 +412,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
               public void run() {
                 refreshDataSet(solveTypesSpinnerAdapter);
                 int selectedIndex = solveTypes.indexOf(finalCurSolveType);
-                if (selectedIndex >= 0) {
+                if (selectedIndex >= 0 && selectedIndex < spSolveType.getCount()) {
                   spSolveType.setSelection(selectedIndex);
                 }
               }
