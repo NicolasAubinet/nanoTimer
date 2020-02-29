@@ -79,23 +79,34 @@ public enum FormatterService {
     if (split.length > 2) {
       return null;
     }
-    int minutes = 0;
-    int seconds = 0;
-    int hundreds = 0;
+
+    long ts = 0;
+
     try {
+      int minutes = 0;
       if (split.length == 2) {
         minutes = Integer.parseInt(split[0]);
       }
       split = split[split.length - 1].split("\\.");
-      seconds = Integer.parseInt(split[0]);
-      hundreds = Integer.parseInt(split[1]);
+      int seconds = Integer.parseInt(split[0]);
+
+      String decimalsStr = split[1];
+      int decimals = Integer.parseInt(decimalsStr);
+
+      if (decimalsStr.length() == 2) {
+        ts += decimals * 10;
+      } else if (decimalsStr.length() == 3) {
+        ts += decimals;
+      } else {
+        return null;
+      }
+
+      ts += seconds * 1000;
+      ts += minutes * 60000;
     } catch (NumberFormatException e) {
       return null;
     }
-    long ts = 0;
-    ts += hundreds * 10;
-    ts += seconds * 1000;
-    ts += minutes * 60000;
+
     return ts;
   }
 
