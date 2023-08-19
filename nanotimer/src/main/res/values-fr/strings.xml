@@ -279,7 +279,12 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.11 <i>(Nouvelle version)</i></b></u>
+    <u><b>v1.3.12 <i>(Nouvelle version)</i></b></u>
+    <ul>
+      <li>Mise à jour de la version Android et des dépendances</li>
+      <li>Ajout de la possibilité d\'annuler un +2 en cliquant une deuxième fois dessus</li>
+    </ul>
+    <u><b>v1.3.11</b></u>
     <ul>
       <li>Réglage d\'un bug lors de l\'import de temps qui rendait certains temps de résolution incorrects</li>
     </ul>

@@ -283,7 +283,12 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.11 <i>(New version)</i></b></u>
+    <u><b>v1.3.12 <i>(New version)</i></b></u>
+    <ul>
+      <li>Updated target Android version and dependencies</li>
+      <li>Allow to undo +2 by clicking a second time on it</li>
+    </ul>
+    <u><b>v1.3.11</b></u>
     <ul>
       <li>Fix bug during times import that was causing imported solve times to not be correct</li>
     </ul>
