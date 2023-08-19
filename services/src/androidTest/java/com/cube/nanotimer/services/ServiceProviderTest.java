@@ -1,6 +1,6 @@
 package com.cube.nanotimer.services;
 
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import android.test.AndroidTestCase;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.FrequencyData;

@@ -20,7 +20,7 @@
        android:inputType="textCapSentences"
        style="@style/SmallTextField"/>
 
-    <android.support.v7.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatButton
        android:id="@+id/buAddStep"
        android:layout_width="65dp"
        android:layout_height="wrap_content"

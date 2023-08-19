@@ -3,7 +3,7 @@ package com.cube.nanotimer.gui.widget;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
+import androidx.fragment.app.FragmentManager;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;

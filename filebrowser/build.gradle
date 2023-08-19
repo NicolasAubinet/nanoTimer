@@ -1,11 +1,9 @@
 apply plugin: 'com.android.library'
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
-
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 28
+        compileSdk 33
+        targetSdkVersion 33
     }
 
     buildTypes {
@@ -14,6 +12,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+    namespace 'com.ankhsoft.filebrowser'
 }
 
 dependencies {

@@ -6,7 +6,7 @@ import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.ActionBar;
+import androidx.appcompat.app.ActionBar;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;

@@ -2,7 +2,7 @@ package com.cube.nanotimer.util.view;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.support.v7.widget.AppCompatTextView;
+import androidx.appcompat.widget.AppCompatTextView;
 import android.util.AttributeSet;
 import com.cube.nanotimer.util.helper.GUIUtils;
 

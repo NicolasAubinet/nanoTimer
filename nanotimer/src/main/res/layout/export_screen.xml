@@ -48,7 +48,7 @@
        android:enabled="false"/>
   </LinearLayout>
 
-  <android.support.v7.widget.AppCompatButton
+  <androidx.appcompat.widget.AppCompatButton
      android:id="@+id/buExport"
      android:text="@string/export_times"
      android:layout_alignParentBottom="true"

@@ -133,7 +133,7 @@
        android:textSize="16sp"
        android:layout_marginBottom="3dp"/>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:layout_margin="3dp"
@@ -156,7 +156,7 @@
           <TextView android:id="@+id/tvAvgOfHundred" style="@style/TableCell"/>
         </TableRow>
       </TableLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
   </LinearLayout>
 
@@ -173,17 +173,17 @@
      android:layout_width="match_parent"
      android:layout_height="wrap_content">
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        style="@style/TableCardView">
-      <android.support.v7.widget.GridLayout
+      <androidx.gridlayout.widget.GridLayout
          android:id="@+id/sessionTimesLayout"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
          app:columnCount="4">
-      </android.support.v7.widget.GridLayout>
-    </android.support.v7.widget.CardView>
+      </androidx.gridlayout.widget.GridLayout>
+    </androidx.cardview.widget.CardView>
 
   </ScrollView>
 

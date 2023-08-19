@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:tools="http://schemas.android.com/tools"
-   package="com.cube.nanotimer">
+   xmlns:tools="http://schemas.android.com/tools">
 
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
@@ -21,7 +20,8 @@
        android:name=".gui.MainScreenActivity"
        android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
        android:theme="@style/NanoTimerThemeNoActionBar"
-       android:launchMode="singleTask">
+       android:launchMode="singleTask"
+       android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
         <category android:name="android.intent.category.LAUNCHER"/>
@@ -37,7 +37,8 @@
        android:screenOrientation="landscape"/>
     <activity
        android:name=".gui.SolveTypesActivity"
-       android:configChanges="orientation|screenSize|keyboard|keyboardHidden">
+       android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+       android:exported="false">
       <intent-filter>
         <action android:name="com.cube.nanotimer.gui.SolveTypesActivity"/>
         <category android:name="android.intent.category.DEFAULT"/>
@@ -53,7 +54,7 @@
     </activity>
 
     <service android:name=".scrambler.randomstate.ChargingStateService"/>
-    <receiver android:name=".scrambler.randomstate.ChargingStateReceiver">
+    <receiver android:name=".scrambler.randomstate.ChargingStateReceiver" android:exported="false">
       <intent-filter>
         <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
         <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
@@ -62,7 +63,7 @@
     </receiver>
 
     <provider
-       android:name="android.support.v4.content.FileProvider"
+       android:name="androidx.core.content.FileProvider"
        android:authorities="com.cube.nanotimer.fileprovider"
        android:exported="false"
        android:grantUriPermissions="true">

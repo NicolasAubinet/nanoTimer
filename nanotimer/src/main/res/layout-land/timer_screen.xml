@@ -55,7 +55,7 @@
          android:layout_height="wrap_content"
          android:orientation="vertical">
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
            style="@style/TableCardViewPx">
@@ -84,7 +84,7 @@
             </TableRow>
           </TableLayout>
 
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
         <!--<TextView style="@style/DividerRow" android:layout_marginTop="1px" android:layout_marginBottom="1px" />-->
 
@@ -230,7 +230,7 @@
         </TableRow>
       </TableLayout>
 
-      <android.support.v7.widget.CardView
+      <androidx.cardview.widget.CardView
          android:id="@+id/averagesCardView"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
@@ -272,7 +272,7 @@
             <com.cube.nanotimer.util.view.FontFitTextView style="@style/TableCellPx" android:padding="2px"/>
           </TableRow>
         </TableLayout>
-      </android.support.v7.widget.CardView>
+      </androidx.cardview.widget.CardView>
     </RelativeLayout>
 
   </LinearLayout>
