@@ -585,7 +585,7 @@ public class ServiceProviderImpl implements ServiceProvider {
         st.setTimestamp(cursor.getLong(2));
         st.setScramble(cursor.getString(3));
         st.setComment(cursor.getString(4));
-        st.setPlusTwo(cursor.getInt(5) == 1);
+        st.setPlusTwo(cursor.getInt(5) == 1, false);
         st.setPb(cursor.getInt(6) == 1);
         st.setSolveType(solveType);
         if (solveType.hasSteps()) {
@@ -834,7 +834,7 @@ public class ServiceProviderImpl implements ServiceProvider {
         sta.setTimestamp(cursor.getLong(2));
         sta.setScramble(cursor.getString(3));
         sta.setComment(cursor.getString(4));
-        sta.setPlusTwo(cursor.getInt(5) == 1);
+        sta.setPlusTwo(cursor.getInt(5) == 1, false);
         sta.setPb(cursor.getInt(6) == 1);
         Long v = getCursorLong(cursor, 7);
         sta.setAvgOf5(v == null || v == -2 ? null : v);
@@ -1003,7 +1003,7 @@ public class ServiceProviderImpl implements ServiceProvider {
         st.setTimestamp(cursor.getLong(2));
         st.setScramble(cursor.getString(3));
         st.setComment(cursor.getString(4));
-        st.setPlusTwo(cursor.getInt(5) == 1);
+        st.setPlusTwo(cursor.getInt(5) == 1, false);
         st.setPb(cursor.getInt(6) == 1);
 
         int cubeTypeId = cursor.getInt(11);

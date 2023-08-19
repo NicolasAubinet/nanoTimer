@@ -105,9 +105,6 @@ public class HistoryDetailDialog extends NanoTimerDialogFragment {
     ImageButton buComment = (ImageButton) v.findViewById(R.id.buComment);
     ImageView imgPb = (ImageView) v.findViewById(R.id.imgPb);
 
-    if (solveTime.isPlusTwo()) {
-      buPlusTwo.setEnabled(false);
-    }
     if (solveTime.isDNF()) {
       buDNF.setEnabled(false);
       buPlusTwo.setEnabled(false);
@@ -131,8 +128,8 @@ public class HistoryDetailDialog extends NanoTimerDialogFragment {
     buPlusTwo.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
-        if (!solveTime.isDNF() && !solveTime.isPlusTwo()) {
-          solveTime.plusTwo();
+        if (!solveTime.isDNF()) {
+          solveTime.setPlusTwo(!solveTime.isPlusTwo(), true);
           saveTime(solveTime);
         }
         dialog.dismiss();

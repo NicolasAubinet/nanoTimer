@@ -54,10 +54,6 @@ public class SolveTime implements Serializable {
     return plusTwo;
   }
 
-  public void setPlusTwo(boolean plusTwo) {
-    this.plusTwo = plusTwo;
-  }
-
   public boolean isPb() {
     return pb;
   }
@@ -102,9 +98,18 @@ public class SolveTime implements Serializable {
     return time < 0;
   }
 
-  public void plusTwo() {
-    setTime(time + 2000);
-    setPlusTwo(true);
+  public void setPlusTwo(boolean plusTwo, boolean adjustTime) {
+    if (this.plusTwo != plusTwo) {
+      this.plusTwo = plusTwo;
+
+      if (adjustTime) {
+        if (plusTwo) {
+          setTime(time + 2000);
+        } else {
+          setTime(time - 2000);
+        }
+      }
+    }
   }
 
   public boolean hasSteps() {

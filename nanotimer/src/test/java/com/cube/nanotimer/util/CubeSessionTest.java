@@ -93,7 +93,7 @@ public class CubeSessionTest {
     Assert.assertEquals(8, cs.getBestTimeInd(12));
     Assert.assertEquals(0, cs.getWorstTimeInd(12));
 
-    cs.setLastAsPlusTwo(); // -1 15 -1 3 8 11 5 7 2 9 8 5 3 (does not change anything because already DNF)
+    cs.setLastAsPlusTwo(true); // -1 15 -1 3 8 11 5 7 2 9 8 5 3 (does not change anything because already DNF)
     Assert.assertEquals(3, cs.getBestTimeInd(5));
     Assert.assertEquals(0, cs.getWorstTimeInd(5));
     Assert.assertEquals(8, cs.getBestTimeInd(12));
@@ -117,7 +117,7 @@ public class CubeSessionTest {
     Assert.assertEquals(0, cs.getBestTimeInd(12));
     Assert.assertEquals(3, cs.getWorstTimeInd(12));
 
-    cs.setLastAsPlusTwo(); // 3 5 3 -1 15 -1 3 8 11 5 7 2 9
+    cs.setLastAsPlusTwo(true); // 3 5 3 -1 15 -1 3 8 11 5 7 2 9
     Assert.assertEquals(0, cs.getBestTimeInd(5));
     Assert.assertEquals(3, cs.getWorstTimeInd(5));
     Assert.assertEquals(11, cs.getBestTimeInd(12));
@@ -168,7 +168,7 @@ public class CubeSessionTest {
     Assert.assertEquals(-1, cs.getBestTimeInd(12));
     Assert.assertEquals(-1, cs.getWorstTimeInd(12));
 
-    cs.setLastAsPlusTwo(); // 3 3 5 4 3 2
+    cs.setLastAsPlusTwo(true); // 3 3 5 4 3 2
     Assert.assertEquals(0, cs.getBestTimeInd(5));
     Assert.assertEquals(2, cs.getWorstTimeInd(5));
     Assert.assertEquals(-1, cs.getBestTimeInd(12));

@@ -410,11 +410,12 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     if (timerState == TimerState.STOPPED) {
       switch (item.getItemId()) {
         case R.id.itPlusTwo:
-          if (lastSolveTime != null && !lastSolveTime.isDNF() && !lastSolveTime.isPlusTwo()) {
-            lastSolveTime.plusTwo();
+          if (lastSolveTime != null && !lastSolveTime.isDNF()) {
+            boolean isPlusTwo = !lastSolveTime.isPlusTwo();
+            lastSolveTime.setPlusTwo(isPlusTwo, true);
             App.INSTANCE.getService().saveTime(lastSolveTime, solveAverageCallback);
             tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(lastSolveTime.getTime()));
-            cubeSession.setLastAsPlusTwo();
+            cubeSession.setLastAsPlusTwo(isPlusTwo);
             refreshSessionFields();
           }
           break;

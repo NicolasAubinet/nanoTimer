@@ -36,11 +36,12 @@ public class CubeSession extends TimesStatistics {
     }
   }
 
-  public void setLastAsPlusTwo() {
+  public void setLastAsPlusTwo(boolean plusTwo) {
     if (!times.isEmpty()) {
       long curLastTime = times.get(0);
       if (curLastTime > 0) {
-        times.set(0, curLastTime + 2000);
+        long time = (plusTwo) ? curLastTime + 2000 : curLastTime - 2000;
+        times.set(0, time);
       }
     }
   }
