@@ -1,13 +1,13 @@
 package com.cube.nanotimer.util.helper;
 
-import androidx.test.ext.junit.runners.AndroidJUnit4;
+import android.content.Context;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.runner.AndroidJUnit4;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.List;
-
-import static androidx.test.platform.app.InstrumentationRegistry.getContext;
 
 @RunWith(AndroidJUnit4.class)
 public class FileUtilsTest {
@@ -16,21 +16,22 @@ public class FileUtilsTest {
 
   @Test
   public void testFileReadWrite() {
-    FileUtils.deleteFile(getContext(), FILENAME);
+    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+    FileUtils.deleteFile(context, FILENAME);
 
     String[] lines = new String[] {
         "abc", "def", "ghi", "jkl", "mno"
     };
-    FileUtils.appendLinesToFile(getContext(), FILENAME, lines);
-    Assert.assertEquals(5, FileUtils.getFileLinesCount(getContext(), FILENAME));
+    FileUtils.appendLinesToFile(context, FILENAME, lines);
+    Assert.assertEquals(5, FileUtils.getFileLinesCount(context, FILENAME));
 
     lines = new String[] {
         "pqr", "stu"
     };
-    FileUtils.appendLinesToFile(getContext(), FILENAME, lines);
-    Assert.assertEquals(7, FileUtils.getFileLinesCount(getContext(), FILENAME));
+    FileUtils.appendLinesToFile(context, FILENAME, lines);
+    Assert.assertEquals(7, FileUtils.getFileLinesCount(context, FILENAME));
 
-    List<String> read = FileUtils.readLinesFromFile(getContext(), FILENAME);
+    List<String> read = FileUtils.readLinesFromFile(context, FILENAME);
     Assert.assertEquals(7, read.size());
     Assert.assertEquals("abc", read.get(0));
     Assert.assertEquals("def", read.get(1));
@@ -40,76 +41,76 @@ public class FileUtilsTest {
     Assert.assertEquals("pqr", read.get(5));
     Assert.assertEquals("stu", read.get(6));
 
-    read = FileUtils.readLinesFromFile(getContext(), FILENAME, 3);
+    read = FileUtils.readLinesFromFile(context, FILENAME, 3);
     Assert.assertEquals(3, read.size());
     Assert.assertEquals("abc", read.get(0));
     Assert.assertEquals("def", read.get(1));
     Assert.assertEquals("ghi", read.get(2));
 
-    FileUtils.removeFirstLineFromFile(getContext(), FILENAME);
-    read = FileUtils.readLinesFromFile(getContext(), FILENAME);
+    FileUtils.removeFirstLineFromFile(context, FILENAME);
+    read = FileUtils.readLinesFromFile(context, FILENAME);
     Assert.assertEquals(6, read.size());
-    Assert.assertEquals(6, FileUtils.getFileLinesCount(getContext(), FILENAME));
+    Assert.assertEquals(6, FileUtils.getFileLinesCount(context, FILENAME));
 
-    read = FileUtils.readLinesFromFile(getContext(), FILENAME, 3);
+    read = FileUtils.readLinesFromFile(context, FILENAME, 3);
     Assert.assertEquals(3, read.size());
     Assert.assertEquals("def", read.get(0));
     Assert.assertEquals("ghi", read.get(1));
     Assert.assertEquals("jkl", read.get(2));
 
-    FileUtils.removeFirstLineFromFile(getContext(), FILENAME);
-    FileUtils.removeFirstLineFromFile(getContext(), FILENAME);
-    Assert.assertEquals(4, FileUtils.getFileLinesCount(getContext(), FILENAME));
+    FileUtils.removeFirstLineFromFile(context, FILENAME);
+    FileUtils.removeFirstLineFromFile(context, FILENAME);
+    Assert.assertEquals(4, FileUtils.getFileLinesCount(context, FILENAME));
 
-    FileUtils.renameFile(getContext(), FILENAME, FILENAME + "_tmp");
-    Assert.assertEquals(0, FileUtils.getFileLinesCount(getContext(), FILENAME));
-    read = FileUtils.readLinesFromFile(getContext(), FILENAME);
+    FileUtils.renameFile(context, FILENAME, FILENAME + "_tmp");
+    Assert.assertEquals(0, FileUtils.getFileLinesCount(context, FILENAME));
+    read = FileUtils.readLinesFromFile(context, FILENAME);
     Assert.assertEquals(0, read.size());
-    FileUtils.removeFirstLineFromFile(getContext(), FILENAME);
-    Assert.assertEquals(0, FileUtils.getFileLinesCount(getContext(), FILENAME));
-    FileUtils.renameFile(getContext(), FILENAME + "_tmp", FILENAME);
-    Assert.assertEquals(4, FileUtils.getFileLinesCount(getContext(), FILENAME));
+    FileUtils.removeFirstLineFromFile(context, FILENAME);
+    Assert.assertEquals(0, FileUtils.getFileLinesCount(context, FILENAME));
+    FileUtils.renameFile(context, FILENAME + "_tmp", FILENAME);
+    Assert.assertEquals(4, FileUtils.getFileLinesCount(context, FILENAME));
 
-    FileUtils.removeFirstLineFromFile(getContext(), FILENAME);
-    FileUtils.removeFirstLineFromFile(getContext(), FILENAME);
-    FileUtils.removeFirstLineFromFile(getContext(), FILENAME);
-    Assert.assertEquals(1, FileUtils.getFileLinesCount(getContext(), FILENAME));
-    read = FileUtils.readLinesFromFile(getContext(), FILENAME, 3);
+    FileUtils.removeFirstLineFromFile(context, FILENAME);
+    FileUtils.removeFirstLineFromFile(context, FILENAME);
+    FileUtils.removeFirstLineFromFile(context, FILENAME);
+    Assert.assertEquals(1, FileUtils.getFileLinesCount(context, FILENAME));
+    read = FileUtils.readLinesFromFile(context, FILENAME, 3);
     Assert.assertEquals(1, read.size());
     Assert.assertEquals("stu", read.get(0));
 
-    FileUtils.removeFirstLineFromFile(getContext(), FILENAME);
-    Assert.assertEquals(0, FileUtils.getFileLinesCount(getContext(), FILENAME));
-    FileUtils.removeFirstLineFromFile(getContext(), FILENAME);
-    Assert.assertEquals(0, FileUtils.getFileLinesCount(getContext(), FILENAME));
-    read = FileUtils.readLinesFromFile(getContext(), FILENAME, 3);
+    FileUtils.removeFirstLineFromFile(context, FILENAME);
+    Assert.assertEquals(0, FileUtils.getFileLinesCount(context, FILENAME));
+    FileUtils.removeFirstLineFromFile(context, FILENAME);
+    Assert.assertEquals(0, FileUtils.getFileLinesCount(context, FILENAME));
+    read = FileUtils.readLinesFromFile(context, FILENAME, 3);
     Assert.assertEquals(0, read.size());
-    FileUtils.removeFirstLineFromFile(getContext(), FILENAME);
+    FileUtils.removeFirstLineFromFile(context, FILENAME);
 
     lines = new String[] {
         "yes", "no"
     };
-    FileUtils.appendLinesToFile(getContext(), FILENAME, lines);
-    Assert.assertEquals(2, FileUtils.getFileLinesCount(getContext(), FILENAME));
+    FileUtils.appendLinesToFile(context, FILENAME, lines);
+    Assert.assertEquals(2, FileUtils.getFileLinesCount(context, FILENAME));
 
-    read = FileUtils.readLinesFromFile(getContext(), FILENAME, 5);
+    read = FileUtils.readLinesFromFile(context, FILENAME, 5);
     Assert.assertEquals(2, read.size());
     Assert.assertEquals("yes", read.get(0));
     Assert.assertEquals("no", read.get(1));
 
-    read = FileUtils.readLinesFromFile(getContext(), FILENAME);
+    read = FileUtils.readLinesFromFile(context, FILENAME);
     Assert.assertEquals(2, read.size());
     Assert.assertEquals("yes", read.get(0));
     Assert.assertEquals("no", read.get(1));
 
-    FileUtils.removeFirstLineFromFile(getContext(), FILENAME);
-    read = FileUtils.readLinesFromFile(getContext(), FILENAME);
+    FileUtils.removeFirstLineFromFile(context, FILENAME);
+    read = FileUtils.readLinesFromFile(context, FILENAME);
     Assert.assertEquals(1, read.size());
     Assert.assertEquals("no", read.get(0));
 
-    FileUtils.deleteFile(getContext(), FILENAME);
-    Assert.assertEquals(0, FileUtils.getFileLinesCount(getContext(), FILENAME));
-    read = FileUtils.readLinesFromFile(getContext(), FILENAME);
+    FileUtils.deleteFile(context, FILENAME);
+    Assert.assertEquals(0, FileUtils.getFileLinesCount(context, FILENAME));
+    read = FileUtils.readLinesFromFile(context, FILENAME);
     Assert.assertEquals(0, read.size());
   }
 
