@@ -549,6 +549,8 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
 
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+
     if (requestCode == IMPORT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
       File file = (File) data.getSerializableExtra("file");
       new CSVImporter(this, this, new ErrorListener() {
