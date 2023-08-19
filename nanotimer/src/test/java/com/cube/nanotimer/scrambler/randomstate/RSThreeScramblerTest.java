@@ -65,6 +65,7 @@ public class RSThreeScramblerTest {
   @Test
   public void testCustomScrambles() {
     RSThreeScrambler scrambler = new RSThreeScrambler();
+    scrambler.genTables();
     System.out.println("getNewScramble...");
     String[] scramble = scrambler.getNewScramble(new ScrambleConfig(23, ScrambleTypes.DEFAULT));
     String formattedScramble = ScrambleFormatterService.INSTANCE.formatScrambleAsSingleLine(scramble, CubeType.THREE_BY_THREE);
