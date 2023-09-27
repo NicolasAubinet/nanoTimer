@@ -279,7 +279,11 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.12 <i>(Nueva versión)</i></b></u>
+    <u><b>v1.3.13 <i>(Nueva versión)</i></b></u>
+    <ul>
+      <li>Fixed crash that some users were experiencing</li>
+    </ul>
+    <u><b>v1.3.12</b></u>
     <ul>
       <li>Actualiza el meta android versión</li>
       <li>Añadir posibilidad de cancelar +2</li>

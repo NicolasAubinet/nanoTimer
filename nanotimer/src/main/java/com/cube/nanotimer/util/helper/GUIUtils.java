@@ -188,7 +188,7 @@ public class GUIUtils {
     stackBuilder.addParentStack(resultClass);
     stackBuilder.addNextIntent(resultIntent);
 
-    PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+    PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     builder.setContentIntent(pendingIntent);
 
     notifManager.notify(id, builder.build());

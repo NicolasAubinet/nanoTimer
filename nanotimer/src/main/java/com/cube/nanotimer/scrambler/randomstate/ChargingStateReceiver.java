@@ -3,6 +3,7 @@ package com.cube.nanotimer.scrambler.randomstate;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.scrambler.ScramblerService;
@@ -52,7 +53,11 @@ public class ChargingStateReceiver extends BroadcastReceiver {
     if (firstCubeTypeToGenerateScrambles != null) {
       Intent i = new Intent(context, ChargingStateService.class);
       i.putExtra(ChargingStateService.CUBE_TYPE_KEY, firstCubeTypeToGenerateScrambles);
-      context.startService(i);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        context.startForegroundService(i);
+      } else {
+        context.startService(i);
+      }
     }
   }
 
