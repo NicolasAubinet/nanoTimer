@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.os.Handler;
@@ -54,6 +55,9 @@ import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.TimesSort;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -552,7 +556,20 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
     super.onActivityResult(requestCode, resultCode, data);
 
     if (requestCode == IMPORT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-      File file = (File) data.getSerializableExtra("file");
+      InputStream inputStream;
+      try {
+        if (VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+          Uri uri = data.getData();
+          assert uri != null;
+          inputStream = getContentResolver().openInputStream(uri);
+        } else {
+          File file = (File) data.getSerializableExtra("file");
+          inputStream = new FileInputStream(file);
+        }
+      } catch (FileNotFoundException e) {
+        throw new RuntimeException(e);
+      }
+
       new CSVImporter(this, this, new ErrorListener() {
         @Override
         public void onError(final String message) {
@@ -563,12 +580,14 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
             }
           });
         }
-      }).importData(file);
+      }).importData(inputStream);
     }
   }
 
   private void tryLaunchImportActivity() {
-    if (VERSION.SDK_INT >= 19) {
+    if (VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+      launchImportActivity(); // Lollipop and up can use the default OS file browser
+    } else if (VERSION.SDK_INT >= 19) {
       final String permission = Manifest.permission.READ_EXTERNAL_STORAGE;
       if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
 //        if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
@@ -606,7 +625,17 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   }
 
   private void launchImportActivity() {
-    startActivityForResult(new Intent(this, ImportActivity.class), IMPORT_REQUEST_CODE);
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+      // Choose a directory using the system's file picker.
+      Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+      intent.addCategory(Intent.CATEGORY_OPENABLE);
+      intent.setType("text/*");
+
+      startActivityForResult(intent, IMPORT_REQUEST_CODE);
+    } else {
+      // Use custom-made file browser (not compatible with newer Android versions because of permissions)
+      startActivityForResult(new Intent(this, ImportActivity.class), IMPORT_REQUEST_CODE);
+    }
   }
 
   private void setSolvesCount(int solvesCount) {

@@ -18,16 +18,13 @@ import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.SolveTypeStep;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
-public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
+public class CSVDataReader extends AsyncTask<InputStream, Void, ImportTimesData> {
 
   private Context context;
   private ProgressDialog progressDialog;
@@ -41,11 +38,11 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
   }
 
   @Override
-  protected ImportTimesData doInBackground(File... files) {
-    File file = files[0];
+  protected ImportTimesData doInBackground(InputStream... inputStreams) {
+    InputStream inputStream = inputStreams[0];
     ImportTimesData importData = null;
     try {
-      importData = getImportData(file);
+      importData = getImportData(inputStream);
     } catch (CSVFormatException e) {
       errorListener.onError(e.getMessage());
     }
@@ -73,8 +70,8 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
     }
   }
 
-  private ImportTimesData getImportData(File importFile) throws CSVFormatException {
-    List<String> lines = readCSVFile(importFile);
+  private ImportTimesData getImportData(InputStream inputStream) throws CSVFormatException {
+    List<String> lines = readCSVFile(inputStream);
     groupQuotedLines(lines);
     List<ExportResult> exportResults = getExportResults(lines);
     ImportTimesData importData = new ImportTimesData(context);
@@ -119,11 +116,10 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
     return importData;
   }
 
-  private List<String> readCSVFile(File file) throws CSVFormatException {
+  private List<String> readCSVFile(InputStream inputStream) throws CSVFormatException {
     List<String> lines = new ArrayList<String>();
     try {
-      FileInputStream fis = new FileInputStream(file);
-      Scanner fileScanner = new Scanner(fis);
+      Scanner fileScanner = new Scanner(inputStream);
       int i = 0;
       while (fileScanner.hasNextLine()) {
         String line = fileScanner.nextLine();
@@ -134,7 +130,7 @@ public class CSVDataReader extends AsyncTask<File, Void, ImportTimesData> {
         i++;
       }
       fileScanner.close();
-      fis.close();
+      inputStream.close();
     } catch (FileNotFoundException e) {
       errorListener.onError(context.getString(R.string.error_reading_import_file, e.getMessage()));
     } catch (IOException e) {

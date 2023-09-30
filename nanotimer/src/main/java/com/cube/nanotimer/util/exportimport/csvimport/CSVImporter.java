@@ -7,7 +7,7 @@ import com.cube.nanotimer.util.exportimport.ErrorListener;
 import com.cube.nanotimer.util.exportimport.csvimport.workers.CSVDataReader;
 import com.cube.nanotimer.util.helper.DialogUtils;
 
-import java.io.File;
+import java.io.InputStream;
 
 public class CSVImporter {
 
@@ -25,7 +25,7 @@ public class CSVImporter {
     this.errorListener = errorListener;
   }
 
-  public void importData(File file) {
+  public void importData(InputStream inputStream) {
     new CSVDataReader(activity, errorListener, new ImportResultListener() {
       @Override
       public void onResult(final String result, final Object... params) {
@@ -48,7 +48,7 @@ public class CSVImporter {
           }
         });
       }
-    }).execute(file);
+    }).execute(inputStream);
   }
 
 }
