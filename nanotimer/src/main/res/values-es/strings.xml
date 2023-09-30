@@ -279,7 +279,11 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.13 <i>(Nueva versión)</i></b></u>
+    <u><b>v1.3.14 <i>(Nueva versión)</i></b></u>
+    <ul>
+      <li>Arreglar tiempos importacion qué no funcionó en Android versiones más nuevas</li>
+    </ul>
+    <u><b>v1.3.13</b></u>
     <ul>
       <li>Fixed crash that some users were experiencing</li>
     </ul>
