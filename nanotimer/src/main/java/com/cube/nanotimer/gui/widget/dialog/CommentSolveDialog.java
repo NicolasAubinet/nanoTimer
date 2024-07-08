@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.EditText;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.gui.widget.HistoryDetailDialog;
+import com.cube.nanotimer.gui.widget.TimeChangedHandler;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
@@ -17,8 +19,11 @@ public class CommentSolveDialog extends ConfirmDialog {
 
   private static final String ARG_SOLVE_TIME = "solveType";
 
-  public static CommentSolveDialog newInstance(SolveTime solveTime) {
+  private TimeChangedHandler handler;
+
+  public static CommentSolveDialog newInstance(SolveTime solveTime, TimeChangedHandler handler) {
     CommentSolveDialog frag = new CommentSolveDialog();
+    frag.handler = handler;
 
     Bundle args = new Bundle();
     args.putSerializable(ARG_SOLVE_TIME, solveTime);
@@ -42,6 +47,9 @@ public class CommentSolveDialog extends ConfirmDialog {
     App.INSTANCE.getService().saveTime(solveTime, new DataCallback<SolveAverages>() {
       @Override
       public void onData(SolveAverages data) {
+        if (handler != null) {
+          handler.onTimeChanged(solveTime);
+        }
       }
     });
 

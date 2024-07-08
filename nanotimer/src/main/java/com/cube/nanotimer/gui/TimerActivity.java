@@ -440,7 +440,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
           break;
         case R.id.itComment:
           if (lastSolveTime != null) {
-            DialogUtils.showFragment(this, CommentSolveDialog.newInstance(lastSolveTime));
+            DialogUtils.showFragment(this, CommentSolveDialog.newInstance(lastSolveTime, null));
           }
           break;
         case R.id.itSessionDetails:

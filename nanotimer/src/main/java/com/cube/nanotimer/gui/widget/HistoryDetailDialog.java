@@ -171,7 +171,7 @@ public class HistoryDetailDialog extends NanoTimerDialogFragment {
     buComment.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        DialogUtils.showFragment(getActivity(), CommentSolveDialog.newInstance(solveTime));
+        DialogUtils.showFragment(getActivity(), CommentSolveDialog.newInstance(solveTime, handler));
       }
     });
 
