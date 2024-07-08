@@ -56,6 +56,7 @@
   <string name="delete">Supprimer</string>
   <string name="session_details">Détails de session</string>
   <string name="new_session">Nouvelle session</string>
+  <string name="date">Date:</string>
   <string name="time">Temps:</string>
   <string name="averages">Moyennes</string>
   <string name="steps">Étapes</string>
