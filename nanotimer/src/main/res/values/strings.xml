@@ -60,6 +60,7 @@
   <string name="delete">Delete</string>
   <string name="session_details">Session details</string>
   <string name="new_session">New session</string>
+  <string name="date">Date:</string>
   <string name="time">Time:</string>
   <string name="averages">Averages</string>
   <string name="steps">Steps</string>

@@ -96,6 +96,7 @@ public class HistoryDetailDialog extends NanoTimerDialogFragment {
       });
     }
 
+    final TextView tvDate = (TextView) v.findViewById(R.id.tvDate);
     final TextView tvTime = (TextView) v.findViewById(R.id.tvTime);
     FontFitTextView tvScramble = (FontFitTextView) v.findViewById(R.id.tvScramble);
     Button buPlusTwo = (Button) v.findViewById(R.id.buPlusTwo);
@@ -120,6 +121,7 @@ public class HistoryDetailDialog extends NanoTimerDialogFragment {
     } else {
       tvScramble.setText(R.string.no_scramble);
     }
+    tvDate.setText(FormatterService.INSTANCE.formatDateTime(solveTime.getTimestamp()));
     tvTime.setText(FormatterService.INSTANCE.formatSolveTime(solveTime.getTime()));
 
     final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(v).create();

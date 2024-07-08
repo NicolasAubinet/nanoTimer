@@ -44,33 +44,22 @@
      android:paddingRight="6dp"
      android:stretchColumns="1"
      android:layout_alignParentTop="true">
-    <TableRow>
+    <TableRow android:id="@+id/trDate" android:layout_marginTop="5dp">
       <TextView
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:layout_gravity="center_vertical"
-         android:text="@string/time"
+         android:text="@string/date"
          android:textSize="15sp"/>
-      <LinearLayout
+      <TextView
+         android:id="@+id/tvDate"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:layout_gravity="center_vertical"
-         android:orientation="horizontal"
          android:layout_marginLeft="10dp"
-         android:layout_weight="1">
-        <TextView
-           android:id="@+id/tvTime"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:textColor="@color/white"
-           android:textSize="15sp"/>
-        <ImageView
-           android:id="@+id/imgPb"
-           android:layout_width="25dp"
-           android:layout_height="25dp"
-           android:paddingLeft="6dp"
-           android:src="@drawable/star"/>
-      </LinearLayout>
+         android:layout_weight="1"
+         android:textColor="@color/white"
+         android:textSize="15sp"/>
       <ImageButton
          android:id="@+id/buComment"
          android:layout_gravity="center_vertical"
@@ -89,6 +78,36 @@
          android:padding="5dp"
          android:src="@android:drawable/ic_menu_share"
          android:contentDescription="@string/share_time"/>
+    </TableRow>
+    <TableRow android:layout_marginBottom="6dp">
+      <TextView
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_gravity="center_vertical"
+         android:text="@string/time"
+         android:textSize="15sp"/>
+      <LinearLayout
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_gravity="center_vertical"
+         android:orientation="horizontal"
+         android:layout_marginLeft="10dp"
+         android:layout_weight="1">
+        <TextView
+           android:id="@+id/tvTime"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_gravity="center_vertical"
+           android:textColor="@color/white"
+           android:textSize="15sp"/>
+        <ImageView
+           android:id="@+id/imgPb"
+           android:layout_width="25dp"
+           android:layout_height="25dp"
+           android:layout_gravity="center_vertical"
+           android:paddingLeft="6dp"
+           android:src="@drawable/star"/>
+      </LinearLayout>
     </TableRow>
     <TableRow android:id="@+id/trSteps" android:layout_marginTop="6dp" android:visibility="gone">
       <TextView
