@@ -133,16 +133,17 @@
 
       <com.cube.nanotimer.util.view.FontFitTextView
          android:id="@+id/tvScramble"
-         android:layout_gravity="center"
+         style="@style/ScrambleTextField"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         custom:myfont="MONOSPACE"
-         android:layout_marginTop="6dp"
-         android:layout_marginBottom="6dp"
+         android:layout_gravity="center"
          android:layout_marginLeft="2dp"
+         android:layout_marginTop="6dp"
          android:layout_marginRight="2dp"
+         android:layout_marginBottom="6dp"
          android:paddingBottom="4dp"
-         style="@style/ScrambleTextField"/>
+         android:textSize="15sp"
+         custom:myfont="MONOSPACE" />
 
       <LinearLayout
          android:id="@+id/averagesTable"
