@@ -14,6 +14,7 @@ import com.cube.nanotimer.vo.ScrambleType;
 
 import java.util.List;
 
+// TODO disabled because of recent android SDK compatibility problems, and it isn't really needed anymore with modern phones
 public class ChargingStateReceiver extends BroadcastReceiver {
 
   public static final String CHECK_ACTION_NAME = "com.cube.nanotimer.action.CHECK_PLUG_STATE";
@@ -24,12 +25,12 @@ public class ChargingStateReceiver extends BroadcastReceiver {
   public void onReceive(Context context, Intent intent) {
     this.context = context;
     App.INSTANCE.setApplicationContext(context.getApplicationContext());
-    boolean charging = Utils.isCurrentlyCharging();
-    if (Options.INSTANCE.isGenerateScramblesWhenPluggedIn() && charging) {
-      startPlugGeneration();
-    } else {
-      stopGenerationIfStartedFromPlug();
-    }
+//    boolean charging = Utils.isCurrentlyCharging();
+//    if (Options.INSTANCE.isGenerateScramblesWhenPluggedIn() && charging) {
+//      startPlugGeneration();
+//    } else {
+//      stopGenerationIfStartedFromPlug();
+//    }
   }
 
   private void startPlugGeneration() {
@@ -63,11 +64,11 @@ public class ChargingStateReceiver extends BroadcastReceiver {
 
   private boolean isMissingScrambles(CubeType cubeType, ScrambleType scrambleType) {
     boolean isMissingScrambles = false;
-    int max = Options.INSTANCE.getPluggedInScramblesGenerateCount();
-    int nScrambles = Math.max(max - ScramblerService.INSTANCE.getScramblesCount(cubeType, scrambleType), 0);
-    if (nScrambles > 0) {
-      isMissingScrambles = true;
-    }
+//    int max = Options.INSTANCE.getPluggedInScramblesGenerateCount();
+//    int nScrambles = Math.max(max - ScramblerService.INSTANCE.getScramblesCount(cubeType, scrambleType), 0);
+//    if (nScrambles > 0) {
+//      isMissingScrambles = true;
+//    }
     return isMissingScrambles;
   }
 

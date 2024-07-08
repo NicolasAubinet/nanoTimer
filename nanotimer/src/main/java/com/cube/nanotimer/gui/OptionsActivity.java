@@ -2,7 +2,6 @@ package com.cube.nanotimer.gui;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -15,7 +14,6 @@ import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.ReleaseNotes;
 import com.cube.nanotimer.scrambler.ScramblerService;
-import com.cube.nanotimer.scrambler.randomstate.ChargingStateReceiver;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.State;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenListener;
@@ -137,10 +135,10 @@ public class OptionsActivity extends NanoTimerActivity {
           editor.putInt(key, max);
           editor.apply();
         }
-      } else if (key.equals(Options.SCRAMBLES_GEN_WHEN_PLUGGED_IN_KEY) ||
-        key.equals(Options.SCRAMBLES_GEN_COUNT_WHEN_PLUGGED_IN_KEY)) {
-        // call service to check if generation should be started or stopped
-        context.sendBroadcast(new Intent(ChargingStateReceiver.CHECK_ACTION_NAME));
+//      } else if (key.equals(Options.SCRAMBLES_GEN_WHEN_PLUGGED_IN_KEY) ||
+//        key.equals(Options.SCRAMBLES_GEN_COUNT_WHEN_PLUGGED_IN_KEY)) {
+//        // call service to check if generation should be started or stopped
+//        context.sendBroadcast(new Intent(ChargingStateReceiver.CHECK_ACTION_NAME));
       }
     }
   }

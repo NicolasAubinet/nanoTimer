@@ -1,11 +1,9 @@
 package com.cube.nanotimer.scrambler;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.scrambler.randomstate.AlreadyGeneratingException;
-import com.cube.nanotimer.scrambler.randomstate.ChargingStateReceiver;
 import com.cube.nanotimer.scrambler.randomstate.RSScrambler;
 import com.cube.nanotimer.scrambler.randomstate.RSThreeScrambler;
 import com.cube.nanotimer.scrambler.randomstate.RSTwoScrambler;
@@ -79,18 +77,18 @@ public enum ScramblerService {
 
   private int loadCacheAndGetToGenCount(CubeType cubeType, ScrambleType scrambleType, boolean isFromPhonePlugged) {
     int minCacheSize = Options.INSTANCE.getScramblesMinCacheSize();
-    if (isFromPhonePlugged) {
-      minCacheSize = Options.INSTANCE.getPluggedInScramblesGenerateCount();
-    }
+//    if (isFromPhonePlugged) {
+//      minCacheSize = Options.INSTANCE.getPluggedInScramblesGenerateCount();
+//    }
 
     Queue<String[]> scramblesCache = getCache(cubeType, scrambleType);
     if (scramblesCache.size() < minCacheSize) {
       loadCacheFromFile(cubeType, scrambleType); // see if there are some more scrambles in the file
       if (scramblesCache.size() < minCacheSize) {
         int maxCacheSize = Options.INSTANCE.getScramblesMaxCacheSize();
-        if (isFromPhonePlugged) {
-          maxCacheSize = Options.INSTANCE.getPluggedInScramblesGenerateCount();
-        }
+//        if (isFromPhonePlugged) {
+//          maxCacheSize = Options.INSTANCE.getPluggedInScramblesGenerateCount();
+//        }
         return Math.max(maxCacheSize - scramblesCache.size(), 0);
       }
     }
@@ -128,7 +126,7 @@ public enum ScramblerService {
 
         synchronized (genThreadHelper) {
           if (generationThread == Thread.currentThread()) {
-            checkPluggedIn();
+            //checkPluggedIn();
             generationThread = null;
           }
         }
@@ -270,10 +268,10 @@ public enum ScramblerService {
         return maxScrambleLength;
       }
 
-      private void checkPluggedIn() {
-        // call service to check if generation should be started or stopped
-        context.sendBroadcast(new Intent(ChargingStateReceiver.CHECK_ACTION_NAME));
-      }
+//      private void checkPluggedIn() {
+//        // call service to check if generation should be started or stopped
+//        context.sendBroadcast(new Intent(ChargingStateReceiver.CHECK_ACTION_NAME));
+//      }
     };
   }
 

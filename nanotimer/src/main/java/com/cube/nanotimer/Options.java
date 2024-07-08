@@ -32,8 +32,8 @@ public enum Options {
   public static final String RANDOMSTATE_SCRAMBLES_KEY = "randomstate_scrambles";
   public static final String SCRAMBLES_QUALITY_KEY = "scrambles_quality";
   public static final String SCRAMBLE_NOTIFICATION_MODE_KEY = "scramble_notification_mode";
-  public static final String SCRAMBLES_GEN_WHEN_PLUGGED_IN_KEY = "scrambles_gen_when_plugged_in";
-  public static final String SCRAMBLES_GEN_COUNT_WHEN_PLUGGED_IN_KEY = "scrambles_gen_count_when_plugged_in";
+  //public static final String SCRAMBLES_GEN_WHEN_PLUGGED_IN_KEY = "scrambles_gen_when_plugged_in";
+  //public static final String SCRAMBLES_GEN_COUNT_WHEN_PLUGGED_IN_KEY = "scrambles_gen_count_when_plugged_in";
   public static final String SCRAMBLES_MIN_CACHE_SIZE_KEY = "scrambles_min_cache_size";
   public static final String SCRAMBLES_MAX_CACHE_SIZE_KEY = "scrambles_max_cache_size";
   public static final String PREGEN_SCRAMBLES_KEY = "pregen_scrambles";
@@ -167,16 +167,6 @@ public enum Options {
       default:
         return ScrambleNotificationMode.ALWAYS;
     }
-  }
-
-  public boolean isGenerateScramblesWhenPluggedIn() {
-    Boolean defaultValue = context.getResources().getBoolean(R.bool.scrambles_gen_when_plugged_in);
-    return sharedPreferences.getBoolean(SCRAMBLES_GEN_WHEN_PLUGGED_IN_KEY, defaultValue);
-  }
-
-  public int getPluggedInScramblesGenerateCount() {
-    Integer defaultValue = context.getResources().getInteger(R.integer.scramble_gen_count_when_plugged_in);
-    return sharedPreferences.getInt(SCRAMBLES_GEN_COUNT_WHEN_PLUGGED_IN_KEY, defaultValue);
   }
 
   public int getScramblesMinCacheSize() {

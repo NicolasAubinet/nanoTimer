@@ -131,7 +131,7 @@
          android:dialogTitle="@string/notification_mode"
          android:defaultValue="@integer/scramble_notification_mode"/>
 
-      <CheckBoxPreference
+      <!--<CheckBoxPreference
          android:key="scrambles_gen_when_plugged_in"
          android:title="@string/generate_when_plugged_in"
          android:summary="@string/generate_when_plugged_in_summary"
@@ -144,7 +144,7 @@
          custom:min="30"
          android:defaultValue="@integer/scramble_gen_count_when_plugged_in"
          custom:defaultVal="@integer/scramble_gen_count_when_plugged_in"
-         android:dependency="scrambles_gen_when_plugged_in"/>
+         android:dependency="scrambles_gen_when_plugged_in"/>-->
 
       <com.cube.nanotimer.gui.widget.preferences.NumberEntryDialog
          android:key="scrambles_min_cache_size"

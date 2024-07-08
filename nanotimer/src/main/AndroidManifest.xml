@@ -56,14 +56,14 @@
        android:configChanges="orientation|screenSize|keyboard|keyboardHidden">
     </activity>
 
-    <service android:name=".scrambler.randomstate.ChargingStateService"/>
+    <!--<service android:name=".scrambler.randomstate.ChargingStateService"/>
     <receiver android:name=".scrambler.randomstate.ChargingStateReceiver" android:exported="false">
       <intent-filter>
         <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
         <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
         <action android:name="com.cube.nanotimer.action.CHECK_PLUG_STATE"/>
       </intent-filter>
-    </receiver>
+    </receiver>-->
 
     <provider
        android:name="androidx.core.content.FileProvider"

@@ -7,6 +7,7 @@ import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.GenerationLaunch;
 import com.cube.nanotimer.vo.CubeType;
 
+// TODO disabled because of recent android SDK compatibility problems, and it isn't really needed anymore with modern phones
 public class ChargingStateService extends Service {
 
   public static final String CUBE_TYPE_KEY = "cube_type";
