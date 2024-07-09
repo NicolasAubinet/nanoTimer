@@ -284,7 +284,14 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.14 <i>(New version)</i></b></u>
+    <u><b>v1.3.15 <i>(New version)</i></b></u>
+    <ul>
+      <li>Fixed import/export for comments containing commas or new line characters</li>
+      <li>Added date and time to solve details window</li>
+      <li>Increased scramble font size in solve details window</li>
+      <li>Upgraded target Android version to fit new store standards</li>
+    </ul>
+    <u><b>v1.3.14</b></u>
     <ul>
       <li>Fixed import feature on newer Android versions</li>
     </ul>
