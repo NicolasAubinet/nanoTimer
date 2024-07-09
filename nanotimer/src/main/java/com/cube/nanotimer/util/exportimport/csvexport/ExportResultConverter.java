@@ -12,6 +12,14 @@ import java.util.List;
 
 public class ExportResultConverter {
 
+  private static String encodeComment(String comment) {
+    return comment.replace("\n", "\\n");
+  }
+
+  private static String decodeComment(String comment) {
+    return comment.replace("\\n", "\n");
+  }
+
   public static String toCSVLine(ExportResult result) {
     StringBuilder sb = new StringBuilder();
     sb.append(result.getCubeTypeName());
@@ -39,13 +47,15 @@ public class ExportResultConverter {
     }
     sb.append(",");
     if (result.getComment() != null) {
-      sb.append(result.getComment());
+      String encodedComment = encodeComment(result.getComment());
+      sb.append(encodedComment);
     }
     return sb.toString();
   }
 
   public static ExportResult fromCSVLine(Context context, String line) throws CSVFormatException {
-    List<String> fields = getFieldsFromCSVLine(line);
+    int MAX_FIELDS_COUNT = 10;
+    List<String> fields = getFieldsFromCSVLine(line, MAX_FIELDS_COUNT);
     if (fields.size() < 8) { // 8 fields is older version, 9 fields contains the scramble type, 10 fields contains comment
       throw new CSVFormatException(context.getString(R.string.import_invalid_columns_count));
     }
@@ -77,7 +87,7 @@ public class ExportResultConverter {
 
     String comment = null;
     if (fields.size() > 9) {
-      comment = fields.get(9);
+      comment = decodeComment(fields.get(9));
     }
 
     ExportResult exportResult = new ExportResult(cubeTypeName, solveTypeName, time, timestamp, plusTwo, blindType, scrambleTypeName, scramble, comment);
@@ -124,7 +134,7 @@ public class ExportResultConverter {
     return stepNames;
   }
 
-  private static List<String> getFieldsFromCSVLine(String line) {
+  private static List<String> getFieldsFromCSVLine(String line, int maxFieldsCount) {
     final char escapeChar = '"';
     boolean inEscapedString = false;
     List<String> fields = new ArrayList<String>();
@@ -134,7 +144,7 @@ public class ExportResultConverter {
         inEscapedString = !inEscapedString;
       } else {
         if (c == ',') {
-          if (inEscapedString) {
+          if (inEscapedString || fields.size() >= maxFieldsCount - 1) { // ignore ',' in last field (comment field)
             currentField.append(c);
           } else {
             fields.add(currentField.toString());
