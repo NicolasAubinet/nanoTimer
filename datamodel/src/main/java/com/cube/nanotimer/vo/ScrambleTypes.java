@@ -150,7 +150,13 @@ public class ScrambleTypes {
       protected byte[] getFixedEdgeOrientationIndices() {
         return new byte[] { 0, 1, 2, 3, 9, 11 };
       }
-    }
+    },
+    new ScrambleType("parity") {
+      @Override
+      protected boolean mustHaveParity() {
+        return true;
+      }
+    },
   };
 
 }

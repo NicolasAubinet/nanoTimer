@@ -26,7 +26,8 @@ public abstract class ScrambleType implements Serializable, NameHolder {
       cubeState.edgePermutations = getRandomPermutation(getFixedEdgePermutationIndices(), 12);
       cubeState.cornerOrientations = getRandomOrientation(getFixedCornerOrientationIndices(), 8, 3);
       cubeState.edgeOrientations = getRandomOrientation(getFixedEdgeOrientationIndices(), 12, 2);
-    } while (hasParity(cubeState.cornerPermutations) != hasParity(cubeState.edgePermutations));
+    } while (hasParity(cubeState.cornerPermutations) != hasParity(cubeState.edgePermutations)
+        || (mustHaveParity() && !hasParity(cubeState.cornerPermutations)));
 
     return cubeState;
   }
@@ -74,6 +75,10 @@ public abstract class ScrambleType implements Serializable, NameHolder {
 
   protected byte[] getFixedEdgeOrientationIndices() {
     return new byte[0];
+  }
+
+  protected boolean mustHaveParity() {
+    return false;
   }
 
   private byte[] getRandomPermutation(byte[] fixedIndices, int size) {

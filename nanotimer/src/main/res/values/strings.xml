@@ -277,6 +277,7 @@
   <string name="scramble_type_edges">Edges only</string>
   <string name="scramble_type_roux_last_10_pieces">Roux last 10 pieces</string>
   <string name="scramble_type_roux_last_6_edges">Roux last 6 edges</string>
+  <string name="scramble_type_parity">Parity</string>
 
   <string name="scramble_generating">Scramble is generating\nPlease wait&#8230;</string>
   <string name="can_not_add_time_while_generating">Can not add a time when there is no scramble</string>
