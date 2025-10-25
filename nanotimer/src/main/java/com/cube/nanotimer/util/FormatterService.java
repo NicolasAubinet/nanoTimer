@@ -137,6 +137,14 @@ public enum FormatterService {
     return sdf.format(new Date(ms));
   }
 
+  public String formatMonthYear(Long ms) {
+    if (ms == null) {
+      return "";
+    }
+    SimpleDateFormat sdf = new SimpleDateFormat("MMM, yyyy", Locale.ENGLISH);
+    return sdf.format(new Date(ms));
+  }
+
   public String formatDateTimeWithoutSeconds(Long ms) {
     if (ms == null) {
       return "";

@@ -28,10 +28,13 @@ import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.utils.ValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -42,6 +45,7 @@ public class GraphActivity extends NanoTimerActivity {
   private CubeType cubeType;
   private SolveType solveType;
   private List<ChartLineData> chartData = new ArrayList<>();
+  private List<Long> pointTimestamps = new ArrayList<>();
 
   private LineChart chart;
   private Spinner spPeriod;
@@ -87,7 +91,7 @@ public class GraphActivity extends NanoTimerActivity {
 
       @Override
       public String formatXLabel(long value) {
-        return FormatterService.INSTANCE.formatDateTime(value);
+        return FormatterService.INSTANCE.formatMonthYear(value);
       }
     },
     FREQUENCY {
@@ -98,7 +102,7 @@ public class GraphActivity extends NanoTimerActivity {
 
       @Override
       public String formatXLabel(long value) {
-        return FormatterService.INSTANCE.formatDate(value);
+        return FormatterService.INSTANCE.formatMonthYear(value);
       }
 //    },
 //    DEVIATION {
@@ -116,6 +120,13 @@ public class GraphActivity extends NanoTimerActivity {
     public abstract String formatValue(float value);
     public abstract String formatXLabel(long value);
   }
+
+  ValueFormatter yValueFormatter = new ValueFormatter() {
+    @Override
+    public String getFormattedValue(float value) {
+      return getSelectedGraphType().formatValue(value);
+    }
+  };
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -151,30 +162,38 @@ public class GraphActivity extends NanoTimerActivity {
     configureSpinner(spGraphType, R.array.graph_types, "graph_type");
 
     chart = (LineChart) findViewById(R.id.chart);
-    chart.setDescription("");
-    chart.setDrawLegend(true);
-    chart.setHighlightEnabled(false);
-    chart.setGridColor(getResourceColor(R.color.gray800));
+    chart.getDescription().setEnabled(false);
+    chart.getLegend().setEnabled(true);
     chart.setBackgroundColor(getResourceColor(R.color.graybg));
     chart.setDrawGridBackground(false);
-    chart.setDrawYValues(false);
     chart.setNoDataText("");
 
-    ValueFormatter valueFormatter = new ValueFormatter() {
+    ValueFormatter xValueFormatter = new ValueFormatter() {
       @Override
       public String getFormattedValue(float value) {
-        return getSelectedGraphType().formatValue(value);
+        GraphType selectedGraphType = getSelectedGraphType();
+
+        int i = (int) value;
+        if (i >= 0 && i < pointTimestamps.size()) {
+          long timestamp = pointTimestamps.get(i);
+          return selectedGraphType.formatXLabel(timestamp);
+        }
+        return "";
       }
     };
 
-    chart.getXLabels().setSpaceBetweenLabels(1);
-    chart.getXLabels().setTextColor(getResourceColor(R.color.white));
-    chart.getXLabels().setTextSize(12);
-    chart.setValueFormatter(valueFormatter);
+    XAxis xAxis = chart.getXAxis();
+    xAxis.setSpaceMin(1);
+    xAxis.setTextColor(getResourceColor(R.color.white));
+    xAxis.setTextSize(12);
+    xAxis.setValueFormatter(xValueFormatter);
 
-    chart.getYLabels().setTextColor(getResourceColor(R.color.white));
-    chart.getYLabels().setTextSize(12);
-    chart.getYLabels().setFormatter(valueFormatter);
+    YAxis yAxis = chart.getAxisLeft();
+    yAxis.setTextColor(getResourceColor(R.color.white));
+    yAxis.setTextSize(12);
+    yAxis.setValueFormatter(yValueFormatter);
+
+    chart.getAxisRight().setEnabled(false);
   }
 
   private Spinner configureSpinner(Spinner spinner, int dataArray, final String prefsKey) {
@@ -218,6 +237,7 @@ public class GraphActivity extends NanoTimerActivity {
 
             List<ChartData> timesLineData = parseData(getChartTimesFromSolveHistory(data));
             ChartLineData chartLineData = new ChartLineData(timesLineData, getString(R.string.times), defaultColor);
+            chartLineData.setxOffset(0);
             chartLineData.setLineWidth(2.5f);
             chartLineData.setCircleSize(4f);
             chartData.add(chartLineData);
@@ -273,39 +293,37 @@ public class GraphActivity extends NanoTimerActivity {
 
   private void refreshData() {
     chart.setNoDataText(getString(R.string.no_data_found)); // done here to avoid displaying that message when data is loading
-    GraphType selectedGraphType = getSelectedGraphType();
     chart.clear();
 
     if (chartData.isEmpty()) {
       return;
     }
 
-    ArrayList<LineDataSet> dataSets = new ArrayList<LineDataSet>();
-    ArrayList<String> xLabels = new ArrayList<String>();
+    ArrayList<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
+    pointTimestamps.clear();
 
     for (ChartLineData chartLineData : chartData) {
       List<ChartData> data = chartLineData.getData();
-      boolean addLabels = (xLabels.size() == 0);
 
       ArrayList<Entry> times = new ArrayList<Entry>();
       for (ChartData solveTime : data) {
-        times.add(new Entry(solveTime.getData(), times.size() + chartLineData.getxOffset()));
-
-        if (addLabels) {
-          xLabels.add(selectedGraphType.formatXLabel(solveTime.getTimestamp()));
-        }
+        pointTimestamps.add(solveTime.getTimestamp());
+        times.add(new Entry(times.size() + chartLineData.getxOffset(), solveTime.getData()));
       }
 
       LineDataSet dataSet = new LineDataSet(times, chartLineData.getLabel());
       dataSet.setColor(getResourceColor(chartLineData.getColor()));
       dataSet.setLineWidth(chartLineData.getLineWidth());
       dataSet.setCircleColor(getResourceColor(chartLineData.getColor()));
-      dataSet.setCircleSize(chartLineData.getCircleSize());
+      dataSet.setCircleRadius(chartLineData.getCircleSize());
+      dataSet.setHighlightEnabled(false);
+      dataSet.setValueFormatter(yValueFormatter);
+      dataSet.setDrawValues(false);
 
       dataSets.add(dataSet);
     }
 
-    LineData chartData = new LineData(xLabels, dataSets);
+    LineData chartData = new LineData(dataSets);
     chart.setData(chartData);
     chart.invalidate();
 
