@@ -159,30 +159,26 @@ public class SolveTypesActivity extends NanoTimerActivity implements SelectionHa
             }
           });
     } else if (menuItem.getItemId() == ACTION_CREATESTEPS) {
-      if (liSolveTypes.get(position).isBlind()) {
-        DialogUtils.showInfoMessage(SolveTypesActivity.this, R.string.steps_can_not_be_added_to_blind_types);
-      } else {
-        App.INSTANCE.getService().getPagedHistory(liSolveTypes.get(position), TimesSort.TIMESTAMP, new DataCallback<SolveHistory>() {
-          @Override
-          public void onData(final SolveHistory data) {
-            runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                if (data.getSolveTimes().isEmpty()) {
-                  DialogUtils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
-                } else {
-                  DialogUtils.showYesNoConfirmation(SolveTypesActivity.this, R.string.solvetype_has_times_addsteps, new YesNoListener() {
-                    @Override
-                    public void onYes() {
-                      DialogUtils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
-                    }
-                  });
-                }
+      App.INSTANCE.getService().getPagedHistory(liSolveTypes.get(position), TimesSort.TIMESTAMP, new DataCallback<SolveHistory>() {
+        @Override
+        public void onData(final SolveHistory data) {
+          runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              if (data.getSolveTimes().isEmpty()) {
+                DialogUtils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
+              } else {
+                DialogUtils.showYesNoConfirmation(SolveTypesActivity.this, R.string.solvetype_has_times_addsteps, new YesNoListener() {
+                  @Override
+                  public void onYes() {
+                    DialogUtils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
+                  }
+                });
               }
-            });
-          }
-        });
-      }
+            }
+          });
+        }
+      });
     }
     return super.onContextItemSelected(menuItem);
   }
@@ -324,10 +320,6 @@ public class SolveTypesActivity extends NanoTimerActivity implements SelectionHa
 
   @Override
   public void addSteps(final List<String> stepNames, final int pos) {
-    if (liSolveTypes.get(pos).isBlind()) { // should never get here, but just to make absolutely sure
-      DialogUtils.showInfoMessage(SolveTypesActivity.this, R.string.steps_can_not_be_added_to_blind_types);
-      return;
-    }
     // delete existing times (if there are some) before adding the steps
     App.INSTANCE.getService().deleteHistory(liSolveTypes.get(pos), new DataCallback<Void>() {
       @Override

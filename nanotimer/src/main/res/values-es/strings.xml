@@ -189,7 +189,6 @@
   <string name="solve_types_shortcut_summary">Mostrar \"Editar más métodos\" en la lista</string>
   <string name="blind">A ciegas</string>
   <string name="blind_mode">Modo a ciegas</string>
-  <string name="steps_can_not_be_added_to_blind_types">No se pueden añadir pasos a tipos de a ciegas.\nUtiliza tipos diferentes de a ciegas.</string>
 
   <string name="import_export">Importar / exportar</string>
   <string name="export_times">Exportar</string>

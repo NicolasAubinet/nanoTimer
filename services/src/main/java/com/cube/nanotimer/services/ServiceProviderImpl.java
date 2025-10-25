@@ -356,7 +356,9 @@ public class ServiceProviderImpl implements ServiceProvider {
   public SolveAverages getSolveAverages(SolveType solveType) {
     syncCaches(solveType);
     SolveAverages solveAverages = new SolveAverages();
-    if (solveType.isBlind()) {
+    if (solveType.hasSteps()) {
+      setStepsAverages(solveAverages, solveType);
+    } else if (solveType.isBlind()) {
       solveAverages.setMeanOf3(getLastMean(3));
       solveAverages.setBestOf3(cachedBestAverages.get(5)); // DB column avg5 contains the mean of 3 for blind
       Long[] averages = getSuccessAverages(new int[] { 12, 50, 100 });
@@ -369,7 +371,7 @@ public class ServiceProviderImpl implements ServiceProvider {
       solveAverages.setAccuracyOf50(getLastAccuracy(50, false));
       solveAverages.setAccuracyOf100(getLastAccuracy(100, false));
       solveAverages.setLifetimeAccuracy(getLastAccuracy(1000, true));
-    } else if (!solveType.hasSteps()) {
+    } else {
       solveAverages.setMeanOf3(getLastMean(3));
       solveAverages.setAvgOf5(getLastAvg(5));
       solveAverages.setAvgOf12(getLastAvg(12));
@@ -381,8 +383,6 @@ public class ServiceProviderImpl implements ServiceProvider {
       solveAverages.setBestOf50(cachedBestAverages.get(50));
       solveAverages.setBestOf100(cachedBestAverages.get(100));
       solveAverages.setBestOfLifetime(cachedLifetimeBest);
-    } else {
-      setStepsAverages(solveAverages, solveType);
     }
     return solveAverages;
   }

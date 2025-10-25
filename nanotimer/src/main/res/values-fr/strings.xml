@@ -189,7 +189,6 @@
   <string name="solve_types_shortcut_summary">Affiche \"Éditer les temps de résolution\" dans la liste</string>
   <string name="blind">Blind</string>
   <string name="blind_mode">Mode blind</string>
-  <string name="steps_can_not_be_added_to_blind_types">Impossible d\'ajouter des étapes aux types blind.\nUtilisez un type non-blind à la place.</string>
 
   <string name="import_export">Importer / exporter</string>
   <string name="export_times">Exporter</string>

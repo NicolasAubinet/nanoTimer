@@ -219,13 +219,8 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
       tvScramble.setTextSize(TypedValue.COMPLEX_UNIT_PX, scrambleTextSize);
     }
 
-    if (solveType.isBlind()) {
-      findViewById(R.id.trAvgOfFive).setVisibility(View.GONE);
-      findViewById(R.id.trLifetimeAccuracy).setVisibility(View.VISIBLE);
-      findViewById(R.id.trBestMeanOfThree).setVisibility(View.VISIBLE);
-      ((TextView) findViewById(R.id.tvAvgOf)).setText(R.string.success_avg);
-      ((TextView) findViewById(R.id.tvBestOf)).setText(R.string.accuracy);
-    } else if (solveType.hasSteps()) {
+
+    if (solveType.hasSteps()) {
       findViewById(R.id.sessionLayout).setVisibility(View.GONE);
       averagesLayout.setColumnCollapsed(2, true);
       timerStepsLayout.setVisibility(View.VISIBLE);
@@ -235,6 +230,12 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
       }
       findViewById(R.id.trAvgOfLife).setVisibility(View.VISIBLE);
       hideUnneededStepFields();
+    } else if (solveType.isBlind()) {
+      findViewById(R.id.trAvgOfFive).setVisibility(View.GONE);
+      findViewById(R.id.trLifetimeAccuracy).setVisibility(View.VISIBLE);
+      findViewById(R.id.trBestMeanOfThree).setVisibility(View.VISIBLE);
+      ((TextView) findViewById(R.id.tvAvgOf)).setText(R.string.success_avg);
+      ((TextView) findViewById(R.id.tvBestOf)).setText(R.string.accuracy);
     } else {
       timerStepsLayout.setVisibility(View.GONE);
       findViewById(R.id.trAvgOfLife).setVisibility(View.GONE);
@@ -600,6 +601,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
 
   private void startTimer() {
     long curTime = System.currentTimeMillis();
+    resetTimerText();
     lastTimerStartTs = curTime;
     if (curTime - lastTimerStopTs < STOP_START_DELAY) {
       return;
@@ -946,7 +948,19 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     }
     animations = new ArrayList<Animation>();
 
-    if (solveType.isBlind()) {
+
+    if (solveType.hasSteps()) {
+      ((TextView) findViewById(R.id.tvAvgOfFive)).setText(
+      FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf5()));
+      ((TextView) findViewById(R.id.tvAvgOfTwelve)).setText(
+      FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf12()));
+      ((TextView) findViewById(R.id.tvAvgOfFifty)).setText(
+      FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf50()));
+      ((TextView) findViewById(R.id.tvAvgOfHundred)).setText(
+      FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf100()));
+      ((TextView) findViewById(R.id.tvAvgOfLife)).setText(
+      FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOfLifetime()));
+    } else if (solveType.isBlind()) {
       tvAccuracy.setText(FormatterService.INSTANCE.formatPercentage(solveAverages.getLifetimeAccuracy()));
       refreshAvgField(R.id.tvMeanOfThree, solveAverages.getMeanOf3(), getString(R.string.NA));
       refreshAvgFieldWithRecord(R.id.tvBestMeanOfThree, solveAverages.getBestOf3(),
@@ -964,17 +978,6 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
           FormatterService.INSTANCE.formatPercentage(solveAverages.getAccuracyOf50(), "-"));
       ((TextView) findViewById(R.id.tvBestOfHundred)).setText(
           FormatterService.INSTANCE.formatPercentage(solveAverages.getAccuracyOf100(), "-"));
-    } else if (solveType.hasSteps()) {
-      ((TextView) findViewById(R.id.tvAvgOfFive)).setText(
-          FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf5()));
-      ((TextView) findViewById(R.id.tvAvgOfTwelve)).setText(
-          FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf12()));
-      ((TextView) findViewById(R.id.tvAvgOfFifty)).setText(
-          FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf50()));
-      ((TextView) findViewById(R.id.tvAvgOfHundred)).setText(
-          FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOf100()));
-      ((TextView) findViewById(R.id.tvAvgOfLife)).setText(
-          FormatterService.INSTANCE.formatStepsTimes(solveAverages.getStepsAvgOfLifetime()));
     } else {
       refreshAvgField(R.id.tvAvgOfFive, solveAverages.getAvgOf5(), "-");
       refreshAvgField(R.id.tvAvgOfTwelve, solveAverages.getAvgOf12(), "-");

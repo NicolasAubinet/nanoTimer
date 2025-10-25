@@ -193,7 +193,6 @@
   <string name="solve_types_shortcut_summary">Show \"Edit more solve types\" in list</string>
   <string name="blind">Blind</string>
   <string name="blind_mode">Blind mode</string>
-  <string name="steps_can_not_be_added_to_blind_types">Steps can not be added to blind types.\nUse a non-blind type instead.</string>
 
   <string name="import_export">Import / export</string>
   <string name="export_times">Export</string>

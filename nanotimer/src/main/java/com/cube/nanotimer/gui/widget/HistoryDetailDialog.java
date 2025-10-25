@@ -52,7 +52,12 @@ public class HistoryDetailDialog extends NanoTimerDialogFragment {
     final SolveTime solveTime = (SolveTime) args.getSerializable(ARG_SOLVETIME);
     final CubeType cubeType = (CubeType) args.getSerializable(ARG_CUBETYPE);
 
-    if (solveTime.getSolveType().isBlind()) {
+    if (solveTime.hasSteps()) {
+      v.findViewById(R.id.averagesTable).setVisibility(View.GONE);
+      v.findViewById(R.id.trSteps).setVisibility(View.VISIBLE);
+      ((TextView) v.findViewById(R.id.tvSteps)).setText(
+      FormatterService.INSTANCE.formatStepsTimes(Arrays.asList(solveTime.getStepsTimes())));
+    } else if (solveTime.getSolveType().isBlind()) {
       v.findViewById(R.id.averagesTable).setVisibility(View.GONE);
       v.findViewById(R.id.trMeanOfThree).setVisibility(View.VISIBLE);
       App.INSTANCE.getService().getSolveTimeAverages(solveTime, new DataCallback<SolveTimeAverages>() {
@@ -69,11 +74,6 @@ public class HistoryDetailDialog extends NanoTimerDialogFragment {
           }
         }
       });
-    } else if (solveTime.hasSteps()) {
-      v.findViewById(R.id.averagesTable).setVisibility(View.GONE);
-      v.findViewById(R.id.trSteps).setVisibility(View.VISIBLE);
-      ((TextView) v.findViewById(R.id.tvSteps)).setText(
-          FormatterService.INSTANCE.formatStepsTimes(Arrays.asList(solveTime.getStepsTimes())));
     } else {
       App.INSTANCE.getService().getSolveTimeAverages(solveTime, new DataCallback<SolveTimeAverages>() {
         @Override
