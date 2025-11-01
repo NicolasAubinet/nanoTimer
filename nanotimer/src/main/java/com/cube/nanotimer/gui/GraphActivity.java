@@ -88,37 +88,20 @@ public class GraphActivity extends NanoTimerActivity {
       public String formatValue(float value) {
         return FormatterService.INSTANCE.formatSolveTime(Math.round((double) value));
       }
-
-      @Override
-      public String formatXLabel(long value) {
-        return FormatterService.INSTANCE.formatMonthYear(value);
-      }
     },
     FREQUENCY {
       @Override
       public String formatValue(float value) {
         return FormatterService.INSTANCE.formatFloat(value, 2);
       }
-
-      @Override
-      public String formatXLabel(long value) {
-        return FormatterService.INSTANCE.formatMonthYear(value);
-      }
-//    },
 //    DEVIATION {
 //      @Override
 //      public String formatValue(float value) {
 //        return FormatterService.INSTANCE.formatSolveTime(Math.round((double) value));
 //      }
-//
-//      @Override
-//      public String formatXLabel(long value) {
-//        return FormatterService.INSTANCE.formatDateTime(value);
-//      }
     };
 
     public abstract String formatValue(float value);
-    public abstract String formatXLabel(long value);
   }
 
   ValueFormatter yValueFormatter = new ValueFormatter() {
@@ -172,12 +155,14 @@ public class GraphActivity extends NanoTimerActivity {
     ValueFormatter xValueFormatter = new ValueFormatter() {
       @Override
       public String getFormattedValue(float value) {
-        GraphType selectedGraphType = getSelectedGraphType();
-
         int i = (int) value;
         if (i >= 0 && i < pointTimestamps.size()) {
           long timestamp = pointTimestamps.get(i);
-          return selectedGraphType.formatXLabel(timestamp);
+          if (chart.getVisibleXRange() < 20) { // when zoomed in, show more details
+            return FormatterService.INSTANCE.formatDate(timestamp);
+          } else {
+            return FormatterService.INSTANCE.formatMonthYear(timestamp);
+          }
         }
         return "";
       }
