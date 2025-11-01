@@ -280,7 +280,12 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.15 <i>(Nueva versión)</i></b></u>
+    <u><b>v1.3.16 <i>(Nueva versión)</i></b></u>
+    <ul>
+      <li>Permite de añadir pasos a los Métodos "a ciegas"</li>
+      <li>Actualiza el meta android versión y otro dependencias</li>
+    </ul>
+    <u><b>v1.3.15</b></u>
     <ul>
       <li>Arreglar del import/export para comentarios con comas o salto de línea</li>
       <li>Añadidura de la fecha y hora en la ventana de detalles de resoluciónes</li>

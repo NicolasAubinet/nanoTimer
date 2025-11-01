@@ -280,7 +280,14 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.15 <i>(Nouvelle version)</i></b></u>
+    <u><b>v1.3.16 <i>(Nouvelle version)</i></b></u>
+    <ul>
+      <li></li>
+      <li>Possibilité d\'ajouter des étapes aux types de résolution "blind"</li>
+      <li>Mise à jour de différentes librairies et dépendances</li>
+      <li>Mise à jour de la version Android pour correspondre aux nouveaux standards du store</li>
+    </ul>
+    <u><b>v1.3.15</b></u>
     <ul>
       <li>Réglage de l\'import/export pour les commentaires contenant des virgules ou retours à la ligne</li>
       <li>Ajout de la date et heure dans la fenêtre des détails de résolution</li>
