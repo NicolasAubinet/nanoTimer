@@ -167,6 +167,7 @@ public class GraphActivity extends NanoTimerActivity {
     chart.setBackgroundColor(getResourceColor(R.color.graybg));
     chart.setDrawGridBackground(false);
     chart.setNoDataText("");
+    chart.setExtraTopOffset(5f); // fix X-labels being cut at the top
 
     ValueFormatter xValueFormatter = new ValueFormatter() {
       @Override
@@ -183,6 +184,7 @@ public class GraphActivity extends NanoTimerActivity {
     };
 
     XAxis xAxis = chart.getXAxis();
+    xAxis.setPosition(XAxis.XAxisPosition.TOP);
     xAxis.setSpaceMin(1);
     xAxis.setTextColor(getResourceColor(R.color.white));
     xAxis.setTextSize(12);
