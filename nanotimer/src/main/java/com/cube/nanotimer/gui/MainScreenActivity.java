@@ -13,6 +13,8 @@ import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.activity.OnBackPressedCallback;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -117,6 +119,31 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
     curSolveType = new SolveType(Utils.getCurrentSolveTypeId(this), "", false, null, curCubeType.getId());
 
     initViews();
+
+    getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+      @Override
+      public void handleOnBackPressed() {
+        if (inQuitMode) {
+          if (quitMessage != null) {
+            quitMessage.cancel();
+          }
+          setEnabled(false);
+          MainScreenActivity.this.getOnBackPressedDispatcher().onBackPressed();
+        } else {
+          quitMessage = Toast.makeText(MainScreenActivity.this, R.string.backspace_exit, Toast.LENGTH_LONG);
+          quitMessage.show();
+          inQuitMode = true;
+          Handler handler = new Handler();
+          handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+              quitMessage.cancel();
+              inQuitMode = false;
+            }
+          }, QUIT_MODE_DELAY);
+        }
+      }
+    });
   }
 
   @Override
@@ -309,28 +336,6 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
     refreshCubeTypes();
 
     setSortMode(TimesSort.TIMESTAMP);
-  }
-
-  @Override
-  public void onBackPressed() {
-    if (inQuitMode) {
-      if (quitMessage != null) {
-        quitMessage.cancel();
-      }
-      super.onBackPressed();
-    } else {
-      quitMessage = Toast.makeText(this, R.string.backspace_exit, Toast.LENGTH_LONG);
-      quitMessage.show();
-      inQuitMode = true;
-      Handler handler = new Handler();
-      handler.postDelayed(new Runnable() {
-        @Override
-        public void run() {
-          quitMessage.cancel();
-          inQuitMode = false;
-        }
-      }, QUIT_MODE_DELAY);
-    }
   }
 
   private void refreshDataSet(final ArrayAdapter arrayAdapter) {

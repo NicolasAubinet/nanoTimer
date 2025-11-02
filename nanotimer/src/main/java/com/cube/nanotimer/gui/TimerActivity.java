@@ -6,6 +6,8 @@ import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.ActionBar;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -185,6 +187,26 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     }
 
     generateScramble();
+
+    getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+      @Override
+      public void handleOnBackPressed() {
+        if (timerState == TimerState.RUNNING) {
+          stopTimer(false);
+          resetTimer();
+        } else if (timerState == TimerState.INSPECTING) { // for automatic inspection mode
+          stopInspectionTimer();
+          resetTimer();
+        } else {
+          if (timer != null) {
+            timer.cancel();
+            timer.purge();
+          }
+          setEnabled(false);
+          TimerActivity.this.getOnBackPressedDispatcher().onBackPressed();
+        }
+      }
+    });
   }
 
   @Override
@@ -346,23 +368,6 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
   @Override
   public void setTitleColor(int textColor) {
     tvTitle.setTextColor(textColor);
-  }
-
-  @Override
-  public void onBackPressed() {
-    if (timerState == TimerState.RUNNING) {
-      stopTimer(false);
-      resetTimer();
-    } else if (timerState == TimerState.INSPECTING) { // for automatic inspection mode
-      stopInspectionTimer();
-      resetTimer();
-    } else {
-      if (timer != null) {
-        timer.cancel();
-        timer.purge();
-      }
-      super.onBackPressed();
-    }
   }
 
   @Override

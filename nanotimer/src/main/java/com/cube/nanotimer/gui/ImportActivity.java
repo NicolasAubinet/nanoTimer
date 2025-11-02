@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+
+import androidx.activity.OnBackPressedCallback;
+
 import com.ankhsoft.filebrowser.FileBrowser;
 import com.ankhsoft.filebrowser.OnFileSelectedListener;
 import com.cube.nanotimer.R;
@@ -21,6 +24,18 @@ public class ImportActivity extends NanoTimerActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.import_screen);
     initViews();
+
+    getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+      @Override
+      public void handleOnBackPressed() {
+        if (fileBrowser.isRootFolder(fileBrowser.getCurrentFolder())) {
+          setEnabled(false);
+          ImportActivity.this.getOnBackPressedDispatcher().onBackPressed();
+        } else {
+          fileBrowser.moveToParent();
+        }
+      }
+    });
   }
 
   private void initViews() {
@@ -37,15 +52,6 @@ public class ImportActivity extends NanoTimerActivity {
         finish();
       }
     });
-  }
-
-  @Override
-  public void onBackPressed() {
-    if (fileBrowser.isRootFolder(fileBrowser.getCurrentFolder())) {
-      super.onBackPressed();
-    } else {
-      fileBrowser.moveToParent();
-    }
   }
 
   @Override
