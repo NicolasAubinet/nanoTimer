@@ -2,6 +2,7 @@ package com.cube.nanotimer.util;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.view.WindowManager;
 
 public class ScaleUtils {
@@ -19,12 +20,20 @@ public class ScaleUtils {
 
   public static int getScreenHeight(Context c) {
     init(c);
-    return windowManager.getDefaultDisplay().getHeight();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      return windowManager.getCurrentWindowMetrics().getBounds().height();
+    } else {
+      return windowManager.getDefaultDisplay().getHeight();
+    }
   }
 
   public static int getScreenWidth(Context c) {
     init(c);
-    return windowManager.getDefaultDisplay().getWidth();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      return windowManager.getCurrentWindowMetrics().getBounds().width();
+    } else {
+      return windowManager.getDefaultDisplay().getWidth();
+    }
   }
 
   public static float getXScale(Context c) {

@@ -2,6 +2,8 @@
 
 <com.cube.nanotimer.util.view.ScalingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
    xmlns:app="http://schemas.android.com/apk/res-auto"
+   android:id="@+id/scalingRootLayout"
+   android:fitsSystemWindows="true"
    android:orientation="vertical"
    android:layout_height="match_parent"
    android:layout_width="match_parent">
@@ -10,6 +12,7 @@
      android:id="@+id/mainLayout"
      android:layout_width="match_parent"
      android:layout_height="match_parent"
+     android:baselineAligned="false"
      android:orientation="horizontal">
 
     <LinearLayout
@@ -91,6 +94,7 @@
         <LinearLayout
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
+           android:baselineAligned="false"
            android:orientation="horizontal"
            android:layout_marginLeft="6px"
            android:layout_marginRight="6px">

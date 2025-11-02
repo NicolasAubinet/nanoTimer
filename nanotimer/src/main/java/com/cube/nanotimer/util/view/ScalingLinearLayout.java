@@ -49,39 +49,41 @@ public class ScalingLinearLayout extends LinearLayout {
 
   // Scale the given view, its contents, and all of its children by the given factor.
   private void scaleViewAndChildren(View root, float scale, int canary) {
-    // Retrieve the view's layout information
-    ViewGroup.LayoutParams layoutParams = root.getLayoutParams();
+    if (root != this) { // don't scale root, to avoid scaling manual padding (from status bar and navigation bar)
+      // Retrieve the view's layout information
+      ViewGroup.LayoutParams layoutParams = root.getLayoutParams();
 
-    // Scale the View itself
-    if (layoutParams.width != ViewGroup.LayoutParams.MATCH_PARENT && layoutParams.width != ViewGroup.LayoutParams.WRAP_CONTENT) {
-      layoutParams.width *= scale;
-    }
-    if (layoutParams.height != ViewGroup.LayoutParams.MATCH_PARENT && layoutParams.height != ViewGroup.LayoutParams.WRAP_CONTENT) {
-      layoutParams.height *= scale;
-    }
+      // Scale the View itself
+      if (layoutParams.width != ViewGroup.LayoutParams.MATCH_PARENT && layoutParams.width != ViewGroup.LayoutParams.WRAP_CONTENT) {
+        layoutParams.width *= scale;
+      }
+      if (layoutParams.height != ViewGroup.LayoutParams.MATCH_PARENT && layoutParams.height != ViewGroup.LayoutParams.WRAP_CONTENT) {
+        layoutParams.height *= scale;
+      }
 
-    // If the View has margins, scale those too
-    if (layoutParams instanceof ViewGroup.MarginLayoutParams) {
-      ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams)layoutParams;
-      marginParams.leftMargin *= scale;
-      marginParams.topMargin *= scale;
-      marginParams.rightMargin *= scale;
-      marginParams.bottomMargin *= scale;
-    }
-    root.setLayoutParams(layoutParams);
+      // If the View has margins, scale those too
+      if (layoutParams instanceof ViewGroup.MarginLayoutParams) {
+        ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams) layoutParams;
+        marginParams.leftMargin *= scale;
+        marginParams.topMargin *= scale;
+        marginParams.rightMargin *= scale;
+        marginParams.bottomMargin *= scale;
+      }
+      root.setLayoutParams(layoutParams);
 
-    // Same treatment for padding
-    root.setPadding(
-        (int)(root.getPaddingLeft() * scale),
-        (int)(root.getPaddingTop() * scale),
-        (int)(root.getPaddingRight() * scale),
-        (int)(root.getPaddingBottom() * scale)
-    );
+      // Same treatment for padding
+      root.setPadding(
+        (int) (root.getPaddingLeft() * scale),
+        (int) (root.getPaddingTop() * scale),
+        (int) (root.getPaddingRight() * scale),
+        (int) (root.getPaddingBottom() * scale)
+      );
 
-    // If it's a TextView, scale the font size
-    if (root instanceof TextView) {
-      TextView tv = (TextView)root;
-      tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, tv.getTextSize() * scale);
+      // If it's a TextView, scale the font size
+      if (root instanceof TextView) {
+        TextView tv = (TextView) root;
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, tv.getTextSize() * scale);
+      }
     }
 
     // If it's a ViewGroup, recurse!
