@@ -34,6 +34,9 @@ public class FTOSolver {
   private static final int[] PHASE1_MOVES = {0, 2, 22, 6, 16, 10, 12, 14}; // keep the (D, DR) edge
   private static final int[] PHASE2_MOVES = {0, 12, 14, 8, 10};
   private static final int[] PHASE3_MOVES = {8, 10, 12, 14};
+  // More phase-1 candidates give phase 2 more (and better) starting points, so it
+  // finds a short solution faster. Counter-intuitively, lowering this slows solving
+  // down (phase 2 must search deeper) and lengthens scrambles, so keep it high.
   private static final int N_PHASE1_SOLS = 1000;
   private static final int P2EPRL_MAXL = 11;
 
@@ -76,7 +79,10 @@ public class FTOSolver {
   private static int[][] p2ufMoveStd;
   private static int[] cc2Bit;
   private static int[][] p2ccRecol;
-  private static final Map<String, Integer> p2cc2ufBit = new java.util.HashMap<>();
+  // Populated during genTables() (single-threaded); only read during solving. A
+  // concurrent map keeps it safe even if a never-before-seen (cp,co) showed up while
+  // generating on several threads.
+  private static final Map<String, Integer> p2cc2ufBit = new java.util.concurrent.ConcurrentHashMap<>();
   private static final FtoMath.Coord p2ufCoord = new FtoMath.Coord(new int[] {3, 3, 3, 3});
 
   // Phase 3
@@ -238,15 +244,20 @@ public class FTOSolver {
 
   // ------------------------------------------------------------------ init
 
-  public static synchronized void genTables() {
+  public static void genTables() {
     if (inited) {
-      return;
+      return; // fast path: avoid locking on every per-scramble solver creation
     }
-    FtoMoves.ensureInit();
-    phase1Init();
-    phase2Init();
-    phase3Init();
-    inited = true;
+    synchronized (FTOSolver.class) {
+      if (inited) {
+        return;
+      }
+      FtoMoves.ensureInit();
+      phase1Init();
+      phase2Init();
+      phase3Init();
+      inited = true;
+    }
   }
 
   private static void phase1Init() {
