@@ -401,6 +401,11 @@ public class Square1Solver {
       solution = solution(state);
     } catch (InterruptedException e) {
       // user requested stop
+      synchronized (solutionSyncHelper) {
+        solutionSearchCount--;
+        solutionSyncHelper.notify();
+      }
+      mustStop = false;
       return null;
     }
 

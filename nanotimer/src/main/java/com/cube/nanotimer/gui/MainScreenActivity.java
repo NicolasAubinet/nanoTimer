@@ -618,7 +618,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
     switch (requestCode) {
       case REQUEST_READ_PERMISSIONS_CODE:
-        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
           launchImportActivity();
         } else {
           DialogUtils.showShortInfoMessage(this, R.string.read_permission_denied_cant_import);

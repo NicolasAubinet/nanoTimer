@@ -33,7 +33,7 @@ public class RSThreeScrambler implements RSScrambler {
 //      Log.i("[NanoTimer]", "Random state:\n" + randomState.toString());
       scramble = Utils.invertMoves(threeSolver.getSolution(randomState, config));
 //      Log.i("[NanoTimer]", "Scramble: " + Arrays.toString(scramble));
-    } while (scramble != null && scramble.length < 12 && scrambleType.isDefault());
+    } while (scramble != null && scramble.length < 12 && (scrambleType == null || scrambleType.isDefault()));
 
     if (scrambleType != null && scramble != null) {
       scramble = scrambleType.finalizeScramble(scramble);

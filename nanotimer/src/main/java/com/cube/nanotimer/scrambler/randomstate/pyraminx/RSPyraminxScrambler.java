@@ -31,6 +31,8 @@ public class RSPyraminxScrambler implements RSScrambler {
 
   @Override
   public void stop() {
-    solver.stop();
+    if (solver != null) {
+      solver.stop();
+    }
   }
 }

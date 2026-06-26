@@ -142,6 +142,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     historySolvesCount = getIntent().getIntExtra("solvesCount", 0);
     if (cubeType == null || solveType == null) {
       finish();
+      return;
     }
     cubeSession = new CubeSession();
     App.INSTANCE.getService().getSolveAverages(solveType, solveAverageCallback);

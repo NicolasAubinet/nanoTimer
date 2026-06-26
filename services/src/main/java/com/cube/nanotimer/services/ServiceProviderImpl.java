@@ -1129,6 +1129,7 @@ public class ServiceProviderImpl implements ServiceProvider {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         times.add(new CachedTime(cursor.getInt(0), cursor.getLong(1), cursor.getLong(2)));
       }
+      cursor.close();
     }
     return times;
   }
