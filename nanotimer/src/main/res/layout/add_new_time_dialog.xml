@@ -59,9 +59,27 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginLeft="5dp"
-        android:maxLength="2"
+        android:maxLength="3"
         style="@style/NumericEditText"/>
 
    </LinearLayout>
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/DNF"
+                android:textSize="16sp"/>
+        <CheckBox
+                android:id="@+id/cbDNF"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+    </LinearLayout>
 
 </LinearLayout>

@@ -6,6 +6,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
@@ -21,6 +22,7 @@ public class AddNewTimeDialog extends ConfirmDialog {
   private EditText tfMinutes;
   private EditText tfSeconds;
   private EditText tfHundreds;
+  private CheckBox cbDNF;
 
   private static final String ARG_RESULT_LISTENER = "resultListener";
   private static final String ARG_SOLVE_TYPE = "solveType";
@@ -48,21 +50,28 @@ public class AddNewTimeDialog extends ConfirmDialog {
   protected void onConfirm() {
     int minutes;
     int seconds;
-    int hundreds;
+    int millis;
     try {
       minutes = getIntValue(tfMinutes);
       seconds = getIntValue(tfSeconds);
-      hundreds = getIntValue(tfHundreds);
+      millis = getIntValue(tfHundreds, 3); // milliseconds
     } catch (NumberFormatException e) {
       DialogUtils.showInfoMessage(getContext(), R.string.invalid_integer_value);
       return;
     }
-    if (!checkTimeValues(minutes, seconds, hundreds)) {
+    if (!checkTimeValues(minutes, seconds, millis)) {
       return;
     }
-    long time = minutes * 60000;
-    time += seconds * 1000;
-    time += hundreds * 10;
+
+    long time;
+    if (cbDNF.isChecked()) {
+      time = -1;
+    }
+    else {
+      time = minutes * 60000;
+      time += seconds * 1000;
+      time += millis;
+    }
 
     Bundle args = getArguments();
     final ResultListener resultListener = (ResultListener) args.getSerializable(ARG_RESULT_LISTENER) ;
@@ -94,6 +103,7 @@ public class AddNewTimeDialog extends ConfirmDialog {
     tfMinutes = (EditText) view.findViewById(R.id.tfMinutes);
     tfSeconds = (EditText) view.findViewById(R.id.tfSeconds);
     tfHundreds = (EditText) view.findViewById(R.id.tfHundreds);
+    cbDNF = view.findViewById(R.id.cbDNF);
 
     tfMinutes.addTextChangedListener(new OnNumericFieldKeyListener(tfSeconds));
     tfSeconds.addTextChangedListener(new OnNumericFieldKeyListener(tfHundreds));
@@ -102,10 +112,17 @@ public class AddNewTimeDialog extends ConfirmDialog {
   }
 
   private int getIntValue(EditText editText) throws NumberFormatException {
+    return getIntValue(editText, 0);
+  }
+
+  private int getIntValue(EditText editText, int minTextSize) throws NumberFormatException {
     int value = 0;
-    String stringValue = editText.getText().toString();
-    if (!stringValue.trim().equals("")) {
-      value = Integer.parseInt(stringValue);
+    StringBuilder stringValue = new StringBuilder(editText.getText().toString());
+    while (stringValue.length() < minTextSize) {
+      stringValue.append("0");
+    }
+    if (!stringValue.toString().trim().isEmpty()) {
+      value = Integer.parseInt(stringValue.toString());
     }
     return value;
   }
@@ -120,11 +137,11 @@ public class AddNewTimeDialog extends ConfirmDialog {
       tfSeconds.requestFocus();
       DialogUtils.showInfoMessage(getContext(), getString(R.string.invalid_value_for_field, getString(R.string.seconds)));
       valid = false;
-    } else if (hundreds < 0 || hundreds >= 100) {
+    } else if (hundreds < 0 || hundreds >= 1000) {
       tfHundreds.requestFocus();
       DialogUtils.showInfoMessage(getContext(), getString(R.string.invalid_value_for_field, getString(R.string.hundreds)));
       valid = false;
-    } else if (minutes == 0 && seconds == 0 && hundreds == 0) {
+    } else if (minutes == 0 && seconds == 0 && hundreds == 0 && !cbDNF.isChecked()) {
       DialogUtils.showInfoMessage(getContext(), R.string.please_set_a_value);
       valid = false;
     }
