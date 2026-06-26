@@ -13,6 +13,7 @@ public enum CubeType implements Serializable, NameHolder {
   SIX_BY_SIX(5, "6x6x6"),
   SEVEN_BY_SEVEN(6, "7x7x7"),
   MEGAMINX(7, "Megaminx"),
+  FTO(12, "FTO"),
   PYRAMINX(8, "Pyraminx"),
   SKEWB(9, "Skewb"),
   SQUARE1(10, "Square-1"),

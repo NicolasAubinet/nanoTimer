@@ -21,6 +21,8 @@ import com.cube.nanotimer.vo.TimesSort;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -70,6 +72,14 @@ public class ServiceProviderImpl implements ServiceProvider {
       }
       cursor.close();
     }
+    // Sort by enum declaration order so the puzzle list follows CubeType's order
+    // rather than the DB id order (lets FTO appear after Megaminx despite its higher id).
+    Collections.sort(cubeTypes, new Comparator<CubeType>() {
+      @Override
+      public int compare(CubeType c1, CubeType c2) {
+        return Integer.compare(c1.ordinal(), c2.ordinal());
+      }
+    });
     return cubeTypes;
   }
 

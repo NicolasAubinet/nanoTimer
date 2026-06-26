@@ -158,6 +158,10 @@ public class DBHelper extends SQLiteOpenHelper {
       db.execSQL("ALTER TABLE " + DB.TABLE_TIMEHISTORY + " ADD COLUMN " + DB.COL_TIMEHISTORY_COMMENT + " TEXT");
     }
 
+    if (oldVersion < 15) {
+      insertSolveType(getString(R.string.def), insertCubeType(12, getString(R.string.fto)));
+    }
+
 //    progressDialog.hide();
   }
 
@@ -175,6 +179,7 @@ public class DBHelper extends SQLiteOpenHelper {
     insertSolveType(getString(R.string.def), insertCubeType(9, getString(R.string.skewb)));
     insertSolveType(getString(R.string.def), insertCubeType(10, getString(R.string.square1)));
     insertSolveType(getString(R.string.def), insertCubeType(11, getString(R.string.clock)));
+    insertSolveType(getString(R.string.def), insertCubeType(12, getString(R.string.fto)));
 
     insertSolveType(getString(R.string.one_handed), THREE_BY_THREE_ID);
 
