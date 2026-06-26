@@ -259,9 +259,11 @@
   <string name="cross_neutrality_full">Complète</string>
   <string name="cross_solving">Résolution…</string>
   <string name="cross_no_scramble">Aucun mélange disponible pour l\'instant</string>
-  <string name="cross_face_summary">Croix %1$s : %2$d mouvements (%3$d solutions)</string>
-  <string name="cross_face_already_solved">Croix %1$s : déjà résolue</string>
-  <string name="cross_more_solutions">… et %1$d de plus</string>
+  <string name="cross_section_title">Croix %1$s · %2$d mouvements</string>
+  <string name="cross_solutions_count">%1$d solutions optimales</string>
+  <string name="cross_subtext_solved">déjà résolue</string>
+  <string name="cross_show_all">Afficher les %1$d</string>
+  <string name="cross_show_fewer">Afficher moins</string>
   <string name="invalid_integer_value">Valeur invalide. Entrez un nombre entier.</string>
   <string name="invalid_value_for_field">Valeur invalide pour %1$s</string>
   <string name="please_set_a_value">Spécifiez une valeur</string>

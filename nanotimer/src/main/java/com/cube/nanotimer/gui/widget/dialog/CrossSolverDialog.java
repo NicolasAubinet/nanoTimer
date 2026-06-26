@@ -2,15 +2,18 @@ package com.cube.nanotimer.gui.widget.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
 
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.Options.CrossNeutrality;
@@ -32,8 +35,8 @@ public class CrossSolverDialog extends NanoTimerDialogFragment {
 
   private static final String ARG_SCRAMBLE = "scramble";
 
-  // How many optimal solutions to list per face (the set can be large); the UI notes truncation.
-  private static final int MAX_SOLUTIONS_SHOWN = 12;
+  // How many optimal solutions to show per face before the "Show all" toggle (the set can be large).
+  private static final int INITIAL_SOLUTIONS_SHOWN = 6;
 
   private String scramble;
   private final CrossSolvers solvers = new CrossSolvers();
@@ -136,7 +139,7 @@ public class CrossSolverDialog extends NanoTimerDialogFragment {
     final int currentRequest = ++requestId;
 
     llResults.removeAllViews();
-    llResults.addView(makeTextView(getString(R.string.cross_solving), false));
+    llResults.addView(makeInfoLine(getString(R.string.cross_solving)));
 
     new Thread(new Runnable() {
       @Override
@@ -160,65 +163,175 @@ public class CrossSolverDialog extends NanoTimerDialogFragment {
   private void render(CrossNeutrality mode, List<FaceSolutions> results) {
     llResults.removeAllViews();
     if (mode == CrossNeutrality.SPECIFIC) {
-      renderFaceSolutions(results.get(0), true);
+      // Single face: a card that is always expanded, no chevron.
+      addSectionCard(results.get(0), false, false, true);
     } else {
-      for (final FaceSolutions fs : results) {
-        renderCollapsibleFace(fs);
+      // Ranked comparison: collapsible cards, shortest first, with the shortest face(s) starred.
+      // The top (best) card starts expanded so the easiest cross is visible at a glance.
+      int bestLength = Integer.MAX_VALUE;
+      for (FaceSolutions fs : results) {
+        bestLength = Math.min(bestLength, fs.length);
+      }
+      for (int i = 0; i < results.size(); i++) {
+        FaceSolutions fs = results.get(i);
+        addSectionCard(fs, true, fs.length == bestLength, i == 0);
       }
     }
   }
 
-  // Specific mode: a header then every optimal solution (capped).
-  private void renderFaceSolutions(FaceSolutions fs, boolean expanded) {
-    llResults.addView(makeTextView(faceHeader(fs), true));
-    if (expanded) {
-      addSolutionLines(fs);
+  // A section card for one face: accent header (face + move count) with a dim solution-count subtext,
+  // and a body of monospace solution lines. Collapsible cards get a chevron and a tappable header.
+  private void addSectionCard(final FaceSolutions fs, boolean collapsible, boolean best, boolean startExpanded) {
+    LinearLayout card = new LinearLayout(getActivity());
+    card.setOrientation(LinearLayout.VERTICAL);
+    card.setBackgroundResource(R.drawable.cross_section_card);
+    card.setPadding(dp(12), dp(10), dp(12), dp(10));
+    LinearLayout.LayoutParams cardLp =
+        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+    cardLp.bottomMargin = dp(8);
+    card.setLayoutParams(cardLp);
+
+    final boolean solved = fs.solutions.isEmpty() || fs.length == 0;
+
+    LinearLayout header = new LinearLayout(getActivity());
+    header.setOrientation(LinearLayout.HORIZONTAL);
+    header.setGravity(Gravity.CENTER_VERTICAL);
+
+    final TextView chevron = (collapsible && !solved) ? makeChevron(startExpanded) : null;
+    if (chevron != null) {
+      header.addView(chevron);
     }
-  }
 
-  // Dual/Full mode: one tappable row per face; tapping expands its solution list.
-  private void renderCollapsibleFace(final FaceSolutions fs) {
-    final TextView header = makeTextView(faceHeader(fs), true);
-    final LinearLayout solutionsContainer = new LinearLayout(getActivity());
-    solutionsContainer.setOrientation(LinearLayout.VERTICAL);
-    solutionsContainer.setVisibility(View.GONE);
+    LinearLayout titleBlock = new LinearLayout(getActivity());
+    titleBlock.setOrientation(LinearLayout.VERTICAL);
+    titleBlock.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
 
-    header.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (solutionsContainer.getChildCount() == 0) {
-          fillSolutionLines(solutionsContainer, fs);
-        }
-        solutionsContainer.setVisibility(
-            solutionsContainer.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
+    TextView title = new TextView(getActivity());
+    title.setText(getString(R.string.cross_section_title, fs.face.name(), fs.length));
+    title.setTextColor(color(R.color.lightblue));
+    title.setTypeface(null, Typeface.BOLD);
+    title.setTextSize(16);
+    titleBlock.addView(title);
+
+    TextView subtext = new TextView(getActivity());
+    subtext.setTextColor(color(R.color.secondary_text));
+    subtext.setTextSize(13);
+    subtext.setText(solved ? getString(R.string.cross_subtext_solved)
+        : getString(R.string.cross_solutions_count, fs.solutions.size()));
+    titleBlock.addView(subtext);
+
+    header.addView(titleBlock);
+
+    if (best && !solved) {
+      TextView star = new TextView(getActivity());
+      star.setText("★");
+      star.setTextColor(color(R.color.new_record));
+      star.setTextSize(16);
+      header.addView(star);
+    }
+
+    card.addView(header);
+
+    if (!solved) {
+      final LinearLayout body = new LinearLayout(getActivity());
+      body.setOrientation(LinearLayout.VERTICAL);
+      card.addView(body);
+
+      if (startExpanded) {
+        renderBody(body, fs, false);
+        body.setVisibility(View.VISIBLE);
+      } else {
+        body.setVisibility(View.GONE);
       }
-    });
 
-    llResults.addView(header);
-    llResults.addView(solutionsContainer);
+      if (collapsible) {
+        header.setClickable(true);
+        header.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            boolean expand = body.getVisibility() == View.GONE;
+            if (expand && body.getChildCount() == 0) {
+              renderBody(body, fs, false);
+            }
+            body.setVisibility(expand ? View.VISIBLE : View.GONE);
+            if (chevron != null) {
+              chevron.setText(expand ? "▾" : "▸");
+            }
+          }
+        });
+      }
+    }
+
+    llResults.addView(card);
   }
 
-  private void addSolutionLines(FaceSolutions fs) {
-    fillSolutionLines(llResults, fs);
-  }
+  // Fills a card body with a divider, the (capped or full) solution lines, and a "Show all/fewer"
+  // toggle when there are more than INITIAL_SOLUTIONS_SHOWN. Expansion happens inline, within the
+  // dialog's single scroll (no nested scrolling).
+  private void renderBody(final LinearLayout body, final FaceSolutions fs, final boolean showAll) {
+    body.removeAllViews();
+    body.addView(makeDivider());
 
-  private void fillSolutionLines(ViewGroup container, FaceSolutions fs) {
-    int shown = Math.min(fs.solutions.size(), MAX_SOLUTIONS_SHOWN);
+    int total = fs.solutions.size();
+    int shown = showAll ? total : Math.min(total, INITIAL_SOLUTIONS_SHOWN);
     for (int i = 0; i < shown; i++) {
-      String[] formatted = CrossFormatter.toCrossOnBottom(fs.face, fs.solutions.get(i));
-      container.addView(makeTextView(joinMoves(formatted), false));
+      body.addView(makeSolutionLine(CrossFormatter.toCrossOnBottom(fs.face, fs.solutions.get(i))));
     }
-    if (fs.solutions.size() > shown) {
-      container.addView(makeTextView(
-          getString(R.string.cross_more_solutions, fs.solutions.size() - shown), false));
+
+    if (total > INITIAL_SOLUTIONS_SHOWN) {
+      TextView toggle = new TextView(getActivity());
+      toggle.setTextColor(color(R.color.lightblue));
+      toggle.setTextSize(14);
+      toggle.setPadding(0, dp(6), 0, dp(2));
+      toggle.setText(showAll ? getString(R.string.cross_show_fewer)
+          : getString(R.string.cross_show_all, total));
+      toggle.setClickable(true);
+      toggle.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          renderBody(body, fs, !showAll);
+        }
+      });
+      body.addView(toggle);
     }
   }
 
-  private String faceHeader(FaceSolutions fs) {
-    if (fs.solutions.isEmpty() || fs.length == 0) {
-      return getString(R.string.cross_face_already_solved, fs.face.name());
-    }
-    return getString(R.string.cross_face_summary, fs.face.name(), fs.length, fs.solutions.size());
+  private TextView makeSolutionLine(String[] moves) {
+    TextView tv = new TextView(getActivity());
+    tv.setText(joinMoves(moves));
+    tv.setTextColor(color(R.color.gray200));
+    tv.setTextSize(14);
+    tv.setTypeface(Typeface.MONOSPACE);
+    tv.setPadding(dp(4), dp(3), 0, dp(3));
+    return tv;
+  }
+
+  private TextView makeChevron(boolean expanded) {
+    TextView tv = new TextView(getActivity());
+    tv.setText(expanded ? "▾" : "▸");
+    tv.setTextColor(color(R.color.lightblue));
+    tv.setTextSize(14);
+    tv.setPadding(0, 0, dp(10), 0);
+    return tv;
+  }
+
+  private View makeDivider() {
+    View div = new View(getActivity());
+    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(1));
+    lp.topMargin = dp(6);
+    lp.bottomMargin = dp(4);
+    div.setLayoutParams(lp);
+    div.setBackgroundColor(color(R.color.gray700));
+    return div;
+  }
+
+  private TextView makeInfoLine(String text) {
+    TextView tv = new TextView(getActivity());
+    tv.setText(text);
+    tv.setTextColor(color(R.color.secondary_text));
+    tv.setTextSize(15);
+    tv.setPadding(0, dp(4), 0, dp(4));
+    return tv;
   }
 
   private static String joinMoves(String[] moves) {
@@ -235,12 +348,11 @@ public class CrossSolverDialog extends NanoTimerDialogFragment {
     return sb.toString();
   }
 
-  private TextView makeTextView(String text, boolean header) {
-    TextView tv = new TextView(getActivity());
-    tv.setText(text);
-    tv.setTextSize(header ? 16 : 15);
-    int pad = (int) (4 * getResources().getDisplayMetrics().density);
-    tv.setPadding(0, pad, 0, pad);
-    return tv;
+  private int dp(int value) {
+    return (int) (value * getResources().getDisplayMetrics().density);
+  }
+
+  private int color(int colorResId) {
+    return ContextCompat.getColor(getActivity(), colorResId);
   }
 }
