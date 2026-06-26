@@ -1,6 +1,6 @@
 package com.cube.nanotimer.scrambler.randomstate;
 
-enum Move {
+public enum Move {
 
   // Cubies numbering:
   //
@@ -40,9 +40,9 @@ enum Move {
     this.edgOrient = edgOrient;
   }
 
-  String name;
-  byte[] corPerm;
-  byte[] corOrient;
-  byte[] edgPerm;
-  byte[] edgOrient;
+  public String name;
+  public byte[] corPerm;
+  public byte[] corOrient;
+  public byte[] edgPerm;
+  public byte[] edgOrient;
 }

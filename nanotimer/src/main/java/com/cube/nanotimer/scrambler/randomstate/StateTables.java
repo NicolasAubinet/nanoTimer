@@ -292,7 +292,7 @@ public class StateTables {
     }
   }
 
-  static byte[] getPermResult(byte[] state, byte[] permIndices) {
+  public static byte[] getPermResult(byte[] state, byte[] permIndices) {
     byte[] result = new byte[state.length];
     for (int i = 0; i < result.length; i++) {
       result[i] = state[permIndices[i]];
@@ -300,7 +300,7 @@ public class StateTables {
     return result;
   }
 
-  static byte[] getOrientResult(byte[] state, byte[] permIndices, byte[] orientIndices, int nDifferentValues) {
+  public static byte[] getOrientResult(byte[] state, byte[] permIndices, byte[] orientIndices, int nDifferentValues) {
     byte[] result = new byte[state.length];
     for (int i = 0; i < state.length; i++) {
       result[i] = (byte) ((state[permIndices[i]] + orientIndices[i]) % nDifferentValues);
