@@ -82,32 +82,66 @@ public class FTOPerfTest {
     final int threads = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
     final int toGenerate = 20;
     final AtomicInteger counter = new AtomicInteger(0);
+    final AtomicInteger done = new AtomicInteger(0);
     final AtomicLong totalLen = new AtomicLong(0);
     long wall = System.currentTimeMillis();
     Thread[] pool = new Thread[threads];
     for (int t = 0; t < pool.length; t++) {
       final long seed = 1000 + t;
+      final int tid = t;
       pool[t] = new Thread(new Runnable() {
         @Override
         public void run() {
           Random r = new Random(seed);
           FTOSolver s = new FTOSolver();
-          while (counter.getAndIncrement() < toGenerate) {
+          int idx;
+          while ((idx = counter.getAndIncrement()) < toGenerate) {
+            long t0 = System.nanoTime();
             String[] scr = s.solveFacelet(randomState(r).toFaceCube(), true);
+            long ms = (System.nanoTime() - t0) / 1_000_000;
+            Log.i(TAG, "  [fill] thread " + tid + " solve " + idx + ": " + ms + " ms"
+              + (scr == null ? " (NULL)" : "") + " (done=" + done.incrementAndGet() + "/" + toGenerate + ")");
             if (scr != null) {
               totalLen.addAndGet(scr.length);
             }
           }
         }
-      });
+      }, "fto-fill-" + t);
       pool[t].start();
     }
+    // Watchdog: if the fill stalls, dump every thread's stack so we can tell
+    // "stuck on a lock" (deadlock) from "grinding in idaSearch" (just slow).
+    final Thread[] watched = pool;
+    Thread watchdog = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        for (int tick = 1; tick <= 6; tick++) {
+          try {
+            Thread.sleep(20000);
+          } catch (InterruptedException e) {
+            return; // fill finished, watchdog dismissed
+          }
+          Log.w(TAG, "[watchdog] tick " + tick + ": done=" + done.get() + "/" + toGenerate
+            + " after ~" + (tick * 20) + "s -- dumping fill-thread stacks");
+          for (Thread th : watched) {
+            StringBuilder sb = new StringBuilder(th.getName() + " state=" + th.getState());
+            for (StackTraceElement el : th.getStackTrace()) {
+              sb.append("\n    at ").append(el);
+            }
+            Log.w(TAG, sb.toString());
+          }
+        }
+      }
+    }, "fto-watchdog");
+    watchdog.setDaemon(true);
+    watchdog.start();
     for (Thread th : pool) {
       try {
         th.join();
       } catch (InterruptedException ignored) {
       }
     }
+    watchdog.interrupt();
     long wallMs = System.currentTimeMillis() - wall;
     Log.i(TAG, "cache fill: " + toGenerate + " scrambles on " + threads + " threads in " + wallMs
       + " ms (" + (wallMs / (double) toGenerate) + " ms/scramble wall, avg length "

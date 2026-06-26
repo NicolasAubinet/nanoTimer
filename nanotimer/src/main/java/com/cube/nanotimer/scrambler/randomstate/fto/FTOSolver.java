@@ -89,10 +89,17 @@ public class FTOSolver {
   private static FtoSearch.MoveHash p3epMoves, p3ufMoves;
   private static int[] p3epPrun, p3ufPrun, ckmv3;
 
+  // Wall-clock safety cap for a single solve. Real solves take well under a
+  // second; this only exists so a pathological state (or a very slow device)
+  // can never stall live scramble generation. On timeout the solve returns null
+  // and the caller simply tries another random state (no random-move fallback).
+  private static final long DEFAULT_SOLVE_BUDGET_MS = 10_000;
+
   // Per-instance search state
   private final FtoSearch.Searcher solv1;
   private final FtoSearch.Searcher solv2;
   private final FtoSearch.Searcher solv3;
+  private long solveBudgetNanos = DEFAULT_SOLVE_BUDGET_MS * 1_000_000L;
   private volatile boolean stopped;
 
   public FTOSolver() {
@@ -100,6 +107,11 @@ public class FTOSolver {
     solv1 = buildSolv1();
     solv2 = buildSolv2();
     solv3 = buildSolv3();
+  }
+
+  /** Override the per-solve wall-clock budget in milliseconds ({@code <= 0} disables it). */
+  public void setSolveBudgetMs(long ms) {
+    solveBudgetNanos = ms * 1_000_000L;
   }
 
   public void stop() {
@@ -667,6 +679,11 @@ public class FTOSolver {
    * Returns one move token per array element, or null if interrupted.
    */
   public String[] solve(FtoCubie fc, boolean invSol) {
+    long deadline = (solveBudgetNanos > 0) ? System.nanoTime() + solveBudgetNanos : 0L;
+    solv1.deadlineNanos = deadline;
+    solv2.deadlineNanos = deadline;
+    solv3.deadlineNanos = deadline;
+
     List<Object[]> solvInfos = solvePhase1(fc);
     if (stopped) {
       return null;

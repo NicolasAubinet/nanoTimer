@@ -199,6 +199,10 @@ public final class FtoSearch {
     private final int nPower;
     private final int[] ckmv;
 
+    // Check the wall clock only every 2^14 nodes (System.nanoTime() per node
+    // would dominate the search cost).
+    private static final long DEADLINE_CHECK_MASK = 0x3FFFL;
+
     private int sidx;
     // Preallocated solution stacks (no per-node allocation): the move chosen at
     // each depth is (axisStack[d], powStack[d]) for d in [0, solLen).
@@ -212,6 +216,13 @@ public final class FtoSearch {
 
     /** Set asynchronously to abort an in-flight search. */
     public volatile boolean aborted;
+
+    /**
+     * Absolute {@link System#nanoTime()} deadline for the search, or 0 for none.
+     * Set by the caller before searching; when passed, the search bails out (the
+     * same way an exhausted node budget does) so a single solve can never stall.
+     */
+    public long deadlineNanos;
 
     public Searcher(SearchSolved isSolved, SearchPrun getPrun, SearchMove doMove, int nAxis, int nPower, int[] ckmv) {
       this.isSolved = (isSolved != null) ? isSolved : new SearchSolved() {
@@ -257,6 +268,10 @@ public final class FtoSearch {
 
     private int idaSearch(long idx, int maxl, int depth, int lm) {
       if (--cost <= 0 || aborted) {
+        return 0;
+      }
+      if (deadlineNanos != 0L && (cost & DEADLINE_CHECK_MASK) == 0L && System.nanoTime() >= deadlineNanos) {
+        cost = 0; // trip the budget-exhausted path so solveMulti returns null
         return 0;
       }
       int prun = getPrun.prun(idx);

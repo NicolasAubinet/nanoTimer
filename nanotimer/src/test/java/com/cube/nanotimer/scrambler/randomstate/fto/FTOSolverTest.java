@@ -109,4 +109,30 @@ public class FTOSolverTest {
     System.out.println("[FTO] avg solve: " + (totalSolveMs / (double) n) + " ms over " + n + " states");
     System.out.println("[FTO] avg scramble length: " + (totalLen / (double) n) + ", max: " + maxLen);
   }
+
+  /**
+   * The wall-clock safety cap must bound a single solve: with a tiny budget the
+   * solve aborts promptly and returns null (never hangs), and any non-null result
+   * is still a legal scramble. Guards the deadline plumbing in FtoSearch/FTOSolver.
+   */
+  @Test
+  public void solveRespectsTimeBudget() {
+    FTOSolver.genTables();
+    FTOSolver solver = new FTOSolver();
+    solver.setSolveBudgetMs(1); // far below the tens of ms a real solve needs
+    Random rnd = new Random(7);
+
+    for (int t = 0; t < 20; t++) {
+      FtoCubie fc = randomState(rnd);
+      long s = System.currentTimeMillis();
+      String[] scr = solver.solve(fc, true);
+      long ms = System.currentTimeMillis() - s;
+      assertTrue("solve ran far past its budget: " + ms + " ms", ms < 2000);
+      if (scr != null) {
+        for (String token : scr) {
+          assertTrue("illegal token " + token, TOKENS.contains(token));
+        }
+      }
+    }
+  }
 }
