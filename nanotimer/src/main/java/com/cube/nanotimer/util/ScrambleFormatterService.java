@@ -197,6 +197,9 @@ public enum ScrambleFormatterService {
       case SKEWB:
         movesPerLine = 5;
         break;
+      case FTO:
+        movesPerLine = 8;
+        break;
       case MEGAMINX:
         // don't add line breaks for this, as this a special kind of scramble that is already formatted
         movesPerLine = 0;

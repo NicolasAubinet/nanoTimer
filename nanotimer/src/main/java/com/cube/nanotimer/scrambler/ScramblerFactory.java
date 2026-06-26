@@ -5,6 +5,7 @@ import com.cube.nanotimer.Options.ClockNotation;
 import com.cube.nanotimer.scrambler.basic.ClockURxDRxDLxScrambler;
 import com.cube.nanotimer.scrambler.basic.ClockUUdUxxScrambler;
 import com.cube.nanotimer.scrambler.basic.ClockUUdduxdxScrambler;
+import com.cube.nanotimer.scrambler.basic.FTOScrambler;
 import com.cube.nanotimer.scrambler.basic.FiveScrambler;
 import com.cube.nanotimer.scrambler.basic.FourScrambler;
 import com.cube.nanotimer.scrambler.basic.MegaminxScrambler;
@@ -43,6 +44,9 @@ public class ScramblerFactory {
         break;
       case MEGAMINX:
         scrambler = new MegaminxScrambler();
+        break;
+      case FTO:
+        scrambler = new FTOScrambler();
         break;
       case PYRAMINX:
         scrambler = new PyraminxScrambler();
