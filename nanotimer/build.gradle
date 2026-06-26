@@ -45,5 +45,4 @@ dependencies {
     
     implementation 'asia.ivity.android:drag-sort-listview:1.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
-    implementation 'com.github.thewca:tnoodle:v0.12.0'
 }

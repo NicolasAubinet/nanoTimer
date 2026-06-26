@@ -31,8 +31,8 @@ The build is split into one app module and several libraries (see
   import/export.
 - **`wheel`** — vendored Android Wheel widget (`kankan.wheel`) for picker dialogs.
 
-Third-party deps of note: `tnoodle` (WCA scramble library, via JitPack),
-`MPAndroidChart` (graphs), `drag-sort-listview` (reorderable lists).
+Third-party deps of note: `MPAndroidChart` (graphs), `drag-sort-listview`
+(reorderable lists).
 
 ## Build & test
 
