@@ -14,6 +14,7 @@ public enum Options {
   public enum BigCubesNotation { RUF, RWUWFW }
   public enum ClockNotation { UUdU_x_x, UUdd_ux_dx, URx_DRx_DLx }
   public enum ScrambleNotificationMode { ALWAYS, MANUAL, NEVER }
+  public enum CrossNeutrality { SPECIFIC, DUAL, FULL }
 
   private Context context;
   private SharedPreferences sharedPreferences;
