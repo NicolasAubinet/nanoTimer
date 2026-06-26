@@ -29,6 +29,8 @@ public enum Options {
   public static final String BIG_CUBES_NOTATION_KEY = "big_cubes_notation";
   public static final String CLOCK_NOTATION_SYSTEM_KEY = "clock_notation";
   public static final String SOLVE_TYPES_SHORTCUT_KEY = "solve_types_shortcut";
+  public static final String CROSS_NEUTRALITY_KEY = "cross_neutrality";
+  public static final String CROSS_FACE_KEY = "cross_face";
 
   public static final String RANDOMSTATE_SCRAMBLES_KEY = "randomstate_scrambles";
   public static final String SCRAMBLES_QUALITY_KEY = "scrambles_quality";
@@ -130,6 +132,26 @@ public enum Options {
       default:
         return ClockNotation.UUdU_x_x;
     }
+  }
+
+  public CrossNeutrality getCrossNeutrality() {
+    int ordinal = sharedPreferences.getInt(CROSS_NEUTRALITY_KEY, CrossNeutrality.SPECIFIC.ordinal());
+    CrossNeutrality[] values = CrossNeutrality.values();
+    return (ordinal >= 0 && ordinal < values.length) ? values[ordinal] : CrossNeutrality.SPECIFIC;
+  }
+
+  public void setCrossNeutrality(CrossNeutrality neutrality) {
+    sharedPreferences.edit().putInt(CROSS_NEUTRALITY_KEY, neutrality.ordinal()).apply();
+  }
+
+  // The cross face is stored as an index into the cross face enum (default D), kept here as an int
+  // to avoid coupling Options to the scrambler package.
+  public int getCrossFaceIndex(int defaultIndex) {
+    return sharedPreferences.getInt(CROSS_FACE_KEY, defaultIndex);
+  }
+
+  public void setCrossFaceIndex(int faceIndex) {
+    sharedPreferences.edit().putInt(CROSS_FACE_KEY, faceIndex).apply();
   }
 
   public boolean isRandomStateScrambles() {

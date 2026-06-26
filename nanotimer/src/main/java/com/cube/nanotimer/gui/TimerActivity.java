@@ -33,6 +33,7 @@ import com.cube.nanotimer.gui.widget.ResultListener;
 import com.cube.nanotimer.gui.widget.SessionDetailDialog;
 import com.cube.nanotimer.gui.widget.dialog.AddNewTimeDialog;
 import com.cube.nanotimer.gui.widget.dialog.CommentSolveDialog;
+import com.cube.nanotimer.gui.widget.dialog.CrossSolverDialog;
 import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.State;
@@ -47,6 +48,7 @@ import com.cube.nanotimer.util.helper.GUIUtils;
 import com.cube.nanotimer.util.helper.ScreenUtils;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
+import com.cube.nanotimer.vo.ScrambleType;
 import com.cube.nanotimer.vo.SolveAverages;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
@@ -376,6 +378,10 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
   public boolean onPrepareOptionsMenu(Menu menu) {
     menu.findItem(R.id.itShareTime).setVisible(showMenu && lastSolveTime != null);
     menu.findItem(R.id.itSessionDetails).setVisible(showMenu && hasNewSession);
+    ScrambleType scrambleType = solveType.getScrambleType();
+    boolean crossSolverAvailable = cubeType == CubeType.THREE_BY_THREE
+        && (scrambleType == null || scrambleType.isDefault()); // null scramble type means the default full scramble
+    menu.findItem(R.id.itCrossSolver).setVisible(showMenu && crossSolverAvailable);
     return super.onPrepareOptionsMenu(menu);
   }
 
@@ -480,6 +486,14 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
         case R.id.itShareTime:
           if (lastSolveTime != null) {
             DialogUtils.shareTime(this, lastSolveTime, cubeType);
+          }
+          break;
+        case R.id.itCrossSolver:
+          if (currentScramble != null) {
+            String scramble = ScrambleFormatterService.INSTANCE.formatScrambleAsSingleLine(currentScramble, cubeType);
+            DialogUtils.showFragment(this, CrossSolverDialog.newInstance(scramble));
+          } else {
+            DialogUtils.showShortInfoMessage(this, R.string.cross_no_scramble);
           }
           break;
       }

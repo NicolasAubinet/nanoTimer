@@ -254,6 +254,18 @@
 
   <string name="add_time">Add time</string>
   <string name="select_time_to_add">Select time to add:</string>
+
+  <string name="cross_solver">Cross solver</string>
+  <string name="cross_neutrality">Neutrality</string>
+  <string name="cross_face">Face</string>
+  <string name="cross_neutrality_specific">Specific</string>
+  <string name="cross_neutrality_dual">Dual</string>
+  <string name="cross_neutrality_full">Full</string>
+  <string name="cross_solving">Solving…</string>
+  <string name="cross_no_scramble">No scramble available yet</string>
+  <string name="cross_face_summary">%1$s cross: %2$d moves (%3$d solutions)</string>
+  <string name="cross_face_already_solved">%1$s cross: already solved</string>
+  <string name="cross_more_solutions">… and %1$d more</string>
   <string name="invalid_integer_value">Invalid value. Please enter an integer number.</string>
   <string name="invalid_value_for_field">Invalid value for %1$s</string>
   <string name="please_set_a_value">Please specify a value</string>

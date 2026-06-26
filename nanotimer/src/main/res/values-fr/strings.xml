@@ -250,6 +250,18 @@
 
   <string name="add_time">Ajouter un temps</string>
   <string name="select_time_to_add">Entrez un temps à ajouter:</string>
+
+  <string name="cross_solver">Solveur de croix</string>
+  <string name="cross_neutrality">Neutralité</string>
+  <string name="cross_face">Face</string>
+  <string name="cross_neutrality_specific">Spécifique</string>
+  <string name="cross_neutrality_dual">Double</string>
+  <string name="cross_neutrality_full">Complète</string>
+  <string name="cross_solving">Résolution…</string>
+  <string name="cross_no_scramble">Aucun mélange disponible pour l\'instant</string>
+  <string name="cross_face_summary">Croix %1$s : %2$d mouvements (%3$d solutions)</string>
+  <string name="cross_face_already_solved">Croix %1$s : déjà résolue</string>
+  <string name="cross_more_solutions">… et %1$d de plus</string>
   <string name="invalid_integer_value">Valeur invalide. Entrez un nombre entier.</string>
   <string name="invalid_value_for_field">Valeur invalide pour %1$s</string>
   <string name="please_set_a_value">Spécifiez une valeur</string>
