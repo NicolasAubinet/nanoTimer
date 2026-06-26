@@ -26,7 +26,7 @@ public class ExportResultConverter {
     sb.append(",");
     sb.append(escapeString(result.getSolveTypeName()));
     sb.append(",");
-    sb.append(FormatterService.INSTANCE.formatSolveTime(result.getTime()));
+    sb.append(FormatterService.INSTANCE.formatSolveTime(result.getTime(), null, true));
     sb.append(",");
     sb.append(FormatterService.INSTANCE.formatExportDateTime(result.getTimestamp()));
     sb.append(",");
@@ -166,7 +166,7 @@ public class ExportResultConverter {
       for (char c : Utils.FORBIDDEN_NAME_CHARACTERS) {
         stepName = stepName.replace(c, ' ');
       }
-      sb.append(stepName).append('=').append(FormatterService.INSTANCE.formatSolveTime(stepsTimes[i]));
+      sb.append(stepName).append('=').append(FormatterService.INSTANCE.formatSolveTime(stepsTimes[i], null, true));
       if (i < stepsTimes.length - 1) {
         sb.append('|');
       }
