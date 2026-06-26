@@ -308,6 +308,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
       case THREE_BY_THREE:
       case PYRAMINX:
       case SKEWB:
+      case FTO:
         size = 22f;
         break;
       case FOUR_BY_FOUR:

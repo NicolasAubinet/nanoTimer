@@ -53,6 +53,7 @@ public class PreGenerateScramblesDialog extends DialogPreference implements Rand
     final RadioButton rbTwoByTwo = (RadioButton) layout.findViewById(R.id.rbTwoByTwo);
     final RadioButton rbPyraminx = (RadioButton) layout.findViewById(R.id.rbPyraminx);
     final RadioButton rbSquare1 = (RadioButton) layout.findViewById(R.id.rbSquare1);
+    final RadioButton rbFto = (RadioButton) layout.findViewById(R.id.rbFto);
 
     cubeType = CubeType.THREE_BY_THREE;
     rbThreeByThree.setChecked(true);
@@ -67,6 +68,8 @@ public class PreGenerateScramblesDialog extends DialogPreference implements Rand
           cubeType = CubeType.PYRAMINX;
         } else if (rbSquare1.isChecked()) {
           cubeType = CubeType.SQUARE1;
+        } else if (rbFto.isChecked()) {
+          cubeType = CubeType.FTO;
         }
         updateTotalScramblesCount();
       }
