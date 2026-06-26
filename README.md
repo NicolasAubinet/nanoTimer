@@ -16,9 +16,16 @@ Android speedcubing timer app to keep track of your times and averages everywher
 * Graphs
 * Times import/export
 * Cubing sessions
-* Random-state scrambles for 3x3x3, 2x2x2, Square-1 and Pyraminx
+* Random-state scrambles for 3x3x3, 2x2x2, Square-1, Pyraminx and FTO
 * Special blind solve type with blind-specific fields like success rate, last/best Mo3 and average of successes
 * Keep track of your averages and your best times
+
+## Acknowledgements
+
+* The FTO (Face-Turning Octahedron) random-state scrambler is a Java port of the
+  solver from [cstimer](https://github.com/cs0x7f/cstimer) by Shuang Chen (cs0x7f)
+  and contributors (`src/js/solver/ftocta.js` and the supporting `mathlib.js`),
+  used under the GPL-3.0 license.
 
 ## License (GNU GPL v3)
 
