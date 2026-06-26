@@ -52,20 +52,20 @@ public class FtoSearchTest {
     FtoSearch.Searcher searcher = new FtoSearch.Searcher(
       new FtoSearch.SearchSolved() {
         @Override
-        public boolean solved(Object idx) {
-          return (Integer) idx == 0;
+        public boolean solved(long idx) {
+          return idx == 0;
         }
       },
       new FtoSearch.SearchPrun() {
         @Override
-        public int prun(Object idx) {
-          return FtoMath.getPruning(prun, (Integer) idx);
+        public int prun(long idx) {
+          return FtoMath.getPruning(prun, (int) idx);
         }
       },
       new FtoSearch.SearchMove() {
         @Override
-        public Object move(Object idx, int axis) {
-          return mh.moveTable[axis][(Integer) idx];
+        public long move(long idx, int axis) {
+          return mh.moveTable[axis][(int) idx];
         }
       },
       1, 11, new int[] {1});

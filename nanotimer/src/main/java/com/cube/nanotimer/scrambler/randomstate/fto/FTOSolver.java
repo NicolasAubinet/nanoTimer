@@ -414,6 +414,12 @@ public class FTOSolver {
 
     nP2ep = p2epMoves.nStates();
     nP2rl = p2rlMoves.nStates();
+    // Guard the fixed phase-2 long-packing layout (ep 14b, rl 12b, cc 14b, uf 24b):
+    // fail loudly here rather than silently corrupt coordinates if a table grew.
+    if (nP2ep > (1 << 14) || nP2rl > (1 << 12) || nP2cc > (1 << 14)
+        || (((long) (nStd - 1) << 4) | 0xf) >= (1L << 24)) {
+      throw new IllegalStateException("FTO phase-2 coordinates exceed the long-packing budget");
+    }
     p2eprlPrun = FtoSearch.createPrun(0, nP2ep * nP2rl, P2EPRL_MAXL - 2, new FtoSearch.DoMove() {
       @Override
       public int move(int idx, int move) {
@@ -464,16 +470,14 @@ public class FTOSolver {
     return new FtoSearch.Searcher(null,
       new FtoSearch.SearchPrun() {
         @Override
-        public int prun(Object idxO) {
-          int[] idx = (int[]) idxO;
-          return FtoMath.getPruning(p1eprlPrun, idx[1] * nP1ep + idx[0]);
+        public int prun(long idx) {
+          return FtoMath.getPruning(p1eprlPrun, hi32(idx) * nP1ep + lo32(idx));
         }
       },
       new FtoSearch.SearchMove() {
         @Override
-        public Object move(Object idxO, int axis) {
-          int[] idx = (int[]) idxO;
-          return new int[] {p1epMoves.moveTable[axis][idx[0]], p1rlMoves.moveTable[axis][idx[1]]};
+        public long move(long idx, int axis) {
+          return pack32(p1epMoves.moveTable[axis][lo32(idx)], p1rlMoves.moveTable[axis][hi32(idx)]);
         }
       }, 8, 2, ckmv1);
   }
@@ -482,29 +486,28 @@ public class FTOSolver {
     return new FtoSearch.Searcher(null,
       new FtoSearch.SearchPrun() {
         @Override
-        public int prun(Object idxO) {
-          int[] idx = (int[]) idxO;
-          int xors = ufStd2Bit[idx[3] >> 4] ^ cc2Bit[p2ccRecol[idx[3] & 0xf][idx[2]]];
+        public int prun(long idx) {
+          int uf = p2uf(idx);
+          int xors = ufStd2Bit[uf >> 4] ^ cc2Bit[p2ccRecol[uf & 0xf][p2cc(idx)]];
           xors = (xors | (xors >> 1)) & 0x555555;
           int necIdx = ((Integer.bitCount(xors & 0x3f) << 2) | Integer.bitCount(xors & 0xc0c0c0)) * 7
             + Integer.bitCount(xors & 0x3f3f00);
           return Math.max(
-            Math.min(P2EPRL_MAXL, FtoMath.getPruning(p2eprlPrun, idx[1] * nP2ep + idx[0])),
+            Math.min(P2EPRL_MAXL, FtoMath.getPruning(p2eprlPrun, p2rl(idx) * nP2ep + p2ep(idx))),
             P2NEC_PRUN[necIdx]);
         }
       },
       new FtoSearch.SearchMove() {
         @Override
-        public Object move(Object idxO, int axis) {
-          int[] idx = (int[]) idxO;
-          int ufidx1 = p2ufMoveStd[axis][idx[3] >> 4];
-          int ufcol = FtoMoves.symMult[ufidx1 & 0xf][idx[3] & 0xf];
-          return new int[] {
-            p2epMoves.moveTable[axis][idx[0]],
-            p2rlMoves.moveTable[axis][idx[1]],
-            p2ccMoves.moveTable[axis][idx[2]],
-            (ufidx1 & ~0xf) | ufcol,
-          };
+        public long move(long idx, int axis) {
+          int uf = p2uf(idx);
+          int ufidx1 = p2ufMoveStd[axis][uf >> 4];
+          int ufcol = FtoMoves.symMult[ufidx1 & 0xf][uf & 0xf];
+          return pack2(
+            p2epMoves.moveTable[axis][p2ep(idx)],
+            p2rlMoves.moveTable[axis][p2rl(idx)],
+            p2ccMoves.moveTable[axis][p2cc(idx)],
+            (ufidx1 & ~0xf) | ufcol);
         }
       }, PHASE2_MOVES.length, 2, ckmv2);
   }
@@ -513,16 +516,14 @@ public class FTOSolver {
     return new FtoSearch.Searcher(null,
       new FtoSearch.SearchPrun() {
         @Override
-        public int prun(Object idxO) {
-          int[] idx = (int[]) idxO;
-          return Math.max(FtoMath.getPruning(p3epPrun, idx[0]), FtoMath.getPruning(p3ufPrun, idx[1]));
+        public int prun(long idx) {
+          return Math.max(FtoMath.getPruning(p3epPrun, lo32(idx)), FtoMath.getPruning(p3ufPrun, hi32(idx)));
         }
       },
       new FtoSearch.SearchMove() {
         @Override
-        public Object move(Object idxO, int axis) {
-          int[] idx = (int[]) idxO;
-          return new int[] {p3epMoves.moveTable[axis][idx[0]], p3ufMoves.moveTable[axis][idx[1]]};
+        public long move(long idx, int axis) {
+          return pack32(p3epMoves.moveTable[axis][lo32(idx)], p3ufMoves.moveTable[axis][hi32(idx)]);
         }
       }, 4, 2, ckmv3);
   }
@@ -553,7 +554,7 @@ public class FTOSolver {
   }
 
   private Object[] phase1GenIdxs(FtoCubie fc) {
-    List<Object> idxs = new ArrayList<>();
+    List<Long> idxs = new ArrayList<>();
     List<int[]> syms = new ArrayList<>();
     FtoCubie fc2 = new FtoCubie();
     FtoCubie fc3 = new FtoCubie();
@@ -566,13 +567,16 @@ public class FTOSolver {
           break;
         }
       }
-      idxs.add(new int[] {
+      idxs.add(pack32(
         p1epMoves.hash2idx.get(phase1EdgeHash(fc3.ep)),
-        p1rlMoves.hash2idx.get(phase1CtrlHash(fc3.rl)),
-      });
+        p1rlMoves.hash2idx.get(phase1CtrlHash(fc3.rl))));
       syms.add(new int[] {sidx, rot});
     }
-    return new Object[] {idxs.toArray(), syms};
+    long[] idxArr = new long[idxs.size()];
+    for (int i = 0; i < idxArr.length; i++) {
+      idxArr[i] = idxs.get(i);
+    }
+    return new Object[] {idxArr, syms};
   }
 
   private Object[] phase1ProcSol(int[][] solPairs, int[] solsym, FtoCubie fc) {
@@ -597,7 +601,7 @@ public class FTOSolver {
 
   private List<Object[]> solvePhase1(final FtoCubie fc) {
     Object[] gen = phase1GenIdxs(fc);
-    final Object[] idxs = (Object[]) gen[0];
+    final long[] idxs = (long[]) gen[0];
     @SuppressWarnings("unchecked")
     final List<int[]> syms = (List<int[]>) gen[1];
     final List<Object[]> p1sols = new ArrayList<>();
@@ -612,15 +616,14 @@ public class FTOSolver {
   }
 
   private Object[] solvePhase2(List<Object[]> solvInfos) {
-    Object[] idxs = new Object[solvInfos.size()];
+    long[] idxs = new long[solvInfos.size()];
     for (int i = 0; i < solvInfos.size(); i++) {
       FtoCubie fc = (FtoCubie) solvInfos.get(i)[0];
-      idxs[i] = new int[] {
+      idxs[i] = pack2(
         p2epMoves.hash2idx.get(phase2EdgeHash(fc.ep)),
         p2rlMoves.hash2idx.get(phase2CtHash(fc.rl)),
         p2ccMoves.hash2idx.get(phase2CpcoHash(fc)),
-        getPhase2ufIdx(fc.uf),
-      };
+        getPhase2ufIdx(fc.uf));
     }
     Object[] res = solv2.solveMulti(idxs, 0, 25, null);
     if (res == null) {
@@ -645,7 +648,7 @@ public class FTOSolver {
     int sym1 = (Integer) solvInfo[3];
     int epIdx = p3epMoves.hash2idx.get(phase3EdgeHash(fc.ep));
     int ufIdx = p3ufMoves.hash2idx.get(phase3CcufHash(fc));
-    int[][] solPairs = solv3.solve(new int[] {epIdx, ufIdx}, 0, 25);
+    int[][] solPairs = solv3.solve(pack32(epIdx, ufIdx), 0, 25);
     if (solPairs == null) {
       return null;
     }
@@ -721,6 +724,45 @@ public class FTOSolver {
       return null;
     }
     return solve(fc, invSol);
+  }
+
+  // ------------------------------------------------------------ coord packing
+
+  // Phases 1 and 3 hold two small coordinates -> a plain 32/32 split of the long.
+  private static long pack32(int lo, int hi) {
+    return (lo & 0xffffffffL) | ((long) hi << 32);
+  }
+
+  private static int lo32(long x) {
+    return (int) x;
+  }
+
+  private static int hi32(long x) {
+    return (int) (x >>> 32);
+  }
+
+  // Phase 2 holds four coordinates packed into one long (see the budget guard in
+  // phase2Init): ep [0,14), rl [14,26), cc [26,40), uf [40,64).
+  private static final int P2_RL_SH = 14, P2_CC_SH = 26, P2_UF_SH = 40;
+
+  private static long pack2(int ep, int rl, int cc, int uf) {
+    return (long) ep | ((long) rl << P2_RL_SH) | ((long) cc << P2_CC_SH) | ((long) uf << P2_UF_SH);
+  }
+
+  private static int p2ep(long x) {
+    return (int) (x & 0x3FFF);
+  }
+
+  private static int p2rl(long x) {
+    return (int) ((x >>> P2_RL_SH) & 0xFFF);
+  }
+
+  private static int p2cc(long x) {
+    return (int) ((x >>> P2_CC_SH) & 0x3FFF);
+  }
+
+  private static int p2uf(long x) {
+    return (int) (x >>> P2_UF_SH);
   }
 
   // ------------------------------------------------------------------ helpers

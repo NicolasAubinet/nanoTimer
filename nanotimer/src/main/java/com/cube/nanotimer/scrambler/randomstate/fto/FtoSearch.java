@@ -33,16 +33,19 @@ public final class FtoSearch {
     int move(int idx, int move);
   }
 
+  /** Sentinel returned by {@link SearchMove} for an illegal move (no resulting state). */
+  public static final long NO_STATE = Long.MIN_VALUE;
+
   public interface SearchMove {
-    Object move(Object idx, int axis);
+    long move(long idx, int axis);
   }
 
   public interface SearchPrun {
-    int prun(Object idx);
+    int prun(long idx);
   }
 
   public interface SearchSolved {
-    boolean solved(Object idx);
+    boolean solved(long idx);
   }
 
   public interface SearchCallback {
@@ -186,6 +189,9 @@ public final class FtoSearch {
    * does not implement cstimer's cross-call {@code next()} enumeration.
    */
   public static final class Searcher {
+    // Max search depth across all FTO phases is well under this (<= 25).
+    private static final int MAX_DEPTH = 64;
+
     private final SearchSolved isSolved;
     private final SearchPrun getPrun;
     private final SearchMove doMove;
@@ -194,9 +200,13 @@ public final class FtoSearch {
     private final int[] ckmv;
 
     private int sidx;
-    private List<int[]> sol;
+    // Preallocated solution stacks (no per-node allocation): the move chosen at
+    // each depth is (axisStack[d], powStack[d]) for d in [0, solLen).
+    private final int[] axisStack = new int[MAX_DEPTH];
+    private final int[] powStack = new int[MAX_DEPTH];
+    private int solLen;
     private int length;
-    private Object[] idxs;
+    private long[] idxs;
     private long cost;
     private SearchCallback callback;
 
@@ -206,7 +216,7 @@ public final class FtoSearch {
     public Searcher(SearchSolved isSolved, SearchPrun getPrun, SearchMove doMove, int nAxis, int nPower, int[] ckmv) {
       this.isSolved = (isSolved != null) ? isSolved : new SearchSolved() {
         @Override
-        public boolean solved(Object idx) {
+        public boolean solved(long idx) {
           return true;
         }
       };
@@ -217,14 +227,14 @@ public final class FtoSearch {
       this.ckmv = ckmv;
     }
 
-    public int[][] solve(Object idx, int minl, int maxl) {
-      Object[] sols = solveMulti(new Object[] {idx}, minl, maxl, null);
+    public int[][] solve(long idx, int minl, int maxl) {
+      Object[] sols = solveMulti(new long[] {idx}, minl, maxl, null);
       return sols == null ? null : (int[][]) sols[0];
     }
 
-    public Object[] solveMulti(Object[] idxs, int minl, int maxl, SearchCallback callback) {
+    public Object[] solveMulti(long[] idxs, int minl, int maxl, SearchCallback callback) {
       this.sidx = 0;
-      this.sol = new ArrayList<>();
+      this.solLen = 0;
       this.length = minl;
       this.idxs = idxs;
       this.cost = 1000000000L + 1;
@@ -237,7 +247,7 @@ public final class FtoSearch {
       for (; this.length <= maxl; this.length++) {
         for (; this.sidx < this.idxs.length; this.sidx++) {
           if (idaSearch(this.idxs[this.sidx], this.length, 0, -1) == 0) {
-            return this.cost <= 0 ? null : new Object[] {toArray(this.sol), this.sidx};
+            return this.cost <= 0 ? null : new Object[] {currentSol(), this.sidx};
           }
         }
         this.sidx = 0;
@@ -245,7 +255,7 @@ public final class FtoSearch {
       return null;
     }
 
-    private int idaSearch(Object idx, int maxl, int depth, int lm) {
+    private int idaSearch(long idx, int maxl, int depth, int lm) {
       if (--cost <= 0 || aborted) {
         return 0;
       }
@@ -253,7 +263,7 @@ public final class FtoSearch {
       if (prun > maxl) {
         return prun > maxl + 1 ? 2 : 1;
       } else if (maxl == 0) {
-        return (isSolved.solved(idx) && callback.found(toArray(sol), sidx)) ? 0 : 1;
+        return (isSolved.solved(idx) && callback.found(currentSol(), sidx)) ? 0 : 1;
       } else if (prun == 0 && maxl == 1 && isSolved.solved(idx)) {
         return 1;
       }
@@ -261,18 +271,20 @@ public final class FtoSearch {
         if (lm >= 0 && ((ckmv[lm] >> axis) & 1) != 0) {
           continue;
         }
-        Object idx1 = idx;
+        long idx1 = idx;
         for (int pow = 0; pow < nPower; pow++) {
           idx1 = doMove.move(idx1, axis);
-          if (idx1 == null) {
+          if (idx1 == NO_STATE) {
             break;
           }
-          sol.add(new int[] {axis, pow});
+          axisStack[solLen] = axis;
+          powStack[solLen] = pow;
+          solLen++;
           int ret = idaSearch(idx1, maxl - 1, depth + 1, axis);
           if (ret == 0) {
             return 0;
           }
-          sol.remove(sol.size() - 1);
+          solLen--;
           if (ret == 2) {
             break;
           }
@@ -281,10 +293,10 @@ public final class FtoSearch {
       return 1;
     }
 
-    private static int[][] toArray(List<int[]> sol) {
-      int[][] arr = new int[sol.size()][];
-      for (int i = 0; i < sol.size(); i++) {
-        arr[i] = new int[] {sol.get(i)[0], sol.get(i)[1]};
+    private int[][] currentSol() {
+      int[][] arr = new int[solLen][];
+      for (int i = 0; i < solLen; i++) {
+        arr[i] = new int[] {axisStack[i], powStack[i]};
       }
       return arr;
     }
