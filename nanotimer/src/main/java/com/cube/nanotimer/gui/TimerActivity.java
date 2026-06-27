@@ -1055,7 +1055,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     TextView tv = (TextView) findViewById(fieldId);
     tv.setText(formatAvgField(value, defaultValue));
     tv.setTextColor(defaultTextColor);
-    tv.setTypeface(null, Typeface.NORMAL);
+    tv.setTypeface(null, Typeface.BOLD);
   }
 
   private void clearAvgRecordStyle() {
@@ -1068,7 +1068,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     tvs.add((TextView) findViewById(R.id.tvLifetimeBest));
     for (TextView tv : tvs) {
       tv.setTextColor(defaultTextColor);
-      tv.setTypeface(null, Typeface.NORMAL);
+      tv.setTypeface(null, Typeface.BOLD);
     }
     if (animations != null) {
       for (Animation a : animations) {
