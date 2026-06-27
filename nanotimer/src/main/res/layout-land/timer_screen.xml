@@ -228,28 +228,28 @@
          android:visibility="gone"
          android:stretchColumns="*">
         <TableRow>
-          <TextView style="@style/SolveStepTextFieldPx" android:gravity="right"/>
-          <TextView style="@style/SolveStepTextFieldPx" android:gravity="left"/>
-          <TextView style="@style/SolveStepTextFieldPx" android:gravity="right"/>
-          <TextView style="@style/SolveStepTextFieldPx" android:gravity="left"/>
+          <TextView style="@style/SolveStepLabelPx" android:gravity="right"/>
+          <TextView style="@style/SolveStepValuePx" android:gravity="left"/>
+          <TextView style="@style/SolveStepLabelPx" android:gravity="right"/>
+          <TextView style="@style/SolveStepValuePx" android:gravity="left"/>
         </TableRow>
         <TableRow>
-          <TextView style="@style/SolveStepTextFieldPx" android:gravity="right"/>
-          <TextView style="@style/SolveStepTextFieldPx" android:gravity="left"/>
-          <TextView style="@style/SolveStepTextFieldPx" android:gravity="right"/>
-          <TextView style="@style/SolveStepTextFieldPx" android:gravity="left"/>
+          <TextView style="@style/SolveStepLabelPx" android:gravity="right"/>
+          <TextView style="@style/SolveStepValuePx" android:gravity="left"/>
+          <TextView style="@style/SolveStepLabelPx" android:gravity="right"/>
+          <TextView style="@style/SolveStepValuePx" android:gravity="left"/>
         </TableRow>
         <TableRow>
-          <TextView style="@style/SolveStepTextFieldPx" android:gravity="right"/>
-          <TextView style="@style/SolveStepTextFieldPx" android:gravity="left"/>
-          <TextView style="@style/SolveStepTextFieldPx" android:gravity="right"/>
-          <TextView style="@style/SolveStepTextFieldPx" android:gravity="left"/>
+          <TextView style="@style/SolveStepLabelPx" android:gravity="right"/>
+          <TextView style="@style/SolveStepValuePx" android:gravity="left"/>
+          <TextView style="@style/SolveStepLabelPx" android:gravity="right"/>
+          <TextView style="@style/SolveStepValuePx" android:gravity="left"/>
         </TableRow>
         <TableRow>
-          <TextView style="@style/SolveStepTextFieldPx" android:gravity="right"/>
-          <TextView style="@style/SolveStepTextFieldPx" android:gravity="left"/>
-          <TextView style="@style/SolveStepTextFieldPx" android:gravity="right"/>
-          <TextView style="@style/SolveStepTextFieldPx" android:gravity="left"/>
+          <TextView style="@style/SolveStepLabelPx" android:gravity="right"/>
+          <TextView style="@style/SolveStepValuePx" android:gravity="left"/>
+          <TextView style="@style/SolveStepLabelPx" android:gravity="right"/>
+          <TextView style="@style/SolveStepValuePx" android:gravity="left"/>
         </TableRow>
       </TableLayout>
 
