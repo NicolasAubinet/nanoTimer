@@ -2,4 +2,13 @@
 <resources>
   <dimen name="grid_margin_px">5px</dimen>
   <dimen name="button_corner_radius">8dp</dimen>
+
+  <!-- ===== Navy modernization: spacing + shape foundation ===== -->
+  <dimen name="space_xs">4dp</dimen>
+  <dimen name="space_s">8dp</dimen>
+  <dimen name="space_m">12dp</dimen>
+  <dimen name="space_l">16dp</dimen>
+  <dimen name="card_corner">14dp</dimen>
+  <dimen name="card_elevation">2dp</dimen>
+  <dimen name="divider_height">1dp</dimen>
 </resources>
