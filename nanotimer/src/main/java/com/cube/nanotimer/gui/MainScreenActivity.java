@@ -221,7 +221,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
     if (App.INSTANCE.isProEnabled()) {
       drawableIcon = R.drawable.icon_pro;
     } else {
-      drawableIcon = R.drawable.icon;
+      drawableIcon = R.drawable.app_icon_cube;
     }
     menu.findItem(R.id.itAppIcon).setIcon(drawableIcon);
 

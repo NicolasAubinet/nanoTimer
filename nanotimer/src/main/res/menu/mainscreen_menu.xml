@@ -4,7 +4,7 @@
 
   <item android:id="@+id/itAppIcon"
      android:title="@string/app_name"
-     android:icon="@drawable/icon"
+     android:icon="@drawable/app_icon_cube"
      app:showAsAction="always"/>
 
 </menu>
