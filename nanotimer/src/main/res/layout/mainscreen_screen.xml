@@ -32,7 +32,8 @@
              android:id="@+id/toolbar"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
-             android:background="@color/color_primary"/>
+             android:background="@color/color_primary"
+             app:titleTextAppearance="@style/Toolbar.CustomTitleText"/>
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.cardview.widget.CardView
