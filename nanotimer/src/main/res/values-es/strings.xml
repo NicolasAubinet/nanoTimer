@@ -250,6 +250,9 @@
 
   <string name="add_time">Añadir tiempo</string>
   <string name="select_time_to_add">Selecciona tiempo a añadir:</string>
+  <string name="time_unit_min">min</string>
+  <string name="time_unit_sec">seg</string>
+  <string name="time_unit_ms">ms</string>
 
   <string name="cross_solver">Solucionador de cruz</string>
   <string name="cross_neutrality">Neutralidad</string>

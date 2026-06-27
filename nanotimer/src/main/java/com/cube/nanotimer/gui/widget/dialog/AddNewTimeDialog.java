@@ -6,8 +6,10 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import androidx.appcompat.widget.SwitchCompat;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.ResultListener;
@@ -22,7 +24,7 @@ public class AddNewTimeDialog extends ConfirmDialog {
   private EditText tfMinutes;
   private EditText tfSeconds;
   private EditText tfHundreds;
-  private CheckBox cbDNF;
+  private SwitchCompat cbDNF;
 
   private static final String ARG_RESULT_LISTENER = "resultListener";
   private static final String ARG_SOLVE_TYPE = "solveType";
@@ -108,6 +110,27 @@ public class AddNewTimeDialog extends ConfirmDialog {
     tfMinutes.addTextChangedListener(new OnNumericFieldKeyListener(tfSeconds));
     tfSeconds.addTextChangedListener(new OnNumericFieldKeyListener(tfHundreds));
     tfHundreds.addTextChangedListener(new OnNumericFieldKeyListener(null));
+
+    // The whole DNF row is tappable; dim the time fields while DNF is on since they are ignored.
+    LinearLayout dnfRow = view.findViewById(R.id.llDNFRow);
+    dnfRow.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        cbDNF.setChecked(!cbDNF.isChecked());
+      }
+    });
+    cbDNF.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(CompoundButton buttonView, boolean checked) {
+        float alpha = checked ? 0.35f : 1f;
+        tfMinutes.setEnabled(!checked);
+        tfSeconds.setEnabled(!checked);
+        tfHundreds.setEnabled(!checked);
+        tfMinutes.setAlpha(alpha);
+        tfSeconds.setAlpha(alpha);
+        tfHundreds.setAlpha(alpha);
+      }
+    });
     return view;
   }
 
