@@ -71,6 +71,7 @@
   <style name="GridCellPx" parent="TableCellPx">
     <item name="android:layout_width">0px</item>
     <item name="layout_columnWeight">1</item>
+    <item name="android:layout_margin">3px</item> <!-- gap between recent-solve chips -->
     <!--<item name="gravity">center</item>-->
   </style>
 
