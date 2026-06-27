@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Primary (Start) button background: more rounded than the generic BigButton,
-     with an accent ripple on press (API 21+). -->
+<!-- Primary call-to-action button background: more rounded than the generic
+     BigButton, with an accent ripple on press (API 21+). -->
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
    android:color="@color/lightblue">
   <item android:id="@android:id/mask">

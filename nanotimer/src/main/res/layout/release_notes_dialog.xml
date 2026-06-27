@@ -26,9 +26,9 @@
      android:id="@+id/buClose"
      android:text="@string/close"
      android:layout_alignParentBottom="true"
-     android:layout_marginLeft="12dp"
-     android:layout_marginRight="12dp"
-     android:layout_marginTop="8dp"
-     style="@style/BigButton"/>
+     android:layout_marginLeft="@dimen/space_m"
+     android:layout_marginRight="@dimen/space_m"
+     android:layout_marginTop="@dimen/space_s"
+     style="@style/PrimaryButton"/>
 
 </RelativeLayout>
