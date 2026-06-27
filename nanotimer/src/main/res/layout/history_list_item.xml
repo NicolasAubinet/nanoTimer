@@ -1,60 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
    android:layout_width="match_parent"
    android:layout_height="wrap_content"
-   android:minHeight="48dp"
-   android:paddingLeft="@dimen/space_m"
-   android:paddingRight="@dimen/space_m"
-   android:paddingTop="@dimen/space_s"
-   android:paddingBottom="@dimen/space_s">
+   android:orientation="horizontal"
+   android:baselineAligned="false"
+   android:minHeight="48dp">
 
-  <!-- Muted timestamp (leading) -->
-  <TextView
-     android:id="@+id/tvDate"
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:layout_alignParentLeft="true"
-     android:layout_alignParentStart="true"
-     android:layout_centerVertical="true"
-     android:textColor="@color/secondary_text"
-     android:textSize="15sp"
-     android:singleLine="true"/>
+  <!-- Thin cyan accent on the leading edge of every row -->
+  <View
+     android:id="@+id/accentBar"
+     android:layout_width="3dp"
+     android:layout_height="match_parent"
+     android:background="@color/lightblue"/>
 
-  <!-- Strong solve result (trailing), tabular digits so the column aligns -->
-  <TextView
-     android:id="@+id/tvTime"
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:layout_alignParentRight="true"
-     android:layout_alignParentEnd="true"
-     android:layout_centerVertical="true"
-     android:textStyle="bold"
-     android:textSize="17sp"
-     android:fontFeatureSettings="tnum"
-     android:singleLine="true"/>
+  <RelativeLayout
+     android:layout_width="0dp"
+     android:layout_height="match_parent"
+     android:layout_weight="1"
+     android:minHeight="48dp"
+     android:paddingLeft="@dimen/space_m"
+     android:paddingRight="@dimen/space_m"
+     android:paddingTop="@dimen/space_s"
+     android:paddingBottom="@dimen/space_s">
 
-  <!-- Status icon cluster, right-to-left: PB star, comment -->
-  <ImageView
-     android:id="@+id/imgPb"
-     android:layout_width="16dp"
-     android:layout_height="16dp"
-     android:layout_centerVertical="true"
-     android:layout_toLeftOf="@+id/tvTime"
-     android:layout_toStartOf="@+id/tvTime"
-     android:layout_marginRight="@dimen/space_s"
-     android:layout_marginEnd="@dimen/space_s"
-     android:src="@drawable/star"/>
+    <!-- Muted timestamp (leading) -->
+    <TextView
+       android:id="@+id/tvDate"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentLeft="true"
+       android:layout_alignParentStart="true"
+       android:layout_centerVertical="true"
+       android:textColor="@color/secondary_text"
+       android:textSize="15sp"
+       android:singleLine="true"/>
 
-  <ImageView
-     android:id="@+id/imgComment"
-     android:layout_width="16dp"
-     android:layout_height="16dp"
-     android:layout_centerVertical="true"
-     android:layout_toLeftOf="@+id/imgPb"
-     android:layout_toStartOf="@+id/imgPb"
-     android:layout_marginRight="@dimen/space_s"
-     android:layout_marginEnd="@dimen/space_s"
-     android:src="@drawable/comment"/>
+    <!-- Strong solve result (trailing), tabular digits so the column aligns -->
+    <TextView
+       android:id="@+id/tvTime"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentRight="true"
+       android:layout_alignParentEnd="true"
+       android:layout_centerVertical="true"
+       android:textStyle="bold"
+       android:textSize="17sp"
+       android:fontFeatureSettings="tnum"
+       android:singleLine="true"/>
 
-</RelativeLayout>
+    <!-- Status icon cluster, right-to-left: PB star, comment -->
+    <ImageView
+       android:id="@+id/imgPb"
+       android:layout_width="16dp"
+       android:layout_height="16dp"
+       android:layout_centerVertical="true"
+       android:layout_toLeftOf="@+id/tvTime"
+       android:layout_toStartOf="@+id/tvTime"
+       android:layout_marginRight="@dimen/space_s"
+       android:layout_marginEnd="@dimen/space_s"
+       android:src="@drawable/star"/>
+
+    <ImageView
+       android:id="@+id/imgComment"
+       android:layout_width="16dp"
+       android:layout_height="16dp"
+       android:layout_centerVertical="true"
+       android:layout_toLeftOf="@+id/imgPb"
+       android:layout_toStartOf="@+id/imgPb"
+       android:layout_marginRight="@dimen/space_s"
+       android:layout_marginEnd="@dimen/space_s"
+       android:src="@drawable/comment"/>
+
+  </RelativeLayout>
+
+</LinearLayout>

@@ -779,11 +779,11 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
           ((TextView) view.findViewById(R.id.tvDate)).setText(FormatterService.INSTANCE.formatDateTime(st.getTimestamp()));
           TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
           tvTime.setText(FormatterService.INSTANCE.formatSolveTime(st.getTime()));
-          // Cyan solve times for a "speed timer" accent; DNFs muted with the same
-          // gray the timer screen's last-times grid uses (GUIUtils). Reset on every
-          // bind so recycled rows never keep a stale color.
+          // Mute DNFs with the same gray the timer screen's last-times grid uses
+          // (GUIUtils); real times stay white. Reset on every bind so recycled rows
+          // never keep a stale color.
           tvTime.setTextColor(getContext().getResources().getColor(
-            st.isDNF() ? R.color.gray600 : R.color.lightblue));
+            st.isDNF() ? R.color.gray600 : R.color.white));
 
           if (st.isPb()) {
             view.findViewById(R.id.imgPb).setVisibility(View.VISIBLE);
