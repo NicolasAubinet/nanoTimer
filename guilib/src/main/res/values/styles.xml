@@ -77,6 +77,7 @@
   <style name="GridCell" parent="TableCell">
     <item name="android:layout_width">0dp</item>
     <item name="layout_columnWeight">1</item>
+    <item name="android:fontFeatureSettings">tnum</item> <!-- tabular figures for time cells -->
     <!--<item name="gravity">center</item>-->
   </style>
 

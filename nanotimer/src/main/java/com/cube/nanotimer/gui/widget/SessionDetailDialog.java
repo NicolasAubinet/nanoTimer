@@ -198,9 +198,9 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
 
     int resource;
     if (backgroundColorIndex % 2 == 0) {
-      resource = R.drawable.grid_background_1;
+      resource = R.drawable.session_chip_1;
     } else {
-      resource = R.drawable.grid_background_2;
+      resource = R.drawable.session_chip_2;
     }
     textView.setBackgroundResource(resource);
 
@@ -208,6 +208,8 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
       GridLayout.spec(GridLayout.UNDEFINED, 1f),
       GridLayout.spec(GridLayout.UNDEFINED, 1f)
     );
+    int gap = (int) (2 * getResources().getDisplayMetrics().density); // gap between chips
+    param.setMargins(gap, gap, gap, gap);
     textView.setLayoutParams(param);
 
     gridLayout.addView(textView);
