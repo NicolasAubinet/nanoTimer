@@ -780,8 +780,9 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
           TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
           tvTime.setText(FormatterService.INSTANCE.formatSolveTime(st.getTime()));
           // Mute DNFs so real solve times stand out (reset on every bind for recycled views).
+          // Use the same DNF gray as the timer screen's last-times grid (GUIUtils).
           tvTime.setTextColor(getContext().getResources().getColor(
-            st.isDNF() ? R.color.secondary_text : R.color.white));
+            st.isDNF() ? R.color.gray600 : R.color.white));
 
           if (st.isPb()) {
             view.findViewById(R.id.imgPb).setVisibility(View.VISIBLE);
