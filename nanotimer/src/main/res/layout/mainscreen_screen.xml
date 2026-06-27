@@ -169,11 +169,11 @@
          android:id="@+id/buStart"
          android:text="@string/start"
          android:layout_alignParentBottom="true"
-         android:layout_marginLeft="8dp"
-         android:layout_marginRight="8dp"
-         android:layout_marginTop="6dp"
-         android:layout_marginBottom="3dp"
-         style="@style/BigButton"/>
+         android:layout_marginLeft="@dimen/space_m"
+         android:layout_marginRight="@dimen/space_m"
+         android:layout_marginTop="@dimen/space_s"
+         android:layout_marginBottom="@dimen/space_s"
+         style="@style/StartButton"/>
       <!--android:background="@drawable/button_selector"-->
       <!--android:layout_marginLeft="@dimen/mainscreen_margin"-->
       <!--android:layout_marginRight="@dimen/mainscreen_margin"-->
