@@ -2,48 +2,69 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
    android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   android:paddingLeft="@dimen/mainscreen_margin"
-   android:paddingRight="@dimen/mainscreen_margin">
+   android:layout_height="wrap_content"
+   android:minHeight="48dp"
+   android:paddingLeft="@dimen/space_m"
+   android:paddingRight="@dimen/space_m"
+   android:paddingTop="@dimen/space_s"
+   android:paddingBottom="@dimen/space_s">
 
+  <!-- Muted timestamp (leading) -->
   <TextView
      android:id="@+id/tvDate"
      android:layout_width="wrap_content"
      android:layout_height="wrap_content"
      android:layout_alignParentLeft="true"
-     style="@style/SmallListViewItem"/>
-
-  <ImageView
-     android:id="@+id/imgComment"
-     android:layout_width="16dp"
-     android:layout_height="16dp"
-     android:layout_marginRight="8dp"
+     android:layout_alignParentStart="true"
      android:layout_centerVertical="true"
-     android:layout_toLeftOf="@+id/imgPb"
-     android:src="@drawable/comment"/>
+     android:textColor="@color/secondary_text"
+     android:textSize="15sp"
+     android:singleLine="true"/>
 
-  <ImageView
-     android:id="@+id/imgPb"
-     android:layout_width="16dp"
-     android:layout_height="16dp"
-     android:layout_marginRight="8dp"
+  <!-- Strong solve result (trailing) -->
+  <TextView
+     android:id="@+id/tvTime"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_alignParentRight="true"
+     android:layout_alignParentEnd="true"
      android:layout_centerVertical="true"
-     android:layout_toLeftOf="@+id/imgCircle"
-     android:src="@drawable/star"/>
+     android:textStyle="bold"
+     android:textSize="17sp"
+     android:singleLine="true"/>
 
+  <!-- Status icon cluster, right-to-left: dot, PB star, comment -->
   <ImageView
      android:id="@+id/imgCircle"
      android:layout_width="7dp"
      android:layout_height="7dp"
      android:layout_centerVertical="true"
      android:layout_toLeftOf="@+id/tvTime"
+     android:layout_toStartOf="@+id/tvTime"
+     android:layout_marginRight="@dimen/space_s"
+     android:layout_marginEnd="@dimen/space_s"
      android:src="@drawable/history_circle"/>
 
-  <TextView
-     android:id="@+id/tvTime"
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:layout_alignParentRight="true"
-     style="@style/SmallListViewItem"/>
+  <ImageView
+     android:id="@+id/imgPb"
+     android:layout_width="16dp"
+     android:layout_height="16dp"
+     android:layout_centerVertical="true"
+     android:layout_toLeftOf="@+id/imgCircle"
+     android:layout_toStartOf="@+id/imgCircle"
+     android:layout_marginRight="@dimen/space_s"
+     android:layout_marginEnd="@dimen/space_s"
+     android:src="@drawable/star"/>
+
+  <ImageView
+     android:id="@+id/imgComment"
+     android:layout_width="16dp"
+     android:layout_height="16dp"
+     android:layout_centerVertical="true"
+     android:layout_toLeftOf="@+id/imgPb"
+     android:layout_toStartOf="@+id/imgPb"
+     android:layout_marginRight="@dimen/space_s"
+     android:layout_marginEnd="@dimen/space_s"
+     android:src="@drawable/comment"/>
 
 </RelativeLayout>
