@@ -125,7 +125,7 @@ public enum FormatterService {
     if (ms == null) {
       return "";
     }
-    SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy - HH:mm:ss", Locale.ENGLISH);
+    SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy · HH:mm:ss", Locale.ENGLISH);
     return sdf.format(new Date(ms));
   }
 
@@ -149,7 +149,7 @@ public enum FormatterService {
     if (ms == null) {
       return "";
     }
-    SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy - HH:mm", Locale.ENGLISH);
+    SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy · HH:mm", Locale.ENGLISH);
     return sdf.format(new Date(ms));
   }
 
