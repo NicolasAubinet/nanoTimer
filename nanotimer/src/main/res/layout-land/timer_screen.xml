@@ -127,6 +127,7 @@
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="5px"
                  android:textColor="@color/white"
+                 android:textStyle="bold"
                  style="@style/SmallTextFieldPx"/>
             </TableRow>
             <TableRow android:layout_marginTop="2px">
@@ -141,6 +142,7 @@
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="5px"
                  android:textColor="@color/white"
+                 android:textStyle="bold"
                  style="@style/SmallTextFieldPx"/>
             </TableRow>
             <TableRow android:id="@+id/trBestMeanOfThree" android:layout_marginTop="2px" android:visibility="gone">
@@ -155,6 +157,7 @@
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="5px"
                  android:textColor="@color/white"
+                 android:textStyle="bold"
                  style="@style/SmallTextFieldPx"/>
             </TableRow>
           </TableLayout>
@@ -174,6 +177,7 @@
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="5px"
                  android:textColor="@color/white"
+                 android:textStyle="bold"
                  style="@style/SmallTextFieldPx"/>
             </TableRow>
             <TableRow android:layout_marginTop="2px">
@@ -188,6 +192,7 @@
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="5px"
                  android:textColor="@color/white"
+                 android:textStyle="bold"
                  style="@style/SmallTextFieldPx"/>
             </TableRow>
             <TableRow android:id="@+id/trLifetimeAccuracy" android:layout_marginTop="2px" android:visibility="gone">
@@ -202,6 +207,7 @@
                  android:layout_height="wrap_content"
                  android:layout_marginLeft="5px"
                  android:textColor="@color/white"
+                 android:textStyle="bold"
                  style="@style/SmallTextFieldPx"/>
             </TableRow>
           </TableLayout>
