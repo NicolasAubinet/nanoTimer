@@ -44,18 +44,10 @@
            android:paddingTop="6px"
            android:paddingBottom="8px">
 
-          <TextView
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:text="@string/scrambleC"
-             android:textColor="@color/secondary_text"
-             style="@style/ScrambleTextFieldPx"/>
-
           <com.cube.nanotimer.util.view.FontFitTextView
              android:id="@+id/tvScramble"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
-             android:layout_marginTop="4px"
              android:gravity="center_horizontal"
              app:myfont="MONOSPACE"
              style="@style/ScrambleTextFieldPx"/>
