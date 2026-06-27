@@ -158,6 +158,8 @@
     <!--<item name="android:layout_marginBottom">2px</item>-->
     <item name="android:layout_marginLeft">@dimen/grid_margin_px</item>
     <item name="android:layout_marginRight">@dimen/grid_margin_px</item>
+    <item name="cardCornerRadius">8dp</item>
+    <item name="cardElevation">2dp</item>
   </style>
 
   <style name="ScrambleTextField">

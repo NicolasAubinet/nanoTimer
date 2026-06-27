@@ -87,7 +87,7 @@
   <!--<color name="listview_background">@color/main_element</color>-->
   <color name="listview_divider">@color/gray800</color>
   <!--<color name="button_color">@color/darkblue</color>-->
-  <color name="grid_background_1">@color/darkblue</color>
-  <color name="grid_background_2">@color/table_header</color>
+  <color name="grid_background_1">#146CCCEC</color>
+  <color name="grid_background_2">#336CCCEC</color>
   <color name="grid_divider">@color/gray600</color>
 </resources>
