@@ -9,6 +9,7 @@ import android.os.Handler;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.ActionBar;
+import androidx.core.view.MenuItemCompat;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -394,6 +395,9 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     for (int i = 0; i < menu.size(); i++) {
       menu.getItem(i).setVisible(showMenu);
     }
+    // The scramble-view icon is multi-coloured (a scrambled cube face); clear any
+    // action-bar tint so its colours show instead of being flattened to one.
+    MenuItemCompat.setIconTintList(menu.findItem(R.id.itScrambleView), null);
     if (solveType.hasSteps()) {
       menu.findItem(R.id.itSessionDetails).setVisible(false);
       menu.findItem(R.id.itNewSession).setVisible(false);
@@ -500,23 +504,28 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
           }
           break;
         case R.id.itScrambleView:
-          if (currentScramble != null) {
-            String key = ScrambleViewNotation.getRenderKey(cubeType);
-            String moves = ScrambleViewNotation.toCubingNotation(currentScramble, cubeType);
-            String readable = ScrambleFormatterService.INSTANCE.formatScrambleAsSingleLine(currentScramble, cubeType);
-            // When the diagram can't be drawn (a Clock pin notation), the dialog shows
-            // this text; nudge the user toward the notation that does render.
-            String fallback = (moves == null && cubeType == CubeType.CLOCK)
-                ? getString(R.string.scramble_view_clock_notation_hint) + "\n\n" + readable
-                : readable;
-            DialogUtils.showFragment(this, ScrambleViewDialog.newInstance(key, moves, fallback));
-          } else {
-            DialogUtils.showShortInfoMessage(this, R.string.scramble_view_no_scramble);
-          }
+          openScrambleView();
           break;
       }
     }
     return super.onOptionsItemSelected(item);
+  }
+
+  // Opens the scramble diagram for the current scramble.
+  private void openScrambleView() {
+    if (currentScramble != null) {
+      String key = ScrambleViewNotation.getRenderKey(cubeType);
+      String moves = ScrambleViewNotation.toCubingNotation(currentScramble, cubeType);
+      String readable = ScrambleFormatterService.INSTANCE.formatScrambleAsSingleLine(currentScramble, cubeType);
+      // When the diagram can't be drawn (a Clock pin notation), the dialog shows
+      // this text; nudge the user toward the notation that does render.
+      String fallback = (moves == null && cubeType == CubeType.CLOCK)
+          ? getString(R.string.scramble_view_clock_notation_hint) + "\n\n" + readable
+          : readable;
+      DialogUtils.showFragment(this, ScrambleViewDialog.newInstance(key, moves, fallback));
+    } else {
+      DialogUtils.showShortInfoMessage(this, R.string.scramble_view_no_scramble);
+    }
   }
 
   @Override
