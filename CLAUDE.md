@@ -102,6 +102,12 @@ Tests are plain **JUnit 4**.
 ### GUI (`nanotimer/gui`)
 - Activities: `MainScreenActivity` (launcher, drawer), `TimerActivity` (the timer),
   `GraphActivity`, `SolveTypesActivity`, `OptionsActivity`, `Export`/`ImportActivity`.
+- **`TimerActivity` must stay a full-screen tap target.** A tap *anywhere* in the timer
+  activity starts/stops the timer — there must be no dead zones where a press is ignored.
+  This is deliberate: it guarantees the user can never mistakenly believe the timer started
+  (or stopped) when it didn't because they happened to press an inert area. When adding or
+  changing views in the timer screen, keep the whole surface clickable for start/stop — don't
+  introduce regions or controls that swallow the touch without toggling the timer.
 - `Options.INSTANCE` wraps `SharedPreferences` (keys in `res/xml/preferences.xml`).
 - Import/export is CSV (`util/exportimport/`), shared via a `FileProvider`
   (authority `com.cube.nanotimer.fileprovider`).
