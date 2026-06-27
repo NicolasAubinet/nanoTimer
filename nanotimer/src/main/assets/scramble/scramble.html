@@ -73,7 +73,35 @@
         el.setAttribute("scramble", scramble || "");
       }
       host.appendChild(el);
+      // scramble-display renders into a CLOSED shadow root (so the SVG can't be
+      // found by DOM traversal), but it exposes its internal TwistyPlayer via
+      // `.player`; twisty-player is itself the player. Both expose
+      // experimentalModel.currentPattern, which resolves once the state is computed
+      // — then one more frame ensures it has painted.
+      ntWaitForRender(key === "fto" ? el : el.player);
     };
+
+    function ntNotifyRendered() {
+      if (window.NTBridge && window.NTBridge.onRendered) {
+        try { window.NTBridge.onRendered(); } catch (e) {}
+      }
+    }
+
+    // Signal the app once the diagram is actually drawn, so it can drop the loading
+    // spinner without a blank gap. Falls back to a couple of frames if the model
+    // isn't reachable; the app also has a safety timeout.
+    function ntAfterPaint() {
+      requestAnimationFrame(function () { requestAnimationFrame(ntNotifyRendered); });
+    }
+
+    function ntWaitForRender(player) {
+      var model = player && player.experimentalModel;
+      if (model && model.currentPattern && model.currentPattern.get) {
+        model.currentPattern.get().then(ntAfterPaint).catch(ntNotifyRendered);
+      } else {
+        ntAfterPaint();
+      }
+    }
   </script>
 </body>
 </html>

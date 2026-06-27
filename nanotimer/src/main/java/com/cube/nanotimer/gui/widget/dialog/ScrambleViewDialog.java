@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -41,8 +42,18 @@ public class ScrambleViewDialog extends NanoTimerDialogFragment {
 
   private static final String BASE_URL = "https://appassets.androidplatform.net/assets/scramble/scramble.html";
 
+  // Hide the spinner anyway if the JS "rendered" signal never arrives (e.g. an old
+  // WebView where detection fails), so it can't spin forever.
+  private static final long RENDER_TIMEOUT_MS = 4000;
+
   private WebView webView;
   private ProgressBar progressBar;
+  private final Runnable hideProgressRunnable = new Runnable() {
+    @Override
+    public void run() {
+      hideProgress();
+    }
+  };
 
   /**
    * @param renderKey      cubing.js renderer key (see {@code ScrambleViewNotation}).
@@ -98,6 +109,23 @@ public class ScrambleViewDialog extends NanoTimerDialogFragment {
       // Blend onto the dialog's card background.
       webView.setBackgroundColor(Color.TRANSPARENT);
 
+      // JS calls NTBridge.onRendered() once the SVG diagram is actually drawn, so
+      // we keep the spinner up until then (avoids a blank gap after page load).
+      webView.addJavascriptInterface(new Object() {
+        @JavascriptInterface
+        public void onRendered() {
+          if (webView != null) {
+            webView.post(new Runnable() {
+              @Override
+              public void run() {
+                webView.removeCallbacks(hideProgressRunnable);
+                hideProgress();
+              }
+            });
+          }
+        }
+      }, "NTBridge");
+
       webView.setWebViewClient(new WebViewClientCompat() {
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView v, WebResourceRequest request) {
@@ -106,10 +134,10 @@ public class ScrambleViewDialog extends NanoTimerDialogFragment {
 
         @Override
         public void onPageFinished(WebView v, String url) {
-          // The bundle is parsed by now (synchronous <script> in <head>), so the
-          // diagram draws promptly — drop the spinner and reveal the WebView.
+          // Kick off rendering. The spinner stays until JS signals the diagram is
+          // drawn (NTBridge.onRendered), with a timeout as a safety net.
           render(v, key, scramble);
-          hideProgress();
+          v.postDelayed(hideProgressRunnable, RENDER_TIMEOUT_MS);
         }
 
         @Override
@@ -154,6 +182,7 @@ public class ScrambleViewDialog extends NanoTimerDialogFragment {
   @Override
   public void onDestroyView() {
     if (webView != null) {
+      webView.removeCallbacks(hideProgressRunnable);
       webView.destroy();
       webView = null;
     }
