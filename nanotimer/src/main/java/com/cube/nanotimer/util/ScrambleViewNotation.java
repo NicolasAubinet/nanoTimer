@@ -1,5 +1,7 @@
 package com.cube.nanotimer.util;
 
+import com.cube.nanotimer.Options;
+import com.cube.nanotimer.Options.ClockNotation;
 import com.cube.nanotimer.vo.CubeType;
 
 /**
@@ -19,10 +21,12 @@ import com.cube.nanotimer.vo.CubeType;
  *       cubing.js wants the WCA slash form {@code (3, 2) / (-2, 4) / ...}.</li>
  *   <li><b>Megaminx</b> elements already carry their own spacing (and the raw
  *       scramble has embedded newlines); we just collapse whitespace to one line.</li>
- *   <li><b>Clock</b> has three user-selectable notations; only the WCA-like
- *       {@code URx_DRx_DLx} form is a safe pass-through. The pin-based forms are
- *       NOT yet converted — flagged for on-device verification. If rendering fails,
- *       the dialog falls back to the text scramble.</li>
+ *   <li><b>Clock</b> has three user-selectable notations; only the modern WCA
+ *       {@code URx_DRx_DLx} form (now the app default) is parseable by cubing.js
+ *       and is passed through. The two pin-based forms ({@code UUdU_x_x},
+ *       {@code UUdd_ux_dx}) are a different representation cubing.js can't parse,
+ *       so {@link #toCubingNotation} returns {@code null} for them and the dialog
+ *       falls back to the text scramble.</li>
  * </ul>
  */
 public final class ScrambleViewNotation {
@@ -58,8 +62,21 @@ public final class ScrambleViewNotation {
   /**
    * Reformat a NanoTimer scramble (one move per array element) into the single-line
    * notation string cubing.js parses for the given puzzle.
+   *
+   * @return the cubing.js notation, or {@code null} if this scramble can't be drawn
+   *         (a Clock pin notation) — the caller should fall back to text.
    */
   public static String toCubingNotation(String[] scramble, CubeType cubeType) {
+    ClockNotation clockNotation = (cubeType == CubeType.CLOCK)
+        ? Options.INSTANCE.getClockNotation() : null;
+    return toCubingNotation(scramble, cubeType, clockNotation);
+  }
+
+  /**
+   * Pure variant taking the Clock notation explicitly (the only Options-dependent
+   * input), so the conversion is unit-testable without Android.
+   */
+  static String toCubingNotation(String[] scramble, CubeType cubeType, ClockNotation clockNotation) {
     if (scramble == null || scramble.length == 0) {
       return "";
     }
@@ -77,8 +94,18 @@ public final class ScrambleViewNotation {
       }
       return sb.toString();
     }
+    if (cubeType == CubeType.CLOCK && clockNotation != ClockNotation.URx_DRx_DLx) {
+      // The pin-based notations (UUdU_x_x, UUdd_ux_dx) aren't cubing.js notation and
+      // can't be reliably converted — signal a text fallback. URx_DRx_DLx (the app
+      // default) is modern WCA notation and falls through to the pass-through below.
+      return null;
+    }
     // Everything else: join the moves and collapse any whitespace/newlines (Megaminx
     // elements already include separators) into a single clean line.
+    return joinAndCollapse(scramble);
+  }
+
+  private static String joinAndCollapse(String[] scramble) {
     StringBuilder sb = new StringBuilder();
     for (String move : scramble) {
       if (move == null) {

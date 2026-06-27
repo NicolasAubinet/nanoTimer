@@ -503,7 +503,13 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
           if (currentScramble != null) {
             String key = ScrambleViewNotation.getRenderKey(cubeType);
             String moves = ScrambleViewNotation.toCubingNotation(currentScramble, cubeType);
-            DialogUtils.showFragment(this, ScrambleViewDialog.newInstance(key, moves));
+            String readable = ScrambleFormatterService.INSTANCE.formatScrambleAsSingleLine(currentScramble, cubeType);
+            // When the diagram can't be drawn (a Clock pin notation), the dialog shows
+            // this text; nudge the user toward the notation that does render.
+            String fallback = (moves == null && cubeType == CubeType.CLOCK)
+                ? getString(R.string.scramble_view_clock_notation_hint) + "\n\n" + readable
+                : readable;
+            DialogUtils.showFragment(this, ScrambleViewDialog.newInstance(key, moves, fallback));
           } else {
             DialogUtils.showShortInfoMessage(this, R.string.scramble_view_no_scramble);
           }

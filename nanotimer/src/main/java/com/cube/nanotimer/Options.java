@@ -130,7 +130,9 @@ public enum Options {
       case 3:
         return ClockNotation.URx_DRx_DLx;
       default:
-        return ClockNotation.UUdU_x_x;
+        // Modern WCA notation: the standard, and the only one the scramble diagram
+        // can render (see ScrambleViewNotation). Matches @integer/clock_notation.
+        return ClockNotation.URx_DRx_DLx;
     }
   }
 
