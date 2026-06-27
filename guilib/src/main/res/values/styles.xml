@@ -24,6 +24,11 @@
     <item name="android:letterSpacing">0.08</item>
   </style>
 
+  <!-- Quiet accent section label for the main-screen selector card. -->
+  <style name="SelectorLabel" parent="DialogSectionLabel">
+    <item name="android:textColor">@color/lightblue</item>
+  </style>
+
   <style name="SmallTextFieldPx">
     <item name="android:textSize">21px</item>
     <item name="android:ellipsize">end</item>

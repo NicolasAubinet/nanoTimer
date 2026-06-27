@@ -40,42 +40,40 @@
            android:id="@+id/layoutTop"
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
-           android:layout_marginTop="@dimen/card_margin_vertical"
-           android:layout_marginBottom="@dimen/card_margin_vertical"
-           android:layout_marginLeft="@dimen/card_margin_horizontal"
-           android:layout_marginRight="@dimen/card_margin_horizontal"
+           android:layout_marginTop="@dimen/space_s"
+           android:layout_marginBottom="@dimen/space_xs"
+           android:layout_marginLeft="@dimen/space_m"
+           android:layout_marginRight="@dimen/space_m"
            app:cardBackgroundColor="@color/mainscreen_top_card"
            app:cardElevation="@dimen/mainscreen_card_elevation"
-           app:cardCornerRadius="0dp">
+           app:cardCornerRadius="@dimen/card_corner">
 
           <TableLayout
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:stretchColumns="*"
-             android:paddingTop="8dp"
-             android:paddingBottom="2dp">
+             android:paddingLeft="@dimen/space_s"
+             android:paddingRight="@dimen/space_s"
+             android:paddingTop="@dimen/space_m"
+             android:paddingBottom="@dimen/space_s">
 
             <TableRow>
 
               <TextView
                  android:layout_width="0dp"
                  android:layout_height="wrap_content"
-                 android:layout_marginLeft="10dp"
+                 android:layout_marginLeft="@dimen/space_xs"
                  android:text="@string/cube_type"
-                 android:textColor="@color/lightblue"
-                 android:textStyle="bold"
                  android:gravity="start"
-                 style="@style/SmallTextField"/>
+                 style="@style/SelectorLabel"/>
 
               <TextView
                  android:layout_width="0dp"
                  android:layout_height="wrap_content"
-                 android:layout_marginLeft="10dp"
+                 android:layout_marginLeft="@dimen/space_xs"
                  android:text="@string/solve_type"
-                 android:textColor="@color/lightblue"
-                 android:textStyle="bold"
                  android:gravity="start"
-                 style="@style/SmallTextField"/>
+                 style="@style/SelectorLabel"/>
             </TableRow>
 
             <TableRow>
