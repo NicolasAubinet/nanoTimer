@@ -31,12 +31,13 @@
          android:textColor="@color/white"
          android:layout_gravity="center"/>
       <androidx.cardview.widget.CardView
-         android:layout_width="match_parent"
+         android:layout_width="wrap_content"
          android:layout_height="wrap_content"
+         android:layout_gravity="center_horizontal"
          style="@style/TableCardViewPx">
 
         <LinearLayout
-           android:layout_width="match_parent"
+           android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:orientation="vertical"
            android:paddingLeft="10px"
@@ -46,7 +47,7 @@
 
           <com.cube.nanotimer.util.view.FontFitTextView
              android:id="@+id/tvScramble"
-             android:layout_width="match_parent"
+             android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:gravity="center_horizontal"
              app:myfont="MONOSPACE"
