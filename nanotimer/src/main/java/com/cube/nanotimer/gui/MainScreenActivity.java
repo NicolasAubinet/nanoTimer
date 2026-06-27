@@ -777,7 +777,11 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
         SolveTime st = liHistory.get(position);
         if (st != null) {
           ((TextView) view.findViewById(R.id.tvDate)).setText(FormatterService.INSTANCE.formatDateTime(st.getTimestamp()));
-          ((TextView) view.findViewById(R.id.tvTime)).setText(FormatterService.INSTANCE.formatSolveTime(st.getTime()));
+          TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
+          tvTime.setText(FormatterService.INSTANCE.formatSolveTime(st.getTime()));
+          // Mute DNFs so real solve times stand out (reset on every bind for recycled views).
+          tvTime.setTextColor(getContext().getResources().getColor(
+            st.isDNF() ? R.color.secondary_text : R.color.white));
 
           if (st.isPb()) {
             view.findViewById(R.id.imgPb).setVisibility(View.VISIBLE);

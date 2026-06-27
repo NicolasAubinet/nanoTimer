@@ -21,7 +21,7 @@
      android:textSize="15sp"
      android:singleLine="true"/>
 
-  <!-- Strong solve result (trailing) -->
+  <!-- Strong solve result (trailing), tabular digits so the column aligns -->
   <TextView
      android:id="@+id/tvTime"
      android:layout_width="wrap_content"
@@ -31,27 +31,17 @@
      android:layout_centerVertical="true"
      android:textStyle="bold"
      android:textSize="17sp"
+     android:fontFeatureSettings="tnum"
      android:singleLine="true"/>
 
-  <!-- Status icon cluster, right-to-left: dot, PB star, comment -->
-  <ImageView
-     android:id="@+id/imgCircle"
-     android:layout_width="7dp"
-     android:layout_height="7dp"
-     android:layout_centerVertical="true"
-     android:layout_toLeftOf="@+id/tvTime"
-     android:layout_toStartOf="@+id/tvTime"
-     android:layout_marginRight="@dimen/space_s"
-     android:layout_marginEnd="@dimen/space_s"
-     android:src="@drawable/history_circle"/>
-
+  <!-- Status icon cluster, right-to-left: PB star, comment -->
   <ImageView
      android:id="@+id/imgPb"
      android:layout_width="16dp"
      android:layout_height="16dp"
      android:layout_centerVertical="true"
-     android:layout_toLeftOf="@+id/imgCircle"
-     android:layout_toStartOf="@+id/imgCircle"
+     android:layout_toLeftOf="@+id/tvTime"
+     android:layout_toStartOf="@+id/tvTime"
      android:layout_marginRight="@dimen/space_s"
      android:layout_marginEnd="@dimen/space_s"
      android:src="@drawable/star"/>
