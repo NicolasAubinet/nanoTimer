@@ -29,7 +29,10 @@ await build({
   minify: true,
   // Single offline file; no dynamic chunk loading from the WebView.
   target: ["chrome61"], // matches our minSdk-21 WebView floor (ES modules >= 61)
-  legalComments: "none",
+  // Collect bundled deps' license/copyright banners into bundle.js.LEGAL.txt
+  // (shipped alongside bundle.js) instead of stripping them. Required for the
+  // MIT/BSD deps (e.g. three.js) whose notices must travel with the binary.
+  legalComments: "linked",
   outfile: outFile,
 });
 

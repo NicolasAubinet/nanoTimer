@@ -17,10 +17,9 @@ import { dirname, resolve } from "node:path";
 import { gzipSync } from "node:zlib";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const bundlePath = resolve(
-  here,
-  "../../nanotimer/src/main/assets/scramble/bundle.js"
-);
+const assetsDir = resolve(here, "../../nanotimer/src/main/assets/scramble");
+const bundlePath = resolve(assetsDir, "bundle.js");
+const noticesPath = resolve(assetsDir, "THIRD_PARTY_LICENSES.txt");
 
 let failed = false;
 const fail = (m) => { console.error("FAIL: " + m); failed = true; };
@@ -55,5 +54,15 @@ else ok("no three.js");
 // Single-file gut check: gzipped size should fit the "few hundred KB" budget.
 if (gz > 400 * 1024) warn(`gzipped size ${kb(gz)} exceeds the ~400 KB budget`);
 else ok(`gzipped size within budget (${kb(gz)})`);
+
+// Attribution: the shipped notices file must exist and mention three.js (MIT),
+// which cubing.js bundles in pre-stripped, so esbuild can't recover its banner.
+try {
+  const notices = readFileSync(noticesPath, "utf8");
+  if (/three\.js/i.test(notices) && /MIT/i.test(notices)) ok("THIRD_PARTY_LICENSES.txt present (three.js MIT notice)");
+  else fail("THIRD_PARTY_LICENSES.txt is missing the three.js MIT notice");
+} catch {
+  fail("THIRD_PARTY_LICENSES.txt not found next to bundle.js");
+}
 
 process.exit(failed ? 1 : 0);

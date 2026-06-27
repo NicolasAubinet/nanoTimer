@@ -34,6 +34,34 @@ Then commit the regenerated `bundle.js` together with any `package.json` /
 - `build.mjs` — esbuild config (single file, IIFE, minified, `chrome61` target).
 - `verify.mjs` — post-build invariant checks.
 
+## Licenses & attribution
+
+The bundle ships third-party code, so we carry the notices with it:
+
+- **cubing.js** — `MPL-2.0 OR GPL-3.0-or-later`; used under **GPL-3.0**, same as
+  this app.
+- **scramble-display** — **GPL-3.0-or-later**.
+- **three.js** — **MIT** (bundled transitively); MIT requires its copyright +
+  permission notice to travel with the binary.
+- **esbuild** — MIT, **build-time only** (never shipped), so no distribution
+  obligation; noted here for completeness.
+
+Where the notices live:
+- `nanotimer/src/main/assets/scramble/THIRD_PARTY_LICENSES.txt` — shipped next to
+  `bundle.js`; lists the components and reproduces three.js's full MIT text.
+- The app's `LICENSE.txt` (repo root) is the full GPL-3.0 text covering the
+  GPL-3.0 components.
+- The About dialog (`app_license` string, en/fr/es) credits cubing.js /
+  scramble-display / three.js in-app.
+- **GPL "corresponding source"** for the minified `bundle.js` = this directory
+  (pinned versions + the documented regenerate command).
+
+Note: cubing.js publishes a pre-minified build with dep license banners already
+stripped, so `esbuild`'s `legalComments` can't recover three.js's banner from the
+input — that's why `THIRD_PARTY_LICENSES.txt` is curated by hand. `verify.mjs`
+asserts it exists and mentions three.js/MIT. **When bumping cubing.js, re-check
+the bundled dep set and update that file if it changed.**
+
 ## Known finding: three.js is included (accepted)
 
 The bundle is ~1 MB raw / ~240 KB gzipped. The bulk is **three.js**, which
