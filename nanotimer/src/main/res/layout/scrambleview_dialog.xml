@@ -1,27 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Host for the on-demand scramble diagram. The WebView is transparent and blends
-     onto the card background; a text fallback is shown if rendering is unavailable. -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+     onto the card background; a spinner shows while the bundle loads, and a text
+     fallback is shown if rendering is unavailable. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="8dp">
+    android:layout_height="wrap_content">
 
   <WebView
       android:id="@+id/wvScramble"
       android:layout_width="match_parent"
-      android:layout_height="300dp"
+      android:layout_height="210dp"
       android:background="@android:color/transparent"/>
+
+  <ProgressBar
+      android:id="@+id/pbScramble"
+      style="?android:attr/progressBarStyle"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"/>
 
   <TextView
       android:id="@+id/tvScrambleFallback"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_marginTop="4dp"
+      android:layout_gravity="center"
       android:gravity="center"
-      android:padding="12dp"
+      android:padding="16dp"
       android:textSize="15sp"
       android:textColor="@color/secondary_text"
       android:visibility="gone"/>
 
-</LinearLayout>
+</FrameLayout>

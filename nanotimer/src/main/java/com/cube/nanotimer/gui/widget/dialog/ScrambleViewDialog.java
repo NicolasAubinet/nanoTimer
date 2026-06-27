@@ -10,6 +10,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.webkit.WebViewAssetLoader;
@@ -40,6 +41,7 @@ public class ScrambleViewDialog extends NanoTimerDialogFragment {
   private static final String BASE_URL = "https://appassets.androidplatform.net/assets/scramble/scramble.html";
 
   private WebView webView;
+  private ProgressBar progressBar;
 
   public static ScrambleViewDialog newInstance(String renderKey, String cubingScramble) {
     ScrambleViewDialog frag = new ScrambleViewDialog();
@@ -57,6 +59,7 @@ public class ScrambleViewDialog extends NanoTimerDialogFragment {
 
     View view = LayoutInflater.from(getActivity()).inflate(R.layout.scrambleview_dialog, null);
     webView = view.findViewById(R.id.wvScramble);
+    progressBar = view.findViewById(R.id.pbScramble);
     final TextView fallback = view.findViewById(R.id.tvScrambleFallback);
 
     boolean webViewReady = setupWebView(key, scramble, fallback);
@@ -91,7 +94,10 @@ public class ScrambleViewDialog extends NanoTimerDialogFragment {
 
         @Override
         public void onPageFinished(WebView v, String url) {
+          // The bundle is parsed by now (synchronous <script> in <head>), so the
+          // diagram draws promptly — drop the spinner and reveal the WebView.
           render(v, key, scramble);
+          hideProgress();
         }
 
         @Override
@@ -119,11 +125,18 @@ public class ScrambleViewDialog extends NanoTimerDialogFragment {
   }
 
   private void showFallback(TextView fallback, String scramble) {
+    hideProgress();
     if (webView != null) {
       webView.setVisibility(View.GONE);
     }
     fallback.setText(scramble);
     fallback.setVisibility(View.VISIBLE);
+  }
+
+  private void hideProgress() {
+    if (progressBar != null) {
+      progressBar.setVisibility(View.GONE);
+    }
   }
 
   @Override
@@ -132,6 +145,7 @@ public class ScrambleViewDialog extends NanoTimerDialogFragment {
       webView.destroy();
       webView = null;
     }
+    progressBar = null;
     super.onDestroyView();
   }
 }
