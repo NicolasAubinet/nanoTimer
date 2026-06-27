@@ -4,18 +4,199 @@
    xmlns:custom="http://schemas.android.com/apk/res-auto"
    android:orientation="vertical"
    android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   android:paddingLeft="14dp"
-   android:paddingRight="14dp"
-   android:paddingTop="12dp"
-   android:paddingBottom="8dp"
+   android:layout_height="wrap_content"
+   android:paddingLeft="16dp"
+   android:paddingRight="16dp"
+   android:paddingTop="16dp"
+   android:paddingBottom="12dp"
    android:minWidth="300dp">
 
+  <!-- Hero: solve time + PB star -->
   <LinearLayout
-     android:orientation="horizontal"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
+     android:orientation="horizontal"
      android:gravity="center">
+    <TextView
+       android:id="@+id/tvTime"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_gravity="center_vertical"
+       android:textColor="@color/white"
+       android:textStyle="bold"
+       android:fontFeatureSettings="tnum"
+       android:textSize="36sp"/>
+    <ImageView
+       android:id="@+id/imgPb"
+       android:layout_width="28dp"
+       android:layout_height="28dp"
+       android:layout_gravity="center_vertical"
+       android:layout_marginLeft="8dp"
+       android:src="@drawable/star"/>
+  </LinearLayout>
+
+  <!-- Date subtitle -->
+  <TextView
+     android:id="@+id/tvDate"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="2dp"
+     android:gravity="center"
+     android:textColor="@color/secondary_text"
+     android:textSize="14sp"/>
+
+  <!-- Comment + share actions -->
+  <LinearLayout
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:orientation="horizontal"
+     android:gravity="center"
+     android:layout_marginTop="2dp">
+    <ImageButton
+       android:id="@+id/buComment"
+       android:layout_width="44dp"
+       android:layout_height="44dp"
+       android:scaleType="fitCenter"
+       android:padding="10dp"
+       android:background="?android:attr/selectableItemBackgroundBorderless"
+       android:src="@drawable/comment"
+       android:contentDescription="@string/comment"/>
+    <ImageButton
+       android:id="@+id/buShareTime"
+       android:layout_width="44dp"
+       android:layout_height="44dp"
+       android:scaleType="fitCenter"
+       android:padding="8dp"
+       android:background="?android:attr/selectableItemBackgroundBorderless"
+       android:src="@android:drawable/ic_menu_share"
+       android:contentDescription="@string/share_time"/>
+  </LinearLayout>
+
+  <ScrollView
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="8dp">
+
+    <LinearLayout
+       android:orientation="vertical"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content">
+
+      <!-- Steps (multi-step solves) -->
+      <LinearLayout
+         android:id="@+id/trSteps"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:orientation="horizontal"
+         android:gravity="center"
+         android:layout_marginBottom="4dp"
+         android:visibility="gone">
+        <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="@string/stepsC"
+           android:textColor="@color/secondary_text"
+           android:textSize="15sp"/>
+        <TextView
+           android:id="@+id/tvSteps"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="8dp"
+           android:textColor="@color/white"
+           android:textStyle="bold"
+           android:textSize="15sp"/>
+      </LinearLayout>
+
+      <!-- Mean of 3 (blind solves) -->
+      <LinearLayout
+         android:id="@+id/trMeanOfThree"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:orientation="horizontal"
+         android:gravity="center"
+         android:layout_marginBottom="4dp"
+         android:visibility="gone">
+        <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="@string/mean_of_three"
+           android:textColor="@color/secondary_text"
+           android:textSize="15sp"/>
+        <TextView
+           android:id="@+id/tvMeanOfThree"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="8dp"
+           android:textColor="@color/white"
+           android:textStyle="bold"
+           android:textSize="15sp"/>
+      </LinearLayout>
+
+      <!-- Scramble card -->
+      <androidx.cardview.widget.CardView
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         style="@style/TableCardView">
+        <com.cube.nanotimer.util.view.FontFitTextView
+           android:id="@+id/tvScramble"
+           style="@style/ScrambleTextField"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:padding="12dp"
+           android:textSize="15sp"
+           custom:myfont="MONOSPACE"/>
+      </androidx.cardview.widget.CardView>
+
+      <!-- Averages -->
+      <LinearLayout
+         android:id="@+id/averagesTable"
+         android:orientation="vertical"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="14dp">
+
+        <TextView
+           android:text="@string/averages"
+           android:layout_marginBottom="6dp"
+           style="@style/DialogSectionLabel"/>
+
+        <androidx.cardview.widget.CardView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           style="@style/TableCardView">
+          <TableLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:padding="4dp"
+             style="@style/EqualSizeColumnsTable">
+            <TableRow>
+              <TextView style="@style/AverageTableHeaderField" android:background="@color/transparent" android:text="5"/>
+              <TextView style="@style/AverageTableHeaderField" android:background="@color/transparent" android:text="12"/>
+              <TextView style="@style/AverageTableHeaderField" android:background="@color/transparent" android:text="50"/>
+              <TextView style="@style/AverageTableHeaderField" android:background="@color/transparent" android:text="100"/>
+            </TableRow>
+            <TableRow>
+              <TextView android:id="@+id/tvAvgOfFive" style="@style/TableCell" android:fontFeatureSettings="tnum"/>
+              <TextView android:id="@+id/tvAvgOfTwelve" style="@style/TableCell" android:fontFeatureSettings="tnum"/>
+              <TextView android:id="@+id/tvAvgOfFifty" style="@style/TableCell" android:fontFeatureSettings="tnum"/>
+              <TextView android:id="@+id/tvAvgOfHundred" style="@style/TableCell" android:fontFeatureSettings="tnum"/>
+            </TableRow>
+          </TableLayout>
+        </androidx.cardview.widget.CardView>
+
+      </LinearLayout>
+
+    </LinearLayout>
+
+  </ScrollView>
+
+  <!-- Actions -->
+  <LinearLayout
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:orientation="horizontal"
+     android:gravity="center"
+     android:layout_marginTop="14dp">
     <androidx.appcompat.widget.AppCompatButton
        android:id="@+id/buPlusTwo"
        android:text="@string/plus_two"
@@ -37,181 +218,5 @@
        android:background="@drawable/dialog_action_button_danger"
        style="@style/DialogActionButton"/>
   </LinearLayout>
-
-  <TableLayout
-     android:id="@+id/layoutTypes"
-     android:layout_width="match_parent"
-     android:layout_height="wrap_content"
-     android:stretchColumns="1"
-     android:layout_alignParentTop="true">
-    <TableRow android:id="@+id/trDate" android:layout_marginTop="10dp">
-      <TextView
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_gravity="center_vertical"
-         android:text="@string/date"
-         android:textColor="@color/secondary_text"
-         android:textSize="15sp"/>
-      <TextView
-         android:id="@+id/tvDate"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_gravity="center_vertical"
-         android:layout_marginLeft="10dp"
-         android:layout_weight="1"
-         android:textColor="@color/white"
-         android:textStyle="bold"
-         android:textSize="15sp"/>
-      <ImageButton
-         android:id="@+id/buComment"
-         android:layout_gravity="center_vertical"
-         android:layout_width="48dp"
-         android:layout_height="48dp"
-         android:scaleType="fitCenter"
-         android:padding="8dp"
-         android:src="@drawable/comment"
-         android:contentDescription="@string/share_time"/>
-      <ImageButton
-         android:id="@+id/buShareTime"
-         android:layout_gravity="center_vertical"
-         android:layout_width="48dp"
-         android:layout_height="48dp"
-         android:scaleType="fitCenter"
-         android:padding="5dp"
-         android:src="@android:drawable/ic_menu_share"
-         android:contentDescription="@string/share_time"/>
-    </TableRow>
-    <TableRow android:layout_marginBottom="6dp">
-      <TextView
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_gravity="center_vertical"
-         android:text="@string/time"
-         android:textColor="@color/secondary_text"
-         android:textSize="15sp"/>
-      <LinearLayout
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_gravity="center_vertical"
-         android:orientation="horizontal"
-         android:layout_marginLeft="10dp"
-         android:layout_weight="1">
-        <TextView
-           android:id="@+id/tvTime"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_gravity="center_vertical"
-           android:textColor="@color/white"
-           android:textStyle="bold"
-           android:fontFeatureSettings="tnum"
-           android:textSize="22sp"/>
-        <ImageView
-           android:id="@+id/imgPb"
-           android:layout_width="25dp"
-           android:layout_height="25dp"
-           android:layout_gravity="center_vertical"
-           android:paddingLeft="6dp"
-           android:src="@drawable/star"/>
-      </LinearLayout>
-    </TableRow>
-    <TableRow android:id="@+id/trSteps" android:layout_marginTop="6dp" android:visibility="gone">
-      <TextView
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:text="@string/stepsC"
-         android:textColor="@color/secondary_text"
-         android:textSize="15sp"/>
-      <TextView
-         android:id="@+id/tvSteps"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_marginLeft="10dp"
-         android:layout_weight="1"
-         android:textColor="@color/white"
-         android:textStyle="bold"
-         android:textSize="15sp"/>
-    </TableRow>
-    <TableRow android:id="@+id/trMeanOfThree" android:layout_marginTop="6dp" android:visibility="gone">
-      <TextView
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:text="@string/mean_of_three"
-         android:textColor="@color/secondary_text"
-         android:textSize="15sp"/>
-      <TextView
-         android:id="@+id/tvMeanOfThree"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_marginLeft="10dp"
-         android:layout_weight="1"
-         android:textColor="@color/white"
-         android:textStyle="bold"
-         android:textSize="15sp"/>
-    </TableRow>
-  </TableLayout>
-
-  <ScrollView
-     android:layout_width="match_parent"
-     android:layout_height="wrap_content">
-
-    <LinearLayout
-       android:orientation="vertical"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content">
-
-      <com.cube.nanotimer.util.view.FontFitTextView
-         android:id="@+id/tvScramble"
-         style="@style/ScrambleTextField"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_gravity="center"
-         android:layout_marginTop="10dp"
-         android:layout_marginBottom="6dp"
-         android:paddingBottom="4dp"
-         android:textSize="15sp"
-         custom:myfont="MONOSPACE" />
-
-      <LinearLayout
-         android:id="@+id/averagesTable"
-         android:orientation="vertical"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_marginTop="6dp">
-
-        <TextView
-           android:text="@string/averages"
-           android:layout_marginBottom="6dp"
-           style="@style/DialogSectionLabel"/>
-
-        <androidx.cardview.widget.CardView
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           android:layout_marginLeft="-10dp"
-           android:layout_marginRight="-10dp"
-           style="@style/TableCardView">
-          <TableLayout
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             style="@style/EqualSizeColumnsTable">
-            <TableRow>
-              <TextView style="@style/AverageTableHeaderField" android:background="@color/transparent" android:text="5"/>
-              <TextView style="@style/AverageTableHeaderField" android:background="@color/transparent" android:text="12"/>
-              <TextView style="@style/AverageTableHeaderField" android:background="@color/transparent" android:text="50"/>
-              <TextView style="@style/AverageTableHeaderField" android:background="@color/transparent" android:text="100"/>
-            </TableRow>
-            <TableRow android:background="@color/grid_background_1">
-              <TextView android:id="@+id/tvAvgOfFive" style="@style/TableCell" android:fontFeatureSettings="tnum"/>
-              <TextView android:id="@+id/tvAvgOfTwelve" style="@style/TableCell" android:fontFeatureSettings="tnum"/>
-              <TextView android:id="@+id/tvAvgOfFifty" style="@style/TableCell" android:fontFeatureSettings="tnum"/>
-              <TextView android:id="@+id/tvAvgOfHundred" style="@style/TableCell" android:fontFeatureSettings="tnum"/>
-            </TableRow>
-          </TableLayout>
-        </androidx.cardview.widget.CardView>
-
-      </LinearLayout>
-
-    </LinearLayout>
-
-  </ScrollView>
 
 </LinearLayout>
