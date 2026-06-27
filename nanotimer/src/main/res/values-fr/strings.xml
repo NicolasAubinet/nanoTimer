@@ -263,6 +263,9 @@
   <string name="cross_neutrality_full">Complète</string>
   <string name="cross_solving">Résolution…</string>
   <string name="cross_no_scramble">Aucun mélange disponible pour l\'instant</string>
+
+  <string name="scramble_view">Voir le mélange</string>
+  <string name="scramble_view_no_scramble">Aucun mélange disponible pour l\'instant</string>
   <string name="cross_section_title">Croix %1$s · %2$d mouvements</string>
   <string name="cross_solutions_count">%1$d solutions optimales</string>
   <string name="cross_subtext_solved">déjà résolue</string>

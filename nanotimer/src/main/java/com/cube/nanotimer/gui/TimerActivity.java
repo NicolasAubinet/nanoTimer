@@ -34,6 +34,7 @@ import com.cube.nanotimer.gui.widget.SessionDetailDialog;
 import com.cube.nanotimer.gui.widget.dialog.AddNewTimeDialog;
 import com.cube.nanotimer.gui.widget.dialog.CommentSolveDialog;
 import com.cube.nanotimer.gui.widget.dialog.CrossSolverDialog;
+import com.cube.nanotimer.gui.widget.dialog.ScrambleViewDialog;
 import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent;
 import com.cube.nanotimer.scrambler.randomstate.RandomStateGenEvent.State;
@@ -42,6 +43,7 @@ import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.session.CubeSession;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.ScrambleFormatterService;
+import com.cube.nanotimer.util.ScrambleViewNotation;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.GUIUtils;
@@ -382,6 +384,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     boolean crossSolverAvailable = cubeType == CubeType.THREE_BY_THREE
         && (scrambleType == null || scrambleType.isDefault()); // null scramble type means the default full scramble
     menu.findItem(R.id.itCrossSolver).setVisible(showMenu && crossSolverAvailable);
+    menu.findItem(R.id.itScrambleView).setVisible(showMenu && ScrambleViewNotation.getRenderKey(cubeType) != null);
     return super.onPrepareOptionsMenu(menu);
   }
 
@@ -494,6 +497,15 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
             DialogUtils.showFragment(this, CrossSolverDialog.newInstance(scramble));
           } else {
             DialogUtils.showShortInfoMessage(this, R.string.cross_no_scramble);
+          }
+          break;
+        case R.id.itScrambleView:
+          if (currentScramble != null) {
+            String key = ScrambleViewNotation.getRenderKey(cubeType);
+            String moves = ScrambleViewNotation.toCubingNotation(currentScramble, cubeType);
+            DialogUtils.showFragment(this, ScrambleViewDialog.newInstance(key, moves));
+          } else {
+            DialogUtils.showShortInfoMessage(this, R.string.scramble_view_no_scramble);
           }
           break;
       }
