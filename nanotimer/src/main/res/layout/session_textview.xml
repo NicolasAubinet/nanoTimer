@@ -1,2 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView style="@style/GridCell"/>
+<!-- Session times grid cell: auto-shrinks long times to fit its fixed column. -->
+<com.cube.nanotimer.util.view.FontFitTextView
+   xmlns:android="http://schemas.android.com/apk/res/android"
+   style="@style/GridCell"
+   android:singleLine="true"/>

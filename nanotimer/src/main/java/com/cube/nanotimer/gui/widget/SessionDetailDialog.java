@@ -208,6 +208,7 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
       GridLayout.spec(GridLayout.UNDEFINED, 1f),
       GridLayout.spec(GridLayout.UNDEFINED, 1f)
     );
+    param.width = 0; // equal, fixed columns (the column weight defines width, not the content)
     int gap = (int) (2 * getResources().getDisplayMetrics().density); // gap between chips
     param.setMargins(gap, gap, gap, gap);
     textView.setLayoutParams(param);
