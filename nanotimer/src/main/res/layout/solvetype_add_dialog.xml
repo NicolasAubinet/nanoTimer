@@ -3,35 +3,56 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
    android:orientation="vertical"
    android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   android:paddingRight="6dp"
-   android:paddingLeft="6dp">
+   android:layout_height="wrap_content"
+   android:paddingLeft="16dp"
+   android:paddingRight="16dp"
+   android:paddingTop="18dp"
+   android:paddingBottom="8dp">
+
+  <TextView
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:text="@string/name"
+     android:textAllCaps="true"
+     android:textColor="@color/secondary_text"
+     android:textSize="12sp"
+     android:letterSpacing="0.08"
+     android:layout_marginBottom="6dp"/>
 
   <EditText
      android:id="@+id/tfName"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
-     android:inputType="textCapSentences"
-     android:layout_marginTop="6dp"/>
+     android:background="@drawable/dialog_time_field"
+     android:paddingLeft="12dp"
+     android:paddingRight="12dp"
+     android:paddingTop="10dp"
+     android:paddingBottom="10dp"
+     android:textColor="@color/white"
+     android:textSize="16sp"
+     android:inputType="textCapSentences"/>
 
   <LinearLayout
      android:id="@+id/scrambleTypeLayout"
-     android:orientation="horizontal"
+     android:orientation="vertical"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
-     android:layout_marginTop="10dp">
+     android:layout_marginTop="16dp">
 
     <TextView
-       android:textSize="16sp"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:text="@string/scramble_typeC"/>
+       android:text="@string/scramble_type"
+       android:textAllCaps="true"
+       android:textColor="@color/secondary_text"
+       android:textSize="12sp"
+       android:letterSpacing="0.08"
+       android:layout_marginBottom="6dp"/>
 
     <Spinner
        android:id="@+id/spScrambleType"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_marginLeft="15dp"/>
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"/>
 
   </LinearLayout>
 
@@ -40,7 +61,13 @@
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
      android:text="@string/blind_mode"
-     android:layout_marginTop="10dp"
-     android:layout_marginBottom="10dp"/>
+     android:textColor="@color/white"
+     android:textSize="16sp"
+     android:background="@drawable/dialog_toggle_row"
+     android:paddingLeft="16dp"
+     android:paddingRight="16dp"
+     android:paddingTop="12dp"
+     android:paddingBottom="12dp"
+     android:layout_marginTop="16dp"/>
 
 </LinearLayout>

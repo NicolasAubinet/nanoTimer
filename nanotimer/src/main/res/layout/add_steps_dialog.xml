@@ -4,32 +4,41 @@
    android:orientation="vertical"
    android:layout_width="match_parent"
    android:layout_height="match_parent"
-   android:padding="6dp">
+   android:paddingLeft="16dp"
+   android:paddingRight="16dp"
+   android:paddingTop="16dp"
+   android:paddingBottom="8dp">
 
   <RelativeLayout
      android:orientation="horizontal"
      android:layout_width="match_parent"
-     android:layout_height="wrap_content"
-     android:layout_marginTop="4dp">
-
-    <EditText
-       android:id="@+id/tfStepName"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:layout_toLeftOf="@+id/buAddStep"
-       android:inputType="textCapSentences"
-       style="@style/SmallTextField"/>
+     android:layout_height="wrap_content">
 
     <androidx.appcompat.widget.AppCompatButton
        android:id="@+id/buAddStep"
-       android:layout_width="65dp"
+       android:layout_width="60dp"
        android:layout_height="wrap_content"
        android:text="+"
        android:layout_alignParentRight="true"
        android:layout_alignTop="@+id/tfStepName"
        android:layout_alignBottom="@+id/tfStepName"
        android:gravity="center"
-       android:textSize="15sp"/>
+       android:textSize="18sp"/>
+
+    <EditText
+       android:id="@+id/tfStepName"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_toLeftOf="@+id/buAddStep"
+       android:layout_marginRight="10dp"
+       android:background="@drawable/dialog_time_field"
+       android:paddingLeft="12dp"
+       android:paddingRight="12dp"
+       android:paddingTop="10dp"
+       android:paddingBottom="10dp"
+       android:textColor="@color/white"
+       android:inputType="textCapSentences"
+       style="@style/SmallTextField"/>
 
   </RelativeLayout>
 
@@ -38,6 +47,6 @@
      android:layout_width="match_parent"
      android:layout_height="match_parent"
      android:longClickable="true"
-     android:layout_marginTop="4dp"/>
+     android:layout_marginTop="12dp"/>
 
 </LinearLayout>

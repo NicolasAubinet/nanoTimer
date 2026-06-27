@@ -29,7 +29,7 @@
   <string name="step_already_exists">Paso ya existente con el mismo nombre para este método</string>
   <string name="name_contains_forbidden_char">Carácter inválido en nombre: \'%1$s\'</string>
   <string name="delete_solve_type_confirmation">¿Estás seguro que quieres eliminar el método \'%1$s\' y todos sus tiempos?</string>
-  <string name="new_session_confirmation">¿Estás seguro que deseas comenzar una nueva sesión?</string>
+  <string name="new_session_confirmation">¿Estás seguro que deseas comenzar una nueva sesión?\n\nLas sesiones permiten ver estadísticas (resoluciones, media, mejores tiempos) de una tanda de resoluciones. Comenzar una nueva sesión borra los tiempos mostrados para empezar de cero (tu historial no se ve afectado).</string>
   <string name="solvetype_has_times_addsteps">Este método tiene varios tiempos. Añadir pasos los eliminará. ¿Estás seguro que quieres continuar?</string>
   <string name="min_steps_count_not_reached">Debes crear al menos dos pasos</string>
   <string name="max_steps_count_reached">Se ha alcanzado el límite de pasos</string>
@@ -281,6 +281,8 @@
   <string name="comment">Comentar</string>
 
   <string name="scramble_typeC">Tipo de mezcla:</string>
+  <string name="scramble_type">Tipo de mezcla</string>
+  <string name="name">Nombre</string>
   <string name="scramble_type_default">Aleatoria</string>
   <string name="scramble_type_f2l">F2L</string>
   <string name="scramble_type_last_layer">Última capa</string>

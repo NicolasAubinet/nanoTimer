@@ -29,7 +29,7 @@
   <string name="step_already_exists">Une étape avec le même nom existe déjà pour ce type de résolution</string>
   <string name="name_contains_forbidden_char">Caractère invalide dans le nom: \'%1$s\'</string>
   <string name="delete_solve_type_confirmation">Êtes-vous sûr de vouloir supprimer le type de résolution \'%1$s\' et tous ses temps?</string>
-  <string name="new_session_confirmation">Êtes-vous sûr de vouloir démarrer une nouvelle session?</string>
+  <string name="new_session_confirmation">Êtes-vous sûr de vouloir démarrer une nouvelle session?\n\nLes sessions permettent de suivre des statistiques (résolutions, moyenne, meilleurs temps) pour une série de résolutions. Démarrer une nouvelle session efface les temps affichés pour repartir à zéro (votre historique n\'est pas affecté).</string>
   <string name="solvetype_has_times_addsteps">Ce type de résolution contient des temps. Y ajouter des étapes les supprimera. Êtes-vous sûr de vouloir continuer?</string>
   <string name="min_steps_count_not_reached">Vous devez créer au moins deux étapes</string>
   <string name="max_steps_count_reached">La limite de nombre d\'étapes a été atteinte</string>
@@ -281,6 +281,8 @@
   <string name="comment">Commenter</string>
 
   <string name="scramble_typeC">Type de mélange:</string>
+  <string name="scramble_type">Type de mélange</string>
+  <string name="name">Nom</string>
   <string name="scramble_type_default">Aléatoire</string>
   <string name="scramble_type_f2l">F2L</string>
   <string name="scramble_type_last_layer">Last Layer</string>

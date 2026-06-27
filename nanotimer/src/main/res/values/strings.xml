@@ -33,7 +33,7 @@
   <string name="step_already_exists">A step with the same name already exists for this solve type</string>
   <string name="name_contains_forbidden_char">Invalid character in name: \'%1$s\'</string>
   <string name="delete_solve_type_confirmation">Are you sure you want to delete the solve type \'%1$s\' and all its times?</string>
-  <string name="new_session_confirmation">Are you sure you want to start a new session?</string>
+  <string name="new_session_confirmation">Are you sure you want to start a new session?\n\nSessions let you track stats (solves, average, best times) for one sitting. Starting a new session clears the displayed times to begin fresh (your history is not affected).</string>
   <string name="solvetype_has_times_addsteps">This solve type contains some times. Adding steps will delete them. Are you sure you want to continue?</string>
   <string name="min_steps_count_not_reached">You must create at least two steps</string>
   <string name="max_steps_count_reached">The steps count limit has been reached</string>
@@ -285,6 +285,8 @@
   <string name="comment">Comment</string>
 
   <string name="scramble_typeC">Scramble type:</string>
+  <string name="scramble_type">Scramble type</string>
+  <string name="name">Name</string>
   <string name="scramble_type_default">Random</string>
   <string name="scramble_type_f2l">F2L</string>
   <string name="scramble_type_last_layer">Last layer</string>
