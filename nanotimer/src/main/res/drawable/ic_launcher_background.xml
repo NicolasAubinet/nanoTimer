@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adaptive icon background: dark navy with a soft central glow, matching the cube art. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+   android:shape="rectangle">
+  <gradient
+     android:type="radial"
+     android:centerX="0.5"
+     android:centerY="0.42"
+     android:gradientRadius="72%p"
+     android:startColor="#2A5B7E"
+     android:endColor="#0A0F15"/>
+</shape>
