@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<!--
+  Host page for NanoTimer's scramble-state visualization.
+
+  Loaded once into an on-demand WebView (via WebViewAssetLoader, served from
+  https://appassets.androidplatform.net/... — NOT file://, which breaks ES-module
+  resolution). Java never reads anything back; the only bridge is
+  window.ntRender(...) called via WebView.evaluateJavascript().
+
+  Two render paths (see bundle entry.mjs):
+    - WCA puzzles -> <scramble-display event="...">
+    - FTO         -> <twisty-player puzzle="fto" visualization="2D">
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      overflow: hidden;
+    }
+    #host {
+      box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+    }
+    scramble-display, twisty-player {
+      width: 100%;
+      height: 100%;
+    }
+    /* Hide twisty-player chrome — we only want the 2D net. */
+    twisty-player {
+      --controls-height: 0;
+    }
+  </style>
+  <script src="bundle.js"></script>
+</head>
+<body>
+  <div id="host"></div>
+  <script>
+    // The whole Java<->JS surface: set the puzzle + scramble, render a 2D net.
+    //
+    //   ntRender("333", "R U R' U'")            -> scramble-display
+    //   ntRender("fto", "U F' BR L ...")        -> twisty-player (FTO)
+    //
+    // `key` is a scramble-display event id (222 333 444 555 666 777 clock minx
+    // pyram skewb sq1) or the literal "fto". Returns nothing; failures fall back
+    // to the native text view on the Java side (feature-detect there).
+    window.ntRender = function (key, scramble) {
+      var host = document.getElementById("host");
+      host.textContent = "";
+      var el;
+      if (key === "fto") {
+        el = document.createElement("twisty-player");
+        el.setAttribute("puzzle", "fto");
+        el.setAttribute("visualization", "2D");
+        el.setAttribute("background", "none");
+        el.setAttribute("control-panel", "none");
+        el.setAttribute("alg", scramble || "");
+      } else {
+        el = document.createElement("scramble-display");
+        el.setAttribute("visualization", "2D");
+        el.setAttribute("event", key);
+        el.setAttribute("scramble", scramble || "");
+      }
+      host.appendChild(el);
+    };
+  </script>
+</body>
+</html>
