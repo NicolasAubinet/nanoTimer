@@ -21,7 +21,7 @@
   <!-- Indigo dark theme -->
   <!--<color name="color_primary">#424242</color>-->
   <!--<color name="color_primary_dark">#222222</color>-->
-  <color name="color_accent">#9e9e9e</color>
+  <color name="color_accent">@color/lightblue</color>
   <color name="color_primary">#006599</color>
   <color name="color_primary_dark">#005080</color>
   <!--<color name="color_primary">#515151</color>-->
