@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Typeface;
 import androidx.appcompat.widget.AppCompatTextView;
 import android.util.AttributeSet;
-import com.cube.nanotimer.util.helper.GUIUtils;
 
 public class DigitalTextView extends AppCompatTextView {
 
@@ -25,8 +24,8 @@ public class DigitalTextView extends AppCompatTextView {
 
   public void setFont() {
     if (!isInEditMode()) {
-      Typeface font = GUIUtils.createFont(getContext(), "Digital_dream_Fat_Skew_Narrow.ttf");
-      setTypeface(font);
+      setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
+      setFontFeatureSettings("tnum");
     }
   }
 
