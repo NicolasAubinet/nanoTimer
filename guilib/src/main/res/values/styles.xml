@@ -61,6 +61,7 @@
     <item name="android:textSize">21px</item>
     <item name="android:layout_height">33px</item>
     <item name="android:padding">2px</item>
+    <item name="android:fontFeatureSettings">tnum</item> <!-- tabular figures so time columns align -->
   </style>
 
   <style name="GridCell" parent="TableCell">
