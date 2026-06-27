@@ -169,6 +169,13 @@
     <item name="android:background">@drawable/primary_button_ripple</item>
   </style>
 
+  <!-- Rounded tonal action button used in dialogs (+2 / DNF / Delete). -->
+  <style name="DialogActionButton" parent="CustomButton">
+    <item name="android:layout_height">44dp</item>
+    <item name="android:textSize">15sp</item>
+    <item name="android:background">@drawable/dialog_action_button</item>
+  </style>
+
   <style name="CustomSpinner">
     <item name="android:layout_width">match_parent</item>
     <item name="android:layout_height">wrap_content</item>

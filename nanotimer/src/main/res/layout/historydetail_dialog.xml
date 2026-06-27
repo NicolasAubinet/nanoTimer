@@ -21,20 +21,21 @@
        android:text="@string/plus_two"
        android:layout_marginRight="6dp"
        android:layout_weight="1"
-       style="@style/CustomButton"/>
+       style="@style/DialogActionButton"/>
     <androidx.appcompat.widget.AppCompatButton
        android:id="@+id/buDNF"
        android:text="@string/DNF"
        android:layout_marginLeft="6dp"
        android:layout_marginRight="6dp"
        android:layout_weight="1"
-       style="@style/CustomButton"/>
+       style="@style/DialogActionButton"/>
     <androidx.appcompat.widget.AppCompatButton
        android:id="@+id/buDelete"
        android:text="@string/delete"
        android:layout_marginLeft="6dp"
        android:layout_weight="1"
-       style="@style/CustomButton"/>
+       android:background="@drawable/dialog_action_button_danger"
+       style="@style/DialogActionButton"/>
   </LinearLayout>
 
   <TableLayout
