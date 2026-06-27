@@ -152,8 +152,12 @@ public class TimesStatisticsTest {
 
   @Test
   public void testBestTimeInd() {
-    Assert.assertEquals(-1, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getBestTimeInd(4, false));
-    Assert.assertEquals(-1, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getBestTimeInd(4, true));
+    Assert.assertEquals(-1, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getBestTimeInd(1, false));
+    Assert.assertEquals(-1, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getBestTimeInd(1, true));
+    Assert.assertEquals(1, new TimesStatistics(getTimesList(2000, 1000, 3000, 4000, 5000)).getBestTimeInd(2, false));
+    Assert.assertEquals(1, new TimesStatistics(getTimesList(2000, 1000, 3000, 4000, 5000)).getBestTimeInd(2, true));
+    Assert.assertEquals(0, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getBestTimeInd(4, false));
+    Assert.assertEquals(0, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getBestTimeInd(4, true));
     Assert.assertEquals(0, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getBestTimeInd(5, false));
     Assert.assertEquals(1, new TimesStatistics(getTimesList(2000, 1000, 3000, 4000, 5000)).getBestTimeInd(5, false));
     Assert.assertEquals(0, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getBestTimeInd(5, true));
@@ -177,8 +181,12 @@ public class TimesStatisticsTest {
 
   @Test
   public void testWorstTimeInd() {
-    Assert.assertEquals(-1, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getWorstTimeInd(4, false));
-    Assert.assertEquals(-1, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getWorstTimeInd(4, true));
+    Assert.assertEquals(-1, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getWorstTimeInd(1, false));
+    Assert.assertEquals(-1, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getWorstTimeInd(1, true));
+    Assert.assertEquals(0, new TimesStatistics(getTimesList(2000, 1000, 3000, 4000, 5000)).getWorstTimeInd(2, false));
+    Assert.assertEquals(0, new TimesStatistics(getTimesList(2000, 1000, 3000, 4000, 5000)).getWorstTimeInd(2, true));
+    Assert.assertEquals(3, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getWorstTimeInd(4, false));
+    Assert.assertEquals(3, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getWorstTimeInd(4, true));
     Assert.assertEquals(4, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getWorstTimeInd(5, false));
     Assert.assertEquals(3, new TimesStatistics(getTimesList(2000, 1000, 3000, 5000, 4000)).getWorstTimeInd(5, false));
     Assert.assertEquals(4, new TimesStatistics(getTimesList(1000, 2000, 3000, 4000, 5000)).getWorstTimeInd(5, true));
