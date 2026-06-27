@@ -59,6 +59,7 @@
          android:layout_marginLeft="10dp"
          android:layout_weight="1"
          android:textColor="@color/white"
+         android:textStyle="bold"
          android:textSize="15sp"/>
       <ImageButton
          android:id="@+id/buComment"
@@ -100,7 +101,9 @@
            android:layout_height="wrap_content"
            android:layout_gravity="center_vertical"
            android:textColor="@color/white"
-           android:textSize="15sp"/>
+           android:textStyle="bold"
+           android:fontFeatureSettings="tnum"
+           android:textSize="22sp"/>
         <ImageView
            android:id="@+id/imgPb"
            android:layout_width="25dp"
@@ -124,6 +127,7 @@
          android:layout_marginLeft="10dp"
          android:layout_weight="1"
          android:textColor="@color/white"
+         android:textStyle="bold"
          android:textSize="15sp"/>
     </TableRow>
     <TableRow android:id="@+id/trMeanOfThree" android:layout_marginTop="6dp" android:visibility="gone">
@@ -140,6 +144,7 @@
          android:layout_marginLeft="10dp"
          android:layout_weight="1"
          android:textColor="@color/white"
+         android:textStyle="bold"
          android:textSize="15sp"/>
     </TableRow>
   </TableLayout>
@@ -188,16 +193,16 @@
              android:layout_height="wrap_content"
              style="@style/EqualSizeColumnsTable">
             <TableRow>
-              <TextView style="@style/AverageTableHeaderField" android:text="5"/>
-              <TextView style="@style/AverageTableHeaderField" android:text="12"/>
-              <TextView style="@style/AverageTableHeaderField" android:text="50"/>
-              <TextView style="@style/AverageTableHeaderField" android:text="100"/>
+              <TextView style="@style/AverageTableHeaderField" android:background="@color/transparent" android:text="5"/>
+              <TextView style="@style/AverageTableHeaderField" android:background="@color/transparent" android:text="12"/>
+              <TextView style="@style/AverageTableHeaderField" android:background="@color/transparent" android:text="50"/>
+              <TextView style="@style/AverageTableHeaderField" android:background="@color/transparent" android:text="100"/>
             </TableRow>
             <TableRow android:background="@color/grid_background_1">
-              <TextView android:id="@+id/tvAvgOfFive" style="@style/TableCell"/>
-              <TextView android:id="@+id/tvAvgOfTwelve" style="@style/TableCell"/>
-              <TextView android:id="@+id/tvAvgOfFifty" style="@style/TableCell"/>
-              <TextView android:id="@+id/tvAvgOfHundred" style="@style/TableCell"/>
+              <TextView android:id="@+id/tvAvgOfFive" style="@style/TableCell" android:fontFeatureSettings="tnum"/>
+              <TextView android:id="@+id/tvAvgOfTwelve" style="@style/TableCell" android:fontFeatureSettings="tnum"/>
+              <TextView android:id="@+id/tvAvgOfFifty" style="@style/TableCell" android:fontFeatureSettings="tnum"/>
+              <TextView android:id="@+id/tvAvgOfHundred" style="@style/TableCell" android:fontFeatureSettings="tnum"/>
             </TableRow>
           </TableLayout>
         </androidx.cardview.widget.CardView>
