@@ -3,14 +3,12 @@ package com.cube.nanotimer.gui.widget.dialog;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
@@ -24,6 +22,7 @@ import com.cube.nanotimer.scrambler.cross.CrossFormatter;
 import com.cube.nanotimer.scrambler.cross.CrossSolvers;
 import com.cube.nanotimer.scrambler.cross.CrossSolvers.FaceSolutions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,10 +40,16 @@ public class CrossSolverDialog extends NanoTimerDialogFragment {
   private String scramble;
   private final CrossSolvers solvers = new CrossSolvers();
 
-  private Spinner spMode;
-  private Spinner spFace;
+  private LinearLayout llModeSeg;
+  private LinearLayout llSwatches;
   private LinearLayout llFace;
   private LinearLayout llResults;
+
+  // Current selection (also persisted in Options); the controls are custom views, not spinners.
+  private CrossNeutrality neutrality;
+  private CrossFace face;
+  private final List<TextView> segViews = new ArrayList<>();
+  private final List<TextView> swatchViews = new ArrayList<>();
 
   // Increments on each solve request so stale worker results (after a quick spinner change) are ignored.
   private int requestId;
@@ -64,15 +69,19 @@ public class CrossSolverDialog extends NanoTimerDialogFragment {
     LayoutInflater inflater = LayoutInflater.from(getActivity());
     View view = inflater.inflate(R.layout.crosssolver_dialog, null);
 
-    spMode = view.findViewById(R.id.spCrossMode);
-    spFace = view.findViewById(R.id.spCrossFace);
+    llModeSeg = view.findViewById(R.id.llCrossModeSeg);
+    llSwatches = view.findViewById(R.id.llCrossSwatches);
     llFace = view.findViewById(R.id.llCrossFace);
     llResults = view.findViewById(R.id.llCrossResults);
 
-    setUpModeSpinner();
-    setUpFaceSpinner();
-    llFace.setVisibility(
-        Options.INSTANCE.getCrossNeutrality() == CrossNeutrality.FULL ? View.GONE : View.VISIBLE);
+    neutrality = Options.INSTANCE.getCrossNeutrality();
+    face = CrossFace.values()[Options.INSTANCE.getCrossFaceIndex(CrossFace.D.ordinal())];
+
+    buildModeSegments();
+    buildFaceSwatches();
+    refreshSegStyles();
+    refreshSwatchStyles();
+    llFace.setVisibility(neutrality == CrossNeutrality.FULL ? View.GONE : View.VISIBLE);
 
     AlertDialog dialog = new AlertDialog.Builder(getActivity())
         .setTitle(R.string.cross_solver)
@@ -84,58 +93,125 @@ public class CrossSolverDialog extends NanoTimerDialogFragment {
     return dialog;
   }
 
-  private void setUpModeSpinner() {
-    ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
-        android.R.layout.simple_spinner_item, new String[] {
-            getString(R.string.cross_neutrality_specific),
-            getString(R.string.cross_neutrality_dual),
-            getString(R.string.cross_neutrality_full) });
-    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    spMode.setAdapter(adapter);
-    spMode.setSelection(Options.INSTANCE.getCrossNeutrality().ordinal());
-    spMode.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-      @Override
-      public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
-        CrossNeutrality mode = CrossNeutrality.values()[position];
-        Options.INSTANCE.setCrossNeutrality(mode);
-        // The face only matters for Specific/Dual.
-        llFace.setVisibility(mode == CrossNeutrality.FULL ? View.GONE : View.VISIBLE);
-        solve();
-      }
-
-      @Override
-      public void onNothingSelected(AdapterView<?> parent) {
-      }
-    });
+  // Segmented control (Specific / Dual / Full): one weighted cell per neutrality mode.
+  private void buildModeSegments() {
+    CrossNeutrality[] modes = CrossNeutrality.values();
+    int[] labels = { R.string.cross_neutrality_specific, R.string.cross_neutrality_dual,
+        R.string.cross_neutrality_full };
+    for (int i = 0; i < modes.length; i++) {
+      final CrossNeutrality m = modes[i];
+      TextView seg = new TextView(getActivity());
+      seg.setText(labels[i]);
+      seg.setTextSize(14);
+      seg.setGravity(Gravity.CENTER);
+      seg.setPadding(dp(8), dp(8), dp(8), dp(8));
+      seg.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+      seg.setClickable(true);
+      seg.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          if (neutrality != m) {
+            setNeutrality(m);
+          }
+        }
+      });
+      segViews.add(seg);
+      llModeSeg.addView(seg);
+    }
   }
 
-  private void setUpFaceSpinner() {
-    CrossFace[] faces = CrossFace.values();
-    String[] faceNames = new String[faces.length];
-    for (int i = 0; i < faces.length; i++) {
-      faceNames[i] = faces[i].name();
-    }
-    ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
-        android.R.layout.simple_spinner_item, faceNames);
-    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    spFace.setAdapter(adapter);
-    spFace.setSelection(Options.INSTANCE.getCrossFaceIndex(CrossFace.D.ordinal()));
-    spFace.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-      @Override
-      public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
-        Options.INSTANCE.setCrossFaceIndex(position);
-        solve();
-      }
+  private void setNeutrality(CrossNeutrality m) {
+    neutrality = m;
+    Options.INSTANCE.setCrossNeutrality(m);
+    // The face only matters for Specific/Dual.
+    llFace.setVisibility(m == CrossNeutrality.FULL ? View.GONE : View.VISIBLE);
+    refreshSegStyles();
+    refreshSwatchStyles();
+    solve();
+  }
 
-      @Override
-      public void onNothingSelected(AdapterView<?> parent) {
+  private void refreshSegStyles() {
+    CrossNeutrality[] modes = CrossNeutrality.values();
+    for (int i = 0; i < segViews.size(); i++) {
+      TextView seg = segViews.get(i);
+      if (modes[i] == neutrality) {
+        seg.setBackgroundResource(R.drawable.cross_segment_selected);
+        seg.setTextColor(color(R.color.white));
+        seg.setTypeface(null, Typeface.BOLD);
+      } else {
+        seg.setBackground(null);
+        seg.setTextColor(color(R.color.secondary_text));
+        seg.setTypeface(null, Typeface.NORMAL);
       }
-    });
+    }
+  }
+
+  // Row of six color swatches (the standard WCA scheme); the letter stays the source of truth.
+  private void buildFaceSwatches() {
+    CrossFace[] faces = CrossFace.values();
+    for (int i = 0; i < faces.length; i++) {
+      final CrossFace f = faces[i];
+      TextView sw = new TextView(getActivity());
+      sw.setText(f.name());
+      sw.setGravity(Gravity.CENTER);
+      sw.setTextSize(15);
+      sw.setTypeface(null, Typeface.BOLD);
+      LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(40), 1f);
+      if (i > 0) {
+        lp.leftMargin = dp(6);
+      }
+      sw.setLayoutParams(lp);
+      sw.setClickable(true);
+      sw.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          if (face != f) {
+            setFace(f);
+          }
+        }
+      });
+      swatchViews.add(sw);
+      llSwatches.addView(sw);
+    }
+  }
+
+  private void setFace(CrossFace f) {
+    face = f;
+    Options.INSTANCE.setCrossFaceIndex(f.ordinal());
+    refreshSwatchStyles();
+    solve();
+  }
+
+  private void refreshSwatchStyles() {
+    CrossFace[] faces = CrossFace.values();
+    for (int i = 0; i < faces.length; i++) {
+      CrossFace f = faces[i];
+      TextView sw = swatchViews.get(i);
+      int faceColor = color(faceColorRes(f));
+      boolean primary = (f == face);
+      boolean paired = (neutrality == CrossNeutrality.DUAL && f == face.opposite());
+
+      GradientDrawable bg = new GradientDrawable();
+      bg.setShape(GradientDrawable.RECTANGLE);
+      bg.setCornerRadius(dp(8));
+      bg.setColor(faceColor);
+      if (primary) {
+        bg.setStroke(dp(5), color(R.color.lightblue));
+      } else if (paired) {
+        bg.setStroke(dp(4), color(R.color.iceblue));
+      } else {
+        bg.setStroke(dp(1), color(R.color.gray700));
+      }
+      sw.setBackground(bg);
+      sw.setTextColor(isLightColor(faceColor) ? 0xFF222222 : color(R.color.white));
+      // Dim the unselected faces so the active one (and its Dual pair) clearly stands out.
+      sw.setAlpha((primary || paired) ? 1f : 0.45f);
+    }
   }
 
   private void solve() {
-    final CrossNeutrality mode = CrossNeutrality.values()[spMode.getSelectedItemPosition()];
-    final CrossFace face = CrossFace.values()[spFace.getSelectedItemPosition()];
+    final CrossNeutrality mode = this.neutrality;
+    final CrossFace face = this.face;
     final int currentRequest = ++requestId;
 
     llResults.removeAllViews();
@@ -177,6 +253,13 @@ public class CrossSolverDialog extends NanoTimerDialogFragment {
         addSectionCard(fs, true, fs.length == bestLength, i == 0);
       }
     }
+    // Drop the trailing card's bottom margin so it sits snug above the dialog's Close button.
+    if (llResults.getChildCount() > 0) {
+      View last = llResults.getChildAt(llResults.getChildCount() - 1);
+      LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) last.getLayoutParams();
+      lp.bottomMargin = 0;
+      last.setLayoutParams(lp);
+    }
   }
 
   // A section card for one face: accent header (face + move count) with a dim solution-count subtext,
@@ -201,6 +284,8 @@ public class CrossSolverDialog extends NanoTimerDialogFragment {
     if (chevron != null) {
       header.addView(chevron);
     }
+
+    header.addView(makeFaceDot(fs.face));
 
     LinearLayout titleBlock = new LinearLayout(getActivity());
     titleBlock.setOrientation(LinearLayout.VERTICAL);
@@ -304,6 +389,38 @@ public class CrossSolverDialog extends NanoTimerDialogFragment {
     tv.setTypeface(Typeface.MONOSPACE);
     tv.setPadding(dp(4), dp(3), 0, dp(3));
     return tv;
+  }
+
+  // Small color disc shown before a card title, tying the result back to the face swatch.
+  private View makeFaceDot(CrossFace f) {
+    View dot = new View(getActivity());
+    GradientDrawable bg = new GradientDrawable();
+    bg.setShape(GradientDrawable.OVAL);
+    bg.setColor(color(faceColorRes(f)));
+    bg.setStroke(dp(1), color(R.color.gray700));
+    dot.setBackground(bg);
+    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(14), dp(14));
+    lp.rightMargin = dp(8);
+    dot.setLayoutParams(lp);
+    return dot;
+  }
+
+  // Standard WCA face colors. Decorative: the face letter remains the unambiguous label.
+  private int faceColorRes(CrossFace f) {
+    switch (f) {
+      case U: return R.color.cube_white;
+      case D: return R.color.cube_yellow;
+      case R: return R.color.cube_red;
+      case L: return R.color.cube_orange;
+      case F: return R.color.cube_green;
+      case B: return R.color.cube_blue;
+      default: return R.color.gray400;
+    }
+  }
+
+  private static boolean isLightColor(int c) {
+    int r = (c >> 16) & 0xFF, g = (c >> 8) & 0xFF, b = c & 0xFF;
+    return (0.299 * r + 0.587 * g + 0.114 * b) > 150;
   }
 
   private TextView makeChevron(boolean expanded) {
