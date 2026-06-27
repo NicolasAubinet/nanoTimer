@@ -288,15 +288,15 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
 
     int visibleTableRowsCount = 0;
     for (int i = 1; i < averagesTable.getChildCount(); i++) {
-      TableRow tableRow = (TableRow) averagesTable.getChildAt(i);
+      View child = averagesTable.getChildAt(i);
+      if (!(child instanceof TableRow)) {
+        continue; // skip non-row children (e.g. the header divider)
+      }
+      TableRow tableRow = (TableRow) child;
 
       if (tableRow.getVisibility() == View.VISIBLE) {
-        int backgroundColorId;
-        if (visibleTableRowsCount % 2 == 0) {
-          backgroundColorId = R.color.grid_background_1;
-        } else {
-          backgroundColorId = R.color.grid_background_2;
-        }
+        // Softened alternation: transparent / faint, instead of the cyan zebra.
+        int backgroundColorId = (visibleTableRowsCount % 2 == 0) ? R.color.transparent : R.color.grid_background_1;
         tableRow.setBackgroundResource(backgroundColorId);
 
         visibleTableRowsCount++;
