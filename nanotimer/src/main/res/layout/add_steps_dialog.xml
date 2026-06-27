@@ -6,38 +6,52 @@
    android:layout_height="match_parent"
    android:paddingLeft="16dp"
    android:paddingRight="16dp"
-   android:paddingTop="16dp"
+   android:paddingTop="18dp"
    android:paddingBottom="8dp">
 
+  <TextView
+     android:text="@string/add_step"
+     android:layout_marginBottom="6dp"
+     style="@style/DialogSectionLabel"/>
+
   <RelativeLayout
-     android:orientation="horizontal"
      android:layout_width="match_parent"
      android:layout_height="wrap_content">
 
     <androidx.appcompat.widget.AppCompatButton
        android:id="@+id/buAddStep"
-       android:layout_width="60dp"
-       android:layout_height="wrap_content"
+       android:layout_width="46dp"
+       android:layout_height="46dp"
        android:text="+"
-       android:layout_alignParentRight="true"
-       android:layout_alignTop="@+id/tfStepName"
-       android:layout_alignBottom="@+id/tfStepName"
+       android:textColor="@color/white"
+       android:textSize="26sp"
+       android:textStyle="bold"
        android:gravity="center"
-       android:textSize="18sp"/>
+       android:padding="0dp"
+       android:minWidth="0dp"
+       android:minHeight="0dp"
+       android:includeFontPadding="false"
+       android:background="@drawable/add_button_bg"
+       android:layout_alignParentRight="true"
+       android:layout_centerVertical="true"/>
 
     <EditText
        android:id="@+id/tfStepName"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:layout_toLeftOf="@+id/buAddStep"
-       android:layout_marginRight="10dp"
+       android:layout_centerVertical="true"
+       android:layout_marginRight="12dp"
        android:background="@drawable/dialog_time_field"
+       android:hint="@string/step_name"
+       android:textColorHint="@color/secondary_text"
        android:paddingLeft="12dp"
        android:paddingRight="12dp"
-       android:paddingTop="10dp"
-       android:paddingBottom="10dp"
+       android:paddingTop="11dp"
+       android:paddingBottom="11dp"
        android:textColor="@color/white"
        android:inputType="textCapSentences"
+       android:imeOptions="actionDone"
        style="@style/SmallTextField"/>
 
   </RelativeLayout>
@@ -47,6 +61,8 @@
      android:layout_width="match_parent"
      android:layout_height="match_parent"
      android:longClickable="true"
-     android:layout_marginTop="12dp"/>
+     android:divider="@color/gray800"
+     android:dividerHeight="1dp"
+     android:layout_marginTop="16dp"/>
 
 </LinearLayout>

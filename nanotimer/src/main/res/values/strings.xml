@@ -39,6 +39,7 @@
   <string name="max_steps_count_reached">The steps count limit has been reached</string>
   <string name="add_step">Add step</string>
   <string name="add_steps">Add steps</string>
+  <string name="step_name">Step name</string>
   <string name="solve_type_name_reserved">This solve type name is reserved.\nPlease pick an other one.</string>
 
   <string name="last_avg_of">Last avg of</string>
