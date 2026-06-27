@@ -30,19 +30,39 @@
          android:layout_marginBottom="15px"
          android:textColor="@color/white"
          android:layout_gravity="center"/>
-      <TextView
+      <androidx.cardview.widget.CardView
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:text="@string/scrambleC"
-         style="@style/ScrambleTextFieldPx"/>
-      <com.cube.nanotimer.util.view.FontFitTextView
-         android:id="@+id/tvScramble"
-         android:layout_width="match_parent"
-         android:layout_height="match_parent"
-         android:layout_marginTop="8px"
-         android:gravity="center_horizontal"
-         app:myfont="MONOSPACE"
-         style="@style/ScrambleTextFieldPx"/>
+         style="@style/TableCardViewPx">
+
+        <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="vertical"
+           android:paddingLeft="10px"
+           android:paddingRight="10px"
+           android:paddingTop="6px"
+           android:paddingBottom="8px">
+
+          <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="@string/scrambleC"
+             android:textColor="@color/secondary_text"
+             style="@style/ScrambleTextFieldPx"/>
+
+          <com.cube.nanotimer.util.view.FontFitTextView
+             android:id="@+id/tvScramble"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginTop="4px"
+             android:gravity="center_horizontal"
+             app:myfont="MONOSPACE"
+             style="@style/ScrambleTextFieldPx"/>
+
+        </LinearLayout>
+
+      </androidx.cardview.widget.CardView>
     </LinearLayout>
 
     <RelativeLayout
