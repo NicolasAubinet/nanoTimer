@@ -100,7 +100,7 @@
 
   <style name="AverageTableHeaderFieldPx" parent="TableCellPx">
     <item name="android:textColor">@color/lightblue</item>
-    <item name="android:background">@color/table_header</item>
+    <item name="android:background">@color/transparent</item> <!-- softened: cyan text, no bar -->
     <item name="android:textStyle">bold</item>
   </style>
 
