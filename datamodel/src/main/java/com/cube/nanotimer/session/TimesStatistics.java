@@ -9,6 +9,7 @@ import java.util.List;
 public class TimesStatistics {
 
   private static final int MIN_TIMES_FOR_AVERAGE = 5;
+  private static final int MIN_TIMES_FOR_COLOR_TAG = 2;
 
   protected LinkedList<Long> times = new LinkedList<Long>(); // most recent time is in position 0
 
@@ -29,7 +30,7 @@ public class TimesStatistics {
   private int getBestTimeInd(int count, boolean blind, Collection<Integer> bannedIndexes) {
     int bestInd = -1;
     int specificTimesSize = getTimes(blind).size();
-    if (specificTimesSize >= count && count >= MIN_TIMES_FOR_AVERAGE) {
+    if (specificTimesSize >= count && count >= MIN_TIMES_FOR_COLOR_TAG) {
       List<Long> times = getTimes();
       Long best = (long) 0;
       int parsed = 0;
@@ -83,7 +84,7 @@ public class TimesStatistics {
   private int getWorstTimeInd(int count, boolean blind, Collection<Integer> bannedIndexes) {
     int worstInd = -1;
     int specificTimesSize = getTimes(blind).size();
-    if (specificTimesSize >= count && count >= MIN_TIMES_FOR_AVERAGE) {
+    if (specificTimesSize >= count && count >= MIN_TIMES_FOR_COLOR_TAG) {
       List<Long> times = getTimes();
       Long worst = (long) 0;
       int parsed = 0;
