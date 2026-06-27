@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="app_name">Nano Timer</string>
-  <string name="app_name_copyright">&#169; 2014-2017 Nano Timer</string>
+  <string name="app_name_copyright">&#169; 2014–2026 Nano Timer\nGratis y de c&#243;digo abierto (GPL v3)\ngithub.com/NicolasAubinet/nanoTimer</string>
   <string name="app_description">Temporizador de Cubo de Rubik para Android</string>
   <string name="app_license">Esta app usa librerías drag-sort-listview, MPAndroidChart y android-wheel licenciadas bajo Apache 2.0.</string>
   <string name="feedback_message">Si encuentras un error o tienes sugerencias o comentarios, no dudes en enviar un email al siguiente correo.</string>
