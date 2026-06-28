@@ -88,6 +88,7 @@
   <string name="spanish">Español</string>
 
   <string name="settings">Ajustes</string>
+  <string name="look_and_feel">Apariencia</string>
   <string name="timer_screen">Pantalla del temporizador</string>
   <string name="inspection_mode">Modo de inspección</string>
   <string name="inspection_mode_summary">Seleccionar el modo de inspección</string>

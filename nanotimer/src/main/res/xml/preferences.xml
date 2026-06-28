@@ -5,6 +5,23 @@
    android:key="main_settings_screen">
 
   <PreferenceCategory
+     android:title="@string/look_and_feel">
+
+    <CheckBoxPreference
+       android:key="show_time_when_running"
+       android:title="@string/show_time_when_running"
+       android:summary="@string/show_time_when_running_summary"
+       android:defaultValue="@bool/show_time_when_running"/>
+
+    <CheckBoxPreference
+       android:key="keep_timer_screen_on"
+       android:title="@string/keep_screen_on"
+       android:summary="@string/keep_screen_on_summary"
+       android:defaultValue="@bool/keep_timer_screen_on"/>
+
+  </PreferenceCategory>
+
+  <PreferenceCategory
      android:title="@string/timer_screen">
 
     <ListPreference
@@ -39,18 +56,6 @@
        android:entryValues="@array/entryvalues_inspection_sounds_type"
        android:dialogTitle="@string/inspection_sounds_type"
        android:defaultValue="1"/>
-
-    <CheckBoxPreference
-       android:key="show_time_when_running"
-       android:title="@string/show_time_when_running"
-       android:summary="@string/show_time_when_running_summary"
-       android:defaultValue="@bool/show_time_when_running"/>
-
-    <CheckBoxPreference
-       android:key="keep_timer_screen_on"
-       android:title="@string/keep_screen_on"
-       android:summary="@string/keep_screen_on_summary"
-       android:defaultValue="@bool/keep_timer_screen_on"/>
 
     <CheckBoxPreference
        android:key="high_precision_timer"

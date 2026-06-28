@@ -88,6 +88,7 @@
   <string name="spanish">Espagnol</string>
 
   <string name="settings">Réglages</string>
+  <string name="look_and_feel">Apparence</string>
   <string name="timer_screen">Écran du chronomètre</string>
   <string name="inspection_mode">Mode d\'inspection</string>
   <string name="inspection_mode_summary">Sélectionner le mode d\'inspection du timer</string>
