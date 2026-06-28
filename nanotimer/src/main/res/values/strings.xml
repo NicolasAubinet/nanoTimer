@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="app_name">Nano Timer</string>
-  <string name="app_name_copyright">&#169; 2014–2026 Nano Timer\nFree &amp; open-source (GPL v3)\ngithub.com/NicolasAubinet/nanoTimer</string>
+  <string name="app_name">Cubench</string>
+  <string name="app_formerly_name">Formerly Nano Timer</string>
+  <string name="app_name_copyright">&#169; 2014–2026 Cubench\nFree &amp; open-source (GPL v3)\ngithub.com/NicolasAubinet/cubench</string>
   <!--<string name="admob_app_id" translatable="false">ca-app-pub-8294291525564683~7155145804</string>-->
   <!--<string name="admob_app_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>-->
   <!--<string name="admob_banner_unit_id" translatable="false">ca-app-pub-8294291525564683/1182680112</string>-->
@@ -192,7 +193,7 @@
   <string name="inspection">Inspection</string>
   <string name="ready">Ready</string>
 
-  <string name="rate_message">If you like Nano Timer, please take a moment to rate it.\nThank you for your support.</string>
+  <string name="rate_message">If you like Cubench, please take a moment to rate it.\nThank you for your support.</string>
   <string name="rate">Rate</string>
   <string name="rate_now">Rate now</string>
   <string name="ask_later">Ask later</string>
@@ -214,7 +215,7 @@
   <string name="select_all">Select all</string>
   <string name="times_limit">Times limit:</string>
   <string name="no_limit">&lt;No Limit&gt;</string>
-  <string name="export_mail_subject">Nano Timer history export</string>
+  <string name="export_mail_subject">Cubench history export</string>
   <string name="export_mail_body">History export from %1$s</string>
   <string name="send_via">Send via:</string>
   <string name="no_data_to_export">Could not find any data to export</string>
@@ -300,8 +301,8 @@
 
   <string name="share_time">Share time</string>
   <string name="share_time_subject">New solve time: %1$s</string>
-  <string name="share_time_text">I just solved the %1$s cube in %2$s!\n\nScramble:\n%3$s\n\nTimed on %4$s with Nano Timer android app:\n%5$s</string>
-  <string name="share_time_steps_text">I just solved the %1$s cube in %2$s with the following steps times:\n%3$s\nScramble:\n%4$s\n\nTimed on %5$s with Nano Timer android app:\n%6$s</string>
+  <string name="share_time_text">I just solved the %1$s cube in %2$s!\n\nScramble:\n%3$s\n\nTimed on %4$s with Cubench android app:\n%5$s</string>
+  <string name="share_time_steps_text">I just solved the %1$s cube in %2$s with the following steps times:\n%3$s\nScramble:\n%4$s\n\nTimed on %5$s with Cubench android app:\n%6$s</string>
   <string name="comment">Comment</string>
   <string name="comment_label">Comment</string>
 
@@ -325,6 +326,7 @@
     <![CDATA[<html><body>
     <font color=\"white\">
     <u><b>v1.4.0 <i>(New version)</i></b></u><br/>
+    <b>Nano Timer is now Cubench! (Same app, new name.)</b><br/>
     <b>New features</b>
     <ul>
       <li>Scramble visualizer for all puzzles</li>
@@ -381,7 +383,7 @@
     <u><b>v1.3.9</b></u>
     <ul>
       <li>Unlock all features for everyone (no more paying Pro version)</li>
-      <li>Nano Timer is now free and open source!</li>
+      <li>Cubench is now free and open source!</li>
     </ul>
     <u><b>v1.3.8</b></u>
     <ul>

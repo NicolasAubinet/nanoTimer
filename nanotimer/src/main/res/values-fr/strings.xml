@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="app_name">Nano Timer</string>
-  <string name="app_name_copyright">&#169; 2014–2026 Nano Timer\nGratuit et open-source (GPL v3)\ngithub.com/NicolasAubinet/nanoTimer</string>
+  <string name="app_name">Cubench</string>
+  <string name="app_formerly_name">Anciennement Nano Timer</string>
+  <string name="app_name_copyright">&#169; 2014–2026 Cubench\nGratuit et open-source (GPL v3)\ngithub.com/NicolasAubinet/cubench</string>
   <string name="app_description">Chronomètre de Rubik\'s Cube pour Android</string>
   <string name="app_license">Cette application utilise les librairies drag-sort-listview, MPAndroidChart et android-wheel sous license Apache 2.0. Les diagrammes de mélange sont générés avec cubing.js et scramble-display (GPL-3.0) et three.js (MIT).</string>
   <string name="feedback_message">Si vous rencontrez un bug ou si vous avez des suggestions ou commentaires, n\'hésitez pas à envoyer un mail à l\'adresse ci-dessous.</string>
@@ -188,7 +189,7 @@
   <string name="inspection">Inspection</string>
   <string name="ready">Prêt</string>
 
-  <string name="rate_message">Si vous aimez Nano Timer, n\'hésitez pas à laisser une évaluation.\nMerci pour votre soutien!</string>
+  <string name="rate_message">Si vous aimez Cubench, n\'hésitez pas à laisser une évaluation.\nMerci pour votre soutien!</string>
   <string name="rate">Évaluer</string>
   <string name="rate_now">Évaluer</string>
   <string name="ask_later">Plus tard</string>
@@ -210,7 +211,7 @@
   <string name="select_all">Tout sélectionner</string>
   <string name="times_limit">Nombre de temps max:</string>
   <string name="no_limit">&lt;Pas de limite&gt;</string>
-  <string name="export_mail_subject">Exportation d\'historique Nano Timer</string>
+  <string name="export_mail_subject">Exportation d\'historique Cubench</string>
   <string name="export_mail_body">Exportation d\'historique à partir de %1$s</string>
   <string name="send_via">Envoyer via:</string>
   <string name="no_data_to_export">Pas de données à exporter</string>
@@ -296,8 +297,8 @@
 
   <string name="share_time">Partager le temps</string>
   <string name="share_time_subject">Nouveau temps de résolution: %1$s</string>
-  <string name="share_time_text">Je viens de résoudre le cube %1$s en %2$s!\n\nMélange:\n%3$s\n\nChronométré le %4$s avec l\'application android Nano Timer:\n%5$s</string>
-  <string name="share_time_steps_text">Je viens de résoudre le cube %1$s en %2$s avec les temps d\'étapes suivants:\n%3$s\nMélange:\n%4$s\n\nChonométré le %5$s avec l\'application android Nano Timer:\n%6$s</string>
+  <string name="share_time_text">Je viens de résoudre le cube %1$s en %2$s!\n\nMélange:\n%3$s\n\nChronométré le %4$s avec l\'application android Cubench:\n%5$s</string>
+  <string name="share_time_steps_text">Je viens de résoudre le cube %1$s en %2$s avec les temps d\'étapes suivants:\n%3$s\nMélange:\n%4$s\n\nChonométré le %5$s avec l\'application android Cubench:\n%6$s</string>
   <string name="comment">Commenter</string>
   <string name="comment_label">Commentaire</string>
 
@@ -321,6 +322,7 @@
     <![CDATA[<html><body>
     <font color=\"white\">
     <u><b>v1.4.0 <i>(Nouvelle version)</i></b></u><br/>
+    <b>Nano Timer s\'appelle désormais Cubench ! (Même application, nouveau nom.)</b><br/>
     <b>Nouveautés</b>
     <ul>
       <li>Visualiseur de mélanges pour tous les casse-têtes</li>
@@ -377,7 +379,7 @@
     <u><b>v1.3.9</b></u>
     <ul>
       <li>Déblocage de toutes les fonctionnalités pour tout le monde (plus de version Pro payante)</li>
-      <li>Nano Timer est maintenant libre et open source!</li>
+      <li>Cubench est maintenant libre et open source!</li>
     </ul>
     <u><b>v1.3.8</b></u>
     <ul>

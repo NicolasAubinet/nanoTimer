@@ -4,9 +4,11 @@ Guidance for working in this repository.
 
 ## What this is
 
-NanoTimer is an Android speedcubing timer app. It generates scrambles for many
-puzzle types, records solve times, and shows statistics, averages, graphs and
-sessions. Published on Google Play as `com.cube.nanotimer` (GPL v3).
+Cubench (formerly "Nano Timer") is an Android speedcubing timer app. It generates
+scrambles for many puzzle types, records solve times, and shows statistics,
+averages, graphs and sessions. Published on Google Play as `com.cube.nanotimer`
+(GPL v3) — the display name is "Cubench" but the package/module name stays
+`nanotimer` (permanent Play Store identity).
 
 - Language: **Java** (source/target Java 17). No Kotlin.
 - Build: **Gradle** (Android Gradle Plugin 8.13), multi-module.

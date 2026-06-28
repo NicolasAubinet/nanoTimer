@@ -1,7 +1,7 @@
 ﻿Speedcubing timer app to keep track of your times and averages everywhere
 
 
-Nano Timer is a Rubik's Cube timer app developed for speedcubers.  
+Cubench (formerly Nano Timer) is a Rubik's Cube timer app developed for speedcubers.
 Get this timer on your device to solve cubes anywhere and anytime while keeping track of your progression, your averages, your best times, and a lot more.  
 <br/>
 Features:
@@ -16,4 +16,4 @@ Features:
 • Keep track of your averages, your best times, and your best averages  
 <br/>
 All of this in an easy to use and good-looking timer.  
-Give a new breath to your Rubik's cube solves and start improving like never before with Nano Timer!
+Give a new breath to your Rubik's cube solves and start improving like never before with Cubench!
