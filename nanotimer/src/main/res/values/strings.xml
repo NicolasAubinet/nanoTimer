@@ -323,7 +323,27 @@
   <string name="release_notes_features_html">
     <![CDATA[<html><body>
     <font color=\"white\">
-    <u><b>v1.3.16 <i>(New version)</i></b></u>
+    <u><b>v1.4.0 <i>(New version)</i></b></u><br/>
+    <b>New features</b>
+    <ul>
+      <li>Scramble visualizer for all puzzles</li>
+      <li>New FTO cube type, with random-state scrambles</li>
+      <li>3x3 cross solver: optimal cross solutions for any face and color-neutrality</li>
+      <li>"Add time" dialog now supports milliseconds and DNF entries</li>
+    </ul>
+    <b>Improvements</b>
+    <ul>
+      <li>UI refresh and modernization throughout the app</li>
+      <li>New app icon and banner</li>
+      <li>Colored history solve times (green = good, red = bad), with new "Look and feel" settings</li>
+      <li>Blind types now show best/worst times with just 2 successes in the last 12 solves (was 5)</li>
+    </ul>
+    <b>Fixes</b>
+    <ul>
+      <li>Fixed a crash when opening Solve Types from settings</li>
+      <li>Fixed milliseconds being cut off when exporting times</li>
+    </ul>
+    <u><b>v1.3.16</b></u>
     <ul>
       <li>Allow to add steps to "blind" solve types</li>
       <li>Upgraded various libs and dependencies</li>
