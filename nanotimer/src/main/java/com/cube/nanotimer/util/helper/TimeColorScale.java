@@ -10,10 +10,10 @@ import java.util.List;
 
 /**
  * Maps a solve time to a color on the green→white→red gradient (fast→median→slow).
- * Owns the palette and the current anchors; the fast/slow ends are taken at percentiles
- * (not the raw min/max) so a single lucky or disastrous solve can't stretch the scale
- * and wash everything else toward white. Rebuild the anchors once per data load with
- * {@link #setTimes}; {@link #colorFor} is O(1) per row.
+ * The white pivot is the median (interpolated on even counts so it never lands on an end);
+ * the fast/slow ends are the 5th/95th percentiles so outliers can't stretch the scale, or
+ * the raw min/max when {@code trimOutliers} is off. Rebuild via {@link #setTimes} per data
+ * load; {@link #colorFor} is O(1) per row.
  */
 public class TimeColorScale {
 
@@ -38,8 +38,16 @@ public class TimeColorScale {
     colorDnf = context.getResources().getColor(R.color.dnf_time);
   }
 
-  /** Recomputes the anchors from the given times (DNFs ignored); clears them if unusable. */
+  /** Recomputes the anchors from the given times (DNFs ignored), trimming outliers via percentiles. */
   public void setTimes(List<Long> times) {
+    setTimes(times, true);
+  }
+
+  /**
+   * Recomputes the anchors (DNFs ignored); clears them if unusable. {@code trimOutliers} pulls
+   * the ends to the 5th/95th percentiles; when false the raw min/max anchor the gradient.
+   */
+  public void setTimes(List<Long> times, boolean trimOutliers) {
     hasRange = false;
     if (times == null) {
       return;
@@ -54,9 +62,16 @@ public class TimeColorScale {
       return;
     }
     Collections.sort(sorted);
-    fast = percentile(sorted, P_FAST);
-    median = percentile(sorted, 0.5f);
-    slow = percentile(sorted, P_SLOW);
+    if (trimOutliers) {
+      fast = percentile(sorted, P_FAST);
+      slow = percentile(sorted, P_SLOW);
+    } else {
+      fast = sorted.get(0);
+      slow = sorted.get(sorted.size() - 1);
+    }
+    median = median(sorted);
+    // Keep the white pivot strictly inside the gradient so neither end maps to white.
+    median = Math.max(fast, Math.min(slow, median));
     hasRange = fast < slow;
   }
 
@@ -83,6 +98,16 @@ public class TimeColorScale {
 
   private static long percentile(List<Long> sorted, float p) {
     return sorted.get(Math.round(p * (sorted.size() - 1)));
+  }
+
+  // Median of a sorted list, averaging the two middle values on even counts.
+  private static long median(List<Long> sorted) {
+    int n = sorted.size();
+    int mid = n / 2;
+    if (n % 2 == 1) {
+      return sorted.get(mid);
+    }
+    return (sorted.get(mid - 1) + sorted.get(mid)) / 2;
   }
 
   private static float clamp01(float v) {

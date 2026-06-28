@@ -668,7 +668,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
   // Gradient coloring relative to the displayed times only (each of the 12 ranked among the 12).
   private void colorSessionWithinDisplayed(List<Long> sessionTimes) {
     TimeColorScale scale = new TimeColorScale(this);
-    scale.setTimes(sessionTimes);
+    scale.setTimes(sessionTimes, false);
     colorSessionWithScale(sessionTimes, scale);
   }
 
