@@ -433,7 +433,9 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     if (timerState == TimerState.STOPPED) {
       switch (item.getItemId()) {
         case R.id.itPlusTwo:
-          if (lastSolveTime != null && !lastSolveTime.isDNF()) {
+          if (lastSolveTime == null) {
+            DialogUtils.showShortInfoMessage(this, R.string.no_solve_for_action);
+          } else if (!lastSolveTime.isDNF()) {
             boolean isPlusTwo = !lastSolveTime.isPlusTwo();
             lastSolveTime.setPlusTwo(isPlusTwo, true);
             App.INSTANCE.getService().saveTime(lastSolveTime, solveAverageCallback);
@@ -443,7 +445,9 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
           }
           break;
         case R.id.itDNF:
-          if (lastSolveTime != null && !lastSolveTime.isDNF()) {
+          if (lastSolveTime == null) {
+            DialogUtils.showShortInfoMessage(this, R.string.no_solve_for_action);
+          } else if (!lastSolveTime.isDNF()) {
             lastSolveTime.setTime(-1);
             App.INSTANCE.getService().saveTime(lastSolveTime, solveAverageCallback);
             tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(lastSolveTime.getTime()));
@@ -459,11 +463,15 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
             setSolvesCount(solvesCount - 1);
             refreshSessionFields();
             resetTimer();
+          } else {
+            DialogUtils.showShortInfoMessage(this, R.string.no_solve_for_action);
           }
           break;
         case R.id.itComment:
           if (lastSolveTime != null) {
             DialogUtils.showFragment(this, CommentSolveDialog.newInstance(lastSolveTime, null));
+          } else {
+            DialogUtils.showShortInfoMessage(this, R.string.no_solve_to_comment);
           }
           break;
         case R.id.itSessionDetails:
