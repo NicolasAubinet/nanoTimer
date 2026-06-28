@@ -39,6 +39,7 @@
   <color name="green">#FF00CC00</color>
   <color name="new_record">#FFEEDD00</color>
   <color name="warning">#FFFFAA00</color>
+  <color name="dnf_time">@color/gray600</color>
 
   <color name="gray200">#FFEEEEEE</color>
   <color name="gray400">#FFBDBDBD</color>

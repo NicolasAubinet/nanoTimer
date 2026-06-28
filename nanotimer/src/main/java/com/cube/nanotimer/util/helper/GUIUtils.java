@@ -121,21 +121,14 @@ public class GUIUtils {
     return res;
   }
 
-  public static void setSessionTimeCellText(TextView tv, long time, int timeInd, int bestInd, int worstInd, boolean blind) {
+  public static void setSessionTimeCellText(TextView tv, long time, int timeInd, int bestInd, int worstInd) {
     String strTime = FormatterService.INSTANCE.formatSolveTime(time);
-    StringBuilder sbTimes = new StringBuilder();
-    if (timeInd == bestInd) {
-      sbTimes.append("<font color='").append(tv.getContext().getResources().getColor(R.color.green)).append("'>");
-      sbTimes.append(strTime).append("</font>");
-      tv.setText(Html.fromHtml(sbTimes.toString()));
+    if (time < 0) { // DNF: always grayed out, for consistency across the app
+      setHtmlColoredTime(tv, strTime, tv.getContext().getResources().getColor(R.color.dnf_time));
+    } else if (timeInd == bestInd) {
+      setHtmlColoredTime(tv, strTime, tv.getContext().getResources().getColor(R.color.green));
     } else if (timeInd == worstInd) {
-      sbTimes.append("<font color='").append(tv.getContext().getResources().getColor(R.color.red)).append("'>");
-      sbTimes.append(strTime).append("</font>");
-      tv.setText(Html.fromHtml(sbTimes.toString()));
-    } else if (blind && time == -1) { // DNF
-      sbTimes.append("<font color='").append(tv.getContext().getResources().getColor(R.color.gray600)).append("'>");
-      sbTimes.append(strTime).append("</font>");
-      tv.setText(Html.fromHtml(sbTimes.toString()));
+      setHtmlColoredTime(tv, strTime, tv.getContext().getResources().getColor(R.color.red));
     } else {
       tv.setText(strTime);
     }
@@ -143,14 +136,21 @@ public class GUIUtils {
 
   /** Renders a session time tinted with the given color (gradient coloring modes). */
   public static void setSessionTimeCellColor(TextView tv, long time, int color) {
-    String strTime = FormatterService.INSTANCE.formatSolveTime(time);
-    String html = "<font color='" + color + "'>" + strTime + "</font>";
-    tv.setText(Html.fromHtml(html));
+    setHtmlColoredTime(tv, FormatterService.INSTANCE.formatSolveTime(time), color);
   }
 
-  /** Renders a session time with no coloring (default text color). */
+  /** Renders a session time with no coloring, except DNFs which stay grayed out for consistency. */
   public static void setSessionTimeCellPlain(TextView tv, long time) {
-    tv.setText(FormatterService.INSTANCE.formatSolveTime(time));
+    String strTime = FormatterService.INSTANCE.formatSolveTime(time);
+    if (time < 0) { // DNF: always grayed out
+      setHtmlColoredTime(tv, strTime, tv.getContext().getResources().getColor(R.color.dnf_time));
+    } else {
+      tv.setText(strTime);
+    }
+  }
+
+  private static void setHtmlColoredTime(TextView tv, String strTime, int color) {
+    tv.setText(Html.fromHtml("<font color='" + color + "'>" + strTime + "</font>"));
   }
 
   public static void setWebViewText(WebView webView, String text) {

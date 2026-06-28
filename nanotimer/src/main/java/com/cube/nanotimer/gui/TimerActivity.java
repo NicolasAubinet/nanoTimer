@@ -96,6 +96,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
   private int solvesCount; // session solves count (or history solves count if no session exists)
   private int historySolvesCount;
   private ColorStateList defaultTextColor;
+  private ColorStateList defaultTimerTextColor;
   private static final int MIN_TIMES_FOR_RECORD_NOTIFICATION = 12;
 
   private final long REFRESH_INTERVAL = 30;
@@ -165,6 +166,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     initViews();
 
     defaultTextColor = tvSolvesCount.getTextColors();
+    defaultTimerTextColor = tvTimer.getTextColors();
     resetTimer();
     setDefaultBannerText();
 
@@ -446,6 +448,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
             lastSolveTime.setPlusTwo(isPlusTwo, true);
             App.INSTANCE.getService().saveTime(lastSolveTime, solveAverageCallback);
             tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(lastSolveTime.getTime()));
+            setTimerTextColor(lastSolveTime.getTime());
             cubeSession.setLastAsPlusTwo(isPlusTwo);
             refreshSessionFields();
           }
@@ -457,6 +460,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
             lastSolveTime.setTime(-1);
             App.INSTANCE.getService().saveTime(lastSolveTime, solveAverageCallback);
             tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(lastSolveTime.getTime()));
+            setTimerTextColor(lastSolveTime.getTime());
             cubeSession.setLastAsDNF();
             refreshSessionFields();
           }
@@ -657,7 +661,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     int bestInd = cubeSession.getBestTimeInd(solveType.isBlind());
     int worstInd = cubeSession.getWorstTimeInd(solveType.isBlind());
     for (int i = 0; i < sessionTimes.size(); i++) {
-      GUIUtils.setSessionTimeCellText(getSessionTextView(i), sessionTimes.get(i), i, bestInd, worstInd, solveType.isBlind());
+      GUIUtils.setSessionTimeCellText(getSessionTextView(i), sessionTimes.get(i), i, bestInd, worstInd);
     }
   }
 
@@ -856,6 +860,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
   private void resetTimerText() {
     String defaultText = FormatterService.INSTANCE.formatSolveTime(0L);
     tvTimer.setText(defaultText);
+    setTimerTextColor(0L);
     if (solveType.hasSteps()) {
       for (int i = 0; i < Options.INSTANCE.getMaxStepsCount(); i++) {
         int rowInd = i % 4;
@@ -918,8 +923,19 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
     }
   }
 
+  // Keeps the timer text grayed out for a DNF (time == -1), matching how DNFs are
+  // shown everywhere else; any other value uses the default timer color.
+  private void setTimerTextColor(long time) {
+    if (time < 0) {
+      tvTimer.setTextColor(getResources().getColor(R.color.dnf_time));
+    } else {
+      tvTimer.setTextColor(defaultTimerTextColor);
+    }
+  }
+
   private synchronized void updateTimerText(long curTime) {
     tvTimer.setText(FormatterService.INSTANCE.formatSolveTime(curTime));
+    setTimerTextColor(curTime);
     if (solveType.hasSteps()) {
       updateStepTimeText(stepsTimes.size(),
         FormatterService.INSTANCE.formatSolveTime(System.currentTimeMillis() - stepStartTs));

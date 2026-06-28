@@ -23,7 +23,7 @@ public class TimeColorScale {
   private final int colorFast;    // green
   private final int colorSlow;    // red
   private final int colorNeutral; // white (around the median)
-  private final int colorDnf;     // gray600
+  private final int colorDnf;     // dnf_time (gray)
 
   // Gradient anchors over the loaded window; valid only when hasRange is true.
   private boolean hasRange;
@@ -35,7 +35,7 @@ public class TimeColorScale {
     colorFast = context.getResources().getColor(R.color.green);
     colorSlow = context.getResources().getColor(R.color.red);
     colorNeutral = context.getResources().getColor(R.color.white);
-    colorDnf = context.getResources().getColor(R.color.gray600);
+    colorDnf = context.getResources().getColor(R.color.dnf_time);
   }
 
   /** Recomputes the anchors from the given times (DNFs ignored); clears them if unusable. */

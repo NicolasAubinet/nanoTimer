@@ -123,6 +123,9 @@ public class HistoryDetailDialog extends NanoTimerDialogFragment {
     }
     tvDate.setText(FormatterService.INSTANCE.formatDateTime(solveTime.getTimestamp()));
     tvTime.setText(FormatterService.INSTANCE.formatSolveTime(solveTime.getTime()));
+    if (solveTime.isDNF()) {
+      tvTime.setTextColor(getResources().getColor(R.color.dnf_time));
+    }
 
     final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(v).create();
     dialog.setCanceledOnTouchOutside(true);

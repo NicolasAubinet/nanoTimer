@@ -113,7 +113,7 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
     } else {
       for (int i = 0; i < sessionTimesCount; i++) {
         TextView tv = addNewSolveTimeTextView(sessionTimesLayout);
-        GUIUtils.setSessionTimeCellText(tv, sessionTimes.get(i), i, bestInd, worstInd, solveType.isBlind());
+        GUIUtils.setSessionTimeCellText(tv, sessionTimes.get(i), i, bestInd, worstInd);
       }
       // add remaining cells to have the same cells count than the above lines
       if (sessionTimesCount > TIMES_PER_LINE && sessionTimesCount % TIMES_PER_LINE != 0) {
