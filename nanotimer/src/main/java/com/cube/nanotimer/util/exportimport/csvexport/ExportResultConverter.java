@@ -12,12 +12,30 @@ import java.util.List;
 
 public class ExportResultConverter {
 
-  private static String encodeComment(String comment) {
-    return comment.replace("\n", "\\n");
+  static String encodeComment(String comment) {
+    return comment
+      .replace("\\", "\\\\")
+      .replace("\n", "\\n")
+      .replace("\"", "\\q");
   }
 
-  private static String decodeComment(String comment) {
-    return comment.replace("\\n", "\n");
+  static String decodeComment(String comment) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < comment.length(); i++) {
+      char c = comment.charAt(i);
+      if (c == '\\' && i + 1 < comment.length()) {
+        char next = comment.charAt(++i);
+        switch (next) {
+          case 'n': sb.append('\n'); break;
+          case 'q': sb.append('"'); break;
+          case '\\': sb.append('\\'); break;
+          default: sb.append('\\').append(next); break;
+        }
+      } else {
+        sb.append(c);
+      }
+    }
+    return sb.toString();
   }
 
   public static String toCSVLine(ExportResult result) {
@@ -134,7 +152,7 @@ public class ExportResultConverter {
     return stepNames;
   }
 
-  private static List<String> getFieldsFromCSVLine(String line, int maxFieldsCount) {
+  static List<String> getFieldsFromCSVLine(String line, int maxFieldsCount) {
     final char escapeChar = '"';
     boolean inEscapedString = false;
     List<String> fields = new ArrayList<String>();

@@ -72,7 +72,7 @@ public class CSVDataReader extends AsyncTask<InputStream, Void, ImportTimesData>
 
   private ImportTimesData getImportData(InputStream inputStream) throws CSVFormatException {
     List<String> lines = readCSVFile(inputStream);
-    groupQuotedLines(lines);
+    lines = CSVLineGrouper.group(lines);
     List<ExportResult> exportResults = getExportResults(lines);
     ImportTimesData importData = new ImportTimesData(context);
     if (exportResults.size() == 0) {
@@ -137,30 +137,6 @@ public class CSVDataReader extends AsyncTask<InputStream, Void, ImportTimesData>
       errorListener.onError(context.getString(R.string.error_reading_import_file, e.getMessage()));
     }
     return lines;
-  }
-
-  private void groupQuotedLines(List<String> lines) {
-    // Group lines that are in the same quotes together (like those with Megaminx scrambles)
-    List<String> grouped = new ArrayList<String>();
-    boolean inUnendedQuotes = false;
-    boolean prevLineInUnendedQuotes = false;
-    for (String line : lines) {
-      for (char c : line.toCharArray()) {
-        if (c == '"') {
-          inUnendedQuotes = !inUnendedQuotes;
-        }
-      }
-      if (prevLineInUnendedQuotes) {
-        int index = grouped.size() - 1;
-        String l = grouped.get(index);
-        grouped.set(index, l + "\n" + line);
-      } else {
-        grouped.add(line);
-      }
-      prevLineInUnendedQuotes = inUnendedQuotes;
-    }
-    lines.clear();
-    lines.addAll(grouped);
   }
 
   private List<ExportResult> getExportResults(List<String> lines) throws CSVFormatException {
