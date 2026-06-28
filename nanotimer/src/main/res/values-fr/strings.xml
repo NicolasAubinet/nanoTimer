@@ -326,14 +326,14 @@
       <li>Visualiseur de mélanges pour tous les casse-têtes</li>
       <li>Nouveau type de casse-tête FTO, avec mélanges en état aléatoire (random-state)</li>
       <li>Solveur de croix 3x3 : solutions de croix optimales pour n\'importe quelle face et neutralité de couleur</li>
-      <li>La fenêtre "Ajouter un temps" supporte désormais les millisecondes et les DNF</li>
+      <li>La fenêtre \"Ajouter un temps\" supporte désormais les millisecondes et les DNF</li>
     </ul>
     <b>Améliorations</b>
     <ul>
       <li>Rafraîchissement et modernisation de l\'interface dans toute l\'application</li>
       <li>Nouvelle icône et bannière de l\'application</li>
-      <li>Temps de résolution colorés dans l\'historique (vert = bon, rouge = mauvais), avec de nouveaux réglages "Apparence"</li>
-      <li>Les types "blind" affichent désormais les meilleurs/pires temps dès 2 réussites sur les 12 dernières résolutions (au lieu de 5)</li>
+      <li>Temps de résolution colorés dans l\'historique (vert = bon, rouge = mauvais), avec de nouveaux réglages \"Apparence\"</li>
+      <li>Les types \"blind\" affichent désormais les meilleurs/pires temps dès 2 réussites sur les 12 dernières résolutions (au lieu de 5)</li>
     </ul>
     <b>Corrections</b>
     <ul>
