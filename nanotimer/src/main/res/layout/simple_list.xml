@@ -4,16 +4,17 @@
    android:orientation="vertical"
    android:layout_width="match_parent"
    android:layout_height="match_parent"
-   android:paddingRight="6dp"
-   android:paddingLeft="6dp"
-   android:paddingTop="3dp"
-   android:paddingBottom="3dp"
-   android:background="@color/gray850">
+   android:paddingLeft="@dimen/space_s"
+   android:paddingRight="@dimen/space_s"
+   android:paddingTop="@dimen/space_xs"
+   android:paddingBottom="@dimen/space_xs">
 
   <ListView
      android:id="@+id/lvItems"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
+     android:divider="@android:color/transparent"
+     android:dividerHeight="0dp"
      style="@style/ListView"/>
 
 </LinearLayout>

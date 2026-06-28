@@ -4,7 +4,9 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -15,7 +17,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.cube.nanotimer.R;
@@ -80,12 +81,13 @@ public class SelectorFragmentDialog extends NanoTimerDialogFragment {
 
     if (title != null) {
       TextView tvTitle = new TextView(getContext());
-//      tvTitle.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
-      tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
-      LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-      tvTitle.setPadding(20, 20, 20, 20);
-      tvTitle.setLayoutParams(lp);
       tvTitle.setText(title);
+      tvTitle.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+      tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+      tvTitle.setTypeface(tvTitle.getTypeface(), Typeface.BOLD);
+      tvTitle.setLetterSpacing(0.02f);
+      float density = getResources().getDisplayMetrics().density;
+      tvTitle.setPadding((int) (16 * density), (int) (16 * density), (int) (16 * density), (int) (8 * density));
       tvTitle.setGravity(Gravity.CENTER_VERTICAL);
       dialog.setCustomTitle(tvTitle);
     }
