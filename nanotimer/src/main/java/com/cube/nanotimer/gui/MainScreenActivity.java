@@ -48,6 +48,7 @@ import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.util.exportimport.ErrorListener;
 import com.cube.nanotimer.util.exportimport.csvimport.CSVImporter;
 import com.cube.nanotimer.util.helper.DialogUtils;
+import com.cube.nanotimer.util.helper.TimeColorScale;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.NameHolder;
@@ -91,6 +92,11 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   private MenuListAdapter menuListAdapter;
 
   private int previousLastItem = 0;
+
+  // History time color gradient (green=fast → white=median → red=slow), recomputed once
+  // per data load over the last TIME_COLOR_WINDOW solves.
+  private static final int TIME_COLOR_WINDOW = 200;
+  private TimeColorScale timeColorScale;
 
   private Toast quitMessage;
   private boolean inQuitMode;
@@ -149,6 +155,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   @Override
   protected void initViews() {
     super.initViews();
+    timeColorScale = new TimeColorScale(this);
     spCubeType = (Spinner) findViewById(R.id.spCubeType);
     cubeTypesSpinnerAdapter = new NameHolderSpinnerAdapter(this, R.id.spCubeType, cubeTypes);
     cubeTypesSpinnerAdapter.setDropDownViewResource(R.layout.spinner_item);
@@ -453,6 +460,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
 
   public void refreshHistory() {
     previousLastItem = 0;
+    refreshTimeColorAnchors();
     if (curSolveType != null) {
       refreshingHistory = true;
       App.INSTANCE.getService().getPagedHistory(curSolveType, timesSort, new DataCallback<SolveHistory>() {
@@ -480,6 +488,31 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
         }
       });
     }
+  }
+
+  /**
+   * Recomputes the gradient scale over the last TIME_COLOR_WINDOW solves. Runs once per
+   * data load so getView() coloring stays cheap while scrolling.
+   */
+  private void refreshTimeColorAnchors() {
+    if (curSolveType == null) {
+      timeColorScale.setTimes(null);
+      return;
+    }
+    App.INSTANCE.getService().getLastSolveTimes(curSolveType, TIME_COLOR_WINDOW, new DataCallback<List<Long>>() {
+      @Override
+      public void onData(final List<Long> times) {
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            timeColorScale.setTimes(times);
+            if (historyListAdapter != null) {
+              historyListAdapter.notifyDataSetChanged();
+            }
+          }
+        });
+      }
+    });
   }
 
   @Override
@@ -779,11 +812,9 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
           ((TextView) view.findViewById(R.id.tvDate)).setText(FormatterService.INSTANCE.formatDateTime(st.getTimestamp()));
           TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
           tvTime.setText(FormatterService.INSTANCE.formatSolveTime(st.getTime()));
-          // Mute DNFs with the same gray the timer screen's last-times grid uses
-          // (GUIUtils); real times stay white. Reset on every bind so recycled rows
-          // never keep a stale color.
-          tvTime.setTextColor(getContext().getResources().getColor(
-            st.isDNF() ? R.color.gray600 : R.color.white));
+          // Color the time on the green→white→red gradient (fast→median→slow); DNFs stay
+          // gray. Set on every bind so recycled rows never keep a stale color.
+          tvTime.setTextColor(timeColorScale.colorFor(st));
 
           if (st.isPb()) {
             view.findViewById(R.id.imgPb).setVisibility(View.VISIBLE);

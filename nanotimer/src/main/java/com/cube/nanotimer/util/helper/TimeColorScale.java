@@ -1,0 +1,87 @@
+package com.cube.nanotimer.util.helper;
+
+import android.content.Context;
+import com.cube.nanotimer.R;
+import com.cube.nanotimer.vo.SolveTime;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * Maps a solve time to a color on the green→white→red gradient (fast→median→slow).
+ * Owns the palette and the current anchors; the fast/slow ends are taken at percentiles
+ * (not the raw min/max) so a single lucky or disastrous solve can't stretch the scale
+ * and wash everything else toward white. Rebuild the anchors once per data load with
+ * {@link #setTimes}; {@link #colorFor} is O(1) per row.
+ */
+public class TimeColorScale {
+
+  private static final float P_FAST = 0.05f; // green anchor: 5th percentile (fast end)
+  private static final float P_SLOW = 0.95f; // red anchor: 95th percentile (slow end)
+
+  private final int colorFast;    // green
+  private final int colorSlow;    // red
+  private final int colorNeutral; // white (around the median)
+  private final int colorDnf;     // gray600
+
+  // Gradient anchors over the loaded window; valid only when hasRange is true.
+  private boolean hasRange;
+  private long fast;   // fast (green) end
+  private long median; // neutral (white) pivot
+  private long slow;   // slow (red) end
+
+  public TimeColorScale(Context context) {
+    colorFast = context.getResources().getColor(R.color.green);
+    colorSlow = context.getResources().getColor(R.color.red);
+    colorNeutral = context.getResources().getColor(R.color.white);
+    colorDnf = context.getResources().getColor(R.color.gray600);
+  }
+
+  /** Recomputes the anchors from the given times (DNFs ignored); clears them if unusable. */
+  public void setTimes(List<Long> times) {
+    hasRange = false;
+    if (times == null) {
+      return;
+    }
+    List<Long> sorted = new ArrayList<>(times.size());
+    for (Long time : times) {
+      if (time != null && time >= 0) { // skip DNFs
+        sorted.add(time);
+      }
+    }
+    if (sorted.size() < 2) {
+      return;
+    }
+    Collections.sort(sorted);
+    fast = percentile(sorted, P_FAST);
+    median = percentile(sorted, 0.5f);
+    slow = percentile(sorted, P_SLOW);
+    hasRange = fast < slow;
+  }
+
+  /** Color for a solve: green near the fast end, white around the median, red near the slow end. */
+  public int colorFor(SolveTime st) {
+    if (st.isDNF()) {
+      return colorDnf;
+    }
+    if (!hasRange) {
+      return colorNeutral;
+    }
+    long time = st.getTime();
+    if (time <= median) {
+      float p = (median == fast) ? 1f : (float) (time - fast) / (median - fast);
+      return GUIUtils.getColorCodeBetween(colorFast, colorNeutral, clamp01(p));
+    }
+    float p = (slow == median) ? 1f : (float) (time - median) / (slow - median);
+    return GUIUtils.getColorCodeBetween(colorNeutral, colorSlow, clamp01(p));
+  }
+
+  private static long percentile(List<Long> sorted, float p) {
+    return sorted.get(Math.round(p * (sorted.size() - 1)));
+  }
+
+  private static float clamp01(float v) {
+    return Math.max(0f, Math.min(1f, v));
+  }
+}

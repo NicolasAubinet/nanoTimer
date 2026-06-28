@@ -675,6 +675,18 @@ public class ServiceProviderImpl implements ServiceProvider {
     return getSessionTimes(solveType, null, null, SESSION_TIMES_COUNT);
   }
 
+  /**
+   * Returns the last solve times for a solve type, across all sessions.
+   * The most recent times come first; DNFs are kept (stored as negative values).
+   * @param solveType the solve type
+   * @param count the maximum number of times to return
+   * @return the list of most recent solve times (newest first)
+   */
+  @Override
+  public List<Long> getLastSolveTimes(SolveType solveType, int count) {
+    return getSessionTimes(solveType, 0L, null, count);
+  }
+
   public List<Long> getSessionTimes(SolveType solveType, Long from, Long to, Integer limit) {
     if (from == null) {
       from = getSessionStart(solveType);

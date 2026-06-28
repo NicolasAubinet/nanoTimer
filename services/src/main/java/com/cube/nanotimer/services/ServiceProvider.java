@@ -29,6 +29,7 @@ public interface ServiceProvider {
   void deleteHistory();
   void deleteHistory(SolveType solveType);
   List<Long> getSessionTimes(SolveType solveType);
+  List<Long> getLastSolveTimes(SolveType solveType, int count);
   void startNewSession(SolveType solveType, long startTs);
   long getSessionStart(SolveType solveType);
   void saveSolveTypesOrder(List<SolveType> solveTypes);
