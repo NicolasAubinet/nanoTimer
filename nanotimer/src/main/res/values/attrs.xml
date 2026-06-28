@@ -10,5 +10,6 @@
     <attr name="max" format="integer"/>
     <attr name="defaultVal" format="integer"/>
     <attr name="cyclic" format="boolean"/>
+    <attr name="step" format="integer"/>
   </declare-styleable>
 </resources>

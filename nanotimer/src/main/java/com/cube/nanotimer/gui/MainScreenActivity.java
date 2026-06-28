@@ -35,6 +35,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.cube.nanotimer.App;
+import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.AboutDialog;
 import com.cube.nanotimer.gui.widget.HistoryDetailDialog;
@@ -94,8 +95,8 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   private int previousLastItem = 0;
 
   // History time color gradient (green=fast → white=median → red=slow), recomputed once
-  // per data load over the last TIME_COLOR_WINDOW solves.
-  private static final int TIME_COLOR_WINDOW = 200;
+  // per data load over the last N solves (N = Options.getColorSampleSize()). Disabled
+  // (and the scale left neutral) when Options.isColorHistoryTimes() is off.
   private TimeColorScale timeColorScale;
 
   private Toast quitMessage;
@@ -491,15 +492,16 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   }
 
   /**
-   * Recomputes the gradient scale over the last TIME_COLOR_WINDOW solves. Runs once per
-   * data load so getView() coloring stays cheap while scrolling.
+   * Recomputes the gradient scale over the last getColorSampleSize() solves. Runs once per
+   * data load so getView() coloring stays cheap while scrolling. When history coloring is
+   * disabled the scale is left neutral, so times render in the default (uncolored) text color.
    */
   private void refreshTimeColorAnchors() {
-    if (curSolveType == null) {
+    if (curSolveType == null || !Options.INSTANCE.isColorHistoryTimes()) {
       timeColorScale.setTimes(null);
       return;
     }
-    App.INSTANCE.getService().getLastSolveTimes(curSolveType, TIME_COLOR_WINDOW, new DataCallback<List<Long>>() {
+    App.INSTANCE.getService().getLastSolveTimes(curSolveType, Options.INSTANCE.getColorSampleSize(), new DataCallback<List<Long>>() {
       @Override
       public void onData(final List<Long> times) {
         runOnUiThread(new Runnable() {

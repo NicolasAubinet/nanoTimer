@@ -109,6 +109,10 @@
   <string name="keep_screen_on_summary">Cuando el temporizador no está contando</string>
   <string name="high_precision_timer">Alto precisión temporizador</string>
   <string name="high_precision_timer_summary">Fijar milisegundo</string>
+  <string name="color_history_times">Colorear tiempos del historial</string>
+  <string name="color_history_times_summary">Teñir los tiempos de verde (rápido) a rojo (lento)</string>
+  <string name="color_sample_size">Tamaño de muestra de color</string>
+  <string name="color_sample_size_summary">Cuántas resoluciones recientes se comparan para los colores</string>
   <string name="solve_types">Métodos</string>
   <string name="edit_solve_types">Editar métodos</string>
   <string name="edit_solve_types_summary">Editar, crear y eliminar métodos</string>

@@ -19,6 +19,22 @@
        android:summary="@string/keep_screen_on_summary"
        android:defaultValue="@bool/keep_timer_screen_on"/>
 
+    <CheckBoxPreference
+       android:key="color_history_times"
+       android:title="@string/color_history_times"
+       android:summary="@string/color_history_times_summary"
+       android:defaultValue="@bool/color_history_times"/>
+
+    <com.cube.nanotimer.gui.widget.preferences.NumberEntryDialog
+       android:key="color_sample_size"
+       android:title="@string/color_sample_size"
+       android:summary="@string/color_sample_size_summary"
+       android:dependency="color_history_times"
+       custom:min="10"
+       custom:step="10"
+       android:defaultValue="@integer/color_sample_size"
+       custom:defaultVal="@integer/color_sample_size"/>
+
   </PreferenceCategory>
 
   <PreferenceCategory

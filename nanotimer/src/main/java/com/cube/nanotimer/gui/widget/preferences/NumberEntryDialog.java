@@ -21,6 +21,7 @@ public class NumberEntryDialog extends DialogPreference {
   private int min = 0;
   private int max = 99999;
   private int defaultValue = 0;
+  private int step = 1;
 
   public NumberEntryDialog(Context context, AttributeSet attrs) {
     super(context, attrs);
@@ -33,6 +34,9 @@ public class NumberEntryDialog extends DialogPreference {
     }
     if (a.hasValue(R.styleable.NumberLimit_defaultVal)) {
       defaultValue = a.getInt(R.styleable.NumberLimit_defaultVal, defaultValue);
+    }
+    if (a.hasValue(R.styleable.NumberLimit_step)) {
+      step = a.getInt(R.styleable.NumberLimit_step, step);
     }
   }
 
@@ -55,7 +59,7 @@ public class NumberEntryDialog extends DialogPreference {
       public void onClick(View view) {
         int val = getValue();
         if (val < max) {
-          tfValue.setText(String.valueOf(val + 1));
+          tfValue.setText(String.valueOf(Math.min(val + step, max)));
         }
       }
     });
@@ -65,8 +69,8 @@ public class NumberEntryDialog extends DialogPreference {
       @Override
       public void onClick(View view) {
         int val = getValue();
-        if (val >= (min + 1)) {
-          tfValue.setText(String.valueOf(val - 1));
+        if (val > min) {
+          tfValue.setText(String.valueOf(Math.max(val - step, min)));
         }
       }
     });
