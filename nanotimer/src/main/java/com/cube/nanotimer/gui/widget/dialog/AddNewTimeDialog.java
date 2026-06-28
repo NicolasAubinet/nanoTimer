@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -111,6 +112,9 @@ public class AddNewTimeDialog extends ConfirmDialog {
     tfSeconds.addTextChangedListener(new OnNumericFieldKeyListener(tfHundreds));
     tfHundreds.addTextChangedListener(new OnNumericFieldKeyListener(null));
 
+    tfSeconds.setOnKeyListener(new OnBackspaceToPreviousFieldListener(tfMinutes));
+    tfHundreds.setOnKeyListener(new OnBackspaceToPreviousFieldListener(tfSeconds));
+
     // The whole DNF row is tappable; dim the time fields while DNF is on since they are ignored.
     LinearLayout dnfRow = view.findViewById(R.id.llDNFRow);
     dnfRow.setOnClickListener(new View.OnClickListener() {
@@ -193,6 +197,33 @@ public class AddNewTimeDialog extends ConfirmDialog {
           next.requestFocus();
         }
       }
+    }
+  }
+
+  // When backspacing at the start of a field, jump back to the previous field and erase there,
+  // so that holding/spamming backspace from the last field clears everything.
+  class OnBackspaceToPreviousFieldListener implements View.OnKeyListener {
+    private EditText previous;
+
+    public OnBackspaceToPreviousFieldListener(EditText previous) {
+      this.previous = previous;
+    }
+
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+      if (keyCode == KeyEvent.KEYCODE_DEL && event.getAction() == KeyEvent.ACTION_DOWN && previous != null) {
+        EditText current = (EditText) v;
+        if (current.getSelectionStart() == 0 && current.getSelectionEnd() == 0) {
+          previous.requestFocus();
+          Editable prevText = previous.getText();
+          if (prevText.length() > 0) {
+            prevText.delete(prevText.length() - 1, prevText.length());
+          }
+          previous.setSelection(previous.getText().length());
+          return true;
+        }
+      }
+      return false;
     }
   }
 
