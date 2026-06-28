@@ -3,7 +3,9 @@ package com.cube.nanotimer.gui;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -27,6 +29,7 @@ import com.cube.nanotimer.vo.FrequencyData;
 import com.cube.nanotimer.vo.SolveHistory;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
+import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -35,6 +38,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -147,10 +151,18 @@ public class GraphActivity extends NanoTimerActivity {
     chart = (LineChart) findViewById(R.id.chart);
     chart.getDescription().setEnabled(false);
     chart.getLegend().setEnabled(true);
-    chart.setBackgroundColor(getResourceColor(R.color.graybg));
+    chart.setBackgroundColor(getResourceColor(R.color.mainscreen_top_card)); // blend into the surface card (G3)
     chart.setDrawGridBackground(false);
     chart.setNoDataText("");
     chart.setExtraTopOffset(5f); // fix X-labels being cut at the top
+
+    // G4: styled empty state — muted, slightly larger "no data" text instead of bare default.
+    chart.setNoDataTextColor(getResourceColor(R.color.secondary_text));
+    Paint noDataPaint = chart.getPaint(Chart.PAINT_INFO);
+    if (noDataPaint != null) {
+      noDataPaint.setTextSize(TypedValue.applyDimension(
+         TypedValue.COMPLEX_UNIT_SP, 16, getResources().getDisplayMetrics()));
+    }
 
     ValueFormatter xValueFormatter = new ValueFormatter() {
       @Override
@@ -168,16 +180,22 @@ public class GraphActivity extends NanoTimerActivity {
       }
     };
 
+    // G3: soften axis presentation — drop hard axis lines, keep only a faint Y grid.
     XAxis xAxis = chart.getXAxis();
     xAxis.setPosition(XAxis.XAxisPosition.TOP);
     xAxis.setSpaceMin(1);
     xAxis.setTextColor(getResourceColor(R.color.white));
     xAxis.setTextSize(12);
+    xAxis.setDrawAxisLine(false);
+    xAxis.setDrawGridLines(false);
     xAxis.setValueFormatter(xValueFormatter);
 
     YAxis yAxis = chart.getAxisLeft();
     yAxis.setTextColor(getResourceColor(R.color.white));
     yAxis.setTextSize(12);
+    yAxis.setDrawAxisLine(false);
+    yAxis.setGridColor(getResourceColor(R.color.gray600));
+    yAxis.setGridLineWidth(0.5f);
     yAxis.setValueFormatter(yValueFormatter);
 
     chart.getAxisRight().setEnabled(false);
@@ -318,7 +336,7 @@ public class GraphActivity extends NanoTimerActivity {
   }
 
   private int getResourceColor(int colorRes) {
-    return getResources().getColor(colorRes);
+    return ContextCompat.getColor(this, colorRes);
   }
 
   private Period getSelectedPeriod() {

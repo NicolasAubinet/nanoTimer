@@ -1,73 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
    android:orientation="vertical"
    android:fitsSystemWindows="true"
+   android:background="@color/graybg"
    android:layout_width="match_parent"
    android:layout_height="match_parent">
 
-  <RelativeLayout
+  <!-- G1: cube/solve-type header + controls in one compact rounded filter card. -->
+  <androidx.cardview.widget.CardView
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
-     android:layout_margin="2dp"
-     android:paddingLeft="5dp"
-     android:paddingRight="5dp">
+     android:layout_marginTop="@dimen/space_xs"
+     android:layout_marginBottom="@dimen/space_xs"
+     android:layout_marginLeft="@dimen/space_m"
+     android:layout_marginRight="@dimen/space_m"
+     app:cardBackgroundColor="@color/mainscreen_top_card"
+     app:cardElevation="@dimen/mainscreen_card_elevation"
+     app:cardCornerRadius="@dimen/card_corner">
 
-    <TextView
-       android:id="@+id/tvCubeType"
-       android:layout_width="wrap_content"
+    <LinearLayout
+       android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_alignParentStart="true"
-       android:layout_centerVertical="true"
-       android:textSize="18sp"/>
+       android:orientation="vertical"
+       android:paddingLeft="@dimen/space_m"
+       android:paddingRight="@dimen/space_m"
+       android:paddingTop="@dimen/space_s"
+       android:paddingBottom="@dimen/space_s">
 
-    <TextView
-       android:id="@+id/tvSolveType"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_toEndOf="@+id/tvCubeType"
-       android:layout_toStartOf="@+id/cbSmooth"
-       android:layout_marginStart="10dp"
-       android:layout_centerVertical="true"
-       android:maxLines="1"
-       android:textSize="18sp"/>
+      <LinearLayout
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:orientation="horizontal"
+         android:gravity="center_vertical">
 
-    <CheckBox
-       android:id="@+id/cbSmooth"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_toStartOf="@+id/spPeriod"
-       android:layout_marginEnd="10dp"
-       android:text="@string/smooth"
-       android:textSize="18sp"
-       android:layout_centerVertical="true"/>
+        <TextView
+           android:id="@+id/tvCubeType"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:textColor="@color/white"
+           android:textStyle="bold"
+           style="@style/SimpleTextField"/>
 
-    <Spinner
-       android:id="@+id/spPeriod"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_toStartOf="@+id/spGraphType"
-       android:layout_marginStart="3dp"
-       android:layout_marginEnd="6dp"
-       android:layout_centerVertical="true"/>
+        <TextView
+           android:id="@+id/tvSolveType"
+           android:layout_width="0dp"
+           android:layout_height="wrap_content"
+           android:layout_weight="1"
+           android:layout_marginStart="@dimen/space_s"
+           android:layout_marginEnd="@dimen/space_s"
+           android:textColor="@color/secondary_text"
+           android:maxLines="1"
+           android:ellipsize="end"
+           style="@style/SmallTextField"/>
 
-    <Spinner
-       android:id="@+id/spGraphType"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_alignParentEnd="true"
-       android:layout_centerVertical="true"/>
+        <CheckBox
+           android:id="@+id/cbSmooth"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="@string/smooth"
+           android:textColor="@color/secondary_text"
+           android:textSize="14sp"/>
 
-  </RelativeLayout>
+      </LinearLayout>
 
-  <LinearLayout
+      <LinearLayout
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:orientation="horizontal"
+         android:layout_marginTop="@dimen/space_xs"
+         android:baselineAligned="false">
+
+        <Spinner
+           android:id="@+id/spPeriod"
+           android:layout_width="0dp"
+           android:layout_weight="1"
+           android:gravity="start"
+           style="@style/CustomSpinner"/>
+
+        <Spinner
+           android:id="@+id/spGraphType"
+           android:layout_width="0dp"
+           android:layout_weight="1"
+           android:gravity="start"
+           style="@style/CustomSpinner"/>
+
+      </LinearLayout>
+
+    </LinearLayout>
+
+  </androidx.cardview.widget.CardView>
+
+  <!-- G3: chart sits on a rounded surface card (G2: the old bright iceblue divider is gone). -->
+  <androidx.cardview.widget.CardView
      android:layout_width="match_parent"
-     android:layout_height="3dp"
-     android:background="@color/iceblue"/>
+     android:layout_height="0dp"
+     android:layout_weight="1"
+     android:layout_marginTop="@dimen/space_xs"
+     android:layout_marginBottom="@dimen/space_s"
+     android:layout_marginLeft="@dimen/space_m"
+     android:layout_marginRight="@dimen/space_m"
+     app:cardBackgroundColor="@color/mainscreen_top_card"
+     app:cardElevation="@dimen/mainscreen_card_elevation"
+     app:cardCornerRadius="@dimen/card_corner">
 
-  <com.github.mikephil.charting.charts.LineChart
-     android:id="@+id/chart"
-     android:layout_width="match_parent"
-     android:layout_height="match_parent"/>
+    <com.github.mikephil.charting.charts.LineChart
+       android:id="@+id/chart"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:padding="@dimen/space_s"/>
+
+  </androidx.cardview.widget.CardView>
 
 </LinearLayout>
