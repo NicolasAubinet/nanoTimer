@@ -126,7 +126,7 @@
   <string name="clock_notation">Notación de Clock</string>
   <string name="clock_notation_summary">Elegir sistema de notación de Clock</string>
   <string name="use_modern_scrambles">Utilizar mezclas aleatorias</string>
-  <string name="use_modern_scrambles_summary">Utiliza mezclas aleatorias nuevas</string>
+  <string name="use_modern_scrambles_summary">Usa mezclas de alta calidad para los puzzles compatibles (recomendado).</string>
   <string name="scrambles_quality">Calidad de mezclas</string>
   <string name="scrambles_quality_summary">Selecciona la calidad de las mezclas</string>
   <string name="normal_quality">Normal</string>

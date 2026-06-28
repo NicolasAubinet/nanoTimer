@@ -130,7 +130,7 @@
   <string name="clock_notation">Clock notation</string>
   <string name="clock_notation_summary">Choose the Clock notation system</string>
   <string name="use_modern_scrambles">Use random-state scrambles</string>
-  <string name="use_modern_scrambles_summary">Use new \"random-state\" scrambles</string>
+  <string name="use_modern_scrambles_summary">Use high-quality scrambles for supported puzzles (recommended).</string>
   <string name="scrambles_quality">Scrambles quality</string>
   <string name="scrambles_quality_summary">Select scrambles quality</string>
   <string name="normal_quality">Normal</string>

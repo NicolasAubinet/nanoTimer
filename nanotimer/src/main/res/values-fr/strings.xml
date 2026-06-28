@@ -126,7 +126,7 @@
   <string name="clock_notation">Notation Clock</string>
   <string name="clock_notation_summary">Choisissez le système de notation pour le Clock</string>
   <string name="use_modern_scrambles">Utiliser les mélanges d\'état aléatoire</string>
-  <string name="use_modern_scrambles_summary">Utiliser les nouveaux mélanges à état aléatoire</string>
+  <string name="use_modern_scrambles_summary">Utiliser des mélanges de haute qualité pour les cubes pris en charge (recommandé).</string>
   <string name="scrambles_quality">Qualité des mélanges</string>
   <string name="scrambles_quality_summary">Sélectionner la qualité des mélanges</string>
   <string name="normal_quality">Normale</string>
