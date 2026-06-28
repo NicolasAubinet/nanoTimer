@@ -106,15 +106,18 @@ public class FontFitTextView extends AppCompatTextView {
   }
 
   @Override
-  protected void onTextChanged(final CharSequence text, final int start, final int before, final int after) {
-    refitText(text.toString(), getWidth());
+  protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+    int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+    if (widthMode != MeasureSpec.UNSPECIFIED && widthSize > 0) {
+      refitText(getText().toString(), widthSize);
+    }
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
   }
 
   @Override
-  protected void onSizeChanged (int w, int h, int oldw, int oldh) {
-    if (w != oldw) {
-      refitText(getText().toString(), w);
-    }
+  protected void onTextChanged(final CharSequence text, final int start, final int before, final int after) {
+    requestLayout();
   }
 
   @Override
