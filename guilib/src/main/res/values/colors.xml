@@ -22,8 +22,8 @@
   <!--<color name="color_primary">#424242</color>-->
   <!--<color name="color_primary_dark">#222222</color>-->
   <color name="color_accent">@color/lightblue</color>
-  <color name="color_primary">#006599</color>
-  <color name="color_primary_dark">#005080</color>
+  <color name="color_primary">@color/darkblue</color>
+  <color name="color_primary_dark">#2A363E</color>
   <!--<color name="color_primary">#515151</color>-->
   <!--<color name="color_primary_dark">#414141</color>-->
   <color name="spinner_background">#505050</color>
