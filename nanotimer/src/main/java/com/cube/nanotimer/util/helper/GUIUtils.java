@@ -141,6 +141,18 @@ public class GUIUtils {
     }
   }
 
+  /** Renders a session time tinted with the given color (gradient coloring modes). */
+  public static void setSessionTimeCellColor(TextView tv, long time, int color) {
+    String strTime = FormatterService.INSTANCE.formatSolveTime(time);
+    String html = "<font color='" + color + "'>" + strTime + "</font>";
+    tv.setText(Html.fromHtml(html));
+  }
+
+  /** Renders a session time with no coloring (default text color). */
+  public static void setSessionTimeCellPlain(TextView tv, long time) {
+    tv.setText(FormatterService.INSTANCE.formatSolveTime(time));
+  }
+
   public static void setWebViewText(WebView webView, String text) {
     WebSettings settings = webView.getSettings();
     settings.setDefaultTextEncodingName("utf-8");

@@ -62,13 +62,17 @@ public class TimeColorScale {
 
   /** Color for a solve: green near the fast end, white around the median, red near the slow end. */
   public int colorFor(SolveTime st) {
-    if (st.isDNF()) {
+    return colorFor(st.getTime(), st.isDNF());
+  }
+
+  /** Color for a raw time; DNFs (dnf == true, or a negative time) render gray. */
+  public int colorFor(long time, boolean dnf) {
+    if (dnf || time < 0) {
       return colorDnf;
     }
     if (!hasRange) {
       return colorNeutral;
     }
-    long time = st.getTime();
     if (time <= median) {
       float p = (median == fast) ? 1f : (float) (time - fast) / (median - fast);
       return GUIUtils.getColorCodeBetween(colorFast, colorNeutral, clamp01(p));
