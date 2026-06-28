@@ -175,6 +175,7 @@
   <string name="scrambles_already_generating">Ya se están generando mezclas.</string>
   <string name="scrambles_count_not_valid">La cuenta de mezclas no es válida.</string>
   <string name="scrambles_count">Cuenta de mezclas:</string>
+  <string name="scrambles_count_label">Cuenta de mezclas</string>
   <string name="generate">Generar</string>
   <string name="stop_generation">Parar generación</string>
   <string name="preparing_generation">Preparando generación&#8230;</string>

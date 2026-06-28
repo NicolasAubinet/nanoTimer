@@ -179,6 +179,7 @@
   <string name="scrambles_already_generating">Scrambles are already being generated.</string>
   <string name="scrambles_count_not_valid">The scrambles count is not valid.</string>
   <string name="scrambles_count">Scrambles count:</string>
+  <string name="scrambles_count_label">Scrambles count</string>
   <string name="generate">Generate</string>
   <string name="stop_generation">Stop generation</string>
   <string name="preparing_generation">Preparing generation&#8230;</string>
