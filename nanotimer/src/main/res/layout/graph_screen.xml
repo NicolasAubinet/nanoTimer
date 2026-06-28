@@ -23,70 +23,55 @@
     <LinearLayout
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:orientation="vertical"
+       android:orientation="horizontal"
+       android:gravity="center_vertical"
+       android:baselineAligned="false"
        android:paddingLeft="@dimen/space_m"
        android:paddingRight="@dimen/space_m"
        android:paddingTop="@dimen/space_s"
        android:paddingBottom="@dimen/space_s">
 
-      <LinearLayout
-         android:layout_width="match_parent"
+      <TextView
+         android:id="@+id/tvCubeType"
+         android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:orientation="horizontal"
-         android:gravity="center_vertical">
+         android:textColor="@color/white"
+         android:textStyle="bold"
+         style="@style/SimpleTextField"/>
 
-        <TextView
-           android:id="@+id/tvCubeType"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:textColor="@color/white"
-           android:textStyle="bold"
-           style="@style/SimpleTextField"/>
-
-        <TextView
-           android:id="@+id/tvSolveType"
-           android:layout_width="0dp"
-           android:layout_height="wrap_content"
-           android:layout_weight="1"
-           android:layout_marginStart="@dimen/space_s"
-           android:layout_marginEnd="@dimen/space_s"
-           android:textColor="@color/secondary_text"
-           android:maxLines="1"
-           android:ellipsize="end"
-           style="@style/SmallTextField"/>
-
-        <CheckBox
-           android:id="@+id/cbSmooth"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:text="@string/smooth"
-           android:textColor="@color/secondary_text"
-           android:textSize="14sp"/>
-
-      </LinearLayout>
-
-      <LinearLayout
-         android:layout_width="match_parent"
+      <TextView
+         android:id="@+id/tvSolveType"
+         android:layout_width="0dp"
          android:layout_height="wrap_content"
-         android:orientation="horizontal"
-         android:layout_marginTop="@dimen/space_xs"
-         android:baselineAligned="false">
+         android:layout_weight="1"
+         android:layout_marginStart="@dimen/space_s"
+         android:layout_marginEnd="@dimen/space_s"
+         android:textColor="@color/secondary_text"
+         android:maxLines="1"
+         android:ellipsize="end"
+         style="@style/SmallTextField"/>
 
-        <Spinner
-           android:id="@+id/spPeriod"
-           android:layout_width="0dp"
-           android:layout_weight="1"
-           android:gravity="start"
-           style="@style/CustomSpinner"/>
+      <CheckBox
+         android:id="@+id/cbSmooth"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="@string/smooth"
+         android:textColor="@color/secondary_text"
+         android:textSize="14sp"/>
 
-        <Spinner
-           android:id="@+id/spGraphType"
-           android:layout_width="0dp"
-           android:layout_weight="1"
-           android:gravity="start"
-           style="@style/CustomSpinner"/>
+      <Spinner
+         android:id="@+id/spPeriod"
+         android:layout_width="wrap_content"
+         android:layout_marginStart="@dimen/space_s"
+         android:gravity="center"
+         style="@style/CustomSpinner"/>
 
-      </LinearLayout>
+      <Spinner
+         android:id="@+id/spGraphType"
+         android:layout_width="wrap_content"
+         android:layout_marginStart="@dimen/space_xs"
+         android:gravity="center"
+         style="@style/CustomSpinner"/>
 
     </LinearLayout>
 
