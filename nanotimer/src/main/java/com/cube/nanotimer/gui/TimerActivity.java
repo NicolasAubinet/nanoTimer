@@ -1,5 +1,6 @@
 package com.cube.nanotimer.gui;
 
+import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
@@ -9,6 +10,7 @@ import android.os.Handler;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.core.view.MenuItemCompat;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -392,8 +394,12 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener {
   }
 
   @Override
+  @SuppressLint("RestrictedApi")
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.timer_menu, menu);
+    if (menu instanceof MenuBuilder) {
+      ((MenuBuilder) menu).setOptionalIconsVisible(true);
+    }
     for (int i = 0; i < menu.size(); i++) {
       menu.getItem(i).setVisible(showMenu);
     }

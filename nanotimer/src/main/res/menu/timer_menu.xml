@@ -9,30 +9,39 @@
     app:showAsAction="ifRoom"/>
 
   <item android:id="@+id/itPlusTwo"
-    android:title="@string/plus_two"/>
+    android:icon="@drawable/ic_menu_plus_two"
+    android:title="@string/add_penalty"/>
 
   <item android:id="@+id/itDNF"
+    android:icon="@drawable/ic_menu_dnf"
     android:title="@string/DNF"/>
 
   <item android:id="@+id/itDelete"
+    android:icon="@drawable/ic_menu_delete"
     android:title="@string/delete"/>
 
   <item android:id="@+id/itComment"
+    android:icon="@drawable/ic_menu_comment"
     android:title="@string/comment"/>
 
   <item android:id="@+id/itSessionDetails"
+     android:icon="@drawable/ic_menu_session_details"
      android:title="@string/session_details"/>
 
   <item android:id="@+id/itNewSession"
+    android:icon="@drawable/ic_menu_new_session"
     android:title="@string/new_session"/>
 
   <item android:id="@+id/itAddTime"
+     android:icon="@drawable/ic_menu_add_time"
      android:title="@string/add_time"/>
 
   <item android:id="@+id/itShareTime"
+     android:icon="@drawable/ic_menu_share"
      android:title="@string/share_time"/>
 
   <item android:id="@+id/itCrossSolver"
+     android:icon="@drawable/ic_menu_cross_solver"
      android:title="@string/cross_solver"/>
 
 </menu>

@@ -57,6 +57,7 @@
   <string name="mean_of_three">Mean of 3:</string>
 
   <string name="plus_two">+2</string>
+  <string name="add_penalty">Add penalty</string>
   <string name="DNF">DNF</string>
   <string name="delete">Delete</string>
   <string name="session_details">Session details</string>
