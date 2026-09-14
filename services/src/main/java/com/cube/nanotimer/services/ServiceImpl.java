@@ -4,7 +4,6 @@ import android.content.Context;
 import com.cube.nanotimer.services.db.DBHelper;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.coach.CoachPayload;
-import com.cube.nanotimer.coach.CoachPlan;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.session.MethodStatistics;
 import com.cube.nanotimer.vo.BackupCounts;
@@ -519,12 +518,11 @@ public class ServiceImpl extends DBHelper implements Service {
   }
 
   @Override
-  public void getCoachPlan(final SolveType solveType, final CoachPlan.Source source,
-      final DataCallback<StoredCoachPlan> callback) {
+  public void getCoachPlan(final SolveType solveType, final DataCallback<StoredCoachPlan> callback) {
     run(new Runnable() {
       @Override
       public void run() {
-        callback.onData(provider.getCoachPlan(solveType, source));
+        callback.onData(provider.getCoachPlan(solveType));
       }
     });
   }

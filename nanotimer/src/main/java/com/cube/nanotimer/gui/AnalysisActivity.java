@@ -18,11 +18,13 @@ import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.coach.StepBaseline;
+import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.cube.SolveTypeMethod;
 import com.cube.nanotimer.gui.widget.AnalysisCases;
 import com.cube.nanotimer.gui.widget.AnalysisHelpDialog;
 import com.cube.nanotimer.gui.widget.CaseRow;
 import com.cube.nanotimer.gui.widget.CaseTableHeadings;
+import com.cube.nanotimer.gui.widget.CoachPlanView;
 import com.cube.nanotimer.gui.widget.dialog.CaseAlgorithmsDialog;
 import com.cube.nanotimer.gui.widget.SegmentedControl;
 import com.cube.nanotimer.gui.widget.SmartCubeConnectDialog;
@@ -42,8 +44,10 @@ import com.cube.nanotimer.vo.SolveStep;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.StepStats;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -108,6 +112,7 @@ public class AnalysisActivity extends NanoTimerActivity {
   private boolean loaded;
   private View solveRoot;
   private AnalysisCases cases;
+  private CoachPlanView planView;
   private MethodStatistics statistics;
   private List<CaseKnowledge> known = Collections.emptyList();
 
@@ -176,6 +181,7 @@ public class AnalysisActivity extends NanoTimerActivity {
     cases = new AnalysisCases(this, findViewById(R.id.llAnalysisCases), casesListener());
     cases.setFamily(getIntent().getStringExtra(EXTRA_FAMILY));
     showPlanPoints();
+    planView = new CoachPlanView(this, (LinearLayout) findViewById(R.id.llAnalysisPlanAreas));
     wireSample();
 
     showTabStrip();
@@ -183,6 +189,7 @@ public class AnalysisActivity extends NanoTimerActivity {
     showTab(tabs.getSelection());
     loadKnowledge();
     loadOwnSolves();
+    loadPlan();
     load();
   }
 
@@ -332,7 +339,7 @@ public class AnalysisActivity extends NanoTimerActivity {
    * lands while another is picked.
    */
   private void showWhatIsReadable() {
-    // Plan is the one tab that reads nothing: it says what a plan is, and there are none to have.
+    // Plan reads no window: it shows the plan kept for the solve type, or what a plan is.
     boolean measured = tab == TAB_SOLVE || tab == TAB_CASES;
     boolean readable = loaded && !steps.isEmpty();
     solveRoot.setVisibility(tab == TAB_SOLVE && readable ? View.VISIBLE : View.GONE);
@@ -566,6 +573,45 @@ public class AnalysisActivity extends NanoTimerActivity {
       ((TextView) point.findViewById(R.id.tvAnalysisPointText)).setText(PLAN_POINTS[i]);
       points.addView(point);
     }
+  }
+
+  /** The plan last written for this solve type, read once: nothing on this screen writes one. */
+  private void loadPlan() {
+    App.INSTANCE.getService().getCoachPlan(solveType, new DataCallback<StoredCoachPlan>() {
+      @Override
+      public void onData(final StoredCoachPlan stored) {
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            showPlan(stored);
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * A kept plan in place of the explainer. It is shown even where the history has since changed:
+   * it was a true reading when written, and its date says as of when.
+   */
+  private void showPlan(StoredCoachPlan stored) {
+    planView.setPlan(stored);
+    findViewById(R.id.llAnalysisPlanWritten).setVisibility(stored == null ? View.GONE : View.VISIBLE);
+    findViewById(R.id.llAnalysisPlanAbout).setVisibility(stored == null ? View.VISIBLE : View.GONE);
+    if (stored == null) {
+      return;
+    }
+    String headline = stored.getPlan().getHeadline();
+    TextView tvHeadline = findViewById(R.id.tvAnalysisPlanHeadline);
+    tvHeadline.setText(headline);
+    tvHeadline.setVisibility(headline == null || headline.isEmpty() ? View.GONE : View.VISIBLE);
+    ((TextView) findViewById(R.id.tvAnalysisPlanDate)).setText(getString(R.string.coach_written,
+        DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date(stored.getWrittenAt()))));
+    // A figure nobody sent and a case nobody has are the same complaint to a reader, so one line.
+    int invented = stored.uncited().size() + stored.unknownCodes().size();
+    TextView tvUncited = findViewById(R.id.tvAnalysisPlanUncited);
+    tvUncited.setVisibility(invented == 0 ? View.GONE : View.VISIBLE);
+    tvUncited.setText(getString(R.string.coach_uncited, invented));
   }
 
   /** The Cases tab, which waits on two reads and is drawn by whichever of them lands second. */

@@ -1,7 +1,6 @@
 package com.cube.nanotimer.services;
 
 import com.cube.nanotimer.coach.CoachPayload;
-import com.cube.nanotimer.coach.CoachPlan;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.session.MethodStatistics;
 import com.cube.nanotimer.vo.BackupCounts;
@@ -70,7 +69,7 @@ public interface ServiceProvider {
   int getCoachSolveCount(SolveType solveType, CubeMethod method);
   CoachPayload getCoachPayload(SolveType solveType, CubeMethod method);
   void saveCoachPlan(SolveType solveType, StoredCoachPlan plan);
-  StoredCoachPlan getCoachPlan(SolveType solveType, CoachPlan.Source source);
+  StoredCoachPlan getCoachPlan(SolveType solveType);
   String getCoachStream(SolveType solveType);
   Map<CubeType, List<ScrambleType>> getAllUsedScrambleTypes();
 

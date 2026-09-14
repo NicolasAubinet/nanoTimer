@@ -1772,16 +1772,16 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   @Override
-  public StoredCoachPlan getCoachPlan(SolveType solveType, CoachPlan.Source source) {
+  public StoredCoachPlan getCoachPlan(SolveType solveType) {
     StringBuilder q = new StringBuilder();
     q.append("SELECT ").append(DB.COL_COACH_PLAN_PLAN);
     q.append("     , ").append(DB.COL_COACH_PLAN_PAYLOAD);
     q.append("     , ").append(DB.COL_COACH_PLAN_TIMESTAMP);
     q.append("  FROM ").append(DB.TABLE_COACH_PLAN);
     q.append(" WHERE ").append(DB.COL_COACH_PLAN_SOLVETYPE_ID).append(" = ?");
-    q.append("   AND ").append(DB.COL_COACH_PLAN_SOURCE).append(" = ?");
-    Cursor cursor = db.rawQuery(q.toString(),
-        new String[] { String.valueOf(solveType.getId()), source.code() });
+    // The server names its writer, heuristic or model, so the newest plan is the one to show.
+    q.append(" ORDER BY ").append(DB.COL_COACH_PLAN_TIMESTAMP).append(" DESC LIMIT 1");
+    Cursor cursor = db.rawQuery(q.toString(), new String[] { String.valueOf(solveType.getId()) });
     StoredCoachPlan stored = null;
     if (cursor != null) {
       if (cursor.moveToFirst()) {

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One thing to work on: what kind of problem it is, the cases or the sentence that says so, and
+     something to practise it with when there is anything to practise. The button is inside the card
+     rather than under the plan, because a drill belongs to the area that prescribed it. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:layout_marginTop="@dimen/space_m"
+   android:background="@drawable/analysis_card"
+   android:orientation="vertical"
+   android:padding="16dp">
+
+  <TextView
+     android:id="@+id/tvCoachAreaTitle"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:fontFamily="@font/roboto_medium"
+     android:textColor="@color/white"
+     android:textSize="16sp"/>
+
+  <!-- What the coach said about it. A plan written without a model carries none, and says what it
+       means with the figures under it instead. -->
+  <TextView
+     android:id="@+id/tvCoachAreaText"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="6dp"
+     android:lineSpacingMultiplier="1.2"
+     android:textColor="@color/secondary_text"
+     android:textSize="13.5sp"
+     android:visibility="gone"/>
+
+  <!-- One coach_case_row per case, or nothing at all for an area that is an observation. -->
+  <LinearLayout
+     android:id="@+id/llCoachAreaCases"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="@dimen/space_xs"
+     android:orientation="vertical"/>
+
+  <androidx.appcompat.widget.AppCompatButton
+     android:id="@+id/buCoachAreaDrill"
+     android:layout_marginTop="@dimen/space_s"
+     android:visibility="gone"
+     style="@style/DialogActionButton"/>
+
+</LinearLayout>

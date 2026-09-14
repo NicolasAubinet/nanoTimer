@@ -2,7 +2,6 @@ package com.cube.nanotimer.services;
 
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.coach.CoachPayload;
-import com.cube.nanotimer.coach.CoachPlan;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.session.MethodStatistics;
 import com.cube.nanotimer.vo.BackupCounts;
@@ -111,9 +110,8 @@ public interface Service {
    * being paid for twice.
    */
   void saveCoachPlan(SolveType solveType, StoredCoachPlan plan, DataCallback<Void> callback);
-  /** The last plan that writer left for the solve type, or null where it has never written one. */
-  void getCoachPlan(SolveType solveType, CoachPlan.Source source,
-      DataCallback<StoredCoachPlan> callback);
+  /** The newest plan kept for the solve type, whoever wrote it, or null where none has been. */
+  void getCoachPlan(SolveType solveType, DataCallback<StoredCoachPlan> callback);
   /**
    * The opaque id the coach service counts this solve type by, made the first time it is asked for.
    * A random UUID, never the solve type's id or name, so it says nothing about the user.
