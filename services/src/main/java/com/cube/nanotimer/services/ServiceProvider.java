@@ -71,6 +71,7 @@ public interface ServiceProvider {
   CoachPayload getCoachPayload(SolveType solveType, CubeMethod method);
   void saveCoachPlan(SolveType solveType, StoredCoachPlan plan);
   StoredCoachPlan getCoachPlan(SolveType solveType, CoachPlan.Source source);
+  String getCoachStream(SolveType solveType);
   Map<CubeType, List<ScrambleType>> getAllUsedScrambleTypes();
 
   /** Opens a recorded drill and hands back the id its reps are stored against. */

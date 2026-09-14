@@ -52,6 +52,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.UUID;
 
 public class ServiceProviderImpl implements ServiceProvider {
 
@@ -1789,6 +1790,26 @@ public class ServiceProviderImpl implements ServiceProvider {
       cursor.close();
     }
     return stored;
+  }
+
+  @Override
+  public String getCoachStream(SolveType solveType) {
+    // Written only where none is, so two first reads racing still agree on one id.
+    ContentValues values = new ContentValues();
+    values.put(DB.COL_SOLVETYPE_COACH_STREAM, UUID.randomUUID().toString());
+    String[] id = new String[] { String.valueOf(solveType.getId()) };
+    db.update(DB.TABLE_SOLVETYPE, values,
+        DB.COL_ID + " = ? AND " + DB.COL_SOLVETYPE_COACH_STREAM + " IS NULL", id);
+    Cursor cursor = db.rawQuery("SELECT " + DB.COL_SOLVETYPE_COACH_STREAM
+        + " FROM " + DB.TABLE_SOLVETYPE + " WHERE " + DB.COL_ID + " = ?", id);
+    String stream = null;
+    if (cursor != null) {
+      if (cursor.moveToFirst()) {
+        stream = cursor.getString(0);
+      }
+      cursor.close();
+    }
+    return stream;
   }
 
   /**

@@ -530,6 +530,16 @@ public class ServiceImpl extends DBHelper implements Service {
   }
 
   @Override
+  public void getCoachStream(final SolveType solveType, final DataCallback<String> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        callback.onData(provider.getCoachStream(solveType));
+      }
+    });
+  }
+
+  @Override
   public void getAllUsedScrambleTypes(final DataCallback<Map<CubeType, List<ScrambleType>>> callback) {
     run(new Runnable() {
       @Override

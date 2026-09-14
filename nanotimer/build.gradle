@@ -1,7 +1,23 @@
 apply plugin: 'com.android.application'
 
+// The coach service's address and token, kept out of the repository. A build without them has no coach.
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { localProperties.load(it) }
+}
+// Both become string resources, where a leading @ or ? is a reference and a quote breaks the file.
+['coach.url', 'coach.token'].each { key ->
+    def value = localProperties.getProperty(key, '')
+    if (!(value ==~ /[A-Za-z0-9._~:\/=+-]*/)) {
+        throw new GradleException("local.properties: $key holds a character a string resource cannot carry")
+    }
+}
+
 android {
     defaultConfig {
+        resValue 'string', 'coach_url', localProperties.getProperty('coach.url', '')
+        resValue 'string', 'coach_token', localProperties.getProperty('coach.token', '')
         applicationId "com.cube.nanotimer"
         minSdkVersion 21
         compileSdkVersion 36

@@ -5,6 +5,8 @@
 
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+  <!-- The coach service, the only network call the app makes -->
+  <uses-permission android:name="android.permission.INTERNET" />
 
   <!-- Smart (Bluetooth) cube -->
   <uses-permission android:name="android.permission.BLUETOOTH_SCAN"

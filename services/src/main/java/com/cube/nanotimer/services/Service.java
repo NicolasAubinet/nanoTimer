@@ -114,6 +114,11 @@ public interface Service {
   /** The last plan that writer left for the solve type, or null where it has never written one. */
   void getCoachPlan(SolveType solveType, CoachPlan.Source source,
       DataCallback<StoredCoachPlan> callback);
+  /**
+   * The opaque id the coach service counts this solve type by, made the first time it is asked for.
+   * A random UUID, never the solve type's id or name, so it says nothing about the user.
+   */
+  void getCoachStream(SolveType solveType, DataCallback<String> callback);
   void getAllUsedScrambleTypes(DataCallback<Map<CubeType, List<ScrambleType>>> callback);
 
   /**
