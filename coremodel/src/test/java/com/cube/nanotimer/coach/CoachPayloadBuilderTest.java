@@ -36,6 +36,13 @@ public class CoachPayloadBuilderTest {
         CoachPayloadBuilder.CASE_FLOOR >= StepTallies.MIN_SAMPLES_TO_FILTER);
   }
 
+  /** A history at the plan floor has to be one the step floors quote, or the plan says nothing. */
+  @Test
+  public void testThePlanFloorIsNeverUnderTheStepFloors() {
+    Assert.assertTrue(CoachPayloadBuilder.PLAN_FLOOR >= CoachPayloadBuilder.SOLVE_FLOOR);
+    Assert.assertTrue(CoachPayloadBuilder.PLAN_FLOOR >= CoachPayloadBuilder.FAMILY_FLOOR);
+  }
+
   @Test
   public void testACaseUnderItsFloorIsNotSent() {
     CoachPayload payload = build();
