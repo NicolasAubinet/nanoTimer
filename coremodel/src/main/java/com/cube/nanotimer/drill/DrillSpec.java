@@ -3,8 +3,11 @@ package com.cube.nanotimer.drill;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,7 +36,13 @@ import org.json.JSONObject;
 public final class DrillSpec {
 
   /** The newest spec this app can run. */
-  public static final int VERSION = 2;
+  public static final int VERSION = 3;
+
+  /**
+   * The version a drill with no per-case targets is written at. A drill that needs nothing newer
+   * says so, so an app that only reads 2 still runs every drill that did not need 3.
+   */
+  private static final int VERSION_WITHOUT_CASE_TARGETS = 2;
 
   /**
    * What a rep is timed and judged on. The two case types are the same reps and only move the
@@ -94,6 +103,7 @@ public final class DrillSpec {
   private final Selection selection;
   private final int reps;
   private final long targetMs;
+  private final Map<String, Long> caseTargetsMs;
   private final String label;
   private final String crossFace;
   private final long planningMs;
@@ -102,8 +112,20 @@ public final class DrillSpec {
   /** A drill this app wrote itself, at the current version. */
   public DrillSpec(String id, Type type, Delivery delivery, List<String> cases,
       Selection selection, int reps, long targetMs, String label) {
-    this(VERSION, id, DEFAULT_PUZZLE, DEFAULT_METHOD, type, delivery, cases, selection, reps,
-        targetMs, label, null, 0, null);
+    this(id, type, delivery, cases, selection, reps, targetMs,
+        Collections.<String, Long>emptyMap(), label);
+  }
+
+  /**
+   * A drill over a set whose cases are not one ask: beating the family mean on Gb and on T are
+   * different targets. {@code targetMs} stays the fallback for a case the map does not name.
+   */
+  public DrillSpec(String id, Type type, Delivery delivery, List<String> cases,
+      Selection selection, int reps, long targetMs, Map<String, Long> caseTargetsMs,
+      String label) {
+    this(caseTargetsMs.isEmpty() ? VERSION_WITHOUT_CASE_TARGETS : VERSION, id, DEFAULT_PUZZLE,
+        DEFAULT_METHOD, type, delivery, cases, selection, reps, targetMs, caseTargetsMs, label,
+        null, 0, null);
   }
 
   /**
@@ -112,14 +134,15 @@ public final class DrillSpec {
    */
   public static DrillSpec cross(String id, String crossFace, int reps, long planningMs,
       String label) {
-    return new DrillSpec(VERSION, id, DEFAULT_PUZZLE, DEFAULT_METHOD, Type.CROSS, Delivery.VIRTUAL,
-        Collections.<String>emptyList(), Selection.ROUND_ROBIN, reps, 0, label, crossFace,
-        planningMs, null);
+    return new DrillSpec(VERSION_WITHOUT_CASE_TARGETS, id, DEFAULT_PUZZLE, DEFAULT_METHOD,
+        Type.CROSS, Delivery.VIRTUAL, Collections.<String>emptyList(), Selection.ROUND_ROBIN, reps,
+        0, Collections.<String, Long>emptyMap(), label, crossFace, planningMs, null);
   }
 
   private DrillSpec(int specVersion, String id, String puzzle, String method, Type type,
       Delivery delivery, List<String> cases, Selection selection, int reps, long targetMs,
-      String label, String crossFace, long planningMs, String source) {
+      Map<String, Long> caseTargetsMs, String label, String crossFace, long planningMs,
+      String source) {
     if (type == null || delivery == null || selection == null) {
       throw new IllegalArgumentException("A drill needs a type, a delivery and a selection");
     }
@@ -146,6 +169,14 @@ public final class DrillSpec {
     this.selection = selection;
     this.reps = reps;
     this.targetMs = targetMs;
+    Map<String, Long> targets = new LinkedHashMap<String, Long>();
+    for (Map.Entry<String, Long> target : caseTargetsMs.entrySet()) {
+      // None is what 0 already means for the set-wide target, so it is no entry rather than a zero.
+      if (target.getValue() != null && target.getValue().longValue() > 0) {
+        targets.put(target.getKey(), target.getValue());
+      }
+    }
+    this.caseTargetsMs = Collections.unmodifiableMap(targets);
     this.label = label;
     this.crossFace = crossFace;
     this.planningMs = planningMs;
@@ -175,6 +206,7 @@ public final class DrillSpec {
               "selection"),
           object.getInt("reps"),
           object.optLong("target_ms", 0),
+          targets(object.optJSONObject("case_targets_ms")),
           object.optString("label", null),
           object.optString("cross_face", null),
           object.optLong("planning_ms", 0),
@@ -215,6 +247,9 @@ public final class DrillSpec {
       if (targetMs > 0) {
         object.put("target_ms", targetMs);
       }
+      if (!caseTargetsMs.isEmpty()) {
+        object.put("case_targets_ms", new JSONObject(caseTargetsMs));
+      }
       if (label != null) {
         object.put("label", label);
       }
@@ -234,6 +269,19 @@ public final class DrillSpec {
       codes.add(array.getString(i));
     }
     return codes;
+  }
+
+  private static Map<String, Long> targets(JSONObject object) throws JSONException {
+    Map<String, Long> targets = new LinkedHashMap<String, Long>();
+    if (object == null) {
+      return targets;
+    }
+    Iterator<String> codes = object.keys();
+    while (codes.hasNext()) {
+      String code = codes.next();
+      targets.put(code, Long.valueOf(object.getLong(code)));
+    }
+    return targets;
   }
 
   private static <T extends Enum<T>> T value(Class<T> type, String code, String what) {
@@ -286,9 +334,23 @@ public final class DrillSpec {
     return reps;
   }
 
-  /** What a rep is meant to come in under, on whichever half {@link #getType} names. 0 for none. */
+  /**
+   * What a rep is meant to come in under, on whichever half {@link #getType} names. 0 for none. The
+   * set-wide figure: a case with a target of its own answers to {@link #getTargetMs(String)} instead.
+   */
   public long getTargetMs() {
     return targetMs;
+  }
+
+  /** What a rep of this case is meant to come in under, falling back to the set-wide target. */
+  public long getTargetMs(String caseCode) {
+    Long target = caseTargetsMs.get(caseCode);
+    return target == null ? targetMs : target.longValue();
+  }
+
+  /** The cases with a target of their own, which is what moved the version to 3. Often empty. */
+  public Map<String, Long> getCaseTargetsMs() {
+    return caseTargetsMs;
   }
 
   /** A short name to show. Whoever wrote it is responsible for its language. */

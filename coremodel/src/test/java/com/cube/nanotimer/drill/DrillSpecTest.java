@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.junit.Test;
 
 public class DrillSpecTest {
@@ -75,6 +77,43 @@ public class DrillSpecTest {
     assertEquals(12, read.getReps());
     assertEquals(800, read.getTargetMs());
     assertEquals("Slice perms", read.getLabel());
+  }
+
+  /** A mixed set, where beating the family mean on Gb and on T are not the same ask. */
+  @Test
+  public void readsATargetPerCaseAndFallsBackForTheRest() {
+    DrillSpec spec = DrillSpec.fromJson("{\"spec_version\": 3, \"type\": \"case_execution\","
+        + " \"delivery\": \"virtual\", \"cases\": [\"pll_gb\", \"pll_t\", \"pll_ja\"],"
+        + " \"reps\": 12, \"target_ms\": 2000,"
+        + " \"case_targets_ms\": {\"pll_gb\": 2600, \"pll_t\": 1400}}");
+    assertEquals(3, spec.getSpecVersion());
+    assertEquals(2600, spec.getTargetMs("pll_gb"));
+    assertEquals(1400, spec.getTargetMs("pll_t"));
+    assertEquals("a case the map leaves out", 2000, spec.getTargetMs("pll_ja"));
+    assertEquals(2000, spec.getTargetMs());
+  }
+
+  /** An app that reads only 2 still runs every drill that did not need 3. */
+  @Test
+  public void writesTheOldestVersionItsFieldsNeed() {
+    DrillSpec plain = new DrillSpec("mine", DrillSpec.Type.CASE_EXECUTION,
+        DrillSpec.Delivery.VIRTUAL, Arrays.asList("pll_t"), DrillSpec.Selection.ROUND_ROBIN, 5,
+        1500, "T");
+    assertEquals(2, DrillSpec.fromJson(plain.toJson()).getSpecVersion());
+    assertEquals(2, DrillSpec.fromJson(DrillSpec.cross("x", "D", 3, 0, null).toJson())
+        .getSpecVersion());
+
+    Map<String, Long> targets = new LinkedHashMap<String, Long>();
+    targets.put("pll_gb", Long.valueOf(2600));
+    targets.put("pll_t", Long.valueOf(0)); // no target, not a target of nothing
+    DrillSpec mixed = new DrillSpec("mine", DrillSpec.Type.CASE_EXECUTION,
+        DrillSpec.Delivery.VIRTUAL, Arrays.asList("pll_gb", "pll_t"), DrillSpec.Selection.WEIGHTED,
+        10, 2000, targets, "G and T");
+    DrillSpec read = DrillSpec.fromJson(mixed.toJson());
+    assertEquals(3, read.getSpecVersion());
+    assertEquals(2600, read.getTargetMs("pll_gb"));
+    assertEquals(2000, read.getTargetMs("pll_t"));
+    assertEquals(1, read.getCaseTargetsMs().size());
   }
 
   /** A drill from a version this app does not know is refused, since running it wrong is worse. */
