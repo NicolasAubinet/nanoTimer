@@ -112,4 +112,28 @@
        android:textSize="12.5sp"/>
   </LinearLayout>
 
+  <!-- Asking for a plan, under whichever of the two is showing. Gone in a build with no coach. -->
+  <LinearLayout
+     android:id="@+id/llAnalysisPlanRead"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="16dp"
+     android:orientation="vertical"
+     android:visibility="gone">
+
+    <TextView
+       android:id="@+id/tvAnalysisPlanReadStatus"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginBottom="8dp"
+       android:gravity="center"
+       android:textColor="@color/secondary_text"
+       android:textSize="12.5sp"
+       android:visibility="gone"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+       android:id="@+id/buAnalysisPlanRead"
+       style="@style/DialogActionButton"/>
+  </LinearLayout>
+
 </LinearLayout>

@@ -70,7 +70,10 @@ public class CoachReplyTest {
     CoachPayload payload = CoachPayload.parse(
         "{\"schema_version\":" + CoachPayload.VERSION + ",\"puzzle\":\"3x3\",\"method\":\"cfop\"}");
 
-    JSONObject body = new JSONObject(CoachClient.requestBody(payload, "stream-1"));
+    String text = CoachClient.requestBody(payload, "stream-1");
+    // A plan that answers the request is kept beside the payload it carried.
+    Assert.assertEquals(payload.toJson(), CoachClient.payloadOf(text).toJson());
+    JSONObject body = new JSONObject(text);
 
     Assert.assertEquals("stream-1", body.getString("stream"));
     Assert.assertFalse(body.getJSONObject("payload").has("stream"));

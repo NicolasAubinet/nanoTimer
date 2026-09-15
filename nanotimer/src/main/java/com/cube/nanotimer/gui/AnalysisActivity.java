@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ import androidx.core.content.ContextCompat;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.coach.CoachPayloadBuilder;
 import com.cube.nanotimer.coach.StepBaseline;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.cube.SolveTypeMethod;
@@ -33,6 +35,10 @@ import com.cube.nanotimer.session.CaseKnowledge;
 import com.cube.nanotimer.session.MethodStatistics;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.helper.DialogUtils;
+import com.cube.nanotimer.util.coach.CoachClient;
+import com.cube.nanotimer.util.coach.CoachRead;
+import com.cube.nanotimer.util.coach.CoachRefusal;
+import com.cube.nanotimer.util.coach.CoachReply;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.util.view.DeltaBarView;
 import com.cube.nanotimer.util.view.SolveStepBarView;
@@ -113,6 +119,10 @@ public class AnalysisActivity extends NanoTimerActivity {
   private View solveRoot;
   private AnalysisCases cases;
   private CoachPlanView planView;
+  /** Null in a build made without a coach to ask. */
+  private CoachClient coachClient;
+  private CoachRead.Listener readListener;
+  private boolean hasPlan;
   private MethodStatistics statistics;
   private List<CaseKnowledge> known = Collections.emptyList();
 
@@ -182,6 +192,7 @@ public class AnalysisActivity extends NanoTimerActivity {
     cases.setFamily(getIntent().getStringExtra(EXTRA_FAMILY));
     showPlanPoints();
     planView = new CoachPlanView(this, (LinearLayout) findViewById(R.id.llAnalysisPlanAreas));
+    wireRead();
     wireSample();
 
     showTabStrip();
@@ -191,6 +202,12 @@ public class AnalysisActivity extends NanoTimerActivity {
     loadOwnSolves();
     loadPlan();
     load();
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    CoachRead.of(solveType).removeListener(readListener);
   }
 
   @Override
@@ -500,6 +517,7 @@ public class AnalysisActivity extends NanoTimerActivity {
     showContext();
     showWindow();
     showSample();
+    showRead();
     ((TextView) findViewById(R.id.tvAnalysisDeltaLabel)).setText(
         getString(R.string.analysis_delta_label, getString(SolveTypeMethod.nameOf(method))));
     ((TextView) findViewById(R.id.tvAnalysisDeltaLimit)).setText(
@@ -575,7 +593,102 @@ public class AnalysisActivity extends NanoTimerActivity {
     }
   }
 
-  /** The plan last written for this solve type, read once: nothing on this screen writes one. */
+  private void wireRead() {
+    coachClient = CoachClient.configured(this);
+    final CoachRead read = CoachRead.of(solveType);
+    readListener = new CoachRead.Listener() {
+      @Override
+      public void onReadChanged(CoachRead changed) {
+        showRead();
+        if (changed.getState() == CoachRead.State.IDLE) {
+          loadPlan(); // idle after reading means a plan was saved
+        }
+      }
+    };
+    read.setListener(readListener);
+    findViewById(R.id.buAnalysisPlanRead).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        read.start(coachClient, method);
+      }
+    });
+  }
+
+  /**
+   * The ask, where there is a coach to ask and something of theirs to ask about. The coach reads
+   * CFOP only, and never the example: a plan written off somebody else's figures would be kept as
+   * theirs.
+   */
+  private void showRead() {
+    boolean offered = coachClient != null && readAsSolve() && loaded && !sampling()
+        && SolveTypeMethod.of(solveType) == CubeMethod.CFOP;
+    findViewById(R.id.llAnalysisPlanRead).setVisibility(offered ? View.VISIBLE : View.GONE);
+    if (!offered) {
+      return;
+    }
+    CoachRead read = CoachRead.of(solveType);
+    CoachReply failure = read.getFailure();
+    TextView status = findViewById(R.id.tvAnalysisPlanReadStatus);
+    Button button = findViewById(R.id.buAnalysisPlanRead);
+    switch (read.getState()) {
+      case READING:
+        status.setText(R.string.coach_reading);
+        break;
+      case FAILED:
+        status.setText(failureLine(read));
+        break;
+      default:
+        break;
+    }
+    status.setVisibility(read.getState() == CoachRead.State.IDLE ? View.GONE : View.VISIBLE);
+    boolean capped = failure != null && failure.getRefusal() == CoachRefusal.WEEKLY_CAP_REACHED;
+    button.setVisibility(capped ? View.GONE : View.VISIBLE);
+    button.setEnabled(read.getState() != CoachRead.State.READING);
+    button.setText(read.getState() == CoachRead.State.FAILED ? R.string.coach_read_retry
+        : hasPlan ? R.string.coach_read_again : R.string.coach_read_first);
+  }
+
+  /** What went wrong, grouped by what the reader can do about it rather than by what broke. */
+  private String failureLine(CoachRead read) {
+    CoachReply failure = read.getFailure();
+    switch (failure.getKind()) {
+      case UNREACHABLE:
+        return getString(R.string.coach_refused_unreachable);
+      case UNREADABLE:
+        return getString(R.string.coach_refused_update);
+      default:
+        break;
+    }
+    switch (failure.getRefusal()) {
+      case INSUFFICIENT_DATA:
+        int more = CoachPayloadBuilder.PLAN_FLOOR - read.getSolveCount();
+        // Unknown, or refused with enough solves anyway: no count to give that would be true.
+        if (read.getSolveCount() < 0 || more <= 0) {
+          return getString(R.string.coach_refused_thin);
+        }
+        return getResources().getQuantityString(R.plurals.coach_refused_too_few, more,
+            CoachPayloadBuilder.PLAN_FLOOR, read.getSolveCount(), more);
+      case WEEKLY_CAP_REACHED:
+        return read.getAskAgainAt() == 0 ? getString(R.string.coach_refused_cap_undated)
+            : getString(R.string.coach_refused_cap,
+                DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date(read.getAskAgainAt())));
+      case RATE_LIMITED:
+        return getString(R.string.coach_refused_busy);
+      case PLAN_REJECTED:
+        return getString(R.string.coach_refused_rejected);
+      case UNAUTHORIZED:
+        return getString(R.string.coach_refused_device);
+      case PAYLOAD_INVALID:
+      case PAYLOAD_TOO_LARGE:
+      case PAYLOAD_TOO_NEW:
+        return getString(R.string.coach_refused_update);
+      default:
+        // The service's own trouble, and any code added after this app was built.
+        return getString(R.string.coach_refused_unavailable);
+    }
+  }
+
+  /** The plan last written for this solve type. */
   private void loadPlan() {
     App.INSTANCE.getService().getCoachPlan(solveType, new DataCallback<StoredCoachPlan>() {
       @Override
@@ -595,6 +708,8 @@ public class AnalysisActivity extends NanoTimerActivity {
    * it was a true reading when written, and its date says as of when.
    */
   private void showPlan(StoredCoachPlan stored) {
+    hasPlan = stored != null;
+    showRead();
     planView.setPlan(stored);
     findViewById(R.id.llAnalysisPlanWritten).setVisibility(stored == null ? View.GONE : View.VISIBLE);
     findViewById(R.id.llAnalysisPlanAbout).setVisibility(stored == null ? View.VISIBLE : View.GONE);

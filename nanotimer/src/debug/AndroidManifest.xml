@@ -2,8 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
    xmlns:tools="http://schemas.android.com/tools">
 
+  <!-- Plain http only in a debug build, so a coach service running on this computer can be asked. -->
   <application
      android:label="Cubench (debug)"
+     android:usesCleartextTraffic="true"
      tools:replace="android:label"/>
 
 </manifest>

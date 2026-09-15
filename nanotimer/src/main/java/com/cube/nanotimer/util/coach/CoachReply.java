@@ -41,6 +41,11 @@ public final class CoachReply {
     return new CoachReply(Kind.UNREACHABLE, null, null, 0);
   }
 
+  /** A refusal the app can give itself, without asking. */
+  static CoachReply refused(CoachRefusal refusal) {
+    return new CoachReply(Kind.REFUSED, null, refusal, 0);
+  }
+
   static CoachReply unreadable() {
     return new CoachReply(Kind.UNREADABLE, null, null, 0);
   }

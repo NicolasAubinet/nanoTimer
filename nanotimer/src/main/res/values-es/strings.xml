@@ -1149,6 +1149,23 @@
   <string name="analysis_plan_not_yet">Todavía no hay ningún plan aquí. Resolución y Casos siguen siendo gratis pase lo que pase con esta pestaña.</string>
   <string name="coach_written">Analizado el %1$s</string>
   <string name="coach_uncited">%1$d datos de este plan no están en tu historial y no se muestran.</string>
+  <string name="coach_read_first">Escribir mi plan</string>
+  <string name="coach_read_again">Escribir un plan nuevo</string>
+  <string name="coach_reading">Leyendo tus resoluciones y escribiendo un plan. Puede tardar un minuto.</string>
+  <string name="coach_read_retry">Reintentar</string>
+  <string name="coach_refused_thin">Todavía no hay suficiente para leer. Haz algunas resoluciones más con tu cubo inteligente y vuelve a pedirlo.</string>
+  <string name="coach_refused_cap">Ya has tenido todos los planes de esta semana, el próximo estará disponible el %1$s.</string>
+  <string name="coach_refused_cap_undated">Ya has tenido todos los planes de esta semana.</string>
+  <string name="coach_refused_busy">Demasiadas solicitudes en poco tiempo. Vuelve a intentarlo en unos minutos.</string>
+  <string name="coach_refused_unavailable">El coach no está disponible ahora mismo. Vuelve a intentarlo más tarde.</string>
+  <string name="coach_refused_unreachable">No se pudo contactar con el coach. Comprueba tu conexión y vuelve a intentarlo.</string>
+  <string name="coach_refused_rejected">El coach no pudo escribir un plan respaldado por tus cifras. Vuelve a intentarlo.</string>
+  <string name="coach_refused_update">Esta versión de Cubench no puede comunicarse con el coach. Actualiza la aplicación y vuelve a intentarlo.</string>
+  <string name="coach_refused_device">Este dispositivo no está configurado para el coach.</string>
+  <plurals name="coach_refused_too_few">
+    <item quantity="one">Un plan necesita %1$d resoluciones con tu cubo inteligente, y tienes %2$d. Te falta %3$d.</item>
+    <item quantity="other">Un plan necesita %1$d resoluciones con tu cubo inteligente, y tienes %2$d. Te faltan %3$d.</item>
+  </plurals>
   <string name="coach_area_family">%1$s: %2$s</string>
   <string name="coach_reason_slow_case">Casos que te cuestan tiempo</string>
   <string name="coach_reason_slow_under_pressure">Conocidos, pero lentos al resolver</string>
@@ -1192,7 +1209,7 @@
   <string name="analysis_help_spread">Desvío</string>
   <string name="analysis_help_spread_body">Cuánto cambia el paso de una resolución a otra. Dos pasos con la misma media pueden ser uno que haces siempre igual y otro en el que a veces te atascas, y esto es lo que los distingue.</string>
   <string name="analysis_help_plan_title">Un plan</string>
-  <string name="analysis_help_plan_body">Aquí no se mide nada. La pestaña muestra qué cubriría un plan, y todavía no hay ninguno. Las cifras que usaría un plan están en Resolución y Casos, y esas siguen siendo gratis.</string>
+  <string name="analysis_help_plan_body">Aquí no se mide nada. Un plan se escribe a partir de las cifras de Resolución y Casos, y esas siguen siendo gratis.</string>
   <string name="analysis_help_cases_title">Qué casos te cuestan</string>
   <string name="analysis_help_cases_body">Un paso a la vez, ordenado por lo que cada caso te ha costado en la ventana indicada arriba. Un caso solo se compara con los casos de su propio paso, así que los botones sobre la tabla cambian de uno a otro.</string>
   <string name="analysis_help_cost">Coste</string>

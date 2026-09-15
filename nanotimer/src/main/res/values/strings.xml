@@ -1196,6 +1196,23 @@
   <string name="analysis_plan_not_yet">There is no plan here yet. Solve and Cases stay free whatever lands on this tab.</string>
   <string name="coach_written">Read on %1$s</string>
   <string name="coach_uncited">%1$d of this plan\'s claims are not in your history, and are not shown.</string>
+  <string name="coach_read_first">Write my plan</string>
+  <string name="coach_read_again">Write a new plan</string>
+  <string name="coach_reading">Reading your solves and writing a plan. This can take a minute.</string>
+  <string name="coach_read_retry">Try again</string>
+  <string name="coach_refused_thin">There isn\'t enough to read yet. Do a few more solves with your smart cube and ask again.</string>
+  <string name="coach_refused_cap">You\'ve already had all this week\'s plans, the next one will be available on %1$s.</string>
+  <string name="coach_refused_cap_undated">You\'ve already had all this week\'s plans.</string>
+  <string name="coach_refused_busy">Too many requests in a short time. Try again in a few minutes.</string>
+  <string name="coach_refused_unavailable">The coach isn\'t available right now. Try again later.</string>
+  <string name="coach_refused_unreachable">Couldn\'t reach the coach. Check your connection and try again.</string>
+  <string name="coach_refused_rejected">The coach couldn\'t write a plan it could back with your figures. Please try again.</string>
+  <string name="coach_refused_update">This version of Cubench can\'t talk to the coach. Update the app and try again.</string>
+  <string name="coach_refused_device">This device isn\'t set up for the coach.</string>
+  <plurals name="coach_refused_too_few">
+    <item quantity="one">A plan needs %1$d solves with your smart cube, and you have %2$d. %3$d more to go.</item>
+    <item quantity="other">A plan needs %1$d solves with your smart cube, and you have %2$d. %3$d more to go.</item>
+  </plurals>
   <string name="coach_area_family">%1$s: %2$s</string>
   <string name="coach_reason_slow_case">Cases costing you time</string>
   <string name="coach_reason_slow_under_pressure">Known, but slow in a solve</string>
@@ -1242,7 +1259,7 @@
   <string name="analysis_help_spread">Spread</string>
   <string name="analysis_help_spread_body">How much the step changes from solve to solve. Two steps with the same mean can be one you do the same way every time and one you sometimes get stuck on, and this is what tells them apart.</string>
   <string name="analysis_help_plan_title">A plan</string>
-  <string name="analysis_help_plan_body">Nothing here is measured. The tab shows what a plan would cover, and there is none to have yet. The figures a plan would use are on Solve and Cases, and those stay free.</string>
+  <string name="analysis_help_plan_body">Nothing here is measured. A plan is written from the figures on Solve and Cases, and those stay free.</string>
   <string name="analysis_help_cases_title">Which cases cost you</string>
   <string name="analysis_help_cases_body">One step at a time, ranked by what each case cost you over the window shown at the top. A case is only worth comparing with the cases of its own step, so the buttons above the table switch between them.</string>
   <string name="analysis_help_cost">Cost</string>

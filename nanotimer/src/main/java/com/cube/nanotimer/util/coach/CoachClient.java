@@ -42,11 +42,16 @@ public final class CoachClient {
     return url.isEmpty() || token.isEmpty() ? null : new CoachClient(url, token);
   }
 
-  /** Blocks until the service answers or gives up, so never call it on the main thread. */
-  public CoachReply requestPlan(CoachPayload payload, String stream) {
+  /**
+   * Blocks until the service answers or gives up, so never call it on the main thread.
+   *
+   * @param requestBody what {@link #requestBody} wrote, sent as it was kept: the service knows a
+   *     repeated question by the payload's exact text
+   */
+  public CoachReply requestPlan(String requestBody) {
     HttpURLConnection connection = null;
     try {
-      byte[] body = requestBody(payload, stream).getBytes(StandardCharsets.UTF_8);
+      byte[] body = requestBody.getBytes(StandardCharsets.UTF_8);
       connection = (HttpURLConnection) new URL(planUrl).openConnection();
       connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
       connection.setReadTimeout(READ_TIMEOUT_MS);
@@ -67,6 +72,15 @@ public final class CoachClient {
       if (connection != null) {
         connection.disconnect();
       }
+    }
+  }
+
+  /** The payload a request body carries, which is what a plan that answers it is kept beside. */
+  static CoachPayload payloadOf(String requestBody) {
+    try {
+      return CoachPayload.parse(new JSONObject(requestBody).getJSONObject("payload").toString());
+    } catch (JSONException e) {
+      throw new IllegalArgumentException("Not a coach request: " + e.getMessage(), e);
     }
   }
 

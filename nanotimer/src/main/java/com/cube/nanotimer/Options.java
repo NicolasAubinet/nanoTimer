@@ -70,6 +70,7 @@ public enum Options {
   public static final String SMART_CUBE_OFFSET_KEY_PREFIX = "smart_cube_offset_";
   public static final String DRILL_CHOICE_KEY_PREFIX = "drill_choice_";
   private static final String ANALYSIS_WINDOW_KEY = "analysisWindow";
+  private static final String COACH_PENDING_KEY_PREFIX = "coach_pending_";
   public static final String CASE_KNOWLEDGE_RULE_KEY = "case_knowledge_rule";
   public static final String CFOP_READING_KEY = "cfop_reading_version";
   public static final String DRILL_CASES_KEY_PREFIX = "drill_cases_";
@@ -297,6 +298,22 @@ public enum Options {
 
   public void setAnalysisWindow(int ordinal) {
     sharedPreferences.edit().putInt(ANALYSIS_WINDOW_KEY, ordinal).apply();
+  }
+
+  /** The plan request a solve type sent and never got a plan back for, or null. */
+  public String getCoachPendingRequest(int solveTypeId) {
+    return sharedPreferences.getString(COACH_PENDING_KEY_PREFIX + solveTypeId, null);
+  }
+
+  /** Written with commit, not apply: it has to be on disk before the request leaves the device. */
+  public void setCoachPendingRequest(int solveTypeId, String requestBody) {
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+    if (requestBody == null) {
+      editor.remove(COACH_PENDING_KEY_PREFIX + solveTypeId);
+    } else {
+      editor.putString(COACH_PENDING_KEY_PREFIX + solveTypeId, requestBody);
+    }
+    editor.commit();
   }
 
   /**
