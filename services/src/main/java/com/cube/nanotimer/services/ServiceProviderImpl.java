@@ -1632,12 +1632,18 @@ public class ServiceProviderImpl implements ServiceProvider {
    * The one thing that leaves the device, built here because it is the floors and the outlier rule
    * that decide what may be said and both need the occurrences one at a time, which SQL cannot give
    * a mean of. The figures the screens read are aggregated in the query; these are not.
+   *
+   * @throws IllegalArgumentException for any puzzle but a 3x3, the only one a smart cube reads
    */
   @Override
   public CoachPayload getCoachPayload(SolveType solveType, CubeMethod method) {
+    if (solveType.getCubeTypeId() != CubeType.THREE_BY_THREE.getId()) {
+      throw new IllegalArgumentException("A coach reads 3x3 solves only, not cube type "
+          + solveType.getCubeTypeId());
+    }
     int caseSolves = getMethodSolvesCount(solveType, method, CoachPayloadBuilder.CASE_WINDOW);
     List<StepSample> drillSamples = getDrillCaseSamples(CoachPayloadBuilder.DRILL_WINDOW);
-    return CoachPayloadBuilder.build(puzzleCode(solveType),
+    return CoachPayloadBuilder.build(THREE_BY_THREE_PUZZLE,
         method.getCode().toLowerCase(Locale.US),
         getMethodSolveTimes(solveType, method, CoachPayloadBuilder.FAMILY_WINDOW),
         getMethodStepSamples(solveType, method, CoachPayloadBuilder.FAMILY_WINDOW),
@@ -1825,10 +1831,7 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   /** The puzzle in the vocabulary a drill spec speaks, never a name the user could have edited. */
-  private static String puzzleCode(SolveType solveType) {
-    return solveType.getCubeTypeId() == CubeType.THREE_BY_THREE.getId() ? "3x3"
-        : CubeType.getCubeType(solveType.getCubeTypeId()).name().toLowerCase(Locale.US);
-  }
+  private static final String THREE_BY_THREE_PUZZLE = "3x3";
 
   /** The whole times of the window, one row each, so a junk solve can be told from a slow one. */
   private List<Long> getMethodSolveTimes(SolveType solveType, CubeMethod method, int lastSolves) {
