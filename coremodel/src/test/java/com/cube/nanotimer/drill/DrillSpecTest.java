@@ -1,6 +1,7 @@
 package com.cube.nanotimer.drill;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -114,6 +115,37 @@ public class DrillSpecTest {
     assertEquals(2600, read.getTargetMs("pll_gb"));
     assertEquals(2000, read.getTargetMs("pll_t"));
     assertEquals(1, read.getCaseTargetsMs().size());
+  }
+
+  /** A drill that runs each case until it beats its target needs 3, and keeps its counts. */
+  @Test
+  public void aRetiringDrillIsWrittenAtThreeAndReadsBack() {
+    Map<String, Long> targets = new LinkedHashMap<String, Long>();
+    targets.put("pll_gb", Long.valueOf(2600));
+    DrillSpec spec = new DrillSpec("coach", DrillSpec.Type.CASE_EXECUTION,
+        DrillSpec.Delivery.VIRTUAL, Arrays.asList("pll_gb", "pll_t"), DrillSpec.Selection.ROUND_ROBIN,
+        40, 2000, targets, 3, 5, "G and T");
+    DrillSpec read = DrillSpec.fromJson(spec.toJson());
+    assertEquals(3, read.getSpecVersion());
+    assertTrue(read.retiresCases());
+    assertEquals(3, read.getWinsToRetire());
+    assertEquals(5, read.getMinShowings());
+    assertEquals(40, read.getReps());
+
+    DrillSpec plain = new DrillSpec("mine", DrillSpec.Type.CASE_EXECUTION,
+        DrillSpec.Delivery.VIRTUAL, Arrays.asList("pll_t"), DrillSpec.Selection.ROUND_ROBIN, 5, 0,
+        "T");
+    assertFalse("a hand-picked drill runs its reps out", DrillSpec.fromJson(plain.toJson())
+        .retiresCases());
+  }
+
+  /** A case with nothing to beat could never leave, so the drill is refused rather than run. */
+  @Test(expected = IllegalArgumentException.class)
+  public void aRetiringDrillNeedsATargetForEveryCase() {
+    DrillSpec.fromJson("{\"spec_version\": 3, \"type\": \"case_execution\","
+        + " \"delivery\": \"virtual\", \"cases\": [\"pll_gb\", \"pll_t\"], \"reps\": 40,"
+        + " \"case_targets_ms\": {\"pll_gb\": 2600},"
+        + " \"retire_after_wins\": 3, \"min_showings\": 5}");
   }
 
   /** A drill from a version this app does not know is refused, since running it wrong is worse. */

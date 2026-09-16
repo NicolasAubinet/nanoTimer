@@ -11,6 +11,7 @@ import com.cube.nanotimer.smartcube.step.FaceTurns;
 import com.cube.nanotimer.smartcube.step.LastLayerScrambles;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -50,6 +51,9 @@ public final class DrillSession {
   private final List<String> unknownCases = new ArrayList<String>();
   private final List<DrillRep> reps = new ArrayList<DrillRep>();
   private final List<String> pass = new ArrayList<String>();
+  /** Per case, for a drill that retires its cases: clean reps, and those that beat the target. */
+  private final Map<String, Integer> showings = new HashMap<String, Integer>();
+  private final Map<String, Integer> wins = new HashMap<String, Integer>();
 
   private CubieCube cube = new CubieCube();
   /** The user's own cube, followed only so that a turn it never reported can be recovered. */
@@ -341,14 +345,59 @@ public final class DrillSession {
         new ArrayList<CubeMove>(moves), shownAt, recognition, execution, moves.size(),
         resetCount, revealed, abandoned);
     reps.add(rep);
-    // Not for one that was skipped: giving up on a case is an answer about it, and the rep spends
-    // it whether or not it had been restarted or looked up first.
-    if (!abandoned && (resetCount > 0 || revealed)) {
+    if (spec.retiresCases()) {
+      // A case stays in until it has earned its way out, so nothing needs dealing again.
+      tally(rep);
+    } else if (!abandoned && (resetCount > 0 || revealed)) {
+      // Not for one that was skipped: giving up on a case is an answer about it, and the rep spends
+      // it whether or not it had been restarted or looked up first.
       showAgain(currentCase);
     }
     currentCase = null;
     caseShownAtMs = NOT_SHOWN;
     return rep;
+  }
+
+  /**
+   * Only a clean rep is a showing, and a win is one whose whole time, looking and turning, came in
+   * under the case's target: the drill is about the case getting faster, whichever half it lost.
+   */
+  private void tally(DrillRep rep) {
+    if (rep.isAbandoned() || rep.getResetCount() > 0 || rep.wasRevealed()) {
+      return;
+    }
+    String code = rep.getCaseCode();
+    showings.put(code, countOf(showings, code) + 1);
+    if (rep.getRecognitionMs() + rep.getExecutionMs() <= spec.getTargetMs(code)) {
+      wins.put(code, countOf(wins, code) + 1);
+    }
+  }
+
+  private static int countOf(Map<String, Integer> counts, String code) {
+    Integer count = counts.get(code);
+    return count == null ? 0 : count.intValue();
+  }
+
+  /** Whether a case has beaten its target often enough to leave the drill. */
+  public boolean isRetired(String code) {
+    return spec.retiresCases() && countOf(wins, code) >= spec.getWinsToRetire()
+        && countOf(showings, code) >= spec.getMinShowings();
+  }
+
+  /** How many clean reps of a case beat its target so far. Always 0 for a drill that retires none. */
+  public int getWins(String code) {
+    return countOf(wins, code);
+  }
+
+  /** The cases still being dealt, in the order the spec named them. */
+  public List<String> getActiveCases() {
+    List<String> active = new ArrayList<String>();
+    for (String code : cases) {
+      if (!isRetired(code)) {
+        active.add(code);
+      }
+    }
+    return active;
   }
 
   /** When the case went up, said in the clock the moves are stamped on. */
@@ -378,29 +427,30 @@ public final class DrillSession {
 
   /** Every case in turn, the order redrawn each pass so that the next one cannot be guessed. */
   private String pick() {
+    List<String> active = getActiveCases();
     if (spec.getSelection() == DrillSpec.Selection.WEIGHTED) {
-      return weighted();
+      return weighted(active);
     }
     if (pass.isEmpty()) {
-      pass.addAll(cases);
+      pass.addAll(active);
       Collections.shuffle(pass, random);
     }
     return pass.remove(pass.size() - 1);
   }
 
-  private String weighted() {
+  private String weighted(List<String> active) {
     long total = 0;
-    for (String code : cases) {
+    for (String code : active) {
       total += weightOf(code);
     }
     long draw = (long) (random.nextDouble() * total);
-    for (String code : cases) {
+    for (String code : active) {
       draw -= weightOf(code);
       if (draw < 0) {
         return code;
       }
     }
-    return cases.get(cases.size() - 1);
+    return active.get(active.size() - 1);
   }
 
   private long weightOf(String code) {
@@ -428,6 +478,6 @@ public final class DrillSession {
   }
 
   public boolean isFinished() {
-    return !isRunnable() || reps.size() >= spec.getReps();
+    return !isRunnable() || reps.size() >= spec.getReps() || getActiveCases().isEmpty();
   }
 }

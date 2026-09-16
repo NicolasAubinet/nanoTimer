@@ -39,10 +39,10 @@ public final class DrillSpec {
   public static final int VERSION = 3;
 
   /**
-   * The version a drill with no per-case targets is written at. A drill that needs nothing newer
-   * says so, so an app that only reads 2 still runs every drill that did not need 3.
+   * The version a drill with no per-case targets and no retiring is written at. A drill that needs
+   * nothing newer says so, so an app that only reads 2 still runs every drill that did not need 3.
    */
-  private static final int VERSION_WITHOUT_CASE_TARGETS = 2;
+  private static final int VERSION_2 = 2;
 
   /**
    * What a rep is timed and judged on. The two case types are the same reps and only move the
@@ -104,6 +104,8 @@ public final class DrillSpec {
   private final int reps;
   private final long targetMs;
   private final Map<String, Long> caseTargetsMs;
+  private final int winsToRetire;
+  private final int minShowings;
   private final String label;
   private final String crossFace;
   private final long planningMs;
@@ -123,9 +125,20 @@ public final class DrillSpec {
   public DrillSpec(String id, Type type, Delivery delivery, List<String> cases,
       Selection selection, int reps, long targetMs, Map<String, Long> caseTargetsMs,
       String label) {
-    this(caseTargetsMs.isEmpty() ? VERSION_WITHOUT_CASE_TARGETS : VERSION, id, DEFAULT_PUZZLE,
-        DEFAULT_METHOD, type, delivery, cases, selection, reps, targetMs, caseTargetsMs, label,
-        null, 0, null);
+    this(id, type, delivery, cases, selection, reps, targetMs, caseTargetsMs, 0, 0, label);
+  }
+
+  /**
+   * A drill that runs each case until it has beaten its target {@code winsToRetire} times, and
+   * not before {@code minShowings} clean reps of it; {@code reps} is then only the ceiling. 0 wins
+   * for a drill that runs its reps out, which is every drill the user picks by hand.
+   */
+  public DrillSpec(String id, Type type, Delivery delivery, List<String> cases,
+      Selection selection, int reps, long targetMs, Map<String, Long> caseTargetsMs,
+      int winsToRetire, int minShowings, String label) {
+    this(caseTargetsMs.isEmpty() && winsToRetire == 0 ? VERSION_2 : VERSION, id, DEFAULT_PUZZLE,
+        DEFAULT_METHOD, type, delivery, cases, selection, reps, targetMs, caseTargetsMs,
+        winsToRetire, minShowings, label, null, 0, null);
   }
 
   /**
@@ -134,15 +147,15 @@ public final class DrillSpec {
    */
   public static DrillSpec cross(String id, String crossFace, int reps, long planningMs,
       String label) {
-    return new DrillSpec(VERSION_WITHOUT_CASE_TARGETS, id, DEFAULT_PUZZLE, DEFAULT_METHOD,
-        Type.CROSS, Delivery.VIRTUAL, Collections.<String>emptyList(), Selection.ROUND_ROBIN, reps,
-        0, Collections.<String, Long>emptyMap(), label, crossFace, planningMs, null);
+    return new DrillSpec(VERSION_2, id, DEFAULT_PUZZLE, DEFAULT_METHOD, Type.CROSS,
+        Delivery.VIRTUAL, Collections.<String>emptyList(), Selection.ROUND_ROBIN, reps, 0,
+        Collections.<String, Long>emptyMap(), 0, 0, label, crossFace, planningMs, null);
   }
 
   private DrillSpec(int specVersion, String id, String puzzle, String method, Type type,
       Delivery delivery, List<String> cases, Selection selection, int reps, long targetMs,
-      Map<String, Long> caseTargetsMs, String label, String crossFace, long planningMs,
-      String source) {
+      Map<String, Long> caseTargetsMs, int winsToRetire, int minShowings, String label,
+      String crossFace, long planningMs, String source) {
     if (type == null || delivery == null || selection == null) {
       throw new IllegalArgumentException("A drill needs a type, a delivery and a selection");
     }
@@ -177,6 +190,22 @@ public final class DrillSpec {
       }
     }
     this.caseTargetsMs = Collections.unmodifiableMap(targets);
+    if (winsToRetire < 0 || minShowings < 0) {
+      throw new IllegalArgumentException("Retiring counts cannot be negative");
+    }
+    if (winsToRetire > 0) {
+      // A case with nothing to beat could never retire, so the drill would only ever hit its ceiling.
+      if (type == Type.CROSS) {
+        throw new IllegalArgumentException("A cross drill does not retire cases");
+      }
+      for (String code : this.cases) {
+        if (getTargetMs(code) <= 0) {
+          throw new IllegalArgumentException("A retiring drill needs a target for " + code);
+        }
+      }
+    }
+    this.winsToRetire = winsToRetire;
+    this.minShowings = minShowings;
     this.label = label;
     this.crossFace = crossFace;
     this.planningMs = planningMs;
@@ -207,6 +236,8 @@ public final class DrillSpec {
           object.getInt("reps"),
           object.optLong("target_ms", 0),
           targets(object.optJSONObject("case_targets_ms")),
+          object.optInt("retire_after_wins", 0),
+          object.optInt("min_showings", 0),
           object.optString("label", null),
           object.optString("cross_face", null),
           object.optLong("planning_ms", 0),
@@ -249,6 +280,10 @@ public final class DrillSpec {
       }
       if (!caseTargetsMs.isEmpty()) {
         object.put("case_targets_ms", new JSONObject(caseTargetsMs));
+      }
+      if (winsToRetire > 0) {
+        object.put("retire_after_wins", winsToRetire);
+        object.put("min_showings", minShowings);
       }
       if (label != null) {
         object.put("label", label);
@@ -329,14 +364,15 @@ public final class DrillSpec {
     return selection;
   }
 
-  /** Reps over the whole set, not per case. */
+  /** Reps over the whole set, not per case. The ceiling, for a drill that retires its cases. */
   public int getReps() {
     return reps;
   }
 
   /**
-   * What a rep is meant to come in under, on whichever half {@link #getType} names. 0 for none. The
-   * set-wide figure: a case with a target of its own answers to {@link #getTargetMs(String)} instead.
+   * What a rep is meant to come in under, on whichever half {@link #getType} names, or on the whole
+   * rep for a drill that retires its cases. 0 for none. The set-wide figure: a case with a target of
+   * its own answers to {@link #getTargetMs(String)} instead.
    */
   public long getTargetMs() {
     return targetMs;
@@ -351,6 +387,20 @@ public final class DrillSpec {
   /** The cases with a target of their own, which is what moved the version to 3. Often empty. */
   public Map<String, Long> getCaseTargetsMs() {
     return caseTargetsMs;
+  }
+
+  /** Wins against its target that retire a case, or 0 for a drill that runs its reps out. */
+  public int getWinsToRetire() {
+    return winsToRetire;
+  }
+
+  /** Clean reps a case must have had before it may retire, so one lucky first rep does not do it. */
+  public int getMinShowings() {
+    return minShowings;
+  }
+
+  public boolean retiresCases() {
+    return winsToRetire > 0;
   }
 
   /** A short name to show. Whoever wrote it is responsible for its language. */

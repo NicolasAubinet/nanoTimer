@@ -556,6 +556,64 @@ public class DrillSessionTest {
     assertFalse(session.isFinished());
   }
 
+  /** A case that keeps beating its target leaves, and the drill ends when none is left. */
+  @Test
+  public void aRetiringDrillEndsWhenEveryCaseHasBeatenItsTarget() {
+    DrillSession session = new DrillSession(retiring(60_000, 60_000, 40, 3, 5), new Random(7));
+    Map<String, Integer> dealt = solveAll(session, false);
+    assertEquals("five showings each, the minimum, not three wins", 5, dealt.get("pll_h").intValue());
+    assertEquals(5, dealt.get("pll_z").intValue());
+    assertTrue(session.isFinished());
+    assertTrue(session.getActiveCases().isEmpty());
+  }
+
+  /** A case that never beats its target stays, the one that does stops being dealt. */
+  @Test
+  public void aSlowCaseStaysUntilTheCeiling() {
+    DrillSession session = new DrillSession(retiring(60_000, 1, 20, 3, 3), new Random(7));
+    Map<String, Integer> dealt = solveAll(session, false);
+    assertEquals(3, dealt.get("pll_h").intValue());
+    assertEquals(17, dealt.get("pll_z").intValue());
+    assertEquals(0, session.getWins("pll_z"));
+    assertEquals(Collections.singletonList("pll_z"), session.getActiveCases());
+  }
+
+  /** A rep solved with the algorithm on screen is no showing and no win. */
+  @Test
+  public void aRevealedRepDoesNotCountTowardsRetiring() {
+    DrillSession session = new DrillSession(retiring(60_000, 60_000, 12, 1, 1), new Random(7));
+    Map<String, Integer> dealt = solveAll(session, true);
+    assertEquals(12, dealt.get("pll_h") + dealt.get("pll_z"));
+    assertFalse(session.isRetired("pll_h"));
+    assertEquals(0, session.getWins("pll_h"));
+  }
+
+  /** How often each case was dealt over a whole drill, every rep solved at once. */
+  private static Map<String, Integer> solveAll(DrillSession session, boolean reveal) {
+    Map<String, Integer> dealt = new HashMap<String, Integer>();
+    Hand hand = new Hand(session);
+    while (hand.next()) {
+      String code = session.getCurrentCase();
+      dealt.put(code, dealt.containsKey(code) ? dealt.get(code) + 1 : 1);
+      if (reveal) {
+        session.markRevealed();
+      }
+      hand.pause(300);
+      assertNotNull(code, hand.execute(inverse(session.getCurrentScramble())));
+    }
+    return dealt;
+  }
+
+  private static DrillSpec retiring(long targetH, long targetZ, int ceiling, int wins,
+      int showings) {
+    Map<String, Long> targets = new HashMap<String, Long>();
+    targets.put("pll_h", targetH);
+    targets.put("pll_z", targetZ);
+    return new DrillSpec("coach", DrillSpec.Type.CASE_EXECUTION, DrillSpec.Delivery.VIRTUAL,
+        Arrays.asList("pll_h", "pll_z"), DrillSpec.Selection.ROUND_ROBIN, ceiling, 0, targets,
+        wins, showings, null);
+  }
+
   private static void assertFinishes(String code, String algorithm) {
     DrillSession session = new DrillSession(spec(code, 1), noAlignment());
     Hand hand = new Hand(session);
