@@ -1,16 +1,23 @@
 package com.cube.nanotimer.gui;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
 
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.cube.CubePatternFormat;
 import com.cube.nanotimer.cube.SmartCubeManager;
+import com.cube.nanotimer.smartcube.drill.CaseTally;
 import com.cube.nanotimer.smartcube.drill.DrillRep;
 import com.cube.nanotimer.smartcube.drill.DrillSession;
 import com.cube.nanotimer.smartcube.drill.LayerRotation;
 import com.cube.nanotimer.drill.DrillSpec;
+import com.cube.nanotimer.gui.widget.DrillCasePips;
 import com.cube.nanotimer.gui.widget.DrillCaseTable;
 import com.cube.nanotimer.gui.widget.DrillStatCells;
 import com.cube.nanotimer.gui.widget.dialog.CaseAlgorithmsDialog;
@@ -24,6 +31,8 @@ import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.util.view.DrillRepFlourish;
 import com.cube.nanotimer.util.view.StepPalette;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -79,6 +88,10 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   /** The whole rep line, since the beat scales it and the hold is posted to it. */
   private View lastRepRow;
   private View repWash;
+  /** A coach drill's cases, its verdict on a rep, and the split that verdict pushed down a line. */
+  private DrillCasePips casePips;
+  private TextView repVerdict;
+  private TextView repBelow;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +101,9 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
 
     lastRepRow = findViewById(R.id.llDrillLastRep);
     repWash = findViewById(R.id.drillRepWash);
+    casePips = findViewById(R.id.vDrillCasePips);
+    repVerdict = findViewById(R.id.tvDrillLastRepVerdict);
+    repBelow = findViewById(R.id.tvDrillLastRepBelow);
 
     findViewById(R.id.btDrillSkip).setOnClickListener(new View.OnClickListener() {
       @Override
@@ -138,6 +154,9 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     if (!session.isRunnable()) {
       showUnavailable(getString(R.string.drill_no_known_cases));
       return;
+    }
+    if (spec.retiresCases()) {
+      useCaseProgress();
     }
     startWhenCubeConnected();
   }
@@ -231,6 +250,9 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
    */
   private void onRepFinished(DrillRep rep) {
     recorder.record(rep);
+    if (session.getSpec().retiresCases()) {
+      refreshCaseProgress(); // during the beat, so the dot fills beside the rep that earned it
+    }
     showLastRep(rep);
     // No wash for a rep that was skipped: nothing was solved to dwell on. The hold stays, since
     // what the user could not place is the one thing worth reading off a skipped rep, and the line
@@ -296,7 +318,11 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     // is. The line naming the rep that is over stays, since one beat is not long enough to read
     // it, but it stands back so that it cannot be taken for the name of this one.
     recedeLastRep();
-    setProgress(session.getReps().size() + 1, session.getSpec().getReps());
+    if (session.getSpec().retiresCases()) {
+      refreshCaseProgress();
+    } else {
+      setProgress(session.getReps().size() + 1, session.getSpec().getReps());
+    }
     // Only once the case is really up: before the page has drawn, the first one is not yet in
     // front of anybody, and onCubeDrawn is what says it is.
     if (cubeReady) {
@@ -324,16 +350,67 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
    */
   private void showLastRep(DrillRep rep) {
     String name = Utils.toSmartCubeCaseHeadline(this, rep.getCaseCode());
-    int colour = rep.getCaseCode() != null && rep.getCaseCode().startsWith(FAMILY_OLL)
-        ? R.color.step_oll : R.color.step_pll;
+    int colour = familyColour(rep.getCaseCode());
+    boolean retiring = session.getSpec().retiresCases();
+    repVerdict.setVisibility(View.GONE);
     if (rep.isAbandoned()) {
       setLastRep(name, colour, getString(R.string.drill_rep_skipped), true, null);
+      repBelow.setText(null);
       return;
     }
+    String split = getString(R.string.drill_rep_split,
+        FormatterService.INSTANCE.formatSolveTime(rep.getRecognitionMs()),
+        FormatterService.INSTANCE.formatSolveTime(rep.getExecutionMs()));
     setLastRep(name, colour, FormatterService.INSTANCE.formatSolveTime(rep.getTotalMs()), false,
-        getString(R.string.drill_rep_split,
-            FormatterService.INSTANCE.formatSolveTime(rep.getRecognitionMs()),
-            FormatterService.INSTANCE.formatSolveTime(rep.getExecutionMs())));
+        retiring ? null : split);
+    if (retiring) {
+      showVerdict(rep);
+      repBelow.setText(split);
+    }
+  }
+
+  private static int familyColour(String code) {
+    return code != null && code.startsWith(FAMILY_OLL) ? R.color.step_oll : R.color.step_pll;
+  }
+
+  /**
+   * A coach drill counts cases, not reps: the dots take the rep count's place and its meter's, and
+   * the split holds a line of its own from the start so the cube does not move when it first fills.
+   */
+  private void useCaseProgress() {
+    findViewById(R.id.tvDrillProgress).setVisibility(View.GONE);
+    findViewById(R.id.pbDrillProgress).setVisibility(View.GONE);
+    casePips.setVisibility(View.VISIBLE);
+    repBelow.setVisibility(View.INVISIBLE);
+    refreshCaseProgress();
+  }
+
+  private void refreshCaseProgress() {
+    casePips.show(session.getCases(), session.getTally(), session.getSpec().getWinsToRetire());
+    repBelow.setVisibility(repBelow.getText().length() > 0 ? View.VISIBLE : View.INVISIBLE);
+  }
+
+  /** How the rep did against its case's target, said only once the rep is over. */
+  private void showVerdict(DrillRep rep) {
+    long target = session.getSpec().getTargetMs(rep.getCaseCode());
+    String text;
+    int colourRes;
+    if (!CaseTally.isClean(rep)) {
+      text = getString(R.string.drill_rep_not_counted);
+      colourRes = R.color.secondary_text;
+    } else if (session.getTally().isWin(rep)) {
+      text = getString(R.string.drill_rep_under, FormatterService.INSTANCE.formatSolveTime(target));
+      colourRes = R.color.green_soft;
+    } else {
+      text = getString(R.string.drill_rep_over,
+          FormatterService.INSTANCE.formatSolveTime(rep.getTotalMs() - target));
+      colourRes = R.color.danger_text;
+    }
+    int colour = ContextCompat.getColor(this, colourRes);
+    repVerdict.setText(text);
+    repVerdict.setTextColor(colour);
+    repVerdict.setBackgroundTintList(ColorStateList.valueOf(colour));
+    repVerdict.setVisibility(View.VISIBLE);
   }
 
   @Override
@@ -363,8 +440,13 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
 
   /** The cells over the table, from the reps that count. Redrawn whenever that stops being all. */
   private void showFigures(List<DrillRep> reps) {
-    setSummaryCell(0, getString(R.string.drill_summary_cell_reps), String.valueOf(reps.size()),
-        getString(R.string.drill_summary_cell_of, session.getSpec().getReps()));
+    DrillSpec spec = session.getSpec();
+    if (spec.retiresCases()) {
+      showTargets(reps);
+    } else {
+      setSummaryCell(0, getString(R.string.drill_summary_cell_reps), String.valueOf(reps.size()),
+          getString(R.string.drill_summary_cell_of, spec.getReps()));
+    }
 
     // Skipped reps are counted apart rather than folded into a mean, the same rule the case stats
     // follow: a case you gave up on is not a slow time.
@@ -401,8 +483,101 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
         .setText(FormatterService.INSTANCE.formatSolveTime(executionTotal / timed));
     // The best rep is the best of both halves together, and says which case it was: a time with no
     // case attached was the one figure on this screen that could not be acted on.
-    setSummaryCell(2, getString(R.string.drill_summary_cell_best),
-        FormatterService.INSTANCE.formatSolveTime(best),
-        Utils.toSmartCubeCaseHeadline(this, bestCase));
+    if (spec.retiresCases()) {
+      // A coach drill's length is a result of its own, so it takes the cell the best rep had.
+      setSummaryCell(2, getString(R.string.drill_summary_cell_reps), String.valueOf(reps.size()),
+          getString(R.string.drill_summary_cell_at_most, spec.getReps()));
+      // The cell is laid out for a best time, in the best time's green; a count is not one.
+      ((TextView) findViewById(R.id.tvDrillCellValueThree))
+          .setTextColor(ContextCompat.getColor(this, R.color.white));
+    } else {
+      setSummaryCell(2, getString(R.string.drill_summary_cell_best),
+          FormatterService.INSTANCE.formatSolveTime(best),
+          Utils.toSmartCubeCaseHeadline(this, bestCase));
+    }
+  }
+
+  /**
+   * A coach drill's summary: how many cases cleared, what stopped it, and each case against its
+   * target. Read off the reps that count, so throwing a rep out below can take a clearing with it.
+   */
+  private void showTargets(List<DrillRep> reps) {
+    DrillSpec spec = session.getSpec();
+    List<String> cases = session.getCases();
+    CaseTally tally = CaseTally.of(spec, reps);
+    List<String> over = new ArrayList<String>();
+    LinearLayout rows = findViewById(R.id.llDrillTargetRows);
+    rows.removeAllViews();
+    LayoutInflater inflater = LayoutInflater.from(this);
+    for (String code : cases) {
+      String name = Utils.toSmartCubeCaseHeadline(this, code);
+      if (!tally.isCleared(code)) {
+        over.add(name);
+      }
+      rows.addView(targetRow(inflater, rows, code, name, reps, tally));
+    }
+    findViewById(R.id.llDrillTargets).setVisibility(View.VISIBLE);
+
+    setSummaryCell(0, getString(R.string.drill_summary_cell_cleared),
+        String.valueOf(cases.size() - over.size()),
+        getString(R.string.drill_summary_cell_of_cases, cases.size()));
+
+    StringBuilder note = new StringBuilder();
+    if (session.getReps().size() >= spec.getReps()) {
+      note.append(getString(R.string.drill_summary_ceiling, spec.getReps()));
+    }
+    if (!over.isEmpty()) {
+      note.append(note.length() == 0 ? "" : " ")
+          .append(getString(R.string.drill_summary_over_target, joined(over)));
+    }
+    TextView tvNote = findViewById(R.id.tvDrillSummaryNote);
+    tvNote.setText(note);
+    tvNote.setVisibility(note.length() == 0 ? View.GONE : View.VISIBLE);
+  }
+
+  /** One case: how often it was dealt, its wins, its target, and its mean against that target. */
+  private View targetRow(LayoutInflater inflater, LinearLayout parent, String code, String name,
+      List<DrillRep> reps, CaseTally tally) {
+    int dealt = 0;
+    int timed = 0;
+    long total = 0;
+    for (DrillRep rep : reps) {
+      if (code.equals(rep.getCaseCode())) {
+        dealt++;
+        if (!rep.isAbandoned()) {
+          timed++;
+          total += rep.getTotalMs();
+        }
+      }
+    }
+    long target = session.getSpec().getTargetMs(code);
+    View row = inflater.inflate(R.layout.drill_target_row, parent, false);
+    TextView tvName = row.findViewById(R.id.tvDrillTargetName);
+    tvName.setText(name);
+    tvName.setTextColor(ContextCompat.getColor(this, familyColour(code)));
+    ((TextView) row.findViewById(R.id.tvDrillTargetReps)).setText(String.valueOf(dealt));
+    ((DrillCasePips) row.findViewById(R.id.vDrillTargetWins))
+        .show(Collections.singletonList(code), tally, session.getSpec().getWinsToRetire());
+    ((TextView) row.findViewById(R.id.tvDrillTargetTarget))
+        .setText(FormatterService.INSTANCE.formatSolveTime(target));
+    TextView tvMean = row.findViewById(R.id.tvDrillTargetMean);
+    if (timed == 0) {
+      tvMean.setText(R.string.drill_case_no_time);
+      tvMean.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
+    } else {
+      long mean = total / timed;
+      tvMean.setText(FormatterService.INSTANCE.formatSolveTime(mean));
+      tvMean.setTextColor(ContextCompat.getColor(this,
+          mean <= target ? R.color.green_soft : R.color.danger_text));
+    }
+    return row;
+  }
+
+  private static String joined(List<String> names) {
+    StringBuilder sb = new StringBuilder();
+    for (String name : names) {
+      sb.append(sb.length() == 0 ? "" : ", ").append(name);
+    }
+    return sb.toString();
   }
 }

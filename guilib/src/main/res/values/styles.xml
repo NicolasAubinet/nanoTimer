@@ -771,6 +771,19 @@
     <item name="android:focusable">true</item>
   </style>
 
+  <!-- A coach drill's case list on the summary: its headings, and the figures under them. -->
+  <style name="DrillTargetHeading" parent="DialogSectionLabel">
+    <item name="android:textSize">10sp</item>
+    <item name="android:letterSpacing">0.06</item>
+  </style>
+
+  <style name="DrillTargetValue">
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:textColor">@color/white</item>
+    <item name="android:textSize">14sp</item>
+    <item name="android:fontFeatureSettings">tnum</item>
+  </style>
+
   <style name="NumericEditText">
     <item name="android:inputType">number</item>
     <item name="android:gravity">center</item>

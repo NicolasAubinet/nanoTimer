@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A hairline over each case row, as the rep table below draws between its own rows. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:gravity="top" android:height="1dp">
+    <shape android:shape="rectangle">
+      <solid android:color="@color/white_wash_10"/>
+    </shape>
+  </item>
+</layer-list>

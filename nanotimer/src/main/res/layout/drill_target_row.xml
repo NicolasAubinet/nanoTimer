@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One case of a coach drill on its summary, in the columns of the heading above the rows. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:minHeight="40dp"
+   android:gravity="center_vertical"
+   android:background="@drawable/drill_target_row_rule"
+   android:orientation="horizontal">
+
+  <TextView
+     android:id="@+id/tvDrillTargetName"
+     style="@style/DrillTargetValue"
+     android:layout_width="0dp"
+     android:layout_weight="1.5"
+     android:singleLine="true"
+     android:ellipsize="end"
+     android:fontFamily="@font/roboto_medium"
+     android:textSize="13sp"/>
+
+  <TextView
+     android:id="@+id/tvDrillTargetReps"
+     style="@style/DrillTargetValue"
+     android:layout_width="0dp"
+     android:layout_weight="0.7"/>
+
+  <FrameLayout
+     android:layout_width="0dp"
+     android:layout_height="wrap_content"
+     android:layout_weight="1.1">
+
+    <com.cube.nanotimer.gui.widget.DrillCasePips
+       android:id="@+id/vDrillTargetWins"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"/>
+  </FrameLayout>
+
+  <TextView
+     android:id="@+id/tvDrillTargetTarget"
+     style="@style/DrillTargetValue"
+     android:layout_width="0dp"
+     android:layout_weight="0.9"
+     android:gravity="end"/>
+
+  <TextView
+     android:id="@+id/tvDrillTargetMean"
+     style="@style/DrillTargetValue"
+     android:layout_width="0dp"
+     android:layout_weight="0.9"
+     android:gravity="end"/>
+</LinearLayout>

@@ -82,34 +82,69 @@
        android:layout_marginTop="12dp"
        android:minHeight="46dp"
        android:gravity="center"
-       android:orientation="horizontal">
+       android:orientation="vertical">
 
-      <TextView
-         android:id="@+id/tvDrillLastRepName"
+      <LinearLayout
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:layout_marginRight="8dp"
-         android:letterSpacing="0.02"
-         android:fontFamily="@font/roboto_medium"
-         android:textSize="13sp"/>
+         android:gravity="center"
+         android:orientation="horizontal">
 
+        <TextView
+           android:id="@+id/tvDrillLastRepName"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginRight="8dp"
+           android:letterSpacing="0.02"
+           android:fontFamily="@font/roboto_medium"
+           android:textSize="13sp"/>
+
+        <TextView
+           android:id="@+id/tvDrillLastRep"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:textColor="@color/white"
+           android:fontFamily="@font/roboto_medium"
+           android:textSize="24sp"
+           android:fontFeatureSettings="tnum"/>
+
+        <!-- A coach drill's verdict on the rep, against its case's target. Gone on every other. -->
+        <TextView
+           android:id="@+id/tvDrillLastRepVerdict"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="8dp"
+           android:background="@drawable/tinted_pill"
+           android:paddingLeft="10dp"
+           android:paddingRight="10dp"
+           android:paddingTop="3dp"
+           android:paddingBottom="3dp"
+           android:singleLine="true"
+           android:fontFamily="@font/roboto_medium"
+           android:textSize="12sp"
+           android:fontFeatureSettings="tnum"
+           android:visibility="gone"/>
+
+        <TextView
+           android:id="@+id/tvDrillLastRepSplit"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="8dp"
+           android:textColor="@color/secondary_text"
+           android:textSize="12sp"
+           android:fontFeatureSettings="tnum"/>
+      </LinearLayout>
+
+      <!-- The split, for a coach drill whose verdict took its place on the line above. Such a drill
+           holds its room from the first rep, so the cube does not jump when it first fills. -->
       <TextView
-         android:id="@+id/tvDrillLastRep"
+         android:id="@+id/tvDrillLastRepBelow"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:textColor="@color/white"
-         android:fontFamily="@font/roboto_medium"
-         android:textSize="24sp"
-         android:fontFeatureSettings="tnum"/>
-
-      <TextView
-         android:id="@+id/tvDrillLastRepSplit"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_marginLeft="8dp"
          android:textColor="@color/secondary_text"
          android:textSize="12sp"
-         android:fontFeatureSettings="tnum"/>
+         android:fontFeatureSettings="tnum"
+         android:visibility="gone"/>
     </LinearLayout>
 
     <!-- Where the drill has got to, and the mode it cannot leave. On their own line above the
@@ -121,6 +156,14 @@
        android:layout_marginTop="14dp"
        android:gravity="center_vertical"
        android:orientation="horizontal">
+
+      <!-- A coach drill's progress, a group of dots per case, in place of the rep count. -->
+      <com.cube.nanotimer.gui.widget.DrillCasePips
+         android:id="@+id/vDrillCasePips"
+         android:layout_width="0dp"
+         android:layout_height="wrap_content"
+         android:layout_weight="1"
+         android:visibility="gone"/>
 
       <TextView
          android:id="@+id/tvDrillProgress"
@@ -270,6 +313,72 @@
          android:textColor="@color/white"
          android:textSize="17sp"
          android:visibility="gone"/>
+
+      <!-- A coach drill's ending: what stopped it, and which cases are still over target. -->
+      <TextView
+         android:id="@+id/tvDrillSummaryNote"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="14dp"
+         android:textColor="@color/white"
+         android:textSize="14sp"
+         android:lineSpacingMultiplier="1.1"
+         android:visibility="gone"/>
+
+      <!-- A coach drill's cases against their targets: one line per case, dots as on the drill. -->
+      <LinearLayout
+         android:id="@+id/llDrillTargets"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="18dp"
+         android:orientation="vertical"
+         android:visibility="gone">
+
+        <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:paddingBottom="8dp"
+           android:orientation="horizontal">
+
+          <TextView
+             style="@style/DrillTargetHeading"
+             android:layout_width="0dp"
+             android:layout_weight="1.5"
+             android:text="@string/drill_targets_column_case"/>
+
+          <TextView
+             style="@style/DrillTargetHeading"
+             android:layout_width="0dp"
+             android:layout_weight="0.7"
+             android:text="@string/drill_targets_column_reps"/>
+
+          <TextView
+             style="@style/DrillTargetHeading"
+             android:layout_width="0dp"
+             android:layout_weight="1.1"
+             android:text="@string/drill_targets_column_wins"/>
+
+          <TextView
+             style="@style/DrillTargetHeading"
+             android:layout_width="0dp"
+             android:layout_weight="0.9"
+             android:gravity="end"
+             android:text="@string/drill_targets_column_target"/>
+
+          <TextView
+             style="@style/DrillTargetHeading"
+             android:layout_width="0dp"
+             android:layout_weight="0.9"
+             android:gravity="end"
+             android:text="@string/drill_summary_cell_mean"/>
+        </LinearLayout>
+
+        <LinearLayout
+           android:id="@+id/llDrillTargetRows"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="vertical"/>
+      </LinearLayout>
 
       <!-- Where the figures above came from. One line per case rather than per rep, because the
            question a finished drill answers is which cases the time went to, and a case dealt four

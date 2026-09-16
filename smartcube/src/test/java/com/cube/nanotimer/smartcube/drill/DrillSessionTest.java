@@ -574,7 +574,7 @@ public class DrillSessionTest {
     Map<String, Integer> dealt = solveAll(session, false);
     assertEquals(3, dealt.get("pll_h").intValue());
     assertEquals(17, dealt.get("pll_z").intValue());
-    assertEquals(0, session.getWins("pll_z"));
+    assertEquals(0, session.getTally().getWins("pll_z"));
     assertEquals(Collections.singletonList("pll_z"), session.getActiveCases());
   }
 
@@ -585,7 +585,7 @@ public class DrillSessionTest {
     Map<String, Integer> dealt = solveAll(session, true);
     assertEquals(12, dealt.get("pll_h") + dealt.get("pll_z"));
     assertFalse(session.isRetired("pll_h"));
-    assertEquals(0, session.getWins("pll_h"));
+    assertEquals(0, session.getTally().getShowings("pll_h"));
   }
 
   /** How often each case was dealt over a whole drill, every rep solved at once. */

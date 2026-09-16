@@ -11,7 +11,6 @@ import com.cube.nanotimer.smartcube.step.FaceTurns;
 import com.cube.nanotimer.smartcube.step.LastLayerScrambles;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -51,9 +50,6 @@ public final class DrillSession {
   private final List<String> unknownCases = new ArrayList<String>();
   private final List<DrillRep> reps = new ArrayList<DrillRep>();
   private final List<String> pass = new ArrayList<String>();
-  /** Per case, for a drill that retires its cases: clean reps, and those that beat the target. */
-  private final Map<String, Integer> showings = new HashMap<String, Integer>();
-  private final Map<String, Integer> wins = new HashMap<String, Integer>();
 
   private CubieCube cube = new CubieCube();
   /** The user's own cube, followed only so that a turn it never reported can be recovered. */
@@ -345,10 +341,8 @@ public final class DrillSession {
         new ArrayList<CubeMove>(moves), shownAt, recognition, execution, moves.size(),
         resetCount, revealed, abandoned);
     reps.add(rep);
-    if (spec.retiresCases()) {
-      // A case stays in until it has earned its way out, so nothing needs dealing again.
-      tally(rep);
-    } else if (!abandoned && (resetCount > 0 || revealed)) {
+    // A retiring drill deals nothing again: a case stays in until it has earned its way out.
+    if (!spec.retiresCases() && !abandoned && (resetCount > 0 || revealed)) {
       // Not for one that was skipped: giving up on a case is an answer about it, and the rep spends
       // it whether or not it had been restarted or looked up first.
       showAgain(currentCase);
@@ -358,42 +352,27 @@ public final class DrillSession {
     return rep;
   }
 
-  /**
-   * Only a clean rep is a showing, and a win is one whose whole time, looking and turning, came in
-   * under the case's target: the drill is about the case getting faster, whichever half it lost.
-   */
-  private void tally(DrillRep rep) {
-    if (rep.isAbandoned() || rep.getResetCount() > 0 || rep.wasRevealed()) {
-      return;
-    }
-    String code = rep.getCaseCode();
-    showings.put(code, countOf(showings, code) + 1);
-    if (rep.getRecognitionMs() + rep.getExecutionMs() <= spec.getTargetMs(code)) {
-      wins.put(code, countOf(wins, code) + 1);
-    }
-  }
-
-  private static int countOf(Map<String, Integer> counts, String code) {
-    Integer count = counts.get(code);
-    return count == null ? 0 : count.intValue();
+  /** What the reps so far have counted towards each case leaving the drill. */
+  public CaseTally getTally() {
+    return CaseTally.of(spec, reps);
   }
 
   /** Whether a case has beaten its target often enough to leave the drill. */
   public boolean isRetired(String code) {
-    return spec.retiresCases() && countOf(wins, code) >= spec.getWinsToRetire()
-        && countOf(showings, code) >= spec.getMinShowings();
+    return getTally().isCleared(code);
   }
 
-  /** How many clean reps of a case beat its target so far. Always 0 for a drill that retires none. */
-  public int getWins(String code) {
-    return countOf(wins, code);
+  /** The cases this app can deal, in the order the spec named them. */
+  public List<String> getCases() {
+    return Collections.unmodifiableList(cases);
   }
 
   /** The cases still being dealt, in the order the spec named them. */
   public List<String> getActiveCases() {
+    CaseTally tally = getTally();
     List<String> active = new ArrayList<String>();
     for (String code : cases) {
-      if (!isRetired(code)) {
+      if (!tally.isCleared(code)) {
         active.add(code);
       }
     }
