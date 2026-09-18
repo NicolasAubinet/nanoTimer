@@ -118,9 +118,11 @@ public class AnalysisCases {
     return order;
   }
 
-  /** Told which case the reader asked to see. */
+  /** Told which case the reader asked to see, or that they asked where the plan is. */
   public interface Listener {
     void onCasePicked(String caseCode);
+
+    void onRecommendedDrills();
   }
 
   private final Context context;
@@ -153,6 +155,12 @@ public class AnalysisCases {
     headings.setLabel(R.string.analysis_column_case);
     headings.rankableLabel(false); // a set opens at its first case, which is OLL 1 and PLL Aa
     headings.reserveChevron(true); // every case opens its algorithms, so every row carries one
+    root.findViewById(R.id.llAnalysisRecommended).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        listener.onRecommendedDrills();
+      }
+    });
   }
 
   /** Opens on one family, for a reader who arrived by tapping that step rather than the tab. */
@@ -181,6 +189,8 @@ public class AnalysisCases {
         .setVisibility(anything ? View.VISIBLE : View.GONE);
     root.findViewById(R.id.svAnalysisFamilies).setVisibility(anything ? View.VISIBLE : View.GONE);
     root.findViewById(R.id.llAnalysisCaseTable).setVisibility(anything ? View.VISIBLE : View.GONE);
+    root.findViewById(R.id.llAnalysisRecommended)
+        .setVisibility(anything ? View.VISIBLE : View.GONE);
     TextView empty = (TextView) root.findViewById(R.id.tvAnalysisCasesEmpty);
     empty.setVisibility(anything ? View.GONE : View.VISIBLE);
     empty.setText(emptyLine(method));

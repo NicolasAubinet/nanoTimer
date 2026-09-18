@@ -1117,6 +1117,7 @@
   <string name="analysis_tab_solve">R\u00e9solution</string>
   <string name="analysis_tab_cases">Cas</string>
   <string name="analysis_tab_plan">Plan</string>
+  <string name="analysis_recommended_drills">Entraînements recommandés</string>
   <string name="analysis_empty">Connectez un smart cube et faites quelques résolutions pour voir vos étapes apparaître ici.</string>
   <string name="analysis_empty_scramble">Ce type de résolution met en place une seule étape et non une résolution entière, il n\'y a donc rien à détailler.</string>
   <string name="analysis_empty_puzzle">Un smart cube ne lit que les résolutions de 3x3. Il n\'y a rien à détailler ici.</string>

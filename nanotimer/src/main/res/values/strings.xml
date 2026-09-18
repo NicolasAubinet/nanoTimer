@@ -1163,6 +1163,7 @@
   <string name="analysis_tab_solve">Solve</string>
   <string name="analysis_tab_cases">Cases</string>
   <string name="analysis_tab_plan">Plan</string>
+  <string name="analysis_recommended_drills">Recommended drills</string>
   <string name="analysis_empty">Connect a smart cube and do some solves to have your steps appear here.</string>
   <string name="analysis_empty_scramble">This solve type sets up one step rather than a whole solve, so there is nothing to break down.</string>
   <string name="analysis_empty_puzzle">A smart cube only reads 3x3 solves. There is nothing to break down here.</string>
