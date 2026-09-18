@@ -23,7 +23,7 @@ android {
         compileSdkVersion 36
         targetSdkVersion 36
         versionCode 69
-        versionName "2.1.0"
+        versionName project.property('cubenchVersion')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
