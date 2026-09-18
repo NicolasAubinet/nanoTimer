@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 
-// The coach service's address and token, kept out of the repository. A build without them has no coach.
+// The coach service's address and token, kept out of the repository and given to debug builds only.
+// A build without them has no coach.
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -16,8 +17,6 @@ if (localPropertiesFile.exists()) {
 
 android {
     defaultConfig {
-        resValue 'string', 'coach_url', localProperties.getProperty('coach.url', '')
-        resValue 'string', 'coach_token', localProperties.getProperty('coach.token', '')
         applicationId "com.cube.nanotimer"
         minSdkVersion 21
         compileSdkVersion 36
@@ -32,8 +31,14 @@ android {
             // touching it or its data.
             applicationIdSuffix ".debug"
             versionNameSuffix "-debug"
+            resValue 'string', 'coach_url', localProperties.getProperty('coach.url', '')
+            resValue 'string', 'coach_token', localProperties.getProperty('coach.token', '')
         }
         release {
+            // No coach in a release until each install has its own identity (C2): a token here
+            // would be one shared by every Play user, and readable out of the APK.
+            resValue 'string', 'coach_url', ''
+            resValue 'string', 'coach_token', ''
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
