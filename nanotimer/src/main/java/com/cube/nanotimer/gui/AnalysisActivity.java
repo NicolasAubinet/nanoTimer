@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ import com.cube.nanotimer.R;
 import com.cube.nanotimer.coach.CoachPayloadBuilder;
 import com.cube.nanotimer.coach.StepBaseline;
 import com.cube.nanotimer.coach.StoredCoachPlan;
+import com.cube.nanotimer.cube.AlgorithmFiguresReader;
 import com.cube.nanotimer.cube.SolveTypeMethod;
 import com.cube.nanotimer.gui.widget.AnalysisCases;
 import com.cube.nanotimer.gui.widget.AnalysisHelpDialog;
@@ -31,6 +33,7 @@ import com.cube.nanotimer.gui.widget.dialog.CaseAlgorithmsDialog;
 import com.cube.nanotimer.gui.widget.SegmentedControl;
 import com.cube.nanotimer.gui.widget.SmartCubeConnectDialog;
 import com.cube.nanotimer.services.db.DataCallback;
+import com.cube.nanotimer.session.AlgorithmFigures;
 import com.cube.nanotimer.session.CaseKnowledge;
 import com.cube.nanotimer.session.MethodStatistics;
 import com.cube.nanotimer.util.FormatterService;
@@ -40,13 +43,16 @@ import com.cube.nanotimer.util.coach.CoachRead;
 import com.cube.nanotimer.util.coach.CoachRefusal;
 import com.cube.nanotimer.util.coach.CoachReply;
 import com.cube.nanotimer.util.helper.Utils;
+import com.cube.nanotimer.util.view.AlgorithmFiguresBarView;
 import com.cube.nanotimer.util.view.DeltaBarView;
+import com.cube.nanotimer.util.view.KnowledgeRingView;
 import com.cube.nanotimer.util.view.SolveStepBarView;
 import com.cube.nanotimer.util.view.StepPalette;
 import com.cube.nanotimer.vo.CaseHistory;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.CubeMethod;
 import com.cube.nanotimer.vo.SolveStep;
+import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.vo.StepStats;
 
@@ -129,6 +135,8 @@ public class AnalysisActivity extends NanoTimerActivity {
   /** What the query returned, kept apart from what is drawn: the sample stands in front of it. */
   private MethodStatistics read;
   private List<CaseKnowledge> readKnown = Collections.emptyList();
+  /** The standard-algorithms card's figures, null until the window's solves have been read again. */
+  private Map<String, AlgorithmFigures> algorithmFigures;
   /**
    * Whether a cube has ever read a solve of theirs, of any solve type. Null until that read lands.
    * It is what separates the two readers an empty window otherwise looks the same to: one who owns
@@ -475,6 +483,7 @@ public class AnalysisActivity extends NanoTimerActivity {
   }
 
   private void load() {
+    loadAlgorithmFigures();
     App.INSTANCE.getService().getMethodStatistics(solveType, method, window.solves(),
         new DataCallback<MethodStatistics>() {
           @Override
@@ -487,6 +496,90 @@ public class AnalysisActivity extends NanoTimerActivity {
             });
           }
         });
+  }
+
+  /**
+   * Replays every solve in the window, so it runs on a thread of its own rather than holding up the
+   * service, and a read that lands after the window has changed again is dropped.
+   */
+  private void loadAlgorithmFigures() {
+    algorithmFigures = null;
+    showAlgorithmFigures();
+    final AnalysisWindow asked = window;
+    CubeMethod solved = SolveTypeMethod.of(solveType);
+    if (solved != CubeMethod.CFOP || !readAsSolve()) {
+      return;
+    }
+    App.INSTANCE.getService().getMethodSolves(solveType, solved, window.solves(),
+        new DataCallback<List<SolveTime>>() {
+          @Override
+          public void onData(final List<SolveTime> solves) {
+            new Thread(new Runnable() {
+              @Override
+              public void run() {
+                final Map<String, AlgorithmFigures> figures =
+                    AlgorithmFiguresReader.readFrom(solves);
+                runOnUiThread(new Runnable() {
+                  @Override
+                  public void run() {
+                    if (asked == window && !isFinishing()) {
+                      algorithmFigures = figures;
+                      showAlgorithmFigures();
+                    }
+                  }
+                });
+              }
+            }).start();
+          }
+        });
+  }
+
+  private void showAlgorithmFigures() {
+    View card = findViewById(R.id.llAnalysisAlgorithmsCard);
+    boolean any = false;
+    if (algorithmFigures != null) {
+      for (AlgorithmFigures figures : algorithmFigures.values()) {
+        any |= figures.getNotSeen() < figures.getSetSize();
+      }
+    }
+    // Never over the example: its steps are invented, and these would be the reader's own.
+    boolean shown = any && !sampling();
+    card.setVisibility(shown ? View.VISIBLE : View.GONE);
+    if (!shown) {
+      return;
+    }
+    LinearLayout rows = findViewById(R.id.llAnalysisAlgorithmsRows);
+    rows.removeAllViews();
+    LayoutInflater inflater = LayoutInflater.from(this);
+    for (Map.Entry<String, AlgorithmFigures> family : algorithmFigures.entrySet()) {
+      AlgorithmFigures figures = family.getValue();
+      View row = inflater.inflate(R.layout.analysis_algorithms_row, rows, false);
+      ((TextView) row.findViewById(R.id.tvAnalysisAlgorithmsName))
+          .setText(Utils.toSmartCubeStepLocalizedName(this, family.getKey(), 0));
+      ((AlgorithmFiguresBarView) row.findViewById(R.id.vAnalysisAlgorithmsBar)).setCounts(
+          figures.getStandard(), figures.getNotStandard(), figures.getSetSize());
+      ((TextView) row.findViewById(R.id.tvAnalysisAlgorithmsCount)).setText(getString(
+          R.string.analysis_algorithms_count, figures.getStandard(), figures.getSetSize()));
+      ((TextView) row.findViewById(R.id.tvAnalysisAlgorithmsExtra))
+          .setText(String.valueOf(figures.getExtraMoves()));
+      rows.addView(row);
+    }
+
+    ViewGroup key = findViewById(R.id.llAnalysisAlgorithmsKey);
+    key.removeAllViews();
+    int hue = ContextCompat.getColor(this, R.color.lightblue);
+    addAlgorithmsKey(key, inflater, hue, R.string.analysis_algorithms_standard);
+    addAlgorithmsKey(key, inflater, hue & 0x00FFFFFF | KnowledgeRingView.SEEN_ALPHA << 24,
+        R.string.analysis_algorithms_not_standard);
+    addAlgorithmsKey(key, inflater, ContextCompat.getColor(this, R.color.hero_inset),
+        R.string.analysis_algorithms_not_seen);
+  }
+
+  private void addAlgorithmsKey(ViewGroup key, LayoutInflater inflater, int color, int name) {
+    View entry = inflater.inflate(R.layout.analysis_algorithms_key, key, false);
+    entry.findViewById(R.id.vAnalysisAlgorithmsKeySwatch).setBackgroundColor(color);
+    ((TextView) entry.findViewById(R.id.tvAnalysisAlgorithmsKeyName)).setText(name);
+    key.addView(entry);
   }
 
   private void show(MethodStatistics statistics) {
@@ -534,6 +627,7 @@ public class AnalysisActivity extends NanoTimerActivity {
     }
     showHero(statistics);
     showDeltas();
+    showAlgorithmFigures();
     // Before the step table: which families have cases is what decides a step row's chevron, and
     // it is known from the statistics alone, so it does not wait on the case history.
     showCases();

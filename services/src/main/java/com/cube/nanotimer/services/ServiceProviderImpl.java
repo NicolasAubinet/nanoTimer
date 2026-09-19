@@ -1694,6 +1694,14 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   @Override
+  public List<SolveTime> getMethodSolves(SolveType solveType, CubeMethod method, int lastSolves) {
+    String and = " AND h." + DB.COL_TIMEHISTORY_SOLVETYPE_ID + " = ?"
+        + " AND h." + DB.COL_TIMEHISTORY_SMARTCUBE_METHOD + " = ?";
+    return smartcubeSolves(and, new String[] { String.valueOf(solveType.getId()), method.getCode() },
+        Math.max(0, lastSolves));
+  }
+
+  @Override
   public void refreshCaseKnowledge() {
     CaseKnowledgeStore.rebuild(db);
   }
