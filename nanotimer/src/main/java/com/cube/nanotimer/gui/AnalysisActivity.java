@@ -774,8 +774,10 @@ public class AnalysisActivity extends NanoTimerActivity {
         return getString(R.string.coach_refused_device);
       case PAYLOAD_INVALID:
       case PAYLOAD_TOO_LARGE:
-      case PAYLOAD_TOO_NEW:
         return getString(R.string.coach_refused_update);
+      case PAYLOAD_TOO_NEW:
+        // The service is the older of the two, so updating the app would only widen the gap.
+        return getString(R.string.coach_refused_unavailable);
       default:
         // The service's own trouble, and any code added after this app was built.
         return getString(R.string.coach_refused_unavailable);
