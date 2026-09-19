@@ -17,11 +17,13 @@ import java.util.Set;
  * standard, and neither is an algorithm of the solver's own, even one they asked not to be flagged
  * for. Which algorithms a case is listed with is the tables' business, not this class's.
  *
- * <p><b>Extra moves</b> is one definition, shared by every screen and by the coach: the turns an
- * execution took over the shortest algorithm its case is listed with, both counted the same way, and
- * never below zero, since a shorter execution is not a cost and must not cancel a longer one out of a
- * total. The word "optimal" is deliberately absent: the lists hold the algorithms a case is usually
- * taught with, not every algorithm there is.
+ * <p><b>Extra moves</b> is one definition, shared by every screen and by the coach: none for an
+ * execution that is one of its case's listed algorithms, whichever of them, since a solver turning a
+ * recommended algorithm is not wasting moves because a shorter one is also listed (owner,
+ * 2026-09-19). Any other execution costs the turns it took over the shortest listed algorithm, both
+ * counted the same way, and never below zero, since a shorter execution is not a cost and must not
+ * cancel a longer one out of a total. The word "optimal" is deliberately absent: the lists hold the
+ * algorithms a case is usually taught with, not every algorithm there is.
  */
 public final class AlgorithmFigures {
 
@@ -35,9 +37,15 @@ public final class AlgorithmFigures {
     this.setSize = setSize;
   }
 
-  /** The turns taken over the usual ones, or 0 where there is nothing to compare with. */
-  public static int extraMoves(int moves, int usualMoves) {
-    return usualMoves <= 0 ? 0 : Math.max(0, moves - usualMoves);
+  /**
+   * The turns taken over the usual ones: 0 for a listed algorithm, or where there is nothing to
+   * compare with.
+   *
+   * @param listed whether the execution is one of its case's listed algorithms
+   * @param usualMoves the turns of the shortest listed algorithm
+   */
+  public static int extraMoves(boolean listed, int moves, int usualMoves) {
+    return listed || usualMoves <= 0 ? 0 : Math.max(0, moves - usualMoves);
   }
 
   /**
@@ -53,7 +61,7 @@ public final class AlgorithmFigures {
     if (isStandard) {
       standard++;
     }
-    extraMoves += extraMoves(moves, usualMoves);
+    extraMoves += extraMoves(isStandard, moves, usualMoves);
   }
 
   /** Whether every case of the set has been counted, so older solves can change nothing. */

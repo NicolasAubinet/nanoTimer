@@ -1239,7 +1239,7 @@
   <string name="analysis_help_standard">Algorithmes standards</string>
   <string name="analysis_help_standard_body">Chaque cas de l\'étape compté une fois, tel que vous l\'avez fait la dernière fois qu\'il est venu dans la fenêtre : avec l\'un des algorithmes qu\'on enseigne d\'habitude pour lui, ou non. Deux algorithmes pour un cas, ou un algorithme à vous, comptent comme non standards. En F2L, ce sont les 41 cas de base.</string>
   <string name="analysis_help_extra">Coups en trop</string>
-  <string name="analysis_help_extra_body">Les mouvements faits en plus de l\'algorithme habituel le plus court, pour chacun de ces cas, additionnés. Une tranche ou un mouvement large compte pour les mouvements qui le composent. Un algorithme plus court compte pour zéro.</string>
+  <string name="analysis_help_extra_body">Pour chacun de ces cas fait sans aucun de ses algorithmes habituels, les mouvements faits en plus du plus court d\'entre eux, additionnés. Un algorithme habituel compte pour zéro, même s\'il en existe un plus court, tout comme un algorithme à vous plus court. Une tranche ou un mouvement large compte pour les mouvements qui le composent.</string>
   <string name="analysis_help_plan_title">Un plan</string>
   <string name="analysis_help_plan_body">Rien ici n\'est mesuré. Un plan est écrit à partir des chiffres de Résolution et Cas, et ceux-là restent gratuits.</string>
   <string name="analysis_help_cases_title">Quels cas vous coûtent</string>

@@ -1288,7 +1288,7 @@
   <string name="analysis_help_standard">Standard algorithms</string>
   <string name="analysis_help_standard_body">Each case of the step counted once, as you turned it the last time it came up in the window: with one of the algorithms it is usually taught with, or not. Two algorithms for one case, or an algorithm of your own, count as not standard. F2L counts its 41 basic cases.</string>
   <string name="analysis_help_extra">Extra moves</string>
-  <string name="analysis_help_extra_body">The turns you took over the shortest usual algorithm for each of those cases, added up. Slices and wide turns count as the turns they are made of. A shorter algorithm counts as none.</string>
+  <string name="analysis_help_extra_body">For each of those cases put in with none of its usual algorithms, the turns you took over the shortest usual one, added up. A usual algorithm counts as none, even where a shorter one is listed, and so does a shorter algorithm of your own. Slices and wide turns count as the turns they are made of.</string>
   <string name="analysis_help_plan_title">A plan</string>
   <string name="analysis_help_plan_body">Nothing here is measured. A plan is written from the figures on Solve and Cases, and those stay free.</string>
   <string name="analysis_help_cases_title">Which cases cost you</string>

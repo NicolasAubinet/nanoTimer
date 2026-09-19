@@ -1238,7 +1238,7 @@
   <string name="analysis_help_standard">Algoritmos estándar</string>
   <string name="analysis_help_standard_body">Cada caso del paso cuenta una vez, tal como lo hiciste la última vez que salió en la ventana: con uno de los algoritmos con los que se suele enseñar, o no. Dos algoritmos para un caso, o un algoritmo propio, cuentan como no estándar. En F2L son sus 41 casos básicos.</string>
   <string name="analysis_help_extra">Movimientos de más</string>
-  <string name="analysis_help_extra_body">Los giros que hiciste de más sobre el algoritmo habitual más corto de cada uno de esos casos, sumados. Un slice o un giro doble capa cuenta como los giros que lo forman. Un algoritmo más corto cuenta como cero.</string>
+  <string name="analysis_help_extra_body">Para cada uno de esos casos resuelto sin ninguno de sus algoritmos habituales, los giros que hiciste de más sobre el más corto de ellos, sumados. Un algoritmo habitual cuenta como cero, aunque haya uno más corto, igual que un algoritmo tuyo más corto. Un slice o un giro doble capa cuenta como los giros que lo forman.</string>
   <string name="analysis_help_plan_title">Un plan</string>
   <string name="analysis_help_plan_body">Aquí no se mide nada. Un plan se escribe a partir de las cifras de Resolución y Casos, y esas siguen siendo gratis.</string>
   <string name="analysis_help_cases_title">Qué casos te cuestan</string>

@@ -10,18 +10,24 @@ public class AlgorithmFiguresTest {
 
   @Test
   public void extraMovesAreTheTurnsOverTheUsualOnes() {
-    assertEquals(2, AlgorithmFigures.extraMoves(16, 14));
-    assertEquals(0, AlgorithmFigures.extraMoves(14, 14));
+    assertEquals(2, AlgorithmFigures.extraMoves(false, 16, 14));
+    assertEquals(0, AlgorithmFigures.extraMoves(false, 14, 14));
+  }
+
+  /** A recommended algorithm longer than another listed one is still no waste. */
+  @Test
+  public void aListedAlgorithmCostsNothing() {
+    assertEquals(0, AlgorithmFigures.extraMoves(true, 11, 7));
   }
 
   @Test
   public void aShorterExecutionCostsNothing() {
-    assertEquals(0, AlgorithmFigures.extraMoves(12, 15));
+    assertEquals(0, AlgorithmFigures.extraMoves(false, 12, 15));
   }
 
   @Test
   public void nothingToCompareWithCostsNothing() {
-    assertEquals(0, AlgorithmFigures.extraMoves(9, 0));
+    assertEquals(0, AlgorithmFigures.extraMoves(false, 9, 0));
   }
 
   @Test
@@ -43,7 +49,7 @@ public class AlgorithmFiguresTest {
     assertEquals(1, figures.getStandard());
     assertEquals(2, figures.getNotStandard());
     assertEquals(18, figures.getNotSeen());
-    assertEquals(4, figures.getExtraMoves());
+    assertEquals(2, figures.getExtraMoves()); // the V is listed, so its two over count nothing
   }
 
   @Test

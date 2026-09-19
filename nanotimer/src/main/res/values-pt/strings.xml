@@ -1241,7 +1241,7 @@
   <string name="analysis_help_standard">Algoritmos padrão</string>
   <string name="analysis_help_standard_body">Cada caso da etapa conta uma vez, tal como o fizeste da última vez que apareceu na janela: com um dos algoritmos com que costuma ser ensinado, ou não. Dois algoritmos para um caso, ou um algoritmo teu, contam como fora do padrão. No F2L contam os seus 41 casos básicos.</string>
   <string name="analysis_help_extra">Movimentos a mais</string>
-  <string name="analysis_help_extra_body">Os movimentos que fizeste a mais sobre o algoritmo habitual mais curto de cada um desses casos, somados. Uma fatia ou um movimento largo conta como os movimentos que o compõem. Um algoritmo mais curto conta como zero.</string>
+  <string name="analysis_help_extra_body">Para cada um desses casos resolvido sem nenhum dos seus algoritmos habituais, os movimentos que fizeste a mais sobre o mais curto deles, somados. Um algoritmo habitual conta como zero, mesmo que haja um mais curto, tal como um algoritmo teu mais curto. Uma fatia ou um movimento largo conta como os movimentos que o compõem.</string>
   <string name="analysis_help_plan_title">Um plano</string>
   <string name="analysis_help_plan_body">Aqui nada é medido. Um plano é escrito a partir dos números de Resolução e Casos, e esses continuam gratuitos.</string>
   <string name="analysis_help_cases_title">Que casos te custam</string>
