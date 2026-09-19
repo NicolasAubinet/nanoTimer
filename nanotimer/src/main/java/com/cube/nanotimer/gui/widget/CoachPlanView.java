@@ -9,6 +9,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.Locale;
+
+import androidx.fragment.app.FragmentActivity;
 
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.coach.CoachPayload;
@@ -21,8 +24,11 @@ import com.cube.nanotimer.gui.CrossDrillActivity;
 import com.cube.nanotimer.gui.DrillActivity;
 import com.cube.nanotimer.gui.DrillScreenActivity;
 import com.cube.nanotimer.gui.DrillSetupActivity;
+import com.cube.nanotimer.gui.widget.dialog.CaseAlgorithmsDialog;
+import com.cube.nanotimer.smartcube.step.CaseAlgorithms;
 import com.cube.nanotimer.smartcube.step.LastLayerDiagram;
 import com.cube.nanotimer.util.FormatterService;
+import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
 
 /**
@@ -73,6 +79,8 @@ public class CoachPlanView {
     for (String code : area.getCodes()) {
       if (payload.value("cases." + code + ".mean_ms") != null) {
         cases.addView(caseRow(cases, area, payload, code));
+      } else if (payload.value("f2l_habits." + code + ".extra_moves") != null) {
+        cases.addView(pairRow(cases, payload, code));
       }
     }
 
@@ -104,6 +112,8 @@ public class CoachPlanView {
         return familyTitle(area, R.string.coach_reason_stuck_pieces);
       case SLOW_FIRST_PAIR:
         return familyTitle(area, R.string.coach_reason_slow_first_pair);
+      case LONG_PAIR:
+        return activity.getString(R.string.coach_reason_long_pair);
       default:
         // Not the consistency note: it ranks across the whole history and names no family of its own.
         return activity.getString(R.string.coach_reason_inconsistent_case);
@@ -161,6 +171,14 @@ public class CoachPlanView {
       return first == null || later == null ? null
           : activity.getString(R.string.coach_first_pair_body, time(first), time(later));
     }
+    if (area.getReason() == FocusArea.Reason.LONG_PAIR) {
+      Double solves = payload.value("f2l_moves.count");
+      Double turned = payload.value("f2l_moves.turned_moves");
+      Double usual = payload.value("f2l_moves.usual_moves");
+      return solves == null || turned == null || usual == null ? null
+          : activity.getString(R.string.coach_long_pair_body, solves.intValue(), moves(turned),
+              moves(usual));
+    }
     return null;
   }
 
@@ -208,6 +226,30 @@ public class CoachPlanView {
         .setText(Utils.toSmartCubeCaseHeadline(activity, code));
     fill(row, R.id.tvCoachCaseFigures, figures(area, payload, code));
     fill(row, R.id.tvCoachCaseCost, cost(area, payload, code));
+    return row;
+  }
+
+  /**
+   * An F2L case, named by the algorithm its extra moves are counted over and never by its number,
+   * which is the site's and not something a solver knows it by. The button shows the case itself.
+   */
+  private View pairRow(LinearLayout parent, CoachPayload payload, final String code) {
+    View row = inflater.inflate(R.layout.coach_pair_row, parent, false);
+    fill(row, R.id.tvCoachCaseName, CaseAlgorithms.shortestListed(code));
+    Double extra = payload.value("f2l_habits." + code + ".extra_moves");
+    fill(row, R.id.tvCoachCaseFigures,
+        activity.getString(R.string.coach_pair_extra, moves(extra)));
+    Double count = payload.value("f2l_habits." + code + ".count");
+    Double offList = payload.value("f2l_habits." + code + ".off_list_rate");
+    fill(row, R.id.tvCoachCaseCost, count == null || offList == null ? null
+        : activity.getString(R.string.coach_pair_off_list, count.intValue(), rounded(offList)));
+    row.findViewById(R.id.buCoachPairCase).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        DialogUtils.showFragment((FragmentActivity) activity,
+            CaseAlgorithmsDialog.newInstance(code));
+      }
+    });
     return row;
   }
 
@@ -296,6 +338,11 @@ public class CoachPlanView {
     }
     intent.putExtra(DrillScreenActivity.EXTRA_RECORDING, true);
     activity.startActivity(intent);
+  }
+
+  /** A mean of moves, to the tenth the payload carries. */
+  private static String moves(Double moves) {
+    return String.format(Locale.getDefault(), "%.1f", moves.doubleValue());
   }
 
   private String time(Double ms) {

@@ -251,12 +251,60 @@ public class CoachPayloadBuilderTest {
     Assert.assertTrue(payload.holds("f2l_first"));
   }
 
-  /** No F2L case number may reach a card, so none may reach the payload as a code of its own. */
+  /**
+   * An F2L case is sent as a code in one place only, its moves, where a card can name it without its
+   * number (owner, 2026-09-19); the groups and the timings carry none.
+   */
   @Test
-  public void testNoF2lCaseIsSentOnItsOwn() {
-    CoachPayload payload = buildWithPlacedPairs();
+  public void testAnF2lCaseIsSentOnlyWithItsMoves() {
+    String json = buildWithPairMoves(12).toJson();
+    Assert.assertTrue(json, json.contains("\"pair_23\""));
 
-    Assert.assertFalse(payload.toJson(), payload.toJson().matches(".*\"pair_a?\\d.*"));
+    String rest = json.replaceAll(",?\"f2l_habits\":\\[[^\\]]*\\],?", "");
+    Assert.assertFalse(rest, rest.matches(".*\"pair_a?\\d.*"));
+  }
+
+  @Test
+  public void testF2lMovesRideInThePayloadAndSurviveARoundTrip() {
+    CoachPayload payload = CoachPayload.parse(buildWithPairMoves(12).toJson());
+
+    Assert.assertEquals(5, payload.getSchemaVersion());
+    Assert.assertEquals(12, payload.value("f2l_moves.count"), 1e-9);
+    Assert.assertEquals(19, payload.value("f2l_moves.turned_moves"), 1e-9);
+    Assert.assertEquals(18, payload.value("f2l_moves.usual_moves"), 1e-9);
+    Assert.assertEquals(1, payload.value("f2l_moves.extra_moves"), 1e-9);
+    Assert.assertNull(payload.value("f2l_moves.off_list_rate"));
+    Assert.assertEquals(0, payload.value("f2l_habits.pair_23.extra_moves"), 1e-9);
+    Assert.assertEquals(0, payload.value("f2l_habits.pair_23.off_list_rate"), 1e-9);
+    Assert.assertEquals(1, payload.value("f2l_habits.pair_4.extra_moves"), 1e-9);
+    Assert.assertEquals(0.25, payload.value("f2l_habits.pair_4.off_list_rate"), 1e-9);
+    Assert.assertTrue(payload.holds("pair_23"));
+    Assert.assertFalse(payload.holds("pair_9"));
+  }
+
+  /** Moves are charged to the pair that finishes next, so a case never goes without the total. */
+  @Test
+  public void testNoF2lCaseIsSentWithoutTheWholeF2l() {
+    CoachPayload payload = buildWithPairMoves(CoachPayloadBuilder.FAMILY_FLOOR - 1);
+
+    Assert.assertNull(payload.getF2lMoves());
+    Assert.assertTrue(payload.getF2lHabits().isEmpty());
+    Assert.assertFalse(payload.toJson(), payload.toJson().contains("f2l_habits"));
+    Assert.assertFalse(payload.holds("pair_23"));
+  }
+
+  /** A payload with nothing replayed, or from before version 5, has no F2L moves: not zero. */
+  @Test
+  public void testAPayloadWithoutF2lMovesSaysNothingAboutThem() {
+    String json = buildWithPlacedPairs().toJson();
+    Assert.assertFalse(json, json.contains("f2l_moves"));
+    CoachPayload payload = CoachPayload.parse(json
+        .replace("\"schema_version\":" + CoachPayload.VERSION, "\"schema_version\":4"));
+
+    Assert.assertEquals(4, payload.getSchemaVersion());
+    Assert.assertNull(payload.getF2lMoves());
+    Assert.assertNull(payload.value("f2l_moves.extra_moves"));
+    Assert.assertNull(payload.value("f2l_habits.pair_23.extra_moves"));
   }
 
   /** A payload from before the groups existed has none, and none is not measured, not zero. */
@@ -331,6 +379,23 @@ public class CoachPayloadBuilderTest {
     }
     return CoachPayloadBuilder.build("3x3", "cfop", solveTimes(30), samples, samples, 30,
         Collections.<StepSample>emptyList(), 0, Collections.<CaseKnowledge>emptyList());
+  }
+
+  /**
+   * Solves of two pairs each: case 23 always with a listed algorithm 4 moves over the shortest, which
+   * costs nothing, case 4 with its usual one except a quarter of the time, off the list 4 over.
+   */
+  private static CoachPayload buildWithPairMoves(int solves) {
+    List<PairExecution> pairs = new ArrayList<PairExecution>();
+    for (int solve = 0; solve < solves; solve++) {
+      long spread = (solve % 2 == 0 ? 1 : -1) * solve * 20L;
+      boolean odd = solve % 4 == 0;
+      pairs.add(PairExecution.of(solve, "pair_23", 3000 + spread, 11, 7, true));
+      pairs.add(PairExecution.of(solve, "pair_4", 3000 + spread, odd ? 11 : 7, 7, !odd));
+    }
+    return CoachPayloadBuilder.build("3x3", "cfop", solveTimes(solves), familySamples(solves),
+        familySamples(solves), solves, Collections.<StepSample>emptyList(), 0,
+        Collections.<CaseKnowledge>emptyList(), pairs);
   }
 
   /** Two cases that go in unaided, one that does not, and one of a method this payload is not for. */

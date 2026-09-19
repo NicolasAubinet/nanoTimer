@@ -112,6 +112,12 @@ public final class CaseAlgorithms {
         : matched.getEmptySlot();
   }
 
+  /** The shortest algorithm the case is listed with, the one extra moves are counted over. */
+  public static String shortestListed(String caseCode) {
+    return isPair(caseCode) ? F2LCaseAlgorithms.shortestListed(pairCase(caseCode))
+        : LastLayerCaseAlgorithms.shortestListed(caseCode);
+  }
+
   /** @see AlgorithmList#read */
   public static AlgorithmExecution read(String caseCode, String moves) {
     return isPair(caseCode) ? F2LCaseAlgorithms.read(pairCase(caseCode), moves)

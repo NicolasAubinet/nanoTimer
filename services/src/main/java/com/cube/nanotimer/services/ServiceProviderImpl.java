@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.cube.nanotimer.coach.CoachPayload;
 import com.cube.nanotimer.coach.CoachPayloadBuilder;
 import com.cube.nanotimer.coach.CoachPlan;
+import com.cube.nanotimer.coach.PairExecution;
 import com.cube.nanotimer.coach.StepSample;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.services.db.CaseKnowledgeStore;
@@ -1636,7 +1637,8 @@ public class ServiceProviderImpl implements ServiceProvider {
    * @throws IllegalArgumentException for any puzzle but a 3x3, the only one a smart cube reads
    */
   @Override
-  public CoachPayload getCoachPayload(SolveType solveType, CubeMethod method) {
+  public CoachPayload getCoachPayload(SolveType solveType, CubeMethod method,
+      List<PairExecution> pairs) {
     if (solveType.getCubeTypeId() != CubeType.THREE_BY_THREE.getId()) {
       throw new IllegalArgumentException("A coach reads 3x3 solves only, not cube type "
           + solveType.getCubeTypeId());
@@ -1649,7 +1651,7 @@ public class ServiceProviderImpl implements ServiceProvider {
         getMethodStepSamples(solveType, method, CoachPayloadBuilder.FAMILY_WINDOW),
         getMethodStepSamples(solveType, method, CoachPayloadBuilder.CASE_WINDOW), caseSolves,
         drillSamples, getDrilledDrillsCount(CoachPayloadBuilder.DRILL_WINDOW),
-        CaseKnowledgeStore.read(db));
+        CaseKnowledgeStore.read(db), pairs);
   }
 
   /**

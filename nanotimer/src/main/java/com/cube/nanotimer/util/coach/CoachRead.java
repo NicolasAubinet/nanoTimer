@@ -7,12 +7,17 @@ import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.coach.CoachPayload;
 import com.cube.nanotimer.coach.CoachPayloadBuilder;
+import com.cube.nanotimer.coach.PairExecution;
 import com.cube.nanotimer.coach.StoredCoachPlan;
+import com.cube.nanotimer.cube.F2lHabitReader;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.vo.CubeMethod;
+import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -118,21 +123,37 @@ public final class CoachRead {
     });
   }
 
-  private void ask(final CoachClient client, CubeMethod method) {
-    App.INSTANCE.getService().getCoachPayload(solveType, method, new DataCallback<CoachPayload>() {
-      @Override
-      public void onData(final CoachPayload payload) {
-        App.INSTANCE.getService().getCoachStream(solveType, new DataCallback<String>() {
+  /** Replays the case window's solves for their F2L pairs first, which only the app can do. */
+  private void ask(final CoachClient client, final CubeMethod method) {
+    if (method != CubeMethod.CFOP) {
+      ask(client, method, Collections.<PairExecution>emptyList());
+      return;
+    }
+    App.INSTANCE.getService().getMethodSolves(solveType, method, CoachPayloadBuilder.CASE_WINDOW,
+        new DataCallback<List<SolveTime>>() {
           @Override
-          public void onData(String stream) {
-            String body = CoachClient.requestBody(payload, stream);
-            // Kept before it leaves, so a request the process dies waiting on is still the one resent.
-            Options.INSTANCE.setCoachPendingRequest(solveType.getId(), body);
-            send(client, body);
+          public void onData(List<SolveTime> solves) {
+            ask(client, method, F2lHabitReader.readFrom(solves)); // off the main thread already
           }
         });
-      }
-    });
+  }
+
+  private void ask(final CoachClient client, CubeMethod method, List<PairExecution> pairs) {
+    App.INSTANCE.getService().getCoachPayload(solveType, method, pairs,
+        new DataCallback<CoachPayload>() {
+          @Override
+          public void onData(final CoachPayload payload) {
+            App.INSTANCE.getService().getCoachStream(solveType, new DataCallback<String>() {
+              @Override
+              public void onData(String stream) {
+                String body = CoachClient.requestBody(payload, stream);
+                // Kept before it leaves, so a request the process dies on is still the one resent.
+                Options.INSTANCE.setCoachPendingRequest(solveType.getId(), body);
+                send(client, body);
+              }
+            });
+          }
+        });
   }
 
   private void send(final CoachClient client, final String body) {

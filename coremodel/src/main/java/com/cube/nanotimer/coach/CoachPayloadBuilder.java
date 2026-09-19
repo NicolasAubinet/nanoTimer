@@ -123,10 +123,13 @@ public class CoachPayloadBuilder {
    * @param drillCount how many drills those reps came from
    * @param knowledge where every case with a status stands, of every method: the ones belonging to
    *     this method's own steps are picked out here
+   * @param pairs every F2L pair of the {@link #CASE_WINDOW}'s solves, replayed and set against the
+   *     algorithms its case is usually taught with; empty where nothing could be replayed
    */
   public static CoachPayload build(String puzzle, String method, List<Long> solveTimes,
       List<StepSample> familySamples, List<StepSample> caseSamples, int caseSolveCount,
-      List<StepSample> drillSamples, int drillCount, List<CaseKnowledge> knowledge) {
+      List<StepSample> drillSamples, int drillCount, List<CaseKnowledge> knowledge,
+      List<PairExecution> pairs) {
     StepTallies familyTallies = new StepTallies(familySamples);
     MethodStatistics families =
         new MethodStatistics(familyTallies.getSteps(), familyTallies.getParts(), solveTimes.size());
@@ -138,6 +141,7 @@ public class CoachPayloadBuilder {
     List<StepFigure> caseFigures = caseFigures(cases, caseTallies);
     List<StepFigure> drillFigures = drillFigures(drillTallies);
     Set<String> sets = familiesOf(cases);
+    MoveFigure f2lMoves = F2lHabits.total(pairs, FAMILY_FLOOR);
     return new CoachPayload(CoachPayload.VERSION, puzzle, method, solveTimes.size(),
         caseSolveCount, drillCount, Integer.valueOf(twoLookSolves(familySamples)),
         solveFigure(solveTimes),
@@ -148,7 +152,16 @@ public class CoachPayloadBuilder {
         casesAt(knowledge, sets, CaseKnowledge.Status.NEEDS_REVIEW,
             CaseKnowledge.Status.TO_LEARN),
         casesAt(knowledge, sets, CaseKnowledge.Status.TO_LEARN),
-        F2lGroups.of(familySamples, FAMILY_FLOOR));
+        F2lGroups.of(familySamples, FAMILY_FLOOR), f2lMoves,
+        f2lMoves == null ? null : F2lHabits.cases(pairs, CASE_FLOOR));
+  }
+
+  /** As above with no F2L pairs replayed, so the payload carries no F2L moves. */
+  public static CoachPayload build(String puzzle, String method, List<Long> solveTimes,
+      List<StepSample> familySamples, List<StepSample> caseSamples, int caseSolveCount,
+      List<StepSample> drillSamples, int drillCount, List<CaseKnowledge> knowledge) {
+    return build(puzzle, method, solveTimes, familySamples, caseSamples, caseSolveCount,
+        drillSamples, drillCount, knowledge, Collections.<PairExecution>emptyList());
   }
 
   /**

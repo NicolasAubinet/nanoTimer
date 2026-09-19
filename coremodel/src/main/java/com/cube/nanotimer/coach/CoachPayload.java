@@ -28,9 +28,9 @@ import org.json.JSONObject;
 public class CoachPayload {
 
   /** The newest payload this app writes and can read back. Version 2 added the two-look count and
-   * the known set, 3 the cases to learn, 4 the F2L groups; an older payload is still read, and is
-   * simply missing them. */
-  public static final int VERSION = 4;
+   * the known set, 3 the cases to learn, 4 the F2L groups, 5 the F2L moves over the usual
+   * algorithms; an older payload is still read, and is simply missing them. */
+  public static final int VERSION = 5;
 
   private final int schemaVersion;
   private final String puzzle;
@@ -49,6 +49,8 @@ public class CoachPayload {
   private final List<String> learningCases;
   private final List<String> toLearnCases;
   private final List<StepFigure> f2lGroups;
+  private final MoveFigure f2lMoves;
+  private final List<MoveFigure> f2lHabits;
 
   /**
    * @param solve the whole solve's figures, or null when the window holds too few to quote
@@ -82,6 +84,22 @@ public class CoachPayload {
       List<StepFigure> families, List<StepFigure> parts, List<StepFigure> cases,
       List<StepFigure> drillCases, List<CaseComparison> comparisons, List<String> knownCases,
       List<String> learningCases, List<String> toLearnCases, List<StepFigure> f2lGroups) {
+    this(schemaVersion, puzzle, method, familyWindow, caseWindow, drillWindow, twoLookCount, solve,
+        families, parts, cases, drillCases, comparisons, knownCases, learningCases, toLearnCases,
+        f2lGroups, null, null);
+  }
+
+  /**
+   * As above, with the whole F2L's moves over the usual algorithms ({@link #getF2lMoves}), null
+   * where too few solves could be read, and each case's beside it ({@link #getF2lHabits}), which
+   * are dropped with it.
+   */
+  public CoachPayload(int schemaVersion, String puzzle, String method, int familyWindow,
+      int caseWindow, int drillWindow, Integer twoLookCount, StepFigure solve,
+      List<StepFigure> families, List<StepFigure> parts, List<StepFigure> cases,
+      List<StepFigure> drillCases, List<CaseComparison> comparisons, List<String> knownCases,
+      List<String> learningCases, List<String> toLearnCases, List<StepFigure> f2lGroups,
+      MoveFigure f2lMoves, List<MoveFigure> f2lHabits) {
     this.schemaVersion = schemaVersion;
     this.puzzle = puzzle;
     this.method = method;
@@ -101,6 +119,10 @@ public class CoachPayload {
     this.learningCases = codes(learningCases);
     this.toLearnCases = codes(toLearnCases);
     this.f2lGroups = unmodifiable(f2lGroups);
+    this.f2lMoves = f2lMoves;
+    this.f2lHabits = f2lMoves == null || f2lHabits == null
+        ? Collections.<MoveFigure>emptyList()
+        : Collections.unmodifiableList(new ArrayList<MoveFigure>(f2lHabits));
   }
 
   private static List<String> codes(List<String> codes) {
@@ -219,11 +241,30 @@ public class CoachPayload {
   }
 
   /**
+   * The whole F2L's moves a solve against what its pairs' usual algorithms add up to, or null where
+   * too few solves could be set against them, or the payload predates version 5: not measured, and
+   * never zero.
+   */
+  public MoveFigure getF2lMoves() {
+    return f2lMoves;
+  }
+
+  /**
+   * Each F2L case's extra moves and how often it went in with none of its listed algorithms, most
+   * extra moves first. Only ever sent beside {@link #getF2lMoves}: moves are charged to the pair
+   * that finishes next, so a case's figure alone would punish look-ahead.
+   */
+  public List<MoveFigure> getF2lHabits() {
+    return f2lHabits;
+  }
+
+  /**
    * The figure at a path, or null when the payload holds nothing there. Paths are how a plan cites
    * what it leans on: {@code solve.mean_ms}, {@code families.pll.recognition_ms},
    * {@code cases.pll_gb.time_lost_ms}, {@code comparisons.pll_gb.gap_ms}, {@code windows.cases},
    * {@code two_look_count}, {@code to_learn_cases.count}, {@code to_learn_cases.oll_53},
-   * {@code f2l_groups.f2l_stuck.share}, {@code f2l_groups.f2l_first.recognition_ms}.
+   * {@code f2l_groups.f2l_stuck.share}, {@code f2l_groups.f2l_first.recognition_ms},
+   * {@code f2l_moves.extra_moves}, {@code f2l_habits.pair_27.off_list_rate}.
    *
    * <p>A case set answers how many cases are in it and whether a named one is among them, which is
    * what lets a plan saying "learn this case" be checked rather than believed. A case that is not in
@@ -240,6 +281,9 @@ public class CoachPayload {
     if (segments.length == 2 && "solve".equals(segments[0])) {
       return solve == null ? null : field(solve, segments[1]);
     }
+    if (segments.length == 2 && "f2l_moves".equals(segments[0])) {
+      return f2lMoves == null ? null : f2lMoves.field(segments[1]);
+    }
     if (segments.length == 2 && "windows".equals(segments[0])) {
       return window(segments[1]);
     }
@@ -254,6 +298,10 @@ public class CoachPayload {
     if ("comparisons".equals(segments[0])) {
       CaseComparison comparison = comparison(segments[1]);
       return comparison == null ? null : field(comparison, segments[2]);
+    }
+    if ("f2l_habits".equals(segments[0])) {
+      MoveFigure habit = habit(segments[1]);
+      return habit == null ? null : habit.field(segments[2]);
     }
     StepFigure figure = figure(list(segments[0]), segments[1]);
     return figure == null ? null : field(figure, segments[2]);
@@ -299,6 +347,15 @@ public class CoachPayload {
     for (StepFigure figure : figures) {
       if (figure.getCode().equals(code)) {
         return figure;
+      }
+    }
+    return null;
+  }
+
+  private MoveFigure habit(String code) {
+    for (MoveFigure habit : f2lHabits) {
+      if (habit.getCode().equals(code)) {
+        return habit;
       }
     }
     return null;
@@ -374,7 +431,8 @@ public class CoachPayload {
     return figure(families, code) != null || figure(parts, code) != null
         || figure(cases, code) != null || figure(drillCases, code) != null
         || comparison(code) != null || knownCases.contains(code) || learningCases.contains(code)
-        || toLearnCases.contains(code) || figure(f2lGroups, code) != null;
+        || toLearnCases.contains(code) || figure(f2lGroups, code) != null
+        || habit(code) != null;
   }
 
   /** Is there enough here to say anything at all? */
@@ -412,6 +470,14 @@ public class CoachPayload {
       json.put("learning_cases", new JSONArray(learningCases));
       json.put("to_learn_cases", new JSONArray(toLearnCases));
       json.put("f2l_groups", figures(f2lGroups));
+      if (f2lMoves != null) {
+        json.put("f2l_moves", f2lMoves.toJson());
+        JSONArray habits = new JSONArray();
+        for (MoveFigure habit : f2lHabits) {
+          habits.put(habit.toJson());
+        }
+        json.put("f2l_habits", habits);
+      }
       return json.toString();
     } catch (JSONException e) {
       throw new IllegalStateException("Cannot write coach payload", e);
@@ -448,7 +514,9 @@ public class CoachPayload {
           figures(json, "families"), figures(json, "parts"), figures(json, "cases"),
           figures(json, "drill_cases"), comparisons(json), codes(json, "known_cases"),
           codes(json, "learning_cases"), codes(json, "to_learn_cases"),
-          figures(json, "f2l_groups"));
+          figures(json, "f2l_groups"),
+          json.has("f2l_moves") ? MoveFigure.fromJson(json.getJSONObject("f2l_moves")) : null,
+          habits(json));
     } catch (JSONException e) {
       throw new IllegalArgumentException("Not a coach payload: " + e.getMessage(), e);
     }
@@ -461,6 +529,15 @@ public class CoachPayload {
       figures.add(StepFigure.fromJson(array.getJSONObject(i)));
     }
     return figures;
+  }
+
+  private static List<MoveFigure> habits(JSONObject json) throws JSONException {
+    List<MoveFigure> habits = new ArrayList<MoveFigure>();
+    JSONArray array = json.optJSONArray("f2l_habits");
+    for (int i = 0; array != null && i < array.length(); i++) {
+      habits.add(MoveFigure.fromJson(array.getJSONObject(i)));
+    }
+    return habits;
   }
 
   private static List<String> codes(JSONObject json, String field) throws JSONException {

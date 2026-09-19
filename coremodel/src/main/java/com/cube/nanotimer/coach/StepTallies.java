@@ -61,9 +61,7 @@ public class StepTallies {
     // A skip is a step that never happened rather than a fast one, so there is no spread to judge.
     boolean filter = ofCode.size() >= MIN_SAMPLES_TO_FILTER
         && !MethodStatistics.SKIP.equals(MethodStatistics.caseOf(code));
-    double[] times = times(ofCode);
-    double median = median(times);
-    double limit = filter ? outlierLimit(times, median) : -1;
+    boolean[] kept = filter ? kept(times(ofCode)) : null;
 
     int count = 0;
     int dropped = 0;
@@ -72,8 +70,9 @@ public class StepTallies {
     long bestMs = Long.MAX_VALUE;
     long worstMs = 0;
     double sumOfSquares = 0;
-    for (StepSample sample : ofCode) {
-      if (limit >= 0 && Math.abs(sample.getTimeMs() - median) > limit) {
+    for (int i = 0; i < ofCode.size(); i++) {
+      StepSample sample = ofCode.get(i);
+      if (kept != null && !kept[i]) {
         dropped++;
         continue;
       }
@@ -93,6 +92,24 @@ public class StepTallies {
     tallies.put(code, count == 0 ? new StepStats(code, 0, 0, 0, 0, 0, 0)
         : new StepStats(code, count, totalMs, recognitionMs, bestMs, worstMs, sumOfSquares));
     rejected.put(code, dropped);
+  }
+
+  /**
+   * Which of one code's occurrences the rule keeps, judged by their times: every one of them when
+   * there are too few to measure a spread, or no spread to measure.
+   */
+  static boolean[] kept(double[] times) {
+    boolean[] kept = new boolean[times.length];
+    Arrays.fill(kept, true);
+    if (times.length < MIN_SAMPLES_TO_FILTER) {
+      return kept;
+    }
+    double median = median(times);
+    double limit = outlierLimit(times, median);
+    for (int i = 0; limit >= 0 && i < times.length; i++) {
+      kept[i] = Math.abs(times[i] - median) <= limit;
+    }
+    return kept;
   }
 
   /** How far from the median an occurrence may sit, or -1 when the spread cannot be measured. */

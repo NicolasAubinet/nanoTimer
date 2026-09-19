@@ -1257,6 +1257,11 @@
   <string name="coach_step_share_body">%1$s takes %2$s of your solve, where %3$s is usual.</string>
   <string name="coach_stuck_body">%1$s of your pairs start with a piece stuck in another slot. Those take %2$s, where the others take %3$s.</string>
   <string name="coach_first_pair_body">You look for %1$s before your first pair, and %2$s before each pair after it.</string>
+  <string name="coach_reason_long_pair">F2L pairs taking extra moves</string>
+  <string name="coach_long_pair_body">Over %1$d solves, your F2L took %2$s moves where the usual algorithms for its pairs add up to %3$s.</string>
+  <string name="coach_pair_extra">%1$s extra moves on average</string>
+  <string name="coach_pair_off_list">%1$d times, %2$d%% off the usual algorithms</string>
+  <string name="coach_pair_show">Show case</string>
   <string name="coach_percent">%1$d%%</string>
   <string name="coach_drill_case">Drill this case</string>
   <string name="coach_drill_cases">Drill these cases</string>

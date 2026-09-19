@@ -2,6 +2,7 @@ package com.cube.nanotimer.services;
 
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.coach.CoachPayload;
+import com.cube.nanotimer.coach.PairExecution;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.session.MethodStatistics;
 import com.cube.nanotimer.vo.BackupCounts;
@@ -102,8 +103,12 @@ public interface Service {
   /**
    * The solver's history as a coach may see it: aggregated figures, vocabulary codes, and nothing a
    * user ever typed. What is too thin to stand is left out here rather than caveated later.
+   *
+   * @param pairs the F2L pairs of the case window's solves, replayed by the caller, since only the
+   *     app can replay a solve; empty to send no F2L moves
    */
-  void getCoachPayload(SolveType solveType, CubeMethod method, DataCallback<CoachPayload> callback);
+  void getCoachPayload(SolveType solveType, CubeMethod method, List<PairExecution> pairs,
+      DataCallback<CoachPayload> callback);
   /**
    * Keeps the last plan written for a solve type, and the payload it was written from, replacing
    * whatever that writer left before. A plan is stored so it reads without the network and without

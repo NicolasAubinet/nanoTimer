@@ -1,6 +1,8 @@
 package com.cube.nanotimer.cube;
 
 import com.cube.nanotimer.session.MethodStatistics;
+import com.cube.nanotimer.smartcube.step.AlgorithmExecution;
+import com.cube.nanotimer.smartcube.step.AlgorithmForm;
 import com.cube.nanotimer.smartcube.step.CFOPStepDetector;
 import com.cube.nanotimer.smartcube.step.CaseAlgorithms;
 import com.cube.nanotimer.vo.CubeMethod;
@@ -221,6 +223,46 @@ public final class CaseExecutions {
         continue; // the solve stopped inside it, so its moves are half of an answer
       }
       reader.read(steps.get(i), solution.getSteps().get(i));
+    }
+  }
+
+  /**
+   * One F2L pair of a step read against its case's algorithms, or null where there is nothing to
+   * read it against: a placement no basic case names, a piece stuck in another slot, a skip, or
+   * moves no algorithm can be told from. What counts as one of the case's algorithms is decided
+   * here alone, since the figures now do arithmetic with it and not only counting.
+   */
+  static Pair pairOf(SolveStep part, String moves) {
+    String caseCode = caseOfPart(part.getName());
+    if (!CaseAlgorithms.isBasicPair(caseCode) || moves.isEmpty()
+        || AlgorithmForm.key(moves) == null) {
+      return null;
+    }
+    return new Pair(caseCode, CaseAlgorithms.read(caseCode, moves));
+  }
+
+  /** A pair's case and how it was turned. */
+  static final class Pair {
+
+    private final String caseCode;
+    private final AlgorithmExecution execution;
+
+    private Pair(String caseCode, AlgorithmExecution execution) {
+      this.caseCode = caseCode;
+      this.execution = execution;
+    }
+
+    String getCaseCode() {
+      return caseCode;
+    }
+
+    AlgorithmExecution getExecution() {
+      return execution;
+    }
+
+    /** Whether it went in with one of the case's listed algorithms. */
+    boolean isListed() {
+      return !execution.isUnusual();
     }
   }
 

@@ -126,14 +126,25 @@ final class AlgorithmList {
 
   /** The shortest listed algorithm, which is what a long execution is measured against. */
   private int shortest() {
-    int shortest = 0;
+    int at = shortestAt();
+    return at < 0 ? 0 : forms.get(at).size();
+  }
+
+  /** That same algorithm as the table spells it, or null where the case is listed with none. */
+  Row shortestListed() {
+    int at = shortestAt();
+    return at < 0 ? null : rows.get(at);
+  }
+
+  private int shortestAt() {
+    int at = -1;
     for (int i = 0; i < listed; i++) {
       int length = forms.get(i).size();
-      if (length > 0 && (shortest == 0 || length < shortest)) {
-        shortest = length;
+      if (length > 0 && (at < 0 || length < forms.get(at).size())) {
+        at = i;
       }
     }
-    return shortest;
+    return at;
   }
 
   /** One algorithm and every spelling of it the table holds, as the most voted one spells it. */

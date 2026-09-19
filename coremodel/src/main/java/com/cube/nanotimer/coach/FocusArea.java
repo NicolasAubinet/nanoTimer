@@ -46,7 +46,9 @@ public class FocusArea {
     /** F2L pairs handed with a piece stuck in another slot, costing more than the basic ones. */
     STUCK_PIECES,
     /** A longer pause before the first F2L pair than before the later ones. */
-    SLOW_FIRST_PAIR;
+    SLOW_FIRST_PAIR,
+    /** An F2L case put in with more moves than its usual algorithm, time after time. */
+    LONG_PAIR;
 
     public String code() {
       return name().toLowerCase(Locale.ROOT);

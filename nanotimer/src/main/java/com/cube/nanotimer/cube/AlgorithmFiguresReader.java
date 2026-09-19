@@ -63,9 +63,10 @@ public final class AlgorithmFiguresReader {
       AlgorithmFigures figures) {
     List<SolveStep> parts = step.getSubSteps();
     for (int i = 0; i < parts.size() && i < turned.getGroups().size(); i++) {
-      String caseCode = CaseExecutions.caseOfPart(parts.get(i).getName());
-      if (CaseAlgorithms.isBasicPair(caseCode)) {
-        count(figures, caseCode, turned.getPartMoves(i), false);
+      CaseExecutions.Pair pair = CaseExecutions.pairOf(parts.get(i), turned.getPartMoves(i));
+      if (pair != null) {
+        figures.add(pair.getCaseCode(), pair.isListed(), pair.getExecution().getMoves(),
+            pair.getExecution().getUsualMoves());
       }
     }
   }
