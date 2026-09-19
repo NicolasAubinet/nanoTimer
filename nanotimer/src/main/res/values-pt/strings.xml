@@ -1190,6 +1190,8 @@
   <string name="coach_reason_two_look_oll">Dois olhares à última camada</string>
   <string name="coach_reason_inconsistent_case">Casos que correm mal</string>
   <string name="coach_reason_slow_step">Ocupa mais resolução do que o habitual</string>
+  <string name="coach_reason_stuck_pieces">Peças presas noutros slots</string>
+  <string name="coach_reason_slow_first_pair">Um primeiro par lento</string>
   <string name="coach_reason_unknown">Outra coisa para trabalhar</string>
   <string name="coach_case_mean">%1$s contra %2$s dos restantes</string>
   <string name="coach_case_cost">%1$d vezes, %2$s perdidos</string>
@@ -1200,6 +1202,8 @@
   <string name="coach_two_look_share">A última camada leva %1$s da sua resolução, onde %2$s é o normal num olhar.</string>
   <string name="coach_two_look_to_learn">As suas resoluções mostram %1$d casos que ainda não coloca com um só algoritmo.</string>
   <string name="coach_step_share_body">%1$s ocupa %2$s da sua resolução, quando o habitual é %3$s.</string>
+  <string name="coach_stuck_body">%1$s dos seus pares começam com uma peça presa noutro slot. Esses levam %2$s, e os outros %3$s.</string>
+  <string name="coach_first_pair_body">Procura durante %1$s antes do seu primeiro par, e %2$s antes de cada um dos seguintes.</string>
   <string name="coach_percent">%1$d%%</string>
   <string name="coach_drill_case">Treinar este caso</string>
   <string name="coach_drill_cases">Treinar estes casos</string>

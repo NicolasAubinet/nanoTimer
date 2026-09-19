@@ -237,6 +237,44 @@ public class CoachPayloadBuilderTest {
   }
 
   @Test
+  public void testF2lGroupsRideInThePayloadAndSurviveARoundTrip() {
+    CoachPayload payload = CoachPayload.parse(buildWithPlacedPairs().toJson());
+
+    Assert.assertEquals(4, payload.getF2lGroups().size());
+    Assert.assertEquals(0.25, payload.value("f2l_groups.f2l_stuck.share"), 1e-9);
+    Assert.assertEquals(5000, payload.value("f2l_groups.f2l_stuck.mean_ms"), 50);
+    Assert.assertEquals(3000, payload.value("f2l_groups.f2l_basic.mean_ms"), 50);
+    Assert.assertEquals(2000, payload.value("f2l_groups.f2l_first.recognition_ms"), 1e-9);
+    Assert.assertEquals(600, payload.value("f2l_groups.f2l_later.recognition_ms"), 1e-9);
+    Assert.assertNull(payload.value("f2l_groups.f2l_basic.share"));
+    Assert.assertTrue(payload.holds("f2l_stuck"));
+    Assert.assertTrue(payload.holds("f2l_first"));
+  }
+
+  /** No F2L case number may reach a card, so none may reach the payload as a code of its own. */
+  @Test
+  public void testNoF2lCaseIsSentOnItsOwn() {
+    CoachPayload payload = buildWithPlacedPairs();
+
+    Assert.assertFalse(payload.toJson(), payload.toJson().matches(".*\"pair_a?\\d.*"));
+  }
+
+  /** A payload from before the groups existed has none, and none is not measured, not zero. */
+  @Test
+  public void testAPayloadWrittenBeforeTheF2lGroupsHoldsNone() {
+    String older = buildWithPlacedPairs().toJson()
+        .replace("\"schema_version\":" + CoachPayload.VERSION, "\"schema_version\":3")
+        .replaceAll(",\"f2l_groups\":\\[[^\\]]*\\]", "");
+    Assert.assertFalse(older, older.contains("f2l_groups"));
+    CoachPayload payload = CoachPayload.parse(older);
+
+    Assert.assertEquals(3, payload.getSchemaVersion());
+    Assert.assertTrue(payload.getF2lGroups().isEmpty());
+    Assert.assertNull(payload.value("f2l_groups.f2l_stuck.share"));
+    Assert.assertFalse(payload.holds("f2l_stuck"));
+  }
+
+  @Test
   public void testAPayloadFromANewerVersionIsRefused() {
     String newer = build().toJson().replace("\"schema_version\":" + CoachPayload.VERSION,
         "\"schema_version\":" + (CoachPayload.VERSION + 1));
@@ -274,6 +312,25 @@ public class CoachPayloadBuilderTest {
 
     return CoachPayloadBuilder.build("3x3", "cfop", solveTimes(20), familySamples(20), cases, 40,
         drills, 3, knowledge());
+  }
+
+  /**
+   * Thirty solves whose pairs carry their case and their place: the first basic and slow to find,
+   * then two more basic and one stuck.
+   */
+  private static CoachPayload buildWithPlacedPairs() {
+    List<StepSample> samples = new ArrayList<StepSample>();
+    samples.addAll(steps("cross", 30, 6500, 0));
+    samples.addAll(steps("f2l", 30, 15000, 4000));
+    for (int solve = 0; solve < 30; solve++) {
+      long spread = (solve % 2 == 0 ? 1 : -1) * solve * 5L;
+      samples.add(new StepSample("pair_27_rf", 3000 + spread, 2000, true, solve, 0));
+      samples.add(new StepSample("pair_4_fl", 3000 + spread, 600, true, solve, 1));
+      samples.add(new StepSample("pair_a12_br", 5000 + spread, 600, true, solve, 2));
+      samples.add(new StepSample("pair_9_lb", 3000 + spread, 600, true, solve, 3));
+    }
+    return CoachPayloadBuilder.build("3x3", "cfop", solveTimes(30), samples, samples, 30,
+        Collections.<StepSample>emptyList(), 0, Collections.<CaseKnowledge>emptyList());
   }
 
   /** Two cases that go in unaided, one that does not, and one of a method this payload is not for. */

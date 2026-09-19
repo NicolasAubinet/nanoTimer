@@ -28,8 +28,9 @@ import org.json.JSONObject;
 public class CoachPayload {
 
   /** The newest payload this app writes and can read back. Version 2 added the two-look count and
-   * the known set; a version 1 payload is still read, and is simply missing them. */
-  public static final int VERSION = 3;
+   * the known set, 3 the cases to learn, 4 the F2L groups; an older payload is still read, and is
+   * simply missing them. */
+  public static final int VERSION = 4;
 
   private final int schemaVersion;
   private final String puzzle;
@@ -47,6 +48,7 @@ public class CoachPayload {
   private final List<String> knownCases;
   private final List<String> learningCases;
   private final List<String> toLearnCases;
+  private final List<StepFigure> f2lGroups;
 
   /**
    * @param solve the whole solve's figures, or null when the window holds too few to quote
@@ -66,6 +68,20 @@ public class CoachPayload {
       List<StepFigure> families, List<StepFigure> parts, List<StepFigure> cases,
       List<StepFigure> drillCases, List<CaseComparison> comparisons, List<String> knownCases,
       List<String> learningCases, List<String> toLearnCases) {
+    this(schemaVersion, puzzle, method, familyWindow, caseWindow, drillWindow, twoLookCount, solve,
+        families, parts, cases, drillCases, comparisons, knownCases, learningCases, toLearnCases,
+        null);
+  }
+
+  /**
+   * As above, with the F2L pairs gathered into groups ({@link #getF2lGroups}), null or empty where
+   * none cleared its floor.
+   */
+  public CoachPayload(int schemaVersion, String puzzle, String method, int familyWindow,
+      int caseWindow, int drillWindow, Integer twoLookCount, StepFigure solve,
+      List<StepFigure> families, List<StepFigure> parts, List<StepFigure> cases,
+      List<StepFigure> drillCases, List<CaseComparison> comparisons, List<String> knownCases,
+      List<String> learningCases, List<String> toLearnCases, List<StepFigure> f2lGroups) {
     this.schemaVersion = schemaVersion;
     this.puzzle = puzzle;
     this.method = method;
@@ -84,6 +100,7 @@ public class CoachPayload {
     this.knownCases = codes(knownCases);
     this.learningCases = codes(learningCases);
     this.toLearnCases = codes(toLearnCases);
+    this.f2lGroups = unmodifiable(f2lGroups);
   }
 
   private static List<String> codes(List<String> codes) {
@@ -191,10 +208,22 @@ public class CoachPayload {
   }
 
   /**
+   * The F2L pairs gathered across cases, since no one F2L case has a figure worth sending: the basic
+   * pairs and the ones handed with a piece stuck in another slot ({@code f2l_basic},
+   * {@code f2l_stuck}, the second carrying its share of the two), and the first pair of each solve
+   * against the later ones ({@code f2l_first}, {@code f2l_later}). A comparison is here whole or
+   * not at all, and empty in a payload written before version 4, which is not measured and not zero.
+   */
+  public List<StepFigure> getF2lGroups() {
+    return f2lGroups;
+  }
+
+  /**
    * The figure at a path, or null when the payload holds nothing there. Paths are how a plan cites
    * what it leans on: {@code solve.mean_ms}, {@code families.pll.recognition_ms},
    * {@code cases.pll_gb.time_lost_ms}, {@code comparisons.pll_gb.gap_ms}, {@code windows.cases},
-   * {@code two_look_count}, {@code to_learn_cases.count}, {@code to_learn_cases.oll_53}.
+   * {@code two_look_count}, {@code to_learn_cases.count}, {@code to_learn_cases.oll_53},
+   * {@code f2l_groups.f2l_stuck.share}, {@code f2l_groups.f2l_first.recognition_ms}.
    *
    * <p>A case set answers how many cases are in it and whether a named one is among them, which is
    * what lets a plan saying "learn this case" be checked rather than believed. A case that is not in
@@ -260,6 +289,9 @@ public class CoachPayload {
     if ("cases".equals(name)) {
       return cases;
     }
+    if ("f2l_groups".equals(name)) {
+      return f2lGroups;
+    }
     return "drill_cases".equals(name) ? drillCases : Collections.<StepFigure>emptyList();
   }
 
@@ -312,7 +344,7 @@ public class CoachPayload {
     if ("skip_rate".equals(name)) {
       return figure.getSkipRate() == null ? null : figure.getSkipRate();
     }
-    return null;
+    return "share".equals(name) ? figure.getShare() : null;
   }
 
   private static Double field(CaseComparison comparison, String name) {
@@ -342,7 +374,7 @@ public class CoachPayload {
     return figure(families, code) != null || figure(parts, code) != null
         || figure(cases, code) != null || figure(drillCases, code) != null
         || comparison(code) != null || knownCases.contains(code) || learningCases.contains(code)
-        || toLearnCases.contains(code);
+        || toLearnCases.contains(code) || figure(f2lGroups, code) != null;
   }
 
   /** Is there enough here to say anything at all? */
@@ -379,6 +411,7 @@ public class CoachPayload {
       json.put("known_cases", new JSONArray(knownCases));
       json.put("learning_cases", new JSONArray(learningCases));
       json.put("to_learn_cases", new JSONArray(toLearnCases));
+      json.put("f2l_groups", figures(f2lGroups));
       return json.toString();
     } catch (JSONException e) {
       throw new IllegalStateException("Cannot write coach payload", e);
@@ -414,7 +447,8 @@ public class CoachPayload {
           json.has("solve") ? StepFigure.fromJson(json.getJSONObject("solve")) : null,
           figures(json, "families"), figures(json, "parts"), figures(json, "cases"),
           figures(json, "drill_cases"), comparisons(json), codes(json, "known_cases"),
-          codes(json, "learning_cases"), codes(json, "to_learn_cases"));
+          codes(json, "learning_cases"), codes(json, "to_learn_cases"),
+          figures(json, "f2l_groups"));
     } catch (JSONException e) {
       throw new IllegalArgumentException("Not a coach payload: " + e.getMessage(), e);
     }

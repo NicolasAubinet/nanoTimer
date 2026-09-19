@@ -88,6 +88,33 @@ public class CoachPlanTest {
     Assert.assertEquals(Collections.singletonList("slow_case"), plan.undealableDrills(payload()));
   }
 
+  /** An F2L group card names a group, not a case, and reads back under its own reason. */
+  @Test
+  public void testAnF2lGroupCardSurvivesARoundTrip() {
+    CoachPlan plan = CoachPlan.parse(new CoachPlan(CoachPlan.VERSION, CoachPlan.Source.COACH, null,
+        Arrays.asList(
+            new FocusArea(FocusArea.Reason.STUCK_PIECES, Collections.singletonList("f2l_stuck"),
+                Collections.<Evidence>emptyList(), null, null),
+            new FocusArea(FocusArea.Reason.SLOW_FIRST_PAIR,
+                Collections.singletonList("f2l_first"), Collections.<Evidence>emptyList(), null,
+                null))).toJson());
+
+    Assert.assertEquals(FocusArea.Reason.STUCK_PIECES, plan.getFocus().get(0).getReason());
+    Assert.assertEquals("slow_first_pair", plan.getFocus().get(1).getReasonCode());
+  }
+
+  /** A reason from a newer coach is kept as its code, so the card still draws, untitled. */
+  @Test
+  public void testAReasonThisVersionHasNeverHeardOfIsKept() {
+    CoachPlan plan = CoachPlan.parse(new CoachPlan(CoachPlan.VERSION, CoachPlan.Source.COACH, null,
+        Collections.singletonList(new FocusArea("f2l_lookahead", Collections.singletonList("f2l"),
+            Collections.<Evidence>emptyList(), "Look ahead.", null))).toJson());
+
+    Assert.assertNull(plan.getFocus().get(0).getReason());
+    Assert.assertEquals("f2l_lookahead", plan.getFocus().get(0).getReasonCode());
+    Assert.assertEquals("Look ahead.", plan.getFocus().get(0).getText());
+  }
+
   /** Every case the app can deal is a case this check accepts, which is the two ends meeting. */
   @Test
   public void testEveryCaseTheAlgorithmTableHoldsIsDealable() {

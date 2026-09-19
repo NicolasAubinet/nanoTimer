@@ -27,9 +27,11 @@ public class StepFigure {
   private final Long timeLostMs;
   private final Long familyMeanMs;
   private final Double skipRate;
+  private final Double share;
 
   private StepFigure(String code, int count, long meanMs, Long recognitionMs, long stdDevMs,
-      long bestMs, double rejectionRate, Long timeLostMs, Long familyMeanMs, Double skipRate) {
+      long bestMs, double rejectionRate, Long timeLostMs, Long familyMeanMs, Double skipRate,
+      Double share) {
     this.code = code;
     this.count = count;
     this.meanMs = meanMs;
@@ -40,6 +42,7 @@ public class StepFigure {
     this.timeLostMs = timeLostMs;
     this.familyMeanMs = familyMeanMs;
     this.skipRate = skipRate;
+    this.share = share;
   }
 
   /** A step of the method, or one of the parts a step was built from, with how often it was skipped. */
@@ -47,7 +50,7 @@ public class StepFigure {
       double rejectionRate, Double skipRate) {
     return new StepFigure(stats.getCode(), stats.getCount(), stats.getMeanMs(),
         recognitionOf(stats, measuresRecognition), stats.getStdDevMs(), stats.getBestMs(),
-        rejectionRate, null, null, skipRate);
+        rejectionRate, null, null, skipRate, null);
   }
 
   /**
@@ -59,7 +62,7 @@ public class StepFigure {
       double rejectionRate, long timeLostMs, long familyMeanMs) {
     return new StepFigure(stats.getCode(), stats.getCount(), stats.getMeanMs(),
         recognitionOf(stats, measuresRecognition), stats.getStdDevMs(), stats.getBestMs(),
-        rejectionRate, Long.valueOf(timeLostMs), Long.valueOf(familyMeanMs), null);
+        rejectionRate, Long.valueOf(timeLostMs), Long.valueOf(familyMeanMs), null, null);
   }
 
   /** A figure with neither a family behind it nor cases under it: a whole solve, or a drilled case. */
@@ -67,7 +70,17 @@ public class StepFigure {
       double rejectionRate) {
     return new StepFigure(stats.getCode(), stats.getCount(), stats.getMeanMs(),
         recognitionOf(stats, measuresRecognition), stats.getStdDevMs(), stats.getBestMs(),
-        rejectionRate, null, null, null);
+        rejectionRate, null, null, null, null);
+  }
+
+  /**
+   * A group of a step's parts gathered across cases, such as the F2L pairs that started with a piece
+   * stuck in another slot, with its share of the pairs it is weighed against, or null for none.
+   */
+  public static StepFigure group(StepStats stats, double rejectionRate, Double share) {
+    return new StepFigure(stats.getCode(), stats.getCount(), stats.getMeanMs(),
+        recognitionOf(stats, true), stats.getStdDevMs(), stats.getBestMs(), rejectionRate, null,
+        null, null, share);
   }
 
   /** A step timed from its own first move has nowhere to put recognition, and 0 there reads as instant. */
@@ -121,6 +134,14 @@ public class StepFigure {
     return skipRate;
   }
 
+  /**
+   * The group's share of the two groups it is weighed against, from 0 to 1, counted before any
+   * occurrence was dropped as junk, or null for any figure that carries none.
+   */
+  public Double getShare() {
+    return share;
+  }
+
   JSONObject toJson() throws JSONException {
     JSONObject json = new JSONObject();
     json.put("code", code);
@@ -141,6 +162,9 @@ public class StepFigure {
     if (skipRate != null) {
       json.put("skip_rate", round(skipRate.doubleValue()));
     }
+    if (share != null) {
+      json.put("share", round(share.doubleValue()));
+    }
     return json;
   }
 
@@ -150,7 +174,8 @@ public class StepFigure {
         json.getLong("std_dev_ms"), json.getLong("best_ms"), json.getDouble("rejection_rate"),
         json.has("time_lost_ms") ? Long.valueOf(json.getLong("time_lost_ms")) : null,
         json.has("family_mean_ms") ? Long.valueOf(json.getLong("family_mean_ms")) : null,
-        json.has("skip_rate") ? Double.valueOf(json.getDouble("skip_rate")) : null);
+        json.has("skip_rate") ? Double.valueOf(json.getDouble("skip_rate")) : null,
+        json.has("share") ? Double.valueOf(json.getDouble("share")) : null);
   }
 
   /** Rates go out at two decimals: the third is noise the model would read as precision. */

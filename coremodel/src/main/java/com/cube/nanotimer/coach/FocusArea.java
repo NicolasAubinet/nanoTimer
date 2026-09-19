@@ -42,7 +42,11 @@ public class FocusArea {
     /** A case whose occurrences are thrown out often enough to be the complaint itself. */
     INCONSISTENT_CASE,
     /** A step taking more of the solve than the method's published baseline says it should. */
-    SLOW_STEP;
+    SLOW_STEP,
+    /** F2L pairs handed with a piece stuck in another slot, costing more than the basic ones. */
+    STUCK_PIECES,
+    /** A longer pause before the first F2L pair than before the later ones. */
+    SLOW_FIRST_PAIR;
 
     public String code() {
       return name().toLowerCase(Locale.ROOT);

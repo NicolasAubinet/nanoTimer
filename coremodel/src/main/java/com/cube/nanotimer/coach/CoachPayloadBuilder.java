@@ -147,7 +147,8 @@ public class CoachPayloadBuilder {
         casesAt(knowledge, sets, CaseKnowledge.Status.KNOWN),
         casesAt(knowledge, sets, CaseKnowledge.Status.NEEDS_REVIEW,
             CaseKnowledge.Status.TO_LEARN),
-        casesAt(knowledge, sets, CaseKnowledge.Status.TO_LEARN));
+        casesAt(knowledge, sets, CaseKnowledge.Status.TO_LEARN),
+        F2lGroups.of(familySamples, FAMILY_FLOOR));
   }
 
   /**

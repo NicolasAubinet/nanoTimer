@@ -14,6 +14,7 @@ public class StepSample {
   private final long recognitionMs;
   private final boolean part;
   private final long solveId;
+  private final Integer partIndex;
 
   /**
    * @param code the step code as the breakdown stores it, {@code cross} or {@code pll_gb}
@@ -25,11 +26,21 @@ public class StepSample {
    *     one part each of two solves; a drill rep is an occurrence on its own and has no solve
    */
   public StepSample(String code, long timeMs, long recognitionMs, boolean part, long solveId) {
+    this(code, timeMs, recognitionMs, part, solveId, null);
+  }
+
+  /**
+   * @param partIndex where a part came in its step, 0 for the first one finished, or null for a
+   *     step of the method, a drill rep, or a part whose place was not read
+   */
+  public StepSample(String code, long timeMs, long recognitionMs, boolean part, long solveId,
+      Integer partIndex) {
     this.code = code;
     this.timeMs = timeMs;
     this.recognitionMs = recognitionMs;
     this.part = part;
     this.solveId = solveId;
+    this.partIndex = partIndex;
   }
 
   public String getCode() {
@@ -50,5 +61,10 @@ public class StepSample {
 
   public long getSolveId() {
     return solveId;
+  }
+
+  /** Where the part came in its step, 0 for the first, or null when that is not known. */
+  public Integer getPartIndex() {
+    return partIndex;
   }
 }

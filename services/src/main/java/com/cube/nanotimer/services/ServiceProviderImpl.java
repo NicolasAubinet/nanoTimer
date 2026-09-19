@@ -1869,7 +1869,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("SELECT s.").append(DB.COL_SMARTCUBE_SOLVESTEP_NAME);
     q.append("     , s.").append(DB.COL_SMARTCUBE_SOLVESTEP_TIME);
     q.append("     , s.").append(DB.COL_SMARTCUBE_SOLVESTEP_RECOGNITION);
-    q.append("     , s.").append(DB.COL_SMARTCUBE_SOLVESTEP_SUB_INDEX).append(" IS NOT NULL");
+    q.append("     , s.").append(DB.COL_SMARTCUBE_SOLVESTEP_SUB_INDEX);
     q.append("     , s.").append(DB.COL_SMARTCUBE_SOLVESTEP_TIMEHISTORY_ID);
     q.append("  FROM ").append(DB.TABLE_SMARTCUBE_SOLVESTEP).append(" s");
     q.append("  JOIN (").append(window).append(") h");
@@ -1884,8 +1884,9 @@ public class ServiceProviderImpl implements ServiceProvider {
         new String[] { String.valueOf(solveType.getId()), method.getCode() });
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+        boolean part = !cursor.isNull(3); // its sub_index is where it came in its step
         samples.add(new StepSample(cursor.getString(0), cursor.getLong(1), cursor.getLong(2),
-            cursor.getInt(3) == 1, cursor.getLong(4)));
+            part, cursor.getLong(4), part ? Integer.valueOf(cursor.getInt(3)) : null));
       }
       cursor.close();
     }

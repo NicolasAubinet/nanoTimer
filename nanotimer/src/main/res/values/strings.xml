@@ -1234,6 +1234,8 @@
   <string name="coach_reason_two_look_oll">Two looks at the last layer</string>
   <string name="coach_reason_inconsistent_case">Cases that go wrong</string>
   <string name="coach_reason_slow_step">Taking more of the solve than usual</string>
+  <string name="coach_reason_stuck_pieces">Pieces stuck in other slots</string>
+  <string name="coach_reason_slow_first_pair">A slow first pair</string>
   <string name="coach_reason_unknown">Something else to work on</string>
   <string name="coach_case_mean">%1$s against %2$s for the rest</string>
   <string name="coach_case_cost">%1$d times, %2$s lost</string>
@@ -1244,6 +1246,8 @@
   <string name="coach_two_look_share">The last layer takes %1$s of your solve, where %2$s is usual in one look.</string>
   <string name="coach_two_look_to_learn">Your solves show %1$d cases you do not yet put in with one algorithm.</string>
   <string name="coach_step_share_body">%1$s takes %2$s of your solve, where %3$s is usual.</string>
+  <string name="coach_stuck_body">%1$s of your pairs start with a piece stuck in another slot. Those take %2$s, where the others take %3$s.</string>
+  <string name="coach_first_pair_body">You look for %1$s before your first pair, and %2$s before each pair after it.</string>
   <string name="coach_percent">%1$d%%</string>
   <string name="coach_drill_case">Drill this case</string>
   <string name="coach_drill_cases">Drill these cases</string>

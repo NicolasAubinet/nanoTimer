@@ -100,6 +100,10 @@ public class CoachPlanView {
         return activity.getString(R.string.coach_reason_two_look_oll);
       case SLOW_STEP:
         return familyTitle(area, R.string.coach_reason_slow_step);
+      case STUCK_PIECES:
+        return familyTitle(area, R.string.coach_reason_stuck_pieces);
+      case SLOW_FIRST_PAIR:
+        return familyTitle(area, R.string.coach_reason_slow_first_pair);
       default:
         // Not the consistency note: it ranks across the whole history and names no family of its own.
         return activity.getString(R.string.coach_reason_inconsistent_case);
@@ -143,6 +147,19 @@ public class CoachPlanView {
     }
     if (area.getReason() == FocusArea.Reason.TWO_LOOK_OLL && !area.getCodes().isEmpty()) {
       return twoLook(payload, area.getCodes().get(0));
+    }
+    if (area.getReason() == FocusArea.Reason.STUCK_PIECES) {
+      Double share = payload.value("f2l_groups.f2l_stuck.share");
+      Double stuck = payload.value("f2l_groups.f2l_stuck.mean_ms");
+      Double basic = payload.value("f2l_groups.f2l_basic.mean_ms");
+      return share == null || stuck == null || basic == null ? null
+          : activity.getString(R.string.coach_stuck_body, percent(share), time(stuck), time(basic));
+    }
+    if (area.getReason() == FocusArea.Reason.SLOW_FIRST_PAIR) {
+      Double first = payload.value("f2l_groups.f2l_first.recognition_ms");
+      Double later = payload.value("f2l_groups.f2l_later.recognition_ms");
+      return first == null || later == null ? null
+          : activity.getString(R.string.coach_first_pair_body, time(first), time(later));
     }
     return null;
   }

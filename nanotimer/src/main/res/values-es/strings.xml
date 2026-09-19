@@ -1187,6 +1187,8 @@
   <string name="coach_reason_two_look_oll">Dos miradas a la última capa</string>
   <string name="coach_reason_inconsistent_case">Casos que salen mal</string>
   <string name="coach_reason_slow_step">Ocupa más resolución de lo habitual</string>
+  <string name="coach_reason_stuck_pieces">Piezas atrapadas en otros slots</string>
+  <string name="coach_reason_slow_first_pair">Un primer par lento</string>
   <string name="coach_reason_unknown">Otra cosa que trabajar</string>
   <string name="coach_case_mean">%1$s frente a %2$s del resto</string>
   <string name="coach_case_cost">%1$d veces, %2$s perdidos</string>
@@ -1197,6 +1199,8 @@
   <string name="coach_two_look_share">La última capa ocupa %1$s de tu resolución, donde %2$s es lo normal en una mirada.</string>
   <string name="coach_two_look_to_learn">Tus resoluciones muestran %1$d casos que aún no colocas con un solo algoritmo.</string>
   <string name="coach_step_share_body">%1$s ocupa el %2$s de tu resolución, cuando lo habitual es el %3$s.</string>
+  <string name="coach_stuck_body">El %1$s de tus pares empiezan con una pieza atrapada en otro slot. Esos tardan %2$s, y los demás %3$s.</string>
+  <string name="coach_first_pair_body">Buscas %1$s antes de tu primer par, y %2$s antes de cada uno de los siguientes.</string>
   <string name="coach_percent">%1$d%%</string>
   <string name="coach_drill_case">Practicar este caso</string>
   <string name="coach_drill_cases">Practicar estos casos</string>
