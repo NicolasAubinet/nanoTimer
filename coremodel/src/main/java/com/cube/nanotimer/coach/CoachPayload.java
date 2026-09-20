@@ -29,7 +29,8 @@ public class CoachPayload {
 
   /** The newest payload this app writes and can read back. Version 2 added the two-look count and
    * the known set, 3 the cases to learn, 4 the F2L groups, 5 the F2L moves over the usual
-   * algorithms; an older payload is still read, and is simply missing them. */
+   * algorithms and the window they were replayed from; an older payload is still read, and is
+   * simply missing them. */
   public static final int VERSION = 5;
 
   private final int schemaVersion;
@@ -51,6 +52,7 @@ public class CoachPayload {
   private final List<StepFigure> f2lGroups;
   private final MoveFigure f2lMoves;
   private final List<MoveFigure> f2lHabits;
+  private final Integer f2lMoveWindow;
 
   /**
    * @param solve the whole solve's figures, or null when the window holds too few to quote
@@ -100,6 +102,24 @@ public class CoachPayload {
       List<StepFigure> drillCases, List<CaseComparison> comparisons, List<String> knownCases,
       List<String> learningCases, List<String> toLearnCases, List<StepFigure> f2lGroups,
       MoveFigure f2lMoves, List<MoveFigure> f2lHabits) {
+    this(schemaVersion, puzzle, method, familyWindow, caseWindow, drillWindow, twoLookCount, solve,
+        families, parts, cases, drillCases, comparisons, knownCases, learningCases, toLearnCases,
+        f2lGroups, f2lMoves, f2lHabits, null);
+  }
+
+  /**
+   * As above, saying how many solves were replayed for the F2L move figures
+   * ({@link CoachPayloadBuilder#F2L_MOVE_WINDOW}). It rides explicitly because the payload carries
+   * an F2L figure read from the family window as well, and the two must not be read as one. Null
+   * where no moves are sent.
+   */
+  public CoachPayload(int schemaVersion, String puzzle, String method, int familyWindow,
+      int caseWindow, int drillWindow, Integer twoLookCount, StepFigure solve,
+      List<StepFigure> families, List<StepFigure> parts, List<StepFigure> cases,
+      List<StepFigure> drillCases, List<CaseComparison> comparisons, List<String> knownCases,
+      List<String> learningCases, List<String> toLearnCases, List<StepFigure> f2lGroups,
+      MoveFigure f2lMoves, List<MoveFigure> f2lHabits, Integer f2lMoveWindow) {
+    this.f2lMoveWindow = f2lMoveWindow;
     this.schemaVersion = schemaVersion;
     this.puzzle = puzzle;
     this.method = method;
@@ -160,6 +180,14 @@ public class CoachPayload {
 
   public int getDrillWindow() {
     return drillWindow;
+  }
+
+  /**
+   * How many solves the F2L move figures were replayed from, or null in a payload carrying no F2L
+   * moves at all. Sent because the payload also carries an F2L figure read from the family window.
+   */
+  public Integer getF2lMoveWindow() {
+    return f2lMoveWindow;
   }
 
   /**
@@ -314,6 +342,9 @@ public class CoachPayload {
     if ("cases".equals(name)) {
       return Double.valueOf(caseWindow);
     }
+    if ("f2l_moves".equals(name)) {
+      return f2lMoveWindow == null ? null : Double.valueOf(f2lMoveWindow.intValue());
+    }
     return "drills".equals(name) ? Double.valueOf(drillWindow) : null;
   }
 
@@ -450,6 +481,9 @@ public class CoachPayload {
       windows.put("families", familyWindow);
       windows.put("cases", caseWindow);
       windows.put("drills", drillWindow);
+      if (f2lMoveWindow != null) {
+        windows.put("f2l_moves", f2lMoveWindow);
+      }
       json.put("windows", windows);
       if (twoLookCount != null) {
         json.put("two_look_count", twoLookCount);
@@ -516,7 +550,9 @@ public class CoachPayload {
           codes(json, "learning_cases"), codes(json, "to_learn_cases"),
           figures(json, "f2l_groups"),
           json.has("f2l_moves") ? MoveFigure.fromJson(json.getJSONObject("f2l_moves")) : null,
-          habits(json));
+          habits(json),
+          windows != null && windows.has("f2l_moves")
+              ? Integer.valueOf(windows.getInt("f2l_moves")) : null);
     } catch (JSONException e) {
       throw new IllegalArgumentException("Not a coach payload: " + e.getMessage(), e);
     }

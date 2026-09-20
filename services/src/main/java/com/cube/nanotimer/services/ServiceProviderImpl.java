@@ -1651,7 +1651,8 @@ public class ServiceProviderImpl implements ServiceProvider {
         getMethodStepSamples(solveType, method, CoachPayloadBuilder.FAMILY_WINDOW),
         getMethodStepSamples(solveType, method, CoachPayloadBuilder.CASE_WINDOW), caseSolves,
         drillSamples, getDrilledDrillsCount(CoachPayloadBuilder.DRILL_WINDOW),
-        CaseKnowledgeStore.read(db), pairs);
+        CaseKnowledgeStore.read(db), pairs,
+        getMethodSolvesCount(solveType, method, CoachPayloadBuilder.F2L_MOVE_WINDOW));
   }
 
   /**

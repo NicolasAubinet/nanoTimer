@@ -282,6 +282,28 @@ public class CoachPayloadBuilderTest {
     Assert.assertFalse(payload.holds("pair_9"));
   }
 
+  /**
+   * The F2L figures are replayed from a shorter window than the cases are read from, so how far
+   * back they go rides with them rather than being inferred from the case window.
+   */
+  @Test
+  public void testTheF2lMoveWindowRidesBesideTheFigures() {
+    CoachPayload payload = CoachPayload.parse(buildWithPairMoves(12, 400).toJson());
+
+    Assert.assertEquals(12, payload.getF2lMoveWindow().intValue());
+    Assert.assertEquals(12, payload.value("windows.f2l_moves"), 1e-9);
+    Assert.assertEquals(400, payload.value("windows.cases"), 1e-9);
+  }
+
+  /** Nothing replayed, nothing to say how far back: the window goes when the figures do. */
+  @Test
+  public void testAPayloadWithoutF2lMovesCarriesNoF2lWindow() {
+    CoachPayload payload = CoachPayload.parse(buildWithPlacedPairs().toJson());
+
+    Assert.assertNull(payload.getF2lMoveWindow());
+    Assert.assertNull(payload.value("windows.f2l_moves"));
+  }
+
   /** Moves are charged to the pair that finishes next, so a case never goes without the total. */
   @Test
   public void testNoF2lCaseIsSentWithoutTheWholeF2l() {
@@ -386,6 +408,11 @@ public class CoachPayloadBuilderTest {
    * costs nothing, case 4 with its usual one except a quarter of the time, off the list 4 over.
    */
   private static CoachPayload buildWithPairMoves(int solves) {
+    return buildWithPairMoves(solves, solves);
+  }
+
+  /** As above, with the case layer read from a window of its own, longer than the F2L one. */
+  private static CoachPayload buildWithPairMoves(int solves, int caseSolves) {
     List<PairExecution> pairs = new ArrayList<PairExecution>();
     for (int solve = 0; solve < solves; solve++) {
       long spread = (solve % 2 == 0 ? 1 : -1) * solve * 20L;
@@ -394,8 +421,8 @@ public class CoachPayloadBuilderTest {
       pairs.add(PairExecution.of(solve, "pair_4", 3000 + spread, odd ? 11 : 7, 7, !odd));
     }
     return CoachPayloadBuilder.build("3x3", "cfop", solveTimes(solves), familySamples(solves),
-        familySamples(solves), solves, Collections.<StepSample>emptyList(), 0,
-        Collections.<CaseKnowledge>emptyList(), pairs);
+        familySamples(solves), caseSolves, Collections.<StepSample>emptyList(), 0,
+        Collections.<CaseKnowledge>emptyList(), pairs, solves);
   }
 
   /** Two cases that go in unaided, one that does not, and one of a method this payload is not for. */

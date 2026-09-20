@@ -123,13 +123,18 @@ public final class CoachRead {
     });
   }
 
-  /** Replays the case window's solves for their F2L pairs first, which only the app can do. */
+  /**
+   * Replays the F2L move window's solves for their pairs first, which only the app can do. Every
+   * solve is read again from its scramble and this lands inside the wait the solver is watching,
+   * which is answered by not reading a solve twice rather than by looking at fewer of them.
+   */
   private void ask(final CoachClient client, final CubeMethod method) {
     if (method != CubeMethod.CFOP) {
       ask(client, method, Collections.<PairExecution>emptyList());
       return;
     }
-    App.INSTANCE.getService().getMethodSolves(solveType, method, CoachPayloadBuilder.CASE_WINDOW,
+    App.INSTANCE.getService().getMethodSolves(solveType, method,
+        CoachPayloadBuilder.F2L_MOVE_WINDOW,
         new DataCallback<List<SolveTime>>() {
           @Override
           public void onData(List<SolveTime> solves) {

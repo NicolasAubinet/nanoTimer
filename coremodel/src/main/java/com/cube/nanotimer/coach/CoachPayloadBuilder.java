@@ -50,6 +50,21 @@ public class CoachPayloadBuilder {
   public static final int DRILL_WINDOW = 50;
 
   /**
+   * How many solves are replayed for the F2L move figures. The case window, and named separately
+   * only because it is the one thing about them that could be guessed wrong: the payload carries an
+   * F2L figure on the family window too, so which of the two a number came from has to be said
+   * rather than inferred.
+   *
+   * <p><b>It was measured at the family window and put back.</b> A per-case habit is a rate, and
+   * over 100 solves a pair case has 5 to 19 occurrences (median 9), where a rate cannot be told
+   * from noise: on the owner's history case 27 read 27% off the list over 148 solves and 60% over
+   * 100. {@link #CASE_FLOOR} was reasoned for a time mean with outliers thrown out, not for a rate,
+   * so the length is doing the work here. What the short window was for, the cost of replaying, is
+   * answered by not replaying twice.
+   */
+  public static final int F2L_MOVE_WINDOW = CASE_WINDOW;
+
+  /**
    * Below this many occurrences a case is not quoted, in a solve or in a drill.
    *
    * <p><b>It cannot go lower, and the reason is not the one it looks like.</b> Measured on synthetic
@@ -123,13 +138,15 @@ public class CoachPayloadBuilder {
    * @param drillCount how many drills those reps came from
    * @param knowledge where every case with a status stands, of every method: the ones belonging to
    *     this method's own steps are picked out here
-   * @param pairs every F2L pair of the {@link #CASE_WINDOW}'s solves, replayed and set against the
-   *     algorithms its case is usually taught with; empty where nothing could be replayed
+   * @param pairs every F2L pair of the {@link #F2L_MOVE_WINDOW}'s solves, replayed and set against
+   *     the algorithms its case is usually taught with; empty where nothing could be replayed
+   * @param f2lSolveCount how many solves that window actually held, sent beside the figures so
+   *     that which window an F2L number came from is said rather than inferred
    */
   public static CoachPayload build(String puzzle, String method, List<Long> solveTimes,
       List<StepSample> familySamples, List<StepSample> caseSamples, int caseSolveCount,
       List<StepSample> drillSamples, int drillCount, List<CaseKnowledge> knowledge,
-      List<PairExecution> pairs) {
+      List<PairExecution> pairs, int f2lSolveCount) {
     StepTallies familyTallies = new StepTallies(familySamples);
     MethodStatistics families =
         new MethodStatistics(familyTallies.getSteps(), familyTallies.getParts(), solveTimes.size());
@@ -153,7 +170,8 @@ public class CoachPayloadBuilder {
             CaseKnowledge.Status.TO_LEARN),
         casesAt(knowledge, sets, CaseKnowledge.Status.TO_LEARN),
         F2lGroups.of(familySamples, FAMILY_FLOOR), f2lMoves,
-        f2lMoves == null ? null : F2lHabits.cases(pairs, CASE_FLOOR));
+        f2lMoves == null ? null : F2lHabits.cases(pairs, CASE_FLOOR),
+        f2lMoves == null ? null : Integer.valueOf(f2lSolveCount));
   }
 
   /** As above with no F2L pairs replayed, so the payload carries no F2L moves. */
@@ -161,7 +179,7 @@ public class CoachPayloadBuilder {
       List<StepSample> familySamples, List<StepSample> caseSamples, int caseSolveCount,
       List<StepSample> drillSamples, int drillCount, List<CaseKnowledge> knowledge) {
     return build(puzzle, method, solveTimes, familySamples, caseSamples, caseSolveCount,
-        drillSamples, drillCount, knowledge, Collections.<PairExecution>emptyList());
+        drillSamples, drillCount, knowledge, Collections.<PairExecution>emptyList(), 0);
   }
 
   /**
