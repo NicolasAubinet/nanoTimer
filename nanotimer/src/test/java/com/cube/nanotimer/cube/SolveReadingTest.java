@@ -1,0 +1,134 @@
+package com.cube.nanotimer.cube;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import com.cube.nanotimer.coach.PairExecution;
+import com.cube.nanotimer.session.AlgorithmFigures;
+import com.cube.nanotimer.vo.SolveTime;
+
+import org.junit.Test;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * A kept reading has to say exactly what reading the solve again would, or the figures quietly
+ * change the first time a window is opened twice. Solves are built as {@link CaseExecutionsTest}
+ * builds them.
+ */
+public class SolveReadingTest {
+
+  private static final String SUNE = "R U R' U R U U R'";
+  private static final String TPERM = "R U R' U' R' F R R U' R' U' R U R' F'";
+  /** F2L case 4 into each slot in turn, front right first. */
+  private static final String PAIRS = "R U R' B U B' L U L' F U F'";
+
+  private static List<SolveTime> solves() {
+    return CaseExecutionsTest.solves(PAIRS + " " + SUNE + " " + TPERM);
+  }
+
+  @Test
+  public void readsAPairTheSameWayOutOfAKeptReadingAsOutOfTheSolve() {
+    List<SolveTime> solves = solves();
+    SolveReadings read = new SolveReadings(null);
+    List<PairExecution> fresh = F2lHabitReader.readFrom(solves, read);
+
+    SolveReadings kept = new SolveReadings(read.unkept());
+    List<PairExecution> again = F2lHabitReader.readFrom(solves, kept);
+
+    assertTrue("nothing should have been read a second time", kept.unkept().isEmpty());
+    assertEquals(fresh.size(), again.size());
+    for (int i = 0; i < fresh.size(); i++) {
+      assertEquals(fresh.get(i).getCaseCode(), again.get(i).getCaseCode());
+      assertEquals(fresh.get(i).getSolveId(), again.get(i).getSolveId());
+      assertEquals(fresh.get(i).getTimeMs(), again.get(i).getTimeMs());
+      assertEquals(fresh.get(i).getMoves(), again.get(i).getMoves());
+      assertEquals(fresh.get(i).getUsualMoves(), again.get(i).getUsualMoves());
+      assertEquals(fresh.get(i).isListed(), again.get(i).isListed());
+      assertEquals(fresh.get(i).isComparable(), again.get(i).isComparable());
+    }
+  }
+
+  @Test
+  public void readsTheFiguresTheSameWayOutOfAKeptReadingAsOutOfTheSolve() {
+    List<SolveTime> solves = solves();
+    SolveReadings read = new SolveReadings(null);
+    Map<String, AlgorithmFigures> fresh = AlgorithmFiguresReader.readFrom(solves, read);
+
+    SolveReadings kept = new SolveReadings(read.unkept());
+    Map<String, AlgorithmFigures> again = AlgorithmFiguresReader.readFrom(solves, kept);
+
+    assertTrue(kept.unkept().isEmpty());
+    for (String family : fresh.keySet()) {
+      assertEquals(family, fresh.get(family).getStandard(), again.get(family).getStandard());
+      assertEquals(family, fresh.get(family).getNotStandard(), again.get(family).getNotStandard());
+      assertEquals(family, fresh.get(family).getNotSeen(), again.get(family).getNotSeen());
+      assertEquals(family, fresh.get(family).getExtraMoves(), again.get(family).getExtraMoves());
+    }
+    assertTrue("the fixture should have said something", fresh.get("pll").getStandard() > 0);
+  }
+
+  /** One window's reading serves the other reader, since both fold the same executions. */
+  @Test
+  public void oneReadingServesBothReaders() {
+    List<SolveTime> solves = solves();
+    SolveReadings read = new SolveReadings(null);
+    AlgorithmFiguresReader.readFrom(solves, read);
+
+    SolveReadings kept = new SolveReadings(read.unkept());
+    List<PairExecution> pairs = F2lHabitReader.readFrom(solves, kept);
+
+    assertTrue(kept.unkept().isEmpty());
+    assertEquals(4, pairs.size());
+  }
+
+  /** A cache is never the only copy: text nothing can read is read out of the solve again. */
+  @Test
+  public void readsTheSolveAgainWhenTheKeptTextCannotBeRead() {
+    List<SolveTime> solves = solves();
+    Map<Long, String> rubbish = new HashMap<Long, String>();
+    rubbish.put(Long.valueOf(solves.get(0).getId()), "not a reading");
+
+    SolveReadings readings = new SolveReadings(rubbish);
+    List<PairExecution> pairs = F2lHabitReader.readFrom(solves, readings);
+
+    assertEquals(4, pairs.size());
+    assertFalse("it should have been read and kept", readings.unkept().isEmpty());
+  }
+
+  /** A pair set against nothing still happened, so it survives being kept as one. */
+  @Test
+  public void keepsAPairThatCanBeSetAgainstNothingAsAPairThatHappened() {
+    List<SolveReading.Execution> round = SolveReading.parse(SolveReading.toJson(
+        Collections.singletonList(new SolveReading.Execution("f2l", null, 1200, 0, 0, false, 1))));
+
+    assertEquals(1, round.size());
+    assertNull(round.get(0).getCaseCode());
+    assertFalse(round.get(0).isRead());
+    assertEquals(1200, round.get(0).getTimeMs());
+  }
+
+  /** A two-looked last layer is not standard however usual each of its algorithms was. */
+  @Test
+  public void keepsHowManyAlgorithmsAStepTookApartFromWhetherTheyWereListed() {
+    List<SolveReading.Execution> round = SolveReading.parse(SolveReading.toJson(
+        Collections.singletonList(new SolveReading.Execution("oll", "oll_21", 3400, 11, 11, true, 2))));
+
+    assertEquals(1, round.size());
+    assertTrue(round.get(0).isListed());
+    assertEquals(2, round.get(0).getAlgorithms());
+  }
+
+  @Test
+  public void saysNothingWasReadOutOfASolveWithNoMoves() {
+    List<SolveTime> solves = solves();
+    solves.get(0).setSmartcubeMoves(null);
+
+    assertTrue(SolveReading.read(solves.get(0)).isEmpty());
+  }
+}

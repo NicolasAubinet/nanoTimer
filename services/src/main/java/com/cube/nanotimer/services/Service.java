@@ -107,6 +107,15 @@ public interface Service {
    * @param pairs the F2L pairs of the case window's solves, replayed by the caller, since only the
    *     app can replay a solve; empty to send no F2L moves
    */
+  /**
+   * What has already been read out of the given solves, by solve id, so a caller replays only the
+   * solves that are missing. A solve read by another version of the reading is not in the answer.
+   */
+  void getSolveReadings(List<Long> solveIds, int version, DataCallback<Map<Long, String>> callback);
+
+  /** Keeps readings the caller had to make for itself, so the next window does not make them again. */
+  void saveSolveReadings(Map<Long, String> readings, int version, DataCallback<Void> callback);
+
   void getCoachPayload(SolveType solveType, CubeMethod method, List<PairExecution> pairs,
       DataCallback<CoachPayload> callback);
   /**

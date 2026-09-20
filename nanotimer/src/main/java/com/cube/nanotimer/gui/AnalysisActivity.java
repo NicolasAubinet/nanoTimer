@@ -23,6 +23,8 @@ import com.cube.nanotimer.coach.CoachPayloadBuilder;
 import com.cube.nanotimer.coach.StepBaseline;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.cube.AlgorithmFiguresReader;
+import com.cube.nanotimer.cube.SolveReading;
+import com.cube.nanotimer.cube.SolveReadings;
 import com.cube.nanotimer.cube.SolveTypeMethod;
 import com.cube.nanotimer.gui.widget.AnalysisCases;
 import com.cube.nanotimer.gui.widget.AnalysisHelpDialog;
@@ -499,8 +501,9 @@ public class AnalysisActivity extends NanoTimerActivity {
   }
 
   /**
-   * Replays every solve in the window, so it runs on a thread of its own rather than holding up the
-   * service, and a read that lands after the window has changed again is dropped.
+   * Reads every solve in the window that has not been read before, off the service's own thread,
+   * and drops an answer that lands after the window has changed again. What it had to read is
+   * handed back to be kept, so opening this tab again reads nothing.
    */
   private void loadAlgorithmFigures() {
     algorithmFigures = null;
@@ -514,22 +517,26 @@ public class AnalysisActivity extends NanoTimerActivity {
         new DataCallback<List<SolveTime>>() {
           @Override
           public void onData(final List<SolveTime> solves) {
-            new Thread(new Runnable() {
-              @Override
-              public void run() {
-                final Map<String, AlgorithmFigures> figures =
-                    AlgorithmFiguresReader.readFrom(solves);
-                runOnUiThread(new Runnable() {
+            App.INSTANCE.getService().getSolveReadings(SolveReadings.idsOf(solves),
+                SolveReading.VERSION, new DataCallback<Map<Long, String>>() {
                   @Override
-                  public void run() {
-                    if (asked == window && !isFinishing()) {
-                      algorithmFigures = figures;
-                      showAlgorithmFigures();
-                    }
+                  public void onData(Map<Long, String> kept) { // off the main thread already
+                    SolveReadings readings = new SolveReadings(kept);
+                    final Map<String, AlgorithmFigures> figures =
+                        AlgorithmFiguresReader.readFrom(solves, readings);
+                    App.INSTANCE.getService().saveSolveReadings(readings.unkept(),
+                        SolveReading.VERSION, null);
+                    runOnUiThread(new Runnable() {
+                      @Override
+                      public void run() {
+                        if (asked == window && !isFinishing()) {
+                          algorithmFigures = figures;
+                          showAlgorithmFigures();
+                        }
+                      }
+                    });
                   }
                 });
-              }
-            }).start();
           }
         });
   }

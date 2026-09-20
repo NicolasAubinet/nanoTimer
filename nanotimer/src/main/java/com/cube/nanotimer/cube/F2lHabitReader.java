@@ -1,7 +1,6 @@
 package com.cube.nanotimer.cube;
 
 import com.cube.nanotimer.coach.PairExecution;
-import com.cube.nanotimer.vo.SolveStep;
 import com.cube.nanotimer.vo.SolveTime;
 
 import java.util.ArrayList;
@@ -19,45 +18,31 @@ import java.util.List;
  */
 public final class F2lHabitReader {
 
-  private static final String F2L = "f2l";
-
   private F2lHabitReader() {
   }
 
-  /** @param solves the window's solves, whatever they were solved as: only CFOP is read */
-  public static List<PairExecution> readFrom(List<SolveTime> solves) {
-    final List<PairExecution> pairs = new ArrayList<PairExecution>();
-    for (final SolveTime solve : solves) {
-      CaseExecutions.readSteps(solve, new CaseExecutions.StepReader() {
-        @Override
-        public void read(SolveStep step, SolveSolution.Step turned) {
-          if (F2L.equals(step.getName())) {
-            readPairs(solve.getId(), step, turned, pairs);
-          }
+  /**
+   * @param solves the window's solves, whatever they were solved as: only CFOP is read
+   * @param readings where each solve's executions come from, read there only where none was kept
+   */
+  public static List<PairExecution> readFrom(List<SolveTime> solves, SolveReadings readings) {
+    List<PairExecution> pairs = new ArrayList<PairExecution>();
+    for (SolveTime solve : solves) {
+      for (SolveReading.Execution execution : readings.of(solve)) {
+        if (!SolveReading.F2L.equals(execution.getFamily())) {
+          continue;
         }
-      });
+        pairs.add(execution.isRead()
+            ? PairExecution.of(solve.getId(), execution.getCaseCode(), execution.getTimeMs(),
+                execution.getMoves(), execution.getUsualMoves(), execution.isListed())
+            : PairExecution.unlisted(solve.getId(), execution.getTimeMs()));
+      }
     }
     return pairs;
   }
 
-  private static void readPairs(long solveId, SolveStep step, SolveSolution.Step turned,
-      List<PairExecution> pairs) {
-    List<SolveStep> parts = step.getSubSteps();
-    for (int i = 0; i < parts.size(); i++) {
-      long timeMs = parts.get(i).getTotalMs();
-      if (i >= turned.getGroups().size()) {
-        pairs.add(PairExecution.unlisted(solveId, timeMs)); // no moves to set against anything
-        continue;
-      }
-      String moves = turned.getPartMoves(i);
-      if (moves.isEmpty()) {
-        continue; // a skip: nothing turned, so nothing over the usual either
-      }
-      CaseExecutions.Pair pair = CaseExecutions.pairOf(parts.get(i), moves);
-      pairs.add(pair == null || pair.getExecution().getUsualMoves() <= 0
-          ? PairExecution.unlisted(solveId, timeMs)
-          : PairExecution.of(solveId, pair.getCaseCode(), timeMs, pair.getExecution().getMoves(),
-              pair.getExecution().getUsualMoves(), pair.isListed()));
-    }
+  /** As above, reading every solve and keeping nothing. */
+  public static List<PairExecution> readFrom(List<SolveTime> solves) {
+    return readFrom(solves, SolveReadings.none());
   }
 }

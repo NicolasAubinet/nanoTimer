@@ -10,6 +10,7 @@ import com.cube.nanotimer.coach.PairExecution;
 import com.cube.nanotimer.coach.StepSample;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.services.db.CaseKnowledgeStore;
+import com.cube.nanotimer.services.db.SolveReadingStore;
 import com.cube.nanotimer.services.db.DB;
 import com.cube.nanotimer.session.CaseKnowledge;
 import com.cube.nanotimer.session.MethodStatistics;
@@ -614,6 +615,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     List<String> cases = smartcubeStepNames(solveTime.getId()); // read before the rows go
     db.delete(DB.TABLE_TIMEHISTORYSTEP, DB.COL_TIMEHISTORYSTEP_TIMEHISTORY_ID + " = ?", getStringArray(solveTime.getId()));
     db.delete(DB.TABLE_SMARTCUBE_SOLVESTEP, DB.COL_SMARTCUBE_SOLVESTEP_TIMEHISTORY_ID + " = ?", getStringArray(solveTime.getId()));
+    SolveReadingStore.forget(db, solveTime.getId());
     db.delete(DB.TABLE_TIMEHISTORY, DB.COL_ID + " = ?", getStringArray(solveTime.getId()));
     CaseKnowledgeStore.update(db, cases); // the solve no longer says anything about its cases
 
@@ -876,6 +878,7 @@ public class ServiceProviderImpl implements ServiceProvider {
   public void deleteHistory() {
     db.delete(DB.TABLE_TIMEHISTORYSTEP, null, null);
     db.delete(DB.TABLE_SMARTCUBE_SOLVESTEP, null, null);
+    SolveReadingStore.forgetAll(db);
     db.delete(DB.TABLE_TIMEHISTORY, null, null);
     db.delete(DB.TABLE_COACH_PLAN, null, null); // a plan is a reading of the history, not a thing beside it
     CaseKnowledgeStore.rebuild(db);
@@ -890,6 +893,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     db.delete(DB.TABLE_SMARTCUBE_SOLVESTEP,
         DB.COL_SMARTCUBE_SOLVESTEP_TIMEHISTORY_ID + " IN (SELECT " + DB.COL_ID + " FROM " + DB.TABLE_TIMEHISTORY
             + " WHERE " + DB.COL_TIMEHISTORY_SOLVETYPE_ID + " = ?)", getStringArray(solveType.getId()));
+    SolveReadingStore.forgetSolveType(db, solveType.getId());
     db.delete(DB.TABLE_TIMEHISTORY, DB.COL_TIMEHISTORY_SOLVETYPE_ID + " = ?", getStringArray(solveType.getId()));
     db.delete(DB.TABLE_COACH_PLAN, DB.COL_COACH_PLAN_SOLVETYPE_ID + " = ?", getStringArray(solveType.getId()));
     CaseKnowledgeStore.rebuild(db);
@@ -1656,6 +1660,21 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   /**
+   * What has already been read out of the given solves, so a caller replays only what is missing.
+   * The reading itself belongs to the app, which alone can replay a solve; this module keeps it.
+   */
+  @Override
+  public Map<Long, String> getSolveReadings(List<Long> solveIds, int version) {
+    return SolveReadingStore.read(db, solveIds, version);
+  }
+
+  /** Keeps what a caller had to read for itself, so the next window does not read it again. */
+  @Override
+  public void saveSolveReadings(Map<Long, String> readings, int version) {
+    SolveReadingStore.write(db, readings, version);
+  }
+
+  /**
    * The statuses and the solves behind them in one read. The moves a case was answered with are not
    * stored anywhere on their own: they are part of the solve, so the solves come up whole and the
    * caller cuts them at their steps.
@@ -2016,6 +2035,8 @@ public class ServiceProviderImpl implements ServiceProvider {
             getStringArray(solveTime.getId()));
         db.delete(DB.TABLE_SMARTCUBE_SOLVESTEP, DB.COL_SMARTCUBE_SOLVESTEP_TIMEHISTORY_ID + " = ?",
             getStringArray(solveTime.getId()));
+        // A solve read again is a solve whose cases may be read differently: the old reading goes.
+        SolveReadingStore.forget(db, solveTime.getId());
         if (solveTime.getSmartcubeSteps() != null) {
           insertSmartcubeSteps(solveTime.getId(), solveTime.getSmartcubeSteps());
         }

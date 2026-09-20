@@ -496,6 +496,31 @@ public class ServiceImpl extends DBHelper implements Service {
   }
 
   @Override
+  public void getSolveReadings(final List<Long> solveIds, final int version,
+      final DataCallback<Map<Long, String>> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        callback.onData(provider.getSolveReadings(solveIds, version));
+      }
+    });
+  }
+
+  @Override
+  public void saveSolveReadings(final Map<Long, String> readings, final int version,
+      final DataCallback<Void> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        provider.saveSolveReadings(readings, version);
+        if (callback != null) {
+          callback.onData(null);
+        }
+      }
+    });
+  }
+
+  @Override
   public void getCoachPayload(final SolveType solveType, final CubeMethod method,
       final List<PairExecution> pairs, final DataCallback<CoachPayload> callback) {
     run(new Runnable() {

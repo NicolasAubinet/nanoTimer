@@ -10,6 +10,8 @@ import com.cube.nanotimer.coach.CoachPayloadBuilder;
 import com.cube.nanotimer.coach.PairExecution;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.cube.F2lHabitReader;
+import com.cube.nanotimer.cube.SolveReading;
+import com.cube.nanotimer.cube.SolveReadings;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.vo.CubeMethod;
 import com.cube.nanotimer.vo.SolveTime;
@@ -124,9 +126,9 @@ public final class CoachRead {
   }
 
   /**
-   * Replays the F2L move window's solves for their pairs first, which only the app can do. Every
-   * solve is read again from its scramble and this lands inside the wait the solver is watching,
-   * which is answered by not reading a solve twice rather than by looking at fewer of them.
+   * Reads the F2L move window's solves for their pairs first, which only the app can do. A solve
+   * read before is taken from the store rather than solved again, which is what keeps this off the
+   * wait the solver is watching: only solves done since the last plan cost anything.
    */
   private void ask(final CoachClient client, final CubeMethod method) {
     if (method != CubeMethod.CFOP) {
@@ -137,8 +139,18 @@ public final class CoachRead {
         CoachPayloadBuilder.F2L_MOVE_WINDOW,
         new DataCallback<List<SolveTime>>() {
           @Override
-          public void onData(List<SolveTime> solves) {
-            ask(client, method, F2lHabitReader.readFrom(solves)); // off the main thread already
+          public void onData(final List<SolveTime> solves) {
+            App.INSTANCE.getService().getSolveReadings(SolveReadings.idsOf(solves),
+                SolveReading.VERSION, new DataCallback<Map<Long, String>>() {
+                  @Override
+                  public void onData(Map<Long, String> kept) { // off the main thread already
+                    SolveReadings readings = new SolveReadings(kept);
+                    List<PairExecution> pairs = F2lHabitReader.readFrom(solves, readings);
+                    App.INSTANCE.getService().saveSolveReadings(readings.unkept(),
+                        SolveReading.VERSION, null);
+                    ask(client, method, pairs);
+                  }
+                });
           }
         });
   }
