@@ -121,6 +121,16 @@
      android:orientation="vertical"
      android:visibility="gone">
 
+    <!-- Only while reading: a minute of nothing moving reads as a screen that has stopped. -->
+    <ProgressBar
+       android:id="@+id/pbAnalysisPlanRead"
+       style="?android:attr/progressBarStyleSmall"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_gravity="center"
+       android:layout_marginBottom="8dp"
+       android:visibility="gone"/>
+
     <TextView
        android:id="@+id/tvAnalysisPlanReadStatus"
        android:layout_width="match_parent"

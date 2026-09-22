@@ -742,6 +742,8 @@ public class AnalysisActivity extends NanoTimerActivity {
         break;
     }
     status.setVisibility(read.getState() == CoachRead.State.IDLE ? View.GONE : View.VISIBLE);
+    findViewById(R.id.pbAnalysisPlanRead).setVisibility(
+        read.getState() == CoachRead.State.READING ? View.VISIBLE : View.GONE);
     boolean capped = failure != null && failure.getRefusal() == CoachRefusal.WEEKLY_CAP_REACHED;
     button.setVisibility(capped ? View.GONE : View.VISIBLE);
     button.setEnabled(read.getState() != CoachRead.State.READING);
