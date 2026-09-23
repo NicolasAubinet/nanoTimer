@@ -1223,6 +1223,10 @@
   <string name="coach_first_pair_body">Vous cherchez %1$s avant votre première paire, et %2$s avant chacune des suivantes.</string>
   <string name="coach_reason_long_pair">Des paires F2L en mouvements de trop</string>
   <string name="coach_long_pair_body">Sur %1$d résolutions, votre F2L a pris %2$s mouvements, là où les algorithmes habituels de ses paires en comptent %3$s.</string>
+  <string name="coach_reason_stalling">Des blocages en tournant</string>
+  <string name="coach_stalling_body">%1$s : %2$s blocages par résolution en tournant, soit %3$s sur ses %4$s.</string>
+  <string name="coach_reason_uneven_step">Irrégulier d\'une résolution à l\'autre</string>
+  <string name="coach_uneven_body">%1$s : moyenne de %2$s, à %3$s près, et votre meilleur temps est %4$s.</string>
   <string name="coach_pair_extra">%1$s mouvements de trop en moyenne</string>
   <string name="coach_pair_off_list">%1$d fois, %2$d%% hors des algorithmes habituels</string>
   <string name="coach_pair_show">Voir le cas</string>

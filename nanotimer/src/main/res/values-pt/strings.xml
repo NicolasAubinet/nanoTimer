@@ -1225,6 +1225,10 @@
   <string name="coach_first_pair_body">Procura durante %1$s antes do seu primeiro par, e %2$s antes de cada um dos seguintes.</string>
   <string name="coach_reason_long_pair">Pares de F2L com movimentos a mais</string>
   <string name="coach_long_pair_body">Em %1$d resoluções, o seu F2L levou %2$s movimentos, onde os algoritmos habituais dos seus pares somam %3$s.</string>
+  <string name="coach_reason_stalling">Bloqueios a rodar</string>
+  <string name="coach_stalling_body">%1$s: %2$s bloqueios por resolução a rodar, que somam %3$s dos seus %4$s.</string>
+  <string name="coach_reason_uneven_step">Irregular de resolução para resolução</string>
+  <string name="coach_uneven_body">%1$s: média de %2$s, com uma variação de %3$s, e o seu melhor é %4$s.</string>
   <string name="coach_pair_extra">%1$s movimentos a mais em média</string>
   <string name="coach_pair_off_list">%1$d vezes, %2$d%% fora dos algoritmos habituais</string>
   <string name="coach_pair_show">Ver o caso</string>

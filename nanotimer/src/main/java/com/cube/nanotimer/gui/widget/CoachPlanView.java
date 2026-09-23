@@ -114,6 +114,10 @@ public class CoachPlanView {
         return familyTitle(area, R.string.coach_reason_slow_first_pair);
       case LONG_PAIR:
         return activity.getString(R.string.coach_reason_long_pair);
+      case STALLING:
+        return familyTitle(area, R.string.coach_reason_stalling);
+      case UNEVEN_STEP:
+        return familyTitle(area, R.string.coach_reason_uneven_step);
       default:
         // Not the consistency note: it ranks across the whole history and names no family of its own.
         return activity.getString(R.string.coach_reason_inconsistent_case);
@@ -170,6 +174,26 @@ public class CoachPlanView {
       Double later = payload.value("f2l_groups.f2l_later.recognition_ms");
       return first == null || later == null ? null
           : activity.getString(R.string.coach_first_pair_body, time(first), time(later));
+    }
+    if (area.getReason() == FocusArea.Reason.STALLING && !area.getCodes().isEmpty()) {
+      String code = area.getCodes().get(0);
+      Double stalls = payload.value("turning." + code + ".stalls");
+      Double stallMs = payload.value("turning." + code + ".stall_ms");
+      Double mean = payload.value("families." + code + ".mean_ms");
+      return stalls == null || stallMs == null || mean == null ? null
+          : activity.getString(R.string.coach_stalling_body,
+              Utils.toSmartCubeStepLocalizedName(activity, code, 0), moves(stalls), time(stallMs),
+              time(mean));
+    }
+    if (area.getReason() == FocusArea.Reason.UNEVEN_STEP && !area.getCodes().isEmpty()) {
+      String code = area.getCodes().get(0);
+      Double mean = payload.value("families." + code + ".mean_ms");
+      Double spread = payload.value("families." + code + ".std_dev_ms");
+      Double best = payload.value("families." + code + ".best_ms");
+      return mean == null || spread == null || best == null ? null
+          : activity.getString(R.string.coach_uneven_body,
+              Utils.toSmartCubeStepLocalizedName(activity, code, 0), time(mean), time(spread),
+              time(best));
     }
     if (area.getReason() == FocusArea.Reason.LONG_PAIR) {
       Double solves = payload.value("f2l_moves.count");

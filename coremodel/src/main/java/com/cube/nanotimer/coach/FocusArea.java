@@ -48,7 +48,11 @@ public class FocusArea {
     /** A longer pause before the first F2L pair than before the later ones. */
     SLOW_FIRST_PAIR,
     /** An F2L case put in with more moves than its usual algorithm, time after time. */
-    LONG_PAIR;
+    LONG_PAIR,
+    /** A step whose turning keeps stopping: planning inside the cross, recall inside an algorithm. */
+    STALLING,
+    /** A step ordinary on average and uneven from one solve to the next. */
+    UNEVEN_STEP;
 
     public String code() {
       return name().toLowerCase(Locale.ROOT);
