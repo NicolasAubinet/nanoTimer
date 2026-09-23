@@ -1,6 +1,7 @@
 package com.cube.nanotimer.gui;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
@@ -58,7 +59,7 @@ import com.cube.nanotimer.gui.widget.SolveStepBar;
 import com.cube.nanotimer.gui.widget.StepSplitsView;
 import com.cube.nanotimer.gui.widget.TimeChangedHandler;
 import com.cube.nanotimer.gui.widget.dialog.AddNewTimeDialog;
-import com.cube.nanotimer.gui.widget.dialog.BlindBuffersPrompt;
+import com.cube.nanotimer.gui.widget.dialog.BlindSetupPrompt;
 import com.cube.nanotimer.gui.widget.dialog.CrossSolverDialog;
 import com.cube.nanotimer.gui.widget.dialog.ScrambleViewDialog;
 import com.cube.nanotimer.scrambler.ScramblerService;
@@ -158,6 +159,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
   private String autoPenaltyReason; // why the cube marked the last solve, null when it did not
   private ValueAnimator solveFlourish; // the finish flash, kept so a late verdict can call it off
   private boolean skipRecordPanel; // suppress the record panel on the next refresh (a discard-bound stop, or a delete)
+  private boolean fastSolvePending; // the solve being saved beat half the PB, so it is asked about before it is celebrated
   private CubeSession cubeSession;
   private SolveAverages solveAverages;
   private SolveAverages prevSolveAverages;
@@ -174,6 +176,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
   private ColorStateList secondaryTextColor;
   private ColorStateList defaultTimerTextColor;
   private static final int MIN_TIMES_FOR_RECORD_NOTIFICATION = 12;
+  private static final double FAST_SOLVE_RATIO = 0.5; // a time under this share of the PB is asked about
   private static final int MIN_WINDOW_SUCCESSES_FOR_VERDICT = 5;
 
   private final long REFRESH_INTERVAL = 30;
@@ -193,8 +196,8 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
   // The gap changes hands as a cube comes and goes. Added in onResume, which replays the current
   // connection at once, so the gap is settled before anything is drawn in it.
   private final CubeConnectionListener statePreviewOwner = c -> refreshStatePreviewOwner();
-  /** A blind reconstruction is named through the solver's buffers, so they are asked for once. */
-  private final CubeConnectionListener blindBuffersAsk = c -> askBlindBuffers();
+  /** A blind reading is named through how the cube is held and what it shot from: asked once. */
+  private final CubeConnectionListener blindSetupAsk = c -> askBlindSetup();
   private boolean timerFocused; // the screen has stood down for a solve, so the preview has too
   private SmartCubeSolveController solveController;
   private SolveStepBar solveStepBar;
@@ -337,7 +340,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
     liveCube.start();
     statePreview.start();
     SmartCubeManager.INSTANCE.addConnectionListener(statePreviewOwner);
-    SmartCubeManager.INSTANCE.addConnectionListener(blindBuffersAsk);
+    SmartCubeManager.INSTANCE.addConnectionListener(blindSetupAsk);
     applySessionStripChoice(); // both this and the coloring below may have changed in the settings
     renderStatePreview(); // and so may what the picture under the scramble is drawn as
     refreshSessionFields();
@@ -351,7 +354,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
     liveCube.stop();
     statePreview.stop();
     SmartCubeManager.INSTANCE.removeConnectionListener(statePreviewOwner);
-    SmartCubeManager.INSTANCE.removeConnectionListener(blindBuffersAsk);
+    SmartCubeManager.INSTANCE.removeConnectionListener(blindSetupAsk);
   }
 
   @Override
@@ -1063,6 +1066,38 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
         });
   }
 
+  private boolean isSuspiciouslyFast(long time) {
+    Long best = (solveAverages == null) ? null : solveAverages.getBestOfLifetime();
+    return time > 0 && best != null && best > 0 && time < best * FAST_SOLVE_RATIO;
+  }
+
+  /**
+   * A time far under the PB is usually a start and stop by accident, so it is not celebrated until
+   * the user says it was real. Its averages were held back and are only shown with the answer.
+   */
+  private void confirmFastSolve() {
+    Long best = (prevSolveAverages == null) ? null : prevSolveAverages.getBestOfLifetime();
+    String message = getString(R.string.fast_solve_confirmation, FormatterService.INSTANCE.formatSolveTime(best));
+    AlertDialog dialog = DialogUtils.showDestructiveConfirmDialog(this, R.string.discard_solve_title, message,
+        R.string.discard_solve, R.string.keep_solve, new YesNoListener() {
+          @Override
+          public void onYes() {
+            deleteLastSolve();
+          }
+
+          @Override
+          public void onNo() {
+            keepFastSolve();
+          }
+        });
+    dialog.setOnCancelListener(d -> keepFastSolve());
+  }
+
+  private void keepFastSolve() {
+    // A solve already under way (a smart cube's first turn) will announce its own verdict.
+    refreshAvgFields(timerState == TimerState.STOPPED, true);
+  }
+
   private void deleteLastSolve() {
     if (lastSolveTime == null) {
       DialogUtils.showShortInfoMessage(this, R.string.no_solve_for_action);
@@ -1631,6 +1666,8 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
       }
     }
     applyAutoPenalty(solveTime, penalty);
+    // A cross-button stop already asks; asking twice would be the same question.
+    fastSolvePending = !skipRecordPanel && isSuspiciouslyFast(solveTime.getTime());
 
     addTimeToUI(solveTime);
     App.INSTANCE.getService().saveTime(solveTime, solveAverageCallback);
@@ -1910,19 +1947,19 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
   }
 
   /**
-   * The buffers, asked for the first time a blind solve type is opened with a cube on. Later than
-   * the method question, which the connect sheet asks, because this one only means anything for a
-   * blind solve type and most solvers never open one.
+   * How the cube is held and what is shot from, asked the first time a blind solve type is opened
+   * with a cube on. Later than the method question, which the connect sheet asks, because these
+   * only mean anything for a blind solve type and most solvers never open one.
    *
    * <p>Skipped rather than queued where the timer is not idle: nothing marks it asked, so the next
    * time the screen resumes it is asked again.
    */
-  private void askBlindBuffers() {
+  private void askBlindSetup() {
     // Never over a running attempt. A cube connecting mid-memorisation would otherwise put a modal
     // dialog over the timer, and the tap meant to stop it would land on the dialog instead.
     if (timerState == TimerState.STOPPED && solveType != null && solveType.isBlind()
         && SmartCubeManager.INSTANCE.isConnected()) {
-      BlindBuffersPrompt.askOnce(this);
+      BlindSetupPrompt.askOnce(this);
     }
   }
 
@@ -2583,7 +2620,12 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
               deleteLastSolve();
             }
           }
-          refreshAvgFields(showNotifications, data.getSolveTime() != null);
+          if (fastSolvePending && data.getSolveTime() != null) {
+            fastSolvePending = false;
+            confirmFastSolve(); // the fields refresh with the answer, so nothing is lit before it
+          } else {
+            refreshAvgFields(showNotifications, data.getSolveTime() != null);
+          }
         }
       });
     }

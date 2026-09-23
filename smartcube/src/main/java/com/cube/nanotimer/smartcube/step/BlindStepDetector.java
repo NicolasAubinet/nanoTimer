@@ -302,12 +302,17 @@ public final class BlindStepDetector implements StepDetector {
   private boolean parityFound;
 
   /**
-   * The whole-cube rotation the solver made picking the cube up, which the gyro already tracks for
-   * every solve — the scramble is turned green in front and a blind solve is turned in whatever
-   * grip the solver memorised in, and nothing rotates it after that.
+   * The whole-cube rotation the solver holds the cube in: the orientation they declare in the
+   * settings for a solve being read as it is turned, and the solve's own recorded grip where a
+   * stored one is being read back. A scramble is followed green in front, a blind solve is turned
+   * out of that into the grip it is memorised in, and nothing rotates it after that.
    *
    * <p>Its <em>inverse</em> is the frame: the rotation carries the solver's front onto the face the
    * cube reports it as, and names have to be spelled the other way round.
+   *
+   * <p>Overruled wherever the pieces the solve shot from settle a frame of their own, which is what
+   * makes a wrong declaration reach only the solves that had no answer at all. See
+   * {@link BlindFrame}.
    */
   public void setPickupRotation(CubeRotation pickup) {
     int frame = pickup == null ? BlindTargets.UNKNOWN_FRAME

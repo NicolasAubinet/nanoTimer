@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.AudioManager;
@@ -19,6 +20,7 @@ import androidx.core.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.TouchDelegate;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -57,7 +59,6 @@ import com.cube.nanotimer.util.backup.BackupRestorer;
 import com.cube.nanotimer.util.exportimport.ErrorListener;
 import com.cube.nanotimer.util.exportimport.csvimport.CSVImporter;
 import com.cube.nanotimer.util.helper.DialogUtils;
-import com.cube.nanotimer.util.helper.ScreenUtils;
 import com.cube.nanotimer.util.helper.TimeColorScale;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.util.view.EnterAnimation;
@@ -127,6 +128,9 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   // Position of the first solve of each day, to its heading. Rebuilt whenever the list changes,
   // so binding a row stays a lookup.
   private final Map<Integer, String> dayHeaders = new HashMap<>();
+  // The heading each row falls under, carried down from the heading above it, so the pinned bar can
+  // name the group at any scroll position without walking back up the list.
+  private final List<String> rowGroups = new ArrayList<>();
   private final Handler timeAgoHandler = new Handler();
   /**
    * The drawer's entries, by their place in {@code R.array.mainscreen_menu_items}. Named because the
@@ -135,22 +139,25 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
    * a different entry depending on both.
    */
   private static final int MENU_SETTINGS = 0;
-  private static final int MENU_SORT = 1;
-  private static final int MENU_GRAPHS = 2;
-  private static final int MENU_ANALYSIS = 3;
-  private static final int MENU_DRILLS = 4;
-  private static final int MENU_COACHING = 5;
-  private static final int MENU_IMPORT_EXPORT = 6;
-  private static final int MENU_CLEAR_HISTORY = 7;
-  private static final int MENU_LANGUAGE = 8;
-  private static final int MENU_ABOUT = 9;
-  private static final int MENU_RATE = 10;
+  private static final int MENU_GRAPHS = 1;
+  private static final int MENU_ANALYSIS = 2;
+  private static final int MENU_DRILLS = 3;
+  private static final int MENU_COACHING = 4;
+  private static final int MENU_IMPORT_EXPORT = 5;
+  private static final int MENU_CLEAR_HISTORY = 6;
+  private static final int MENU_LANGUAGE = 7;
+  private static final int MENU_ABOUT = 8;
+  private static final int MENU_RATE = 9;
 
   /** A row that names the group under it rather than leading anywhere, and cannot be tapped. */
   private static final int MENU_HEADER = -1;
 
   /** Which entry each row of the drawer is, in order. {@link #MENU_HEADER} for a group label. */
   private int[] menuEntries;
+
+  private View historySortBar;
+  private TextView tvHistoryGroup;
+  private TextView tvHistorySort;
 
   private HistoryListAdapter historyListAdapter;
   private MenuListAdapter menuListAdapter;
@@ -294,6 +301,8 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
 
     initHistoryList();
 
+    ((TextView) findViewById(R.id.tvDrawerVersion)).setText("v" + Utils.getAppVersion(this));
+
     menuListAdapter = new MenuListAdapter(this, R.id.lvMenuItems, buildMenu());
     ListView lvMenuItems = (ListView) findViewById(R.id.lvMenuItems);
     lvMenuItems.setAdapter(menuListAdapter);
@@ -304,8 +313,6 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
         onMenuItemClick(menuEntries[i]);
       }
     });
-
-    setSortMode(TimesSort.TIMESTAMP);
 
     smartCubeChip = new SmartCubeChip(this, this::openSmartCubeConnect);
 
@@ -451,10 +458,13 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
           shown.add(getString(R.string.menu_section_smartcube));
         }
       }
-      if (entry == MENU_IMPORT_EXPORT && SmartCubeGate.ENABLED) {
-        // A rule with no label, closing the section: without it the rows below read as part of it.
+      if (entry == MENU_IMPORT_EXPORT) {
         entries.add(MENU_HEADER);
-        shown.add("");
+        shown.add(getString(R.string.menu_section_data));
+      }
+      if (entry == MENU_LANGUAGE) {
+        entries.add(MENU_HEADER);
+        shown.add(getString(R.string.menu_section_app));
       }
       entries.add(entry);
       shown.add(labels[entry]);
@@ -497,6 +507,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   }
 
   private void initHistoryList() {
+    initHistorySortBar();
     historyListAdapter = new HistoryListAdapter(this, R.id.lvHistory, liHistory);
     lvHistory = (ListView) findViewById(R.id.lvHistory);
     lvHistory.setAdapter(historyListAdapter);
@@ -514,6 +525,7 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
 
       @Override
       public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        showGroupOf(firstVisibleItem);
         if (view.getId() == R.id.lvHistory && !liHistory.isEmpty() && !refreshingHistory) {
           int lastVisibleItem = firstVisibleItem + visibleItemCount;
           if (totalItemCount == lastVisibleItem && lastVisibleItem != previousLastItem) {
@@ -547,13 +559,6 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
     switch (index) {
       case MENU_SETTINGS:
         startActivity(new Intent(this, OptionsActivity.class));
-        break;
-      case MENU_SORT:
-        if (timesSort == TimesSort.TIMESTAMP) {
-          setSortMode(TimesSort.TIME);
-        } else if (timesSort == TimesSort.TIME) {
-          setSortMode(TimesSort.TIMESTAMP);
-        }
         break;
       case MENU_GRAPHS:
         openGraph();
@@ -616,7 +621,6 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
 
     refreshCubeTypes();
 
-    setSortMode(TimesSort.TIMESTAMP);
     startTimeAgoTicks();
   }
 
@@ -1010,6 +1014,61 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
     });
   }
 
+  /**
+   * The list's heading, pinned over it. It carries the one choice the list offers, which order the
+   * rows are in: the drawer was no place for it, since what it changes is the screen behind the
+   * drawer. The bar is as tall as the heading it replaces and the rows run behind it, so at the top
+   * of the list it stands exactly where the first row draws its own heading.
+   */
+  private void initHistorySortBar() {
+    historySortBar = findViewById(R.id.historySortBar);
+    tvHistoryGroup = (TextView) findViewById(R.id.tvHistoryGroup);
+    tvHistorySort = (TextView) findViewById(R.id.tvHistorySort);
+    final View toggle = findViewById(R.id.historySortToggle);
+    toggle.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        setSortMode(timesSort == TimesSort.TIMESTAMP ? TimesSort.TIME : TimesSort.TIMESTAMP);
+      }
+    });
+    // A line of headings is shorter than a finger, so the toggle takes the whole height of the bar.
+    historySortBar.post(new Runnable() {
+      @Override
+      public void run() {
+        Rect hit = new Rect();
+        toggle.getHitRect(hit);
+        hit.top = 0;
+        hit.bottom = historySortBar.getHeight();
+        hit.right = historySortBar.getWidth();
+        historySortBar.setTouchDelegate(new TouchDelegate(hit, toggle));
+      }
+    });
+    showGroupOf(0);
+  }
+
+  /**
+   * Names the group the row at the top of the list belongs to, and the order to switch to. Called on
+   * every scroll event, so it writes only when the answer has changed.
+   */
+  private void showGroupOf(int firstVisibleItem) {
+    if (liHistory.isEmpty()) {
+      historySortBar.setVisibility(View.GONE);
+      return;
+    }
+    historySortBar.setVisibility(View.VISIBLE);
+    if (firstVisibleItem >= 0 && firstVisibleItem < rowGroups.size()) {
+      String group = rowGroups.get(firstVisibleItem);
+      if (!group.contentEquals(tvHistoryGroup.getText())) {
+        tvHistoryGroup.setText(group);
+      }
+    }
+    String order = getString(
+      timesSort == TimesSort.TIMESTAMP ? R.string.sort_by_date : R.string.best_times);
+    if (!order.contentEquals(tvHistorySort.getText())) {
+      tvHistorySort.setText(order);
+    }
+  }
+
   /** Below a handful of solves there is no trend and no average worth a cell, so both go. */
   private void refreshTrendVisibility() {
     boolean hasTrend = sparkline.hasEnoughTimes();
@@ -1021,19 +1080,27 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
     rebuildDayHeaders();
     historyListAdapter.notifyDataSetChanged();
     tvNoSolves.setVisibility(liHistory.isEmpty() ? View.VISIBLE : View.GONE);
+    showGroupOf(lvHistory.getFirstVisiblePosition());
   }
 
   /**
    * Marks the first row of each day with its heading, so the list carries the dates the rows no
-   * longer repeat. Sorted by time there are no days to group, and the one heading names the sort.
+   * longer repeat, and notes the heading every row falls under for the pinned bar above them.
+   * Sorted by time there are no days to group, and the bar says so itself.
    */
   private void rebuildDayHeaders() {
     dayHeaders.clear();
+    rowGroups.clear();
     if (liHistory.isEmpty()) {
       return;
     }
     if (timesSort != TimesSort.TIMESTAMP) {
-      dayHeaders.put(0, getString(R.string.best_times));
+      // No days to name, and the bar says which order this is. The first row keeps an empty heading
+      // all the same: it is the band the bar stands over, and without it the bar covers the row.
+      dayHeaders.put(0, "");
+      for (int i = 0; i < liHistory.size(); i++) {
+        rowGroups.add("");
+      }
       return;
     }
     Calendar calendar = Calendar.getInstance();
@@ -1041,12 +1108,15 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
     calendar.add(Calendar.DAY_OF_YEAR, -1); // not today minus 24h: a day is not always that long
     long yesterday = calendar.getTimeInMillis();
     long previousDay = -1;
+    String group = "";
     for (int i = 0; i < liHistory.size(); i++) {
       long day = dayStart(calendar, liHistory.get(i).getTimestamp());
       if (day != previousDay) {
-        dayHeaders.put(i, dayLabel(day, today, yesterday));
+        group = dayLabel(day, today, yesterday);
+        dayHeaders.put(i, group);
         previousDay = day;
       }
+      rowGroups.add(group);
     }
   }
 
@@ -1076,12 +1146,11 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
   }
 
   private void setSortMode(TimesSort timesSort) {
-    menuListAdapter.notifyDataSetChanged();
-
     if (this.timesSort != timesSort) {
       this.timesSort = timesSort;
       refreshHistory();
     }
+    showGroupOf(lvHistory.getFirstVisiblePosition());
   }
 
   @Override
@@ -1328,16 +1397,13 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
       }
 
       if (position >= 0 && position < objects.length) {
-        view.findViewById(R.id.imgMenuPremium)
+        view.findViewById(R.id.tvMenuPremium)
             .setVisibility(menuEntries[position] == MENU_COACHING ? View.VISIBLE : View.GONE);
         ImageView icon = (ImageView) view.findViewById(R.id.imgIcon);
         Integer imageResource = null;
         switch (menuEntries[position]) {
           case MENU_SETTINGS:
             imageResource = R.drawable.menu_settings;
-            break;
-          case MENU_SORT:
-            imageResource = R.drawable.menu_sort_history;
             break;
           case MENU_GRAPHS:
             imageResource = R.drawable.menu_graph;
@@ -1371,36 +1437,28 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
           icon.setImageResource(imageResource);
         }
 
+        boolean destructive = menuEntries[position] == MENU_CLEAR_HISTORY;
+        icon.setColorFilter(ContextCompat.getColor(MainScreenActivity.this,
+            destructive ? R.color.danger_text : R.color.lightblue));
+        view.findViewById(R.id.menuGlyphTile).setBackgroundResource(
+            destructive ? R.drawable.menu_glyph_danger : R.drawable.hero_glyph);
+
         TextView tvName = (TextView) view.findViewById(R.id.tvText);
-        if (menuEntries[position] == MENU_SORT) {
-          if (timesSort == TimesSort.TIMESTAMP) {
-            tvName.setText(R.string.show_best_times);
-          } else {
-            tvName.setText(R.string.show_history);
-          }
-        } else {
-          tvName.setText(objects[position]);
-        }
+        tvName.setTextColor(ContextCompat.getColor(MainScreenActivity.this,
+            destructive ? R.color.danger_text : R.color.white));
+        tvName.setText(objects[position]);
       }
       return view;
     }
 
-    /** A group label, or with no text the bare rule that closes the group above it. */
+    /** The label naming the group of rows under it. */
     private View headerView(int position, View convertView, ViewGroup parent) {
       View view = convertView;
       if (view == null) {
         view = inflater.inflate(R.layout.menu_section_header, parent, false);
       }
-      String label = position < objects.length ? objects[position] : "";
-      TextView tvSection = (TextView) view.findViewById(R.id.tvMenuSection);
-      tvSection.setText(label);
-      tvSection.setVisibility(label.isEmpty() ? View.GONE : View.VISIBLE);
-      // With no label under it the rule keeps the gap the label would have filled, and sits closer
-      // to the group above than to the one below. Take that back so it sits between the two.
-      View rule = view.findViewById(R.id.vMenuSectionRule);
-      ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) rule.getLayoutParams();
-      params.bottomMargin = ScreenUtils.dipToPixels(label.isEmpty() ? 10 : 14);
-      rule.setLayoutParams(params);
+      ((TextView) view.findViewById(R.id.tvMenuSection))
+          .setText(position < objects.length ? objects[position] : "");
       return view;
     }
   }

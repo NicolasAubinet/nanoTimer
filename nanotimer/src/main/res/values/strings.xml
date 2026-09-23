@@ -332,9 +332,8 @@
   <string name="graph_help_frequency">How many solves you did on each day.</string>
   <string name="graph_help_distribution">How many solves landed in each time range. The number under a bar is where its range starts.</string>
 
-  <string name="show_best_times">Sort by best times</string>
-  <string name="show_history">Sort by date</string>
   <string name="best_times">Best times</string>
+  <string name="sort_by_date">By date</string>
 
   <string name="add_time">Add time</string>
   <string name="select_time_to_add">Select time to add:</string>
@@ -863,6 +862,7 @@
   <string name="discard_solve_confirmation">The timer stopped and the time was saved. Discarding removes it.</string>
   <string name="discard_solve">Discard</string>
   <string name="keep_solve">Keep</string>
+  <string name="fast_solve_confirmation">Less than half your personal best of %1$s.</string>
   <string name="timer_session">Session</string>
   <string name="personal_best_label">Personal best</string>
   <string name="timer_best_value">best %1$s</string>
@@ -1149,18 +1149,31 @@
   <string name="known_algorithms_hint">Tap a case for the algorithms it can be solved with. A case counts as known the first time you put it in with one algorithm in a solve. Take it in two looks again and it needs review; one you have never yet put in with a single algorithm is still to learn.</string>
   <string name="known_algorithms_empty">Nothing here yet. Solve with a smart cube connected and the cases you put in unaided will show up.</string>
   <string name="known_algorithms_reading">Reading your solves...</string>
-  <string name="blind_buffers">Blind buffers</string>
-  <string name="blind_buffers_summary">The pieces you shoot from blindfolded: %1$s and %2$s</string>
-  <string name="blind_buffers_prompt">Select the buffers you use</string>
-  <string name="blind_buffers_why">Your blindfolded solves are reconstructed from them.</string>
-  <string name="blind_buffers_changeable">You can change this later in the settings.</string>
+  <string name="blind_setup_summary">%1$s, buffers %2$s and %3$s</string>
+  <string name="blind_setup">Blindfolded solves</string>
+  <string name="blind_setup_why">Your blindfolded solves are reconstructed from these two.</string>
+  <string name="blind_setup_hold">How you hold the cube</string>
+  <string name="blind_setup_shoot">The buffers you shoot from</string>
+  <string name="blind_orientation_up">Up face</string>
+  <string name="blind_orientation_front">Front face</string>
+  <string name="blind_orientation_summary">Cube held %1$s up, %2$s front</string>
+  <string name="blind_read_with">Read with %1$s up, %2$s front</string>
+  <string name="colour_white">white</string>
+  <string name="colour_yellow">yellow</string>
+  <string name="colour_red">red</string>
+  <string name="colour_orange">orange</string>
+  <string name="colour_green">green</string>
+  <string name="colour_blue">blue</string>
+  <string name="blind_setup_changeable">You can change this later in the settings.</string>
 
   <!-- ================= Analysis hub ================= -->
   <string name="analysis_title">Analysis</string>
   <string name="menu_section_smartcube">Smart cube</string>
+  <string name="menu_section_data">Your data</string>
+  <string name="menu_section_app">App</string>
   <string name="menu_drills">Drills</string>
   <string name="menu_coaching">Coaching</string>
-  <string name="menu_premium_desc">Paid feature</string>
+  <string name="menu_premium_tag">Premium</string>
   <!-- The solve type and the method its solves are read as, on the app bar's second line. -->
   <string name="analysis_context">%1$s, %2$s</string>
   <string name="analysis_tab_solve">Solve</string>
@@ -1173,15 +1186,14 @@
   <string name="analysis_empty_steps">This solve type times its own steps, so its breakdown is the one you tap on the timer.</string>
   <string name="analysis_best">Best</string>
   <plurals name="analysis_mean_of">
-    <item quantity="one">mean of %d cube-read solve</item>
-    <item quantity="other">mean of %d cube-read solves</item>
+    <item quantity="one">Mean of %d solve</item>
+    <item quantity="other">Mean of %d solves</item>
   </plurals>
   <string name="analysis_column_step">Step</string>
   <string name="analysis_delta_label">Against a typical %s solve</string>
   <string name="analysis_delta_over">+%s</string>
   <string name="analysis_delta_under">\u2212%s</string>
-  <string name="analysis_delta_limit">These always cancel out, so this says where your time sits, not that you are slow. A quick last step will always show as a problem with an earlier one.</string>
-  <string name="analysis_delta_limit_sample">These always cancel out, so this says where this solver\'s time sits, not that they are slow. A quick last step will always show as a problem with an earlier one.</string>
+  <string name="analysis_delta_limit">These are shares of one solve, so if one step is over, another has to be under. A quick last step will always make an earlier one look like the problem.</string>
   <string name="analysis_window_title">Read over</string>
   <string name="analysis_window_chip">%s \u25be</string>
   <string name="analysis_window_50">Last 50</string>
@@ -1190,22 +1202,20 @@
   <string name="analysis_window_all">Every solve</string>
 
   <string name="analysis_column_case">Case</string>
-  <string name="analysis_column_cost">Cost</string>
-  <string name="analysis_cost">%ss</string>
   <string name="analysis_shape_title">Shape</string>
   <string name="analysis_shape_all">All shapes</string>
   <string name="analysis_shape_count">%1$s (%2$d)</string>
   <string name="analysis_knowledge_of">of %d</string>
   <string name="analysis_knowledge_known">Known</string>
-  <string name="analysis_knowledge_seen">Seen, still slow</string>
+  <string name="analysis_knowledge_seen">Seen, not known</string>
   <string name="analysis_knowledge_unseen">Not yet seen</string>
-  <string name="analysis_knowledge_costing">Costing you</string>
   <string name="analysis_algorithms_label">Standard algorithms</string>
   <string name="analysis_algorithms_extra">Extra moves</string>
   <string name="analysis_algorithms_count">%1$d of %2$d</string>
   <string name="analysis_algorithms_standard">Standard</string>
   <string name="analysis_algorithms_not_standard">Not standard</string>
   <string name="analysis_algorithms_not_seen">Not seen</string>
+  <string name="analysis_algorithms_reading">Reading your solves…</string>
   <string name="analysis_rest_title">The rest of the set</string>
   <string name="analysis_cases_empty">Connect a smart cube and do some solves to have the cases it reads ranked here.</string>
   <string name="analysis_cases_blind">A blindfolded solve has no cases. It is read as a memo and the pieces it solved.</string>
@@ -1283,30 +1293,26 @@
   <string name="analysis_help_solve_title">Where your time goes</string>
   <string name="analysis_help_solve_body">These figures come from your own solves, the ones a cube read, over the window shown at the top.</string>
   <string name="analysis_help_bar">The average solve</string>
-  <string name="analysis_help_bar_body">One block per step, as wide as its share of the time. Each block is pale where you were looking and solid where you were turning. A step with no turning in it at all, like a blind memo, is solid throughout.</string>
+  <string name="analysis_help_bar_body">One block per step, as wide as its share of the time. Each block is pale where you were looking and solid where you were turning.</string>
   <string name="analysis_help_delta">Against a typical solve</string>
-  <string name="analysis_help_delta_body">These are shares of one solve, so if one step is over, another has to be under. It shows which step is out of balance, not whether you are fast or slow.</string>
+  <string name="analysis_help_delta_body">These are shares of one solve, so if one step is over, another has to be under. It shows which step is out of balance.</string>
   <string name="analysis_help_table">The step table</string>
   <string name="analysis_help_table_body">Mean, best and spread for each step. Tap a heading to sort by it. Steps that have named cases, OLL and PLL, show an arrow and open them.</string>
   <string name="analysis_help_spread">Spread</string>
-  <string name="analysis_help_spread_body">How much the step changes from solve to solve. Two steps with the same mean can be one you do the same way every time and one you sometimes get stuck on, and this is what tells them apart.</string>
+  <string name="analysis_help_spread_body">How much the time changes from solve to solve. The same mean can come from doing it the same way every time, or from getting stuck now and then.</string>
   <string name="analysis_help_standard">Standard algorithms</string>
-  <string name="analysis_help_standard_body">Each case of the step counted once, as you turned it the last time it came up in the window: with one of the algorithms it is usually taught with, or not. Two algorithms for one case, or an algorithm of your own, count as not standard. F2L counts its 41 basic cases.</string>
+  <string name="analysis_help_standard_body">How you last turned each case of the set: with one of the algorithms listed for it, which is considered standard.</string>
   <string name="analysis_help_extra">Extra moves</string>
-  <string name="analysis_help_extra_body">For each of those cases put in with none of its usual algorithms, the turns you took over the shortest usual one, added up. A usual algorithm counts as none, even where a shorter one is listed, and so does a shorter algorithm of your own. Slices and wide turns count as the turns they are made of.</string>
+  <string name="analysis_help_extra_body">The turns those cases cost you over the shortest standard algorithm, added up.</string>
   <string name="analysis_help_plan_title">A plan</string>
   <string name="analysis_help_plan_body">Nothing here is measured. A plan is written from the figures on Solve and Cases, and those stay free.</string>
-  <string name="analysis_help_cases_title">Which cases cost you</string>
-  <string name="analysis_help_cases_body">One step at a time, ranked by what each case cost you over the window shown at the top. A case is only worth comparing with the cases of its own step, so the buttons above the table switch between them.</string>
-  <string name="analysis_help_cost">Cost</string>
-  <string name="analysis_help_cost_body">The time a case has cost you: how often it came up, times how much longer than usual it took. The table is sorted by this.</string>
-  <string name="analysis_help_too_few">N/A</string>
-  <string name="analysis_help_too_few_body">The case came up too few times to put a cost on. Widen the window at the top and more of them fill in.</string>
-  <string name="analysis_help_known">Known</string>
-  <string name="analysis_help_known_body">The case went in with one algorithm and no help. Taken from your solves, not from a list you tick. The ring counts every case in the set, not only the ones that came up.</string>
+  <string name="analysis_help_cases_title">Case by case</string>
+  <string name="analysis_help_cases_body">The cases of the selected step, over the window shown at the top.</string>
+  <string name="analysis_help_standing">Where a case stands</string>
+  <string name="analysis_help_standing_body">Known went in with one algorithm and no help, recently enough for that to still hold. Needs review went in that way before, but took two looks the last two times. To learn has never gone in with one algorithm. All of it is read from your solves, not from a list you tick.</string>
   <string name="analysis_help_shape">Shape</string>
-  <string name="analysis_help_shape_body">Pick OLL and a Shape button appears beside it, with the groups its cases are known by: the dots, the fish, the L shapes. The number beside each is how big the group is. Tapping the Case heading puts the list back in case order.</string>
-  <string name="analysis_help_rest_body">Under the table, the cases of this step the window holds no figures for, grouped by where they stand. That is read from every solve rather than from the window, so a case you know but have not had lately is in there as known. Tap one for its algorithms.</string>
+  <string name="analysis_help_shape_body">On OLL, a Shape button narrows the table to one group of shapes, with each group\'s size beside it.</string>
+  <string name="analysis_help_rest_body">Under the table, the cases that did not come up in the window, grouped by where they stand over all your solves. Tap one for its algorithms.</string>
   <string name="analysis_help_sample">Example</string>
   <string name="analysis_help_sample_body">Nothing on these tabs is yours. These figures are made up, and they are here so the screen has something to show before you own a smart cube. Connect one and your own take their place.</string>
 

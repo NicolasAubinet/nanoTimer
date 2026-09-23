@@ -71,6 +71,43 @@ public class RecordedBlindSolveTest {
     assertFalse(detector.isComplete());
   }
 
+  /**
+   * The edges-only solve of 2026-09-19, reported by its solver for reading every name mirrored. It
+   * never reached its corners, so one buffer was all it said, and the half turn about that buffer's
+   * own axis is a second way to hold the cube that no cube state disowns. Its stored grip is the
+   * {@code y' x'} the gyro guessed, which is that wrong way round; the orientation its solver
+   * declares, white up and red front, is the {@code y} it was held in, and it is handed in here the
+   * way the app hands it.
+   */
+  @Test
+  public void readsAnEdgesOnlySolveThroughTheOrientationItsSolverDeclares() {
+    replay(RecordedBlindSolve.SCRAMBLE_EDGES_ONLY, RecordedBlindSolve.MOVES_EDGES_ONLY,
+        Long.MAX_VALUE, declaring('U', 'R'));
+
+    assertFalse("its corners were never turned", detector.isComplete());
+    assertEquals(6, detector.subStepCount(1));
+    assertEquals("UF-BR-RD", detector.subStepName(1, 0));
+    assertEquals("UF-RF-BU", detector.subStepName(1, 1));
+    assertEquals("y", detector.getPickupRotation().getNotation());
+  }
+
+  /**
+   * And it is the declaration that decides. Its edge buffer leaves this solve exactly two ways up,
+   * measured: white up with red in front, and red up with white in front, which are {@code y} and
+   * the {@code y' x'} the gyro guessed. Declared the second, the solve reads the second, which is
+   * the mirrored reading its solver reported. A solve that reads both piece types is named the same
+   * whatever is declared, which is what keeps this to the solves that cannot say for themselves:
+   * see {@link BlindFrameTest}.
+   */
+  @Test
+  public void readsAnEdgesOnlySolveTheOtherWayUpWhereTheOtherWayIsDeclared() {
+    replay(RecordedBlindSolve.SCRAMBLE_EDGES_ONLY, RecordedBlindSolve.MOVES_EDGES_ONLY,
+        Long.MAX_VALUE, declaring('R', 'U'));
+
+    assertEquals("y' x'", detector.getPickupRotation().getNotation());
+    assertEquals("UF-LD-BL", detector.subStepName(1, 0));
+  }
+
   @Test
   public void readsASolveWithNoParityAsTwoPieceTypesAndNothingElse() {
     replay(RecordedBlindSolve.SCRAMBLE_163, RecordedBlindSolve.MOVES_163, Long.MAX_VALUE);
@@ -1190,6 +1227,12 @@ public class RecordedBlindSolveTest {
 
     assertEquals("UFR-BUL-UBR", detector.subStepName(2, 2));
     assertEquals("UF-UB-UR", detector.subStepName(1, 5));
+  }
+
+  /** A declared orientation as the app hands it: the rotation that holds those two faces so. */
+  private static int declaring(char upFace, char frontFace) {
+    return FaceletRotations.inverse(
+        FaceletRotations.of(CubeRotation.holding(upFace, frontFace)));
   }
 
   /**

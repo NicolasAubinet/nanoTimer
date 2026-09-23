@@ -67,6 +67,8 @@ public interface ServiceProvider {
   List<SolveTime> getSmartcubeSolves(SolveType solveType);
   List<SolveTime> getSmartcubeSolves(CubeMethod method);
   void saveSmartcubeBreakdowns(List<SolveTime> solveTimes);
+
+  void updateSmartcubeMoves(SolveTime solveTime);
   int getCoachSolveCount(SolveType solveType, CubeMethod method);
   CoachPayload getCoachPayload(SolveType solveType, CubeMethod method, List<PairExecution> pairs);
   Map<Long, String> getSolveReadings(List<Long> solveIds, int version);

@@ -244,8 +244,9 @@ public class SmartCubeSolveController implements CubeStateListener, CubeMoveList
 
   /**
    * The grip the stored stream carries: the one the analysis actually named the solve through, so
-   * reading it back gives the same names. A blind solve settles its own from the pieces it shot
-   * from, which is the answer wherever it has one; anything else keeps the gyro's.
+   * reading it back gives the same names. A blind solve's is settled by the pieces it shot from, or
+   * by the orientation its solver declares where they leave more than one; anything else keeps the
+   * gyro's.
    */
   private String gripToStore() {
     CubeRotation settled = analyzers.getPickupRotation();
@@ -513,8 +514,13 @@ public class SmartCubeSolveController implements CubeStateListener, CubeMoveList
   }
 
   /**
-   * The grip the solve was picked up in, which is what a blind solver's targets are named by, read
-   * across everything <b>before</b> its first move and then left alone.
+   * The grip the solve was picked up in, read across everything <b>before</b> its first move and
+   * then left alone. It is stored with the moves, so they replay in the orientation they were made
+   * in.
+   *
+   * <p>A blind solve is not named through it: the reading is a coin flip over a memorisation that
+   * does not hold still, so its targets are spelled in the orientation its solver declares and in
+   * the pieces it shot from. See {@code BlindFrame}.
    *
    * <p>Every reading at a move has the solve's own slices in it — a slice carries the core, and the
    * gyro and the face labels with it — while the names are spelled off states carried back to the
@@ -544,7 +550,6 @@ public class SmartCubeSolveController implements CubeStateListener, CubeMoveList
     // stored moves have to be read back through for the names to come out the same.
     usedPickup = pickup != null ? pickup
         : rotationTracker.getPickupRotation(sliceSpins.possiblePairs());
-    analyzers.setPickupRotation(usedPickup);
   }
 
   /** Both readers of the gyro: the frame the solve is turned in, and the slices it is turned with. */
@@ -567,8 +572,21 @@ public class SmartCubeSolveController implements CubeStateListener, CubeMoveList
     // very next solve and not on the one after it.
     analyzers.setBlindBuffers(
         Options.INSTANCE.getBlindEdgeBuffer(), Options.INSTANCE.getBlindCornerBuffer());
+    analyzers.setPickupRotation(declaredGrip());
     analyzers.start(state, startTimestampMs);
     analyzing = true;
+  }
+
+  /**
+   * The orientation the solver declares they hold the cube in blindfolded, as the frame a blind
+   * solve is named through wherever the pieces it shot from leave more than one way to hold it.
+   * Read at every solve, so a solver who has just declared one is answered on the very next.
+   */
+  private static CubeRotation declaredGrip() {
+    CubeRotation declared = CubeRotation.holding(
+        Options.INSTANCE.getBlindUpFace().charAt(0), Options.INSTANCE.getBlindFrontFace().charAt(0));
+    // Null only for a pair naming one axis twice, which no picker can produce: read as square on.
+    return declared == null ? CubeRotation.byNotation("") : declared;
   }
 
   private void beginAnalysis(CubeMove move) {

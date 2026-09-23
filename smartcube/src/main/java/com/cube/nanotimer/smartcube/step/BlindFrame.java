@@ -21,13 +21,32 @@ import java.util.List;
  * piece that is, is a fact about them rather than about a solve. The detector reads the slot each
  * algorithm was shot from off cube states alone, and one buffer slot per type pins the frame: a
  * corner slot leaves three of the 24 rotations standing and an edge slot two, and no rotation but
- * one satisfies both. Measured over all 25 recorded blind solves, exactly one frame of 24 puts their
- * shot cycles at the owner's {@code UF}/{@code UFR}, and it is the grip they were recorded with
- * wherever they carry one.
+ * one satisfies both. Measured over the recorded blind solves, 26 of the 27 settle their frame from
+ * their pieces alone: exactly one frame of 24 puts the shot cycles of both types at the owner's
+ * {@code UF}/{@code UFR}, it is the grip they were recorded with wherever they carry one, and they
+ * are named the same whatever frame is handed in. The 27th read only its edges, and is the whole
+ * subject of the note below.
  *
  * <p>It reads no gyro, so yaw drift, an unpinned session anchor and a cube held off square cannot
  * reach it. The one way left to be wrong is a buffer declared that the solver does not use, which is
- * why {@link #of} moves off the frame it is given only when the answer is <em>unique</em>.
+ * why {@link #of} moves off the frame it is given only as far as the pieces force it: to their one
+ * fit where they pin one, and no further than the nearest of the few they leave where the frame
+ * given is not among them.
+ *
+ * <p><b>Where one buffer is all the solve read.</b> A solve that stops before its second piece type,
+ * an edges-only session or a 3BLD abandoned part way, leaves the two frames an edge slot admits
+ * (three for a corner slot), and they differ by a turn about the buffer's own axis. Nothing in any
+ * cube state tells them apart: the whole reading rotates with the frame and comes out just as
+ * consistent either way, so a wrong one is invisible and every name comes out mirrored. That is the
+ * solve of 2026-09-19, reported by its solver.
+ *
+ * <p><b>What answers there is the orientation the solver declares.</b> A cube writes its state
+ * against its own centres, which no face turn moves, and this app fixes that reported frame as white
+ * up and green front. So "I hold white up, red front" is not a hint but an equation: it names one of
+ * the 24 and no other, with nothing measured, nothing inferred and nothing to drift. It is asked for
+ * once and kept in the settings, and it is what {@code frame} carries for a solve being read as it
+ * is turned. A solve whose pieces settle their own frame never consults it, so a declaration left at
+ * a hold the solver has since changed can only reach the solves that had no answer at all.
  */
 final class BlindFrame {
 
@@ -42,15 +61,16 @@ final class BlindFrame {
    *     {@link BlindTargets#NO_BUFFER} for a type nothing settled
    * @param declared the slot the solver shoots that type from, or {@link BlindTargets#NO_BUFFER}
    * @param frame the frame to keep where the buffers leave more than one way to hold the cube: the
-   *     gyro's answer, which still decides the yaw of a solve that only read one piece type
+   *     orientation the solver declares they hold it in, or the grip a stored solve was recorded
+   *     through, which is what decides the way up of a solve that only read one piece type
    */
   static int of(int[] shotFrom, int[] declared, int frame) {
     List<Integer> fits = fits(shotFrom, declared);
-    if (fits.isEmpty() || fits.contains(frame)) {
-      return frame;
-    }
     if (fits.size() == 1) {
-      return fits.get(0);
+      return fits.get(0); // the pieces pin it, and nothing declared can move them
+    }
+    if (fits.isEmpty() || fits.contains(frame)) {
+      return frame; // they settled nothing, or the frame given is one of the ways they left
     }
     return frame == BlindTargets.UNKNOWN_FRAME ? frame : closestTo(fits, frame);
   }
@@ -83,9 +103,10 @@ final class BlindFrame {
 
   /**
    * The fit nearest the frame given, counted in faces left where that frame puts them. Reached only
-   * by a solve that read one piece type and no more, where the buffer says which way up the cube is
-   * without saying which way round: the gyro is wrong about one of those and is still the only thing
-   * with an opinion on the other.
+   * where a solve read one piece type and no more <em>and</em> the frame given is not one of the
+   * ways up it leaves, which is a solver whose declared buffer or declared hold no longer matches
+   * what they do: the pieces still know which way up the cube is, so what they know is kept and the
+   * declaration decides the rest.
    */
   private static int closestTo(List<Integer> fits, int frame) {
     int best = fits.get(0);
