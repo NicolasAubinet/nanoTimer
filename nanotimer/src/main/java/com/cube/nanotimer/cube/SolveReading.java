@@ -209,8 +209,10 @@ public final class SolveReading {
     boolean whole = CaseExecutions.readSteps(solve, new CaseExecutions.StepReader() {
       @Override
       public void read(SolveStep step, SolveSolution.Step turned) {
-        turnings.add(new Turning(step.getName(), step.getTotalMs(),
-            turned.getMoveCount(), turned.getStalls(), turned.getStallMs()));
+        if (!SolveBreakdown.UNFINISHED_STEP.equals(step.getName())) { // after a stop inside PLL
+          turnings.add(new Turning(step.getName(), step.getTotalMs(),
+              turned.getMoveCount(), turned.getStalls(), turned.getStallMs()));
+        }
         if (F2L.equals(step.getName())) {
           readPairs(step, turned, executions);
         } else {

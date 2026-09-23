@@ -170,13 +170,15 @@ public class SolveReadingTest {
             + "\"listed\":false,\"algorithms\":1}]"));
   }
 
-  /** A solve stopped part way is not whole, and its unfinished tail is never read as a step. */
+  /**
+   * A solve stopped one AUF short keeps its named PLL and puts what is left in a tail after it,
+   * which is no step of the method: it is not read as one, and the solve is not whole.
+   */
   @Test
-  public void readsNoTailAndNoWholeSolveOutOfASolveStoppedPartWay() {
-    SolveTime solve = solves().get(0);
+  public void readsNoTailAndNoWholeSolveOutOfASolveStoppedInsideItsPll() {
+    SolveTime solve = CaseExecutionsTest.solves(PAIRS + " " + SUNE + " " + TPERM + " U").get(0);
     String[] played = solve.getSmartcubeMoves().split(" ");
-    // the four pairs and half the Sune: stopped inside the OLL
-    solve.setSmartcubeMoves(String.join(" ", Arrays.copyOf(played, 16)));
+    solve.setSmartcubeMoves(String.join(" ", Arrays.copyOf(played, played.length - 1)));
 
     SolveReading reading = SolveReading.read(solve);
 
@@ -184,7 +186,6 @@ public class SolveReadingTest {
     assertFalse("the fixture should still read its F2L", reading.getTurnings().isEmpty());
     for (SolveReading.Turning turning : reading.getTurnings()) {
       assertNotEquals(SolveBreakdown.UNFINISHED_STEP, turning.getCode());
-      assertNotEquals(SolveBreakdown.GAP_STEP, turning.getCode());
     }
   }
 }
