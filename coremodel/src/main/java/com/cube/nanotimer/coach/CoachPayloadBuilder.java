@@ -168,8 +168,9 @@ public class CoachPayloadBuilder {
     Set<String> sets = familiesOf(cases);
     MoveFigure f2lMoves = F2lHabits.total(pairs, FAMILY_FLOOR);
     List<MoveFigure> llMoves = LastLayerHabits.steps(lastLayer, FAMILY_FLOOR);
+    Set<Long> twoLooked = twoLookSolves(familySamples);
     return new CoachPayload(CoachPayload.VERSION, puzzle, method, solveTimes.size(),
-        caseSolveCount, drillCount, Integer.valueOf(twoLookSolves(familySamples)),
+        caseSolveCount, drillCount, Integer.valueOf(twoLooked.size()),
         solveFigure(solveTimes),
         familyFigures(families.getFamilies(), families, familyTallies),
         familyFigures(families.getParts(), families, familyTallies), caseFigures, drillFigures,
@@ -182,7 +183,8 @@ public class CoachPayloadBuilder {
         f2lMoves == null ? null : F2lHabits.cases(pairs, CASE_FLOOR),
         f2lMoves == null ? null : Integer.valueOf(f2lSolveCount),
         Turnings.of(turnings, FAMILY_FLOOR), Integer.valueOf(turningSolveCount), llMoves,
-        LastLayerHabits.cases(lastLayer, CASE_FLOOR), Integer.valueOf(f2lSolveCount));
+        LastLayerHabits.cases(lastLayer, CASE_FLOOR), Integer.valueOf(f2lSolveCount),
+        OllLooks.of(familySamples, twoLooked, FAMILY_FLOOR));
   }
 
   /** As above with no step's turning replayed. */
@@ -234,7 +236,7 @@ public class CoachPayloadBuilder {
    * thing. Counted rather than inferred from a step being recorded in parts at all, so it still says
    * what it counts if a one-look OLL should later start carrying its one algorithm as a part.
    */
-  private static int twoLookSolves(List<StepSample> samples) {
+  private static Set<Long> twoLookSolves(List<StepSample> samples) {
     Map<Long, Integer> looks = new LinkedHashMap<Long, Integer>();
     for (StepSample sample : samples) {
       if (!sample.isPart() || !LOOK_FAMILIES.contains(MethodStatistics.familyOf(sample.getCode()))) {
@@ -244,10 +246,10 @@ public class CoachPayloadBuilder {
       Integer seen = looks.get(solve);
       looks.put(solve, Integer.valueOf(seen == null ? 1 : seen.intValue() + 1));
     }
-    int twoLooks = 0;
-    for (Integer count : looks.values()) {
-      if (count.intValue() > 1) {
-        twoLooks++;
+    Set<Long> twoLooks = new LinkedHashSet<Long>();
+    for (Map.Entry<Long, Integer> solve : looks.entrySet()) {
+      if (solve.getValue().intValue() > 1) {
+        twoLooks.add(solve.getKey());
       }
     }
     return twoLooks;

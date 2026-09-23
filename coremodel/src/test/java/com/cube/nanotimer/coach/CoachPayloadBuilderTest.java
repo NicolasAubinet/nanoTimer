@@ -444,7 +444,7 @@ public class CoachPayloadBuilderTest {
   public void testTurningSurvivesTheRoundTripAndCanBeCited() {
     CoachPayload payload = CoachPayload.parse(buildWithTurnings(20).toJson());
 
-    Assert.assertEquals(6, payload.getSchemaVersion());
+    Assert.assertEquals(CoachPayload.VERSION, payload.getSchemaVersion());
     Assert.assertEquals(600, payload.value("turning.cross.stall_ms"), 1e-9);
     Assert.assertEquals(58.9, payload.value("turning.solve.moves"), 1e-9);
     Assert.assertEquals(3.8, payload.value("turning.solve.stalls"), 1e-9);

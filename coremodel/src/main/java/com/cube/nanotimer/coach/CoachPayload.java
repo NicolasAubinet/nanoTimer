@@ -30,9 +30,9 @@ public class CoachPayload {
   /** The newest payload this app writes and can read back. Version 2 added the two-look count and
    * the known set, 3 the cases to learn, 4 the F2L groups, 5 the F2L moves over the usual
    * algorithms and the window they were replayed from, 6 each step's moves and stalls and the last
-   * layer's moves over the usual algorithms; an older payload is still read, and is simply missing
-   * them. */
-  public static final int VERSION = 6;
+   * layer's moves over the usual algorithms, 7 the OLL step split by one look and two; an older
+   * payload is still read, and is simply missing them. */
+  public static final int VERSION = 7;
 
   private final int schemaVersion;
   private final String puzzle;
@@ -59,6 +59,7 @@ public class CoachPayload {
   private final List<MoveFigure> llMoves;
   private final List<MoveFigure> llHabits;
   private final Integer llMoveWindow;
+  private final List<StepFigure> ollLooks;
 
   /**
    * @param solve the whole solve's figures, or null when the window holds too few to quote
@@ -159,6 +160,25 @@ public class CoachPayload {
       MoveFigure f2lMoves, List<MoveFigure> f2lHabits, Integer f2lMoveWindow,
       List<TurningFigure> turning, Integer turningWindow, List<MoveFigure> llMoves,
       List<MoveFigure> llHabits, Integer llMoveWindow) {
+    this(schemaVersion, puzzle, method, familyWindow, caseWindow, drillWindow, twoLookCount, solve,
+        families, parts, cases, drillCases, comparisons, knownCases, learningCases, toLearnCases,
+        f2lGroups, f2lMoves, f2lHabits, f2lMoveWindow, turning, turningWindow, llMoves, llHabits,
+        llMoveWindow, null);
+  }
+
+  /**
+   * As above, with the OLL step split by the solves that took it in one look and in two
+   * ({@link #getOllLooks}).
+   */
+  public CoachPayload(int schemaVersion, String puzzle, String method, int familyWindow,
+      int caseWindow, int drillWindow, Integer twoLookCount, StepFigure solve,
+      List<StepFigure> families, List<StepFigure> parts, List<StepFigure> cases,
+      List<StepFigure> drillCases, List<CaseComparison> comparisons, List<String> knownCases,
+      List<String> learningCases, List<String> toLearnCases, List<StepFigure> f2lGroups,
+      MoveFigure f2lMoves, List<MoveFigure> f2lHabits, Integer f2lMoveWindow,
+      List<TurningFigure> turning, Integer turningWindow, List<MoveFigure> llMoves,
+      List<MoveFigure> llHabits, Integer llMoveWindow, List<StepFigure> ollLooks) {
+    this.ollLooks = unmodifiable(ollLooks);
     this.llMoves = moves(llMoves);
     this.llMoveWindow = this.llMoves.isEmpty() ? null : llMoveWindow;
     this.llHabits = this.llMoves.isEmpty() ? Collections.<MoveFigure>emptyList() : moves(llHabits);
@@ -371,6 +391,15 @@ public class CoachPayload {
   }
 
   /**
+   * The OLL step over the family window's solves that took it in one look ({@code one_look}) and in
+   * more than one ({@code two_look}), a skip in neither. Both or neither, and empty in a payload
+   * written before version 7: not measured, and never a gap of nothing.
+   */
+  public List<StepFigure> getOllLooks() {
+    return ollLooks;
+  }
+
+  /**
    * Each step's moves and stalls a solve, in solving order, then the whole solve's under
    * {@code solve}. Empty where too few solves could be replayed, or the payload predates version 6:
    * not measured, and never zero.
@@ -387,7 +416,7 @@ public class CoachPayload {
    * {@code f2l_groups.f2l_stuck.share}, {@code f2l_groups.f2l_first.recognition_ms},
    * {@code f2l_moves.extra_moves}, {@code f2l_habits.pair_27.off_list_rate},
    * {@code turning.cross.stall_ms}, {@code turning.solve.moves}, {@code ll_moves.pll.extra_moves},
-   * {@code ll_habits.pll_rb.off_list_rate}.
+   * {@code ll_habits.pll_rb.off_list_rate}, {@code oll_looks.two_look.mean_ms}.
    *
    * <p>A case set answers how many cases are in it and whether a named one is among them, which is
    * what lets a plan saying "learn this case" be checked rather than believed. A case that is not in
@@ -479,6 +508,9 @@ public class CoachPayload {
     }
     if ("f2l_groups".equals(name)) {
       return f2lGroups;
+    }
+    if ("oll_looks".equals(name)) {
+      return ollLooks;
     }
     return "drill_cases".equals(name) ? drillCases : Collections.<StepFigure>emptyList();
   }
@@ -647,6 +679,9 @@ public class CoachPayload {
         json.put("ll_moves", moveArray(llMoves));
         json.put("ll_habits", moveArray(llHabits));
       }
+      if (!ollLooks.isEmpty()) {
+        json.put("oll_looks", figures(ollLooks));
+      }
       return json.toString();
     } catch (JSONException e) {
       throw new IllegalStateException("Cannot write coach payload", e);
@@ -701,7 +736,8 @@ public class CoachPayload {
               ? Integer.valueOf(windows.getInt("turning")) : null,
           moves(json, "ll_moves"), moves(json, "ll_habits"),
           windows != null && windows.has("ll_moves")
-              ? Integer.valueOf(windows.getInt("ll_moves")) : null);
+              ? Integer.valueOf(windows.getInt("ll_moves")) : null,
+          figures(json, "oll_looks"));
     } catch (JSONException e) {
       throw new IllegalArgumentException("Not a coach payload: " + e.getMessage(), e);
     }
