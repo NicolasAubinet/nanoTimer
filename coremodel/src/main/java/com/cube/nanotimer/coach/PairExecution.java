@@ -1,7 +1,8 @@
 package com.cube.nanotimer.coach;
 
 /**
- * One F2L pair as the solver turned it, set against the algorithms its case is usually taught with.
+ * One F2L pair as the solver turned it, set against the algorithms its case is usually taught with,
+ * or one last layer step taken in a single algorithm, set against its case's the same way.
  *
  * <p>Nothing stores this: a solve keeps its moves, and which of them went into which pair is found
  * by replaying it, which only the app can do. So it arrives here ready read, and the payload builder

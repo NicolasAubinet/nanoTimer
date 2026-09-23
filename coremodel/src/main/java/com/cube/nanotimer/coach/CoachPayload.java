@@ -29,8 +29,9 @@ public class CoachPayload {
 
   /** The newest payload this app writes and can read back. Version 2 added the two-look count and
    * the known set, 3 the cases to learn, 4 the F2L groups, 5 the F2L moves over the usual
-   * algorithms and the window they were replayed from, 6 each step's moves and stalls; an older
-   * payload is still read, and is simply missing them. */
+   * algorithms and the window they were replayed from, 6 each step's moves and stalls and the last
+   * layer's moves over the usual algorithms; an older payload is still read, and is simply missing
+   * them. */
   public static final int VERSION = 6;
 
   private final int schemaVersion;
@@ -55,6 +56,9 @@ public class CoachPayload {
   private final Integer f2lMoveWindow;
   private final List<TurningFigure> turning;
   private final Integer turningWindow;
+  private final List<MoveFigure> llMoves;
+  private final List<MoveFigure> llHabits;
+  private final Integer llMoveWindow;
 
   /**
    * @param solve the whole solve's figures, or null when the window holds too few to quote
@@ -137,6 +141,27 @@ public class CoachPayload {
       List<String> learningCases, List<String> toLearnCases, List<StepFigure> f2lGroups,
       MoveFigure f2lMoves, List<MoveFigure> f2lHabits, Integer f2lMoveWindow,
       List<TurningFigure> turning, Integer turningWindow) {
+    this(schemaVersion, puzzle, method, familyWindow, caseWindow, drillWindow, twoLookCount, solve,
+        families, parts, cases, drillCases, comparisons, knownCases, learningCases, toLearnCases,
+        f2lGroups, f2lMoves, f2lHabits, f2lMoveWindow, turning, turningWindow, null, null, null);
+  }
+
+  /**
+   * As above, with each last layer step's moves over the usual algorithms ({@link #getLlMoves}) and
+   * each of its cases' ({@link #getLlHabits}), read from the same replayed solves as the F2L moves,
+   * and how many solves that was. The cases and the window are dropped where no step is sent.
+   */
+  public CoachPayload(int schemaVersion, String puzzle, String method, int familyWindow,
+      int caseWindow, int drillWindow, Integer twoLookCount, StepFigure solve,
+      List<StepFigure> families, List<StepFigure> parts, List<StepFigure> cases,
+      List<StepFigure> drillCases, List<CaseComparison> comparisons, List<String> knownCases,
+      List<String> learningCases, List<String> toLearnCases, List<StepFigure> f2lGroups,
+      MoveFigure f2lMoves, List<MoveFigure> f2lHabits, Integer f2lMoveWindow,
+      List<TurningFigure> turning, Integer turningWindow, List<MoveFigure> llMoves,
+      List<MoveFigure> llHabits, Integer llMoveWindow) {
+    this.llMoves = moves(llMoves);
+    this.llMoveWindow = this.llMoves.isEmpty() ? null : llMoveWindow;
+    this.llHabits = this.llMoves.isEmpty() ? Collections.<MoveFigure>emptyList() : moves(llHabits);
     this.f2lMoveWindow = f2lMoveWindow;
     this.turning = turning == null
         ? Collections.<TurningFigure>emptyList()
@@ -170,6 +195,11 @@ public class CoachPayload {
   private static List<String> codes(List<String> codes) {
     return codes == null ? Collections.<String>emptyList()
         : Collections.unmodifiableList(new ArrayList<String>(codes));
+  }
+
+  private static List<MoveFigure> moves(List<MoveFigure> figures) {
+    return figures == null ? Collections.<MoveFigure>emptyList()
+        : Collections.unmodifiableList(new ArrayList<MoveFigure>(figures));
   }
 
   private static List<StepFigure> unmodifiable(List<StepFigure> figures) {
@@ -210,6 +240,14 @@ public class CoachPayload {
    */
   public Integer getF2lMoveWindow() {
     return f2lMoveWindow;
+  }
+
+  /**
+   * How many solves the last layer move figures were replayed from, or null in a payload carrying
+   * none. The same solves as the F2L moves, said again so neither has to be read off the other.
+   */
+  public Integer getLlMoveWindow() {
+    return llMoveWindow;
   }
 
   /**
@@ -316,6 +354,23 @@ public class CoachPayload {
   }
 
   /**
+   * Each last layer step's moves an execution against its cases' usual algorithms, {@code oll} then
+   * {@code pll}, counting only the executions taken in one algorithm. Empty where too few could be
+   * read, or the payload predates version 6: not measured, and never zero.
+   */
+  public List<MoveFigure> getLlMoves() {
+    return llMoves;
+  }
+
+  /**
+   * Each last layer case's extra moves and how often it went in with none of its listed algorithms,
+   * most extra moves first. Only ever sent beside {@link #getLlMoves}.
+   */
+  public List<MoveFigure> getLlHabits() {
+    return llHabits;
+  }
+
+  /**
    * Each step's moves and stalls a solve, in solving order, then the whole solve's under
    * {@code solve}. Empty where too few solves could be replayed, or the payload predates version 6:
    * not measured, and never zero.
@@ -331,7 +386,8 @@ public class CoachPayload {
    * {@code two_look_count}, {@code to_learn_cases.count}, {@code to_learn_cases.oll_53},
    * {@code f2l_groups.f2l_stuck.share}, {@code f2l_groups.f2l_first.recognition_ms},
    * {@code f2l_moves.extra_moves}, {@code f2l_habits.pair_27.off_list_rate},
-   * {@code turning.cross.stall_ms}, {@code turning.solve.moves}.
+   * {@code turning.cross.stall_ms}, {@code turning.solve.moves}, {@code ll_moves.pll.extra_moves},
+   * {@code ll_habits.pll_rb.off_list_rate}.
    *
    * <p>A case set answers how many cases are in it and whether a named one is among them, which is
    * what lets a plan saying "learn this case" be checked rather than believed. A case that is not in
@@ -367,8 +423,12 @@ public class CoachPayload {
       return comparison == null ? null : field(comparison, segments[2]);
     }
     if ("f2l_habits".equals(segments[0])) {
-      MoveFigure habit = habit(segments[1]);
+      MoveFigure habit = move(f2lHabits, segments[1]);
       return habit == null ? null : habit.field(segments[2]);
+    }
+    if ("ll_moves".equals(segments[0]) || "ll_habits".equals(segments[0])) {
+      MoveFigure figure = move("ll_moves".equals(segments[0]) ? llMoves : llHabits, segments[1]);
+      return figure == null ? null : figure.field(segments[2]);
     }
     if ("turning".equals(segments[0])) {
       TurningFigure figure = turning(segments[1]);
@@ -387,6 +447,9 @@ public class CoachPayload {
     }
     if ("f2l_moves".equals(name)) {
       return f2lMoveWindow == null ? null : Double.valueOf(f2lMoveWindow.intValue());
+    }
+    if ("ll_moves".equals(name)) {
+      return llMoveWindow == null ? null : Double.valueOf(llMoveWindow.intValue());
     }
     if ("turning".equals(name)) {
       return turningWindow == null ? null : Double.valueOf(turningWindow.intValue());
@@ -429,8 +492,8 @@ public class CoachPayload {
     return null;
   }
 
-  private MoveFigure habit(String code) {
-    for (MoveFigure habit : f2lHabits) {
+  private static MoveFigure move(List<MoveFigure> figures, String code) {
+    for (MoveFigure habit : figures) {
       if (habit.getCode().equals(code)) {
         return habit;
       }
@@ -518,7 +581,7 @@ public class CoachPayload {
         || figure(cases, code) != null || figure(drillCases, code) != null
         || comparison(code) != null || knownCases.contains(code) || learningCases.contains(code)
         || toLearnCases.contains(code) || figure(f2lGroups, code) != null
-        || habit(code) != null;
+        || move(f2lHabits, code) != null || move(llHabits, code) != null;
   }
 
   /** Is there enough here to say anything at all? */
@@ -541,6 +604,9 @@ public class CoachPayload {
       }
       if (turningWindow != null) {
         windows.put("turning", turningWindow);
+      }
+      if (llMoveWindow != null) {
+        windows.put("ll_moves", llMoveWindow);
       }
       json.put("windows", windows);
       if (twoLookCount != null) {
@@ -577,10 +643,22 @@ public class CoachPayload {
         }
         json.put("turning", turns);
       }
+      if (!llMoves.isEmpty()) {
+        json.put("ll_moves", moveArray(llMoves));
+        json.put("ll_habits", moveArray(llHabits));
+      }
       return json.toString();
     } catch (JSONException e) {
       throw new IllegalStateException("Cannot write coach payload", e);
     }
+  }
+
+  private static JSONArray moveArray(List<MoveFigure> figures) throws JSONException {
+    JSONArray array = new JSONArray();
+    for (MoveFigure figure : figures) {
+      array.put(figure.toJson());
+    }
+    return array;
   }
 
   private static JSONArray figures(List<StepFigure> figures) throws JSONException {
@@ -615,12 +693,15 @@ public class CoachPayload {
           codes(json, "learning_cases"), codes(json, "to_learn_cases"),
           figures(json, "f2l_groups"),
           json.has("f2l_moves") ? MoveFigure.fromJson(json.getJSONObject("f2l_moves")) : null,
-          habits(json),
+          moves(json, "f2l_habits"),
           windows != null && windows.has("f2l_moves")
               ? Integer.valueOf(windows.getInt("f2l_moves")) : null,
           turning(json),
           windows != null && windows.has("turning")
-              ? Integer.valueOf(windows.getInt("turning")) : null);
+              ? Integer.valueOf(windows.getInt("turning")) : null,
+          moves(json, "ll_moves"), moves(json, "ll_habits"),
+          windows != null && windows.has("ll_moves")
+              ? Integer.valueOf(windows.getInt("ll_moves")) : null);
     } catch (JSONException e) {
       throw new IllegalArgumentException("Not a coach payload: " + e.getMessage(), e);
     }
@@ -635,9 +716,9 @@ public class CoachPayload {
     return figures;
   }
 
-  private static List<MoveFigure> habits(JSONObject json) throws JSONException {
+  private static List<MoveFigure> moves(JSONObject json, String field) throws JSONException {
     List<MoveFigure> habits = new ArrayList<MoveFigure>();
-    JSONArray array = json.optJSONArray("f2l_habits");
+    JSONArray array = json.optJSONArray(field);
     for (int i = 0; array != null && i < array.length(); i++) {
       habits.add(MoveFigure.fromJson(array.getJSONObject(i)));
     }

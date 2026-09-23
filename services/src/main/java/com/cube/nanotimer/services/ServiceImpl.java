@@ -544,12 +544,12 @@ public class ServiceImpl extends DBHelper implements Service {
 
   @Override
   public void getCoachPayload(final SolveType solveType, final CubeMethod method,
-      final List<PairExecution> pairs, final List<StepTurning> turnings,
+      final List<PairExecution> executions, final List<StepTurning> turnings,
       final DataCallback<CoachPayload> callback) {
     run(new Runnable() {
       @Override
       public void run() {
-        callback.onData(provider.getCoachPayload(solveType, method, pairs, turnings));
+        callback.onData(provider.getCoachPayload(solveType, method, executions, turnings));
       }
     });
   }

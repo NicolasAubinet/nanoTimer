@@ -6,8 +6,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * What F2L pairs cost in moves against the algorithms their cases are usually taught with: one case
- * over every time it came up, or the whole F2L over the solves that can be set against them.
+ * What F2L pairs and last layer cases cost in moves against the algorithms their cases are usually
+ * taught with: one case over every time it came up, the whole F2L over the solves that can be set
+ * against them, or one last layer step over its executions.
  *
  * <p>Extra moves are {@link AlgorithmFigures#extraMoves}, the one definition every screen shares:
  * none for a listed algorithm, never below zero, so a case's figure is the mean of its occurrences'
@@ -56,7 +57,14 @@ public class MoveFigure {
         Double.valueOf(turnedMoves), Double.valueOf(usualMoves));
   }
 
-  /** The case, or null for the whole F2L. */
+  /** The same for one last layer step, {@code oll} or {@code pll}, a mean per execution. */
+  static MoveFigure step(String code, int count, double turnedMoves, double usualMoves,
+      double extraMoves, double rejectionRate) {
+    return new MoveFigure(code, count, extraMoves, rejectionRate, null,
+        Double.valueOf(turnedMoves), Double.valueOf(usualMoves));
+  }
+
+  /** The case, the last layer step for a step's total, or null for the whole F2L. */
   public String getCode() {
     return code;
   }
@@ -75,12 +83,12 @@ public class MoveFigure {
     return rejectionRate;
   }
 
-  /** How often a case went in with none of its listed algorithms; null for the whole F2L. */
+  /** How often a case went in with none of its listed algorithms; null for a total. */
   public Double getOffListRate() {
     return offListRate;
   }
 
-  /** The moves the whole F2L took a solve; null for a case. */
+  /** The moves the whole F2L took a solve, or a last layer step an execution; null for a case. */
   public Double getTurnedMoves() {
     return turnedMoves;
   }

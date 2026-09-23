@@ -282,6 +282,42 @@ public class CoachPayloadBuilderTest {
     Assert.assertFalse(payload.holds("pair_9"));
   }
 
+  @Test
+  public void testLastLayerMovesRideInThePayloadAndSurviveARoundTrip() {
+    CoachPayload payload = CoachPayload.parse(buildWithLastLayerMoves(12).toJson());
+
+    Assert.assertEquals(12, payload.value("ll_moves.pll.count"), 1e-9);
+    Assert.assertEquals(16, payload.value("ll_moves.pll.turned_moves"), 1e-9);
+    Assert.assertEquals(14, payload.value("ll_moves.pll.usual_moves"), 1e-9);
+    Assert.assertEquals(2, payload.value("ll_moves.pll.extra_moves"), 1e-9);
+    Assert.assertEquals(0, payload.value("ll_moves.oll.extra_moves"), 1e-9);
+    Assert.assertEquals(2, payload.value("ll_habits.pll_t.extra_moves"), 1e-9);
+    Assert.assertEquals(0.5, payload.value("ll_habits.pll_t.off_list_rate"), 1e-9);
+    Assert.assertEquals(12, payload.value("windows.ll_moves"), 1e-9);
+    Assert.assertTrue(payload.holds("pll_t"));
+  }
+
+  /** A last layer case goes to its own list and never into the F2L's, which it would skew. */
+  @Test
+  public void testALastLayerCaseIsNotAnF2lHabit() {
+    CoachPayload payload = buildWithLastLayerMoves(12);
+
+    Assert.assertEquals(2, payload.value("f2l_moves.extra_moves"), 1e-9);
+    Assert.assertNull(payload.value("f2l_habits.pll_t.extra_moves"));
+    Assert.assertNull(payload.value("ll_habits.pair_4.extra_moves"));
+  }
+
+  /** Nothing of the last layer replayed: no step, no case and no window, not zeros. */
+  @Test
+  public void testAPayloadWithoutLastLayerMovesSaysNothingAboutThem() {
+    CoachPayload payload = CoachPayload.parse(buildWithPairMoves(12).toJson());
+
+    Assert.assertTrue(payload.getLlMoves().isEmpty());
+    Assert.assertNull(payload.value("ll_moves.pll.extra_moves"));
+    Assert.assertNull(payload.value("windows.ll_moves"));
+    Assert.assertFalse(payload.toJson(), payload.toJson().contains("\"ll_"));
+  }
+
   /**
    * The F2L figures are replayed from a shorter window than the cases are read from, so how far
    * back they go rides with them rather than being inferred from the case window.
@@ -495,6 +531,24 @@ public class CoachPayloadBuilderTest {
     return CoachPayloadBuilder.build("3x3", "cfop", solveTimes(solves), familySamples(solves),
         familySamples(solves), caseSolves, Collections.<StepSample>emptyList(), 0,
         Collections.<CaseKnowledge>emptyList(), pairs, solves);
+  }
+
+  /**
+   * An F2L of one case always turned 2 over, an OLL always its listed algorithm, and a PLL T that
+   * goes in 4 over every other solve, all in the one list the app hands over.
+   */
+  private static CoachPayload buildWithLastLayerMoves(int solves) {
+    List<PairExecution> executions = new ArrayList<PairExecution>();
+    for (int solve = 0; solve < solves; solve++) {
+      long spread = (solve % 2 == 0 ? 1 : -1) * solve * 20L;
+      boolean odd = solve % 2 == 0;
+      executions.add(PairExecution.of(solve, "pair_4", 3000 + spread, 9, 7, false));
+      executions.add(PairExecution.of(solve, "oll_27", 1500 + spread, 7, 7, true));
+      executions.add(PairExecution.of(solve, "pll_t", 2000 + spread, odd ? 18 : 14, 14, !odd));
+    }
+    return CoachPayloadBuilder.build("3x3", "cfop", solveTimes(solves), familySamples(solves),
+        familySamples(solves), solves, Collections.<StepSample>emptyList(), 0,
+        Collections.<CaseKnowledge>emptyList(), executions, solves);
   }
 
   /** Two cases that go in unaided, one that does not, and one of a method this payload is not for. */

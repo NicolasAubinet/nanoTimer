@@ -125,7 +125,7 @@ public interface Service {
   /** Keeps readings the caller had to make for itself, so the next window does not make them again. */
   void saveSolveReadings(Map<Long, String> readings, int version, DataCallback<Void> callback);
 
-  void getCoachPayload(SolveType solveType, CubeMethod method, List<PairExecution> pairs,
+  void getCoachPayload(SolveType solveType, CubeMethod method, List<PairExecution> executions,
       List<StepTurning> turnings, DataCallback<CoachPayload> callback);
   /**
    * Keeps the last plan written for a solve type, and the payload it was written from, replacing

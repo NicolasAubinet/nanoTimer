@@ -11,6 +11,7 @@ import com.cube.nanotimer.coach.PairExecution;
 import com.cube.nanotimer.coach.StepTurning;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.cube.F2lHabitReader;
+import com.cube.nanotimer.cube.LastLayerHabitReader;
 import com.cube.nanotimer.cube.SolveReading;
 import com.cube.nanotimer.cube.SolveReadings;
 import com.cube.nanotimer.cube.TurningReader;
@@ -128,7 +129,8 @@ public final class CoachRead {
   }
 
   /**
-   * Reads the F2L move window's solves for their pairs and steps first, which only the app can do.
+   * Reads the F2L move window's solves for their pairs, last layers and steps first, which only the
+   * app can do.
    * A solve read before is taken from the store rather than solved again, which is what keeps this
    * off the wait the solver is watching: only solves done since the last plan cost anything.
    */
@@ -148,20 +150,21 @@ public final class CoachRead {
                   @Override
                   public void onData(Map<Long, String> kept) { // off the main thread already
                     SolveReadings readings = new SolveReadings(kept);
-                    List<PairExecution> pairs = F2lHabitReader.readFrom(solves, readings);
+                    List<PairExecution> executions = F2lHabitReader.readFrom(solves, readings);
+                    executions.addAll(LastLayerHabitReader.readFrom(solves, readings));
                     List<StepTurning> turnings = TurningReader.readFrom(solves, readings);
                     App.INSTANCE.getService().saveSolveReadings(readings.unkept(),
                         SolveReading.VERSION, null);
-                    ask(client, method, pairs, turnings);
+                    ask(client, method, executions, turnings);
                   }
                 });
           }
         });
   }
 
-  private void ask(final CoachClient client, CubeMethod method, List<PairExecution> pairs,
+  private void ask(final CoachClient client, CubeMethod method, List<PairExecution> executions,
       List<StepTurning> turnings) {
-    App.INSTANCE.getService().getCoachPayload(solveType, method, pairs, turnings,
+    App.INSTANCE.getService().getCoachPayload(solveType, method, executions, turnings,
         new DataCallback<CoachPayload>() {
           @Override
           public void onData(final CoachPayload payload) {

@@ -138,10 +138,11 @@ public class CoachPayloadBuilder {
    * @param drillCount how many drills those reps came from
    * @param knowledge where every case with a status stands, of every method: the ones belonging to
    *     this method's own steps are picked out here
-   * @param pairs every F2L pair of the {@link #F2L_MOVE_WINDOW}'s solves, replayed and set against
-   *     the algorithms its case is usually taught with; empty where nothing could be replayed
+   * @param executions every F2L pair of the {@link #F2L_MOVE_WINDOW}'s solves, and every last layer
+   *     step of them taken in one algorithm, replayed and set against the algorithms its case is
+   *     usually taught with; empty where nothing could be replayed
    * @param f2lSolveCount how many solves that window actually held, sent beside the figures so
-   *     that which window an F2L number came from is said rather than inferred
+   *     that which window a move figure came from is said rather than inferred
    * @param turnings every step of the {@link #FAMILY_WINDOW}'s solves as it was turned, replayed
    *     like the pairs; empty where nothing could be
    * @param turningSolveCount how many solves they were replayed from
@@ -149,8 +150,11 @@ public class CoachPayloadBuilder {
   public static CoachPayload build(String puzzle, String method, List<Long> solveTimes,
       List<StepSample> familySamples, List<StepSample> caseSamples, int caseSolveCount,
       List<StepSample> drillSamples, int drillCount, List<CaseKnowledge> knowledge,
-      List<PairExecution> pairs, int f2lSolveCount, List<StepTurning> turnings,
+      List<PairExecution> executions, int f2lSolveCount, List<StepTurning> turnings,
       int turningSolveCount) {
+    List<PairExecution> lastLayer = LastLayerHabits.of(executions);
+    List<PairExecution> pairs = new ArrayList<PairExecution>(executions);
+    pairs.removeAll(lastLayer);
     StepTallies familyTallies = new StepTallies(familySamples);
     MethodStatistics families =
         new MethodStatistics(familyTallies.getSteps(), familyTallies.getParts(), solveTimes.size());
@@ -163,6 +167,7 @@ public class CoachPayloadBuilder {
     List<StepFigure> drillFigures = drillFigures(drillTallies);
     Set<String> sets = familiesOf(cases);
     MoveFigure f2lMoves = F2lHabits.total(pairs, FAMILY_FLOOR);
+    List<MoveFigure> llMoves = LastLayerHabits.steps(lastLayer, FAMILY_FLOOR);
     return new CoachPayload(CoachPayload.VERSION, puzzle, method, solveTimes.size(),
         caseSolveCount, drillCount, Integer.valueOf(twoLookSolves(familySamples)),
         solveFigure(solveTimes),
@@ -176,7 +181,8 @@ public class CoachPayloadBuilder {
         F2lGroups.of(familySamples, FAMILY_FLOOR), f2lMoves,
         f2lMoves == null ? null : F2lHabits.cases(pairs, CASE_FLOOR),
         f2lMoves == null ? null : Integer.valueOf(f2lSolveCount),
-        Turnings.of(turnings, FAMILY_FLOOR), Integer.valueOf(turningSolveCount));
+        Turnings.of(turnings, FAMILY_FLOOR), Integer.valueOf(turningSolveCount), llMoves,
+        LastLayerHabits.cases(lastLayer, CASE_FLOOR), Integer.valueOf(f2lSolveCount));
   }
 
   /** As above with no step's turning replayed. */
