@@ -268,7 +268,7 @@ public class CoachPayloadBuilderTest {
   public void testF2lMovesRideInThePayloadAndSurviveARoundTrip() {
     CoachPayload payload = CoachPayload.parse(buildWithPairMoves(12).toJson());
 
-    Assert.assertEquals(5, payload.getSchemaVersion());
+    Assert.assertEquals(CoachPayload.VERSION, payload.getSchemaVersion());
     Assert.assertEquals(12, payload.value("f2l_moves.count"), 1e-9);
     Assert.assertEquals(19, payload.value("f2l_moves.turned_moves"), 1e-9);
     Assert.assertEquals(18, payload.value("f2l_moves.usual_moves"), 1e-9);
@@ -354,6 +354,78 @@ public class CoachPayloadBuilderTest {
     } catch (IllegalArgumentException e) {
       Assert.assertTrue(e.getMessage(), e.getMessage().contains("version"));
     }
+  }
+
+  /** Each step in solving order, then the whole solve, each with its moves and stops a solve. */
+  @Test
+  public void testEachStepsTurningRidesInSolvingOrderThenTheWholeSolve() {
+    CoachPayload payload = buildWithTurnings(20);
+
+    List<String> codes = new ArrayList<String>();
+    for (TurningFigure figure : payload.getTurning()) {
+      codes.add(figure.getCode());
+    }
+    Assert.assertEquals(Arrays.asList("cross", "f2l", "oll", "pll", CoachPayloadBuilder.SOLVE),
+        codes);
+    TurningFigure cross = payload.getTurning().get(0);
+    Assert.assertEquals(20, cross.getCount());
+    Assert.assertEquals(8, cross.getMoves(), 1e-9);
+    Assert.assertEquals(1, cross.getStalls(), 1e-9);
+    Assert.assertEquals(600, cross.getStallMs());
+  }
+
+  /** A skipped PLL turned nothing of its own, and counted in it would read as efficiency. */
+  @Test
+  public void testASkipIsNotCountedAsTurningTheStep() {
+    TurningFigure pll = turning(buildWithTurnings(20), "pll");
+
+    Assert.assertEquals(14, pll.getCount()); // 20, less 4 skips and 2 solves that stopped early
+    Assert.assertEquals(14, pll.getMoves(), 1e-9);
+  }
+
+  /** A solve missing a step would be a step short, so the whole solve reads only whole solves. */
+  @Test
+  public void testTheWholeSolveIsReadOverTheSolvesReadToTheEnd() {
+    TurningFigure solve = turning(buildWithTurnings(20), CoachPayloadBuilder.SOLVE);
+
+    Assert.assertEquals(18, solve.getCount());
+    Assert.assertEquals(1060 / 18.0, solve.getMoves(), 1e-9); // 4 skips at 48, 14 at 62
+    Assert.assertEquals(68 / 18.0, solve.getStalls(), 1e-9);
+    Assert.assertEquals(2489, solve.getStallMs());
+  }
+
+  @Test
+  public void testTurningUnderTheFloorIsNotSent() {
+    CoachPayload payload = buildWithTurnings(CoachPayloadBuilder.FAMILY_FLOOR - 1);
+
+    Assert.assertTrue(payload.getTurning().isEmpty());
+    Assert.assertNull(payload.getTurningWindow());
+    Assert.assertFalse(payload.toJson(), payload.toJson().contains("turning"));
+  }
+
+  /** What rides is what a plan can cite, with the window it was replayed over beside it. */
+  @Test
+  public void testTurningSurvivesTheRoundTripAndCanBeCited() {
+    CoachPayload payload = CoachPayload.parse(buildWithTurnings(20).toJson());
+
+    Assert.assertEquals(6, payload.getSchemaVersion());
+    Assert.assertEquals(600, payload.value("turning.cross.stall_ms"), 1e-9);
+    Assert.assertEquals(58.9, payload.value("turning.solve.moves"), 1e-9);
+    Assert.assertEquals(3.8, payload.value("turning.solve.stalls"), 1e-9);
+    Assert.assertEquals(20, payload.value("windows.turning"), 1e-9);
+    Assert.assertNull(payload.value("turning.cross.tps"));
+    Assert.assertNull(payload.value("turning.lse.moves"));
+  }
+
+  /** A payload from before version 6 has no turning: not zero moves and no stops. */
+  @Test
+  public void testAPayloadWithoutTurningSaysNothingAboutIt() {
+    CoachPayload payload = CoachPayload.parse(buildWithPlacedPairs().toJson()
+        .replace("\"schema_version\":" + CoachPayload.VERSION, "\"schema_version\":5"));
+
+    Assert.assertTrue(payload.getTurning().isEmpty());
+    Assert.assertNull(payload.value("turning.cross.moves"));
+    Assert.assertNull(payload.value("windows.turning"));
   }
 
   /** Twenty solves of steps, forty of cases, three drills of the same two PLLs. */
@@ -508,5 +580,38 @@ public class CoachPayloadBuilderTest {
       }
     }
     return null;
+  }
+
+  /**
+   * Solves turned the same way every time: a cross of 8 moves with one 600 ms stop, an F2L of 30
+   * with two, an OLL of 10 with none, a PLL of 14 with one, except that every fifth PLL is a skip
+   * and every tenth solve stopped before its PLL was read.
+   */
+  private static CoachPayload buildWithTurnings(int solves) {
+    List<StepTurning> turnings = new ArrayList<StepTurning>();
+    for (int solve = 0; solve < solves; solve++) {
+      boolean whole = solve % 10 != 9;
+      turnings.add(new StepTurning(solve, "cross", 3000, 8, 1, 600, whole));
+      turnings.add(new StepTurning(solve, "f2l", 12000, 30, 2, 1500, whole));
+      turnings.add(new StepTurning(solve, "oll_21", 2500, 10, 0, 0, whole));
+      if (!whole) {
+        continue;
+      }
+      turnings.add(solve % 5 == 0 ? new StepTurning(solve, "pll_skip", 400, 0, 0, 0, true)
+          : new StepTurning(solve, "pll_t", 2000, 14, 1, 500, true));
+    }
+    return CoachPayloadBuilder.build("3x3", "cfop", solveTimes(solves), familySamples(solves),
+        familySamples(solves), solves, Collections.<StepSample>emptyList(), 0,
+        Collections.<CaseKnowledge>emptyList(), Collections.<PairExecution>emptyList(), 0,
+        turnings, solves);
+  }
+
+  private static TurningFigure turning(CoachPayload payload, String code) {
+    for (TurningFigure figure : payload.getTurning()) {
+      if (figure.getCode().equals(code)) {
+        return figure;
+      }
+    }
+    throw new AssertionError("no turning for " + code);
   }
 }

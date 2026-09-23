@@ -8,10 +8,12 @@ import com.cube.nanotimer.Options;
 import com.cube.nanotimer.coach.CoachPayload;
 import com.cube.nanotimer.coach.CoachPayloadBuilder;
 import com.cube.nanotimer.coach.PairExecution;
+import com.cube.nanotimer.coach.StepTurning;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.cube.F2lHabitReader;
 import com.cube.nanotimer.cube.SolveReading;
 import com.cube.nanotimer.cube.SolveReadings;
+import com.cube.nanotimer.cube.TurningReader;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.vo.CubeMethod;
 import com.cube.nanotimer.vo.SolveTime;
@@ -126,13 +128,14 @@ public final class CoachRead {
   }
 
   /**
-   * Reads the F2L move window's solves for their pairs first, which only the app can do. A solve
-   * read before is taken from the store rather than solved again, which is what keeps this off the
-   * wait the solver is watching: only solves done since the last plan cost anything.
+   * Reads the F2L move window's solves for their pairs and steps first, which only the app can do.
+   * A solve read before is taken from the store rather than solved again, which is what keeps this
+   * off the wait the solver is watching: only solves done since the last plan cost anything.
    */
   private void ask(final CoachClient client, final CubeMethod method) {
     if (method != CubeMethod.CFOP) {
-      ask(client, method, Collections.<PairExecution>emptyList());
+      ask(client, method, Collections.<PairExecution>emptyList(),
+          Collections.<StepTurning>emptyList());
       return;
     }
     App.INSTANCE.getService().getMethodSolves(solveType, method,
@@ -146,17 +149,19 @@ public final class CoachRead {
                   public void onData(Map<Long, String> kept) { // off the main thread already
                     SolveReadings readings = new SolveReadings(kept);
                     List<PairExecution> pairs = F2lHabitReader.readFrom(solves, readings);
+                    List<StepTurning> turnings = TurningReader.readFrom(solves, readings);
                     App.INSTANCE.getService().saveSolveReadings(readings.unkept(),
                         SolveReading.VERSION, null);
-                    ask(client, method, pairs);
+                    ask(client, method, pairs, turnings);
                   }
                 });
           }
         });
   }
 
-  private void ask(final CoachClient client, CubeMethod method, List<PairExecution> pairs) {
-    App.INSTANCE.getService().getCoachPayload(solveType, method, pairs,
+  private void ask(final CoachClient client, CubeMethod method, List<PairExecution> pairs,
+      List<StepTurning> turnings) {
+    App.INSTANCE.getService().getCoachPayload(solveType, method, pairs, turnings,
         new DataCallback<CoachPayload>() {
           @Override
           public void onData(final CoachPayload payload) {

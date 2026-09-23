@@ -24,8 +24,7 @@ public final class SolveReadings {
 
   private final Map<Long, String> kept;
   private final Map<Long, String> unkept = new LinkedHashMap<Long, String>();
-  private final Map<Long, List<SolveReading.Execution>> parsed =
-      new HashMap<Long, List<SolveReading.Execution>>();
+  private final Map<Long, SolveReading> parsed = new HashMap<Long, SolveReading>();
 
   /** @param kept what the store holds for this window, by solve id; empty reads everything */
   public SolveReadings(Map<Long, String> kept) {
@@ -39,19 +38,24 @@ public final class SolveReadings {
 
   /** One solve's executions, off a kept row where there is one and out of the solve otherwise. */
   public List<SolveReading.Execution> of(SolveTime solve) {
+    return readingOf(solve).getExecutions();
+  }
+
+  /** One solve's whole reading, its steps as well as its executions, got the same way. */
+  public SolveReading readingOf(SolveTime solve) {
     Long id = Long.valueOf(solve.getId());
-    List<SolveReading.Execution> executions = parsed.get(id);
-    if (executions != null) {
-      return executions;
+    SolveReading reading = parsed.get(id);
+    if (reading != null) {
+      return reading;
     }
     String text = kept.get(id);
-    executions = text == null ? null : SolveReading.parse(text);
-    if (executions == null) { // never read, read by another version, or kept as text nothing reads
-      executions = SolveReading.read(solve);
-      unkept.put(id, SolveReading.toJson(executions));
+    reading = text == null ? null : SolveReading.parse(text);
+    if (reading == null) { // never read, read by another version, or kept as text nothing reads
+      reading = SolveReading.read(solve);
+      unkept.put(id, SolveReading.toJson(reading));
     }
-    parsed.put(id, executions);
-    return executions;
+    parsed.put(id, reading);
+    return reading;
   }
 
   /** The ids of a window's solves, as the store is asked for what it holds of them. */

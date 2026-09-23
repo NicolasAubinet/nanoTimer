@@ -105,7 +105,8 @@ public class SolveReadingTest {
   @Test
   public void keepsAPairThatCanBeSetAgainstNothingAsAPairThatHappened() {
     List<SolveReading.Execution> round = SolveReading.parse(SolveReading.toJson(
-        Collections.singletonList(new SolveReading.Execution("f2l", null, 1200, 0, 0, false, 1))));
+        new SolveReading(Collections.singletonList(
+            new SolveReading.Execution("f2l", null, 1200, 0, 0, false, 1))))).getExecutions();
 
     assertEquals(1, round.size());
     assertNull(round.get(0).getCaseCode());
@@ -117,7 +118,8 @@ public class SolveReadingTest {
   @Test
   public void keepsHowManyAlgorithmsAStepTookApartFromWhetherTheyWereListed() {
     List<SolveReading.Execution> round = SolveReading.parse(SolveReading.toJson(
-        Collections.singletonList(new SolveReading.Execution("oll", "oll_21", 3400, 11, 11, true, 2))));
+        new SolveReading(Collections.singletonList(
+            new SolveReading.Execution("oll", "oll_21", 3400, 11, 11, true, 2))))).getExecutions();
 
     assertEquals(1, round.size());
     assertTrue(round.get(0).isListed());
@@ -130,5 +132,39 @@ public class SolveReadingTest {
     solves.get(0).setSmartcubeMoves(null);
 
     assertTrue(SolveReading.read(solves.get(0)).isEmpty());
+  }
+
+  /** Each step's turning is kept with the executions and comes back as it was read. */
+  @Test
+  public void readsTheStepsTheSameWayOutOfAKeptReadingAsOutOfTheSolve() {
+    List<SolveTime> solves = solves();
+    SolveReadings read = new SolveReadings(null);
+    SolveReading fresh = read.readingOf(solves.get(0));
+
+    SolveReadings kept = new SolveReadings(read.unkept());
+    SolveReading again = kept.readingOf(solves.get(0));
+
+    assertTrue(kept.unkept().isEmpty());
+    assertTrue("a solve read to the end is whole", fresh.isWhole());
+    assertEquals(fresh.isWhole(), again.isWhole());
+    assertFalse("the fixture should have said something", fresh.getTurnings().isEmpty());
+    assertEquals(fresh.getTurnings().size(), again.getTurnings().size());
+    for (int i = 0; i < fresh.getTurnings().size(); i++) {
+      SolveReading.Turning a = fresh.getTurnings().get(i);
+      SolveReading.Turning b = again.getTurnings().get(i);
+      assertEquals(a.getCode(), b.getCode());
+      assertEquals(a.getTimeMs(), b.getTimeMs());
+      assertEquals(a.getMoves(), b.getMoves());
+      assertEquals(a.getStalls(), b.getStalls());
+      assertEquals(a.getStallMs(), b.getStallMs());
+    }
+  }
+
+  /** A row kept before steps were read has none, and is read again rather than believed empty. */
+  @Test
+  public void readsAgainARowKeptBeforeStepsWereRead() {
+    assertNull(SolveReading.parse(
+        "[{\"family\":\"f2l\",\"time_ms\":1200,\"moves\":0,\"usual_moves\":0,"
+            + "\"listed\":false,\"algorithms\":1}]"));
   }
 }

@@ -142,11 +142,15 @@ public class CoachPayloadBuilder {
    *     the algorithms its case is usually taught with; empty where nothing could be replayed
    * @param f2lSolveCount how many solves that window actually held, sent beside the figures so
    *     that which window an F2L number came from is said rather than inferred
+   * @param turnings every step of the {@link #FAMILY_WINDOW}'s solves as it was turned, replayed
+   *     like the pairs; empty where nothing could be
+   * @param turningSolveCount how many solves they were replayed from
    */
   public static CoachPayload build(String puzzle, String method, List<Long> solveTimes,
       List<StepSample> familySamples, List<StepSample> caseSamples, int caseSolveCount,
       List<StepSample> drillSamples, int drillCount, List<CaseKnowledge> knowledge,
-      List<PairExecution> pairs, int f2lSolveCount) {
+      List<PairExecution> pairs, int f2lSolveCount, List<StepTurning> turnings,
+      int turningSolveCount) {
     StepTallies familyTallies = new StepTallies(familySamples);
     MethodStatistics families =
         new MethodStatistics(familyTallies.getSteps(), familyTallies.getParts(), solveTimes.size());
@@ -171,7 +175,18 @@ public class CoachPayloadBuilder {
         casesAt(knowledge, sets, CaseKnowledge.Status.TO_LEARN),
         F2lGroups.of(familySamples, FAMILY_FLOOR), f2lMoves,
         f2lMoves == null ? null : F2lHabits.cases(pairs, CASE_FLOOR),
-        f2lMoves == null ? null : Integer.valueOf(f2lSolveCount));
+        f2lMoves == null ? null : Integer.valueOf(f2lSolveCount),
+        Turnings.of(turnings, FAMILY_FLOOR), Integer.valueOf(turningSolveCount));
+  }
+
+  /** As above with no step's turning replayed. */
+  public static CoachPayload build(String puzzle, String method, List<Long> solveTimes,
+      List<StepSample> familySamples, List<StepSample> caseSamples, int caseSolveCount,
+      List<StepSample> drillSamples, int drillCount, List<CaseKnowledge> knowledge,
+      List<PairExecution> pairs, int f2lSolveCount) {
+    return build(puzzle, method, solveTimes, familySamples, caseSamples, caseSolveCount,
+        drillSamples, drillCount, knowledge, pairs, f2lSolveCount,
+        Collections.<StepTurning>emptyList(), 0);
   }
 
   /** As above with no F2L pairs replayed, so the payload carries no F2L moves. */

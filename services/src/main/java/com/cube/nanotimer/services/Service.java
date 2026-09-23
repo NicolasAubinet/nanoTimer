@@ -3,6 +3,7 @@ package com.cube.nanotimer.services;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.coach.CoachPayload;
 import com.cube.nanotimer.coach.PairExecution;
+import com.cube.nanotimer.coach.StepTurning;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.session.MethodStatistics;
 import com.cube.nanotimer.vo.BackupCounts;
@@ -124,7 +125,7 @@ public interface Service {
   void saveSolveReadings(Map<Long, String> readings, int version, DataCallback<Void> callback);
 
   void getCoachPayload(SolveType solveType, CubeMethod method, List<PairExecution> pairs,
-      DataCallback<CoachPayload> callback);
+      List<StepTurning> turnings, DataCallback<CoachPayload> callback);
   /**
    * Keeps the last plan written for a solve type, and the payload it was written from, replacing
    * whatever that writer left before. A plan is stored so it reads without the network and without

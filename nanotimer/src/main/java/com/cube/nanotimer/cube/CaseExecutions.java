@@ -203,27 +203,35 @@ public final class CaseExecutions {
     });
   }
 
-  /** Each step of a CFOP solve read again from its scramble, with its moves; none otherwise. */
-  static void readSteps(SolveTime solve, StepReader reader) {
+  /**
+   * Each step of a CFOP solve read again from its scramble, with its moves; none otherwise.
+   *
+   * @return whether every step was handed over, so that what was read adds up to the whole solve
+   */
+  static boolean readSteps(SolveTime solve, StepReader reader) {
     CubeMethod method = SolveTypeMethod.of(solve.getSolveType());
     if (method != CubeMethod.CFOP) {
-      return; // only CFOP is solved in these cases: nothing else would be read, it would be guessed
+      // only CFOP is solved in these cases: nothing else would be read, it would be guessed
+      return false;
     }
     StoredSolveReplay.Result reread = StoredSolveReplay.reinterpret(solve.getScramble(),
         solve.getSmartcubeMoves(), method);
     if (reread == null) {
-      return;
+      return false;
     }
     List<SolveStep> steps = SolveBreakdown.withTail(reread.getSteps(), reread.getStoppedStep(),
         SolveBreakdown.solvingDurationMs(solve), reread.getMoves(), reread.getMethod());
     SolveSolution solution = SolveSolution.from(reread.getMoves(), steps);
+    boolean whole = !steps.isEmpty() && steps.size() == solution.getSteps().size();
     for (int i = 0; i < steps.size() && i < solution.getSteps().size(); i++) {
       if (reread.getStoppedStep() != null
           && reread.getStoppedStep().intValue() == steps.get(i).getStepIndex()) {
+        whole = false;
         continue; // the solve stopped inside it, so its moves are half of an answer
       }
       reader.read(steps.get(i), solution.getSteps().get(i));
     }
+    return whole;
   }
 
   /**

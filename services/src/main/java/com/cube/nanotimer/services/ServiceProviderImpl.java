@@ -7,6 +7,7 @@ import com.cube.nanotimer.coach.CoachPayload;
 import com.cube.nanotimer.coach.CoachPayloadBuilder;
 import com.cube.nanotimer.coach.CoachPlan;
 import com.cube.nanotimer.coach.PairExecution;
+import com.cube.nanotimer.coach.StepTurning;
 import com.cube.nanotimer.coach.StepSample;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.services.db.CaseKnowledgeStore;
@@ -1642,7 +1643,7 @@ public class ServiceProviderImpl implements ServiceProvider {
    */
   @Override
   public CoachPayload getCoachPayload(SolveType solveType, CubeMethod method,
-      List<PairExecution> pairs) {
+      List<PairExecution> pairs, List<StepTurning> turnings) {
     if (solveType.getCubeTypeId() != CubeType.THREE_BY_THREE.getId()) {
       throw new IllegalArgumentException("A coach reads 3x3 solves only, not cube type "
           + solveType.getCubeTypeId());
@@ -1656,7 +1657,9 @@ public class ServiceProviderImpl implements ServiceProvider {
         getMethodStepSamples(solveType, method, CoachPayloadBuilder.CASE_WINDOW), caseSolves,
         drillSamples, getDrilledDrillsCount(CoachPayloadBuilder.DRILL_WINDOW),
         CaseKnowledgeStore.read(db), pairs,
-        getMethodSolvesCount(solveType, method, CoachPayloadBuilder.F2L_MOVE_WINDOW));
+        getMethodSolvesCount(solveType, method, CoachPayloadBuilder.F2L_MOVE_WINDOW), turnings,
+        turnings.isEmpty() ? 0
+            : getMethodSolvesCount(solveType, method, CoachPayloadBuilder.FAMILY_WINDOW));
   }
 
   /**

@@ -588,4 +588,55 @@ public class SolveSolutionTest {
         .getSteps().get(0).getMoves();
   }
 
+  /** A stop mid-execution is a gap between two turns over the analyzer's line for having stopped. */
+  @Test
+  public void countsAStopBetweenTwoTurnsOfTheCross() {
+    SolveSolution.Step cross = SolveSolution.from(moves("R@0", "U@200", "F@900", "L@1100"),
+        Arrays.asList(step("cross", 0, 1100))).getSteps().get(0);
+
+    assertEquals(1, cross.getStalls());
+    assertEquals(700, cross.getStallMs());
+  }
+
+  /** The wait before a step's turning is its recognition, AUF and all, and is counted there. */
+  @Test
+  public void doesNotCountTheRecognitionBeforeAStepAsAStall() {
+    SolveSolution.Step oll = SolveSolution.from(
+        moves("U@0", "R@1000", "U@1150", "R'@1300"),
+        Arrays.asList(step("oll", 1000, 300))).getSteps().get(0);
+
+    assertEquals(0, oll.getStalls());
+    assertEquals(0, oll.getStallMs());
+  }
+
+  /** Each part starts over at its own recognition, so only the stops inside a pair are stalls. */
+  @Test
+  public void readsEachPartsStallsAfterItsOwnRecognition() {
+    SolveSolution.Step f2l = SolveSolution.from(
+        moves("R@500", "U@700", "R'@1500", "U@2300", "R@2500", "U'@3000"),
+        Arrays.asList(step("f2l", 1300, 1700, step("pair", 500, 1000), step("pair", 800, 700))))
+        .getSteps().get(0);
+
+    assertEquals(2, f2l.getStalls()); // 800 ms inside the first pair, 500 inside the second
+    assertEquals(1300, f2l.getStallMs());
+  }
+
+  /** Rotating the cube is not turning it, so a stop around a rotation is still a stop. */
+  @Test
+  public void readsAStopAcrossARotationAsOneStall() {
+    SolveSolution.Step f2l = SolveSolution.from(moves("R@0", "y@300", "U@900"),
+        Arrays.asList(step("f2l", 0, 900))).getSteps().get(0);
+
+    assertEquals(1, f2l.getStalls());
+    assertEquals(900, f2l.getStallMs());
+  }
+
+  /** Turning at a steady rhythm is not stopping, however slow the rhythm. */
+  @Test
+  public void countsNoStallInTurningThatNeverStops() {
+    SolveSolution.Step pll = SolveSolution.from(moves("R@0", "U@400", "R'@800", "U'@1200"),
+        Arrays.asList(step("pll", 0, 1200))).getSteps().get(0);
+
+    assertEquals(0, pll.getStalls());
+  }
 }

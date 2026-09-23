@@ -2,6 +2,7 @@ package com.cube.nanotimer.cube;
 
 import com.cube.nanotimer.cube.SolveMovesFormat.Move;
 import com.cube.nanotimer.smartcube.model.CubeRotation;
+import com.cube.nanotimer.smartcube.step.SolveAnalyzer;
 import com.cube.nanotimer.vo.CubeMethod;
 import com.cube.nanotimer.vo.SolveStep;
 import java.util.ArrayList;
@@ -133,10 +134,57 @@ public final class SolveSolution {
       // turn is the first of the solving: shown under the memo it reads as a move made blind.
       int end = solveStep.getExecutionMs() > 0 ? endOf(moves, taken, boundaryMs) : taken;
       steps.add(new Step(i, solveStep.getName(),
-          groupsFor(moves, taken, end, solveStep.getSubSteps(), stepStartMs)));
+          groupsFor(moves, taken, end, solveStep.getSubSteps(), stepStartMs),
+          stallsOf(moves, taken, end, solveStep, stepStartMs)));
       taken = end;
     }
     return steps;
+  }
+
+  /**
+   * The stops inside a step's execution: gaps between two turns of the same part longer than the
+   * analyzer's own line for having stopped. A gap before a part's first turn is its recognition and
+   * is already counted there, so only the gaps after it are read, which is where an unplanned cross
+   * and a forgotten algorithm show up. Rotations are not turns, so a pause around one still counts.
+   *
+   * @return how many, and the milliseconds they came to
+   */
+  private static long[] stallsOf(List<Move> moves, int from, int to, SolveStep step,
+      long stepStartMs) {
+    long[] stalls = new long[2];
+    List<SolveStep> parts = step.getSubSteps();
+    if (parts.isEmpty()) {
+      addStalls(moves, from, to, stepStartMs + step.getRecognitionMs(), stalls);
+      return stalls;
+    }
+    long boundaryMs = stepStartMs;
+    int taken = from;
+    for (SolveStep part : parts) {
+      long executionStartMs = boundaryMs + part.getRecognitionMs();
+      boundaryMs += part.getTotalMs();
+      int end = Math.min(endOf(moves, taken, boundaryMs), to);
+      addStalls(moves, taken, end, executionStartMs, stalls);
+      taken = end;
+    }
+    return stalls;
+  }
+
+  private static void addStalls(List<Move> moves, int from, int to, long executionStartMs,
+      long[] stalls) {
+    Move previous = null;
+    for (int i = from; i < to; i++) {
+      Move move = moves.get(i);
+      if (move.getOffsetMs() < executionStartMs
+          || SolveMovesFormat.isRotation(move.getNotation())) {
+        continue;
+      }
+      long gapMs = previous == null ? 0 : move.getOffsetMs() - previous.getOffsetMs();
+      if (gapMs > SolveAnalyzer.LOOKAHEAD_PAUSE_MS) {
+        stalls[0]++;
+        stalls[1] += gapMs;
+      }
+      previous = move;
+    }
   }
 
   /** The stored stream spelled under one set of choices, for a reading that is weighing them. */
@@ -726,10 +774,14 @@ public final class SolveSolution {
     private final String name;
     private final List<List<Token>> groups;
     private final int moveCount;
+    private final int stalls;
+    private final long stallMs;
 
-    Step(int index, String name, List<List<Token>> groups) {
+    Step(int index, String name, List<List<Token>> groups, long[] stalls) {
       this.index = index;
       this.name = name;
+      this.stalls = (int) stalls[0];
+      this.stallMs = stalls[1];
       List<List<Token>> parts = new ArrayList<List<Token>>(groups.size());
       for (List<Token> group : groups) {
         parts.add(Collections.unmodifiableList(group));
@@ -788,6 +840,19 @@ public final class SolveSolution {
 
     public int getMoveCount() {
       return moveCount;
+    }
+
+    /**
+     * How many times the solver stopped mid-execution, a gap between two turns of one part over
+     * {@link SolveAnalyzer#LOOKAHEAD_PAUSE_MS}. Recognition is not in it: see {@link #stallsOf}.
+     */
+    public int getStalls() {
+      return stalls;
+    }
+
+    /** What those stops came to, gap for whole gap. */
+    public long getStallMs() {
+      return stallMs;
     }
 
     /**
