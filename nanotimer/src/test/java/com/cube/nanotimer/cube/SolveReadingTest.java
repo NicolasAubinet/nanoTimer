@@ -2,6 +2,7 @@ package com.cube.nanotimer.cube;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -11,6 +12,7 @@ import com.cube.nanotimer.vo.SolveTime;
 
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -166,5 +168,23 @@ public class SolveReadingTest {
     assertNull(SolveReading.parse(
         "[{\"family\":\"f2l\",\"time_ms\":1200,\"moves\":0,\"usual_moves\":0,"
             + "\"listed\":false,\"algorithms\":1}]"));
+  }
+
+  /** A solve stopped part way is not whole, and its unfinished tail is never read as a step. */
+  @Test
+  public void readsNoTailAndNoWholeSolveOutOfASolveStoppedPartWay() {
+    SolveTime solve = solves().get(0);
+    String[] played = solve.getSmartcubeMoves().split(" ");
+    // the four pairs and half the Sune: stopped inside the OLL
+    solve.setSmartcubeMoves(String.join(" ", Arrays.copyOf(played, 16)));
+
+    SolveReading reading = SolveReading.read(solve);
+
+    assertFalse(reading.isWhole());
+    assertFalse("the fixture should still read its F2L", reading.getTurnings().isEmpty());
+    for (SolveReading.Turning turning : reading.getTurnings()) {
+      assertNotEquals(SolveBreakdown.UNFINISHED_STEP, turning.getCode());
+      assertNotEquals(SolveBreakdown.GAP_STEP, turning.getCode());
+    }
   }
 }

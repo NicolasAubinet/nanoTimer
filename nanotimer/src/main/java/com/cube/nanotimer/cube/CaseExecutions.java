@@ -206,7 +206,8 @@ public final class CaseExecutions {
   /**
    * Each step of a CFOP solve read again from its scramble, with its moves; none otherwise.
    *
-   * @return whether every step was handed over, so that what was read adds up to the whole solve
+   * @return whether the solve was read to the end, not stopped and come out solved, so that what
+   *     was read adds up to the whole solve
    */
   static boolean readSteps(SolveTime solve, StepReader reader) {
     CubeMethod method = SolveTypeMethod.of(solve.getSolveType());
@@ -222,16 +223,14 @@ public final class CaseExecutions {
     List<SolveStep> steps = SolveBreakdown.withTail(reread.getSteps(), reread.getStoppedStep(),
         SolveBreakdown.solvingDurationMs(solve), reread.getMoves(), reread.getMethod());
     SolveSolution solution = SolveSolution.from(reread.getMoves(), steps);
-    boolean whole = !steps.isEmpty() && steps.size() == solution.getSteps().size();
     for (int i = 0; i < steps.size() && i < solution.getSteps().size(); i++) {
       if (reread.getStoppedStep() != null
           && reread.getStoppedStep().intValue() == steps.get(i).getStepIndex()) {
-        whole = false;
         continue; // the solve stopped inside it, so its moves are half of an answer
       }
       reader.read(steps.get(i), solution.getSteps().get(i));
     }
-    return whole;
+    return reread.getStoppedStep() == null && reread.reachedSolved() && !steps.isEmpty();
   }
 
   /**
