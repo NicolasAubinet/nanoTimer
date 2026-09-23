@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
-// The coach service's address and token, kept out of the repository and given to debug builds only.
-// A build without them has no coach.
+// The coach service's address and token, kept out of the repository. A build without them has no
+// coach.
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -12,6 +12,25 @@ if (localPropertiesFile.exists()) {
     def value = localProperties.getProperty(key, '')
     if (!(value ==~ /[A-Za-z0-9._~:\/=+-]*/)) {
         throw new GradleException("local.properties: $key holds a character a string resource cannot carry")
+    }
+}
+
+// A release carries the coach only while SmartCubeGate is on. A Play build turns the gate off on its
+// release branch, so the token leaves with it: hidden screens would still leave it in the APK.
+def gateMatch = file('src/main/java/com/cube/nanotimer/cube/SmartCubeGate.java').text =~
+    /(?m)^\s*public static final boolean ENABLED = (true|false);/
+if (!gateMatch.find()) {
+    throw new GradleException("SmartCubeGate.java: no ENABLED line, and a release's coach token depends on it")
+}
+def releaseCoach = gateMatch.group(1) == 'true'
+def releaseCoachUrl = releaseCoach ? localProperties.getProperty('coach.url', '') : ''
+def releaseCoachToken = releaseCoach ? localProperties.getProperty('coach.token', '') : ''
+
+// A bundle is only ever built for Play, where the token is one shared by every user: never carry it.
+gradle.taskGraph.whenReady { graph ->
+    if (graph.allTasks.any { it.path == ':nanotimer:bundleRelease' } && releaseCoachToken) {
+        throw new GradleException("bundleRelease would carry the coach token: turn SmartCubeGate off, "
+            + "as a Play build does, or take coach.token out of local.properties")
     }
 }
 
@@ -35,10 +54,10 @@ android {
             resValue 'string', 'coach_token', localProperties.getProperty('coach.token', '')
         }
         release {
-            // No coach in a release until each install has its own identity (C2): a token here
-            // would be one shared by every Play user, and readable out of the APK.
-            resValue 'string', 'coach_url', ''
-            resValue 'string', 'coach_token', ''
+            // The owner's own APK only, while the gate is on (see releaseCoach). Until each install
+            // has its own identity (C2) a token here is one shared by every user who has the APK.
+            resValue 'string', 'coach_url', releaseCoachUrl
+            resValue 'string', 'coach_token', releaseCoachToken
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
