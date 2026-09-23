@@ -353,8 +353,11 @@ public class CoachPlanView {
   private void launch(DrillSpec spec) {
     Intent intent;
     if (spec.getType() == DrillSpec.Type.CROSS) {
+      // The coach cannot know the solver's cross face; the setup screen's standing answer is it.
+      String face = DrillSetupActivity.layerFace().opposite().name();
       intent = new Intent(activity, CrossDrillActivity.class);
-      intent.putExtra(CrossDrillActivity.EXTRA_SPEC, spec.toJson());
+      intent.putExtra(CrossDrillActivity.EXTRA_SPEC, DrillSpec.cross(spec.getId(), face,
+          spec.getReps(), spec.getPlanningMs(), spec.getLabel()).toJson());
     } else {
       intent = new Intent(activity, DrillActivity.class);
       intent.putExtra(DrillActivity.EXTRA_SPEC, spec.toJson());
