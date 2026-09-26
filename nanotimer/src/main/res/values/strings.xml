@@ -26,6 +26,8 @@
   <string name="scramble">Scramble</string>
   <string name="scrambleC">Scramble:</string>
   <string name="scramble_copied">Scramble copied!</string>
+  <string name="copy_details">Copy</string>
+  <string name="details_copied">Details copied!</string>
   <string name="start">Start</string>
 
   <string name="add">Add</string>
@@ -196,6 +198,7 @@
   <string name="generating_cube_scramble">%1$s scrambles generating&#8230;\n%2$d of %3$d</string>
   <string name="stopping_generation">Stopping generation&#8230;</string>
   <string name="record_label_lifetime">PB</string>
+  <string name="record_label_average">%s PB</string>
   <string name="verdict_personal_best">Personal best, %1$s under %2$s</string>
   <string name="verdict_record">Best %1$s, %2$s under %3$s</string>
   <string name="verdict_window_best">Best of the last %1$d</string>
@@ -215,6 +218,7 @@
   <string name="could_not_find_market">Could not find the market app</string>
   <string name="could_not_launch_market">Could not launch the market</string>
   <string name="release_notes">Release notes</string>
+  <string name="release_notes_hide_on_update">Don\'t show after updates</string>
   <string name="close">Close</string>
 
   <string name="edit_solve_types_dots">Edit solve types&#8230;</string>
@@ -334,6 +338,8 @@
 
   <string name="best_times">Best times</string>
   <string name="sort_by_date">By date</string>
+  <string name="sort_by">Sort by</string>
+  <string name="sort_best_average">Best %s</string>
 
   <string name="add_time">Add time</string>
   <string name="select_time_to_add">Select time to add:</string>

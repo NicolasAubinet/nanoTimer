@@ -18,6 +18,8 @@
   <string name="scramble">Mélange</string>
   <string name="scrambleC">Mélange:</string>
   <string name="scramble_copied">Mélange copié!</string>
+  <string name="copy_details">Copier</string>
+  <string name="details_copied">Détails copiés!</string>
   <string name="start">Démarrer</string>
 
   <string name="add">Ajouter</string>
@@ -184,6 +186,7 @@
   <string name="generating_cube_scramble">Mélanges %1$s en génération&#8230;\n%2$d de %3$d</string>
   <string name="stopping_generation">Arrêt de la génération&#8230;</string>
   <string name="record_label_lifetime">PB</string>
+  <string name="record_label_average">%s PB</string>
   <string name="verdict_personal_best">Record personnel, %1$s de moins que %2$s</string>
   <string name="verdict_record">Meilleur %1$s, %2$s de moins que %3$s</string>
   <string name="verdict_window_best">Meilleur des %1$d derniers</string>
@@ -203,6 +206,7 @@
   <string name="could_not_find_market">Impossible de trouver l\'app du market</string>
   <string name="could_not_launch_market">Impossible de lancer le market</string>
   <string name="release_notes">Notes de version</string>
+  <string name="release_notes_hide_on_update">Ne plus afficher après les mises à jour</string>
   <string name="close">Fermer</string>
 
   <string name="edit_solve_types_dots">Éditer les types&#8230;</string>
@@ -322,6 +326,8 @@
 
   <string name="best_times">Meilleurs temps</string>
   <string name="sort_by_date">Par date</string>
+  <string name="sort_by">Trier par</string>
+  <string name="sort_best_average">Meilleur %s</string>
 
   <string name="add_time">Ajouter un temps</string>
   <string name="select_time_to_add">Entrez un temps à ajouter:</string>

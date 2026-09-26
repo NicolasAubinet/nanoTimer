@@ -10,9 +10,11 @@ import com.cube.nanotimer.coach.PairExecution;
 import com.cube.nanotimer.coach.StepTurning;
 import com.cube.nanotimer.coach.StepSample;
 import com.cube.nanotimer.coach.StoredCoachPlan;
+import com.cube.nanotimer.services.db.AverageRecordsStore;
 import com.cube.nanotimer.services.db.CaseKnowledgeStore;
 import com.cube.nanotimer.services.db.SolveReadingStore;
 import com.cube.nanotimer.services.db.DB;
+import com.cube.nanotimer.session.AverageRecords;
 import com.cube.nanotimer.session.CaseKnowledge;
 import com.cube.nanotimer.session.MethodStatistics;
 import com.cube.nanotimer.session.TimesStatistics;
@@ -44,6 +46,7 @@ import com.cube.nanotimer.vo.drill.DrillEnd;
 import com.cube.nanotimer.vo.drill.DrillRecord;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -234,6 +237,11 @@ public class ServiceProviderImpl implements ServiceProvider {
         progressListener.onProgress(++i);
       }
     }
+    long oldest = Long.MAX_VALUE;
+    for (SolveTime solveTime : solveTimes) {
+      oldest = Math.min(oldest, solveTime.getTimestamp());
+    }
+    AverageRecordsStore.update(db, solveType.getId(), oldest); // imported solves can be older than existing ones
     return updateAveragesAndPBCaches(solveType);
   }
 
@@ -395,6 +403,8 @@ public class ServiceProviderImpl implements ServiceProvider {
     Long avg50 = getLastAvg(50);
     Long avg100 = getLastAvg(100);
 
+    int avgPb = newAverageRecords(solveTime, avg5, avg12, avg50, avg100);
+    solveTime.setAverageRecords(AverageRecordsStore.sizes(avgPb, currentSolveType.isBlind()));
     syncBestAveragesWithCurrent(avg5, avg12, avg50, avg100);
     if (isTimeBetter(cachedLifetimeBest, solveTime.getTime()) && cachedSolveTimes.size() >= MIN_TIMES_BEFORE_PB_FLAG) {
       solveTime.setPb(true);
@@ -410,6 +420,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     values.put(DB.COL_TIMEHISTORY_TIMESTAMP, solveTime.getTimestamp());
     values.put(DB.COL_TIMEHISTORY_PLUSTWO, solveTime.isPlusTwo() ? 1 : 0);
     values.put(DB.COL_TIMEHISTORY_PB, solveTime.isPb() ? 1 : 0);
+    values.put(DB.COL_TIMEHISTORY_AVG_PB, avgPb);
     values.put(DB.COL_TIMEHISTORY_AVG5, avg5);
     values.put(DB.COL_TIMEHISTORY_AVG12, avg12);
     values.put(DB.COL_TIMEHISTORY_AVG50, avg50);
@@ -573,6 +584,18 @@ public class ServiceProviderImpl implements ServiceProvider {
     }
   }
 
+  /** The {@link AverageRecordsStore} bitmask of a new solve, computed before it is inserted. */
+  private int newAverageRecords(SolveTime solveTime, Long... averages) {
+    int[] cacheKeys = { 5, 12, 50, 100 }; // the avg5 column (Mo3 for blind) is cached under key 5
+    for (int i = 0; i < averages.length; i++) {
+      if (isTimeBetter(cachedBestAverages.get(cacheKeys[i]), averages[i])) { // query the warm-up count only when needed
+        AverageRecords records = AverageRecordsStore.recordsBefore(db, solveTime.getSolveType().getId(), solveTime.getTimestamp());
+        return AverageRecordsStore.mask(records.next(averages), currentSolveType.isBlind());
+      }
+    }
+    return 0;
+  }
+
   private void syncBestAveragesWithCurrent(Long avg5, Long avg12, Long avg50, Long avg100) {
     if (isTimeBetter(cachedBestAverages.get(5), avg5) || avg5 == null) {
       cachedBestAverages.put(5, avg5);
@@ -667,22 +690,11 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   public List<SolveTime> getHistoryTimes(SolveType solveType, Long from, boolean searchInPast, Integer pageSize, TimesSort timesSort) {
-    List<SolveTime> history = new ArrayList<SolveTime>();
-    StringBuilder q = new StringBuilder();
-    q.append("SELECT ").append(DB.COL_ID);
-    q.append("     , ").append(DB.COL_TIMEHISTORY_TIME);
-    q.append("     , ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
-    q.append("     , ").append(DB.COL_TIMEHISTORY_SCRAMBLE);
-    q.append("     , ").append(DB.COL_TIMEHISTORY_COMMENT);
-    q.append("     , ").append(DB.COL_TIMEHISTORY_PLUSTWO);
-    q.append("     , ").append(DB.COL_TIMEHISTORY_PB);
-    q.append("     , ").append(DB.COL_TIMEHISTORY_SMARTCUBE_METHOD);
-    q.append("     , ").append(DB.COL_TIMEHISTORY_SMARTCUBE_MOVES);
-    q.append("     , ").append(DB.COL_TIMEHISTORY_SMARTCUBE_STOPPED_STEP);
-    q.append("     , ").append(DB.COL_TIMEHISTORY_TIME_BEFORE_DNF);
-    q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
-    q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
-
+    StringBuilder q = historySelect(timesSort.isAverage());
+    if (timesSort.isAverage()) {
+      return readHistoryTimes(solveType, averageSortQuery(q, timesSort, from, pageSize),
+          getStringArray(solveType.getId()), true);
+    }
     String sortColumn = DB.COL_TIMEHISTORY_TIMESTAMP;
     if (timesSort == TimesSort.TIME) {
       sortColumn = DB.COL_TIMEHISTORY_TIME;
@@ -706,10 +718,64 @@ public class ServiceProviderImpl implements ServiceProvider {
       q.append(" LIMIT ").append(pageSize);
     }
     String[] params = (from == null) ? getStringArray(solveType.getId()) : getStringArray(solveType.getId(), from);
-    Cursor cursor = db.rawQuery(q.toString(), params);
+    return readHistoryTimes(solveType, q.toString(), params, false);
+  }
+
+  /** The history columns {@link #readHistoryTimes} reads, over one solve type's solves. */
+  private StringBuilder historySelect(boolean withAverages) {
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT ").append(DB.COL_ID);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_TIME);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_SCRAMBLE);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_COMMENT);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_PLUSTWO);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_PB);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_SMARTCUBE_METHOD);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_SMARTCUBE_MOVES);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_SMARTCUBE_STOPPED_STEP);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_TIME_BEFORE_DNF);
+    q.append("     , ").append(DB.COL_TIMEHISTORY_AVG_PB);
+    if (withAverages) {
+      for (String column : AverageRecordsStore.COLUMNS) {
+        q.append("     , ").append(column);
+      }
+    }
+    q.append(" FROM ").append(DB.TABLE_TIMEHISTORY);
+    q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
+    return q;
+  }
+
+  /**
+   * Best average first. Paged by offset ({@code from} is the number of rows already loaded), since
+   * paging by the last value would skip rows whose average equals it.
+   */
+  private String averageSortQuery(StringBuilder q, TimesSort timesSort, Long from, Integer pageSize) {
+    String column = AverageRecordsStore.COLUMNS[Arrays.asList(5, 12, 50, 100).indexOf(timesSort.getAverageSize())];
+    q.append("   AND ").append(column).append(" > 0");
+    q.append(" ORDER BY ").append(column).append(", ").append(DB.COL_TIMEHISTORY_TIMESTAMP);
+    q.append(" LIMIT ").append(pageSize == null ? -1 : pageSize);
+    q.append(" OFFSET ").append(from == null ? 0 : from);
+    return q.toString();
+  }
+
+  /** @param withAverages whether the query also selected the four average columns, after the others */
+  private List<SolveTime> readHistoryTimes(SolveType solveType, String query, String[] params, boolean withAverages) {
+    List<SolveTime> history = new ArrayList<SolveTime>();
+    Cursor cursor = db.rawQuery(query, params);
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-        SolveTime st = new SolveTime();
+        SolveTime st;
+        if (withAverages) {
+          SolveTimeAverages sta = new SolveTimeAverages();
+          sta.setAvgOf5(getCursorLong(cursor, 12));
+          sta.setAvgOf12(getCursorLong(cursor, 13));
+          sta.setAvgOf50(getCursorLong(cursor, 14));
+          sta.setAvgOf100(getCursorLong(cursor, 15));
+          st = sta;
+        } else {
+          st = new SolveTime();
+        }
         st.setId(cursor.getInt(0));
         st.setTime(cursor.getInt(1));
         st.setTimestamp(cursor.getLong(2));
@@ -718,6 +784,7 @@ public class ServiceProviderImpl implements ServiceProvider {
         st.setPlusTwo(cursor.getInt(5) == 1, false);
         st.setPb(cursor.getInt(6) == 1);
         st.setTimeBeforeDnf(getCursorLong(cursor, 10));
+        st.setAverageRecords(AverageRecordsStore.sizes(cursor.getInt(11), solveType.isBlind()));
         st.setSolveType(solveType);
         if (solveType.hasSteps()) {
           List<Long> stepTimes = getSolveTimeSteps(st.getId());
@@ -2124,9 +2191,40 @@ public class ServiceProviderImpl implements ServiceProvider {
     long sessionStart = getSessionStart(solveType);
     sessionDetails.setSessionStart(sessionStart);
     if (sessionStart > 0) { // if a new session was created
-      sessionDetails.setSessionTimes(getSessionTimes(solveType, from, to, null).getTimes());
+      StringBuilder q = historySelect(false);
+      q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" >= ?");
+      if (to != null) {
+        q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
+      }
+      q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC, ").append(DB.COL_ID).append(" DESC");
+      long start = (from == null) ? sessionStart : from;
+      String[] params = (to == null) ? getStringArray(solveType.getId(), start) : getStringArray(solveType.getId(), start, to);
+      sessionDetails.setSolves(readHistoryTimes(solveType, q.toString(), params, false));
     }
     return sessionDetails;
+  }
+
+  /**
+   * Returns the solves an average recorded on a solve was taken over: that solve and the ones before
+   * it in its solve type, newest first, across sessions.
+   * @param solveTime the solve the average is recorded on
+   * @param count the size of the average
+   * @return the details of those solves
+   */
+  @Override
+  public SessionDetails getAverageDetails(SolveTime solveTime, int count) {
+    SolveType solveType = solveTime.getSolveType();
+    // Solves sharing a timestamp were averaged in the order they were saved, which is their id's.
+    StringBuilder q = historySelect(false);
+    q.append("   AND (").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" < ?");
+    q.append("     OR (").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" = ? AND ").append(DB.COL_ID).append(" <= ?))");
+    q.append(" ORDER BY ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" DESC, ").append(DB.COL_ID).append(" DESC");
+    q.append(" LIMIT ").append(count);
+    SessionDetails details = new SessionDetails();
+    details.setTotalSolvesCount(getHistorySolvesCount(solveType));
+    details.setSolves(readHistoryTimes(solveType, q.toString(), getStringArray(solveType.getId(),
+        solveTime.getTimestamp(), solveTime.getTimestamp(), solveTime.getId()), false));
+    return details;
   }
 
   @Override
@@ -2402,6 +2500,7 @@ public class ServiceProviderImpl implements ServiceProvider {
 
       db.update(DB.TABLE_TIMEHISTORY, values, DB.COL_ID + " = ?", getStringArray(ct.getSolveId()));
     }
+    AverageRecordsStore.update(db, solveType.getId(), timestamp);
   }
 
   private List<CachedTime> getTimesAroundTs(long timestamp, SolveType solveType, boolean before) {

@@ -18,6 +18,8 @@
   <string name="scramble">Scramble</string>
   <string name="scrambleC">Scramble:</string>
   <string name="scramble_copied">Scramble copiado!</string>
+  <string name="copy_details">Copiar</string>
+  <string name="details_copied">Detalhes copiados!</string>
   <string name="start">Iniciar</string>
 
   <string name="add">Adicionar</string>
@@ -184,6 +186,7 @@
   <string name="generating_cube_scramble">Gerando scrambles %1$s&#8230;\n%2$d de %3$d</string>
   <string name="stopping_generation">Parando a geração&#8230;</string>
   <string name="record_label_lifetime">PB</string>
+  <string name="record_label_average">%s PB</string>
   <string name="verdict_personal_best">Recorde pessoal, %1$s a menos que %2$s</string>
   <string name="verdict_record">Melhor %1$s, %2$s a menos que %3$s</string>
   <string name="verdict_window_best">Melhor dos últimos %1$d</string>
@@ -205,6 +208,7 @@
   <string name="could_not_find_market">Não foi possível encontrar o app da loja</string>
   <string name="could_not_launch_market">Não foi possível abrir a loja</string>
   <string name="release_notes">Notas da versão</string>
+  <string name="release_notes_hide_on_update">Não mostrar após as atualizações</string>
   <string name="close">Fechar</string>
 
   <string name="edit_solve_types_dots">Editar os tipos&#8230;</string>
@@ -324,6 +328,8 @@
 
   <string name="best_times">Melhores tempos</string>
   <string name="sort_by_date">Por data</string>
+  <string name="sort_by">Ordenar por</string>
+  <string name="sort_best_average">Melhor %s</string>
 
   <string name="add_time">Adicionar um tempo</string>
   <string name="select_time_to_add">Digite um tempo a adicionar:</string>
