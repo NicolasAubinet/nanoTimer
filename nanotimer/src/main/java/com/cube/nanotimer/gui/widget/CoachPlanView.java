@@ -80,16 +80,7 @@ public class CoachPlanView {
     ((TextView) card.findViewById(R.id.tvCoachPracticeTitle)).setText(activity.getString(
         R.string.coach_practice_set,
         Utils.toSmartCubeStepLocalizedName(activity, set.getFamily(), 0)));
-    LinearLayout cases = card.findViewById(R.id.llCoachPracticeCases);
-    for (String code : set.getCases()) {
-      View cell = inflater.inflate(R.layout.coach_practice_case, cases, false);
-      LastLayerDiagram diagram = LastLayerDiagram.forCase(code);
-      LastLayerCaseView chart = cell.findViewById(R.id.vCoachPracticeChart);
-      chart.setDiagram(diagram);
-      chart.setVisibility(diagram == null ? View.INVISIBLE : View.VISIBLE);
-      ((TextView) cell.findViewById(R.id.tvCoachPracticeName)).setText(shortName(code));
-      cases.addView(cell);
-    }
+    addCaseCharts((LinearLayout) card.findViewById(R.id.llCoachPracticeCases), set.getCases());
     Button button = card.findViewById(R.id.buCoachPracticeDrill);
     button.setText(set.getCases().size() == 1 ? R.string.coach_drill_case
         : R.string.coach_drill_cases);
@@ -100,6 +91,19 @@ public class CoachPlanView {
       }
     });
     return card;
+  }
+
+  /** One small chart per case, each over its short name, sharing the row equally. */
+  private void addCaseCharts(LinearLayout row, List<String> codes) {
+    for (String code : codes) {
+      View cell = inflater.inflate(R.layout.coach_practice_case, row, false);
+      LastLayerDiagram diagram = LastLayerDiagram.forCase(code);
+      LastLayerCaseView chart = cell.findViewById(R.id.vCoachPracticeChart);
+      chart.setDiagram(diagram);
+      chart.setVisibility(diagram == null ? View.INVISIBLE : View.VISIBLE);
+      ((TextView) cell.findViewById(R.id.tvCoachPracticeName)).setText(shortName(code));
+      row.addView(cell);
+    }
   }
 
   /** A case as a cuber writes it under its chart: Rb, 21. */
@@ -126,7 +130,15 @@ public class CoachPlanView {
       }
     }
 
-    bindDrill(card, area, undealable);
+    DrillSpec drill = bindDrill(card, area, undealable);
+    // A card about a step names no case, so the cases its drill deals are shown instead.
+    if (drill != null && drill.getType() != DrillSpec.Type.CROSS && cases.getChildCount() == 0) {
+      LinearLayout row = new LinearLayout(activity);
+      row.setOrientation(LinearLayout.HORIZONTAL);
+      row.setPadding(0, activity.getResources().getDimensionPixelSize(R.dimen.space_s), 0, 0);
+      addCaseCharts(row, drill.getCases());
+      cases.addView(row);
+    }
     return card;
   }
 
@@ -356,22 +368,24 @@ public class CoachPlanView {
   /**
    * A drill written by a version newer than this app is one area that cannot be practised, not a
    * plan that cannot be read, so the spec is parsed here rather than when the plan was.
+   *
+   * @return the drill whose button is shown, or null where there is no button
    */
-  private void bindDrill(View card, FocusArea area, List<String> undealable) {
+  private DrillSpec bindDrill(View card, FocusArea area, List<String> undealable) {
     Button button = card.findViewById(R.id.buCoachAreaDrill);
     if (area.getDrill() == null) {
-      return;
+      return null;
     }
     final DrillSpec spec;
     try {
       spec = DrillSpec.fromJson(area.getDrill());
     } catch (IllegalArgumentException e) {
-      return;
+      return null;
     }
     // A button over a case nothing can deal opens a drill with nothing in it.
     for (String code : spec.getCases()) {
       if (undealable.contains(code)) {
-        return;
+        return null;
       }
     }
     button.setVisibility(View.VISIBLE);
@@ -384,6 +398,7 @@ public class CoachPlanView {
         launch(spec);
       }
     });
+    return spec;
   }
 
   /**
