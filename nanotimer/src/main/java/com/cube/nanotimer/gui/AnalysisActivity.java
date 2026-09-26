@@ -41,6 +41,7 @@ import com.cube.nanotimer.session.MethodStatistics;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.coach.CoachClient;
+import com.cube.nanotimer.util.coach.CoachPractice;
 import com.cube.nanotimer.util.coach.CoachRead;
 import com.cube.nanotimer.util.coach.CoachRefusal;
 import com.cube.nanotimer.util.coach.CoachReply;
@@ -130,6 +131,8 @@ public class AnalysisActivity extends NanoTimerActivity {
   /** Null in a build made without a coach to ask. */
   private CoachClient coachClient;
   private CoachRead.Listener readListener;
+  /** Whether this screen has asked the service for practice sets yet: once is enough. */
+  private boolean practiceAsked;
   private boolean hasPlan;
   private MethodStatistics statistics;
   private List<CaseKnowledge> known = Collections.emptyList();
@@ -710,6 +713,7 @@ public class AnalysisActivity extends NanoTimerActivity {
       public void onReadChanged(CoachRead changed) {
         showRead();
         if (changed.getState() == CoachRead.State.IDLE) {
+          practiceAsked = false; // the new plan's drilled cases leave the practice sets
           loadPlan(); // idle after reading means a plan was saved
         }
       }
@@ -732,6 +736,7 @@ public class AnalysisActivity extends NanoTimerActivity {
     boolean offered = coachClient != null && readAsSolve() && loaded && !sampling()
         && SolveTypeMethod.of(solveType) == CubeMethod.CFOP;
     findViewById(R.id.llAnalysisPlanRead).setVisibility(offered ? View.VISIBLE : View.GONE);
+    showPractice(offered);
     if (!offered) {
       return;
     }
@@ -757,6 +762,38 @@ public class AnalysisActivity extends NanoTimerActivity {
     button.setEnabled(read.getState() != CoachRead.State.READING);
     button.setText(read.getState() == CoachRead.State.FAILED ? R.string.coach_read_retry
         : hasPlan ? R.string.coach_read_again : R.string.coach_read_first);
+  }
+
+  /**
+   * The standing practice under the plan: the sets last kept at once, then asked for afresh once a
+   * screen, which costs the service no model call.
+   */
+  private void showPractice(boolean offered) {
+    if (!offered) {
+      findViewById(R.id.llAnalysisPractice).setVisibility(View.GONE);
+      return;
+    }
+    if (practiceAsked) {
+      LinearLayout sets = findViewById(R.id.llAnalysisPracticeSets);
+      findViewById(R.id.llAnalysisPractice).setVisibility(
+          sets.getChildCount() == 0 ? View.GONE : View.VISIBLE);
+      return;
+    }
+    practiceAsked = true;
+    drawPractice(CoachPractice.kept(solveType));
+    CoachPractice.refresh(coachClient, solveType, method, new CoachPractice.Listener() {
+      @Override
+      public void onPractice(List<CoachPractice.Set> sets) {
+        if (!isFinishing()) {
+          drawPractice(sets);
+        }
+      }
+    });
+  }
+
+  private void drawPractice(List<CoachPractice.Set> sets) {
+    findViewById(R.id.llAnalysisPractice).setVisibility(sets.isEmpty() ? View.GONE : View.VISIBLE);
+    planView.setPractice((LinearLayout) findViewById(R.id.llAnalysisPracticeSets), sets);
   }
 
   /** What went wrong, grouped by what the reader can do about it rather than by what broke. */

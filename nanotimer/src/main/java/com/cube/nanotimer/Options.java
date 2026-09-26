@@ -76,6 +76,7 @@ public enum Options {
   public static final String DRILL_CHOICE_KEY_PREFIX = "drill_choice_";
   private static final String ANALYSIS_WINDOW_KEY = "analysisWindow";
   private static final String COACH_PENDING_KEY_PREFIX = "coach_pending_";
+  private static final String COACH_PRACTICE_KEY_PREFIX = "coach_practice_";
   public static final String CASE_KNOWLEDGE_RULE_KEY = "case_knowledge_rule";
   public static final String CFOP_READING_KEY = "cfop_reading_version";
   public static final String DRILL_CASES_KEY_PREFIX = "drill_cases_";
@@ -319,6 +320,15 @@ public enum Options {
       editor.putString(COACH_PENDING_KEY_PREFIX + solveTypeId, requestBody);
     }
     editor.commit();
+  }
+
+  /** The practice sets the coach last answered with for a solve type, as it sent them, or null. */
+  public String getCoachPractice(int solveTypeId) {
+    return sharedPreferences.getString(COACH_PRACTICE_KEY_PREFIX + solveTypeId, null);
+  }
+
+  public void setCoachPractice(int solveTypeId, String reply) {
+    sharedPreferences.edit().putString(COACH_PRACTICE_KEY_PREFIX + solveTypeId, reply).apply();
   }
 
   /**

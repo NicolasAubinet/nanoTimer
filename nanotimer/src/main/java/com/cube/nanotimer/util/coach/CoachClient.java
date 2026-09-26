@@ -27,11 +27,17 @@ public final class CoachClient {
   // A model call takes tens of seconds, and the service answers only once it is written.
   private static final int READ_TIMEOUT_MS = 120_000;
 
+  // No model behind it, so it answers at once or not at all.
+  private static final int PRACTICE_READ_TIMEOUT_MS = 15_000;
+
   private final String planUrl;
+  private final String practiceUrl;
   private final String token;
 
   CoachClient(String baseUrl, String token) {
-    this.planUrl = baseUrl.replaceAll("/+$", "") + "/v1/plan";
+    String base = baseUrl.replaceAll("/+$", "");
+    this.planUrl = base + "/v1/plan";
+    this.practiceUrl = base + "/v1/practice";
     this.token = token;
   }
 
@@ -49,12 +55,45 @@ public final class CoachClient {
    *     repeated question by the payload's exact text
    */
   public CoachReply requestPlan(String requestBody) {
+    try {
+      Answer answer = post(planUrl, requestBody, READ_TIMEOUT_MS);
+      return answer.body == null ? CoachReply.unreadable()
+          : CoachReply.parse(answer.status, answer.body);
+    } catch (IOException e) {
+      return CoachReply.unreachable();
+    }
+  }
+
+  /**
+   * The standing practice sets for a payload, as the service sent them, or null for any failure:
+   * the section keeps what it last had. Blocks, like {@link #requestPlan}.
+   */
+  public String requestPractice(String requestBody) {
+    try {
+      Answer answer = post(practiceUrl, requestBody, PRACTICE_READ_TIMEOUT_MS);
+      return answer.status == 200 ? answer.body : null;
+    } catch (IOException e) {
+      return null;
+    }
+  }
+
+  private static final class Answer {
+    final int status;
+    final String body;
+
+    Answer(int status, String body) {
+      this.status = status;
+      this.body = body;
+    }
+  }
+
+  private Answer post(String url, String requestBody, int readTimeoutMs) throws IOException {
     HttpURLConnection connection = null;
     try {
       byte[] body = requestBody.getBytes(StandardCharsets.UTF_8);
-      connection = (HttpURLConnection) new URL(planUrl).openConnection();
+      connection = (HttpURLConnection) new URL(url).openConnection();
       connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
-      connection.setReadTimeout(READ_TIMEOUT_MS);
+      connection.setReadTimeout(readTimeoutMs);
       connection.setRequestMethod("POST");
       connection.setDoOutput(true);
       connection.setFixedLengthStreamingMode(body.length);
@@ -65,9 +104,7 @@ public final class CoachClient {
       }
       int status = connection.getResponseCode();
       InputStream in = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
-      return in == null ? CoachReply.unreadable() : CoachReply.parse(status, read(in));
-    } catch (IOException e) {
-      return CoachReply.unreachable();
+      return new Answer(status, in == null ? null : read(in));
     } finally {
       if (connection != null) {
         connection.disconnect();

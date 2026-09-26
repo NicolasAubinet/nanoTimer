@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A case in a practice set: its chart over its name. Five share the row equally. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="0dp"
+   android:layout_height="wrap_content"
+   android:layout_weight="1"
+   android:gravity="center_horizontal"
+   android:orientation="vertical">
+
+  <com.cube.nanotimer.gui.widget.LastLayerCaseView
+     android:id="@+id/vCoachPracticeChart"
+     android:layout_width="38dp"
+     android:layout_height="38dp"/>
+
+  <TextView
+     android:id="@+id/tvCoachPracticeName"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="4dp"
+     android:textColor="@color/secondary_text"
+     android:textSize="12.5sp"/>
+
+</LinearLayout>

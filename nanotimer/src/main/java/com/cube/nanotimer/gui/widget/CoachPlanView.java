@@ -28,6 +28,7 @@ import com.cube.nanotimer.gui.widget.dialog.CaseAlgorithmsDialog;
 import com.cube.nanotimer.smartcube.step.CaseAlgorithms;
 import com.cube.nanotimer.smartcube.step.LastLayerDiagram;
 import com.cube.nanotimer.util.FormatterService;
+import com.cube.nanotimer.util.coach.CoachPractice;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
 
@@ -64,6 +65,47 @@ public class CoachPlanView {
     for (FocusArea area : stored.getPlan().getFocus()) {
       container.addView(areaCard(area, stored.getPayload(), undealable));
     }
+  }
+
+  /** The standing practice sets, one outlined card per family, into their own container. */
+  public void setPractice(LinearLayout into, List<CoachPractice.Set> sets) {
+    into.removeAllViews();
+    for (CoachPractice.Set set : sets) {
+      into.addView(practiceCard(into, set));
+    }
+  }
+
+  private View practiceCard(LinearLayout parent, final CoachPractice.Set set) {
+    View card = inflater.inflate(R.layout.coach_practice_set, parent, false);
+    ((TextView) card.findViewById(R.id.tvCoachPracticeTitle)).setText(activity.getString(
+        R.string.coach_practice_set,
+        Utils.toSmartCubeStepLocalizedName(activity, set.getFamily(), 0)));
+    LinearLayout cases = card.findViewById(R.id.llCoachPracticeCases);
+    for (String code : set.getCases()) {
+      View cell = inflater.inflate(R.layout.coach_practice_case, cases, false);
+      LastLayerDiagram diagram = LastLayerDiagram.forCase(code);
+      LastLayerCaseView chart = cell.findViewById(R.id.vCoachPracticeChart);
+      chart.setDiagram(diagram);
+      chart.setVisibility(diagram == null ? View.INVISIBLE : View.VISIBLE);
+      ((TextView) cell.findViewById(R.id.tvCoachPracticeName)).setText(shortName(code));
+      cases.addView(cell);
+    }
+    Button button = card.findViewById(R.id.buCoachPracticeDrill);
+    button.setText(set.getCases().size() == 1 ? R.string.coach_drill_case
+        : R.string.coach_drill_cases);
+    button.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        launch(set.getDrill());
+      }
+    });
+    return card;
+  }
+
+  /** A case as a cuber writes it under its chart: Rb, 21. */
+  private static String shortName(String code) {
+    String name = code.substring(code.indexOf('_') + 1);
+    return name.isEmpty() ? name : name.substring(0, 1).toUpperCase(Locale.US) + name.substring(1);
   }
 
   private View areaCard(FocusArea area, CoachPayload payload, List<String> undealable) {

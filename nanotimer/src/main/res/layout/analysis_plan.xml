@@ -146,4 +146,46 @@
        style="@style/DialogActionButton"/>
   </LinearLayout>
 
+  <!-- Standing practice, under whatever the plan says and apart from it: each family's costliest
+       cases, refreshed from the service whenever the tab opens. Gone in a build with no coach. -->
+  <LinearLayout
+     android:id="@+id/llAnalysisPractice"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="28dp"
+     android:orientation="vertical"
+     android:visibility="gone">
+
+    <View
+       android:layout_width="match_parent"
+       android:layout_height="1dp"
+       android:background="@color/hero_divider"/>
+
+    <TextView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="16dp"
+       android:fontFamily="@font/roboto_medium"
+       android:letterSpacing="0.08"
+       android:text="@string/coach_practice_title"
+       android:textAllCaps="true"
+       android:textColor="@color/secondary_text"
+       android:textSize="12.5sp"/>
+
+    <TextView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="4dp"
+       android:lineSpacingMultiplier="1.2"
+       android:text="@string/coach_practice_body"
+       android:textColor="@color/secondary_text"
+       android:textSize="13.5sp"/>
+
+    <LinearLayout
+       android:id="@+id/llAnalysisPracticeSets"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="vertical"/>
+  </LinearLayout>
+
 </LinearLayout>

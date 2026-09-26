@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One family's standing practice: its costliest cases as small charts, and the drill. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:layout_marginTop="@dimen/space_m"
+   android:background="@drawable/coach_practice_card"
+   android:orientation="vertical"
+   android:padding="16dp">
+
+  <TextView
+     android:id="@+id/tvCoachPracticeTitle"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:fontFamily="@font/roboto_medium"
+     android:textColor="@color/white"
+     android:textSize="16sp"/>
+
+  <!-- One coach_practice_case per case, costliest first. -->
+  <LinearLayout
+     android:id="@+id/llCoachPracticeCases"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="@dimen/space_s"
+     android:orientation="horizontal"/>
+
+  <androidx.appcompat.widget.AppCompatButton
+     android:id="@+id/buCoachPracticeDrill"
+     android:layout_marginTop="@dimen/space_s"
+     style="@style/DialogActionButton"/>
+
+</LinearLayout>
