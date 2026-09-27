@@ -1273,8 +1273,15 @@
   <string name="analysis_help_standard_body">La dernière façon dont vous avez tourné chaque cas de l\'ensemble : avec l\'un des algorithmes listés pour lui, ce qui est considéré comme standard.</string>
   <string name="analysis_help_extra">Coups en trop</string>
   <string name="analysis_help_extra_body">Les coups que ces cas vous ont coûtés par rapport à l\'algorithme standard le plus court, additionnés.</string>
-  <string name="analysis_help_plan_title">Un plan</string>
-  <string name="analysis_help_plan_body">Rien ici n\'est mesuré. Un plan est écrit à partir des chiffres de Résolution et Cas, et ceux-là restent gratuits.</string>
+  <string name="analysis_help_plan_title">Votre plan</string>
+  <string name="analysis_help_plan_body">Les plans font partie du coach Cubench, une fonction payante. Le coach lit vos résolutions au smart cube, trouve ce qui vous coûte le plus de temps et en fait un plan pour la semaine, avec des drills pour vos points faibles.</string>
+  <string name="analysis_help_plan_cards">Les cartes</string>
+  <string name="analysis_help_plan_cards_body">Jusqu\'à trois points à travailler, le plus rentable en premier. Chacune dit ce qui se passe, pourquoi, et une chose à faire.</string>
+  <string name="analysis_help_plan_drills">Drills</string>
+  <string name="analysis_help_plan_drills_body">Le bouton d\'une carte ouvre un drill fait pour elle. Chaque cas quitte le drill une fois son objectif battu quelques fois.</string>
+  <string name="analysis_help_plan_practice_body">Sous le plan, les cas qui vous coûtent le plus, prêts à travailler entre deux plans.</string>
+  <string name="analysis_help_plan_new">Un nouveau plan</string>
+  <string name="analysis_help_plan_new_body">Écrit à partir de vos 100 dernières résolutions au smart cube, il en faut donc autant d\'abord. Demandez-en un nouveau après une semaine d\'entraînement.</string>
   <string name="analysis_help_cases_title">Cas par cas</string>
   <string name="analysis_help_cases_body">Les cas de l\'étape choisie, sur la fenêtre indiquée en haut.</string>
   <string name="analysis_help_standing">Où en est un cas</string>

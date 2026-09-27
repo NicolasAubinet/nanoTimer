@@ -1272,8 +1272,15 @@
   <string name="analysis_help_standard_body">Cómo giraste por última vez cada caso del conjunto: con uno de los algoritmos que tiene listados, lo que se considera estándar.</string>
   <string name="analysis_help_extra">Movimientos de más</string>
   <string name="analysis_help_extra_body">Los giros que esos casos te han costado sobre el algoritmo estándar más corto, sumados.</string>
-  <string name="analysis_help_plan_title">Un plan</string>
-  <string name="analysis_help_plan_body">Aquí no se mide nada. Un plan se escribe a partir de las cifras de Resolución y Casos, y esas siguen siendo gratis.</string>
+  <string name="analysis_help_plan_title">Tu plan</string>
+  <string name="analysis_help_plan_body">Los planes son parte del coach de Cubench, una función de pago. El coach lee tus resoluciones con smart cube, encuentra lo que más tiempo te cuesta y lo convierte en un plan para la semana, con drills para tus puntos débiles.</string>
+  <string name="analysis_help_plan_cards">Las tarjetas</string>
+  <string name="analysis_help_plan_cards_body">Hasta tres cosas que trabajar, la que más vale primero. Cada una dice qué pasa, por qué y una cosa que hacer.</string>
+  <string name="analysis_help_plan_drills">Drills</string>
+  <string name="analysis_help_plan_drills_body">El botón de una tarjeta abre un drill hecho para ella. Cada caso sale del drill cuando has batido su objetivo unas cuantas veces.</string>
+  <string name="analysis_help_plan_practice_body">Debajo del plan, los casos que más te cuestan, listos para practicar entre planes.</string>
+  <string name="analysis_help_plan_new">Un plan nuevo</string>
+  <string name="analysis_help_plan_new_body">Se escribe a partir de tus últimas 100 resoluciones con smart cube, así que primero necesita esas. Pide uno nuevo tras una semana de práctica.</string>
   <string name="analysis_help_cases_title">Caso por caso</string>
   <string name="analysis_help_cases_body">Los casos del paso elegido, sobre la ventana indicada arriba.</string>
   <string name="analysis_help_standing">Cómo está un caso</string>

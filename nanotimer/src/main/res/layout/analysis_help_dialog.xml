@@ -184,6 +184,26 @@
            android:textColor="@color/secondary_text"
            android:textSize="13.5sp"/>
 
+        <LinearLayout style="@style/HelpTermRow">
+          <TextView android:text="@string/analysis_help_plan_cards" style="@style/HelpTermName"/>
+          <TextView android:text="@string/analysis_help_plan_cards_body" style="@style/HelpTermText"/>
+        </LinearLayout>
+
+        <LinearLayout style="@style/HelpTermRow">
+          <TextView android:text="@string/analysis_help_plan_drills" style="@style/HelpTermName"/>
+          <TextView android:text="@string/analysis_help_plan_drills_body" style="@style/HelpTermText"/>
+        </LinearLayout>
+
+        <LinearLayout style="@style/HelpTermRow">
+          <TextView android:text="@string/coach_practice_title" style="@style/HelpTermName"/>
+          <TextView android:text="@string/analysis_help_plan_practice_body" style="@style/HelpTermText"/>
+        </LinearLayout>
+
+        <LinearLayout style="@style/HelpTermRow">
+          <TextView android:text="@string/analysis_help_plan_new" style="@style/HelpTermName"/>
+          <TextView android:text="@string/analysis_help_plan_new_body" style="@style/HelpTermText"/>
+        </LinearLayout>
+
       </LinearLayout>
 
     </LinearLayout>
