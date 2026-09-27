@@ -9,7 +9,10 @@ import com.cube.nanotimer.smartcube.cube.CubieCube;
 import com.cube.nanotimer.smartcube.model.CubeState;
 import com.cube.nanotimer.smartcube.model.Face;
 import com.cube.nanotimer.step.LastLayerAlgorithms;
+import com.cube.nanotimer.step.LastLayerOdds;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import org.junit.Test;
 
@@ -152,6 +155,38 @@ public class LastLayerCasesTest {
     }
     assertEquals(216, states);
     assertEquals(58, named.size()); // the 57 cases, and the skip
+  }
+
+  /** The coach weighs a case by how often it is dealt, from a coremodel table; recount it here. */
+  @Test
+  public void everyCaseIsDealtAsOftenAsTheOddsTableSays() {
+    Map<String, Integer> counted = new HashMap<String, Integer>();
+    for (int[] corners : permutations()) {
+      for (int[] edges : permutations()) {
+        if (isOdd(corners) == isOdd(edges)) {
+          String state = permutationState(corners, edges);
+          count(counted, "pll_" + LastLayerCases.permutation(state, CROSS));
+        }
+      }
+    }
+    for (int[] corners : twists(3)) {
+      for (int[] edges : twists(2)) {
+        if (sum(corners) % 3 == 0 && sum(edges) % 2 == 0) {
+          String state = orientationState(corners, edges);
+          count(counted, "oll_" + LastLayerCases.orientation(state, CROSS));
+        }
+      }
+    }
+    for (String code : LastLayerAlgorithms.caseCodes()) {
+      assertEquals(code, (int) counted.get(code), LastLayerOdds.states(code));
+    }
+    assertEquals(4, (int) counted.get("pll_" + LastLayerCases.SKIP));
+    assertEquals(1, (int) counted.get("oll_" + LastLayerCases.SKIP));
+  }
+
+  private static void count(Map<String, Integer> counted, String code) {
+    Integer seen = counted.get(code);
+    counted.put(code, seen == null ? 1 : seen + 1);
   }
 
   @Test
