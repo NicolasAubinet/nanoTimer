@@ -25,12 +25,15 @@ import com.cube.nanotimer.Options;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.cube.SmartCubeGate;
+import com.cube.nanotimer.cube.SolveTypeMethod;
+import com.cube.nanotimer.vo.BlindMethod;
 import com.cube.nanotimer.vo.CubeMethod;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ScrambleType;
 import com.cube.nanotimer.vo.TimerQuickAction;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -42,6 +45,8 @@ public class SolveTypeAddDialog extends ConfirmDialog {
   public static final String KEY_QUICK_ACTION = "key_quickAction";
   /** The chosen method's code, empty to follow the preferred method. A blind type always follows. */
   public static final String KEY_METHOD = "key_method";
+  /** The chosen blind method's code, empty to follow the preferred one. Only a blind type has one. */
+  public static final String KEY_BLIND_METHOD = "key_blindMethod";
 
   private static final String ARG_FIELD_CREATOR = "fieldCreator";
   private static final String ARG_CUBE_TYPE = "cubeType";
@@ -53,6 +58,7 @@ public class SolveTypeAddDialog extends ConfirmDialog {
   private static final String ARG_EDIT_SCRAMBLE_NAME = "editScrambleName";
   private static final String ARG_EDIT_QUICK_ACTION = "editQuickAction";
   private static final String ARG_EDIT_METHOD = "editMethod";
+  private static final String ARG_EDIT_BLIND_METHOD = "editBlindMethod";
 
   /**
    * The spinner's choices: following the preferred method first, then each sighted method that can
@@ -60,6 +66,9 @@ public class SolveTypeAddDialog extends ConfirmDialog {
    */
   private static final CubeMethod[] METHODS =
       {null, CubeMethod.CFOP, CubeMethod.ROUX, CubeMethod.LBL};
+  /** The same for a blind type, which is solved by how it shoots rather than by a sighted method. */
+  private static final BlindMethod[] BLIND_METHODS =
+      {null, BlindMethod.THREE_STYLE, BlindMethod.OP_M2};
 
   // Offered in the order the timer menu lists them, with the opt-out last.
   private static final TimerQuickAction[] QUICK_ACTIONS = {
@@ -72,6 +81,7 @@ public class SolveTypeAddDialog extends ConfirmDialog {
   private Spinner spScrambleType;
   private Spinner spQuickAction;
   private Spinner spMethod;
+  private Spinner spBlindMethod;
   private SwitchCompat swBlind;
   private SwitchCompat swInspection;
   // What the inspection switch held before blind mode forced it off, to give back when blind is unticked.
@@ -97,7 +107,8 @@ public class SolveTypeAddDialog extends ConfirmDialog {
   // scrambleTypeName is the name of the solve type's scramble type, or null for the default scramble.
   public static <T extends FieldCreator & FieldEditor> SolveTypeAddDialog newInstanceForEdit(
       T fieldEditor, CubeType cubeType, int position, String name, boolean blind, boolean inspection,
-      String scrambleTypeName, TimerQuickAction quickAction, CubeMethod method) {
+      String scrambleTypeName, TimerQuickAction quickAction, CubeMethod method,
+      BlindMethod blindMethod) {
     SolveTypeAddDialog frag = new SolveTypeAddDialog();
     Bundle args = new Bundle();
     args.putSerializable(ARG_FIELD_CREATOR, fieldEditor);
@@ -110,6 +121,7 @@ public class SolveTypeAddDialog extends ConfirmDialog {
     args.putString(ARG_EDIT_SCRAMBLE_NAME, scrambleTypeName);
     args.putInt(ARG_EDIT_QUICK_ACTION, quickAction.getId());
     args.putString(ARG_EDIT_METHOD, method == null ? "" : method.getCode());
+    args.putString(ARG_EDIT_BLIND_METHOD, blindMethod == null ? "" : blindMethod.getCode());
     frag.setArguments(args);
     return frag;
   }
@@ -204,10 +216,15 @@ public class SolveTypeAddDialog extends ConfirmDialog {
       swInspection.setChecked(getArguments().getBoolean(ARG_EDIT_INSPECTION, true));
       selectQuickAction(TimerQuickAction.fromId(
           getArguments().getInt(ARG_EDIT_QUICK_ACTION, TimerQuickAction.getDefault(false).getId())));
-      selectMethod(CubeMethod.fromCode(getArguments().getString(ARG_EDIT_METHOD, "")));
+      // A blind type follows too: the blind flag settles its method, and its spinner is hidden.
+      select(spMethod, METHODS, CubeMethod.fromCode(getArguments().getString(ARG_EDIT_METHOD, "")));
+      select(spBlindMethod, BLIND_METHODS,
+          BlindMethod.fromCode(getArguments().getString(ARG_EDIT_BLIND_METHOD, "")));
     } else {
       selectQuickAction(TimerQuickAction.getDefault(false));
-      selectMethod(null); // a new type follows the preferred method rather than freezing a copy of it
+      // A new type follows the preferred method rather than freezing a copy of it.
+      select(spMethod, METHODS, null);
+      select(spBlindMethod, BLIND_METHODS, null);
     }
     refreshInspectionEnabled();
     refreshMethodEnabled();
@@ -272,14 +289,13 @@ public class SolveTypeAddDialog extends ConfirmDialog {
 
   /**
    * A blindfolded solve is not a sighted method read through a blindfold — it is memorised first and
-   * its steps are the piece types — so the blind switch answers this and the spinner gives way to
-   * what it answered, rather than sitting there greyed out over a choice that no longer applies.
+   * its steps are the piece types — so the blind switch swaps the sighted methods for the blind
+   * ones, rather than leaving a choice that no longer applies.
    */
   private void refreshMethodEnabled() {
     boolean sighted = !swBlind.isChecked();
     spMethod.setVisibility(sighted ? View.VISIBLE : View.GONE);
-    view.findViewById(R.id.tvMethodBlind).setVisibility(sighted ? View.GONE : View.VISIBLE);
-    view.findViewById(R.id.tvMethodLabel).setAlpha(sighted ? 1f : 0.5f);
+    spBlindMethod.setVisibility(sighted ? View.GONE : View.VISIBLE);
   }
 
   private void initMethodSpinner() {
@@ -289,12 +305,20 @@ public class SolveTypeAddDialog extends ConfirmDialog {
         .setVisibility(SmartCubeGate.ENABLED ? View.VISIBLE : View.GONE);
     spMethod = (Spinner) view.findViewById(R.id.spMethod);
     List<CharSequence> names = new ArrayList<>();
+    int preferred = Utils.getMethodLabel(Options.INSTANCE.getPreferredMethod());
     for (CubeMethod method : METHODS) {
-      names.add(getMethodName(method));
+      names.add(choiceName(method == null ? 0 : Utils.getMethodLabel(method), preferred));
     }
-    ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, names);
-    adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-    spMethod.setAdapter(adapter);
+    fill(spMethod, names);
+
+    spBlindMethod = (Spinner) view.findViewById(R.id.spBlindMethod);
+    List<CharSequence> blindNames = new ArrayList<>();
+    int preferredBlind = SolveTypeMethod.nameOf(Options.INSTANCE.getPreferredBlindMethod());
+    for (BlindMethod method : BLIND_METHODS) {
+      int label = method == null ? 0 : SolveTypeMethod.nameOf(method);
+      blindNames.add(choiceName(label, preferredBlind));
+    }
+    fill(spBlindMethod, blindNames);
 
     view.findViewById(R.id.buMethodInfo).setOnClickListener(new OnClickListener() {
       @Override
@@ -304,31 +328,28 @@ public class SolveTypeAddDialog extends ConfirmDialog {
     });
   }
 
-  /** The follower names the method it currently stands for, that choice being invisible otherwise. */
-  private CharSequence getMethodName(CubeMethod method) {
-    if (method != null) {
-      return getString(Utils.getMethodLabel(method));
-    }
-    return getString(R.string.method_default,
-        getString(Utils.getMethodLabel(Options.INSTANCE.getPreferredMethod())));
+  private void fill(Spinner spinner, List<CharSequence> names) {
+    ArrayAdapter<CharSequence> adapter =
+        new ArrayAdapter<>(getContext(), R.layout.spinner_item, names);
+    adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+    spinner.setAdapter(adapter);
+  }
+
+  /** The follower (label 0) names the method it stands for, which is invisible otherwise. */
+  private CharSequence choiceName(int label, int preferredLabel) {
+    return label != 0 ? getString(label)
+        : getString(R.string.method_default, getString(preferredLabel));
   }
 
   /** Null when the type follows the preferred method rather than overriding it. */
-  private CubeMethod getSelectedMethod() {
-    int position = spMethod.getSelectedItemPosition();
-    return (position >= 0 && position < METHODS.length) ? METHODS[position] : METHODS[0];
+  private static <T> T selected(Spinner spinner, T[] choices) {
+    int position = spinner.getSelectedItemPosition();
+    return (position >= 0 && position < choices.length) ? choices[position] : choices[0];
   }
 
-  /** A blind type follows too: its method is settled by the blind flag, and its spinner is hidden. */
-  private void selectMethod(CubeMethod method) {
-    CubeMethod wanted = (method == CubeMethod.BLIND) ? null : method;
-    for (int i = 0; i < METHODS.length; i++) {
-      if (METHODS[i] == wanted) {
-        spMethod.setSelection(i);
-        return;
-      }
-    }
-    spMethod.setSelection(0);
+  /** Anything not offered selects the follower. */
+  private static <T> void select(Spinner spinner, T[] choices, T wanted) {
+    spinner.setSelection(Math.max(Arrays.asList(choices).indexOf(wanted), 0));
   }
 
   private void initQuickActionSpinner(CubeType cubeType) {
@@ -437,8 +458,11 @@ public class SolveTypeAddDialog extends ConfirmDialog {
     props.put(KEY_QUICK_ACTION, isDefault ? "" : String.valueOf(quickAction.getId()));
     // A blind type is read as blind whatever the spinner still holds, so it stores no sighted
     // override: a type ticked blind would otherwise keep one nothing can act on.
-    CubeMethod method = swBlind.isChecked() ? null : getSelectedMethod();
+    CubeMethod method = swBlind.isChecked() ? null : selected(spMethod, METHODS);
     props.put(KEY_METHOD, method == null ? "" : method.getCode());
+    // And a sighted type stores no blind method, for the same reason.
+    BlindMethod blindMethod = swBlind.isChecked() ? selected(spBlindMethod, BLIND_METHODS) : null;
+    props.put(KEY_BLIND_METHOD, blindMethod == null ? "" : blindMethod.getCode());
 
     boolean confirmed;
     if (isEditMode()) {

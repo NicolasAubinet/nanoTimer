@@ -216,7 +216,7 @@ public final class CaseExecutions {
       return false;
     }
     StoredSolveReplay.Result reread = StoredSolveReplay.reinterpret(solve.getScramble(),
-        solve.getSmartcubeMoves(), method);
+        solve.getSmartcubeMoves(), method, SolveTypeMethod.blindMethodOf(solve.getSolveType()));
     if (reread == null) {
       return false;
     }

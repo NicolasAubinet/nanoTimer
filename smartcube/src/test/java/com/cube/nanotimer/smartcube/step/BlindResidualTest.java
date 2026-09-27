@@ -60,6 +60,23 @@ public class BlindResidualTest {
     assertEquals("UFR-UFL + UR-UF", residual.getPieces());
   }
 
+  @Test
+  public void twoEdgePairsReadAsSwapsWithTheBufferFirst() {
+    String left = swap(swap(Cubies.SOLVED, UR, UF), UL, UB);
+    assertEquals(BlindResidual.Shape.SWAPS, read(left).getShape());
+    BlindResidual residual = BlindResidual.of(left, targets, UB, BlindTargets.NO_BUFFER, false);
+    assertEquals("UB-UL + UR-UF", residual.getPieces());
+  }
+
+  /** With OP/M2 a missed swap leaves the parity's shape, so it is not called a parity. */
+  @Test
+  public void twoOfEachSwappedReadAsSwapsForOpM2() {
+    String left = swap(swap(Cubies.SOLVED, UR, UF), URF, UBL);
+    BlindResidual residual = BlindResidual.of(left, targets, UR, UBL, true);
+    assertEquals(BlindResidual.Shape.SWAPS, residual.getShape());
+    assertEquals("UBL-UFR + UR-UF", residual.getPieces());
+  }
+
   /** A cycle and an orientation are two mistakes, and the cycle is still the cycle it was. */
   @Test
   public void aCycleWithAnExtraTurnedPieceKeepsItsShapeAndSaysTheTurnedPieceApart() {
@@ -134,14 +151,14 @@ public class BlindResidualTest {
     String left = cycle(Cubies.SOLVED, UR, UF, UL);
     assertEquals("UR-UL-UF", read(left).getPieces()); // no buffer settled: the slot order stands
     assertEquals("UF-UR-UL",
-        BlindResidual.of(left, targets, UF, BlindTargets.NO_BUFFER).getPieces());
+        BlindResidual.of(left, targets, UF, BlindTargets.NO_BUFFER, false).getPieces());
 
     // A buffer of the other type is not this cycle's, and says nothing about where it opens.
     String corners = cycle(Cubies.SOLVED, URF, UFL, UBL);
     assertEquals("UFR-UBL-UFL",
-        BlindResidual.of(corners, targets, UF, BlindTargets.NO_BUFFER).getPieces());
+        BlindResidual.of(corners, targets, UF, BlindTargets.NO_BUFFER, false).getPieces());
     assertEquals("UBL-UFL-UFR",
-        BlindResidual.of(corners, targets, BlindTargets.NO_BUFFER, UBL).getPieces());
+        BlindResidual.of(corners, targets, BlindTargets.NO_BUFFER, UBL, false).getPieces());
   }
 
   /** The pieces are said in the grip the solve was held in, as every other blind name is. */
@@ -159,7 +176,8 @@ public class BlindResidualTest {
   }
 
   private static BlindResidual read(String facelets, BlindTargets targets) {
-    return BlindResidual.of(facelets, targets, BlindTargets.NO_BUFFER, BlindTargets.NO_BUFFER);
+    return BlindResidual.of(facelets, targets, BlindTargets.NO_BUFFER, BlindTargets.NO_BUFFER,
+        false);
   }
 
   /** The piece at {@code a} moved to {@code b}, the one at {@code b} to {@code c}, and so round. */

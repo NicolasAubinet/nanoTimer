@@ -59,8 +59,16 @@ import java.util.Set;
  * move that is <em>wide</em>, whose swing the gyro has already reported, and the scripted wide
  * drill stores a grip its own ground truth disowns. Spelling a sighted solve from the grip turns
  * every letter of it a quarter turn.
+ *
+ * <p><b>A slice turned slowly is still one slice.</b> Its halves can come too far apart for the gyro
+ * to vouch for it, and the core's spin is then written between them as a regrip. A blind solver does
+ * not regrip mid-slice by exactly that slice's spin, so the three read as the slice (an M2 seen
+ * split over 343 ms).
  */
 public final class SolveSolution {
+
+  /** How far apart a straddled slice's halves may be: the one seen split was 343 ms. */
+  private static final long STRADDLED_SLICE_MS = 1000;
 
   /** Between the parts of a step, wherever they are shown as one run of moves. */
   public static final String GROUP_SEPARATOR = " · ";
@@ -328,7 +336,11 @@ public final class SolveSolution {
       } else {
         boolean sensed = sliceCoreSpin(stored, i) != null
             && (choices == null || choices.foldsSlice(move.getOffsetMs()));
-        int far = sensed ? i + 1 : foldedFar(stored, i, choices);
+        int straddled = sensed || heldIn == null ? -1 : straddledSlice(stored, i);
+        if (straddled > i && choices != null && !choices.foldsSlice(move.getOffsetMs())) {
+          straddled = -1;
+        }
+        int far = sensed ? i + 1 : straddled > i ? straddled : foldedFar(stored, i, choices);
         if (far > i) {
           // An opposite-face pair the gyro vouches for, or one the name check does: the solver did
           // one M/E/S, named in their frame. The spin is the same physical event as the move, not a
@@ -454,10 +466,11 @@ public final class SolveSolution {
       String notation = move.getNotation();
       if (!SolveMovesFormat.isRotation(notation)) {
         Move spin = sliceCoreSpin(stored, i);
-        if (spin != null) {
-          steps.add(FrameStep.slice(CubeRotation.byNotation(spin.getNotation()),
-              move.getOffsetMs()));
-          i += 2;
+        int straddled = spin == null ? straddledSlice(stored, i) : -1;
+        if (spin != null || straddled > i) {
+          String turned = spin != null ? spin.getNotation() : stored.get(i + 1).getNotation();
+          steps.add(FrameStep.slice(CubeRotation.byNotation(turned), move.getOffsetMs()));
+          i = spin != null ? i + 2 : straddled;
         }
         continue;
       }
@@ -556,6 +569,19 @@ public final class SolveSolution {
         || !SolveMovesFormat.isRotation(stored.get(i + 3).getNotation())
         || stored.get(i + 3).getOffsetMs() != spin.getOffsetMs();
     return lone ? spin : null; // part of a bigger reorientation: leave it to the rotation path
+  }
+
+  /** The far face of a slow slice whose core spin was logged between its halves, or -1. */
+  static int straddledSlice(List<Move> stored, int i) {
+    if (i + 2 >= stored.size()) {
+      return -1;
+    }
+    Move near = stored.get(i);
+    Move spin = stored.get(i + 1);
+    Move far = stored.get(i + 2);
+    String[] slice = Slices.forPair(near.getNotation(), far.getNotation());
+    return slice != null && spin.getNotation().equals(slice[1])
+        && far.getOffsetMs() - near.getOffsetMs() <= STRADDLED_SLICE_MS ? i + 2 : -1;
   }
 
   /**

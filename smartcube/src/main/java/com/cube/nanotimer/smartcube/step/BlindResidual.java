@@ -1,6 +1,7 @@
 package com.cube.nanotimer.smartcube.step;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,6 +41,11 @@ public final class BlindResidual {
     CORNER_CYCLE,
     /** Two corners and two edges swapped: the parity, not done or not done right. */
     PARITY,
+    /**
+     * Two pairs swapped, of one type, or of both types when the solver uses OP/M2 (there a missed
+     * swap and a missed parity leave the same state).
+     */
+    SWAPS,
     /** Edges turned where they stand. */
     FLIPPED,
     /** Corners turned where they stand. */
@@ -93,8 +99,10 @@ public final class BlindResidual {
    * What was left in the state the solve stopped at, or null when there is no state to read. The
    * buffers are the pieces the solve was shooting each type from, so a cycle can be opened where the
    * solver's memo would open it; {@link BlindTargets#NO_BUFFER} where the solve never settled one.
+   * {@code swaps} when the solver uses OP/M2.
    */
-  static BlindResidual of(String facelets, BlindTargets targets, int edgeBuffer, int cornerBuffer) {
+  static BlindResidual of(String facelets, BlindTargets targets, int edgeBuffer, int cornerBuffer,
+      boolean swaps) {
     if (facelets == null) {
       return null;
     }
@@ -127,9 +135,15 @@ public final class BlindResidual {
       Shape shape = edges ? Shape.EDGE_CYCLE : Shape.CORNER_CYCLE;
       return new BlindResidual(shape, shotToFix(steady, cycle, targets), alsoTurned, count);
     }
-    String parity = parityOf(steady, misplaced, targets);
-    if (parity != null) {
-      return new BlindResidual(Shape.PARITY, parity, alsoTurned, count);
+    List<List<Integer>> pairs = BlindSwaps.exchanges(Cubies.SOLVED, steady, misplaced);
+    if (pairs != null) {
+      boolean oneType = Cubies.isEdge(pairs.get(0).get(0)) == Cubies.isEdge(pairs.get(1).get(0));
+      if (!oneType && !swaps) {
+        String parity = said(targets, pairs, BlindTargets.NO_BUFFER, BlindTargets.NO_BUFFER);
+        return new BlindResidual(Shape.PARITY, parity, alsoTurned, count);
+      }
+      return new BlindResidual(Shape.SWAPS, said(targets, pairs, edgeBuffer, cornerBuffer),
+          alsoTurned, count);
     }
     return new BlindResidual(Shape.MIXED, said(targets, misplaced, ", "), alsoTurned, count);
   }
@@ -195,27 +209,19 @@ public final class BlindResidual {
     return slot == cycle.get(0) ? cycle : null;
   }
 
-  // The two corners and the two edges a parity leaves swapped, corners first as the algorithm is.
-  // Null unless the four pieces are exactly two swapped pairs.
-  private static String parityOf(String steady, List<Integer> misplaced, BlindTargets targets) {
-    if (misplaced.size() != 4) {
-      return null;
+  // Corners first when the pairs are of both types, else the pair with the buffer first.
+  private static String said(BlindTargets targets, List<List<Integer>> pairs, int edgeBuffer,
+      int cornerBuffer) {
+    List<List<Integer>> ordered = new ArrayList<List<Integer>>();
+    for (List<Integer> pair : pairs) {
+      int buffer = Cubies.isEdge(pair.get(0)) ? edgeBuffer : cornerBuffer;
+      ordered.add(pair.contains(buffer) ? 0 : ordered.size(), fromBuffer(pair, buffer));
     }
-    List<Integer> edges = new ArrayList<Integer>();
-    List<Integer> corners = new ArrayList<Integer>();
-    for (int slot : misplaced) {
-      (Cubies.isEdge(slot) ? edges : corners).add(slot);
+    if (Cubies.isEdge(ordered.get(0).get(0)) != Cubies.isEdge(ordered.get(1).get(0))
+        && Cubies.isEdge(ordered.get(0).get(0))) {
+      Collections.reverse(ordered);
     }
-    if (edges.size() != 2 || !swapped(steady, edges) || !swapped(steady, corners)) {
-      return null;
-    }
-    return said(targets, corners, "-") + " + " + said(targets, edges, "-");
-  }
-
-  /** Whether the two slots hold each other's piece. */
-  private static boolean swapped(String steady, List<Integer> pair) {
-    return Cubies.homeSlotOf(steady, pair.get(0)) == pair.get(1)
-        && Cubies.homeSlotOf(steady, pair.get(1)) == pair.get(0);
+    return said(targets, ordered.get(0), "-") + " + " + said(targets, ordered.get(1), "-");
   }
 
   private static String said(BlindTargets targets, List<Integer> slots, String separator) {

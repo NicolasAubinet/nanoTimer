@@ -421,6 +421,7 @@
   <string name="blind_left_edge_cycle">Terminou num ciclo de 3 arestas: %s</string>
   <string name="blind_left_corner_cycle">Terminou num ciclo de 3 cantos: %s</string>
   <string name="blind_left_parity">Terminou numa paridade: %s</string>
+  <string name="blind_left_swaps">Terminou com dois pares trocados: %s</string>
   <string name="blind_left_flipped">Terminou com arestas viradas: %s</string>
   <string name="blind_left_twisted">Terminou com cantos girados: %s</string>
   <string name="blind_left_turned">Terminou com peças mal orientadas: %s</string>
@@ -827,6 +828,8 @@
   <string name="method_roux">Roux</string>
   <string name="method_lbl">Camada por camada</string>
   <string name="method_blind">Às cegas</string>
+  <string name="blind_method_3style">3-style</string>
+  <string name="blind_method_op_m2">OP/M2</string>
   <string name="method_default">Padrão (%1$s)</string>
   <string name="method_info">Sobre o método</string>
   <string name="method_info_message">Usado para reconstruir suas resoluções quando há um cubo inteligente conectado: diz ao aplicativo em quais etapas dividir uma resolução. Deixe no padrão para seguir o método preferido das configurações, ou indique o método que você realmente usa para este tipo de resolução.</string>
@@ -1112,10 +1115,11 @@
   <string name="known_algorithms_hint">Toque num caso para ver os seus algoritmos. Um caso conta como conhecido na primeira vez que o faz com um único algoritmo numa resolução. Se voltar a fazê-lo em duas etapas, fica para rever; um que nunca fez com um único algoritmo fica para aprender.</string>
   <string name="known_algorithms_empty">Nada aqui ainda. Resolva com um smart cube conectado e os casos que você faz sem ajuda vão aparecer.</string>
   <string name="known_algorithms_reading">Lendo suas resoluções...</string>
-  <string name="blind_setup_summary">%1$s, buffers %2$s e %3$s</string>
+  <string name="blind_setup_summary">%2$s, %1$s, buffers %3$s e %4$s</string>
   <string name="blind_setup">Resoluções às cegas</string>
-  <string name="blind_setup_why">Suas resoluções às cegas são reconstruídas a partir destas duas respostas.</string>
+  <string name="blind_setup_why">Suas resoluções às cegas são reconstruídas a partir destas respostas.</string>
   <string name="blind_setup_hold">Como você segura o cubo</string>
+  <string name="blind_setup_method">Qual método você usa?</string>
   <string name="blind_setup_shoot">Os buffers de onde você dispara</string>
   <string name="blind_orientation_up">Face de cima</string>
   <string name="blind_orientation_front">Face da frente</string>
@@ -1137,6 +1141,7 @@
   <string name="menu_drills">Treinos</string>
   <string name="menu_coaching">Coaching</string>
   <string name="menu_premium_tag">Premium</string>
+  <string name="menu_hub_unavailable">Apenas resoluções normais de 3x3</string>
   <string name="analysis_context">%1$s, %2$s</string>
   <string name="analysis_tab_solve">Resolu\u00e7\u00e3o</string>
   <string name="analysis_tab_cases">Casos</string>

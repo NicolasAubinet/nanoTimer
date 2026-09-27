@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import com.cube.nanotimer.util.DrillCasePreset;
 import com.cube.nanotimer.util.view.HeroStat;
 import com.cube.nanotimer.util.view.TimerFont;
+import com.cube.nanotimer.vo.BlindMethod;
 import com.cube.nanotimer.vo.CubeMethod;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +32,9 @@ public enum Options {
   /** What a 3-styler shoots from, and so what to assume of a solver who has not said. */
   public static final String DEFAULT_EDGE_BUFFER = "UF";
   public static final String DEFAULT_CORNER_BUFFER = "UFR";
+  /** OP corners with M2 edges, the usual pairing: an OP edge solver moves the edge to UR. */
+  public static final String DEFAULT_OP_EDGE_BUFFER = "DF";
+  public static final String DEFAULT_OP_CORNER_BUFFER = "UBL";
   // The cube's own labels, so white up and green front: the orientation a scramble is followed in.
   public static final String DEFAULT_UP_FACE = "U";
   public static final String DEFAULT_FRONT_FACE = "F";
@@ -67,6 +71,9 @@ public enum Options {
   public static final String SMART_CUBE_METHOD_ASKED_KEY = "smart_cube_method_asked";
   public static final String SMART_CUBE_EDGE_BUFFER_KEY = "smart_cube_edge_buffer";
   public static final String SMART_CUBE_CORNER_BUFFER_KEY = "smart_cube_corner_buffer";
+  public static final String SMART_CUBE_OP_EDGE_BUFFER_KEY = "smart_cube_op_edge_buffer";
+  public static final String SMART_CUBE_OP_CORNER_BUFFER_KEY = "smart_cube_op_corner_buffer";
+  public static final String SMART_CUBE_BLIND_METHOD_KEY = "smart_cube_blind_method";
   public static final String SMART_CUBE_UP_FACE_KEY = "smart_cube_blind_up_face";
   public static final String SMART_CUBE_FRONT_FACE_KEY = "smart_cube_blind_front_face";
   public static final String SMART_CUBE_BLIND_ASKED_KEY = "smart_cube_blind_asked";
@@ -556,26 +563,54 @@ public enum Options {
   }
 
   /**
+   * How blind solve types shoot their targets unless one says otherwise. 3-style until asked, which
+   * is what every blind solve was read as before there was a choice.
+   */
+  public BlindMethod getPreferredBlindMethod() {
+    BlindMethod method = sharedPreferences == null ? null
+        : BlindMethod.fromCode(sharedPreferences.getString(SMART_CUBE_BLIND_METHOD_KEY, ""));
+    return method == null ? BlindMethod.THREE_STYLE : method;
+  }
+
+  public void setPreferredBlindMethod(BlindMethod method) {
+    sharedPreferences.edit().putString(SMART_CUBE_BLIND_METHOD_KEY, method.getCode()).apply();
+  }
+
+  /**
    * The pieces the solver shoots from blindfolded, which is what a blind reconstruction is spelled
-   * through: the frame is the one that puts the piece every algorithm shot from at these. Defaults
-   * to the 3-style pair, the commonest by far, and is asked for once at the first blind solve.
+   * through: the frame is the one that puts the piece every algorithm shot from at these. Kept per
+   * blind method, since each shoots from its own, and asked for once at the first blind solve.
    *
    * <p>Answered without preferences behind it, which is what the reconstruction tests read it
    * through: they exercise the reading and not what the solver was asked.
    */
-  public String getBlindEdgeBuffer() {
-    return sharedPreferences == null ? DEFAULT_EDGE_BUFFER
-        : sharedPreferences.getString(SMART_CUBE_EDGE_BUFFER_KEY, DEFAULT_EDGE_BUFFER);
+  public String getBlindEdgeBuffer(BlindMethod method) {
+    return getBlindBuffer(method, true);
   }
 
-  public String getBlindCornerBuffer() {
-    return sharedPreferences == null ? DEFAULT_CORNER_BUFFER
-        : sharedPreferences.getString(SMART_CUBE_CORNER_BUFFER_KEY, DEFAULT_CORNER_BUFFER);
+  public String getBlindCornerBuffer(BlindMethod method) {
+    return getBlindBuffer(method, false);
   }
 
-  public void setBlindBuffers(String edge, String corner) {
-    sharedPreferences.edit().putString(SMART_CUBE_EDGE_BUFFER_KEY, edge)
-        .putString(SMART_CUBE_CORNER_BUFFER_KEY, corner).apply();
+  private String getBlindBuffer(BlindMethod method, boolean edge) {
+    String fallback = method == BlindMethod.OP_M2
+        ? (edge ? DEFAULT_OP_EDGE_BUFFER : DEFAULT_OP_CORNER_BUFFER)
+        : (edge ? DEFAULT_EDGE_BUFFER : DEFAULT_CORNER_BUFFER);
+    return sharedPreferences == null ? fallback
+        : sharedPreferences.getString(blindBufferKey(method, edge), fallback);
+  }
+
+  public void setBlindBuffers(BlindMethod method, String edge, String corner) {
+    sharedPreferences.edit()
+        .putString(blindBufferKey(method, true), edge)
+        .putString(blindBufferKey(method, false), corner)
+        .apply();
+  }
+
+  private static String blindBufferKey(BlindMethod method, boolean edge) {
+    return method == BlindMethod.OP_M2
+        ? (edge ? SMART_CUBE_OP_EDGE_BUFFER_KEY : SMART_CUBE_OP_CORNER_BUFFER_KEY)
+        : (edge ? SMART_CUBE_EDGE_BUFFER_KEY : SMART_CUBE_CORNER_BUFFER_KEY);
   }
 
   /**

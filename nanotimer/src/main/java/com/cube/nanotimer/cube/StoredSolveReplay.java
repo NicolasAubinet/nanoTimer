@@ -10,6 +10,7 @@ import com.cube.nanotimer.smartcube.step.BlindResidual;
 import com.cube.nanotimer.smartcube.step.LostReading;
 import com.cube.nanotimer.smartcube.step.ParityCheck;
 import com.cube.nanotimer.smartcube.step.SolveAnalyzer;
+import com.cube.nanotimer.vo.BlindMethod;
 import com.cube.nanotimer.vo.CubeMethod;
 import com.cube.nanotimer.vo.SolveStep;
 import java.util.Collections;
@@ -157,8 +158,11 @@ public final class StoredSolveReplay {
    *
    * @param expected the method the solve type is read as, and the only one on offer: a solve that
    *     does not fit it is left unread rather than filed under the method it happens to fit.
+   * @param blindMethod how a blind solve type shoots its targets, which a blind reading is told the
+   *     same way it is told the method
    */
-  public static Result reinterpret(String scramble, String storedMoves, CubeMethod expected) {
+  public static Result reinterpret(String scramble, String storedMoves, CubeMethod expected,
+      BlindMethod blindMethod) {
     if (scramble == null || storedMoves == null || storedMoves.isEmpty()) {
       return null;
     }
@@ -179,8 +183,9 @@ public final class StoredSolveReplay {
         apply(cube, token);
       }
       MethodAnalyzers analyzers = new MethodAnalyzers(expected);
-      analyzers.setBlindBuffers(
-          Options.INSTANCE.getBlindEdgeBuffer(), Options.INSTANCE.getBlindCornerBuffer());
+      analyzers.setBlindMethod(blindMethod);
+      analyzers.setBlindBuffers(Options.INSTANCE.getBlindEdgeBuffer(blindMethod),
+          Options.INSTANCE.getBlindCornerBuffer(blindMethod));
       if (pickup != null) {
         analyzers.setPickupRotation(CubeRotation.byNotation(pickup));
       }

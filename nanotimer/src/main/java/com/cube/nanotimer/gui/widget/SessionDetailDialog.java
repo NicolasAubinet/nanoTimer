@@ -2,6 +2,7 @@ package com.cube.nanotimer.gui.widget;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.TextUtils;
 import androidx.gridlayout.widget.GridLayout;
@@ -35,6 +36,7 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
   private static final String ARG_AVERAGE_SIZE = "averagesize";
 
   private LayoutInflater inflater;
+  private View contentView;
   private Spinner spSessionsList;
   private ArrayAdapter<String> spinnerAdapter;
   private GridLayout sessionTimesLayout;
@@ -66,6 +68,7 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
   public Dialog onCreateDialog(Bundle savedInstanceState) {
     inflater = getActivity().getLayoutInflater();
     final View v = inflater.inflate(R.layout.sessiondetail_dialog, null);
+    contentView = v;
     solveType = (SolveType) getArguments().getSerializable(ARG_SOLVETYPE);
     averageSize = getArguments().getInt(ARG_AVERAGE_SIZE);
     DataCallback<SessionDetails> displayCallback = new DataCallback<SessionDetails>() {
@@ -105,9 +108,20 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
       }
     });
 
-    final AlertDialog dialog = new AlertDialog.Builder(getActivity(), R.style.NanoTimerDialogTheme).setView(v).create();
+    final AlertDialog dialog = new AlertDialog.Builder(getActivity(), R.style.NanoTimerDialogTheme)
+        .setView(v)
+        .setPositiveButton(R.string.close, null)
+        .create();
     dialog.setCanceledOnTouchOutside(true);
     return dialog;
+  }
+
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    if (getDialog() != null) { // the activity keeps the dialog across a rotation, so the room it had changes
+      DialogUtils.fitToWindow((AlertDialog) getDialog(), contentView);
+    }
   }
 
   private void displaySessionDetails(View v, SessionDetails sessionDetails, long sessionStart) {
@@ -158,6 +172,9 @@ public class SessionDetailDialog extends NanoTimerDialogFragment {
       }
     }
     copyText = buildCopyText(sessionDetails.getSolves(), sessionStart, stats);
+    if (getDialog() != null) {
+      DialogUtils.fitToWindow((AlertDialog) getDialog(), v);
+    }
   }
 
   private void showStat(View v, int valueId, int labelId, String value, List<String> copyLines) {
