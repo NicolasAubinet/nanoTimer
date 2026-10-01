@@ -83,6 +83,7 @@ public enum Options {
   public static final String DRILL_CHOICE_KEY_PREFIX = "drill_choice_";
   private static final String ANALYSIS_WINDOW_KEY = "analysisWindow";
   private static final String COACH_PENDING_KEY_PREFIX = "coach_pending_";
+  private static final String COACH_PENDING_AT_KEY_PREFIX = "coach_pending_at_";
   private static final String COACH_PRACTICE_KEY_PREFIX = "coach_practice_";
   private static final String COACH_PLANS_ON_KEY = "coach_plans_on";
   private static final String COACH_PLANS_SOLVE_TYPE_KEY = "coach_plans_solve_type";
@@ -321,13 +322,20 @@ public enum Options {
     return sharedPreferences.getString(COACH_PENDING_KEY_PREFIX + solveTypeId, null);
   }
 
+  /** When that request was kept, 0 for none or for one kept before its time was. */
+  public long getCoachPendingRequestAt(int solveTypeId) {
+    return sharedPreferences.getLong(COACH_PENDING_AT_KEY_PREFIX + solveTypeId, 0);
+  }
+
   /** Written with commit, not apply: it has to be on disk before the request leaves the device. */
   public void setCoachPendingRequest(int solveTypeId, String requestBody) {
     SharedPreferences.Editor editor = sharedPreferences.edit();
     if (requestBody == null) {
       editor.remove(COACH_PENDING_KEY_PREFIX + solveTypeId);
+      editor.remove(COACH_PENDING_AT_KEY_PREFIX + solveTypeId);
     } else {
       editor.putString(COACH_PENDING_KEY_PREFIX + solveTypeId, requestBody);
+      editor.putLong(COACH_PENDING_AT_KEY_PREFIX + solveTypeId, System.currentTimeMillis());
     }
     editor.commit();
   }

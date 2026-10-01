@@ -3,36 +3,16 @@ package com.cube.nanotimer.util.coach;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.cube.nanotimer.App;
-import com.cube.nanotimer.Options;
-import com.cube.nanotimer.coach.CoachPayload;
-import com.cube.nanotimer.coach.CoachPayloadBuilder;
-import com.cube.nanotimer.coach.PairExecution;
-import com.cube.nanotimer.coach.StepTurning;
-import com.cube.nanotimer.coach.StoredCoachPlan;
-import com.cube.nanotimer.cube.F2lHabitReader;
-import com.cube.nanotimer.cube.LastLayerHabitReader;
-import com.cube.nanotimer.cube.SolveReading;
-import com.cube.nanotimer.cube.SolveReadings;
-import com.cube.nanotimer.cube.TurningReader;
-import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.vo.CubeMethod;
-import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
- * One solve type's request for a plan, which outlives the screen that asked: a model call takes
- * longer than a rotation, and the answer is kept whether or not anyone is still looking.
- *
- * <p><b>A request that got no answer is kept and sent again as it was, never rebuilt.</b> The phone
- * can give up after the service has already stored a plan, and only the same payload text is
- * answered from that store rather than bought a second time. A refusal says no plan was stored, so
- * it lets the request go and the next ask reads the history afresh.
+ * One solve type's request for a plan as a screen sees it, which outlives the screen that asked: a
+ * model call takes longer than a rotation, and the answer is kept whether or not anyone is still
+ * looking. The asking itself is {@link CoachAsk}.
  */
 public final class CoachRead {
 
@@ -104,112 +84,18 @@ public final class CoachRead {
   }
 
   /** Asks for a plan, sending again what went unanswered if anything did. */
-  public void start(final CoachClient client, final CubeMethod method) {
+  public void start(CoachClient client, CubeMethod method) {
     if (state == State.READING) {
       return;
     }
     moveTo(State.READING, null);
-    String pending = Options.INSTANCE.getCoachPendingRequest(solveType.getId());
-    if (pending != null) {
-      send(client, pending);
-      return;
-    }
-    App.INSTANCE.getService().getCoachSolveCount(solveType, method, new DataCallback<Integer>() {
+    CoachAsk.ask(client, solveType, method, new CoachAsk.Listener() {
       @Override
-      public void onData(Integer count) {
-        solveCount = count.intValue();
-        // Below the floor every figure is withheld, so the answer is known without asking.
-        if (solveCount < CoachPayloadBuilder.PLAN_FLOOR) {
-          post(State.FAILED, CoachReply.refused(CoachRefusal.INSUFFICIENT_DATA));
-        } else {
-          ask(client, method);
-        }
+      public void onAnswer(CoachReply failure, int count) {
+        solveCount = count;
+        post(failure == null ? State.IDLE : State.FAILED, failure);
       }
     });
-  }
-
-  /**
-   * Reads the F2L move window's solves for their pairs, last layers and steps first, which only the
-   * app can do.
-   * A solve read before is taken from the store rather than solved again, which is what keeps this
-   * off the wait the solver is watching: only solves done since the last plan cost anything.
-   */
-  private void ask(final CoachClient client, final CubeMethod method) {
-    if (method != CubeMethod.CFOP) {
-      ask(client, method, Collections.<PairExecution>emptyList(),
-          Collections.<StepTurning>emptyList());
-      return;
-    }
-    App.INSTANCE.getService().getMethodSolves(solveType, method,
-        CoachPayloadBuilder.F2L_MOVE_WINDOW,
-        new DataCallback<List<SolveTime>>() {
-          @Override
-          public void onData(final List<SolveTime> solves) {
-            App.INSTANCE.getService().getSolveReadings(SolveReadings.idsOf(solves),
-                SolveReading.VERSION, new DataCallback<Map<Long, String>>() {
-                  @Override
-                  public void onData(Map<Long, String> kept) { // off the main thread already
-                    SolveReadings readings = new SolveReadings(kept);
-                    List<PairExecution> executions = F2lHabitReader.readFrom(solves, readings);
-                    executions.addAll(LastLayerHabitReader.readFrom(solves, readings));
-                    List<StepTurning> turnings = TurningReader.readFrom(solves, readings);
-                    App.INSTANCE.getService().saveSolveReadings(readings.unkept(),
-                        SolveReading.VERSION, null);
-                    ask(client, method, executions, turnings);
-                  }
-                });
-          }
-        });
-  }
-
-  private void ask(final CoachClient client, CubeMethod method, List<PairExecution> executions,
-      List<StepTurning> turnings) {
-    App.INSTANCE.getService().getCoachPayload(solveType, method, executions, turnings,
-        new DataCallback<CoachPayload>() {
-          @Override
-          public void onData(final CoachPayload payload) {
-            App.INSTANCE.getService().getCoachStream(solveType, new DataCallback<String>() {
-              @Override
-              public void onData(String stream) {
-                String body = CoachClient.requestBody(payload, stream);
-                // Kept before it leaves, so a request the process dies on is still the one resent.
-                Options.INSTANCE.setCoachPendingRequest(solveType.getId(), body);
-                send(client, body);
-              }
-            });
-          }
-        });
-  }
-
-  private void send(final CoachClient client, final String body) {
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        final CoachReply reply = client.requestPlan(body);
-        switch (reply.getKind()) {
-          case PLAN:
-            final StoredCoachPlan stored = new StoredCoachPlan(reply.getPlan(),
-                CoachClient.payloadOf(body), System.currentTimeMillis());
-            App.INSTANCE.getService().saveCoachPlan(solveType, stored, new DataCallback<Void>() {
-              @Override
-              public void onData(Void unused) {
-                Options.INSTANCE.setCoachPendingRequest(solveType.getId(), null);
-                Options.INSTANCE.setCoachLastPlanAt(stored.getWrittenAt());
-                post(State.IDLE, null);
-              }
-            });
-            break;
-          case REFUSED:
-            Options.INSTANCE.setCoachPendingRequest(solveType.getId(), null);
-            post(State.FAILED, reply);
-            break;
-          default:
-            // No answer, or one this app cannot read: either way a plan may be sitting in the store.
-            post(State.FAILED, reply);
-            break;
-        }
-      }
-    }).start();
   }
 
   private void post(final State state, final CoachReply failure) {
