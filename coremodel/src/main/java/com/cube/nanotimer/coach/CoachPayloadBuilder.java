@@ -99,6 +99,12 @@ public class CoachPayloadBuilder {
    */
   public static final int PLAN_FLOOR = FAMILY_WINDOW;
 
+  /**
+   * How many solves must follow a plan before the next is told about it: fewer would set a few
+   * days of cubing against the last plan's figures.
+   */
+  public static final int SINCE_FLOOR = 25;
+
   /** The code the whole solve's figures ride under, which is not a step and has no family. */
   public static final String SOLVE = "solve";
 
@@ -152,6 +158,21 @@ public class CoachPayloadBuilder {
       List<StepSample> drillSamples, int drillCount, List<CaseKnowledge> knowledge,
       List<PairExecution> executions, int f2lSolveCount, List<StepTurning> turnings,
       int turningSolveCount) {
+    return build(puzzle, method, solveTimes, familySamples, caseSamples, caseSolveCount,
+        drillSamples, drillCount, knowledge, executions, f2lSolveCount, turnings,
+        turningSolveCount, null);
+  }
+
+  /**
+   * As above, with the last plan and what has been solved since ({@link #previous}), or null.
+   *
+   * @param solveTimes newest first, so the solves since the last plan are its head
+   */
+  public static CoachPayload build(String puzzle, String method, List<Long> solveTimes,
+      List<StepSample> familySamples, List<StepSample> caseSamples, int caseSolveCount,
+      List<StepSample> drillSamples, int drillCount, List<CaseKnowledge> knowledge,
+      List<PairExecution> executions, int f2lSolveCount, List<StepTurning> turnings,
+      int turningSolveCount, PreviousPlan previous) {
     List<PairExecution> lastLayer = LastLayerHabits.of(executions);
     List<PairExecution> pairs = new ArrayList<PairExecution>(executions);
     pairs.removeAll(lastLayer);
@@ -184,7 +205,61 @@ public class CoachPayloadBuilder {
         f2lMoves == null ? null : Integer.valueOf(f2lSolveCount),
         Turnings.of(turnings, FAMILY_FLOOR), Integer.valueOf(turningSolveCount), llMoves,
         LastLayerHabits.cases(lastLayer, CASE_FLOOR), Integer.valueOf(f2lSolveCount),
-        OllLooks.of(familySamples, twoLooked, FAMILY_FLOOR));
+        OllLooks.of(familySamples, twoLooked, FAMILY_FLOOR), previous);
+  }
+
+  /**
+   * The last plan as the next payload carries it, or null where it may not ride: no plan yet, one
+   * written for another method, or fewer than {@link #SINCE_FLOOR} solves since.
+   *
+   * @param solvesSince how many solves of this method followed the last plan
+   * @param sinceTimes the whole times of the newest of them, at most {@link #FAMILY_WINDOW}
+   * @param sinceSamples every step occurrence of those same solves
+   * @param turnings the turnings the payload is built from; the ones of those solves are kept
+   * @param drillReps for each card of the last plan in order, the reps done since on its drill,
+   *     null where it had none
+   */
+  public static PreviousPlan previous(StoredCoachPlan last, String method, int solvesSince,
+      List<Long> sinceTimes, List<StepSample> sinceSamples, List<StepTurning> turnings,
+      List<Integer> drillReps) {
+    if (last == null || !method.equals(last.getPayload().getMethod())
+        || solvesSince < SINCE_FLOOR) {
+      return null;
+    }
+    Set<Long> sinceSolves = new LinkedHashSet<Long>();
+    for (StepSample sample : sinceSamples) {
+      sinceSolves.add(Long.valueOf(sample.getSolveId()));
+    }
+    List<StepTurning> sinceTurnings = new ArrayList<StepTurning>();
+    for (StepTurning turning : turnings) {
+      if (sinceSolves.contains(Long.valueOf(turning.getSolveId()))) {
+        sinceTurnings.add(turning);
+      }
+    }
+    StepTallies tallies = new StepTallies(sinceSamples);
+    MethodStatistics statistics =
+        new MethodStatistics(tallies.getSteps(), tallies.getParts(), sinceTimes.size());
+    PreviousPlan before = last.getPayload().getPrevious();
+    List<PreviousPlan.Card> cards = new ArrayList<PreviousPlan.Card>();
+    List<FocusArea> focus = last.getPlan().getFocus();
+    for (int i = 0; i < focus.size(); i++) {
+      FocusArea area = focus.get(i);
+      // A card the plan before also carried is one plan further into its run.
+      PreviousPlan.Card earlier =
+          before == null ? null : before.card(area.getReasonCode(), area.getCodes());
+      cards.add(PreviousPlan.Card.of(area, earlier == null ? 1 : earlier.getRun() + 1,
+          drillReps != null && i < drillReps.size() ? drillReps.get(i) : null));
+    }
+    CoachPayload written = last.getPayload();
+    return new PreviousPlan(solvesSince,
+        new PreviousPlan.Steps(written.getFamilyWindow(), written.getTwoLookCount(),
+            written.getSolve(), written.getFamilies(), written.getF2lGroups(),
+            written.getTurning()),
+        new PreviousPlan.Steps(sinceTimes.size(),
+            Integer.valueOf(twoLookSolves(sinceSamples).size()), solveFigure(sinceTimes),
+            familyFigures(statistics.getFamilies(), statistics, tallies),
+            F2lGroups.of(sinceSamples, FAMILY_FLOOR), Turnings.of(sinceTurnings, FAMILY_FLOOR)),
+        cards);
   }
 
   /** As above with no step's turning replayed. */

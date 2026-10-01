@@ -6,10 +6,13 @@ import android.database.sqlite.SQLiteDatabase;
 import com.cube.nanotimer.coach.CoachPayload;
 import com.cube.nanotimer.coach.CoachPayloadBuilder;
 import com.cube.nanotimer.coach.CoachPlan;
+import com.cube.nanotimer.coach.FocusArea;
 import com.cube.nanotimer.coach.PairExecution;
+import com.cube.nanotimer.coach.PreviousPlan;
 import com.cube.nanotimer.coach.StepTurning;
 import com.cube.nanotimer.coach.StepSample;
 import com.cube.nanotimer.coach.StoredCoachPlan;
+import com.cube.nanotimer.drill.DrillSpec;
 import com.cube.nanotimer.services.db.AverageRecordsStore;
 import com.cube.nanotimer.services.db.CaseKnowledgeStore;
 import com.cube.nanotimer.services.db.SolveReadingStore;
@@ -1744,16 +1747,108 @@ public class ServiceProviderImpl implements ServiceProvider {
     }
     int caseSolves = getMethodSolvesCount(solveType, method, CoachPayloadBuilder.CASE_WINDOW);
     List<StepSample> drillSamples = getDrillCaseSamples(CoachPayloadBuilder.DRILL_WINDOW);
-    return CoachPayloadBuilder.build(THREE_BY_THREE_PUZZLE,
-        method.getCode().toLowerCase(Locale.US),
-        getMethodSolveTimes(solveType, method, CoachPayloadBuilder.FAMILY_WINDOW),
+    String methodCode = method.getCode().toLowerCase(Locale.US);
+    List<Long> solveTimes =
+        getMethodSolveTimes(solveType, method, CoachPayloadBuilder.FAMILY_WINDOW);
+    return CoachPayloadBuilder.build(THREE_BY_THREE_PUZZLE, methodCode, solveTimes,
         getMethodStepSamples(solveType, method, CoachPayloadBuilder.FAMILY_WINDOW),
         getMethodStepSamples(solveType, method, CoachPayloadBuilder.CASE_WINDOW), caseSolves,
         drillSamples, getDrilledDrillsCount(CoachPayloadBuilder.DRILL_WINDOW),
         CaseKnowledgeStore.read(db), executions,
         getMethodSolvesCount(solveType, method, CoachPayloadBuilder.F2L_MOVE_WINDOW), turnings,
         turnings.isEmpty() ? 0
-            : getMethodSolvesCount(solveType, method, CoachPayloadBuilder.FAMILY_WINDOW));
+            : getMethodSolvesCount(solveType, method, CoachPayloadBuilder.FAMILY_WINDOW),
+        getPreviousPlan(solveType, method, methodCode, solveTimes, turnings));
+  }
+
+  /** The last plan and the solves since it, or null where the next plan is not to be told of it. */
+  private PreviousPlan getPreviousPlan(SolveType solveType, CubeMethod method, String methodCode,
+      List<Long> solveTimes, List<StepTurning> turnings) {
+    StoredCoachPlan last = getCoachPlan(solveType);
+    if (last == null) {
+      return null;
+    }
+    int solvesSince = getMethodSolvesCountSince(solveType, method, last.getWrittenAt());
+    if (solvesSince < CoachPayloadBuilder.SINCE_FLOOR) {
+      return null;
+    }
+    // The solve times come newest first, so the solves since the plan are the head of the window.
+    int window = Math.min(solvesSince, solveTimes.size());
+    List<Integer> drillReps = new ArrayList<Integer>();
+    for (FocusArea area : last.getPlan().getFocus()) {
+      drillReps.add(getDrillRepsSince(area.getDrill(), last.getWrittenAt()));
+    }
+    return CoachPayloadBuilder.previous(last, methodCode, solvesSince,
+        solveTimes.subList(0, window), getMethodStepSamples(solveType, method, window), turnings,
+        drillReps);
+  }
+
+  /** How many solves of the method were done after the given time. */
+  private int getMethodSolvesCountSince(SolveType solveType, CubeMethod method, long since) {
+    int count = 0;
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT COUNT(*) FROM ").append(DB.TABLE_TIMEHISTORY);
+    q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
+    q.append("   AND ").append(DB.COL_TIMEHISTORY_TIME).append(" > 0");
+    q.append("   AND ").append(DB.COL_TIMEHISTORY_SMARTCUBE_METHOD).append(" = ?");
+    q.append("   AND ").append(DB.COL_TIMEHISTORY_TIMESTAMP).append(" > ?");
+    Cursor cursor = db.rawQuery(q.toString(), new String[] {
+        String.valueOf(solveType.getId()), method.getCode(), String.valueOf(since) });
+    if (cursor != null) {
+      if (cursor.moveToFirst()) {
+        count = cursor.getInt(0);
+      }
+      cursor.close();
+    }
+    return count;
+  }
+
+  /**
+   * The reps done after the given time on what a card's drill practises: its cases in any drill,
+   * or any cross for a cross drill. Null for a card with no drill, or one this app cannot read.
+   */
+  private Integer getDrillRepsSince(String drill, long since) {
+    if (drill == null) {
+      return null;
+    }
+    DrillSpec spec;
+    try {
+      spec = DrillSpec.fromJson(drill);
+    } catch (IllegalArgumentException e) {
+      return null;
+    }
+    boolean cross = spec.getType() == DrillSpec.Type.CROSS;
+    if (!cross && spec.getCases().isEmpty()) {
+      return null;
+    }
+    List<String> args = new ArrayList<String>();
+    args.add(String.valueOf(since));
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT COUNT(*) FROM ");
+    q.append(cross ? DB.TABLE_DRILL_CROSS_REP : DB.TABLE_DRILL_REP).append(" r");
+    q.append("  JOIN ").append(DB.TABLE_DRILL).append(" d");
+    q.append("    ON d.").append(DB.COL_ID).append(" = r.");
+    q.append(cross ? DB.COL_DRILL_CROSS_REP_DRILL_ID : DB.COL_DRILL_REP_DRILL_ID);
+    q.append(" WHERE d.").append(DB.COL_DRILL_TIMESTAMP).append(" > ?");
+    if (!cross) {
+      q.append(" AND r.").append(DB.COL_DRILL_REP_ABANDONED).append(" = 0");
+      q.append(" AND r.").append(DB.COL_DRILL_REP_DELETED).append(" = 0");
+      q.append(" AND r.").append(DB.COL_DRILL_REP_CASE).append(" IN (");
+      for (int i = 0; i < spec.getCases().size(); i++) {
+        q.append(i == 0 ? "?" : ",?");
+        args.add(spec.getCases().get(i));
+      }
+      q.append(")");
+    }
+    int count = 0;
+    Cursor cursor = db.rawQuery(q.toString(), args.toArray(new String[0]));
+    if (cursor != null) {
+      if (cursor.moveToFirst()) {
+        count = cursor.getInt(0);
+      }
+      cursor.close();
+    }
+    return Integer.valueOf(count);
   }
 
   /**

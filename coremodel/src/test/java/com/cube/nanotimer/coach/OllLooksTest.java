@@ -53,7 +53,7 @@ public class OllLooksTest {
   public void testTheSplitSurvivesTheWire() {
     CoachPayload payload = CoachPayload.parse(build(SOLVES, false).toJson());
 
-    Assert.assertEquals(7, payload.getSchemaVersion());
+    Assert.assertEquals(CoachPayload.VERSION, payload.getSchemaVersion());
     Assert.assertEquals(2, payload.getOllLooks().size());
     Assert.assertEquals(6000, payload.value("oll_looks.two_look.mean_ms").doubleValue(), 30);
   }
