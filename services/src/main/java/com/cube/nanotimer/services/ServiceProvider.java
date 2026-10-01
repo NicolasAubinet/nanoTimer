@@ -2,6 +2,7 @@ package com.cube.nanotimer.services;
 
 import com.cube.nanotimer.coach.CoachPayload;
 import com.cube.nanotimer.coach.PairExecution;
+import com.cube.nanotimer.coach.PlanSchedule;
 import com.cube.nanotimer.coach.StepTurning;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.session.MethodStatistics;
@@ -73,6 +74,7 @@ public interface ServiceProvider {
 
   void updateSmartcubeMoves(SolveTime solveTime);
   int getCoachSolveCount(SolveType solveType, CubeMethod method);
+  PlanSchedule getPlanSchedule(SolveType solveType, CubeMethod method, long lastPlanAt, long now);
   CoachPayload getCoachPayload(SolveType solveType, CubeMethod method,
       List<PairExecution> executions, List<StepTurning> turnings);
   Map<Long, String> getSolveReadings(List<Long> solveIds, int version);

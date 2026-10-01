@@ -5,6 +5,7 @@ import com.cube.nanotimer.services.db.DBHelper;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.coach.CoachPayload;
 import com.cube.nanotimer.coach.PairExecution;
+import com.cube.nanotimer.coach.PlanSchedule;
 import com.cube.nanotimer.coach.StepTurning;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.session.MethodStatistics;
@@ -537,6 +538,17 @@ public class ServiceImpl extends DBHelper implements Service {
       @Override
       public void run() {
         callback.onData(Integer.valueOf(provider.getCoachSolveCount(solveType, method)));
+      }
+    });
+  }
+
+  @Override
+  public void getPlanSchedule(final SolveType solveType, final CubeMethod method,
+      final long lastPlanAt, final long now, final DataCallback<PlanSchedule> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        callback.onData(provider.getPlanSchedule(solveType, method, lastPlanAt, now));
       }
     });
   }

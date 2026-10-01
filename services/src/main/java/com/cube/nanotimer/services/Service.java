@@ -3,6 +3,7 @@ package com.cube.nanotimer.services;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.coach.CoachPayload;
 import com.cube.nanotimer.coach.PairExecution;
+import com.cube.nanotimer.coach.PlanSchedule;
 import com.cube.nanotimer.coach.StepTurning;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.session.MethodStatistics;
@@ -110,6 +111,14 @@ public interface Service {
    * so rather than made to press for an empty plan.
    */
   void getCoachSolveCount(SolveType solveType, CubeMethod method, DataCallback<Integer> callback);
+  /**
+   * When the next plan may be asked for on this solve type, off its solves and the device's last
+   * plan, which may have been written for another solve type.
+   *
+   * @param lastPlanAt when the last plan was written, 0 when there is none
+   */
+  void getPlanSchedule(SolveType solveType, CubeMethod method, long lastPlanAt, long now,
+      DataCallback<PlanSchedule> callback);
   /**
    * The solver's history as a coach may see it: aggregated figures, vocabulary codes, and nothing a
    * user ever typed. What is too thin to stand is left out here rather than caveated later.

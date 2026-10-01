@@ -84,6 +84,9 @@ public enum Options {
   private static final String ANALYSIS_WINDOW_KEY = "analysisWindow";
   private static final String COACH_PENDING_KEY_PREFIX = "coach_pending_";
   private static final String COACH_PRACTICE_KEY_PREFIX = "coach_practice_";
+  private static final String COACH_PLANS_ON_KEY = "coach_plans_on";
+  private static final String COACH_PLANS_SOLVE_TYPE_KEY = "coach_plans_solve_type";
+  private static final String COACH_LAST_PLAN_KEY = "coach_last_plan_at";
   public static final String CASE_KNOWLEDGE_RULE_KEY = "case_knowledge_rule";
   public static final String CFOP_READING_KEY = "cfop_reading_version";
   public static final String DRILL_CASES_KEY_PREFIX = "drill_cases_";
@@ -336,6 +339,37 @@ public enum Options {
 
   public void setCoachPractice(int solveTypeId, String reply) {
     sharedPreferences.edit().putString(COACH_PRACTICE_KEY_PREFIX + solveTypeId, reply).apply();
+  }
+
+  /** Whether the solver agreed to weekly plans, which are asked for in the background. */
+  public boolean isCoachPlansOn() {
+    return sharedPreferences.getBoolean(COACH_PLANS_ON_KEY, false);
+  }
+
+  public void setCoachPlansOn(boolean on) {
+    sharedPreferences.edit().putBoolean(COACH_PLANS_ON_KEY, on).apply();
+  }
+
+  /** The id of the one solve type the weekly plans are written for, or -1 when there is none. */
+  public int getCoachPlansSolveType() {
+    return sharedPreferences.getInt(COACH_PLANS_SOLVE_TYPE_KEY, -1);
+  }
+
+  public void setCoachPlansSolveType(int solveTypeId) {
+    sharedPreferences.edit().putInt(COACH_PLANS_SOLVE_TYPE_KEY, solveTypeId).apply();
+  }
+
+  /**
+   * When the last plan was written, 0 when none was. Kept apart from the plan itself so that
+   * moving the plans to another solve type, or deleting the one they were for, keeps the week.
+   */
+  public long getCoachLastPlanAt() {
+    return sharedPreferences.getLong(COACH_LAST_PLAN_KEY, 0);
+  }
+
+  /** Written with commit, not apply: a lost write would ask for a second plan in the same week. */
+  public void setCoachLastPlanAt(long writtenAt) {
+    sharedPreferences.edit().putLong(COACH_LAST_PLAN_KEY, writtenAt).commit();
   }
 
   /**

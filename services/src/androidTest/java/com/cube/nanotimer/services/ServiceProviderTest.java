@@ -11,6 +11,16 @@ import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import org.junit.After;
 import org.junit.Before;
+import com.cube.nanotimer.coach.CoachPayload;
+import com.cube.nanotimer.coach.CoachPayloadBuilder;
+import com.cube.nanotimer.coach.CoachPlan;
+import com.cube.nanotimer.coach.Evidence;
+import com.cube.nanotimer.coach.FocusArea;
+import com.cube.nanotimer.coach.PairExecution;
+import com.cube.nanotimer.coach.PlanSchedule;
+import com.cube.nanotimer.coach.StepTurning;
+import com.cube.nanotimer.coach.StoredCoachPlan;
+import com.cube.nanotimer.drill.DrillSpec;
 import com.cube.nanotimer.session.CaseKnowledge;
 import com.cube.nanotimer.session.MethodStatistics;
 import com.cube.nanotimer.vo.CubeMethod;
@@ -1155,6 +1165,119 @@ public class ServiceProviderTest {
     assertEquals("f2l", stats.getFamilies().get(1).getCode());
     assertEquals(1, stats.getParts().size());
     assertEquals("pair", stats.getParts().get(0).getCode());
+  }
+
+  // Only the type's own timed solves of the method count toward a plan, and any solve on it at
+  // all is a session still running.
+  @Test
+  public void testThePlanScheduleCountsTheTypesOwnSolves() {
+    provider.deleteHistory();
+    long now = 1000L * PlanSchedule.PERIOD_MS;
+    for (int i = 0; i < CoachPayloadBuilder.PLAN_FLOOR - 1; i++) {
+      saveCfopSolve(); // stamped 100 to 198
+    }
+    saveCubeSolve(CubeMethod.ROUX, null, step("cross", 2000, 500)); // 199
+    saveDnfCubeSolve(CubeMethod.CFOP, step("cross", 2000, 500)); // 200
+    SolveTime elsewhere = new SolveTime();
+    elsewhere.setScramble(SCRAMBLE);
+    elsewhere.setTimestamp(5000);
+    elsewhere.setSolveType(solveType2);
+    elsewhere.setTime(9000);
+    elsewhere.setSmartcubeMethod(CubeMethod.CFOP);
+    provider.saveTime(elsewhere);
+
+    PlanSchedule first = provider.getPlanSchedule(solveType1, CubeMethod.CFOP, 0, now);
+    assertEquals(PlanSchedule.State.NEEDS_SOLVES, first.getState());
+    assertEquals(1, first.getSolvesNeeded());
+    assertEquals(200 + PlanSchedule.QUIET_MS, first.getQuietUntil()); // the DNF, not the other type
+
+    saveCfopSolve(); // 201
+    first = provider.getPlanSchedule(solveType1, CubeMethod.CFOP, 0, now);
+    assertTrue(first.isFirst());
+    assertEquals(PlanSchedule.State.READY, first.getState());
+    assertEquals(PlanSchedule.State.QUIET,
+        provider.getPlanSchedule(solveType1, CubeMethod.CFOP, 0, 300).getState());
+
+    // After a plan at 190: the solves at 191 to 198 and 201, not the Roux one or the DNF.
+    PlanSchedule next = provider.getPlanSchedule(solveType1, CubeMethod.CFOP, 190, now);
+    assertEquals(PlanSchedule.State.NEEDS_SOLVES, next.getState());
+    assertEquals(CoachPayloadBuilder.SINCE_FLOOR - 9, next.getSolvesNeeded());
+
+    PlanSchedule empty = provider.getPlanSchedule(solveTypeBlind, CubeMethod.CFOP, 0, now);
+    assertEquals(CoachPayloadBuilder.PLAN_FLOOR, empty.getSolvesNeeded());
+    assertEquals(0, empty.getQuietUntil());
+  }
+
+  // The next plan is told of the last one only after enough solves, with the reps drilled since.
+  @Test
+  public void testThePreviousPlanCountsTheSolvesAndDrillRepsSinceIt() {
+    provider.deleteHistory();
+    deleteDrills();
+    deleteCoachPlans();
+    List<PairExecution> noPairs = Collections.<PairExecution>emptyList();
+    List<StepTurning> noTurnings = Collections.<StepTurning>emptyList();
+    for (int i = 0; i < CoachPayloadBuilder.PLAN_FLOOR; i++) {
+      saveCfopSolve(); // stamped 100 to 199
+    }
+    CoachPayload first = provider.getCoachPayload(solveType1, CubeMethod.CFOP, noPairs, noTurnings);
+    assertNull(first.getPrevious());
+
+    String crossDrill = DrillSpec.cross("coach-stalling-cross", "D", 10, 15000, null).toJson();
+    String caseDrill = new DrillSpec("coach-slow_case-pll", DrillSpec.Type.CASE_RECOGNITION,
+        DrillSpec.Delivery.VIRTUAL, Arrays.asList("pll_rb", "pll_t"),
+        DrillSpec.Selection.WEIGHTED, 40, 0, null).toJson();
+    CoachPlan plan = new CoachPlan(CoachPlan.VERSION, CoachPlan.Source.COACH, "Headline",
+        Arrays.asList(
+            new FocusArea(FocusArea.Reason.STALLING, Arrays.asList("cross"),
+                Collections.<Evidence>emptyList(), "Cross.", crossDrill),
+            new FocusArea(FocusArea.Reason.SLOW_CASE, Arrays.asList("pll_rb"),
+                Collections.<Evidence>emptyList(), "Rb.", caseDrill),
+            new FocusArea(FocusArea.Reason.STUCK_PIECES, Arrays.asList("f2l_stuck"),
+                Collections.<Evidence>emptyList(), "Stuck.", null)));
+    long writtenAt = 199;
+    provider.saveCoachPlan(solveType1, new StoredCoachPlan(plan, first, writtenAt));
+
+    // Drilled before the plan: none of it counts.
+    long crossBefore = provider.addDrill(drill("cross", 1, writtenAt - 50));
+    provider.addDrillCrossRep(crossBefore, crossRep(0, 8, 6, true));
+    long casesBefore = provider.addDrill(drill("case_execution", 1, writtenAt - 50));
+    provider.addDrillCaseRep(casesBefore, caseRep(0, "pll_rb", 500, 1500, 13, 0, false, false));
+    // Drilled since: both cross reps, and the two reps that measured one of the card's cases.
+    long crossSince = provider.addDrill(drill("cross", 2, writtenAt + 50));
+    provider.addDrillCrossRep(crossSince, crossRep(0, 9, 6, true));
+    provider.addDrillCrossRep(crossSince, crossRep(1, 7, 7, true));
+    long casesSince = provider.addDrill(drill("case_execution", 5, writtenAt + 50));
+    provider.addDrillCaseRep(casesSince, caseRep(0, "pll_rb", 500, 1500, 13, 0, false, false));
+    provider.addDrillCaseRep(casesSince, caseRep(1, "pll_t", 500, 1500, 13, 0, false, false));
+    provider.addDrillCaseRep(casesSince, caseRep(2, "pll_ga", 500, 1500, 13, 0, false, false));
+    provider.addDrillCaseRep(casesSince, caseRep(3, "pll_rb", 500, 1500, 13, 0, false, true));
+    provider.addDrillCaseRep(casesSince, caseRep(4, "pll_rb", 500, 1500, 13, 0, false, false));
+    provider.setDrillCaseRepDeleted(casesSince, 4, true);
+
+    saveDnfCubeSolve(CubeMethod.CFOP, step("cross", 2000, 500));
+    for (int i = 0; i < CoachPayloadBuilder.SINCE_FLOOR - 1; i++) {
+      saveCfopSolve();
+    }
+    assertNull(provider.getCoachPayload(solveType1, CubeMethod.CFOP, noPairs, noTurnings)
+        .getPrevious());
+
+    saveCfopSolve();
+    CoachPayload next = provider.getCoachPayload(solveType1, CubeMethod.CFOP, noPairs, noTurnings);
+    assertNotNull(next.getPrevious());
+    assertEquals(CoachPayloadBuilder.SINCE_FLOOR, next.value("previous.solves_since"), 1e-9);
+    assertEquals(2, next.value("previous.cards.1.drill_reps"), 1e-9);
+    assertEquals(2, next.value("previous.cards.2.drill_reps"), 1e-9);
+    assertNull(next.value("previous.cards.3.drill_reps")); // no drill, not no reps
+    deleteCoachPlans();
+  }
+
+  private SolveTime saveCfopSolve() {
+    return saveCubeSolve(CubeMethod.CFOP, null, step("cross", 2000, 500), step("f2l", 8000, 1000));
+  }
+
+  /** Plans outlive a test otherwise, like drills. */
+  private void deleteCoachPlans() {
+    service.getWritableDatabase().delete(DB.TABLE_COACH_PLAN, null, null);
   }
 
   /** @param stoppedStep the step the timer was stopped inside, null when the solve ran to the end */

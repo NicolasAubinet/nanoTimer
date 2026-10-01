@@ -8,6 +8,7 @@ import com.cube.nanotimer.coach.CoachPayloadBuilder;
 import com.cube.nanotimer.coach.CoachPlan;
 import com.cube.nanotimer.coach.FocusArea;
 import com.cube.nanotimer.coach.PairExecution;
+import com.cube.nanotimer.coach.PlanSchedule;
 import com.cube.nanotimer.coach.PreviousPlan;
 import com.cube.nanotimer.coach.StepTurning;
 import com.cube.nanotimer.coach.StepSample;
@@ -1729,6 +1730,29 @@ public class ServiceProviderImpl implements ServiceProvider {
   @Override
   public int getCoachSolveCount(SolveType solveType, CubeMethod method) {
     return getMethodSolvesCount(solveType, method, Integer.MAX_VALUE); // uncapped: it is a total, not a window
+  }
+
+  @Override
+  public PlanSchedule getPlanSchedule(SolveType solveType, CubeMethod method, long lastPlanAt,
+      long now) {
+    return PlanSchedule.of(lastPlanAt, getCoachSolveCount(solveType, method),
+        lastPlanAt == 0 ? 0 : getMethodSolvesCountSince(solveType, method, lastPlanAt),
+        getLastSolveTimestamp(solveType), now);
+  }
+
+  /** When the solve type was last solved, by any method and DNFs included, 0 when never. */
+  private long getLastSolveTimestamp(SolveType solveType) {
+    long last = 0;
+    Cursor cursor = db.rawQuery("SELECT MAX(" + DB.COL_TIMEHISTORY_TIMESTAMP + ") FROM "
+        + DB.TABLE_TIMEHISTORY + " WHERE " + DB.COL_TIMEHISTORY_SOLVETYPE_ID + " = ?",
+        getStringArray(solveType.getId()));
+    if (cursor != null) {
+      if (cursor.moveToFirst()) {
+        last = cursor.getLong(0); // 0 for the NULL of an empty history
+      }
+      cursor.close();
+    }
+    return last;
   }
 
   /**

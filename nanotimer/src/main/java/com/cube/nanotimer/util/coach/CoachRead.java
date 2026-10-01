@@ -188,12 +188,13 @@ public final class CoachRead {
         final CoachReply reply = client.requestPlan(body);
         switch (reply.getKind()) {
           case PLAN:
-            StoredCoachPlan stored = new StoredCoachPlan(reply.getPlan(),
+            final StoredCoachPlan stored = new StoredCoachPlan(reply.getPlan(),
                 CoachClient.payloadOf(body), System.currentTimeMillis());
             App.INSTANCE.getService().saveCoachPlan(solveType, stored, new DataCallback<Void>() {
               @Override
               public void onData(Void unused) {
                 Options.INSTANCE.setCoachPendingRequest(solveType.getId(), null);
+                Options.INSTANCE.setCoachLastPlanAt(stored.getWrittenAt());
                 post(State.IDLE, null);
               }
             });
