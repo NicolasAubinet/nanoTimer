@@ -2,6 +2,7 @@ package com.cube.nanotimer.cube;
 
 import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -75,6 +76,9 @@ public class VirtualCube implements GyroReferenceListener {
   /** How it stands while it is following nothing, or null for square. */
   private CubeOrientation hold;
   private boolean paused;
+  /** Read on the page's thread, so volatile. See {@link #setSquaring}. */
+  private volatile boolean squaring;
+  private final YawSquarer squarer = new YawSquarer();
 
   /** What the cube is showing: the state it was pointed at, plus the turns made since. */
   private String pattern;
@@ -109,6 +113,7 @@ public class VirtualCube implements GyroReferenceListener {
   /** The reference arrived, was re-taken, or went with the cube: the page follows it or stops. */
   @Override
   public void onGyroReferenceChanged() {
+    squarer.reset();
     refreshGyro();
   }
 
@@ -226,6 +231,14 @@ public class VirtualCube implements GyroReferenceListener {
   private String holdCall() {
     CubeOrientation q = hold == null ? IDENTITY : hold;
     return "window.ntLiveHold(" + q.getW() + "," + q.getX() + "," + q.getY() + "," + q.getZ() + ");";
+  }
+
+  /**
+   * Whether the followed pose is squared against yaw drift each time the cube rests, for a screen
+   * where the cube is held square: see {@link YawSquarer}. Only the drawn cube changes.
+   */
+  public void setSquaring(boolean squaring) {
+    this.squaring = squaring;
   }
 
   /** Whether this cube should follow the physical one's orientation, if there is one to follow. */
@@ -425,8 +438,11 @@ public class VirtualCube implements GyroReferenceListener {
      */
     @JavascriptInterface
     public String orientation() {
-      CubeOrientation pose = CubeRotation.continuousFrame(
-          gyroReference.get(), SmartCubeManager.INSTANCE.getOrientation());
+      CubeOrientation reference = gyroReference.get();
+      CubeOrientation reading = SmartCubeManager.INSTANCE.getOrientation();
+      CubeOrientation pose = squaring
+          ? squarer.pose(reference, reading, SystemClock.uptimeMillis())
+          : CubeRotation.continuousFrame(reference, reading);
       return pose == null ? ""
           : pose.getW() + "," + pose.getX() + "," + pose.getY() + "," + pose.getZ();
     }

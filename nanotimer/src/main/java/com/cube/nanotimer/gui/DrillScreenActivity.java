@@ -261,6 +261,8 @@ public abstract class DrillScreenActivity extends NanoTimerActivity
       return false;
     }
     cube.setGyroFollowing(followGyro);
+    // A drill is held square throughout, so resting in the hands is when the gyro's drift shows.
+    cube.setSquaring(true);
     // How it stands when it is let go of, which each drill answers for itself.
     cube.setHold(restingRotation());
     // The well here is most of the screen, and at the page's own distance the cube filled about a
