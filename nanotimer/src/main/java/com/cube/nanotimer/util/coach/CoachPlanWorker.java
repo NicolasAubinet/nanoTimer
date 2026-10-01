@@ -29,6 +29,7 @@ public final class CoachPlanWorker extends Worker {
 
   private static final String WEEKLY = "coach_plan_weekly";
   private static final String ONCE = "coach_plan_once";
+  private static final String REMINDER = "coach_plan_reminder";
   private static final String DEBUG_SOLVE_TYPE = "debug_solve_type";
   private static final String ON_SCREEN = "on_screen";
 
@@ -66,6 +67,23 @@ public final class CoachPlanWorker extends Worker {
             .setConstraints(online())
             .build());
     check(context);
+    scheduleReminder(context, false);
+  }
+
+  /**
+   * Runs the job again on the day the solver is to be reminded of the solves the next plan needs,
+   * which no other run is sure to fall on.
+   *
+   * @param newPlan whether a plan was just written, which moves the day
+   */
+  static void scheduleReminder(Context context, boolean newPlan) {
+    long now = System.currentTimeMillis();
+    long wait = CoachPlans.lastPlanAt(now) + PlanSchedule.NUDGE_AFTER_MS - now;
+    if (wait <= 0) {
+      return; // that day has come: every run of the job looks at it from here on
+    }
+    WorkManager.getInstance(context.getApplicationContext()).enqueueUniqueWork(REMINDER,
+        newPlan ? ExistingWorkPolicy.REPLACE : ExistingWorkPolicy.KEEP, once(wait, Data.EMPTY));
   }
 
   /**

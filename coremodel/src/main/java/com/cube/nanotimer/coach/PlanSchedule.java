@@ -113,8 +113,13 @@ public final class PlanSchedule {
    * @param lastNudgeAt when the solver was last told, 0 when never
    */
   public boolean nudgeDue(long lastNudgeAt) {
+    return nudgeOwed(lastNudgeAt) && !inSession();
+  }
+
+  /** Whether the solver is still to be told, whether or not a session holds it back for now. */
+  public boolean nudgeOwed(long lastNudgeAt) {
     return !isFirst() && solvesNeeded > 0 && now >= lastPlanAt + NUDGE_AFTER_MS
-        && lastNudgeAt < lastPlanAt && !inSession();
+        && lastNudgeAt < lastPlanAt;
   }
 
   private boolean inSession() {

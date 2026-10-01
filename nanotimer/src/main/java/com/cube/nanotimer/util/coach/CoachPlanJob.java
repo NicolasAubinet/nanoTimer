@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
@@ -37,8 +38,10 @@ final class CoachPlanJob {
   /** Longer than the client waits for the service, with the reading of the history on top. */
   private static final long ANSWER_WAIT_MS = 5L * 60 * 1000;
 
-  private static final String CHANNEL_ID = "coach_plans";
+  private static final String PLANS_CHANNEL = "coach_plans";
+  private static final String REMINDERS_CHANNEL = "coach_reminders";
   private static final int PLAN_READY_NOTIF_ID = 2;
+  private static final int REMINDER_NOTIF_ID = 3;
 
   enum Outcome {
     /** A plan was saved, or there is nothing to do until something changes. */
@@ -83,6 +86,7 @@ final class CoachPlanJob {
         if (schedule.getState() == PlanSchedule.State.QUIET) {
           CoachPlanWorker.runIn(context, schedule.getQuietUntil() - now); // the session is still on
         }
+        remind(context, solveType, schedule, now);
         return Outcome.DONE;
       }
     }
@@ -95,6 +99,7 @@ final class CoachPlanJob {
       if (started) { // a plan somebody else asked for is theirs to announce
         notifyPlanReady(context, solveType);
       }
+      CoachPlanWorker.scheduleReminder(context, true);
       return Outcome.DONE;
     }
     long wait = waitAfter(answer.failure);
@@ -161,22 +166,55 @@ final class CoachPlanJob {
     return schedule.get();
   }
 
-  /** Opens the plan on top of whatever the app is showing, rather than restarting its task. */
+  /**
+   * Tells the solver once per plan, some days after it, how many solves the next one still needs.
+   * A session holds it back, so the job comes back when the session is over.
+   */
+  private static void remind(Context context, SolveType solveType, PlanSchedule schedule,
+      long now) {
+    long lastNudgeAt = Options.INSTANCE.getCoachLastNudgeAt();
+    if (!Options.INSTANCE.isCoachNudgeOn() || !schedule.nudgeOwed(lastNudgeAt)) {
+      return;
+    }
+    if (!schedule.nudgeDue(lastNudgeAt)) {
+      CoachPlanWorker.runIn(context, schedule.getQuietUntil() - now);
+      return;
+    }
+    if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) {
+      return; // not counted as told: it is shown if notifications are allowed later
+    }
+    Options.INSTANCE.setCoachLastNudgeAt(now);
+    int needed = schedule.getSolvesNeeded();
+    notify(context, REMINDERS_CHANNEL, R.string.coach_channel_reminders, REMINDER_NOTIF_ID,
+        context.getResources().getQuantityString(R.plurals.coach_reminder_title, needed, needed),
+        context.getString(R.string.coach_reminder_text,
+            Utils.toSolveTypeLocalizedName(context, solveType.getName())),
+        solveType);
+  }
+
   private static void notifyPlanReady(Context context, SolveType solveType) {
+    notify(context, PLANS_CHANNEL, R.string.coach_channel_plans, PLAN_READY_NOTIF_ID,
+        context.getString(R.string.coach_plan_ready_title),
+        context.getString(R.string.coach_plan_ready_text), solveType);
+  }
+
+  /** Opens the Plan tab on top of whatever the app is showing, rather than restarting its task. */
+  private static void notify(Context context, String channel, int channelName, int id,
+      String title, String text, SolveType solveType) {
     NotificationManager manager =
         (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      manager.createNotificationChannel(new NotificationChannel(CHANNEL_ID,
-          context.getString(R.string.coach_channel_plans), NotificationManager.IMPORTANCE_DEFAULT));
+      manager.createNotificationChannel(new NotificationChannel(channel,
+          context.getString(channelName), NotificationManager.IMPORTANCE_DEFAULT));
     }
     Intent open = new Intent(context, AnalysisActivity.class)
         .putExtra(AnalysisActivity.EXTRA_SOLVE_TYPE, solveType)
         .putExtra(AnalysisActivity.EXTRA_TAB, AnalysisActivity.TAB_PLAN)
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    manager.notify(PLAN_READY_NOTIF_ID, new NotificationCompat.Builder(context, CHANNEL_ID)
+    manager.notify(id, new NotificationCompat.Builder(context, channel)
         .setSmallIcon(R.drawable.menu_coach)
-        .setContentTitle(context.getString(R.string.coach_plan_ready_title))
-        .setContentText(context.getString(R.string.coach_plan_ready_text))
+        .setContentTitle(title)
+        .setContentText(text)
         .setContentIntent(PendingIntent.getActivity(context, 0, open,
             PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
         .setAutoCancel(true)

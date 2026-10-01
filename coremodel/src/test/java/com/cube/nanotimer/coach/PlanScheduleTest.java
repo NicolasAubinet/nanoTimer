@@ -121,6 +121,17 @@ public class PlanScheduleTest {
     Assert.assertFalse(PlanSchedule.of(PLAN, 300, 5, now - MINUTE, now).nudgeDue(0));
   }
 
+  /** A nudge a session holds back is still owed, so the job comes back for it. */
+  @Test
+  public void testANudgeHeldBackByASessionIsStillOwed() {
+    long now = PLAN + 5 * DAY;
+    PlanSchedule inSession = PlanSchedule.of(PLAN, 300, 5, now - MINUTE, now);
+
+    Assert.assertTrue(inSession.nudgeOwed(0));
+    Assert.assertFalse(inSession.nudgeOwed(PLAN + 4 * DAY));
+    Assert.assertFalse(schedule(SINCE, now).nudgeOwed(0));
+  }
+
   /** After the clock is set back, the week runs from now. The caller stores now for it to hold. */
   @Test
   public void testAPlanDatedAheadOfTheClockCountsFromNow() {

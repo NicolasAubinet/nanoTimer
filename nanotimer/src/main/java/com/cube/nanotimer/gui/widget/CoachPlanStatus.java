@@ -35,6 +35,8 @@ import java.util.List;
  * The Plan tab's status: when the next weekly plan comes and which solve type the plans are for.
  * On that solve type it is one row under the plan's headline. On another one it says where the
  * plans go, and with no solve type to carry them it says so. Moving them is done in the settings.
+ *
+ * <p>Before the solver has agreed to weekly plans there is no status, only the button that asks.
  */
 public class CoachPlanStatus {
 
@@ -69,7 +71,9 @@ public class CoachPlanStatus {
   public void refresh() {
     boolean cfop = solveType.getCubeTypeId() == CubeType.THREE_BY_THREE.getId()
         && SolveTypeMethod.of(solveType) == CubeMethod.CFOP;
-    if (!coach || !cfop || !Options.INSTANCE.isCoachPlansOn()) {
+    boolean on = Options.INSTANCE.isCoachPlansOn();
+    showOptIn(coach && !on && CoachPlans.eligible(solveType));
+    if (!coach || !cfop || !on) {
       status.setVisibility(View.GONE);
       return;
     }
@@ -103,6 +107,23 @@ public class CoachPlanStatus {
                 });
           }
         });
+  }
+
+  /** The way in to weekly plans, on a solve type they can be written for. */
+  private void showOptIn(boolean offered) {
+    View optIn = tab.findViewById(R.id.buCoachPlanOptIn);
+    optIn.setVisibility(offered ? View.VISIBLE : View.GONE);
+    optIn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        CoachOptInDialog.show(activity, solveType, new Runnable() {
+          @Override
+          public void run() {
+            refresh();
+          }
+        });
+      }
+    });
   }
 
   private void show(final Runnable draw) {

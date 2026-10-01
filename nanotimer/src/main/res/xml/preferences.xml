@@ -183,6 +183,12 @@
        android:key="coach_plans_for"
        android:title="@string/coach_plans_setting"/>
 
+    <SwitchPreference
+       android:key="coach_nudge_on"
+       android:title="@string/coach_reminder_setting"
+       android:summary="@string/coach_reminder_setting_summary"
+       android:defaultValue="true"/>
+
   </PreferenceCategory>
 
   <PreferenceCategory

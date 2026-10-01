@@ -1205,6 +1205,20 @@
   <string name="coach_channel_plans">Planes del coach</string>
   <string name="coach_plan_ready_title">Tu nuevo plan está listo</string>
   <string name="coach_plan_ready_text">Mira en qué trabajar esta semana.</string>
+  <string name="coach_channel_reminders">Recordatorios del coach</string>
+  <plurals name="coach_reminder_title">
+    <item quantity="one">Haz %d resolución más para recibir tu próximo plan</item>
+    <item quantity="other">Haz %d resoluciones más para recibir tu próximo plan</item>
+  </plurals>
+  <string name="coach_reminder_text">Resoluciones con smart cube en %1$s.</string>
+  <string name="coach_reminder_setting">Recordatorio de resoluciones</string>
+  <string name="coach_reminder_setting_summary">Una notificación unos días después de un plan, cuando al siguiente aún le faltan resoluciones</string>
+  <string name="coach_opt_in_button">Recibir un plan cada semana</string>
+  <string name="coach_opt_in_title">Un plan cada semana</string>
+  <string name="coach_opt_in_body">Una vez por semana, Cubench envía al coach las cifras de tus resoluciones de %1$s y de tus entrenamientos, y con ellas escribe tu plan. Ocurre en segundo plano, sin que lo pidas.</string>
+  <string name="coach_opt_in_figures">Solo cifras: medias, mejores tiempos y recuentos. Ninguna mezcla, ninguna resolución movimiento a movimiento, y nada de lo que hayas escrito.</string>
+  <string name="coach_opt_in_not_now">Ahora no</string>
+  <string name="coach_opt_in_turn_on">Activar</string>
   <string name="coach_next_days">Próximo plan en %1$s</string>
   <string name="coach_next_days_solves">Próximo plan en %1$s · %2$s</string>
   <string name="coach_next_solves">Próximo plan: %1$s</string>

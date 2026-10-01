@@ -1252,6 +1252,20 @@
   <string name="coach_channel_plans">Coach plans</string>
   <string name="coach_plan_ready_title">Your new plan is ready</string>
   <string name="coach_plan_ready_text">See what to work on this week.</string>
+  <string name="coach_channel_reminders">Coach reminders</string>
+  <plurals name="coach_reminder_title">
+    <item quantity="one">Do %d more solve to get your next plan</item>
+    <item quantity="other">Do %d more solves to get your next plan</item>
+  </plurals>
+  <string name="coach_reminder_text">Smart cube solves on %1$s.</string>
+  <string name="coach_reminder_setting">Solve reminder</string>
+  <string name="coach_reminder_setting_summary">A notification a few days after a plan, when the next one still needs solves</string>
+  <string name="coach_opt_in_button">Get a plan every week</string>
+  <string name="coach_opt_in_title">A plan every week</string>
+  <string name="coach_opt_in_body">Once a week, Cubench sends the figures of your %1$s solves and of your drills to the coach, which writes your plan from them. This happens in the background, without you asking.</string>
+  <string name="coach_opt_in_figures">Figures only: averages, bests and counts. No scramble, no solve move by move, and nothing you typed.</string>
+  <string name="coach_opt_in_not_now">Not now</string>
+  <string name="coach_opt_in_turn_on">Turn on</string>
   <string name="coach_next_days">Next plan in %1$s</string>
   <string name="coach_next_days_solves">Next plan in %1$s · %2$s</string>
   <string name="coach_next_solves">Next plan: %1$s</string>

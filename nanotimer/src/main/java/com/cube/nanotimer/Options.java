@@ -89,6 +89,8 @@ public enum Options {
   private static final String COACH_PLANS_SOLVE_TYPE_KEY = "coach_plans_solve_type";
   private static final String COACH_LAST_PLAN_KEY = "coach_last_plan_at";
   private static final String COACH_ASK_AGAIN_KEY = "coach_ask_again_at";
+  private static final String COACH_NUDGE_ON_KEY = "coach_nudge_on";
+  private static final String COACH_LAST_NUDGE_KEY = "coach_last_nudge_at";
   public static final String CASE_KNOWLEDGE_RULE_KEY = "case_knowledge_rule";
   public static final String CFOP_READING_KEY = "cfop_reading_version";
   public static final String DRILL_CASES_KEY_PREFIX = "drill_cases_";
@@ -388,6 +390,20 @@ public enum Options {
 
   public void setCoachAskAgainAt(long askAgainAt) {
     sharedPreferences.edit().putLong(COACH_ASK_AGAIN_KEY, askAgainAt).apply();
+  }
+
+  /** Whether to remind the solver, some days after a plan, of the solves the next one needs. */
+  public boolean isCoachNudgeOn() {
+    return sharedPreferences.getBoolean(COACH_NUDGE_ON_KEY, true);
+  }
+
+  /** When the solver was last reminded, 0 when never. */
+  public long getCoachLastNudgeAt() {
+    return sharedPreferences.getLong(COACH_LAST_NUDGE_KEY, 0);
+  }
+
+  public void setCoachLastNudgeAt(long nudgedAt) {
+    sharedPreferences.edit().putLong(COACH_LAST_NUDGE_KEY, nudgedAt).apply();
   }
 
   /**
