@@ -66,6 +66,18 @@ public class CoachPlansTest {
     Assert.assertTrue(CoachPlans.eligible(cfop));
   }
 
+  /** What a change of the preferred method would do to the solve type that carries the plans. */
+  @Test
+  public void aTypeThatFollowsThePreferredMethodIsEligibleOnlyUnderCfop() {
+    SolveType follows = type(false, null, THREE);
+    SolveType cfop = type(false, null, THREE);
+    cfop.setMethod(CubeMethod.CFOP);
+
+    Assert.assertTrue(CoachPlans.eligibleUnder(follows, CubeMethod.CFOP));
+    Assert.assertFalse(CoachPlans.eligibleUnder(follows, CubeMethod.ROUX));
+    Assert.assertTrue(CoachPlans.eligibleUnder(cfop, CubeMethod.ROUX));
+  }
+
   private static SolveType type(boolean blind, ScrambleType scrambleType, int cubeTypeId) {
     return new SolveType(1, "type", blind, scrambleType, cubeTypeId);
   }

@@ -3,6 +3,7 @@ package com.cube.nanotimer.gui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,11 +12,15 @@ import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.cube.SmartCubeGate;
 import com.cube.nanotimer.gui.widget.CoachPlansForDialog;
+import com.cube.nanotimer.gui.widget.CoachPlansGuard;
 import com.cube.nanotimer.gui.widget.ReleaseNotes;
 import com.cube.nanotimer.services.db.DataCallback;
+import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.util.coach.CoachClient;
 import com.cube.nanotimer.util.coach.CoachPlans;
+import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
+import com.cube.nanotimer.vo.CubeMethod;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveType;
 
@@ -61,6 +66,7 @@ public class OptionsActivity extends NanoTimerActivity {
       }
 
       showCoach();
+      guardPreferredMethod();
 
       // Null when the reflection-based PreferenceFragment could not build its manager, which it
       // swallows rather than crashing on.
@@ -103,7 +109,83 @@ public class OptionsActivity extends NanoTimerActivity {
       });
     }
 
+    /**
+     * A preferred method other than CFOP stops every solve type that follows it from carrying the
+     * weekly plans. When that is the type they are written for, the change asks first.
+     */
+    private void guardPreferredMethod() {
+      Preference method = findPreference(Options.SMART_CUBE_METHOD_KEY);
+      if (method == null) {
+        return;
+      }
+      method.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object value) {
+          final ListPreference list = (ListPreference) preference;
+          final CubeMethod picked = CubeMethod.fromCode((String) value);
+          if (picked == null || !Options.INSTANCE.isCoachPlansOn()) {
+            return true;
+          }
+          // Whether the plans are touched takes a read, so the value is set once that is known.
+          App.INSTANCE.getService().getSolveTypes(CubeType.THREE_BY_THREE,
+              new DataCallback<List<SolveType>>() {
+                @Override
+                public void onData(final List<SolveType> solveTypes) {
+                  final Activity activity = getActivity();
+                  if (activity == null) {
+                    return;
+                  }
+                  activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                      setPreferredMethod(list, picked, solveTypes);
+                    }
+                  });
+                }
+              });
+          return false;
+        }
+      });
+    }
+
+    private void setPreferredMethod(final ListPreference list, final CubeMethod picked,
+        List<SolveType> solveTypes) {
+      final SolveType flagged = CoachPlans.flagged(solveTypes);
+      if (flagged == null || CoachPlans.eligibleUnder(flagged, picked)) {
+        list.setValue(picked.getCode());
+        return;
+      }
+      boolean canMove = false;
+      for (SolveType solveType : solveTypes) {
+        canMove |= CoachPlans.eligibleUnder(solveType, picked);
+      }
+      final boolean another = canMove;
+      final Activity activity = getActivity();
+      String name = Utils.toSolveTypeLocalizedName(activity, flagged.getName());
+      DialogUtils.showConfirmCancelDialog(activity, R.string.coach_guard_method_title,
+          getString(another ? R.string.coach_guard_method_move : R.string.coach_guard_method_pause,
+              name),
+          CoachPlansGuard.changeConfirm(another), R.string.cancel, new YesNoListener() {
+            @Override
+            public void onYes() {
+              list.setValue(picked.getCode());
+              final Preference plansFor = findPreference("coach_plans_for");
+              showPlansFor(plansFor);
+              CoachPlansGuard.movePlans(activity, another, new Runnable() {
+                @Override
+                public void run() {
+                  showPlansFor(plansFor);
+                }
+              });
+            }
+          });
+    }
+
+    /** @param plansFor null in a build with no coach, where the row is not shown */
     private void showPlansFor(final Preference plansFor) {
+      if (plansFor == null) {
+        return;
+      }
       App.INSTANCE.getService().getSolveTypes(CubeType.THREE_BY_THREE,
           new DataCallback<List<SolveType>>() {
             @Override

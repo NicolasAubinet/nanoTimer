@@ -27,6 +27,17 @@ public final class CoachPlans {
     return eligible(solveType, SolveTypeMethod.of(solveType));
   }
 
+  /** Whether plans could be written for the solve type if the preferred method were this one. */
+  public static boolean eligibleUnder(SolveType solveType, CubeMethod preferred) {
+    return eligible(solveType, SolveTypeMethod.of(solveType, preferred));
+  }
+
+  /** Whether the weekly plans are written for this solve type. */
+  public static boolean carriedBy(SolveType solveType) {
+    return Options.INSTANCE.isCoachPlansOn()
+        && Options.INSTANCE.getCoachPlansSolveType() == solveType.getId();
+  }
+
   /** @param method the method the solve type's solves are read as */
   static boolean eligible(SolveType solveType, CubeMethod method) {
     ScrambleType scrambleType = solveType.getScrambleType();

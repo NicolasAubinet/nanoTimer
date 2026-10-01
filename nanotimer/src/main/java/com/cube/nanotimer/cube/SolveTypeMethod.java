@@ -36,6 +36,18 @@ public final class SolveTypeMethod {
 
   /** Never null: a breakdown read under no method at all is a guess, which is not on offer. */
   public static CubeMethod of(SolveType solveType) {
+    CubeMethod own = ownMethod(solveType);
+    return own != null ? own : Options.INSTANCE.getPreferredMethod();
+  }
+
+  /** The method the solve type would be read as if the preferred method were the one given. */
+  public static CubeMethod of(SolveType solveType, CubeMethod preferred) {
+    CubeMethod own = ownMethod(solveType);
+    return own != null ? own : preferred;
+  }
+
+  /** The method the solve type settles by itself, or null when it follows the preferred one. */
+  private static CubeMethod ownMethod(SolveType solveType) {
     if (solveType.isBlind()) {
       // Memorised first, and its steps are the piece types: the blind flag settles this, not the column.
       return CubeMethod.BLIND;
@@ -45,8 +57,7 @@ public final class SolveTypeMethod {
       return override; // a method named by hand outranks one merely implied
     }
     ScrambleType scrambleType = solveType.getScrambleType();
-    CubeMethod implied = scrambleType == null ? null : scrambleType.getMethod();
-    return implied != null ? implied : Options.INSTANCE.getPreferredMethod();
+    return scrambleType == null ? null : scrambleType.getMethod();
   }
 
   /** What the blind method is called. */

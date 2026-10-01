@@ -26,6 +26,7 @@ import com.cube.nanotimer.R;
 import com.cube.nanotimer.cube.SolveReinterpreter;
 import com.cube.nanotimer.cube.SolveTypeMethod;
 import com.cube.nanotimer.gui.widget.AddStepsDialog;
+import com.cube.nanotimer.gui.widget.CoachPlansGuard;
 import com.cube.nanotimer.gui.widget.SelectionHandler;
 import com.cube.nanotimer.gui.widget.SelectorFragmentDialog;
 import com.cube.nanotimer.gui.widget.SolveTypesHelpDialog;
@@ -36,6 +37,7 @@ import com.cube.nanotimer.gui.widget.dialog.SolveTypeAddDialog;
 import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.YesNoListener;
+import com.cube.nanotimer.util.coach.CoachPlans;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.util.view.SolveTypeIcons;
@@ -238,43 +240,85 @@ public class SolveTypesActivity extends NanoTimerActivity implements SelectionHa
           solveType.getBlindMethodOverride());
       DialogUtils.showFragment(this, editDialog);
     } else if (action == ACTION_DELETE) {
-      String solveTypeName = Utils.toSolveTypeLocalizedName(this, liSolveTypes.get(position).getName());
-      DialogUtils.showDestructiveConfirmDialog(this, R.string.delete_solve_type_title,
-          getString(R.string.delete_solve_type_confirmation, solveTypeName), R.string.delete, R.string.cancel,
+      final SolveType solveType = liSolveTypes.get(position);
+      String message = getString(R.string.delete_solve_type_confirmation,
+          Utils.toSolveTypeLocalizedName(this, solveType.getName()));
+      // The weekly plans go with their solve type, so the confirm says where that leaves them.
+      final boolean carriesPlans = CoachPlans.carriedBy(solveType);
+      final boolean another = CoachPlansGuard.anotherCanCarry(liSolveTypes, solveType);
+      if (carriesPlans) {
+        message += "\n\n" + getString(CoachPlansGuard.deleteWarning(another));
+      }
+      DialogUtils.showDestructiveConfirmDialog(this, R.string.delete_solve_type_title, message,
+          carriesPlans ? CoachPlansGuard.deleteConfirm(another) : R.string.delete, R.string.cancel,
           new YesNoListener() {
             @Override
             public void onYes() {
-              App.INSTANCE.getService().deleteSolveType(liSolveTypes.get(position), new DataCallback<Void>() {
+              App.INSTANCE.getService().deleteSolveType(solveType, new DataCallback<Void>() {
                 @Override
                 public void onData(Void data) {
-                  liSolveTypes.remove(position);
+                  liSolveTypes.remove(solveType);
                   refreshList();
+                  if (carriesPlans) {
+                    CoachPlansGuard.movePlans(SolveTypesActivity.this, another);
+                  }
                 }
               });
             }
           });
     } else if (action == ACTION_CREATESTEPS) {
-      App.INSTANCE.getService().getPagedHistory(liSolveTypes.get(position), TimesSort.TIMESTAMP, new DataCallback<SolveHistory>() {
-        @Override
-        public void onData(final SolveHistory data) {
-          runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              if (data.getSolveTimes().isEmpty()) {
-                DialogUtils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
-              } else {
-                DialogUtils.showYesNoConfirmation(SolveTypesActivity.this, R.string.solvetype_has_times_addsteps, new YesNoListener() {
-                  @Override
-                  public void onYes() {
-                    DialogUtils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
-                  }
-                });
-              }
-            }
-          });
-        }
-      });
+      final SolveType solveType = liSolveTypes.get(position);
+      // Steps of its own stop a solve type being read as CFOP, which the weekly plans need.
+      if (CoachPlans.carriedBy(solveType) && CoachPlans.eligible(solveType)) {
+        confirmPlansChange(solveType, new Runnable() {
+          @Override
+          public void run() {
+            askForSteps(position);
+          }
+        });
+      } else {
+        askForSteps(position);
+      }
     }
+  }
+
+  private void askForSteps(final int position) {
+    App.INSTANCE.getService().getPagedHistory(liSolveTypes.get(position), TimesSort.TIMESTAMP, new DataCallback<SolveHistory>() {
+      @Override
+      public void onData(final SolveHistory data) {
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            if (data.getSolveTimes().isEmpty()) {
+              DialogUtils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
+            } else {
+              DialogUtils.showYesNoConfirmation(SolveTypesActivity.this, R.string.solvetype_has_times_addsteps, new YesNoListener() {
+                @Override
+                public void onYes() {
+                  DialogUtils.showFragment(SolveTypesActivity.this, AddStepsDialog.newInstance(SolveTypesActivity.this, position));
+                }
+              });
+            }
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * Asks before a change that leaves the weekly plans' solve type unable to carry them: they move
+   * or pause, and the confirm says which.
+   */
+  private void confirmPlansChange(SolveType solveType, final Runnable change) {
+    boolean another = CoachPlansGuard.anotherCanCarry(liSolveTypes, solveType);
+    DialogUtils.showConfirmCancelDialog(this, R.string.coach_guard_change_title,
+        getString(CoachPlansGuard.changeWarning(another)), CoachPlansGuard.changeConfirm(another),
+        R.string.cancel, new YesNoListener() {
+          @Override
+          public void onYes() {
+            change.run();
+          }
+        });
   }
 
   @Override
@@ -325,19 +369,43 @@ public class SolveTypesActivity extends NanoTimerActivity implements SelectionHa
     if (!checkSolveTypeName(name, index)) {
       return false;
     }
-    SolveType oldSolveType = liSolveTypes.get(index);
+    final SolveType oldSolveType = liSolveTypes.get(index);
     boolean blindMode = Boolean.valueOf(props.getProperty(SolveTypeAddDialog.KEY_BLD, String.valueOf(false)));
     ScrambleType scrambleType = parseScrambleType(props);
 
-    // Toggling blind changes what the cached avg columns mean, so the service must recompute them.
-    boolean blindChanged = (oldSolveType.isBlind() != blindMode);
-
-    SolveType updatedSolveType = new SolveType(oldSolveType.getId(), name, blindMode, scrambleType, oldSolveType.getCubeTypeId());
+    final SolveType updatedSolveType = new SolveType(oldSolveType.getId(), name, blindMode, scrambleType, oldSolveType.getCubeTypeId());
     updatedSolveType.setSteps(oldSolveType.getSteps());
     updatedSolveType.setInspection(parseInspection(props));
     updatedSolveType.setMethod(parseMethod(props));
     updatedSolveType.setBlindMethod(parseBlindMethod(props));
     updatedSolveType.setQuickAction(parseQuickAction(props));
+
+    // An edit after which no weekly plan can be written for the type that carries them asks first.
+    if (CoachPlans.carriedBy(oldSolveType) && CoachPlans.eligible(oldSolveType)
+        && !CoachPlans.eligible(updatedSolveType)) {
+      final boolean another = CoachPlansGuard.anotherCanCarry(liSolveTypes, oldSolveType);
+      confirmPlansChange(oldSolveType, new Runnable() {
+        @Override
+        public void run() {
+          update(index, oldSolveType, updatedSolveType, new Runnable() {
+            @Override
+            public void run() {
+              CoachPlansGuard.movePlans(SolveTypesActivity.this, another);
+            }
+          });
+        }
+      });
+    } else {
+      update(index, oldSolveType, updatedSolveType, null);
+    }
+    return true;
+  }
+
+  /** @param then run once the edit is stored, off the main thread, or null */
+  private void update(int index, SolveType oldSolveType, final SolveType updatedSolveType,
+      final Runnable then) {
+    // Toggling blind changes what the cached avg columns mean, so the service must recompute them.
+    boolean blindChanged = oldSolveType.isBlind() != updatedSolveType.isBlind();
     liSolveTypes.set(index, updatedSolveType);
 
     // The method a type is read as, which the override may follow rather than name: changing the
@@ -352,9 +420,11 @@ public class SolveTypesActivity extends NanoTimerActivity implements SelectionHa
         if (readBefore != readAfter) {
           offerToRereadSolves(updatedSolveType, readBefore, readAfter);
         }
+        if (then != null) {
+          then.run();
+        }
       }
     });
-    return true;
   }
 
   /**
@@ -599,12 +669,16 @@ public class SolveTypesActivity extends NanoTimerActivity implements SelectionHa
           step.setName(stepNames.get(i));
           steps[i] = step;
         }
-        SolveType solveType = liSolveTypes.get(pos);
+        final SolveType solveType = liSolveTypes.get(pos);
         solveType.setSteps(steps);
         App.INSTANCE.getService().addSolveTypeSteps(solveType, new DataCallback<Void>() {
           @Override
           public void onData(Void data) {
             refreshList();
+            if (CoachPlans.carriedBy(solveType)) {
+              CoachPlansGuard.movePlans(SolveTypesActivity.this,
+                  CoachPlansGuard.anotherCanCarry(liSolveTypes, solveType));
+            }
           }
         });
       }
