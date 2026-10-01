@@ -73,6 +73,7 @@ import com.cube.nanotimer.smartcube.drill.LayerRotation;
 import com.cube.nanotimer.smartcube.model.CubeConnectionListener;
 import com.cube.nanotimer.smartcube.model.DiscoveredCube;
 import com.cube.nanotimer.util.FormatterService;
+import com.cube.nanotimer.util.RankVerdict;
 import com.cube.nanotimer.util.ScaleUtils;
 import com.cube.nanotimer.util.ScrambleFormatterService;
 import com.cube.nanotimer.util.ScrambleViewNotation;
@@ -2416,9 +2417,10 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
   }
 
   /**
-   * What the solve was worth, said once and only when there is something to say: a record, or the
-   * best or worst of the window the bars draw. A delta on every solve would be noise whatever the
-   * number, and the bars below already carry the "beat your recent times" job.
+   * What the solve was worth, said once and only when there is something to say: a record, a place
+   * in the all-time top ten, or the best or worst of the window the bars draw. A delta on every
+   * solve would be noise whatever the number, and the bars below already carry the "beat your
+   * recent times" job.
    *
    * <p>Records also light the cell that holds them, which is how the other three are announced.
    */
@@ -2439,16 +2441,20 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
       showVerdictChip(autoPenaltyReason, R.color.danger_text);
       return;
     }
-    if (!records.isEmpty()) {
-      RecordInfo best = records.get(0);
-      String beat = FormatterService.INSTANCE.formatSolveTime(best.previous - best.value);
-      String previous = FormatterService.INSTANCE.formatSolveTime(best.previous);
-      if (best.isPB) { // gold is for a lifetime best alone, or it stops meaning anything
-        showVerdictChip(getString(R.string.verdict_personal_best, beat, previous), R.color.new_record);
-        tvTimer.setTextColor(getResources().getColor(R.color.new_record));
-      } else {
-        showVerdictChip(getString(R.string.verdict_record, best.label, beat, previous), R.color.green_soft);
-      }
+    RecordInfo best = records.isEmpty() ? null : records.get(0);
+    if (best != null && best.isPB) { // gold is for a lifetime best alone, or it stops meaning anything
+      showVerdictChip(getString(R.string.verdict_personal_best, recordBeat(best), recordPrevious(best)), R.color.new_record);
+      tvTimer.setTextColor(getResources().getColor(R.color.new_record));
+      return;
+    }
+    // Ahead of an average record, which its lit cell announces anyway: the solve details put the
+    // rank first too, and the two have to agree.
+    if (solveAverages != null && RankVerdict.isNotable(solveAverages.getRank(), solveAverages.getRankedCount())) {
+      showVerdictChip(RankVerdict.text(this, solveAverages.getRank()), R.color.lightblue);
+      return;
+    }
+    if (best != null) {
+      showVerdictChip(getString(R.string.verdict_record, best.label, recordBeat(best), recordPrevious(best)), R.color.green_soft);
       return;
     }
     // The timer itself reads DNF, so a chip saying it again is the same word twice. It returns
@@ -2466,6 +2472,14 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
       return;
     }
     tvVerdictChip.setVisibility(View.INVISIBLE);
+  }
+
+  private String recordBeat(RecordInfo record) {
+    return FormatterService.INSTANCE.formatSolveTime(record.previous - record.value);
+  }
+
+  private String recordPrevious(RecordInfo record) {
+    return FormatterService.INSTANCE.formatSolveTime(record.previous);
   }
 
   /**

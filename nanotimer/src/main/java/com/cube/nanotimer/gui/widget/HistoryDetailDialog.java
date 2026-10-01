@@ -59,6 +59,7 @@ import com.cube.nanotimer.util.helper.GUIUtils;
 import com.cube.nanotimer.smartcube.model.CubeRotation;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.util.FormatterService;
+import com.cube.nanotimer.util.RankVerdict;
 import com.cube.nanotimer.util.ScrambleFormatterService;
 import com.cube.nanotimer.util.ScrambleViewNotation;
 import com.cube.nanotimer.util.helper.DialogUtils;
@@ -427,9 +428,6 @@ public class HistoryDetailDialog extends NanoTimerBottomSheetFragment {
     });
   }
 
-  /** A rank is worth naming when it is in the all-time top ten, and in the top quarter of them. */
-  private static final int TOP_RANK = 10;
-  private static final int TOP_PART = 4;
   /** The fraction of the average a solve has to be off by before it is worth a word: a twentieth. */
   private static final int NOTABLE_PART = 20;
 
@@ -450,9 +448,8 @@ public class HistoryDetailDialog extends NanoTimerBottomSheetFragment {
       text = margin > 0 ? getString(R.string.verdict_best_ever_by, formatTime(margin))
           : getString(R.string.verdict_best_ever);
       color = color(R.color.new_record);
-    } else if (data.getRank() > 1 && data.getRank() <= TOP_RANK
-        && data.getRank() * TOP_PART <= data.getRankedCount()) {
-      text = getResources().getStringArray(R.array.verdict_ranks)[data.getRank() - 2];
+    } else if (RankVerdict.isNotable(data.getRank(), data.getRankedCount())) {
+      text = RankVerdict.text(getActivity(), data.getRank());
       color = color(R.color.lightblue);
     } else if (data.getRank() > 0) {
       Form form = verdictForm(data, blind);
