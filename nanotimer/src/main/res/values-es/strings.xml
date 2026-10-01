@@ -1206,6 +1206,9 @@
   <string name="coach_refused_rejected">El coach no pudo escribir un plan respaldado por tus cifras. Vuelve a intentarlo.</string>
   <string name="coach_refused_update">Esta versión de Cubench no puede comunicarse con el coach. Actualiza la aplicación y vuelve a intentarlo.</string>
   <string name="coach_refused_device">Este dispositivo no está configurado para el coach.</string>
+  <string name="coach_channel_plans">Planes del coach</string>
+  <string name="coach_plan_ready_title">Tu nuevo plan está listo</string>
+  <string name="coach_plan_ready_text">Mira en qué trabajar esta semana.</string>
   <plurals name="coach_refused_too_few">
     <item quantity="one">Un plan necesita %1$d resoluciones con tu cubo inteligente, y tienes %2$d. Te falta %3$d.</item>
     <item quantity="other">Un plan necesita %1$d resoluciones con tu cubo inteligente, y tienes %2$d. Te faltan %3$d.</item>

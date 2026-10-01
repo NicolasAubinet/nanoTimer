@@ -1,6 +1,7 @@
 package com.cube.nanotimer.gui;
 
 import android.content.DialogInterface;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,6 +42,8 @@ import com.cube.nanotimer.session.MethodStatistics;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.coach.CoachClient;
+import com.cube.nanotimer.util.coach.CoachPlanWorker;
+import com.cube.nanotimer.util.coach.CoachPlans;
 import com.cube.nanotimer.util.coach.CoachPractice;
 import com.cube.nanotimer.util.coach.CoachRead;
 import com.cube.nanotimer.util.coach.CoachRefusal;
@@ -723,6 +726,15 @@ public class AnalysisActivity extends NanoTimerActivity {
       @Override
       public void onClick(View v) {
         read.start(coachClient, method);
+      }
+    });
+    View askNow = findViewById(R.id.buAnalysisPlanAskNow);
+    boolean debuggable = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+    askNow.setVisibility(debuggable && CoachPlans.eligible(solveType) ? View.VISIBLE : View.GONE);
+    askNow.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        CoachPlanWorker.askNow(AnalysisActivity.this, solveType);
       }
     });
   }

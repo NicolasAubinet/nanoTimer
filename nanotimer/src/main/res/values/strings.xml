@@ -1253,6 +1253,9 @@
   <string name="coach_refused_rejected">The coach couldn\'t write a plan it could back with your figures. Please try again.</string>
   <string name="coach_refused_update">This version of Cubench can\'t talk to the coach. Update the app and try again.</string>
   <string name="coach_refused_device">This device isn\'t set up for the coach.</string>
+  <string name="coach_channel_plans">Coach plans</string>
+  <string name="coach_plan_ready_title">Your new plan is ready</string>
+  <string name="coach_plan_ready_text">See what to work on this week.</string>
   <plurals name="coach_refused_too_few">
     <item quantity="one">A plan needs %1$d solves with your smart cube, and you have %2$d. %3$d more to go.</item>
     <item quantity="other">A plan needs %1$d solves with your smart cube, and you have %2$d. %3$d more to go.</item>

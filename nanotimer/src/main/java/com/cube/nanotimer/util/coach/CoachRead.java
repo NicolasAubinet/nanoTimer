@@ -3,6 +3,7 @@ package com.cube.nanotimer.util.coach;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.cube.nanotimer.Options;
 import com.cube.nanotimer.vo.CubeMethod;
 import com.cube.nanotimer.vo.SolveType;
 
@@ -12,7 +13,8 @@ import java.util.Map;
 /**
  * One solve type's request for a plan as a screen sees it, which outlives the screen that asked: a
  * model call takes longer than a rotation, and the answer is kept whether or not anyone is still
- * looking. The asking itself is {@link CoachAsk}.
+ * looking. The asking itself is {@link CoachAsk}, and an ask the weekly job started shows here like
+ * one the screen started.
  */
 public final class CoachRead {
 
@@ -29,9 +31,34 @@ public final class CoachRead {
   }
 
   private static final Map<Integer, CoachRead> READS = new HashMap<Integer, CoachRead>();
+  private static final Handler MAIN = new Handler(Looper.getMainLooper());
+
+  static {
+    CoachAsk.setWatcher(new CoachAsk.Watcher() {
+      @Override
+      public CoachAsk.Listener onAsking(SolveType solveType) {
+        final CoachRead read = of(solveType);
+        MAIN.post(new Runnable() {
+          @Override
+          public void run() {
+            if (read.state != State.READING) {
+              read.moveTo(State.READING, null);
+            }
+          }
+        });
+        return read.answered;
+      }
+    });
+  }
 
   private final SolveType solveType;
-  private final Handler main = new Handler(Looper.getMainLooper());
+  private final CoachAsk.Listener answered = new CoachAsk.Listener() {
+    @Override
+    public void onAnswer(CoachReply failure, int count) {
+      solveCount = count;
+      post(failure == null ? State.IDLE : State.FAILED, failure);
+    }
+  };
   private State state = State.IDLE;
   private CoachReply failure;
   /** When the service said to ask again, as a time rather than a wait: it is shown later. */
@@ -44,8 +71,8 @@ public final class CoachRead {
     this.solveType = solveType;
   }
 
-  /** Main thread only, like everything else here that is not a callback. */
-  public static CoachRead of(SolveType solveType) {
+  /** From any thread. Everything else here that is not a callback is main thread only. */
+  public static synchronized CoachRead of(SolveType solveType) {
     CoachRead read = READS.get(solveType.getId());
     if (read == null) {
       read = new CoachRead(solveType);
@@ -72,8 +99,10 @@ public final class CoachRead {
     return solveCount;
   }
 
+  /** Takes the screen now showing this solve type, which sees an ask already under way. */
   public void setListener(Listener listener) {
     this.listener = listener;
+    follow();
   }
 
   /** Lets go of a screen on its way out, unless a newer one has taken its place. */
@@ -89,17 +118,18 @@ public final class CoachRead {
       return;
     }
     moveTo(State.READING, null);
-    CoachAsk.ask(client, solveType, method, new CoachAsk.Listener() {
-      @Override
-      public void onAnswer(CoachReply failure, int count) {
-        solveCount = count;
-        post(failure == null ? State.IDLE : State.FAILED, failure);
-      }
-    });
+    CoachAsk.ask(client, solveType, method, Options.INSTANCE.getCoachLastPlanAt(), answered);
+  }
+
+  /** Waits for an ask somebody else started for this solve type, if there is one. */
+  private void follow() {
+    if (state != State.READING && CoachAsk.join(solveType, answered)) {
+      moveTo(State.READING, null);
+    }
   }
 
   private void post(final State state, final CoachReply failure) {
-    main.post(new Runnable() {
+    MAIN.post(new Runnable() {
       @Override
       public void run() {
         moveTo(state, failure);

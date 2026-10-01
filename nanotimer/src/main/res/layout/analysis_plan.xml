@@ -4,6 +4,7 @@
      The explainer never mocks a plan up: a plan the app did not write, rendered beside figures it
      did, is the one arrangement that can make a true number look invented. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:tools="http://schemas.android.com/tools"
    android:id="@+id/llAnalysisPlan"
    android:layout_width="match_parent"
    android:layout_height="wrap_content"
@@ -144,6 +145,15 @@
     <androidx.appcompat.widget.AppCompatButton
        android:id="@+id/buAnalysisPlanRead"
        style="@style/DialogActionButton"/>
+
+    <!-- Debug builds only: runs the weekly job now, for this solve type. -->
+    <androidx.appcompat.widget.AppCompatButton
+       android:id="@+id/buAnalysisPlanAskNow"
+       style="@style/DialogActionButton"
+       android:layout_marginTop="8dp"
+       android:text="Ask now (debug)"
+       android:visibility="gone"
+       tools:ignore="HardcodedText"/>
   </LinearLayout>
 
   <!-- Standing practice, under whatever the plan says and apart from it: each family's costliest

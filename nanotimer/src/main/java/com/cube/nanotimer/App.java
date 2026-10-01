@@ -13,6 +13,7 @@ import com.cube.nanotimer.services.Service;
 import com.cube.nanotimer.services.ServiceImpl;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.session.CaseKnowledge;
+import com.cube.nanotimer.util.coach.CoachPlanWorker;
 import com.cube.nanotimer.util.helper.GUIUtils;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.CubeMethod;
@@ -46,7 +47,8 @@ public enum App {
     init(context, true);
   }
 
-  private void init(Context context, boolean fromService) {
+  /** Synchronized: the coach's job and the first screen can both start the app, on two threads. */
+  private synchronized void init(Context context, boolean fromService) {
     boolean appStarted = (this.context == null);
     if (appStarted || !fromService) {
       this.context = context;
@@ -58,19 +60,6 @@ public enum App {
       ScramblerService.INSTANCE.init(context);
       SmartCubeManager.INSTANCE.init(context);
       initRandomStateGenListener(context);
-
-      getService().getAllUsedScrambleTypes(new DataCallback<Map<CubeType, List<ScrambleType>>>() {
-        @Override
-        public void onData(Map<CubeType, List<ScrambleType>> data) {
-          for (Map.Entry<CubeType, List<ScrambleType>> locEntry : data.entrySet()) {
-            CubeType cubeType = locEntry.getKey();
-            for (ScrambleType scrambleType : locEntry.getValue()) {
-              cubeType.addUsedScrambleType(scrambleType);
-            }
-          }
-          ScramblerService.INSTANCE.checkScrambleCaches();
-        }
-      });
 
       refreshCaseKnowledge();
       rereadCfopSolves();
@@ -138,6 +127,24 @@ public enum App {
     appGUILaunched = true;
     AppLaunchStats.appLaunched(context);
     ReleaseNotes.appLaunched(context);
+    fillScrambleCaches();
+    CoachPlanWorker.onAppStart(context);
+  }
+
+  /** Only once a screen is up: the coach's job starts the app too, and has no use for scrambles. */
+  private void fillScrambleCaches() {
+    getService().getAllUsedScrambleTypes(new DataCallback<Map<CubeType, List<ScrambleType>>>() {
+      @Override
+      public void onData(Map<CubeType, List<ScrambleType>> data) {
+        for (Map.Entry<CubeType, List<ScrambleType>> locEntry : data.entrySet()) {
+          CubeType cubeType = locEntry.getKey();
+          for (ScrambleType scrambleType : locEntry.getValue()) {
+            cubeType.addUsedScrambleType(scrambleType);
+          }
+        }
+        ScramblerService.INSTANCE.checkScrambleCaches();
+      }
+    });
   }
 
   private void initRandomStateGenListener(final Context context) {

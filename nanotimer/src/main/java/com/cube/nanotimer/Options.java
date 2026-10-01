@@ -88,6 +88,7 @@ public enum Options {
   private static final String COACH_PLANS_ON_KEY = "coach_plans_on";
   private static final String COACH_PLANS_SOLVE_TYPE_KEY = "coach_plans_solve_type";
   private static final String COACH_LAST_PLAN_KEY = "coach_last_plan_at";
+  private static final String COACH_ASK_AGAIN_KEY = "coach_ask_again_at";
   public static final String CASE_KNOWLEDGE_RULE_KEY = "case_knowledge_rule";
   public static final String CFOP_READING_KEY = "cfop_reading_version";
   public static final String DRILL_CASES_KEY_PREFIX = "drill_cases_";
@@ -378,6 +379,15 @@ public enum Options {
   /** Written with commit, not apply: a lost write would ask for a second plan in the same week. */
   public void setCoachLastPlanAt(long writtenAt) {
     sharedPreferences.edit().putLong(COACH_LAST_PLAN_KEY, writtenAt).commit();
+  }
+
+  /** Until when the weekly job leaves the coach alone after a refusal, 0 when it was not refused. */
+  public long getCoachAskAgainAt() {
+    return sharedPreferences.getLong(COACH_ASK_AGAIN_KEY, 0);
+  }
+
+  public void setCoachAskAgainAt(long askAgainAt) {
+    sharedPreferences.edit().putLong(COACH_ASK_AGAIN_KEY, askAgainAt).apply();
   }
 
   /**

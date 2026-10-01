@@ -77,6 +77,7 @@ import com.cube.nanotimer.util.ScaleUtils;
 import com.cube.nanotimer.util.ScrambleFormatterService;
 import com.cube.nanotimer.util.ScrambleViewNotation;
 import com.cube.nanotimer.util.YesNoListener;
+import com.cube.nanotimer.util.coach.CoachPlanWorker;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.GUIUtils;
 import com.cube.nanotimer.util.helper.ScreenUtils;
@@ -1136,7 +1137,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
             boolean isPlusTwo = !lastSolveTime.isPlusTwo();
             autoPenaltyReason = null; // a mark set by hand is the user's, whatever the cube read
             lastSolveTime.setPlusTwo(isPlusTwo, true);
-            App.INSTANCE.getService().saveTime(lastSolveTime, solveAverageCallback);
+            save(lastSolveTime);
             tvTimer.setText(FormatterService.INSTANCE.formatMarkedSolveTime(lastSolveTime));
             setTimerTextColor(lastSolveTime.getTime());
             cubeSession.setLastAsPlusTwo(isPlusTwo);
@@ -1224,7 +1225,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
     } else {
       return;
     }
-    App.INSTANCE.getService().saveTime(lastSolveTime, solveAverageCallback);
+    save(lastSolveTime);
     tvTimer.setText(FormatterService.INSTANCE.formatMarkedSolveTime(lastSolveTime));
     setTimerTextColor(lastSolveTime.getTime());
     refreshSessionFields();
@@ -1683,12 +1684,18 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
     fastSolvePending = !skipRecordPanel && isSuspiciouslyFast(solveTime.getTime());
 
     addTimeToUI(solveTime);
-    App.INSTANCE.getService().saveTime(solveTime, solveAverageCallback);
+    save(solveTime);
 
     if (solveTime.getTime() > 0 && !reviewRequested) { // ask for a review after a completed solve, never after a DNF
       reviewRequested = true;
       InAppReviewManager.maybeRequestReview(this, historySolvesCount);
     }
+  }
+
+  /** Stores a solve, new or marked again: either can change what the next coach plan waits for. */
+  private void save(SolveTime solveTime) {
+    App.INSTANCE.getService().saveTime(solveTime, solveAverageCallback);
+    CoachPlanWorker.onSolveSaved(this, solveType);
   }
 
   /**

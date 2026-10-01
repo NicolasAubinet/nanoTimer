@@ -17,6 +17,7 @@ import com.cube.nanotimer.vo.CubeMethod;
 import com.cube.nanotimer.vo.SolveTime;
 import com.cube.nanotimer.vo.SolveType;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,9 @@ import java.util.Map;
  * answered from that store rather than bought a second time. A refusal says no plan was stored, so
  * it lets the request go and the next ask reads the history afresh. So does an hour: a request
  * left that long would be answered from solves the history has since moved past.
+ *
+ * <p><b>One ask runs at a time</b>, whether the job or a screen started it. A second one for the
+ * same solve type gets the first one's answer, and one for another solve type is told to wait.
  */
 final class CoachAsk {
 
@@ -38,31 +42,95 @@ final class CoachAsk {
 
   interface Listener {
     /**
-     * Called once, off the main thread, a plan having been saved first.
+     * Called once, on any thread and possibly before {@link #ask} returns, a plan having been
+     * saved first.
      *
      * @param failure how the ask ended without a plan, null when one was saved
-     * @param solveCount how many solves the method has been read from, or -1 when a resent
-     *     request never counted
+     * @param solveCount how many solves the method has been read from, or -1 when nothing counted
      */
     void onAnswer(CoachReply failure, int solveCount);
   }
 
+  interface Watcher {
+    /**
+     * Called on the asking thread before an ask starts.
+     *
+     * @return a listener to answer as well, or null
+     */
+    Listener onAsking(SolveType solveType);
+  }
+
+  /** The ask under way, null when there is none. Guarded by the class. */
+  private static CoachAsk running;
+  private static Watcher watcher;
+
   private final CoachClient client;
   private final SolveType solveType;
   private final CubeMethod method;
-  private final Listener listener;
+  /** Guarded by the class. */
+  private final List<Listener> listeners = new ArrayList<Listener>();
   private int solveCount = -1;
 
-  private CoachAsk(CoachClient client, SolveType solveType, CubeMethod method, Listener listener) {
+  private CoachAsk(CoachClient client, SolveType solveType, CubeMethod method) {
     this.client = client;
     this.solveType = solveType;
     this.method = method;
-    this.listener = listener;
   }
 
-  /** Asks for a plan, sending again what went unanswered if anything did. Returns at once. */
-  static void ask(CoachClient client, SolveType solveType, CubeMethod method, Listener listener) {
-    new CoachAsk(client, solveType, method, listener).start();
+  /**
+   * Asks for a plan, sending again what went unanswered if anything did. Returns at once.
+   *
+   * @param lastPlanAt the last plan's time as the caller read it: a plan saved since then is the
+   *     answer, and nothing is asked
+   * @return whether this call started an ask, rather than being answered by another one
+   */
+  static boolean ask(CoachClient client, SolveType solveType, CubeMethod method, long lastPlanAt,
+      Listener listener) {
+    CoachAsk started = null;
+    boolean busy = false;
+    synchronized (CoachAsk.class) {
+      if (running != null) {
+        if (running.solveType.getId() == solveType.getId()) {
+          running.listen(listener);
+          return false;
+        }
+        busy = true;
+      } else if (Options.INSTANCE.getCoachLastPlanAt() == lastPlanAt) {
+        started = new CoachAsk(client, solveType, method);
+        started.listen(listener);
+        if (watcher != null) {
+          started.listen(watcher.onAsking(solveType));
+        }
+        running = started;
+      }
+    }
+    if (started == null) {
+      listener.onAnswer(busy ? CoachReply.refused(CoachRefusal.RATE_LIMITED) : null, -1);
+      return false;
+    }
+    started.start();
+    return true;
+  }
+
+  /** Gives the listener the answer of the ask under way for the solve type, if there is one. */
+  static synchronized boolean join(SolveType solveType, Listener listener) {
+    if (running == null || running.solveType.getId() != solveType.getId()) {
+      return false;
+    }
+    running.listen(listener);
+    return true;
+  }
+
+  /** Once each: a screen can be handed the same ask twice, as its watcher and as it opens. */
+  private void listen(Listener listener) {
+    if (listener != null && !listeners.contains(listener)) {
+      listeners.add(listener);
+    }
+  }
+
+  /** Who is told when an ask starts, so a screen can show one it did not start. */
+  static synchronized void setWatcher(Watcher watcher) {
+    CoachAsk.watcher = watcher;
   }
 
   /** Whether an unanswered request kept at the given time is too old to send again as it was. */
@@ -86,7 +154,7 @@ final class CoachAsk {
         solveCount = count.intValue();
         // Below the floor every figure is withheld, so the answer is known without asking.
         if (solveCount < CoachPayloadBuilder.PLAN_FLOOR) {
-          listener.onAnswer(CoachReply.refused(CoachRefusal.INSUFFICIENT_DATA), solveCount);
+          answer(CoachReply.refused(CoachRefusal.INSUFFICIENT_DATA));
         } else {
           read();
         }
@@ -159,20 +227,32 @@ final class CoachAsk {
               public void onData(Void unused) {
                 Options.INSTANCE.setCoachPendingRequest(solveType.getId(), null);
                 Options.INSTANCE.setCoachLastPlanAt(stored.getWrittenAt());
-                listener.onAnswer(null, solveCount);
+                answer(null);
               }
             });
             break;
           case REFUSED:
             Options.INSTANCE.setCoachPendingRequest(solveType.getId(), null);
-            listener.onAnswer(reply, solveCount);
+            answer(reply);
             break;
           default:
             // No answer, or one this app cannot read: either way a plan may be sitting in the store.
-            listener.onAnswer(reply, solveCount);
+            answer(reply);
             break;
         }
       }
     }).start();
+  }
+
+  /** Ends the ask. Only then can another start, so the last plan's time is already written. */
+  private void answer(CoachReply failure) {
+    List<Listener> told;
+    synchronized (CoachAsk.class) {
+      running = null;
+      told = new ArrayList<Listener>(listeners);
+    }
+    for (Listener listener : told) {
+      listener.onAnswer(failure, solveCount);
+    }
   }
 }
