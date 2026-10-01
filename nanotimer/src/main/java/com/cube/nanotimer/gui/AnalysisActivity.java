@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -31,6 +30,7 @@ import com.cube.nanotimer.gui.widget.AnalysisCases;
 import com.cube.nanotimer.gui.widget.AnalysisHelpDialog;
 import com.cube.nanotimer.gui.widget.CaseRow;
 import com.cube.nanotimer.gui.widget.CaseTableHeadings;
+import com.cube.nanotimer.gui.widget.CoachPlanStatus;
 import com.cube.nanotimer.gui.widget.CoachPlanView;
 import com.cube.nanotimer.gui.widget.dialog.CaseAlgorithmsDialog;
 import com.cube.nanotimer.gui.widget.SegmentedControl;
@@ -46,7 +46,6 @@ import com.cube.nanotimer.util.coach.CoachPlanWorker;
 import com.cube.nanotimer.util.coach.CoachPlans;
 import com.cube.nanotimer.util.coach.CoachPractice;
 import com.cube.nanotimer.util.coach.CoachRead;
-import com.cube.nanotimer.util.coach.CoachRefusal;
 import com.cube.nanotimer.util.coach.CoachReply;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.util.view.AlgorithmFiguresBarView;
@@ -136,7 +135,7 @@ public class AnalysisActivity extends NanoTimerActivity {
   private CoachRead.Listener readListener;
   /** Whether this screen has asked the service for practice sets yet: once is enough. */
   private boolean practiceAsked;
-  private boolean hasPlan;
+  private CoachPlanStatus planStatus;
   private MethodStatistics statistics;
   private List<CaseKnowledge> known = Collections.emptyList();
 
@@ -220,6 +219,12 @@ public class AnalysisActivity extends NanoTimerActivity {
     loadOwnSolves();
     loadPlan();
     load();
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    planStatus.refresh(); // days pass, and the solve types may have changed behind this screen
   }
 
   @Override
@@ -710,6 +715,8 @@ public class AnalysisActivity extends NanoTimerActivity {
 
   private void wireRead() {
     coachClient = CoachClient.configured(this);
+    planStatus = new CoachPlanStatus(this, (ViewGroup) findViewById(R.id.llAnalysisPlan), solveType,
+        coachClient != null);
     final CoachRead read = CoachRead.of(solveType);
     readListener = new CoachRead.Listener() {
       @Override
@@ -722,16 +729,7 @@ public class AnalysisActivity extends NanoTimerActivity {
       }
     };
     read.setListener(readListener);
-    findViewById(R.id.buAnalysisPlanRead).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        read.start(coachClient, method);
-      }
-    });
-    View askNow = findViewById(R.id.buAnalysisPlanAskNow);
-    boolean debuggable = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-    askNow.setVisibility(debuggable && CoachPlans.eligible(solveType) ? View.VISIBLE : View.GONE);
-    askNow.setOnClickListener(new View.OnClickListener() {
+    findViewById(R.id.buAnalysisPlanAskNow).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
         CoachPlanWorker.askNow(AnalysisActivity.this, solveType);
@@ -740,40 +738,32 @@ public class AnalysisActivity extends NanoTimerActivity {
   }
 
   /**
-   * The ask, where there is a coach to ask and something of theirs to ask about. The coach reads
-   * CFOP only, and never the example: a plan written off somebody else's figures would be kept as
-   * theirs.
+   * What an ask changes on the tab: the status row, and the practice where there is a coach and
+   * something of theirs to read. The coach reads CFOP only, and never the example: a plan written
+   * off somebody else's figures would be kept as theirs.
    */
   private void showRead() {
-    boolean offered = coachClient != null && readAsSolve() && loaded && !sampling()
-        && SolveTypeMethod.of(solveType) == CubeMethod.CFOP;
-    findViewById(R.id.llAnalysisPlanRead).setVisibility(offered ? View.VISIBLE : View.GONE);
-    showPractice(offered);
+    planStatus.refresh();
+    showPractice(coachClient != null && readAsSolve() && loaded && !sampling()
+        && SolveTypeMethod.of(solveType) == CubeMethod.CFOP);
+    showAskNow();
+  }
+
+  /** Debug builds only: the button that runs the weekly job now, and how its last ask ended. */
+  private void showAskNow() {
+    boolean debuggable = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+    boolean offered = debuggable && coachClient != null && CoachPlans.eligible(solveType);
+    findViewById(R.id.llAnalysisPlanDebug).setVisibility(offered ? View.VISIBLE : View.GONE);
     if (!offered) {
       return;
     }
     CoachRead read = CoachRead.of(solveType);
-    CoachReply failure = read.getFailure();
-    TextView status = findViewById(R.id.tvAnalysisPlanReadStatus);
-    Button button = findViewById(R.id.buAnalysisPlanRead);
-    switch (read.getState()) {
-      case READING:
-        status.setText(R.string.coach_reading);
-        break;
-      case FAILED:
-        status.setText(failureLine(read));
-        break;
-      default:
-        break;
+    boolean failed = read.getState() == CoachRead.State.FAILED;
+    TextView status = findViewById(R.id.tvAnalysisPlanDebugStatus);
+    status.setVisibility(failed ? View.VISIBLE : View.GONE);
+    if (failed) {
+      status.setText(failureLine(read));
     }
-    status.setVisibility(read.getState() == CoachRead.State.IDLE ? View.GONE : View.VISIBLE);
-    findViewById(R.id.pbAnalysisPlanRead).setVisibility(
-        read.getState() == CoachRead.State.READING ? View.VISIBLE : View.GONE);
-    boolean capped = failure != null && failure.getRefusal() == CoachRefusal.WEEKLY_CAP_REACHED;
-    button.setVisibility(capped ? View.GONE : View.VISIBLE);
-    button.setEnabled(read.getState() != CoachRead.State.READING);
-    button.setText(read.getState() == CoachRead.State.FAILED ? R.string.coach_read_retry
-        : hasPlan ? R.string.coach_read_again : R.string.coach_read_first);
   }
 
   /**
@@ -870,12 +860,15 @@ public class AnalysisActivity extends NanoTimerActivity {
    * it was a true reading when written, and its date says as of when.
    */
   private void showPlan(StoredCoachPlan stored) {
-    hasPlan = stored != null;
+    planStatus.setHasPlan(stored != null);
     showRead();
     planView.setPlan(stored);
-    findViewById(R.id.llAnalysisPlanWritten).setVisibility(stored == null ? View.GONE : View.VISIBLE);
+    int written = stored == null ? View.GONE : View.VISIBLE;
+    findViewById(R.id.llAnalysisPlanWritten).setVisibility(written);
+    findViewById(R.id.llAnalysisPlanAreas).setVisibility(written);
     findViewById(R.id.llAnalysisPlanAbout).setVisibility(stored == null ? View.VISIBLE : View.GONE);
     if (stored == null) {
+      findViewById(R.id.tvAnalysisPlanUncited).setVisibility(View.GONE);
       return;
     }
     String headline = stored.getPlan().getHeadline();

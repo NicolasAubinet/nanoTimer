@@ -1193,10 +1193,6 @@
   <string name="analysis_plan_not_yet">Todavía no hay ningún plan aquí. Resolución y Casos siguen siendo gratis pase lo que pase con esta pestaña.</string>
   <string name="coach_written">Analizado el %1$s</string>
   <string name="coach_uncited">%1$d datos de este plan no están en tu historial y no se muestran.</string>
-  <string name="coach_read_first">Escribir mi plan</string>
-  <string name="coach_read_again">Escribir un plan nuevo</string>
-  <string name="coach_reading">Leyendo tus resoluciones y escribiendo un plan. Puede tardar un minuto.</string>
-  <string name="coach_read_retry">Reintentar</string>
   <string name="coach_refused_thin">Todavía no hay suficiente para leer. Haz algunas resoluciones más con tu cubo inteligente y vuelve a pedirlo.</string>
   <string name="coach_refused_cap">Ya has tenido todos los planes de esta semana, el próximo estará disponible el %1$s.</string>
   <string name="coach_refused_cap_undated">Ya has tenido todos los planes de esta semana.</string>
@@ -1209,6 +1205,43 @@
   <string name="coach_channel_plans">Planes del coach</string>
   <string name="coach_plan_ready_title">Tu nuevo plan está listo</string>
   <string name="coach_plan_ready_text">Mira en qué trabajar esta semana.</string>
+  <string name="coach_next_days">Próximo plan en %1$s</string>
+  <string name="coach_next_days_solves">Próximo plan en %1$s · %2$s</string>
+  <string name="coach_next_solves">Próximo plan: %1$s</string>
+  <string name="coach_first_solves">Primer plan: %1$s</string>
+  <string name="coach_next_session">Próximo plan cuando termine esta sesión</string>
+  <string name="coach_next_waiting">Próximo plan: esperando al coach</string>
+  <string name="coach_next_retry">El coach no pudo escribir este plan. Se le volverá a pedir el %1$s.</string>
+  <string name="coach_writing">Escribiendo tu plan…</string>
+  <plurals name="coach_days">
+    <item quantity="one">%d día</item>
+    <item quantity="other">%d días</item>
+  </plurals>
+  <plurals name="coach_more_solves">
+    <item quantity="one">%d resolución más</item>
+    <item quantity="other">%d resoluciones más</item>
+  </plurals>
+  <string name="coach_plans_paused">Los planes están en pausa</string>
+  <string name="coach_plans_paused_body">Un plan se escribe para un tipo de resolución 3x3 en CFOP, que no sea a ciegas y sin mezclas especiales.</string>
+  <string name="coach_plans_paused_none">No queda ninguno.</string>
+  <string name="coach_plans_written_for">Los planes se escriben para %1$s</string>
+  <string name="coach_plans_resume_here">Escribirlos para %1$s</string>
+  <string name="coach_plans_for">Planes para</string>
+  <string name="coach_settings_title">Coach</string>
+  <string name="coach_plans_setting">Planes semanales</string>
+  <string name="coach_plans_setting_summary">Escritos para %1$s</string>
+  <string name="coach_plans_setting_paused">En pausa, sin tipo de resolución para escribirlos</string>
+  <string name="coach_plans_move_title">¿Mover tus planes semanales?</string>
+  <string name="coach_plans_move_body">Se escribirán a partir de tus resoluciones de %1$s en lugar de %2$s. El próximo plan sigue llegando una semana después del último.</string>
+  <string name="coach_plans_move_confirm">Mover los planes</string>
+  <plurals name="coach_plans_move_floor">
+    <item quantity="one">%1$s necesita %2$d resolución más con smart cube antes de su primer plan.</item>
+    <item quantity="other">%1$s necesita %2$d resoluciones más con smart cube antes de su primer plan.</item>
+  </plurals>
+  <plurals name="coach_plans_for_first">
+    <item quantity="one">Primer plan tras %d resolución más</item>
+    <item quantity="other">Primer plan tras %d resoluciones más</item>
+  </plurals>
   <plurals name="coach_refused_too_few">
     <item quantity="one">Un plan necesita %1$d resoluciones con tu cubo inteligente, y tienes %2$d. Te falta %3$d.</item>
     <item quantity="other">Un plan necesita %1$d resoluciones con tu cubo inteligente, y tienes %2$d. Te faltan %3$d.</item>
@@ -1283,7 +1316,7 @@
   <string name="analysis_help_plan_drills_body">El botón de una tarjeta abre un drill hecho para ella. Cada caso sale del drill cuando has batido su objetivo unas cuantas veces.</string>
   <string name="analysis_help_plan_practice_body">Debajo del plan, los casos que más te cuestan, listos para practicar entre planes.</string>
   <string name="analysis_help_plan_new">Un plan nuevo</string>
-  <string name="analysis_help_plan_new_body">Se escribe a partir de tus últimas 100 resoluciones con smart cube, así que primero necesita esas. Pide uno nuevo tras una semana de práctica.</string>
+  <string name="analysis_help_plan_new_body">Se escribe a partir de tus últimas 100 resoluciones con smart cube, así que el primero necesita esas. Después llega un plan nuevo cada semana, cuando hayas hecho 25 resoluciones más y tu sesión haya terminado.</string>
   <string name="analysis_help_cases_title">Caso por caso</string>
   <string name="analysis_help_cases_body">Los casos del paso elegido, sobre la ventana indicada arriba.</string>
   <string name="analysis_help_standing">Cómo está un caso</string>

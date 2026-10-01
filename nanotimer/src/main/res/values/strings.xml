@@ -1240,10 +1240,6 @@
   <string name="analysis_plan_not_yet">There is no plan here yet. Solve and Cases stay free whatever lands on this tab.</string>
   <string name="coach_written">Read on %1$s</string>
   <string name="coach_uncited">%1$d of this plan\'s claims are not in your history, and are not shown.</string>
-  <string name="coach_read_first">Write my plan</string>
-  <string name="coach_read_again">Write a new plan</string>
-  <string name="coach_reading">Reading your solves and writing a plan. This can take a minute.</string>
-  <string name="coach_read_retry">Try again</string>
   <string name="coach_refused_thin">There isn\'t enough to read yet. Do a few more solves with your smart cube and ask again.</string>
   <string name="coach_refused_cap">You\'ve already had all this week\'s plans, the next one will be available on %1$s.</string>
   <string name="coach_refused_cap_undated">You\'ve already had all this week\'s plans.</string>
@@ -1256,6 +1252,43 @@
   <string name="coach_channel_plans">Coach plans</string>
   <string name="coach_plan_ready_title">Your new plan is ready</string>
   <string name="coach_plan_ready_text">See what to work on this week.</string>
+  <string name="coach_next_days">Next plan in %1$s</string>
+  <string name="coach_next_days_solves">Next plan in %1$s · %2$s</string>
+  <string name="coach_next_solves">Next plan: %1$s</string>
+  <string name="coach_first_solves">First plan: %1$s</string>
+  <string name="coach_next_session">Next plan when this session ends</string>
+  <string name="coach_next_waiting">Next plan: waiting for the coach</string>
+  <string name="coach_next_retry">The coach could not write this plan. It will be asked again on %1$s.</string>
+  <string name="coach_writing">Writing your plan…</string>
+  <plurals name="coach_days">
+    <item quantity="one">%d day</item>
+    <item quantity="other">%d days</item>
+  </plurals>
+  <plurals name="coach_more_solves">
+    <item quantity="one">%d more solve</item>
+    <item quantity="other">%d more solves</item>
+  </plurals>
+  <string name="coach_plans_paused">Plans are paused</string>
+  <string name="coach_plans_paused_body">A plan is written for a 3x3 CFOP solve type that is not blind and has no special scrambles.</string>
+  <string name="coach_plans_paused_none">None is left.</string>
+  <string name="coach_plans_written_for">Plans are written for %1$s</string>
+  <string name="coach_plans_resume_here">Write them for %1$s</string>
+  <string name="coach_plans_for">Plans for</string>
+  <string name="coach_settings_title">Coach</string>
+  <string name="coach_plans_setting">Weekly plans</string>
+  <string name="coach_plans_setting_summary">Written for %1$s</string>
+  <string name="coach_plans_setting_paused">Paused, with no solve type to write them for</string>
+  <string name="coach_plans_move_title">Move your weekly plans?</string>
+  <string name="coach_plans_move_body">They will be written from your %1$s solves instead of %2$s. The next plan still comes a week after the last one.</string>
+  <string name="coach_plans_move_confirm">Move plans</string>
+  <plurals name="coach_plans_move_floor">
+    <item quantity="one">%1$s needs %2$d more smart cube solve before its first plan.</item>
+    <item quantity="other">%1$s needs %2$d more smart cube solves before its first plan.</item>
+  </plurals>
+  <plurals name="coach_plans_for_first">
+    <item quantity="one">First plan after %d more solve</item>
+    <item quantity="other">First plan after %d more solves</item>
+  </plurals>
   <plurals name="coach_refused_too_few">
     <item quantity="one">A plan needs %1$d solves with your smart cube, and you have %2$d. %3$d more to go.</item>
     <item quantity="other">A plan needs %1$d solves with your smart cube, and you have %2$d. %3$d more to go.</item>
@@ -1333,7 +1366,7 @@
   <string name="analysis_help_plan_drills_body">A card\'s button opens a drill made for it. Each case leaves the drill once you have beaten its target a few times.</string>
   <string name="analysis_help_plan_practice_body">Under the plan, the cases costing you the most, ready to practise between plans.</string>
   <string name="analysis_help_plan_new">A new plan</string>
-  <string name="analysis_help_plan_new_body">Written from your last 100 smart cube solves, so it needs that many first. Ask for a new one after a week of practice.</string>
+  <string name="analysis_help_plan_new_body">Written from your last 100 smart cube solves, so the first one needs that many. After that a new plan comes every week, once you have done 25 more solves and your session is over.</string>
   <string name="analysis_help_cases_title">Case by case</string>
   <string name="analysis_help_cases_body">The cases of the selected step, over the window shown at the top.</string>
   <string name="analysis_help_standing">Where a case stands</string>

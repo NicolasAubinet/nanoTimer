@@ -7,6 +7,7 @@ import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ScrambleType;
 import com.cube.nanotimer.vo.SolveType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,7 +19,10 @@ public final class CoachPlans {
   private CoachPlans() {
   }
 
-  /** Whether plans can be written for the solve type: whole 3x3 solves, sighted, read as CFOP. */
+  /**
+   * Whether plans can be written for the solve type: whole 3x3 solves, sighted, read as CFOP. A
+   * type with steps of its own is read through those, so it never holds a CFOP solve.
+   */
   public static boolean eligible(SolveType solveType) {
     return eligible(solveType, SolveTypeMethod.of(solveType));
   }
@@ -29,6 +33,7 @@ public final class CoachPlans {
     return solveType.getCubeTypeId() == CubeType.THREE_BY_THREE.getId()
         && !solveType.isBlind()
         && method == CubeMethod.CFOP
+        && !solveType.hasSteps()
         && (scrambleType == null || scrambleType.isDefault());
   }
 
@@ -44,6 +49,28 @@ public final class CoachPlans {
       return now;
     }
     return last;
+  }
+
+  /** Until when a refusal keeps the weekly job from asking the coach, 0 when it may ask. */
+  public static long heldUntil(long now) {
+    long askAgainAt = Options.INSTANCE.getCoachAskAgainAt();
+    return CoachPlanJob.held(askAgainAt, now) ? askAgainAt : 0;
+  }
+
+  /** Writes the plans for another solve type from now on. The week since the last plan is kept. */
+  public static void moveTo(SolveType solveType) {
+    Options.INSTANCE.setCoachPlansSolveType(solveType.getId());
+  }
+
+  /** The solve types plans can be written for, in the order given. */
+  public static List<SolveType> eligible(List<SolveType> solveTypes) {
+    List<SolveType> eligible = new ArrayList<SolveType>();
+    for (SolveType solveType : solveTypes) {
+      if (eligible(solveType)) {
+        eligible.add(solveType);
+      }
+    }
+    return eligible;
   }
 
   /**

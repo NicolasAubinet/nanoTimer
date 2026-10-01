@@ -9,14 +9,16 @@ package com.cube.nanotimer.coach;
  */
 public final class PlanSchedule {
 
+  private static final long DAY_MS = 24L * 60 * 60 * 1000;
+
   /** How long after a plan the next one is due. */
-  public static final long PERIOD_MS = 7L * 24 * 60 * 60 * 1000;
+  public static final long PERIOD_MS = 7 * DAY_MS;
 
   /** How long after a solve a plan is not asked for, so it reads the whole session. */
   public static final long QUIET_MS = 15L * 60 * 1000;
 
   /** How long after a plan the solver is told how many solves the next one still needs. */
-  public static final long NUDGE_AFTER_MS = 4L * 24 * 60 * 60 * 1000;
+  public static final long NUDGE_AFTER_MS = 4 * DAY_MS;
 
   public enum State {
     /** Less than a week since the last plan. */
@@ -82,6 +84,12 @@ public final class PlanSchedule {
   /** When the next plan is due, 0 for a first plan. */
   public long getDueAt() {
     return isFirst() ? 0 : lastPlanAt + PERIOD_MS;
+  }
+
+  /** How many days are left before the next plan is due, a started day counting, 0 once it is. */
+  public int getDaysUntilDue() {
+    long left = getDueAt() - now;
+    return left <= 0 ? 0 : (int) ((left + DAY_MS - 1) / DAY_MS);
   }
 
   /** When the last solve stops holding a plan back, 0 when there is no solve. */

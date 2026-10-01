@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One solve type the plans can be written for: its name, how far it is from a first plan when it
+     has too few smart cube solves, and how many it has. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:layout_marginTop="8dp"
+   android:background="@drawable/coach_plans_for_row"
+   android:gravity="center_vertical"
+   android:minHeight="54dp"
+   android:orientation="horizontal"
+   android:paddingLeft="10dp"
+   android:paddingRight="10dp">
+
+  <ImageView
+     android:id="@+id/imgCoachPlansForType"
+     android:layout_width="30dp"
+     android:layout_height="30dp"
+     android:layout_marginEnd="12dp"
+     android:layout_marginRight="12dp"
+     android:background="@drawable/coach_plans_for_mark"
+     android:padding="5dp"
+     android:contentDescription="@null"/>
+
+  <LinearLayout
+     android:layout_width="0dp"
+     android:layout_height="wrap_content"
+     android:layout_weight="1"
+     android:orientation="vertical">
+
+    <TextView
+       android:id="@+id/tvCoachPlansForName"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:fontFamily="@font/roboto_medium"
+       android:textColor="@color/white"
+       android:textSize="15sp"/>
+
+    <TextView
+       android:id="@+id/tvCoachPlansForNote"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:textColor="@color/secondary_text"
+       android:textSize="12sp"
+       android:visibility="gone"/>
+  </LinearLayout>
+
+  <TextView
+     android:id="@+id/tvCoachPlansForCount"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_marginStart="10dp"
+     android:layout_marginLeft="10dp"
+     android:background="@drawable/coach_plans_for_count"
+     android:paddingLeft="9dp"
+     android:paddingRight="9dp"
+     android:paddingTop="3dp"
+     android:paddingBottom="3dp"
+     android:textColor="@color/white"
+     android:textSize="12sp"/>
+
+</LinearLayout>

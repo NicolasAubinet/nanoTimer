@@ -55,8 +55,11 @@ final class CoachPlanJob {
    *
    * @param debugSolveTypeId a solve type to ask for now, whatever the schedule says and whether or
    *     not the solver agreed to weekly plans, or -1 for the weekly plan
+   * @param onScreen whether the solver is looking at the Plan tab, where a first plan does not
+   *     wait for the session to end
    */
-  static Outcome run(Context context, int debugSolveTypeId) throws InterruptedException {
+  static Outcome run(Context context, int debugSolveTypeId, boolean onScreen)
+      throws InterruptedException {
     // The process may have been started for this alone, with no screen to have set either.
     Utils.updateContextWithPrefsLocale(context);
     App.INSTANCE.setApplicationContext(context);
@@ -76,7 +79,7 @@ final class CoachPlanJob {
         return Outcome.DONE;
       }
       PlanSchedule schedule = schedule(solveType, lastPlanAt, now);
-      if (!schedule.mayAsk(false)) {
+      if (!schedule.mayAsk(onScreen)) {
         if (schedule.getState() == PlanSchedule.State.QUIET) {
           CoachPlanWorker.runIn(context, schedule.getQuietUntil() - now); // the session is still on
         }

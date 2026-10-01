@@ -5,6 +5,7 @@ import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ScrambleType;
 import com.cube.nanotimer.vo.ScrambleTypes;
 import com.cube.nanotimer.vo.SolveType;
+import com.cube.nanotimer.vo.SolveTypeStep;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,6 +38,15 @@ public class CoachPlansTest {
     ScrambleType pll = new ScrambleType("pll") {
     };
     Assert.assertFalse(CoachPlans.eligible(type(false, pll, THREE), CubeMethod.CFOP));
+  }
+
+  /** Its solves are split by its own steps, and no method is read into them. */
+  @Test
+  public void aTypeWithStepsOfItsOwnIsNot() {
+    SolveType stepped = type(false, null, THREE);
+    stepped.setSteps(new SolveTypeStep[] {new SolveTypeStep()});
+
+    Assert.assertFalse(CoachPlans.eligible(stepped, CubeMethod.CFOP));
   }
 
   @Test

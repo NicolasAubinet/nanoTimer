@@ -30,6 +30,7 @@ public final class CoachPlanWorker extends Worker {
   private static final String WEEKLY = "coach_plan_weekly";
   private static final String ONCE = "coach_plan_once";
   private static final String DEBUG_SOLVE_TYPE = "debug_solve_type";
+  private static final String ON_SCREEN = "on_screen";
 
   /** After this many tries in a row the job waits for its next occasion. */
   private static final int MAX_ATTEMPTS = 5;
@@ -45,7 +46,7 @@ public final class CoachPlanWorker extends Worker {
   public Result doWork() {
     try {
       CoachPlanJob.Outcome outcome = CoachPlanJob.run(getApplicationContext(),
-          getInputData().getInt(DEBUG_SOLVE_TYPE, -1));
+          getInputData().getInt(DEBUG_SOLVE_TYPE, -1), getInputData().getBoolean(ON_SCREEN, false));
       return outcome == CoachPlanJob.Outcome.RETRY && getRunAttemptCount() + 1 < MAX_ATTEMPTS
           ? Result.retry() : Result.success();
     } catch (InterruptedException e) {
@@ -64,8 +65,23 @@ public final class CoachPlanWorker extends Worker {
         new PeriodicWorkRequest.Builder(CoachPlanWorker.class, 7, TimeUnit.DAYS)
             .setConstraints(online())
             .build());
-    // Kept, not replaced: one waiting for a session to end is the same check, at a better time.
-    manager.enqueueUniqueWork(ONCE, ExistingWorkPolicy.KEEP, once(0, Data.EMPTY));
+    check(context);
+  }
+
+  /**
+   * Checks whether a plan is due now. A check already waiting for a session to end is kept: it is
+   * the same check, at a better time.
+   */
+  public static void check(Context context) {
+    WorkManager.getInstance(context.getApplicationContext())
+        .enqueueUniqueWork(ONCE, ExistingWorkPolicy.KEEP, once(0, Data.EMPTY));
+  }
+
+  /** Checks now, for a solver who is looking at the Plan tab: a first plan does not wait. */
+  public static void checkFromScreen(Context context) {
+    Data onScreen = new Data.Builder().putBoolean(ON_SCREEN, true).build();
+    WorkManager.getInstance(context.getApplicationContext())
+        .enqueueUniqueWork(ONCE, ExistingWorkPolicy.REPLACE, once(0, onScreen));
   }
 
   /** Checks again once the session has gone quiet, each solve of the plans' type pushing it back. */

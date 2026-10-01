@@ -29,6 +29,17 @@ public class PlanScheduleTest {
         PlanSchedule.of(PLAN, 300, SINCE, OLD_SOLVE, PLAN + 7 * DAY).getState());
   }
 
+  /** What the Plan tab says: "in 4 days" for anything from three days and a bit to four. */
+  @Test
+  public void testTheDaysLeftCountAStartedDay() {
+    Assert.assertEquals(7, PlanSchedule.of(PLAN, 300, 0, 0, PLAN + 1).getDaysUntilDue());
+    Assert.assertEquals(4, PlanSchedule.of(PLAN, 300, 0, 0, PLAN + 3 * DAY).getDaysUntilDue());
+    Assert.assertEquals(4, PlanSchedule.of(PLAN, 300, 0, 0, PLAN + 3 * DAY + 1).getDaysUntilDue());
+    Assert.assertEquals(1, PlanSchedule.of(PLAN, 300, 0, 0, PLAN + 7 * DAY - 1).getDaysUntilDue());
+    Assert.assertEquals(0, PlanSchedule.of(PLAN, 300, 0, 0, PLAN + 7 * DAY).getDaysUntilDue());
+    Assert.assertEquals(0, PlanSchedule.of(0, 300, 0, 0, PLAN).getDaysUntilDue());
+  }
+
   @Test
   public void testADuePlanWaitsForTheNewSolves() {
     PlanSchedule schedule = PlanSchedule.of(PLAN, 300, SINCE - 12, OLD_SOLVE, PLAN + 30 * DAY);

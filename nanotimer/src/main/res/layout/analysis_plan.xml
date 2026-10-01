@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The plan tab: the last plan written for this solve type, or what a plan is where none has been.
+<!-- The plan tab: the last plan written for this solve type, or what a plan is where none has been,
+     with when the next one comes.
 
      The explainer never mocks a plan up: a plan the app did not write, rendered beside figures it
      did, is the one arrangement that can make a true number look invented. -->
@@ -34,23 +35,83 @@
        android:layout_marginTop="4dp"
        android:textColor="@color/secondary_text"
        android:textSize="12.5sp"/>
+  </LinearLayout>
+
+  <!-- When the next plan comes, or where the plans go. Under the headline on the plans' own solve
+       type, and above everything on another one. Gone until weekly plans are on. -->
+  <LinearLayout
+     android:id="@+id/llCoachPlanStatus"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:orientation="vertical"
+     android:visibility="gone">
+
+    <View
+       android:id="@+id/vCoachPlanStatusRule"
+       android:layout_width="match_parent"
+       android:layout_height="1dp"
+       android:layout_marginTop="10dp"
+       android:layout_marginBottom="10dp"
+       android:background="@color/hero_divider"/>
 
     <LinearLayout
-       android:id="@+id/llAnalysisPlanAreas"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:orientation="vertical"/>
+       android:gravity="center_vertical"
+       android:orientation="horizontal">
+
+      <!-- Only while something is under way: a plan being written, or a session being waited out. -->
+      <ProgressBar
+         android:id="@+id/pbCoachPlanStatus"
+         style="?android:attr/progressBarStyleSmall"
+         android:layout_width="14dp"
+         android:layout_height="14dp"
+         android:layout_marginEnd="8dp"
+         android:layout_marginRight="8dp"
+         android:visibility="gone"/>
+
+      <TextView
+         android:id="@+id/tvCoachPlanStatus"
+         android:layout_width="0dp"
+         android:layout_height="wrap_content"
+         android:layout_weight="1"
+         android:textColor="@color/secondary_text"
+         android:textSize="14sp"/>
+    </LinearLayout>
 
     <TextView
-       android:id="@+id/tvAnalysisPlanUncited"
+       android:id="@+id/tvCoachPlanStatusBody"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_marginTop="@dimen/space_m"
-       android:gravity="center"
+       android:layout_marginTop="6dp"
+       android:lineSpacingMultiplier="1.2"
        android:textColor="@color/secondary_text"
-       android:textSize="12.5sp"
+       android:textSize="13.5sp"
+       android:visibility="gone"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+       android:id="@+id/buCoachPlanStatus"
+       style="@style/DialogActionButton"
+       android:layout_marginTop="16dp"
        android:visibility="gone"/>
   </LinearLayout>
+
+  <LinearLayout
+     android:id="@+id/llAnalysisPlanAreas"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:orientation="vertical"
+     android:visibility="gone"/>
+
+  <TextView
+     android:id="@+id/tvAnalysisPlanUncited"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="@dimen/space_m"
+     android:gravity="center"
+     android:textColor="@color/secondary_text"
+     android:textSize="12.5sp"
+     android:visibility="gone"/>
 
   <LinearLayout
      android:id="@+id/llAnalysisPlanAbout"
@@ -113,27 +174,17 @@
        android:textSize="12.5sp"/>
   </LinearLayout>
 
-  <!-- Asking for a plan, under whichever of the two is showing. Gone in a build with no coach. -->
+  <!-- Debug builds only: runs the weekly job now for this solve type, and says how it ended. -->
   <LinearLayout
-     android:id="@+id/llAnalysisPlanRead"
+     android:id="@+id/llAnalysisPlanDebug"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
      android:layout_marginTop="16dp"
      android:orientation="vertical"
      android:visibility="gone">
 
-    <!-- Only while reading: a minute of nothing moving reads as a screen that has stopped. -->
-    <ProgressBar
-       android:id="@+id/pbAnalysisPlanRead"
-       style="?android:attr/progressBarStyleSmall"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_gravity="center"
-       android:layout_marginBottom="8dp"
-       android:visibility="gone"/>
-
     <TextView
-       android:id="@+id/tvAnalysisPlanReadStatus"
+       android:id="@+id/tvAnalysisPlanDebugStatus"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:layout_marginBottom="8dp"
@@ -143,16 +194,9 @@
        android:visibility="gone"/>
 
     <androidx.appcompat.widget.AppCompatButton
-       android:id="@+id/buAnalysisPlanRead"
-       style="@style/DialogActionButton"/>
-
-    <!-- Debug builds only: runs the weekly job now, for this solve type. -->
-    <androidx.appcompat.widget.AppCompatButton
        android:id="@+id/buAnalysisPlanAskNow"
        style="@style/DialogActionButton"
-       android:layout_marginTop="8dp"
        android:text="Ask now (debug)"
-       android:visibility="gone"
        tools:ignore="HardcodedText"/>
   </LinearLayout>
 

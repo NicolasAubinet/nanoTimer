@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Which solve type the weekly plans are written for: the ones that can carry them, to pick from. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content">
+
+  <LinearLayout
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:orientation="vertical"
+     android:paddingLeft="20dp"
+     android:paddingRight="20dp"
+     android:paddingTop="20dp"
+     android:paddingBottom="4dp">
+
+    <TextView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:fontFamily="@font/roboto_medium"
+       android:text="@string/coach_plans_for"
+       android:textColor="@color/white"
+       android:textSize="19sp"/>
+
+    <!-- One coach_plans_for_item per solve type, added in code. -->
+    <LinearLayout
+       android:id="@+id/llCoachPlansForTypes"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="vertical"/>
+
+  </LinearLayout>
+
+</ScrollView>

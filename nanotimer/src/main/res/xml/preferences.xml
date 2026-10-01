@@ -174,6 +174,17 @@
 
   </PreferenceCategory>
 
+  <!-- Only once weekly plans are on: there is nothing to set before that. -->
+  <PreferenceCategory
+     android:key="coach_category"
+     android:title="@string/coach_settings_title">
+
+    <Preference
+       android:key="coach_plans_for"
+       android:title="@string/coach_plans_setting"/>
+
+  </PreferenceCategory>
+
   <PreferenceCategory
      android:title="@string/scrambles">
 
