@@ -185,6 +185,24 @@ public final class CubeRotation {
   }
 
   /**
+   * How far an uprighted delta sits off the nearest of the 24, as a signed turn in degrees about
+   * the vertical. Taken off the reference's yaw, it draws that grip square again: a reference is a
+   * turn about the vertical too, so the two add.
+   */
+  public static double yawOffSquare(CubeOrientation delta) {
+    CubeOrientation pose = toCubeFrame(delta);
+    CubeOrientation residual = pose.multiply(ofQuaternion(pose).quaternion.inverse());
+    // Only the twist about U (the cube's y) is a yaw; a tilt left in it is not ours to correct.
+    double w = residual.getW();
+    double y = residual.getY();
+    if (w < 0) {
+      w = -w;
+      y = -y;
+    }
+    return Math.toDegrees(2 * Math.atan2(y, w));
+  }
+
+  /**
    * The rotation best matching {@code delta}, a body-frame delta straight from the gyro, or null
    * if it is too far from any of the 24 to call (a reading taken mid-turn, say).
    */

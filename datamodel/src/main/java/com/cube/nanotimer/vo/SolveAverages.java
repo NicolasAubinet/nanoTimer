@@ -31,6 +31,9 @@ public class SolveAverages {
   private Integer accuracyOf100;
   private Integer lifetimeAccuracy;
 
+  private int rank;
+  private int rankedCount;
+
   public SolveAverages() {
   }
 
@@ -254,6 +257,28 @@ public class SolveAverages {
 
   public void setLifetimeAccuracy(Integer lifetimeAccuracy) {
     this.lifetimeAccuracy = lifetimeAccuracy;
+  }
+
+  /**
+   * The lifetime rank of the solve these averages were returned for, as
+   * {@link SolveTimeAverages#getRank()} counts it: 1 for the best ever, 0 for a DNF or when no solve
+   * is carried.
+   */
+  public int getRank() {
+    return rank;
+  }
+
+  public void setRank(int rank) {
+    this.rank = rank;
+  }
+
+  /** How many solves the rank was taken among. */
+  public int getRankedCount() {
+    return rankedCount;
+  }
+
+  public void setRankedCount(int rankedCount) {
+    this.rankedCount = rankedCount;
   }
 
   @Override

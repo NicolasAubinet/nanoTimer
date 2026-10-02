@@ -295,6 +295,7 @@ public class ServiceProviderImpl implements ServiceProvider {
 
     SolveAverages solveAverages = getSolveAverages(solveTime.getSolveType());
     solveAverages.setSolveTime(solveTime);
+    fillRank(solveAverages, solveTime);
 
     return solveAverages;
   }
@@ -465,6 +466,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     if (updateCachesFromDB) {
       solveAverages = updateAveragesAndPBCaches(solveTime.getSolveType());
       solveAverages.setSolveTime(solveTime);
+      fillRank(solveAverages, solveTime);
     }
     return solveAverages;
   }
@@ -1611,9 +1613,32 @@ public class ServiceProviderImpl implements ServiceProvider {
    * sides: they have no standing themselves, and they are not something a time can be ranked past.
    */
   private void fillRank(SolveTimeAverages sta) {
-    if (sta.isDNF() || sta.getSolveType() == null) {
+    int[] standing = lifetimeStanding(sta);
+    if (standing == null) {
       return;
     }
+    sta.setRankedCount(standing[0]);
+    sta.setRank(standing[1]);
+    if (sta.getRank() == 1) {
+      sta.setRunnerUp(getBestTimeExcluding(sta));
+    }
+  }
+
+  // The same standing on the averages a save returns, so the timer names a rank as the details do.
+  private void fillRank(SolveAverages averages, SolveTime solveTime) {
+    int[] standing = lifetimeStanding(solveTime);
+    if (standing != null) {
+      averages.setRankedCount(standing[0]);
+      averages.setRank(standing[1]);
+    }
+  }
+
+  /** The count of ranked solves and the solve's rank among them, null when it has no standing. */
+  private int[] lifetimeStanding(SolveTime solveTime) {
+    if (solveTime.isDNF() || solveTime.getSolveType() == null) {
+      return null;
+    }
+    int[] standing = null;
     StringBuilder q = new StringBuilder();
     q.append("SELECT COUNT(*)");
     q.append("     , SUM(CASE WHEN ").append(DB.COL_TIMEHISTORY_TIME).append(" < ? THEN 1 ELSE 0 END)");
@@ -1621,17 +1646,15 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append(" WHERE ").append(DB.COL_TIMEHISTORY_SOLVETYPE_ID).append(" = ?");
     q.append("   AND ").append(DB.COL_TIMEHISTORY_TIME).append(" > 0");
     Cursor cursor = db.rawQuery(q.toString(),
-        getStringArray(sta.getTime(), sta.getSolveType().getId()));
+        getStringArray(solveTime.getTime(), solveTime.getSolveType().getId()));
     if (cursor != null) {
       if (cursor.moveToFirst()) {
-        sta.setRankedCount(cursor.getInt(0));
-        sta.setRank(cursor.getInt(1) + 1); // the solves that beat it, and then itself
+        // the solves that beat it, and then itself
+        standing = new int[] { cursor.getInt(0), cursor.getInt(1) + 1 };
       }
       cursor.close();
     }
-    if (sta.getRank() == 1) {
-      sta.setRunnerUp(getBestTimeExcluding(sta));
-    }
+    return standing;
   }
 
   /**
