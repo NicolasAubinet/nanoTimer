@@ -99,7 +99,7 @@ final class CoachPlanJob {
       if (started) { // a plan somebody else asked for is theirs to announce
         notifyPlanReady(context, solveType);
       }
-      CoachPlanWorker.scheduleReminder(context, true);
+      CoachPlanWorker.scheduleAfterPlan(context, true);
       return Outcome.DONE;
     }
     long wait = waitAfter(answer.failure);

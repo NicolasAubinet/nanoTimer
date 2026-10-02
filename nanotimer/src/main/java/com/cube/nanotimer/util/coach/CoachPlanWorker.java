@@ -21,15 +21,16 @@ import com.cube.nanotimer.vo.SolveType;
 import java.util.concurrent.TimeUnit;
 
 /**
- * When {@link CoachPlanJob} runs: once a week, at every start of the app, and once a session on
- * the plans' solve type has gone quiet. The last two share one piece of unique work, so a solve
- * pushes back whatever was waiting.
+ * When {@link CoachPlanJob} runs: once a week, on the day the next plan is due, at every start of
+ * the app, and once a session on the plans' solve type has gone quiet. The last two share one
+ * piece of unique work, so a solve pushes back whatever was waiting.
  */
 public final class CoachPlanWorker extends Worker {
 
   private static final String WEEKLY = "coach_plan_weekly";
   private static final String ONCE = "coach_plan_once";
   private static final String REMINDER = "coach_plan_reminder";
+  private static final String DUE = "coach_plan_due";
   private static final String DEBUG_SOLVE_TYPE = "debug_solve_type";
   private static final String ON_SCREEN = "on_screen";
 
@@ -67,23 +68,32 @@ public final class CoachPlanWorker extends Worker {
             .setConstraints(online())
             .build());
     check(context);
-    scheduleReminder(context, false);
+    scheduleAfterPlan(context, false);
   }
 
   /**
-   * Runs the job again on the day the solver is to be reminded of the solves the next plan needs,
-   * which no other run is sure to fall on.
+   * Runs the job again on the two days no other run is sure to fall on: the day the solver is to
+   * be reminded of the solves the next plan needs, and the day that plan is due, which a solver
+   * who already has the solves may spend away from the app.
    *
-   * @param newPlan whether a plan was just written, which moves the day
+   * @param newPlan whether a plan was just written, which moves both days
    */
-  static void scheduleReminder(Context context, boolean newPlan) {
+  static void scheduleAfterPlan(Context context, boolean newPlan) {
     long now = System.currentTimeMillis();
-    long wait = CoachPlans.lastPlanAt(now) + PlanSchedule.NUDGE_AFTER_MS - now;
+    long lastPlanAt = CoachPlans.lastPlanAt(now);
+    if (lastPlanAt == 0) {
+      return; // no plan yet: the first one waits for solves, not for a day
+    }
+    runAt(context, REMINDER, lastPlanAt + PlanSchedule.NUDGE_AFTER_MS - now, newPlan);
+    runAt(context, DUE, lastPlanAt + PlanSchedule.PERIOD_MS - now, newPlan);
+  }
+
+  private static void runAt(Context context, String name, long wait, boolean replace) {
     if (wait <= 0) {
       return; // that day has come: every run of the job looks at it from here on
     }
-    WorkManager.getInstance(context.getApplicationContext()).enqueueUniqueWork(REMINDER,
-        newPlan ? ExistingWorkPolicy.REPLACE : ExistingWorkPolicy.KEEP, once(wait, Data.EMPTY));
+    WorkManager.getInstance(context.getApplicationContext()).enqueueUniqueWork(name,
+        replace ? ExistingWorkPolicy.REPLACE : ExistingWorkPolicy.KEEP, once(wait, Data.EMPTY));
   }
 
   /**
