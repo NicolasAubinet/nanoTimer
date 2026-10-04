@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
-// The coach service's address and token, kept out of the repository. A build without them has no
-// coach.
+// The coach service's address and token, kept out of the repository. A build without the address
+// has no coach; one without the token asks by its Coach ID, which the service must hold a grant for.
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {

@@ -20,7 +20,8 @@ import org.json.JSONObject;
  * Asks the coach service for a plan. The one place the app talks to the network.
  *
  * <p>The address and token come from {@code coach.url} and {@code coach.token} in
- * {@code local.properties}, so a build made without them has no coach to ask.
+ * {@code local.properties}. A build made without the address has no coach to ask; the token is the
+ * owner's own device's.
  */
 public final class CoachClient {
 
@@ -44,12 +45,14 @@ public final class CoachClient {
     this.coachId = coachId;
   }
 
-  /** The client this build was configured with, or null when it was built without a coach. */
+  /**
+   * The client this build was configured with, or null when it was built without a coach. A build
+   * with no token is known to the service by its Coach ID alone.
+   */
   public static CoachClient configured(Context context) {
     String url = context.getString(R.string.coach_url);
     String token = context.getString(R.string.coach_token);
-    return url.isEmpty() || token.isEmpty() ? null
-        : new CoachClient(url, token, Options.INSTANCE.getCoachId());
+    return url.isEmpty() ? null : new CoachClient(url, token, Options.INSTANCE.getCoachId());
   }
 
   /**
@@ -101,7 +104,9 @@ public final class CoachClient {
       connection.setRequestMethod("POST");
       connection.setDoOutput(true);
       connection.setFixedLengthStreamingMode(body.length);
-      connection.setRequestProperty("Authorization", "Bearer " + token);
+      if (!token.isEmpty()) {
+        connection.setRequestProperty("Authorization", "Bearer " + token);
+      }
       connection.setRequestProperty("Coach-Id", coachId);
       connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
       try (OutputStream out = connection.getOutputStream()) {
