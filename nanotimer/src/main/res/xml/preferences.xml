@@ -174,7 +174,7 @@
 
   </PreferenceCategory>
 
-  <!-- Only once weekly plans are on: there is nothing to set before that. -->
+  <!-- Only in a build with a coach. The two settings show once weekly plans are on. -->
   <PreferenceCategory
      android:key="coach_category"
      android:title="@string/coach_settings_title">
@@ -188,6 +188,10 @@
        android:title="@string/coach_reminder_setting"
        android:summary="@string/coach_reminder_setting_summary"
        android:defaultValue="true"/>
+
+    <Preference
+       android:key="coach_id"
+       android:title="@string/coach_id"/>
 
   </PreferenceCategory>
 

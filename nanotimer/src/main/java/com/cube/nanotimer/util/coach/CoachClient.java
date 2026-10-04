@@ -1,6 +1,7 @@
 package com.cube.nanotimer.util.coach;
 
 import android.content.Context;
+import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.coach.CoachPayload;
 
@@ -33,19 +34,22 @@ public final class CoachClient {
   private final String planUrl;
   private final String practiceUrl;
   private final String token;
+  private final String coachId;
 
-  CoachClient(String baseUrl, String token) {
+  CoachClient(String baseUrl, String token, String coachId) {
     String base = baseUrl.replaceAll("/+$", "");
     this.planUrl = base + "/v1/plan";
     this.practiceUrl = base + "/v1/practice";
     this.token = token;
+    this.coachId = coachId;
   }
 
   /** The client this build was configured with, or null when it was built without a coach. */
   public static CoachClient configured(Context context) {
     String url = context.getString(R.string.coach_url);
     String token = context.getString(R.string.coach_token);
-    return url.isEmpty() || token.isEmpty() ? null : new CoachClient(url, token);
+    return url.isEmpty() || token.isEmpty() ? null
+        : new CoachClient(url, token, Options.INSTANCE.getCoachId());
   }
 
   /**
@@ -98,6 +102,7 @@ public final class CoachClient {
       connection.setDoOutput(true);
       connection.setFixedLengthStreamingMode(body.length);
       connection.setRequestProperty("Authorization", "Bearer " + token);
+      connection.setRequestProperty("Coach-Id", coachId);
       connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
       try (OutputStream out = connection.getOutputStream()) {
         out.write(body);

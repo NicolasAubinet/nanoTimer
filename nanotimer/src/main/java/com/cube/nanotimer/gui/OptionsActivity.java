@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.cube.nanotimer.App;
@@ -82,16 +83,34 @@ public class OptionsActivity extends NanoTimerActivity {
       }
     }
 
-    /** The coach's settings, for a solver who has weekly plans: which solve type they are for. */
+    /**
+     * The coach's section: this install's id, and for a solver who has weekly plans, which solve
+     * type they are for and the reminder.
+     */
     private void showCoach() {
-      Preference coach = findPreference("coach_category");
+      PreferenceCategory coach = (PreferenceCategory) findPreference("coach_category");
+      Preference coachId = findPreference("coach_id");
       final Preference plansFor = findPreference("coach_plans_for");
-      if (coach == null || plansFor == null) {
+      Preference nudge = findPreference("coach_nudge_on");
+      if (coach == null || coachId == null || plansFor == null || nudge == null) {
         return;
       }
-      if (!SmartCubeGate.ENABLED || CoachClient.configured(getActivity()) == null
-          || !Options.INSTANCE.isCoachPlansOn()) {
+      if (!SmartCubeGate.ENABLED || CoachClient.configured(getActivity()) == null) {
         getPreferenceScreen().removePreference(coach);
+        return;
+      }
+      final String id = Options.INSTANCE.getCoachId();
+      coachId.setSummary(id);
+      coachId.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
+          DialogUtils.copyToClipboard(getActivity(), "coach id", id, R.string.coach_id_copied);
+          return true;
+        }
+      });
+      if (!Options.INSTANCE.isCoachPlansOn()) {
+        coach.removePreference(plansFor);
+        coach.removePreference(nudge);
         return;
       }
       showPlansFor(plansFor);

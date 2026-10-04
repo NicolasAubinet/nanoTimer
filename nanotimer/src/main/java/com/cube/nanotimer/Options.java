@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public enum Options {
   INSTANCE;
@@ -85,6 +86,7 @@ public enum Options {
   private static final String COACH_PENDING_KEY_PREFIX = "coach_pending_";
   private static final String COACH_PENDING_AT_KEY_PREFIX = "coach_pending_at_";
   private static final String COACH_PRACTICE_KEY_PREFIX = "coach_practice_";
+  private static final String COACH_ID_KEY = "coach_id";
   private static final String COACH_PLANS_ON_KEY = "coach_plans_on";
   private static final String COACH_PLANS_SOLVE_TYPE_KEY = "coach_plans_solve_type";
   private static final String COACH_LAST_PLAN_KEY = "coach_last_plan_at";
@@ -350,6 +352,16 @@ public enum Options {
 
   public void setCoachPractice(int solveTypeId, String reply) {
     sharedPreferences.edit().putString(COACH_PRACTICE_KEY_PREFIX + solveTypeId, reply).apply();
+  }
+
+  /** The id the coach service knows this install by, made the first time it is read. */
+  public synchronized String getCoachId() {
+    String id = sharedPreferences.getString(COACH_ID_KEY, null);
+    if (id == null) {
+      id = UUID.randomUUID().toString();
+      sharedPreferences.edit().putString(COACH_ID_KEY, id).commit();
+    }
+    return id;
   }
 
   /** Whether the solver agreed to weekly plans, which are asked for in the background. */

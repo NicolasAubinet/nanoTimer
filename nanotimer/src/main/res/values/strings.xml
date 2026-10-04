@@ -1300,6 +1300,8 @@
   <string name="coach_plans_for">Plans for</string>
   <string name="coach_settings_title">Coach</string>
   <string name="coach_plans_setting">Weekly plans</string>
+  <string name="coach_id">Coach ID</string>
+  <string name="coach_id_copied">Coach ID copied</string>
   <string name="coach_plans_setting_summary">Written for %1$s</string>
   <string name="coach_plans_setting_paused">Paused, with no solve type to write them for</string>
   <string name="coach_plans_move_title">Move your weekly plans?</string>

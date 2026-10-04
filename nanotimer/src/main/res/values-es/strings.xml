@@ -1253,6 +1253,8 @@
   <string name="coach_plans_for">Planes para</string>
   <string name="coach_settings_title">Coach</string>
   <string name="coach_plans_setting">Planes semanales</string>
+  <string name="coach_id">ID de Coach</string>
+  <string name="coach_id_copied">ID de Coach copiado</string>
   <string name="coach_plans_setting_summary">Escritos para %1$s</string>
   <string name="coach_plans_setting_paused">En pausa, sin tipo de resolución para escribirlos</string>
   <string name="coach_plans_move_title">¿Mover tus planes semanales?</string>
