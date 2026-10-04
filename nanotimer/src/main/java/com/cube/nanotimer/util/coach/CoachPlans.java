@@ -1,5 +1,7 @@
 package com.cube.nanotimer.util.coach;
 
+import com.cube.nanotimer.App;
+import com.cube.nanotimer.DynamicTranslations;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.cube.SolveTypeMethod;
 import com.cube.nanotimer.vo.CubeMethod;
@@ -20,8 +22,8 @@ public final class CoachPlans {
   }
 
   /**
-   * Whether plans can be written for the solve type: whole 3x3 solves, sighted, read as CFOP. A
-   * type with steps of its own is read through those, so it never holds a CFOP solve.
+   * Whether plans can be written for the solve type: whole 3x3 solves, sighted, two-handed, read
+   * as CFOP. A type with steps of its own is read through those, so it never holds a CFOP solve.
    */
   public static boolean eligible(SolveType solveType) {
     return eligible(solveType, SolveTypeMethod.of(solveType));
@@ -40,9 +42,16 @@ public final class CoachPlans {
 
   /** @param method the method the solve type's solves are read as */
   static boolean eligible(SolveType solveType, CubeMethod method) {
+    DynamicTranslations names = App.INSTANCE.getDynamicTranslations();
+    return eligible(solveType, method, names != null && names.isOneHanded(solveType.getName()));
+  }
+
+  /** @param oneHanded the coach's bars are two-handed ones, so a one-handed type gets no plan */
+  static boolean eligible(SolveType solveType, CubeMethod method, boolean oneHanded) {
     ScrambleType scrambleType = solveType.getScrambleType();
     return solveType.getCubeTypeId() == CubeType.THREE_BY_THREE.getId()
         && !solveType.isBlind()
+        && !oneHanded
         && method == CubeMethod.CFOP
         && !solveType.hasSteps()
         && (scrambleType == null || scrambleType.isDefault());

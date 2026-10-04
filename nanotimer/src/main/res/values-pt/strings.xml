@@ -1249,7 +1249,7 @@
     <item quantity="other">mais %d resoluções</item>
   </plurals>
   <string name="coach_plans_paused">Os planos estão em pausa</string>
-  <string name="coach_plans_paused_body">Um plano é escrito para um tipo de resolução 3x3 em CFOP, que não seja às cegas e sem scrambles especiais.</string>
+  <string name="coach_plans_paused_body">Um plano é escrito para um tipo de resolução 3x3 em CFOP sem scrambles especiais.</string>
   <string name="coach_plans_paused_none">Não resta nenhum.</string>
   <string name="coach_plans_written_for">Os planos são escritos para %1$s</string>
   <string name="coach_plans_resume_here">Escrevê-los para %1$s</string>

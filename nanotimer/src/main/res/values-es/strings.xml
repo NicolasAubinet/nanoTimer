@@ -1246,7 +1246,7 @@
     <item quantity="other">%d resoluciones más</item>
   </plurals>
   <string name="coach_plans_paused">Los planes están en pausa</string>
-  <string name="coach_plans_paused_body">Un plan se escribe para un tipo de resolución 3x3 en CFOP, que no sea a ciegas y sin mezclas especiales.</string>
+  <string name="coach_plans_paused_body">Un plan se escribe para un tipo de resolución 3x3 en CFOP sin mezclas especiales.</string>
   <string name="coach_plans_paused_none">No queda ninguno.</string>
   <string name="coach_plans_written_for">Los planes se escriben para %1$s</string>
   <string name="coach_plans_resume_here">Escribirlos para %1$s</string>

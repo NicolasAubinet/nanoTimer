@@ -51,8 +51,17 @@ public class DynamicTranslations {
   }
 
   private void addSolveTypeNameTranslationKey(Resources res, int resourceId) {
-    String solveTypeName = res.getString(resourceId);
+    add(res.getString(resourceId), resourceId);
+  }
+
+  void add(String solveTypeName, int resourceId) {
     solveTypeNamesToResourceId.put(solveTypeName, resourceId);
+  }
+
+  /** Whether the name is the one-handed solve type's in any language. Nothing else marks it. */
+  public boolean isOneHanded(String solveTypeName) {
+    Integer resourceId = solveTypeNamesToResourceId.get(solveTypeName);
+    return resourceId != null && resourceId == R.string.one_handed;
   }
 
   public List<String> getDefaultSolveTypeStrings() {

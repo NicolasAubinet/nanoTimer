@@ -34,6 +34,12 @@ public class CoachPlansTest {
   }
 
   @Test
+  public void aOneHandedTypeIsNot() {
+    Assert.assertFalse(CoachPlans.eligible(type(false, null, THREE), CubeMethod.CFOP, true));
+    Assert.assertTrue(CoachPlans.eligible(type(false, null, THREE), CubeMethod.CFOP, false));
+  }
+
+  @Test
   public void aSpecialScrambleIsNot() {
     ScrambleType pll = new ScrambleType("pll") {
     };
