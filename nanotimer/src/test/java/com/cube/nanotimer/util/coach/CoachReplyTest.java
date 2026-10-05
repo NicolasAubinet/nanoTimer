@@ -66,6 +66,19 @@ public class CoachReplyTest {
   }
 
   @Test
+  public void anEndedSubscriptionIsToldApartFromPlayNotAnswering() {
+    CoachReply ended = CoachReply.parse(403,
+        "{\"error\":{\"code\":\"no_access\",\"message\":\"no\"}}");
+    Assert.assertEquals(CoachReply.Kind.REFUSED, ended.getKind());
+    Assert.assertEquals(CoachRefusal.NO_ACCESS, ended.getRefusal());
+
+    CoachReply unasked = CoachReply.parse(503, "{\"error\":{\"code\":\"purchase_unavailable\","
+        + "\"message\":\"no\",\"retry_after_s\":60}}");
+    Assert.assertEquals(CoachRefusal.PURCHASE_UNAVAILABLE, unasked.getRefusal());
+    Assert.assertEquals(60, unasked.getRetryAfterSeconds());
+  }
+
+  @Test
   public void theStreamRidesBesideThePayloadAndNotInIt() throws Exception {
     CoachPayload payload = CoachPayload.parse(
         "{\"schema_version\":" + CoachPayload.VERSION + ",\"puzzle\":\"3x3\",\"method\":\"cfop\"}");

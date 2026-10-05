@@ -13,6 +13,7 @@ import com.cube.nanotimer.services.Service;
 import com.cube.nanotimer.services.ServiceImpl;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.session.CaseKnowledge;
+import com.cube.nanotimer.util.coach.CoachBilling;
 import com.cube.nanotimer.util.coach.CoachPlanWorker;
 import com.cube.nanotimer.util.helper.GUIUtils;
 import com.cube.nanotimer.util.helper.Utils;
@@ -129,6 +130,7 @@ public enum App {
     ReleaseNotes.appLaunched(context);
     fillScrambleCaches();
     CoachPlanWorker.onAppStart(context);
+    CoachBilling.onAppStart(context);
   }
 
   /** Only once a screen is up: the coach's job starts the app too, and has no use for scrambles. */

@@ -71,6 +71,9 @@ final class CoachPlanJob {
       return Outcome.DONE;
     }
     boolean debug = debugSolveTypeId != -1;
+    if (!debug && client.accessEnded()) {
+      return Outcome.DONE; // no plan is coming, so no reminder of the solves one needs either
+    }
     SolveType solveType = debug ? eligible(debugSolveTypeId) : flagged();
     if (solveType == null) {
       return Outcome.DONE;
@@ -125,6 +128,7 @@ final class CoachPlanJob {
         case RATE_LIMITED:
         case UPSTREAM_UNAVAILABLE:
         case STORE_UNAVAILABLE:
+        case PURCHASE_UNAVAILABLE:
           return 0; // the service's trouble, not this request's
         default:
           break;

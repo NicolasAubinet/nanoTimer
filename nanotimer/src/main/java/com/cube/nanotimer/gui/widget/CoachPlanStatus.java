@@ -19,6 +19,7 @@ import com.cube.nanotimer.coach.PlanSchedule;
 import com.cube.nanotimer.cube.SolveTypeMethod;
 import com.cube.nanotimer.gui.SolveTypesActivity;
 import com.cube.nanotimer.services.db.DataCallback;
+import com.cube.nanotimer.util.coach.CoachClient;
 import com.cube.nanotimer.util.coach.CoachPlanWorker;
 import com.cube.nanotimer.util.coach.CoachPlans;
 import com.cube.nanotimer.util.coach.CoachRead;
@@ -44,7 +45,8 @@ public class CoachPlanStatus {
   private final ViewGroup tab;
   private final View status;
   private final SolveType solveType;
-  /** Whether this build has a coach to ask: without one there are no weekly plans to speak of. */
+  /** Null in a build with no coach to ask: without one there are no weekly plans to speak of. */
+  private final CoachClient client;
   private final boolean coach;
   private boolean hasPlan;
   /** Once per screen: a check that ends without a plan must not start the next one. */
@@ -54,12 +56,14 @@ public class CoachPlanStatus {
    * @param tab the Plan tab's own layout, which the status moves about in
    * @param solveType the solve type the screen is showing
    */
-  public CoachPlanStatus(Activity activity, ViewGroup tab, SolveType solveType, boolean coach) {
+  public CoachPlanStatus(Activity activity, ViewGroup tab, SolveType solveType,
+      CoachClient client) {
     this.activity = activity;
     this.tab = tab;
     this.status = tab.findViewById(R.id.llCoachPlanStatus);
     this.solveType = solveType;
-    this.coach = coach;
+    this.client = client;
+    this.coach = client != null;
   }
 
   /** Whether the tab is showing a plan, which the row sits under. Drawn at the next refresh. */
@@ -142,10 +146,13 @@ public class CoachPlanStatus {
     place(true);
     boolean writing = CoachRead.of(solveType).getState() == CoachRead.State.READING;
     long heldUntil = CoachPlans.heldUntil(System.currentTimeMillis());
+    boolean ended = client.accessEnded();
     boolean waiting = writing;
     CharSequence line;
     if (writing) {
       line = activity.getString(R.string.coach_writing);
+    } else if (ended) {
+      line = activity.getString(R.string.coach_subscription_ended);
     } else {
       switch (schedule.getState()) {
         case NOT_DUE:
@@ -183,7 +190,7 @@ public class CoachPlanStatus {
     status.findViewById(R.id.buCoachPlanStatus).setVisibility(View.GONE);
 
     // A first plan does not wait for the session to end while the solver is looking at the tab.
-    if (!checked && !writing && heldUntil == 0 && schedule.mayAsk(true)) {
+    if (!checked && !writing && !ended && heldUntil == 0 && schedule.mayAsk(true)) {
       checked = true;
       CoachPlanWorker.checkFromScreen(activity);
     }

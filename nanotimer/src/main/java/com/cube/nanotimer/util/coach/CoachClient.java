@@ -22,6 +22,10 @@ import org.json.JSONObject;
  * <p>The address and token come from {@code coach.url} and {@code coach.token} in
  * {@code local.properties}. A build made without the address has no coach to ask; the token is the
  * owner's own device's.
+ *
+ * <p>Every request also carries the install's Coach ID and, once Play has shown it one, its
+ * purchase. When the coach says that purchase has ended, nothing more is sent: see
+ * {@link #accessEnded}.
  */
 public final class CoachClient {
 
@@ -36,13 +40,15 @@ public final class CoachClient {
   private final String practiceUrl;
   private final String token;
   private final String coachId;
+  private final CoachAccess access;
 
-  CoachClient(String baseUrl, String token, String coachId) {
+  CoachClient(String baseUrl, String token, String coachId, CoachAccess access) {
     String base = baseUrl.replaceAll("/+$", "");
     this.planUrl = base + "/v1/plan";
     this.practiceUrl = base + "/v1/practice";
     this.token = token;
     this.coachId = coachId;
+    this.access = access;
   }
 
   /**
@@ -52,7 +58,17 @@ public final class CoachClient {
   public static CoachClient configured(Context context) {
     String url = context.getString(R.string.coach_url);
     String token = context.getString(R.string.coach_token);
-    return url.isEmpty() ? null : new CoachClient(url, token, Options.INSTANCE.getCoachId());
+    return url.isEmpty() ? null
+        : new CoachClient(url, token, Options.INSTANCE.getCoachId(), CoachAccess.of(context));
+  }
+
+  /**
+   * Whether the coach has said this install's subscription has ended, after which no summary is
+   * sent until Play shows a purchase again. A build with a token is let in by the token, so a
+   * purchase that ended says nothing about it.
+   */
+  public boolean accessEnded() {
+    return token.isEmpty() && access.hasEnded();
   }
 
   /**
@@ -62,10 +78,15 @@ public final class CoachClient {
    *     repeated question by the payload's exact text
    */
   public CoachReply requestPlan(String requestBody) {
+    if (accessEnded()) {
+      return CoachReply.refused(CoachRefusal.NO_ACCESS);
+    }
     try {
       Answer answer = post(planUrl, requestBody, READ_TIMEOUT_MS);
-      return answer.body == null ? CoachReply.unreadable()
+      CoachReply reply = answer.body == null ? CoachReply.unreadable()
           : CoachReply.parse(answer.status, answer.body);
+      noteRefusal(reply, answer);
+      return reply;
     } catch (IOException e) {
       return CoachReply.unreachable();
     }
@@ -76,21 +97,41 @@ public final class CoachClient {
    * the section keeps what it last had. Blocks, like {@link #requestPlan}.
    */
   public String requestPractice(String requestBody) {
+    if (accessEnded()) {
+      return null;
+    }
     try {
       Answer answer = post(practiceUrl, requestBody, PRACTICE_READ_TIMEOUT_MS);
-      return answer.status == 200 ? answer.body : null;
+      if (answer.status == 200) {
+        return answer.body;
+      }
+      if (answer.body != null) {
+        noteRefusal(CoachReply.parse(answer.status, answer.body), answer);
+      }
+      return null;
     } catch (IOException e) {
       return null;
+    }
+  }
+
+  /** Keeps a "no access" against the purchase that was sent, which is what stops the asking. */
+  private void noteRefusal(CoachReply reply, Answer answer) {
+    if (reply.getKind() == CoachReply.Kind.REFUSED
+        && reply.getRefusal() == CoachRefusal.NO_ACCESS) {
+      access.refused(answer.purchaseSent, System.currentTimeMillis());
     }
   }
 
   private static final class Answer {
     final int status;
     final String body;
+    /** The purchase the request carried, null when it carried none. */
+    final String purchaseSent;
 
-    Answer(int status, String body) {
+    Answer(int status, String body, String purchaseSent) {
       this.status = status;
       this.body = body;
+      this.purchaseSent = purchaseSent;
     }
   }
 
@@ -108,13 +149,20 @@ public final class CoachClient {
         connection.setRequestProperty("Authorization", "Bearer " + token);
       }
       connection.setRequestProperty("Coach-Id", coachId);
+      String purchase = access.getPurchaseToken();
+      if (!CoachAccess.sendable(purchase)) {
+        purchase = null;
+      }
+      if (purchase != null) {
+        connection.setRequestProperty("Purchase-Token", purchase);
+      }
       connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
       try (OutputStream out = connection.getOutputStream()) {
         out.write(body);
       }
       int status = connection.getResponseCode();
       InputStream in = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
-      return new Answer(status, in == null ? null : read(in));
+      return new Answer(status, in == null ? null : read(in), purchase);
     } finally {
       if (connection != null) {
         connection.disconnect();

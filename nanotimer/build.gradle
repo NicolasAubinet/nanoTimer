@@ -25,12 +25,19 @@ if (!gateMatch.find()) {
 def releaseCoach = gateMatch.group(1) == 'true'
 def releaseCoachUrl = releaseCoach ? localProperties.getProperty('coach.url', '') : ''
 def releaseCoachToken = releaseCoach ? localProperties.getProperty('coach.token', '') : ''
+// The Plan tab's test purchase buttons, which a release shows only when coach.purchase.debug=true:
+// Play sells to the release package alone, so a debug build cannot try a purchase.
+def releasePurchaseDebug = releaseCoach && localProperties.getProperty('coach.purchase.debug', '') == 'true'
 
 // A bundle is only ever built for Play, where the token is one shared by every user: never carry it.
 gradle.taskGraph.whenReady { graph ->
     if (graph.allTasks.any { it.path == ':nanotimer:bundleRelease' } && releaseCoachToken) {
         throw new GradleException("bundleRelease would carry the coach token: turn SmartCubeGate off, "
             + "as a Play build does, or take coach.token out of local.properties")
+    }
+    if (graph.allTasks.any { it.path == ':nanotimer:bundleRelease' } && releasePurchaseDebug) {
+        throw new GradleException("bundleRelease would carry the test purchase buttons: take "
+            + "coach.purchase.debug out of local.properties")
     }
 }
 
@@ -52,12 +59,14 @@ android {
             versionNameSuffix "-debug"
             resValue 'string', 'coach_url', localProperties.getProperty('coach.url', '')
             resValue 'string', 'coach_token', localProperties.getProperty('coach.token', '')
+            resValue 'bool', 'coach_purchase_debug', 'true'
         }
         release {
             // The owner's own APK only, while the gate is on (see releaseCoach). Until each install
             // has its own identity (C2) a token here is one shared by every user who has the APK.
             resValue 'string', 'coach_url', releaseCoachUrl
             resValue 'string', 'coach_token', releaseCoachToken
+            resValue 'bool', 'coach_purchase_debug', releasePurchaseDebug.toString()
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

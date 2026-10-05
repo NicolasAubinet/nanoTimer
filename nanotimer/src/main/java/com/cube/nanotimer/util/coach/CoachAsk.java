@@ -139,6 +139,11 @@ final class CoachAsk {
   }
 
   private void start() {
+    // Before the history is read: nothing is built to be sent to a coach that will not take it.
+    if (client.accessEnded()) {
+      answer(CoachReply.refused(CoachRefusal.NO_ACCESS));
+      return;
+    }
     String pending = Options.INSTANCE.getCoachPendingRequest(solveType.getId());
     if (pending != null) {
       long keptAt = Options.INSTANCE.getCoachPendingRequestAt(solveType.getId());

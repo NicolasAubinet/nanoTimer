@@ -41,6 +41,8 @@ import com.cube.nanotimer.session.CaseKnowledge;
 import com.cube.nanotimer.session.MethodStatistics;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.helper.DialogUtils;
+import com.cube.nanotimer.util.coach.CoachAccess;
+import com.cube.nanotimer.util.coach.CoachBilling;
 import com.cube.nanotimer.util.coach.CoachClient;
 import com.cube.nanotimer.util.coach.CoachPlanWorker;
 import com.cube.nanotimer.util.coach.CoachPlans;
@@ -136,6 +138,8 @@ public class AnalysisActivity extends NanoTimerActivity {
   /** Whether this screen has asked the service for practice sets yet: once is enough. */
   private boolean practiceAsked;
   private CoachPlanStatus planStatus;
+  private CoachBilling billing;
+  private CoachBilling.Listener billingListener;
   private MethodStatistics statistics;
   private List<CaseKnowledge> known = Collections.emptyList();
 
@@ -231,6 +235,9 @@ public class AnalysisActivity extends NanoTimerActivity {
   protected void onDestroy() {
     super.onDestroy();
     CoachRead.of(solveType).removeListener(readListener);
+    if (billing != null) {
+      billing.removeListener(billingListener);
+    }
   }
 
   @Override
@@ -716,7 +723,7 @@ public class AnalysisActivity extends NanoTimerActivity {
   private void wireRead() {
     coachClient = CoachClient.configured(this);
     planStatus = new CoachPlanStatus(this, (ViewGroup) findViewById(R.id.llAnalysisPlan), solveType,
-        coachClient != null);
+        coachClient);
     final CoachRead read = CoachRead.of(solveType);
     readListener = new CoachRead.Listener() {
       @Override
@@ -735,6 +742,56 @@ public class AnalysisActivity extends NanoTimerActivity {
         CoachPlanWorker.askNow(AnalysisActivity.this, solveType);
       }
     });
+    wirePurchaseDebug();
+  }
+
+  /**
+   * The test purchase buttons, until there is a purchase screen. A release shows them only when
+   * built for it, since a debug build is not a package Play sells to.
+   */
+  private void wirePurchaseDebug() {
+    billing = purchaseDebugOffered() ? CoachBilling.of(this) : null;
+    if (billing == null) {
+      return;
+    }
+    billingListener = new CoachBilling.Listener() {
+      @Override
+      public void onBillingChanged() {
+        showRead(); // a purchase can end a "subscription has ended"
+      }
+    };
+    billing.setListener(billingListener);
+    findViewById(R.id.buAnalysisPlanBuyMonthly).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        billing.buy(AnalysisActivity.this, CoachBilling.MONTHLY);
+      }
+    });
+    findViewById(R.id.buAnalysisPlanBuyYearly).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        billing.buy(AnalysisActivity.this, CoachBilling.YEARLY);
+      }
+    });
+    findViewById(R.id.buAnalysisPlanCopyPurchase).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        String token = CoachAccess.of(AnalysisActivity.this).getPurchaseToken();
+        if (token != null) {
+          DialogUtils.copyToClipboard(AnalysisActivity.this, "purchase token", token,
+              R.string.coach_id_copied);
+        }
+      }
+    });
+  }
+
+  private boolean debuggable() {
+    return (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+  }
+
+  private boolean purchaseDebugOffered() {
+    return coachClient != null
+        && (debuggable() || getResources().getBoolean(R.bool.coach_purchase_debug));
   }
 
   /**
@@ -749,21 +806,41 @@ public class AnalysisActivity extends NanoTimerActivity {
     showAskNow();
   }
 
-  /** Debug builds only: the button that runs the weekly job now, and how its last ask ended. */
+  /**
+   * Debug builds only: the button that runs the weekly job now, and how its last ask ended. The
+   * test purchase buttons sit under it.
+   */
   private void showAskNow() {
-    boolean debuggable = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-    boolean offered = debuggable && coachClient != null && CoachPlans.eligible(solveType);
-    findViewById(R.id.llAnalysisPlanDebug).setVisibility(offered ? View.VISIBLE : View.GONE);
-    if (!offered) {
-      return;
-    }
+    boolean offered = debuggable() && coachClient != null && CoachPlans.eligible(solveType);
+    findViewById(R.id.llAnalysisPlanDebug)
+        .setVisibility(offered || billing != null ? View.VISIBLE : View.GONE);
+    findViewById(R.id.buAnalysisPlanAskNow).setVisibility(offered ? View.VISIBLE : View.GONE);
     CoachRead read = CoachRead.of(solveType);
-    boolean failed = read.getState() == CoachRead.State.FAILED;
+    boolean failed = offered && read.getState() == CoachRead.State.FAILED;
     TextView status = findViewById(R.id.tvAnalysisPlanDebugStatus);
     status.setVisibility(failed ? View.VISIBLE : View.GONE);
     if (failed) {
       status.setText(failureLine(read));
     }
+    showPurchaseDebug();
+  }
+
+  /** What Play last said and what the coach is being sent, for whoever is testing a purchase. */
+  private void showPurchaseDebug() {
+    findViewById(R.id.llAnalysisPlanPurchaseDebug)
+        .setVisibility(billing != null ? View.VISIBLE : View.GONE);
+    if (billing == null) {
+      return;
+    }
+    String token = CoachAccess.of(this).getPurchaseToken();
+    String sent = token == null ? "No purchase to send"
+        : coachClient.accessEnded() ? "Purchase kept, and the coach says it has ended"
+        : "Purchase sent with every request";
+    String said = billing.getStatus();
+    ((TextView) findViewById(R.id.tvAnalysisPlanPurchaseStatus))
+        .setText(said.isEmpty() ? sent : sent + "\n" + said);
+    findViewById(R.id.buAnalysisPlanCopyPurchase)
+        .setVisibility(token != null ? View.VISIBLE : View.GONE);
   }
 
   /**
@@ -828,6 +905,8 @@ public class AnalysisActivity extends NanoTimerActivity {
         return getString(R.string.coach_refused_rejected);
       case UNAUTHORIZED:
         return getString(R.string.coach_refused_device);
+      case NO_ACCESS:
+        return getString(R.string.coach_subscription_ended);
       case PAYLOAD_INVALID:
       case PAYLOAD_TOO_LARGE:
         return getString(R.string.coach_refused_update);

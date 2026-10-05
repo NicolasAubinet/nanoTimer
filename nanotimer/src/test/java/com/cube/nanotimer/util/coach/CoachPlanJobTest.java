@@ -28,6 +28,12 @@ public class CoachPlanJobTest {
     Assert.assertEquals(0, CoachPlanJob.waitAfter(refusal("store_unavailable", 0)));
   }
 
+  /** Play not answering the service says nothing about the subscription. */
+  @Test
+  public void aPurchasePlayCouldNotBeAskedAboutIsTriedAgainSoon() {
+    Assert.assertEquals(0, CoachPlanJob.waitAfter(refusal("purchase_unavailable", 60)));
+  }
+
   @Test
   public void aRefusalIsLeftAloneForAsLongAsItSays() {
     Assert.assertEquals(3_600_000L, CoachPlanJob.waitAfter(refusal("weekly_cap_reached", 3600)));

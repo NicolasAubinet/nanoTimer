@@ -1213,6 +1213,7 @@
   <string name="coach_refused_rejected">Le coach n\'a pas pu écrire un plan appuyé par vos chiffres. Veuillez réessayer.</string>
   <string name="coach_refused_update">Cette version de Cubench ne peut pas communiquer avec le coach. Mettez l\'application à jour et réessayez.</string>
   <string name="coach_refused_device">Cet appareil n\'est pas configuré pour le coach.</string>
+  <string name="coach_subscription_ended">Votre abonnement au coach a pris fin, il n\'y aura donc plus de nouveaux plans.</string>
   <string name="coach_channel_plans">Plans du coach</string>
   <string name="coach_plan_ready_title">Votre nouveau plan est prêt</string>
   <string name="coach_plan_ready_text">Découvrez sur quoi travailler cette semaine.</string>

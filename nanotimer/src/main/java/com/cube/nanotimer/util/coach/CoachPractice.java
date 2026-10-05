@@ -72,6 +72,9 @@ public final class CoachPractice {
    */
   public static void refresh(final CoachClient client, final SolveType solveType,
       CubeMethod method, final Listener listener) {
+    if (client.accessEnded()) {
+      return;
+    }
     final Handler main = new Handler(Looper.getMainLooper());
     App.INSTANCE.getService().getCoachPayload(solveType, method,
         Collections.<PairExecution>emptyList(), Collections.<StepTurning>emptyList(),

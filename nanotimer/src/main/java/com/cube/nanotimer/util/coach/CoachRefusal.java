@@ -10,6 +10,10 @@ import java.util.Locale;
  */
 public enum CoachRefusal {
   UNAUTHORIZED,
+  /** The purchase sent buys nothing any more: the subscription has ended. */
+  NO_ACCESS,
+  /** Play could not be asked about the purchase. A failure, and never "no subscription". */
+  PURCHASE_UNAVAILABLE,
   PAYLOAD_INVALID,
   PAYLOAD_TOO_LARGE,
   PAYLOAD_TOO_NEW,
