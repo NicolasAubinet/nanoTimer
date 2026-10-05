@@ -6,7 +6,7 @@ android {
         minSdkVersion 21
         compileSdkVersion 36
         targetSdkVersion 36
-        versionCode 74
+        versionCode 75
         versionName "2.1.1"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
@@ -48,6 +48,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.13.0'
     implementation 'androidx.webkit:webkit:1.12.1' // WebViewAssetLoader for the scramble diagram
     implementation 'com.google.android.play:review:2.0.2' // Play In-App Review API
+    implementation 'com.android.billingclient:billing:8.0.0' // 8.1 needs API 23
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20231013' // android.jar's org.json is a stub in unit tests
