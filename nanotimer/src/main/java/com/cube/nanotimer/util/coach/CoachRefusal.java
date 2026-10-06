@@ -12,6 +12,8 @@ public enum CoachRefusal {
   UNAUTHORIZED,
   /** The purchase sent buys nothing any more: the subscription has ended. */
   NO_ACCESS,
+  /** The access code entered lets nobody in: never given out, or used up. */
+  CODE_REFUSED,
   /** Play could not be asked about the purchase. A failure, and never "no subscription". */
   PURCHASE_UNAVAILABLE,
   PAYLOAD_INVALID,

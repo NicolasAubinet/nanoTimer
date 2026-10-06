@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 /**
  * The Play purchase this install shows the coach, and whether the coach has said it has ended.
+ * Also the access an entered code gave it, for the few installs let in that way.
  *
  * <p>Play on the device only ever gives a purchase to send. Ending one is the service's to say:
  * Play listing nothing may be a store that could not be asked, so the purchase last seen is still
@@ -26,6 +27,10 @@ public final class CoachAccess {
   private static final String TOKEN_KEY = "purchase_token";
   private static final String REFUSED_TOKEN_KEY = "refused_token";
   private static final String REFUSED_AT_KEY = "refused_at";
+  private static final String CODE_UNTIL_KEY = "code_until";
+
+  /** An access with no end. */
+  public static final long NO_END = Long.MAX_VALUE;
 
   private static CoachAccess instance;
 
@@ -52,6 +57,25 @@ public final class CoachAccess {
   public synchronized boolean hasEnded() {
     String token = getPurchaseToken();
     return token != null && token.equals(preferences.getString(REFUSED_TOKEN_KEY, null));
+  }
+
+  /**
+   * When the access an entered code gave this install ends: 0 when it holds none,
+   * {@link #NO_END} for one with no end. The coach decides at every request; this is only what the
+   * app shows.
+   */
+  public synchronized long getCodeUntil() {
+    return preferences.getLong(CODE_UNTIL_KEY, 0);
+  }
+
+  /** The coach let this install in for an access code. */
+  synchronized void codeAccepted(long until) {
+    preferences.edit().putLong(CODE_UNTIL_KEY, until).commit();
+  }
+
+  /** The coach answered that nothing lets this install in, so whatever a code gave is over. */
+  synchronized void codeEnded() {
+    preferences.edit().remove(CODE_UNTIL_KEY).commit();
   }
 
   /**

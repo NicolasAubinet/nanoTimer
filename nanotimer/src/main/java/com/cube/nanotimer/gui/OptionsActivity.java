@@ -15,8 +15,10 @@ import com.cube.nanotimer.cube.SmartCubeGate;
 import com.cube.nanotimer.gui.widget.CoachPlansForDialog;
 import com.cube.nanotimer.gui.widget.CoachPlansGuard;
 import com.cube.nanotimer.gui.widget.ReleaseNotes;
+import com.cube.nanotimer.gui.widget.dialog.CoachCodeDialog;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.YesNoListener;
+import com.cube.nanotimer.util.coach.CoachAccess;
 import com.cube.nanotimer.util.coach.CoachClient;
 import com.cube.nanotimer.util.coach.CoachPlans;
 import com.cube.nanotimer.util.helper.DialogUtils;
@@ -25,6 +27,8 @@ import com.cube.nanotimer.vo.CubeMethod;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveType;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class OptionsActivity extends NanoTimerActivity {
@@ -108,6 +112,7 @@ public class OptionsActivity extends NanoTimerActivity {
           return true;
         }
       });
+      showCoachCode(findPreference("coach_code"));
       if (!Options.INSTANCE.isCoachPlansOn()) {
         coach.removePreference(plansFor);
         coach.removePreference(nudge);
@@ -123,6 +128,30 @@ public class OptionsActivity extends NanoTimerActivity {
               showPlansFor(plansFor);
             }
           });
+          return true;
+        }
+      });
+    }
+
+    /** The access code row: where one is entered, and until when the last one taken lasts. */
+    private void showCoachCode(final Preference code) {
+      if (code == null) {
+        return;
+      }
+      long until = CoachAccess.of(getActivity()).getCodeUntil();
+      code.setSummary(until == 0 ? null
+          : until == CoachAccess.NO_END ? getString(R.string.coach_code_on)
+          : getString(R.string.coach_code_until,
+              DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date(until))));
+      code.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
+          DialogUtils.showFragment(getActivity(), CoachCodeDialog.newInstance(new Runnable() {
+            @Override
+            public void run() {
+              showCoachCode(code);
+            }
+          }));
           return true;
         }
       });

@@ -193,6 +193,11 @@
        android:key="coach_id"
        android:title="@string/coach_id"/>
 
+    <!-- For the few installs the owner lets in for free. Says nothing until a code is taken. -->
+    <Preference
+       android:key="coach_code"
+       android:title="@string/coach_code"/>
+
   </PreferenceCategory>
 
   <PreferenceCategory

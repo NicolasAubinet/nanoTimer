@@ -1303,6 +1303,13 @@
   <string name="coach_plans_setting">Weekly plans</string>
   <string name="coach_id">Coach ID</string>
   <string name="coach_id_copied">Coach ID copied</string>
+  <string name="coach_code">Access code</string>
+  <string name="coach_code_hint" translatable="false">XXXX-XXXX-XXXX</string>
+  <string name="coach_code_body">Enter the code you were given to use the coach on this device.</string>
+  <string name="coach_code_refused">That code isn\'t valid, or it has already been used.</string>
+  <string name="coach_code_granted">Coach access is on.</string>
+  <string name="coach_code_on">Access is on</string>
+  <string name="coach_code_until">Access until %1$s</string>
   <string name="coach_plans_setting_summary">Written for %1$s</string>
   <string name="coach_plans_setting_paused">Paused, with no solve type to write them for</string>
   <string name="coach_plans_move_title">Move your weekly plans?</string>

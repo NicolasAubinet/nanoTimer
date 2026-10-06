@@ -38,6 +38,7 @@ public final class CoachClient {
 
   private final String planUrl;
   private final String practiceUrl;
+  private final String redeemUrl;
   private final String token;
   private final String coachId;
   private final CoachAccess access;
@@ -46,6 +47,7 @@ public final class CoachClient {
     String base = baseUrl.replaceAll("/+$", "");
     this.planUrl = base + "/v1/plan";
     this.practiceUrl = base + "/v1/practice";
+    this.redeemUrl = base + "/v1/redeem";
     this.token = token;
     this.coachId = coachId;
     this.access = access;
@@ -114,11 +116,40 @@ public final class CoachClient {
     }
   }
 
-  /** Keeps a "no access" against the purchase that was sent, which is what stops the asking. */
+  /**
+   * Enters an access code for this install. Blocks, like {@link #requestPlan}.
+   *
+   * @param code as it was typed: the service reads it whatever its case, spaces or dashes
+   */
+  public CoachCodeReply redeem(String code) {
+    try {
+      Answer answer = post(redeemUrl, new JSONObject().put("code", code).toString(),
+          PRACTICE_READ_TIMEOUT_MS);
+      CoachCodeReply reply = answer.body == null ? CoachCodeReply.unreadable()
+          : CoachCodeReply.parse(answer.status, answer.body);
+      if (reply.getKind() == CoachCodeReply.Kind.GRANTED) {
+        access.codeAccepted(reply.getUntil());
+      }
+      return reply;
+    } catch (IOException e) {
+      return CoachCodeReply.unreachable();
+    } catch (JSONException e) {
+      throw new IllegalStateException(e); // a string always goes into an object
+    }
+  }
+
+  /**
+   * Keeps a "no access" against the purchase that was sent, which is what stops the asking. An
+   * install nothing lets in has also lost whatever a code gave it.
+   */
   private void noteRefusal(CoachReply reply, Answer answer) {
-    if (reply.getKind() == CoachReply.Kind.REFUSED
-        && reply.getRefusal() == CoachRefusal.NO_ACCESS) {
+    if (reply.getKind() != CoachReply.Kind.REFUSED) {
+      return;
+    }
+    if (reply.getRefusal() == CoachRefusal.NO_ACCESS) {
       access.refused(answer.purchaseSent, System.currentTimeMillis());
+    } else if (reply.getRefusal() == CoachRefusal.UNAUTHORIZED) {
+      access.codeEnded();
     }
   }
 

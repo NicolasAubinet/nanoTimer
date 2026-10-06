@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:orientation="vertical"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:padding="@dimen/space_l"
+   android:minWidth="300dp">
+
+  <TextView
+     android:text="@string/coach_code"
+     style="@style/DialogTitle"/>
+
+  <TextView
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="@dimen/space_s"
+     android:lineSpacingMultiplier="1.2"
+     android:text="@string/coach_code_body"
+     android:textColor="@color/secondary_text"
+     android:textSize="14sp"/>
+
+  <EditText
+     android:id="@+id/tfCoachCode"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="@dimen/space_l"
+     android:background="@drawable/dialog_time_field"
+     android:paddingLeft="12dp"
+     android:paddingRight="12dp"
+     android:paddingTop="11dp"
+     android:paddingBottom="11dp"
+     android:hint="@string/coach_code_hint"
+     android:maxLength="36"
+     android:singleLine="true"
+     android:textColor="@color/white"
+     android:textColorHint="@color/secondary_text"
+     android:textSize="16sp"
+     android:inputType="textCapCharacters|textNoSuggestions"/>
+
+  <!-- Why the code was not taken. Gone until an attempt fails. -->
+  <TextView
+     android:id="@+id/tvCoachCodeError"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="@dimen/space_s"
+     android:lineSpacingMultiplier="1.2"
+     android:textColor="@color/secondary_text"
+     android:textSize="13.5sp"
+     android:visibility="gone"/>
+
+</LinearLayout>

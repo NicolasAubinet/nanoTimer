@@ -1259,6 +1259,12 @@
   <string name="coach_plans_setting">Planos semanais</string>
   <string name="coach_id">ID do Coach</string>
   <string name="coach_id_copied">ID do Coach copiado</string>
+  <string name="coach_code">Código de acesso</string>
+  <string name="coach_code_body">Insira o código que recebeu para usar o coach neste dispositivo.</string>
+  <string name="coach_code_refused">Esse código não é válido ou já foi usado.</string>
+  <string name="coach_code_granted">O acesso ao coach está ativado.</string>
+  <string name="coach_code_on">Acesso ativado</string>
+  <string name="coach_code_until">Acesso até %1$s</string>
   <string name="coach_plans_setting_summary">Escritos para %1$s</string>
   <string name="coach_plans_setting_paused">Em pausa, sem tipo de resolução para os escrever</string>
   <string name="coach_plans_move_title">Mover os seus planos semanais?</string>
