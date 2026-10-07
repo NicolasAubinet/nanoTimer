@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.util.coach.CoachClient;
 import com.cube.nanotimer.util.coach.CoachCodeReply;
+import com.cube.nanotimer.util.coach.CoachPlans;
 import com.cube.nanotimer.util.coach.CoachRefusal;
 import com.cube.nanotimer.util.helper.DialogUtils;
 
@@ -79,6 +80,7 @@ public class CoachCodeDialog extends ConfirmDialog {
       tvError.setVisibility(View.VISIBLE);
       return;
     }
+    CoachPlans.turnOn(getActivity(), null, null); // weekly plans come with the coach
     DialogUtils.showInfoMessage(getActivity(), R.string.coach_code_granted);
     if (onGranted != null) {
       onGranted.run();

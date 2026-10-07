@@ -60,6 +60,18 @@ public final class CoachAccess {
   }
 
   /**
+   * Whether this install holds something the coach lets it in for, as far as the app can tell: a
+   * purchase the coach has not ended, or an entered code that still runs.
+   */
+  public synchronized boolean letsIn(long now) {
+    return letsIn(getPurchaseToken() != null, hasEnded(), getCodeUntil(), now);
+  }
+
+  static boolean letsIn(boolean purchase, boolean ended, long codeUntil, long now) {
+    return (purchase && !ended) || codeUntil > now;
+  }
+
+  /**
    * When the access an entered code gave this install ends: 0 when it holds none,
    * {@link #NO_END} for one with no end. The coach decides at every request; this is only what the
    * app shows.

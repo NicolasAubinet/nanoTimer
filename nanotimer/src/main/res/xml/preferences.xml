@@ -193,6 +193,11 @@
        android:key="coach_id"
        android:title="@string/coach_id"/>
 
+    <!-- Opens the subscription in Google Play. Only for an install Play has shown a purchase. -->
+    <Preference
+       android:key="coach_manage"
+       android:title="@string/coach_manage"/>
+
     <!-- For the few installs the owner lets in for free. Says nothing until a code is taken. -->
     <Preference
        android:key="coach_code"

@@ -1,9 +1,12 @@
 package com.cube.nanotimer.util.coach;
 
+import android.content.Context;
+
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.DynamicTranslations;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.cube.SolveTypeMethod;
+import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.vo.CubeMethod;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.ScrambleType;
@@ -80,6 +83,42 @@ public final class CoachPlans {
   /** Writes the plans for another solve type from now on. The week since the last plan is kept. */
   public static void moveTo(SolveType solveType) {
     Options.INSTANCE.setCoachPlansSolveType(solveType.getId());
+  }
+
+  /**
+   * Turns the weekly plans on for an install the coach has just let in: they come with the coach,
+   * with nothing more to agree to. They are written for the solve type asked for when it can carry
+   * them, else for the only one that can. With several to choose from and none asked for, they
+   * wait for the solver to pick one.
+   *
+   * @param preferred null when nothing says which solve type the solver means
+   * @param then run once the plans' solve type is settled, on any thread; may be null
+   */
+  public static void turnOn(final Context context, final SolveType preferred,
+      final Runnable then) {
+    if (Options.INSTANCE.isCoachPlansOn()) {
+      if (then != null) {
+        then.run();
+      }
+      return;
+    }
+    Options.INSTANCE.setCoachPlansOn(true);
+    App.INSTANCE.getService().getSolveTypes(CubeType.THREE_BY_THREE,
+        new DataCallback<List<SolveType>>() {
+          @Override
+          public void onData(List<SolveType> solveTypes) {
+            List<SolveType> eligible = eligible(solveTypes);
+            if (preferred != null && eligible(preferred)) {
+              moveTo(preferred);
+            } else if (flagged(solveTypes) == null && eligible.size() == 1) {
+              moveTo(eligible.get(0));
+            }
+            CoachPlanWorker.onAppStart(context);
+            if (then != null) {
+              then.run();
+            }
+          }
+        });
   }
 
   /** The solve types plans can be written for, in the order given. */

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The plan tab: the last plan written for this solve type, or what a plan is where none has been,
-     with when the next one comes.
+<!-- The plan tab: where the coach stands for this install, then the last plan written for this
+     solve type, or what a plan is where none has been.
 
      The explainer never mocks a plan up: a plan the app did not write, rendered beside figures it
      did, is the one arrangement that can make a true number look invented. -->
@@ -10,6 +10,88 @@
    android:layout_width="match_parent"
    android:layout_height="wrap_content"
    android:orientation="vertical">
+
+  <!-- Where the coach stands, above everything else: when the next plan comes, where the plans
+       go, or that the access has ended. Gone for an install that never had the coach, which reads
+       the offer in the card further down. -->
+  <LinearLayout
+     android:id="@+id/llCoachPlanStatus"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginBottom="@dimen/space_m"
+     android:background="@drawable/analysis_card"
+     android:orientation="vertical"
+     android:paddingLeft="16dp"
+     android:paddingRight="16dp"
+     android:paddingTop="12dp"
+     android:paddingBottom="14dp"
+     android:visibility="gone">
+
+    <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:gravity="center_vertical"
+       android:orientation="horizontal">
+
+      <!-- Only while something is under way: a plan being written, or a session being waited out. -->
+      <ProgressBar
+         android:id="@+id/pbCoachPlanStatus"
+         style="?android:attr/progressBarStyleSmall"
+         android:layout_width="14dp"
+         android:layout_height="14dp"
+         android:layout_marginEnd="8dp"
+         android:layout_marginRight="8dp"
+         android:visibility="gone"/>
+
+      <!-- "Next plan", for the strip a solver with the coach reads. -->
+      <TextView
+         android:id="@+id/tvCoachPlanStatusLabel"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginEnd="12dp"
+         android:layout_marginRight="12dp"
+         android:fontFamily="@font/roboto_medium"
+         android:letterSpacing="0.08"
+         android:textAllCaps="true"
+         android:textColor="@color/secondary_text"
+         android:textSize="11.5sp"
+         android:visibility="gone"/>
+
+      <TextView
+         android:id="@+id/tvCoachPlanStatus"
+         android:layout_width="0dp"
+         android:layout_height="wrap_content"
+         android:layout_weight="1"
+         android:textColor="@color/secondary_text"
+         android:textSize="14sp"/>
+    </LinearLayout>
+
+    <!-- How many of the solves the next plan needs are done. -->
+    <ProgressBar
+       android:id="@+id/pbCoachPlanMeter"
+       style="?android:attr/progressBarStyleHorizontal"
+       android:layout_width="match_parent"
+       android:layout_height="6dp"
+       android:layout_marginTop="8dp"
+       android:progressDrawable="@drawable/drill_progress"
+       android:visibility="gone"/>
+
+    <TextView
+       android:id="@+id/tvCoachPlanStatusBody"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="6dp"
+       android:lineSpacingMultiplier="1.2"
+       android:textColor="@color/secondary_text"
+       android:textSize="13.5sp"
+       android:visibility="gone"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+       android:id="@+id/buCoachPlanStatus"
+       style="@style/DialogActionButton"
+       android:layout_marginTop="14dp"
+       android:visibility="gone"/>
+  </LinearLayout>
 
   <!-- A written plan. The headline is the coach's own sentence, which is the part being paid for. -->
   <LinearLayout
@@ -35,65 +117,6 @@
        android:layout_marginTop="4dp"
        android:textColor="@color/secondary_text"
        android:textSize="12.5sp"/>
-  </LinearLayout>
-
-  <!-- When the next plan comes, or where the plans go. Under the headline on the plans' own solve
-       type, and above everything on another one. Gone until weekly plans are on. -->
-  <LinearLayout
-     android:id="@+id/llCoachPlanStatus"
-     android:layout_width="match_parent"
-     android:layout_height="wrap_content"
-     android:orientation="vertical"
-     android:visibility="gone">
-
-    <View
-       android:id="@+id/vCoachPlanStatusRule"
-       android:layout_width="match_parent"
-       android:layout_height="1dp"
-       android:layout_marginTop="10dp"
-       android:layout_marginBottom="10dp"
-       android:background="@color/hero_divider"/>
-
-    <LinearLayout
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:gravity="center_vertical"
-       android:orientation="horizontal">
-
-      <!-- Only while something is under way: a plan being written, or a session being waited out. -->
-      <ProgressBar
-         android:id="@+id/pbCoachPlanStatus"
-         style="?android:attr/progressBarStyleSmall"
-         android:layout_width="14dp"
-         android:layout_height="14dp"
-         android:layout_marginEnd="8dp"
-         android:layout_marginRight="8dp"
-         android:visibility="gone"/>
-
-      <TextView
-         android:id="@+id/tvCoachPlanStatus"
-         android:layout_width="0dp"
-         android:layout_height="wrap_content"
-         android:layout_weight="1"
-         android:textColor="@color/secondary_text"
-         android:textSize="14sp"/>
-    </LinearLayout>
-
-    <TextView
-       android:id="@+id/tvCoachPlanStatusBody"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:layout_marginTop="6dp"
-       android:lineSpacingMultiplier="1.2"
-       android:textColor="@color/secondary_text"
-       android:textSize="13.5sp"
-       android:visibility="gone"/>
-
-    <androidx.appcompat.widget.AppCompatButton
-       android:id="@+id/buCoachPlanStatus"
-       style="@style/DialogActionButton"
-       android:layout_marginTop="16dp"
-       android:visibility="gone"/>
   </LinearLayout>
 
   <LinearLayout
@@ -151,6 +174,7 @@
          android:orientation="vertical"/>
 
       <TextView
+         android:id="@+id/tvAnalysisPlanCites"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
          android:layout_marginTop="14dp"
@@ -158,9 +182,92 @@
          android:text="@string/analysis_plan_cites"
          android:textColor="@color/secondary_text"
          android:textSize="12.5sp"/>
+
+      <!-- For an install that never had the coach: how far it is from being offered it, then the
+           offer. Either takes the place of the line above. -->
+      <LinearLayout
+         android:id="@+id/llCoachGate"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="16dp"
+         android:orientation="vertical"
+         android:visibility="gone">
+
+        <View
+           android:layout_width="match_parent"
+           android:layout_height="1dp"
+           android:background="@color/hero_divider"/>
+
+        <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="14dp"
+           android:orientation="horizontal">
+
+          <TextView
+             android:id="@+id/tvCoachGateTitle"
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:layout_weight="1"
+             android:fontFamily="@font/roboto_medium"
+             android:textColor="@color/white"
+             android:textSize="13.5sp"/>
+
+          <TextView
+             android:id="@+id/tvCoachGateCount"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_marginStart="10dp"
+             android:layout_marginLeft="10dp"
+             android:textColor="@color/secondary_text"
+             android:textSize="13sp"/>
+        </LinearLayout>
+
+        <ProgressBar
+           android:id="@+id/pbCoachGate"
+           style="?android:attr/progressBarStyleHorizontal"
+           android:layout_width="match_parent"
+           android:layout_height="6dp"
+           android:layout_marginTop="8dp"
+           android:progressDrawable="@drawable/drill_progress"/>
+
+        <TextView
+           android:id="@+id/tvCoachGateNote"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="8dp"
+           android:lineSpacingMultiplier="1.2"
+           android:textColor="@color/secondary_text"
+           android:textSize="12sp"/>
+      </LinearLayout>
+
+      <LinearLayout
+         android:id="@+id/llCoachOffer"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:orientation="vertical"
+         android:visibility="gone">
+
+        <androidx.appcompat.widget.AppCompatButton
+           android:id="@+id/buCoachOffer"
+           style="@style/DialogActionButton"
+           android:layout_marginTop="14dp"/>
+
+        <!-- What it costs after the free weeks, once Play has said. -->
+        <TextView
+           android:id="@+id/tvCoachOfferNote"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="8dp"
+           android:gravity="center"
+           android:lineSpacingMultiplier="1.2"
+           android:textColor="@color/secondary_text"
+           android:textSize="12sp"
+           android:visibility="gone"/>
+      </LinearLayout>
     </LinearLayout>
 
-    <!-- The two honest lines: there is nothing to buy yet, and the other two tabs are not the bait. -->
+    <!-- The honest line: the other two tabs are not the bait. -->
     <TextView
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
@@ -174,16 +281,8 @@
        android:textSize="12.5sp"/>
   </LinearLayout>
 
-  <!-- For a solver who has not agreed to weekly plans yet: the way in. Gone once they are on. -->
-  <androidx.appcompat.widget.AppCompatButton
-     android:id="@+id/buCoachPlanOptIn"
-     style="@style/DialogActionButton"
-     android:layout_marginTop="16dp"
-     android:text="@string/coach_opt_in_button"
-     android:visibility="gone"/>
-
   <!-- Debug builds only: runs the weekly job now for this solve type, and says how it ended.
-       The purchase buttons also show in a release built with coach.purchase.debug. -->
+       What Play last answered also shows in a release built with coach.purchase.debug. -->
   <LinearLayout
      android:id="@+id/llAnalysisPlanDebug"
      android:layout_width="match_parent"
@@ -226,22 +325,8 @@
          android:textSize="12.5sp"/>
 
       <androidx.appcompat.widget.AppCompatButton
-         android:id="@+id/buAnalysisPlanBuyMonthly"
-         style="@style/DialogActionButton"
-         android:text="Buy monthly (debug)"
-         tools:ignore="HardcodedText"/>
-
-      <androidx.appcompat.widget.AppCompatButton
-         android:id="@+id/buAnalysisPlanBuyYearly"
-         style="@style/DialogActionButton"
-         android:layout_marginTop="8dp"
-         android:text="Buy yearly (debug)"
-         tools:ignore="HardcodedText"/>
-
-      <androidx.appcompat.widget.AppCompatButton
          android:id="@+id/buAnalysisPlanCopyPurchase"
          style="@style/DialogActionButton"
-         android:layout_marginTop="8dp"
          android:background="@drawable/dialog_action_button_ghost"
          android:text="Copy purchase token (debug)"
          tools:ignore="HardcodedText"/>

@@ -722,8 +722,9 @@ public class AnalysisActivity extends NanoTimerActivity {
 
   private void wireRead() {
     coachClient = CoachClient.configured(this);
+    billing = CoachBilling.of(this);
     planStatus = new CoachPlanStatus(this, (ViewGroup) findViewById(R.id.llAnalysisPlan), solveType,
-        coachClient);
+        coachClient, billing);
     final CoachRead read = CoachRead.of(solveType);
     readListener = new CoachRead.Listener() {
       @Override
@@ -742,37 +743,20 @@ public class AnalysisActivity extends NanoTimerActivity {
         CoachPlanWorker.askNow(AnalysisActivity.this, solveType);
       }
     });
-    wirePurchaseDebug();
+    wireBilling();
   }
 
-  /**
-   * The test purchase buttons, until there is a purchase screen. A release shows them only when
-   * built for it, since a debug build is not a package Play sells to.
-   */
-  private void wirePurchaseDebug() {
-    billing = purchaseDebugOffered() ? CoachBilling.of(this) : null;
+  private void wireBilling() {
     if (billing == null) {
       return;
     }
     billingListener = new CoachBilling.Listener() {
       @Override
       public void onBillingChanged() {
-        showRead(); // a purchase can end a "subscription has ended"
+        showRead(); // a purchase changes what the tab offers, and Play's prices what it says
       }
     };
-    billing.setListener(billingListener);
-    findViewById(R.id.buAnalysisPlanBuyMonthly).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        billing.buy(AnalysisActivity.this, CoachBilling.MONTHLY);
-      }
-    });
-    findViewById(R.id.buAnalysisPlanBuyYearly).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        billing.buy(AnalysisActivity.this, CoachBilling.YEARLY);
-      }
-    });
+    billing.addListener(billingListener);
     findViewById(R.id.buAnalysisPlanCopyPurchase).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -789,8 +773,12 @@ public class AnalysisActivity extends NanoTimerActivity {
     return (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
   }
 
+  /**
+   * Whether the tab says what Play last answered. A release does only when built for it, since a
+   * debug build is not a package Play sells to.
+   */
   private boolean purchaseDebugOffered() {
-    return coachClient != null
+    return billing != null
         && (debuggable() || getResources().getBoolean(R.bool.coach_purchase_debug));
   }
 
@@ -807,13 +795,13 @@ public class AnalysisActivity extends NanoTimerActivity {
   }
 
   /**
-   * Debug builds only: the button that runs the weekly job now, and how its last ask ended. The
-   * test purchase buttons sit under it.
+   * Debug builds only: the button that runs the weekly job now, and how its last ask ended. What
+   * Play last answered sits under it.
    */
   private void showAskNow() {
     boolean offered = debuggable() && coachClient != null && CoachPlans.eligible(solveType);
     findViewById(R.id.llAnalysisPlanDebug)
-        .setVisibility(offered || billing != null ? View.VISIBLE : View.GONE);
+        .setVisibility(offered || purchaseDebugOffered() ? View.VISIBLE : View.GONE);
     findViewById(R.id.buAnalysisPlanAskNow).setVisibility(offered ? View.VISIBLE : View.GONE);
     CoachRead read = CoachRead.of(solveType);
     boolean failed = offered && read.getState() == CoachRead.State.FAILED;
@@ -827,9 +815,9 @@ public class AnalysisActivity extends NanoTimerActivity {
 
   /** What Play last said and what the coach is being sent, for whoever is testing a purchase. */
   private void showPurchaseDebug() {
-    findViewById(R.id.llAnalysisPlanPurchaseDebug)
-        .setVisibility(billing != null ? View.VISIBLE : View.GONE);
-    if (billing == null) {
+    boolean offered = purchaseDebugOffered();
+    findViewById(R.id.llAnalysisPlanPurchaseDebug).setVisibility(offered ? View.VISIBLE : View.GONE);
+    if (!offered) {
       return;
     }
     String token = CoachAccess.of(this).getPurchaseToken();
@@ -848,7 +836,7 @@ public class AnalysisActivity extends NanoTimerActivity {
    * screen, which costs the service no model call.
    */
   private void showPractice(boolean offered) {
-    if (!offered) {
+    if (!offered || !coachClient.hasAccess()) {
       findViewById(R.id.llAnalysisPractice).setVisibility(View.GONE);
       return;
     }
@@ -865,6 +853,13 @@ public class AnalysisActivity extends NanoTimerActivity {
       public void onPractice(List<CoachPractice.Set> sets) {
         if (!isFinishing()) {
           drawPractice(sets);
+        }
+      }
+
+      @Override
+      public void onAccessEnded() {
+        if (!isFinishing()) {
+          showRead();
         }
       }
     });
@@ -939,7 +934,6 @@ public class AnalysisActivity extends NanoTimerActivity {
    * it was a true reading when written, and its date says as of when.
    */
   private void showPlan(StoredCoachPlan stored) {
-    planStatus.setHasPlan(stored != null);
     showRead();
     planView.setPlan(stored);
     int written = stored == null ? View.GONE : View.VISIBLE;

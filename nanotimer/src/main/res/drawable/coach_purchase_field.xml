@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The "plans for" field of the opt-in dialog. -->
+<!-- The "plans for" field of the purchase sheet. -->
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
    android:color="@color/lightblue">
   <item>

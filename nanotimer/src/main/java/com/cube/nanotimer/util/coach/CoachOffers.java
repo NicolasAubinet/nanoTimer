@@ -1,30 +1,102 @@
 package com.cube.nanotimer.util.coach;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Which of Play's offers a purchase of a base plan is made with. Offers are known by the tag set
  * on them in Play Console, never by their id, so the launch offer can be ended there with no
  * release: Play stops listing it and the next tag is taken.
  */
-final class CoachOffers {
+public final class CoachOffers {
 
   /** In the order they are wanted. Play lists an offer only to a buyer who may have it. */
   static final String[] TAGS = {"launch", "trial"};
 
+  /** A length of time as Play writes one: a count of days, weeks, months or years. */
+  public static final class Period {
+    private static final Pattern ISO = Pattern.compile("P(\\d+)([DWMY])");
+
+    private final int count;
+    private final char unit;
+
+    private Period(int count, char unit) {
+      this.count = count;
+      this.unit = unit;
+    }
+
+    /** @return null for text that is not one count of one unit, which Play Console cannot set */
+    static Period parse(String iso) {
+      Matcher matcher = ISO.matcher(iso == null ? "" : iso);
+      return matcher.matches()
+          ? new Period(Integer.parseInt(matcher.group(1)), matcher.group(2).charAt(0)) : null;
+    }
+
+    public int getCount() {
+      return count;
+    }
+
+    /** D, W, M or Y. */
+    public char getUnit() {
+      return unit;
+    }
+  }
+
+  /** One stretch of what an offer charges: a price, and how long each payment of it covers. */
+  public static final class Phase {
+    private final String price;
+    private final long micros;
+    private final Period period;
+
+    /**
+     * @param price as Play formats it for the buyer's country
+     * @param period as Play writes it, such as P1M
+     */
+    Phase(String price, long micros, String period) {
+      this.price = price;
+      this.micros = micros;
+      this.period = Period.parse(period);
+    }
+
+    public String getPrice() {
+      return price;
+    }
+
+    /** Null when Play wrote a length this app does not read. */
+    public Period getPeriod() {
+      return period;
+    }
+  }
+
   /** One way of buying a base plan, as Play lists it. */
-  static final class Offer {
+  public static final class Offer {
     private final String basePlan;
     private final String offerId;
     private final List<String> tags;
     private final String offerToken;
+    private final List<Phase> phases;
 
-    /** @param offerId null for the base plan bought plainly, with no offer */
-    Offer(String basePlan, String offerId, List<String> tags, String offerToken) {
+    /**
+     * @param offerId null for the base plan bought plainly, with no offer
+     * @param phases what is charged, in order, the base plan's own price last
+     */
+    Offer(String basePlan, String offerId, List<String> tags, String offerToken,
+        List<Phase> phases) {
       this.basePlan = basePlan;
       this.offerId = offerId;
       this.tags = tags;
       this.offerToken = offerToken;
+      this.phases = phases;
+    }
+
+    Offer(String basePlan, String offerId, List<String> tags, String offerToken) {
+      this(basePlan, offerId, tags, offerToken, Collections.<Phase>emptyList());
+    }
+
+    public String getBasePlan() {
+      return basePlan;
     }
 
     String getOfferId() {
@@ -34,6 +106,41 @@ final class CoachOffers {
     /** What the purchase is launched with. */
     String getOfferToken() {
       return offerToken;
+    }
+
+    /** How long the offer is free for before anything is charged, null when it is not. */
+    public Period getFreePeriod() {
+      return phases.size() > 1 && phases.get(0).micros == 0 ? phases.get(0).period : null;
+    }
+
+    /** The lower price paid before the base plan's own, null when the offer has none. */
+    public Phase getIntro() {
+      for (Phase phase : phases.subList(0, Math.max(phases.size() - 1, 0))) {
+        if (phase.micros > 0) {
+          return phase;
+        }
+      }
+      return null;
+    }
+
+    /** What the base plan costs once any offer is over, null when Play listed no price. */
+    public Phase getRegular() {
+      return phases.isEmpty() ? null : phases.get(phases.size() - 1);
+    }
+
+    /**
+     * How much less the lower price is, in percent. 0 when there is none, or when it is paid over
+     * another length of time, which makes the two prices no comparison.
+     */
+    public int getPercentOff() {
+      Phase intro = getIntro();
+      Phase regular = getRegular();
+      if (intro == null || regular.micros <= 0 || intro.period == null || regular.period == null
+          || intro.period.count != regular.period.count
+          || intro.period.unit != regular.period.unit) {
+        return 0;
+      }
+      return Math.max(0, Math.round(100 - 100f * intro.micros / regular.micros));
     }
   }
 

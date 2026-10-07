@@ -1,7 +1,9 @@
 package com.cube.nanotimer.gui;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -19,6 +21,7 @@ import com.cube.nanotimer.gui.widget.dialog.CoachCodeDialog;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.util.YesNoListener;
 import com.cube.nanotimer.util.coach.CoachAccess;
+import com.cube.nanotimer.util.coach.CoachBilling;
 import com.cube.nanotimer.util.coach.CoachClient;
 import com.cube.nanotimer.util.coach.CoachPlans;
 import com.cube.nanotimer.util.helper.DialogUtils;
@@ -113,6 +116,7 @@ public class OptionsActivity extends NanoTimerActivity {
         }
       });
       showCoachCode(findPreference("coach_code"));
+      showCoachManage(coach, findPreference("coach_manage"));
       if (!Options.INSTANCE.isCoachPlansOn()) {
         coach.removePreference(plansFor);
         coach.removePreference(nudge);
@@ -128,6 +132,30 @@ public class OptionsActivity extends NanoTimerActivity {
               showPlansFor(plansFor);
             }
           });
+          return true;
+        }
+      });
+    }
+
+    /** The way to the subscription in Google Play, for an install Play has shown a purchase. */
+    private void showCoachManage(PreferenceCategory coach, Preference manage) {
+      if (manage == null) {
+        return;
+      }
+      if (CoachAccess.of(getActivity()).getPurchaseToken() == null) {
+        coach.removePreference(manage);
+        return;
+      }
+      manage.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
+          try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(
+                "https://play.google.com/store/account/subscriptions?sku=" + CoachBilling.PRODUCT
+                    + "&package=" + getActivity().getPackageName())));
+          } catch (ActivityNotFoundException e) {
+            // Nothing on the device opens a link, and then nothing sold the subscription either.
+          }
           return true;
         }
       });

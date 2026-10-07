@@ -29,7 +29,8 @@ import java.util.List;
 /**
  * The coach subscription on Play: what this install has bought, read at every start of the app,
  * and the purchase of a base plan. What a purchase buys is the coach service's to say, from the
- * token {@link CoachAccess} keeps for {@link CoachClient} to send.
+ * token {@link CoachAccess} keeps for {@link CoachClient} to send. Also what Play asks for each
+ * base plan, for the sheet that sells them.
  *
  * <p>A purchase is acknowledged here as well as by the service. The service only looks at a
  * purchase when nothing else lets the install in and a request reaches it, and Play refunds one
@@ -43,7 +44,10 @@ public final class CoachBilling {
   public static final String YEARLY = "yearly";
 
   public interface Listener {
-    /** Called on the main thread when {@link #getStatus} has something new to say. */
+    /**
+     * Called on the main thread when Play has answered something: a purchase, the base plans'
+     * prices, or only a new {@link #getStatus}.
+     */
     void onBillingChanged();
   }
 
@@ -53,8 +57,11 @@ public final class CoachBilling {
   private final Context context;
   private final CoachAccess access;
   private final BillingClient billing;
+  private final List<Listener> listeners = new ArrayList<Listener>();
   private String status = "";
-  private Listener listener;
+  /** Null until Play has answered for them. Main thread. */
+  private List<CoachOffers.Offer> plans;
+  private boolean plansAsking;
 
   private CoachBilling(Context context) {
     this.context = context;
@@ -104,15 +111,56 @@ public final class CoachBilling {
   }
 
   /** Main thread. */
-  public void setListener(Listener listener) {
-    this.listener = listener;
+  public void addListener(Listener listener) {
+    listeners.add(listener);
   }
 
-  /** Lets go of a screen on its way out, unless a newer one has taken its place. */
+  /** Main thread. */
   public void removeListener(Listener listener) {
-    if (this.listener == listener) {
-      this.listener = null;
+    listeners.remove(listener);
+  }
+
+  /**
+   * How each base plan is sold to this buyer, the yearly one first: the offer {@link CoachOffers}
+   * picks for it, with its prices. Null until {@link #readPlans} has been answered, and empty when
+   * Play could not say. Main thread.
+   */
+  public List<CoachOffers.Offer> getPlans() {
+    return plans;
+  }
+
+  /**
+   * Asks Play what the base plans cost, once. Main thread.
+   *
+   * @param again whether to ask once more when Play could not say: for a screen being opened,
+   *     never for one being redrawn, which the answer itself causes
+   */
+  public void readPlans(boolean again) {
+    boolean never = plans == null && !plansAsking;
+    // Even with an earlier ask still out: Play does not always answer a second connection.
+    boolean retry = again && plans != null && plans.isEmpty();
+    if (!never && !retry) {
+      return;
     }
+    plansAsking = true;
+    product("Prices", new Product() {
+      @Override
+      public void found(ProductDetails details) {
+        List<CoachOffers.Offer> read = new ArrayList<CoachOffers.Offer>();
+        if (details != null) {
+          List<CoachOffers.Offer> offers = offers(details);
+          for (String basePlan : new String[] {YEARLY, MONTHLY}) {
+            CoachOffers.Offer offer = CoachOffers.pick(offers, basePlan);
+            if (offer != null && offer.getRegular() != null) {
+              read.add(offer);
+            }
+          }
+        }
+        plans = read;
+        plansAsking = false;
+        tell();
+      }
+    });
   }
 
   public void restore() {
@@ -141,7 +189,43 @@ public final class CoachBilling {
    * outcome arrives later, at the purchases listener.
    */
   public void buy(final Activity activity, final String basePlan) {
-    connected("Buy " + basePlan, new Runnable() {
+    final String what = "Buy " + basePlan;
+    product(what, new Product() {
+      @Override
+      public void found(ProductDetails details) {
+        if (details == null) {
+          return;
+        }
+        CoachOffers.Offer offer = CoachOffers.pick(offers(details), basePlan);
+        if (offer == null) {
+          say(what + ": Play lists no such base plan");
+          return;
+        }
+        if (activity.isFinishing() || activity.isDestroyed()) {
+          return;
+        }
+        say(what + ": " + (offer.getOfferId() == null ? "no offer, the plain base plan"
+            : "offer " + offer.getOfferId()));
+        BillingResult result = billing.launchBillingFlow(activity, BillingFlowParams.newBuilder()
+            .setProductDetailsParamsList(Collections.singletonList(
+                BillingFlowParams.ProductDetailsParams.newBuilder()
+                    .setProductDetails(details).setOfferToken(offer.getOfferToken()).build()))
+            .build());
+        if (result.getResponseCode() != BillingClient.BillingResponseCode.OK) {
+          say(what + ": " + describe(result));
+        }
+      }
+    });
+  }
+
+  private interface Product {
+    /** Called on the main thread. @param details null when Play could not say, which is said */
+    void found(ProductDetails details);
+  }
+
+  /** Asks Play for the coach subscription as it is sold to this buyer. */
+  private void product(final String what, final Product then) {
+    connected(what, new Runnable() {
       @Override
       public void run() {
         QueryProductDetailsParams.Product product = QueryProductDetailsParams.Product.newBuilder()
@@ -151,55 +235,51 @@ public final class CoachBilling {
             new ProductDetailsResponseListener() {
               @Override
               public void onProductDetailsResponse(BillingResult result,
-                  final QueryProductDetailsResult found) {
+                  QueryProductDetailsResult found) {
+                List<ProductDetails> listed = found.getProductDetailsList();
+                final ProductDetails details;
                 if (result.getResponseCode() != BillingClient.BillingResponseCode.OK) {
-                  say("Buy " + basePlan + ": " + describe(result));
-                  return;
+                  say(what + ": " + describe(result));
+                  details = null;
+                } else if (listed.isEmpty()) {
+                  say(what + ": Play does not sell \"" + PRODUCT + "\" to this app");
+                  details = null;
+                } else {
+                  details = listed.get(0);
                 }
                 MAIN.post(new Runnable() {
                   @Override
                   public void run() {
-                    launch(activity, basePlan, found.getProductDetailsList());
+                    then.found(details);
                   }
                 });
               }
             });
       }
+    }, new Runnable() {
+      @Override
+      public void run() {
+        then.found(null);
+      }
     });
   }
 
-  private void launch(Activity activity, String basePlan, List<ProductDetails> found) {
-    if (found.isEmpty()) {
-      say("Buy " + basePlan + ": Play does not sell \"" + PRODUCT + "\" to this app");
-      return;
-    }
-    ProductDetails details = found.get(0);
+  private static List<CoachOffers.Offer> offers(ProductDetails details) {
     List<CoachOffers.Offer> offers = new ArrayList<CoachOffers.Offer>();
     List<ProductDetails.SubscriptionOfferDetails> listed = details.getSubscriptionOfferDetails();
-    if (listed != null) {
-      for (ProductDetails.SubscriptionOfferDetails offer : listed) {
-        offers.add(new CoachOffers.Offer(offer.getBasePlanId(), offer.getOfferId(),
-            offer.getOfferTags(), offer.getOfferToken()));
+    if (listed == null) {
+      return offers;
+    }
+    for (ProductDetails.SubscriptionOfferDetails offer : listed) {
+      List<CoachOffers.Phase> phases = new ArrayList<CoachOffers.Phase>();
+      for (ProductDetails.PricingPhase phase : offer.getPricingPhases().getPricingPhaseList()) {
+        phases.add(new CoachOffers.Phase(phase.getFormattedPrice(), phase.getPriceAmountMicros(),
+            phase.getBillingPeriod()));
       }
+      offers.add(new CoachOffers.Offer(offer.getBasePlanId(), offer.getOfferId(),
+          offer.getOfferTags(), offer.getOfferToken(), phases));
     }
-    CoachOffers.Offer offer = CoachOffers.pick(offers, basePlan);
-    if (offer == null) {
-      say("Buy " + basePlan + ": Play lists no such base plan");
-      return;
-    }
-    if (activity.isFinishing() || activity.isDestroyed()) {
-      return;
-    }
-    say("Buy " + basePlan + ": "
-        + (offer.getOfferId() == null ? "no offer, the plain base plan" : "offer " + offer.getOfferId()));
-    BillingResult result = billing.launchBillingFlow(activity, BillingFlowParams.newBuilder()
-        .setProductDetailsParamsList(Collections.singletonList(
-            BillingFlowParams.ProductDetailsParams.newBuilder()
-                .setProductDetails(details).setOfferToken(offer.getOfferToken()).build()))
-        .build());
-    if (result.getResponseCode() != BillingClient.BillingResponseCode.OK) {
-      say("Buy " + basePlan + ": " + describe(result));
-    }
+    return offers;
   }
 
   /**
@@ -227,6 +307,15 @@ public final class CoachBilling {
         Options.INSTANCE.setCoachAskAgainAt(0);
         CoachPlanWorker.onAppStart(context);
       }
+      if (!access.hasEnded()) {
+        // Weekly plans come with the coach, also for a subscriber Play shows a new device.
+        CoachPlans.turnOn(context, null, new Runnable() {
+          @Override
+          public void run() {
+            changed();
+          }
+        });
+      }
       if (!purchase.isAcknowledged()) {
         acknowledge(purchase);
       }
@@ -248,7 +337,12 @@ public final class CoachBilling {
         });
   }
 
-  private void connected(final String what, final Runnable then) {
+  private void connected(String what, Runnable then) {
+    connected(what, then, null);
+  }
+
+  /** @param failed run on the main thread when Play cannot be reached; may be null */
+  private void connected(final String what, final Runnable then, final Runnable failed) {
     if (billing.isReady()) {
       then.run();
       return;
@@ -258,8 +352,11 @@ public final class CoachBilling {
       public void onBillingSetupFinished(BillingResult result) {
         if (result.getResponseCode() == BillingClient.BillingResponseCode.OK) {
           then.run();
-        } else {
-          say(what + ": " + describe(result));
+          return;
+        }
+        say(what + ": " + describe(result));
+        if (failed != null) {
+          MAIN.post(failed);
         }
       }
 
@@ -282,10 +379,24 @@ public final class CoachBilling {
       @Override
       public void run() {
         status = words;
-        if (listener != null) {
-          listener.onBillingChanged();
-        }
+        tell();
       }
     });
+  }
+
+  /** For news that is not a line of status. Any thread. */
+  private void changed() {
+    MAIN.post(new Runnable() {
+      @Override
+      public void run() {
+        tell();
+      }
+    });
+  }
+
+  private void tell() {
+    for (Listener listener : new ArrayList<Listener>(listeners)) {
+      listener.onBillingChanged();
+    }
   }
 }

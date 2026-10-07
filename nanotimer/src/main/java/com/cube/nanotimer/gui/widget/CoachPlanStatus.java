@@ -1,25 +1,31 @@
 package com.cube.nanotimer.gui.widget;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.coach.CoachPayloadBuilder;
 import com.cube.nanotimer.coach.PlanSchedule;
 import com.cube.nanotimer.cube.SolveTypeMethod;
 import com.cube.nanotimer.gui.SolveTypesActivity;
 import com.cube.nanotimer.services.db.DataCallback;
+import com.cube.nanotimer.util.coach.CoachAccess;
+import com.cube.nanotimer.util.coach.CoachBilling;
 import com.cube.nanotimer.util.coach.CoachClient;
+import com.cube.nanotimer.util.coach.CoachOffers;
 import com.cube.nanotimer.util.coach.CoachPlanWorker;
 import com.cube.nanotimer.util.coach.CoachPlans;
 import com.cube.nanotimer.util.coach.CoachRead;
@@ -29,58 +35,98 @@ import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveType;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 /**
- * The Plan tab's status: when the next weekly plan comes and which solve type the plans are for.
- * On that solve type it is one row under the plan's headline. On another one it says where the
- * plans go, and with no solve type to carry them it says so. Moving them is done in the settings.
+ * Where the coach stands for this install, said on the Plan tab.
  *
- * <p>Before the solver has agreed to weekly plans there is no status, only the button that asks.
+ * <p>An install that has the coach reads a card above everything else: when the next plan comes
+ * on the plans' own solve type, where the plans go on another one, and that they are paused with
+ * no solve type to carry them. One whose access has ended reads there that it has, with the way
+ * back to the purchase.
+ *
+ * <p>An install that never had the coach reads the offer inside the card that explains a plan:
+ * how far it is from the solves a first plan needs, then the button that opens the purchase.
  */
 public class CoachPlanStatus {
 
-  private final Activity activity;
+  private static final String SHEET_TAG = "coach_purchase";
+
+  private final FragmentActivity activity;
   private final ViewGroup tab;
   private final View status;
   private final SolveType solveType;
-  /** Null in a build with no coach to ask: without one there are no weekly plans to speak of. */
+  /** Null in a build with no coach to ask: without one there is nothing to say or to sell. */
   private final CoachClient client;
-  private final boolean coach;
-  private boolean hasPlan;
+  /** Null in a build with no coach. */
+  private final CoachBilling billing;
   /** Once per screen: a check that ends without a plan must not start the next one. */
   private boolean checked;
 
   /**
-   * @param tab the Plan tab's own layout, which the status moves about in
+   * @param tab the Plan tab's own layout
    * @param solveType the solve type the screen is showing
    */
-  public CoachPlanStatus(Activity activity, ViewGroup tab, SolveType solveType,
-      CoachClient client) {
+  public CoachPlanStatus(FragmentActivity activity, ViewGroup tab, SolveType solveType,
+      CoachClient client, CoachBilling billing) {
     this.activity = activity;
     this.tab = tab;
     this.status = tab.findViewById(R.id.llCoachPlanStatus);
     this.solveType = solveType;
     this.client = client;
-    this.coach = client != null;
+    this.billing = billing;
   }
 
-  /** Whether the tab is showing a plan, which the row sits under. Drawn at the next refresh. */
-  public void setHasPlan(boolean hasPlan) {
-    this.hasPlan = hasPlan;
-  }
-
-  /** Reads the schedule again and redraws. Main thread only. */
+  /** Reads the access and the schedule again and redraws. Main thread only. */
   public void refresh() {
-    boolean cfop = solveType.getCubeTypeId() == CubeType.THREE_BY_THREE.getId()
-        && SolveTypeMethod.of(solveType) == CubeMethod.CFOP;
-    boolean on = Options.INSTANCE.isCoachPlansOn();
-    showOptIn(coach && !on && CoachPlans.eligible(solveType));
-    if (!coach || !cfop || !on) {
+    if (client == null) {
       status.setVisibility(View.GONE);
+      showNoOffer();
       return;
     }
+    boolean cfop = solveType.getCubeTypeId() == CubeType.THREE_BY_THREE.getId()
+        && SolveTypeMethod.of(solveType) == CubeMethod.CFOP;
+    if (client.hasAccess()) {
+      showNoOffer();
+      if (!Options.INSTANCE.isCoachPlansOn()) {
+        // A build token asks for nothing, so its weekly plans turn on where they are looked for.
+        CoachPlans.turnOn(activity, solveType, new Runnable() {
+          @Override
+          public void run() {
+            show(new Runnable() {
+              @Override
+              public void run() {
+                refresh();
+              }
+            });
+          }
+        });
+      } else if (cfop) {
+        loadSchedule();
+      } else {
+        status.setVisibility(View.GONE);
+      }
+    } else if (client.accessEnded() || Options.INSTANCE.isCoachPlansOn()) {
+      // Weekly plans that are on with nothing to let the install in: it was let in before.
+      showNoOffer();
+      if (cfop) {
+        showEnded();
+      } else {
+        status.setVisibility(View.GONE);
+      }
+    } else {
+      status.setVisibility(View.GONE);
+      if (CoachPlans.eligible(solveType)) {
+        loadOffer();
+      } else {
+        showNoOffer();
+      }
+    }
+  }
+
+  private void loadSchedule() {
     App.INSTANCE.getService().getSolveTypes(CubeType.THREE_BY_THREE,
         new DataCallback<List<SolveType>>() {
           @Override
@@ -113,19 +159,58 @@ public class CoachPlanStatus {
         });
   }
 
-  /** The way in to weekly plans, on a solve type they can be written for. */
-  private void showOptIn(boolean offered) {
-    View optIn = tab.findViewById(R.id.buCoachPlanOptIn);
-    optIn.setVisibility(offered ? View.VISIBLE : View.GONE);
-    optIn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        CoachOptInDialog.show(activity, solveType, new Runnable() {
+  /**
+   * The purchase is offered once a solve type has the solves a first plan needs, so the free weeks
+   * are not spent waiting for one. Until then the card counts the solves of the type on screen.
+   */
+  private void loadOffer() {
+    App.INSTANCE.getService().getSolveTypes(CubeType.THREE_BY_THREE,
+        new DataCallback<List<SolveType>>() {
           @Override
-          public void run() {
-            refresh();
+          public void onData(List<SolveType> solveTypes) {
+            count(CoachPlans.eligible(solveTypes), new ArrayList<Integer>());
           }
         });
+  }
+
+  /** Counts one solve type after the other, the service answering each on a thread of its own. */
+  private void count(final List<SolveType> eligible, final List<Integer> counts) {
+    if (counts.size() < eligible.size()) {
+      App.INSTANCE.getService().getCoachSolveCount(eligible.get(counts.size()), CubeMethod.CFOP,
+          new DataCallback<Integer>() {
+            @Override
+            public void onData(Integer count) {
+              counts.add(count);
+              count(eligible, counts);
+            }
+          });
+      return;
+    }
+    int here = 0;
+    SolveType ready = null;
+    for (int i = 0; i < eligible.size(); i++) {
+      boolean shown = eligible.get(i).getId() == solveType.getId();
+      if (shown) {
+        here = counts.get(i);
+      }
+      if (counts.get(i) >= CoachPayloadBuilder.PLAN_FLOOR && (ready == null || shown)) {
+        ready = eligible.get(i);
+      }
+    }
+    final int solves = here;
+    final SolveType offered = ready;
+    show(new Runnable() {
+      @Override
+      public void run() {
+        // The purchase may have been made while the solves were counted.
+        if (client.hasAccess()) {
+          return;
+        }
+        if (offered == null) {
+          showGate(solves);
+        } else {
+          showOffer(offered);
+        }
       }
     });
   }
@@ -141,59 +226,70 @@ public class CoachPlanStatus {
     });
   }
 
-  /** The row on the plans' own solve type. */
+  /** The strip on the plans' own solve type: when the next plan comes. */
   private void showNext(PlanSchedule schedule) {
-    place(true);
     boolean writing = CoachRead.of(solveType).getState() == CoachRead.State.READING;
     long heldUntil = CoachPlans.heldUntil(System.currentTimeMillis());
-    boolean ended = client.accessEnded();
     boolean waiting = writing;
-    CharSequence line;
+    // A count of days or solves sits beside the label. A sentence takes the row for itself.
+    CharSequence value = null;
+    String sentence = null;
     if (writing) {
-      line = activity.getString(R.string.coach_writing);
-    } else if (ended) {
-      line = activity.getString(R.string.coach_subscription_ended);
+      sentence = activity.getString(R.string.coach_writing);
     } else {
       switch (schedule.getState()) {
         case NOT_DUE:
           String days = quantity(R.plurals.coach_days, schedule.getDaysUntilDue());
-          line = schedule.getSolvesNeeded() == 0 ? lit(R.string.coach_next_days, days)
-              : lit(R.string.coach_next_days_solves, days,
-                  quantity(R.plurals.coach_more_solves, schedule.getSolvesNeeded()));
+          value = schedule.getSolvesNeeded() == 0 ? lit(days) : TextUtils.concat(lit(days),
+              " · ", lit(quantity(R.plurals.coach_more_solves, schedule.getSolvesNeeded())));
           break;
         case NEEDS_SOLVES:
-          line = lit(schedule.isFirst() ? R.string.coach_first_solves : R.string.coach_next_solves,
-              quantity(R.plurals.coach_more_solves, schedule.getSolvesNeeded()));
+          value = lit(quantity(R.plurals.coach_more_solves, schedule.getSolvesNeeded()));
           break;
         case QUIET:
-          line = activity.getString(R.string.coach_next_session);
+          value = activity.getString(R.string.coach_strip_session);
           waiting = true;
           break;
         default:
           if (heldUntil != 0) {
-            line = activity.getString(R.string.coach_next_retry, DateFormat.getDateTimeInstance(
-                DateFormat.MEDIUM, DateFormat.SHORT).format(new Date(heldUntil)));
+            sentence = activity.getString(R.string.coach_next_retry,
+                DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
+                    .format(new Date(heldUntil)));
           } else {
-            line = activity.getString(R.string.coach_next_waiting);
+            value = activity.getString(R.string.coach_strip_waiting);
             waiting = true;
           }
           break;
       }
     }
+    showCard(false);
+    TextView label = status.findViewById(R.id.tvCoachPlanStatusLabel);
+    label.setVisibility(value == null ? View.GONE : View.VISIBLE);
+    label.setText(schedule.isFirst() ? R.string.coach_strip_first : R.string.coach_strip_next);
     TextView text = status.findViewById(R.id.tvCoachPlanStatus);
-    text.setText(line);
+    text.setText(value == null ? sentence : value);
+    text.setGravity(value == null ? Gravity.START : Gravity.END);
     text.setTextColor(ContextCompat.getColor(activity, R.color.secondary_text));
-    text.setTextSize(14);
+    text.setTextSize(13.5f);
     text.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
     status.findViewById(R.id.pbCoachPlanStatus).setVisibility(waiting ? View.VISIBLE : View.GONE);
-    status.findViewById(R.id.tvCoachPlanStatusBody).setVisibility(View.GONE);
-    status.findViewById(R.id.buCoachPlanStatus).setVisibility(View.GONE);
+    showMeter(schedule, value != null);
 
     // A first plan does not wait for the session to end while the solver is looking at the tab.
-    if (!checked && !writing && !ended && heldUntil == 0 && schedule.mayAsk(true)) {
+    if (!checked && !writing && heldUntil == 0 && schedule.mayAsk(true)) {
       checked = true;
       CoachPlanWorker.checkFromScreen(activity);
     }
+  }
+
+  /** How many of the solves the next plan waits for are done, while it waits for any. */
+  private void showMeter(PlanSchedule schedule, boolean counting) {
+    ProgressBar meter = status.findViewById(R.id.pbCoachPlanMeter);
+    int needed = schedule.getSolvesNeeded();
+    meter.setVisibility(counting && needed > 0 ? View.VISIBLE : View.GONE);
+    int of = schedule.isFirst() ? CoachPayloadBuilder.PLAN_FLOOR : CoachPayloadBuilder.SINCE_FLOOR;
+    meter.setMax(of);
+    meter.setProgress(Math.max(of - needed, 0));
   }
 
   /**
@@ -202,30 +298,22 @@ public class CoachPlanStatus {
    * @param none whether no solve type at all can carry the plans
    */
   private void showElsewhere(SolveType flagged, boolean none) {
-    place(false);
-    TextView text = status.findViewById(R.id.tvCoachPlanStatus);
-    text.setTextColor(ContextCompat.getColor(activity, R.color.white));
-    text.setTextSize(16);
-    TextView body = status.findViewById(R.id.tvCoachPlanStatusBody);
-    TextView button = status.findViewById(R.id.buCoachPlanStatus);
-    status.findViewById(R.id.pbCoachPlanStatus).setVisibility(View.GONE);
-
+    showCard(false);
+    TextView text = showTitle(flagged == null ? activity.getString(R.string.coach_plans_paused)
+        : activity.getString(R.string.coach_plans_written_for,
+            Utils.toSolveTypeLocalizedName(activity, flagged.getName())));
     if (flagged != null) {
-      text.setText(activity.getString(R.string.coach_plans_written_for,
-          Utils.toSolveTypeLocalizedName(activity, flagged.getName())));
-      text.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-      body.setVisibility(View.GONE);
-      button.setVisibility(View.GONE);
       return;
     }
-    boolean here = CoachPlans.eligible(solveType);
-    text.setText(R.string.coach_plans_paused);
     text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_plans_paused, 0, 0, 0);
     text.setCompoundDrawablePadding(
         Math.round(6 * activity.getResources().getDisplayMetrics().density));
     String why = activity.getString(R.string.coach_plans_paused_body);
+    TextView body = status.findViewById(R.id.tvCoachPlanStatusBody);
     body.setText(none ? why + " " + activity.getString(R.string.coach_plans_paused_none) : why);
     body.setVisibility(View.VISIBLE);
+    final boolean here = CoachPlans.eligible(solveType);
+    TextView button = status.findViewById(R.id.buCoachPlanStatus);
     button.setText(here
         ? activity.getString(R.string.coach_plans_resume_here,
             Utils.toSolveTypeLocalizedName(activity, solveType.getName()))
@@ -236,7 +324,7 @@ public class CoachPlanStatus {
     button.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        if (CoachPlans.eligible(solveType)) {
+        if (here) {
           moveTo(solveType);
         } else {
           activity.startActivity(new Intent(activity, SolveTypesActivity.class)
@@ -247,19 +335,105 @@ public class CoachPlanStatus {
   }
 
   /**
-   * Puts the status where it reads: under the plan's headline for the row, above everything else
-   * for a solve type the plans are not written for.
+   * The access has ended: no plan is written any more, and the purchase is one tap away. It is
+   * called a subscription only when one was bought, a code's access having an end of its own.
    */
-  private void place(boolean row) {
-    View head = tab.findViewById(R.id.llAnalysisPlanWritten);
-    tab.removeView(status);
-    tab.addView(status, row ? tab.indexOfChild(head) + 1 : 0);
+  private void showEnded() {
+    showCard(true);
+    showTitle(activity.getString(CoachAccess.of(activity).getPurchaseToken() == null
+        ? R.string.coach_ended_title_access : R.string.coach_ended_title));
+    TextView body = status.findViewById(R.id.tvCoachPlanStatusBody);
+    body.setText(R.string.coach_ended_body);
+    body.setVisibility(View.VISIBLE);
+    TextView button = status.findViewById(R.id.buCoachPlanStatus);
+    button.setText(R.string.coach_ended_button);
+    button.setVisibility(View.VISIBLE);
+    button.setBackgroundResource(R.drawable.dialog_action_button_ghost);
+    button.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        openPurchase(solveType);
+      }
+    });
+    billing.readPlans(false); // asked now, so the sheet opens on its prices
+  }
+
+  /** The card with nothing in it but its first line, which the caller fills the rest of. */
+  private void showCard(boolean ended) {
     status.setVisibility(View.VISIBLE);
-    int gap = activity.getResources().getDimensionPixelSize(R.dimen.space_m);
-    // The rule sets the row off from a headline, so it is drawn only under one.
-    status.findViewById(R.id.vCoachPlanStatusRule)
-        .setVisibility(row && hasPlan ? View.VISIBLE : View.GONE);
-    ((LinearLayout.LayoutParams) status.getLayoutParams()).bottomMargin = row && hasPlan ? 0 : gap;
+    status.setBackgroundResource(ended ? R.drawable.coach_card_ended : R.drawable.analysis_card);
+    status.findViewById(R.id.pbCoachPlanStatus).setVisibility(View.GONE);
+    status.findViewById(R.id.tvCoachPlanStatusLabel).setVisibility(View.GONE);
+    status.findViewById(R.id.pbCoachPlanMeter).setVisibility(View.GONE);
+    status.findViewById(R.id.tvCoachPlanStatusBody).setVisibility(View.GONE);
+    status.findViewById(R.id.buCoachPlanStatus).setVisibility(View.GONE);
+  }
+
+  private TextView showTitle(String title) {
+    TextView text = status.findViewById(R.id.tvCoachPlanStatus);
+    text.setText(title);
+    text.setGravity(Gravity.START);
+    text.setTextColor(ContextCompat.getColor(activity, R.color.white));
+    text.setTextSize(16);
+    text.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+    return text;
+  }
+
+  /** @param solves how many smart cube solves the solve type on screen has */
+  private void showGate(int solves) {
+    int floor = CoachPayloadBuilder.PLAN_FLOOR;
+    int more = floor - solves;
+    tab.findViewById(R.id.tvAnalysisPlanCites).setVisibility(View.GONE);
+    tab.findViewById(R.id.llCoachOffer).setVisibility(View.GONE);
+    tab.findViewById(R.id.llCoachGate).setVisibility(View.VISIBLE);
+    ((TextView) tab.findViewById(R.id.tvCoachGateTitle))
+        .setText(activity.getString(R.string.coach_gate_title, floor));
+    ((TextView) tab.findViewById(R.id.tvCoachGateCount))
+        .setText(activity.getString(R.string.coach_gate_count, solves, floor));
+    ProgressBar meter = tab.findViewById(R.id.pbCoachGate);
+    meter.setMax(floor);
+    meter.setProgress(solves);
+    ((TextView) tab.findViewById(R.id.tvCoachGateNote)).setText(activity.getResources()
+        .getQuantityString(R.plurals.coach_gate_note, more, more,
+            Utils.toSolveTypeLocalizedName(activity, solveType.getName())));
+  }
+
+  /** @param offered the solve type with enough solves, which the purchase offers the plans for */
+  private void showOffer(final SolveType offered) {
+    tab.findViewById(R.id.tvAnalysisPlanCites).setVisibility(View.GONE);
+    tab.findViewById(R.id.llCoachGate).setVisibility(View.GONE);
+    tab.findViewById(R.id.llCoachOffer).setVisibility(View.VISIBLE);
+    // Without Play's prices the button still opens the sheet, which says they could not be read.
+    List<CoachOffers.Offer> plans = billing.getPlans();
+    CoachPriceText text = new CoachPriceText(activity.getResources());
+    TextView button = tab.findViewById(R.id.buCoachOffer);
+    button.setText(plans == null ? activity.getString(R.string.coach_offer_try)
+        : text.offerButton(plans));
+    button.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        openPurchase(offered);
+      }
+    });
+    String note = plans == null ? null : text.offerNote(plans);
+    TextView noteView = tab.findViewById(R.id.tvCoachOfferNote);
+    noteView.setText(note);
+    noteView.setVisibility(note == null ? View.GONE : View.VISIBLE);
+    billing.readPlans(false);
+  }
+
+  /** For an install with the coach, or with no coach to have. */
+  private void showNoOffer() {
+    tab.findViewById(R.id.tvAnalysisPlanCites).setVisibility(View.VISIBLE);
+    tab.findViewById(R.id.llCoachGate).setVisibility(View.GONE);
+    tab.findViewById(R.id.llCoachOffer).setVisibility(View.GONE);
+  }
+
+  private void openPurchase(SolveType offered) {
+    if (activity.getSupportFragmentManager().findFragmentByTag(SHEET_TAG) == null) {
+      CoachPurchaseSheet.newInstance(offered)
+          .show(activity.getSupportFragmentManager(), SHEET_TAG);
+    }
   }
 
   /** Only from a pause, where the plans are written for nothing and none can be lost. */
@@ -273,17 +447,11 @@ public class CoachPlanStatus {
     return activity.getResources().getQuantityString(plural, count, count);
   }
 
-  /** A line with the figures in it lit, which are what the eye is after. */
-  private CharSequence lit(int line, String... figures) {
-    SpannableString text = new SpannableString(activity.getString(line, (Object[]) figures));
-    int white = ContextCompat.getColor(activity, R.color.white);
-    for (String figure : figures) {
-      int at = text.toString().indexOf(figure);
-      if (at >= 0) {
-        text.setSpan(new ForegroundColorSpan(white), at, at + figure.length(),
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-      }
-    }
+  /** A figure in white, which is what the eye is after on the strip. */
+  private CharSequence lit(String figure) {
+    SpannableString text = new SpannableString(figure);
+    text.setSpan(new ForegroundColorSpan(ContextCompat.getColor(activity, R.color.white)), 0,
+        figure.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     return text;
   }
 }

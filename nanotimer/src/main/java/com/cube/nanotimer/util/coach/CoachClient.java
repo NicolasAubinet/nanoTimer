@@ -65,12 +65,21 @@ public final class CoachClient {
   }
 
   /**
+   * Whether this install has the coach, as far as the app can tell: a build token, a purchase the
+   * coach has not ended, or an entered code that still runs. The coach decides at every request;
+   * this is what the app offers and shows.
+   */
+  public boolean hasAccess() {
+    return !token.isEmpty() || access.letsIn(System.currentTimeMillis());
+  }
+
+  /**
    * Whether the coach has said this install's subscription has ended, after which no summary is
-   * sent until Play shows a purchase again. A build with a token is let in by the token, so a
-   * purchase that ended says nothing about it.
+   * sent until Play shows a purchase again. A build with a token or an install with a code is let
+   * in by that, so a purchase that ended says nothing about it.
    */
   public boolean accessEnded() {
-    return token.isEmpty() && access.hasEnded();
+    return access.hasEnded() && !hasAccess();
   }
 
   /**
@@ -147,6 +156,8 @@ public final class CoachClient {
       return;
     }
     if (reply.getRefusal() == CoachRefusal.NO_ACCESS) {
+      // The coach reads a code's access before a purchase, so it had none to read.
+      access.codeEnded();
       access.refused(answer.purchaseSent, System.currentTimeMillis());
     } else if (reply.getRefusal() == CoachRefusal.UNAUTHORIZED) {
       access.codeEnded();

@@ -56,6 +56,9 @@ public final class CoachPractice {
   public interface Listener {
     /** On the main thread, only when the service answered. */
     void onPractice(List<Set> sets);
+
+    /** On the main thread, when the coach answered that nothing lets this install in any more. */
+    void onAccessEnded();
   }
 
   private CoachPractice() {
@@ -72,7 +75,7 @@ public final class CoachPractice {
    */
   public static void refresh(final CoachClient client, final SolveType solveType,
       CubeMethod method, final Listener listener) {
-    if (client.accessEnded()) {
+    if (!client.hasAccess()) {
       return;
     }
     final Handler main = new Handler(Looper.getMainLooper());
@@ -86,6 +89,14 @@ public final class CoachPractice {
               public void run() {
                 String reply = client.requestPractice(CoachClient.requestBody(payload, null));
                 final List<Set> sets = parse(reply);
+                if (reply == null && !client.hasAccess()) {
+                  main.post(new Runnable() {
+                    @Override
+                    public void run() {
+                      listener.onAccessEnded();
+                    }
+                  });
+                }
                 if (reply == null || (sets.isEmpty() && !answersEmpty(reply))) {
                   return;
                 }

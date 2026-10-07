@@ -40,6 +40,21 @@ public class CoachAccessTest {
   }
 
   @Test
+  public void aPurchaseLetsTheInstallInUntilTheCoachEndsIt() {
+    Assert.assertTrue(CoachAccess.letsIn(true, false, 0, NOW));
+    Assert.assertFalse(CoachAccess.letsIn(true, true, 0, NOW));
+    Assert.assertFalse(CoachAccess.letsIn(false, false, 0, NOW));
+  }
+
+  /** A code is its own way in, whatever became of a purchase. */
+  @Test
+  public void aCodeLetsTheInstallInWhileItRuns() {
+    Assert.assertTrue(CoachAccess.letsIn(false, false, NOW + 1, NOW));
+    Assert.assertTrue(CoachAccess.letsIn(true, true, CoachAccess.NO_END, NOW));
+    Assert.assertFalse(CoachAccess.letsIn(false, false, NOW, NOW));
+  }
+
+  @Test
   public void onlyTextAHeaderCanCarryIsSent() {
     Assert.assertTrue(CoachAccess.sendable(TOKEN));
     Assert.assertFalse(CoachAccess.sendable(null));

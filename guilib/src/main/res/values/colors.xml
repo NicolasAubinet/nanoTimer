@@ -69,6 +69,7 @@
 
   <color name="new_record">#FFEEDD00</color>
   <color name="warning">#FFFFAA00</color>
+  <color name="warning_wash_08">#14FFAA00</color>
   <color name="dnf_time">@color/gray600</color>
   <!-- The +2 or the time behind a DNF, said beside the solve: never louder than it. -->
   <color name="solve_mark">@color/gray600</color>

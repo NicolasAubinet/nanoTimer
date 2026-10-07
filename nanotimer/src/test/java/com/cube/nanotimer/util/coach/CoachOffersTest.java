@@ -74,4 +74,56 @@ public class CoachOffersTest {
     Assert.assertNull(CoachOffers.pick(newBuyer(), "weekly"));
     Assert.assertNull(CoachOffers.pick(Collections.<CoachOffers.Offer>emptyList(), "monthly"));
   }
+
+  private static CoachOffers.Offer priced(CoachOffers.Phase... phases) {
+    return new CoachOffers.Offer("yearly", "offer", Collections.<String>emptyList(), "token",
+        Arrays.asList(phases));
+  }
+
+  private static final CoachOffers.Phase FREE = new CoachOffers.Phase("Free", 0, "P2W");
+  private static final CoachOffers.Phase LOWER = new CoachOffers.Phase("€43.99", 43_990_000, "P1Y");
+  private static final CoachOffers.Phase YEAR = new CoachOffers.Phase("€54.99", 54_990_000, "P1Y");
+
+  /** The launch offer as it is set in Play Console: two free weeks, a first year at 20% off. */
+  @Test
+  public void theLaunchOfferIsFreeThenLowerThenTheBasePlan() {
+    CoachOffers.Offer launch = priced(FREE, LOWER, YEAR);
+    Assert.assertEquals(2, launch.getFreePeriod().getCount());
+    Assert.assertEquals('W', launch.getFreePeriod().getUnit());
+    Assert.assertSame(LOWER, launch.getIntro());
+    Assert.assertSame(YEAR, launch.getRegular());
+    Assert.assertEquals(20, launch.getPercentOff());
+  }
+
+  @Test
+  public void theTrialTakesNothingOff() {
+    CoachOffers.Offer trial = priced(FREE, YEAR);
+    Assert.assertNotNull(trial.getFreePeriod());
+    Assert.assertNull(trial.getIntro());
+    Assert.assertEquals(0, trial.getPercentOff());
+  }
+
+  @Test
+  public void thePlainBasePlanIsItsPriceAlone() {
+    CoachOffers.Offer plain = priced(YEAR);
+    Assert.assertNull(plain.getFreePeriod());
+    Assert.assertNull(plain.getIntro());
+    Assert.assertSame(YEAR, plain.getRegular());
+  }
+
+  /** Three months at a lower monthly price against a yearly one compares nothing. */
+  @Test
+  public void aLowerPriceOverAnotherLengthGivesNoPercentage() {
+    CoachOffers.Offer offer = priced(new CoachOffers.Phase("€9.99", 9_990_000, "P3M"), YEAR);
+    Assert.assertNotNull(offer.getIntro());
+    Assert.assertEquals(0, offer.getPercentOff());
+  }
+
+  @Test
+  public void aLengthPlayWritesAnotherWayIsNotRead() {
+    Assert.assertNull(CoachOffers.Period.parse("P1M2D"));
+    Assert.assertNull(CoachOffers.Period.parse("PT5M"));
+    Assert.assertNull(CoachOffers.Period.parse(null));
+    Assert.assertEquals(14, CoachOffers.Period.parse("P14D").getCount());
+  }
 }
