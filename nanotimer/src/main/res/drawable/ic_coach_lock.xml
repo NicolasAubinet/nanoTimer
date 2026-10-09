@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The small padlock on what comes with the coach. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+   android:width="14dp"
+   android:height="14dp"
+   android:viewportWidth="24"
+   android:viewportHeight="24">
+  <path
+     android:strokeColor="#C9CED2"
+     android:strokeWidth="2"
+     android:strokeLineCap="round"
+     android:pathData="M7,10.5h10a2,2 0 0 1 2,2v6a2,2 0 0 1 -2,2h-10a2,2 0 0 1 -2,-2v-6a2,2 0 0 1 2,-2zM8,10.5V7.5a4,4 0 0 1 8,0v3"/>
+</vector>

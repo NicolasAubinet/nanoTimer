@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Three empty target dots under a silhouette: the tries a case is practised over. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+   android:width="26dp"
+   android:height="6dp"
+   android:viewportWidth="26"
+   android:viewportHeight="6">
+  <path
+     android:strokeColor="#66FFFFFF"
+     android:strokeWidth="1"
+     android:pathData="M0.5,3a2.5,2.5 0 1 0 5,0a2.5,2.5 0 1 0 -5,0M10.5,3a2.5,2.5 0 1 0 5,0a2.5,2.5 0 1 0 -5,0M20.5,3a2.5,2.5 0 1 0 5,0a2.5,2.5 0 1 0 -5,0"/>
+</vector>

@@ -836,8 +836,15 @@ public class AnalysisActivity extends NanoTimerActivity {
    * screen, which costs the service no model call.
    */
   private void showPractice(boolean offered) {
-    if (!offered || !coachClient.hasAccess()) {
+    if (!offered) {
       findViewById(R.id.llAnalysisPractice).setVisibility(View.GONE);
+      return;
+    }
+    if (!coachClient.hasAccess()) {
+      practiceAsked = false; // the sets are asked for once the coach lets the install in
+      showPracticeLocked(true);
+      findViewById(R.id.llAnalysisPractice).setVisibility(View.VISIBLE);
+      planView.setPracticeTeaser((LinearLayout) findViewById(R.id.llAnalysisPracticeSets));
       return;
     }
     if (practiceAsked) {
@@ -865,7 +872,14 @@ public class AnalysisActivity extends NanoTimerActivity {
     });
   }
 
+  /** @param locked whether the section is the teaser, which the chip says and no text explains */
+  private void showPracticeLocked(boolean locked) {
+    findViewById(R.id.tvAnalysisPracticeLocked).setVisibility(locked ? View.VISIBLE : View.GONE);
+    findViewById(R.id.tvAnalysisPracticeBody).setVisibility(locked ? View.GONE : View.VISIBLE);
+  }
+
   private void drawPractice(List<CoachPractice.Set> sets) {
+    showPracticeLocked(false);
     findViewById(R.id.llAnalysisPractice).setVisibility(sets.isEmpty() ? View.GONE : View.VISIBLE);
     planView.setPractice((LinearLayout) findViewById(R.id.llAnalysisPracticeSets), sets);
   }

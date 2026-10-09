@@ -1419,6 +1419,7 @@
   <string name="coach_practice_title">Practice any time</string>
   <string name="coach_practice_body">Always here, apart from the plan: the cases costing you the most, each one practised until it beats its target. Refreshed as you solve.</string>
   <string name="coach_practice_set">Your costliest %1$s cases</string>
+  <string name="coach_practice_locked">With the coach</string>
 
   <!-- Example mode: the whole hub filled with an invented solver, for a reader no cube has ever
        read a solve for. The solver has no name: the banner already says the figures are not the

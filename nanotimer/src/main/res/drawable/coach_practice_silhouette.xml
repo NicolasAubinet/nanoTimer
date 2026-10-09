@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A last layer case with nothing on it: the place of a chart the coach would draw. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+   android:width="38dp"
+   android:height="38dp"
+   android:viewportWidth="38"
+   android:viewportHeight="38">
+  <path
+     android:fillColor="#16191C"
+     android:pathData="M5,0h28a5,5 0 0 1 5,5v28a5,5 0 0 1 -5,5h-28a5,5 0 0 1 -5,-5v-28a5,5 0 0 1 5,-5z"/>
+  <path
+     android:fillColor="#4A4F55"
+     android:pathData="M5,5h8v8h-8zM15,5h8v8h-8zM25,5h8v8h-8zM5,15h8v8h-8zM15,15h8v8h-8zM25,15h8v8h-8zM5,25h8v8h-8zM15,25h8v8h-8zM25,25h8v8h-8z"/>
+</vector>

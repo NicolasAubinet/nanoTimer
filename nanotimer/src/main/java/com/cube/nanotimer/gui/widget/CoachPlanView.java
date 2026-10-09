@@ -46,6 +46,10 @@ import com.cube.nanotimer.util.helper.Utils;
  */
 public class CoachPlanView {
 
+  /** What the teaser draws: the families the service sends sets for, at a full set's size. */
+  private static final String[] TEASER_FAMILIES = {"oll", "pll"};
+  private static final int TEASER_CASES = 5;
+
   private final Activity activity;
   private final LinearLayout container;
   private final LayoutInflater inflater;
@@ -72,6 +76,25 @@ public class CoachPlanView {
     into.removeAllViews();
     for (CoachPractice.Set set : sets) {
       into.addView(practiceCard(into, set));
+    }
+  }
+
+  /**
+   * The practice sets as an install without the coach reads them: the same cards with blank
+   * charts, since which cases cost it the most is the coach's to say.
+   */
+  public void setPracticeTeaser(LinearLayout into) {
+    into.removeAllViews();
+    for (String family : TEASER_FAMILIES) {
+      View card = inflater.inflate(R.layout.coach_practice_set, into, false);
+      ((TextView) card.findViewById(R.id.tvCoachPracticeTitle)).setText(activity.getString(
+          R.string.coach_practice_set, Utils.toSmartCubeStepLocalizedName(activity, family, 0)));
+      LinearLayout row = card.findViewById(R.id.llCoachPracticeCases);
+      for (int i = 0; i < TEASER_CASES; i++) {
+        row.addView(inflater.inflate(R.layout.coach_practice_silhouette, row, false));
+      }
+      card.findViewById(R.id.buCoachPracticeDrill).setVisibility(View.GONE);
+      into.addView(card);
     }
   }
 

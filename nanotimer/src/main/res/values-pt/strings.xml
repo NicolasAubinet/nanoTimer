@@ -1373,6 +1373,7 @@
   <string name="coach_practice_title">Treino livre</string>
   <string name="coach_practice_body">Sempre aqui, à parte do plano: os casos que mais lhe custam, cada um treinado até bater a sua meta. Atualizado à medida que resolve.</string>
   <string name="coach_practice_set">Os seus casos de %1$s mais custosos</string>
+  <string name="coach_practice_locked">Com o coach</string>
 
   <string name="analysis_sample_subtitle">Não são seus tempos</string>
   <string name="analysis_sample_chip">Exemplo</string>

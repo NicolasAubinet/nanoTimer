@@ -1371,6 +1371,7 @@
   <string name="coach_practice_title">Entraînement libre</string>
   <string name="coach_practice_body">Toujours là, à côté du plan : les cas qui vous coûtent le plus, chacun travaillé jusqu\'à battre son objectif. Mis à jour au fil de vos résolutions.</string>
   <string name="coach_practice_set">Vos cas de %1$s les plus coûteux</string>
+  <string name="coach_practice_locked">Avec le coach</string>
 
   <string name="analysis_sample_subtitle">Pas vos résolutions</string>
   <string name="analysis_sample_chip">Exemple</string>
