@@ -87,6 +87,14 @@ public class GyrolessBlindCaptureTest {
         part(moves, SlowSliceCaptureTest.STEPS, 2, 0));
   }
 
+  /** The same odd pair out in an M2 target, where it is the M2 that stands and turns the core. */
+  @Test
+  public void aTwoHanderInAnM2TargetLeavesTheM2Folded() {
+    String moves = withoutGyro(SlowSliceCaptureTest.MOVES)
+        .replace("U'@8646 ", "U'@8646 F'@8878 B@8881 ");
+    assertEquals("L' U' L U M2 U' L' U L", part(moves, SlowSliceCaptureTest.STEPS, 1, 1));
+  }
+
   /** A slice a wide gave back: no gyro saw the wide, so its algorithm keeps its faces. */
   @Test
   public void aSliceAnUnseenWideUndoesKeepsItsFaces() {

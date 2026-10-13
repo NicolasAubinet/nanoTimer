@@ -2,6 +2,7 @@ package com.cube.nanotimer.cube;
 
 import com.cube.nanotimer.cube.SolveMovesFormat.Move;
 import com.cube.nanotimer.smartcube.model.CubeRotation;
+import com.cube.nanotimer.smartcube.step.AlgorithmSlots;
 import com.cube.nanotimer.vo.CubeMethod;
 import com.cube.nanotimer.vo.SolveStep;
 import java.util.ArrayList;
@@ -67,7 +68,9 @@ import java.util.Set;
  *
  * <p>The readings are tried in a fixed order: every pair as timed, then every pair with a slow
  * slice's gap allowed, then either with one pair left as the two-hander it may have been. Among
- * those last, one that puts the core back is taken ahead of one that leaves it a half turn round.
+ * those last both kinds can fit, and the algorithm's name says which to take first: one that swaps
+ * the buffer with a single edge is an {@code M2} target, whose slices leave the core a half turn
+ * round, and any other puts it back.
  * See {@link #returningPairs}.
  *
  * <p><b>No other solve may be read this way.</b> Nothing guards the stored grip against a first
@@ -224,12 +227,12 @@ public final class SolveSolution {
       }
     }
     int from = 0;
-    for (long endMs : algorithmEnds(solveSteps)) {
+    for (Algorithm algorithm : algorithmsOf(solveSteps)) {
       int to = from;
-      while (to < stored.size() && stored.get(to).getOffsetMs() <= endMs) {
+      while (to < stored.size() && stored.get(to).getOffsetMs() <= algorithm.endMs) {
         to++;
       }
-      for (int pair : returningPairs(stored, from, to)) {
+      for (int pair : returningPairs(stored, from, to, algorithm.edgeSwap)) {
         choices = choices.withPairInverted(stored.get(pair).getOffsetMs());
       }
       from = to;
@@ -238,7 +241,8 @@ public final class SolveSolution {
   }
 
   /** One algorithm's pairs to fold, by the index of the near half; none where no reading fits. */
-  private static List<Integer> returningPairs(List<Move> stored, int from, int to) {
+  private static List<Integer> returningPairs(List<Move> stored, int from, int to,
+      boolean edgeSwap) {
     List<List<Integer>> readings = new ArrayList<List<Integer>>();
     readings.add(pairsWithin(stored, from, to, Slices.WINDOW_MS));
     readings.add(pairsWithin(stored, from, to, STRADDLED_SLICE_MS));
@@ -249,15 +253,19 @@ public final class SolveSolution {
         readings.add(without);
       }
     }
-    for (int i = 0; i < readings.size(); i++) {
+    for (int i = 0; i < 2; i++) {
       CubeRotation net = netSpin(stored, readings.get(i));
-      if (net.isIdentity() || i < 2 && AXIS_HALF_TURNS.contains(net.getNotation())) {
+      if (net.isIdentity() || AXIS_HALF_TURNS.contains(net.getNotation())) {
         return readings.get(i);
       }
     }
-    for (int i = 2; i < readings.size(); i++) {
-      if (AXIS_HALF_TURNS.contains(netSpin(stored, readings.get(i)).getNotation())) {
-        return readings.get(i);
+    // With a pair left out both can fit: an M2 target turns the core half round, the rest do not.
+    for (boolean halfTurn : new boolean[] {edgeSwap, !edgeSwap}) {
+      for (int i = 2; i < readings.size(); i++) {
+        CubeRotation net = netSpin(stored, readings.get(i));
+        if (halfTurn ? AXIS_HALF_TURNS.contains(net.getNotation()) : net.isIdentity()) {
+          return readings.get(i);
+        }
       }
     }
     return Collections.<Integer>emptyList();
@@ -292,9 +300,9 @@ public final class SolveSolution {
     return net;
   }
 
-  /** Where each algorithm's moves end: every part of a step, then what the parts left over. */
-  private static List<Long> algorithmEnds(List<SolveStep> solveSteps) {
-    List<Long> ends = new ArrayList<Long>();
+  /** Every part of each step, then what the parts of that step left over. */
+  private static List<Algorithm> algorithmsOf(List<SolveStep> solveSteps) {
+    List<Algorithm> algorithms = new ArrayList<Algorithm>();
     long boundaryMs = 0;
     for (SolveStep step : solveSteps) {
       long partMs = boundaryMs;
@@ -304,12 +312,31 @@ public final class SolveSolution {
       }
       for (SolveStep part : step.getSubSteps()) {
         partMs += part.getTotalMs();
-        ends.add(partMs);
+        algorithms.add(new Algorithm(partMs, isEdgeSwap(part.getName())));
       }
-      ends.add(boundaryMs);
+      algorithms.add(new Algorithm(boundaryMs, false));
     }
-    ends.add(Long.MAX_VALUE);
-    return ends;
+    algorithms.add(new Algorithm(Long.MAX_VALUE, false));
+    return algorithms;
+  }
+
+  /** A buffer and one edge target, nothing marked: the shape of an M2 target's name. */
+  private static boolean isEdgeSwap(String name) {
+    String[] pieces = AlgorithmSlots.pieces(name);
+    return pieces.length == 2 && name.indexOf(':') < 0
+        && pieces[0].length() == 2 && pieces[1].length() == 2;
+  }
+
+  /** Where one algorithm's moves end, and whether its name is an edge swap's. */
+  private static final class Algorithm {
+
+    private final long endMs;
+    private final boolean edgeSwap;
+
+    private Algorithm(long endMs, boolean edgeSwap) {
+      this.endMs = endMs;
+      this.edgeSwap = edgeSwap;
+    }
   }
 
   /**
