@@ -5,6 +5,7 @@ import com.cube.nanotimer.smartcube.model.CubeRotation;
 import com.cube.nanotimer.vo.CubeMethod;
 import com.cube.nanotimer.vo.SolveStep;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -54,6 +55,21 @@ import java.util.Set;
  * that a spelled algorithm shifts exactly the slots the detector named it for. See
  * {@link BlindSpelling}.
  *
+ * <p><b>A cube with no gyro has its blind slices read from timing, one algorithm at a time.</b> Its
+ * stream carries no rotation token at all, so a pair without a spin is not a two-hander the gyro
+ * vouched for: the opposite pairs inside {@link Slices#WINDOW_MS} are taken as slices. Timing alone
+ * mispairs, though (a slow {@code M2} arriving as {@code R'}, {@code L R'}, {@code L} folds to one
+ * {@code M'}), and one slice too many or too few leaves every later letter a quarter turn out. So
+ * an algorithm's pairs fold only in a reading whose spins leave the core where it was, or a half
+ * turn round as an {@code M2} target does; with none, that algorithm keeps its faces, which leave
+ * the frame alone. The frame is then never a quarter turn out at an algorithm's end, whatever was
+ * misread inside it. With no steps there are no algorithms to hold the folds to, and nothing folds.
+ *
+ * <p>The readings are tried in a fixed order: every pair as timed, then every pair with a slow
+ * slice's gap allowed, then either with one pair left as the two-hander it may have been. Among
+ * those last, one that puts the core back is taken ahead of one that leaves it a half turn round.
+ * See {@link #returningPairs}.
+ *
  * <p><b>No other solve may be read this way.</b> Nothing guards the stored grip against a first
  * move that is <em>wide</em>, whose swing the gyro has already reported, and the scripted wide
  * drill stores a grip its own ground truth disowns. Spelling a sighted solve from the grip turns
@@ -68,6 +84,9 @@ public final class SolveSolution {
 
   /** How far apart a straddled slice's halves may be: the one seen split was 343 ms. */
   private static final long STRADDLED_SLICE_MS = 1000;
+
+  /** What an algorithm's slices may leave the core turned by: an {@code M2} target's worth. */
+  private static final List<String> AXIS_HALF_TURNS = Arrays.asList("x2", "y2", "z2");
 
   /** Between the parts of a step, wherever they are shown as one run of moves. */
   public static final String GROUP_SEPARATOR = " · ";
@@ -185,12 +204,112 @@ public final class SolveSolution {
   private static BlindChoices blindChoices(String storedMoves, List<Move> stored, CubeRotation grip,
       List<SolveStep> solveSteps) {
     BlindChoices choices = BlindChoices.of(peekedWides(stored));
+    if (solveSteps != null) {
+      choices = withUnsensedSlicesFolded(stored, choices, solveSteps);
+    }
     // The name check holds a spelling to a name, only worth anything where the two share a frame:
     // a solve recorded before its grip was kept is left with the reading its stream gives.
     if (solveSteps != null && SolveMovesFormat.pickupOf(storedMoves) != null) {
       choices = BlindSpelling.arbitrate(stored, grip, choices, solveSteps);
     }
     return choices;
+  }
+
+  // A stream with no rotation token had no gyro behind it, so a pair's missing spin says nothing.
+  private static BlindChoices withUnsensedSlicesFolded(List<Move> stored, BlindChoices choices,
+      List<SolveStep> solveSteps) {
+    for (Move move : stored) {
+      if (SolveMovesFormat.isRotation(move.getNotation())) {
+        return choices;
+      }
+    }
+    int from = 0;
+    for (long endMs : algorithmEnds(solveSteps)) {
+      int to = from;
+      while (to < stored.size() && stored.get(to).getOffsetMs() <= endMs) {
+        to++;
+      }
+      for (int pair : returningPairs(stored, from, to)) {
+        choices = choices.withPairInverted(stored.get(pair).getOffsetMs());
+      }
+      from = to;
+    }
+    return choices;
+  }
+
+  /** One algorithm's pairs to fold, by the index of the near half; none where no reading fits. */
+  private static List<Integer> returningPairs(List<Move> stored, int from, int to) {
+    List<List<Integer>> readings = new ArrayList<List<Integer>>();
+    readings.add(pairsWithin(stored, from, to, Slices.WINDOW_MS));
+    readings.add(pairsWithin(stored, from, to, STRADDLED_SLICE_MS));
+    for (int i = 0; i < 2; i++) { // then each of the two with one pair left out
+      for (int left = 0; readings.get(i).size() > 1 && left < readings.get(i).size(); left++) {
+        List<Integer> without = new ArrayList<Integer>(readings.get(i));
+        without.remove(left);
+        readings.add(without);
+      }
+    }
+    for (int i = 0; i < readings.size(); i++) {
+      CubeRotation net = netSpin(stored, readings.get(i));
+      if (net.isIdentity() || i < 2 && AXIS_HALF_TURNS.contains(net.getNotation())) {
+        return readings.get(i);
+      }
+    }
+    for (int i = 2; i < readings.size(); i++) {
+      if (AXIS_HALF_TURNS.contains(netSpin(stored, readings.get(i)).getNotation())) {
+        return readings.get(i);
+      }
+    }
+    return Collections.<Integer>emptyList();
+  }
+
+  private static String[] sliceAt(List<Move> stored, int pair) {
+    return Slices.forPair(stored.get(pair).getNotation(), stored.get(pair + 1).getNotation());
+  }
+
+  /** The opposite-face pairs in {@code stored[from, to)} whose halves are within {@code gapMs}. */
+  private static List<Integer> pairsWithin(List<Move> stored, int from, int to, long gapMs) {
+    List<Integer> pairs = new ArrayList<Integer>();
+    for (int i = from; i + 1 < to; i++) {
+      Move near = stored.get(i);
+      Move far = stored.get(i + 1);
+      if (far.getOffsetMs() - near.getOffsetMs() <= gapMs
+          && Slices.forPair(near.getNotation(), far.getNotation()) != null) {
+        pairs.add(i);
+        i++;
+      }
+    }
+    return pairs;
+  }
+
+  /** What the given pairs, read as slices, turn the core by between them. */
+  private static CubeRotation netSpin(List<Move> stored, List<Integer> pairs) {
+    CubeRotation net = CubeRotation.byNotation("");
+    for (int pair : pairs) {
+      // The spins are in the cube's own axes, so the later one goes on the right.
+      net = CubeRotation.byNotation(sliceAt(stored, pair)[1]).then(net);
+    }
+    return net;
+  }
+
+  /** Where each algorithm's moves end: every part of a step, then what the parts left over. */
+  private static List<Long> algorithmEnds(List<SolveStep> solveSteps) {
+    List<Long> ends = new ArrayList<Long>();
+    long boundaryMs = 0;
+    for (SolveStep step : solveSteps) {
+      long partMs = boundaryMs;
+      boundaryMs += step.getTotalMs();
+      if (step.getExecutionMs() <= 0) {
+        continue; // it turned nothing, so its moves are the next step's
+      }
+      for (SolveStep part : step.getSubSteps()) {
+        partMs += part.getTotalMs();
+        ends.add(partMs);
+      }
+      ends.add(boundaryMs);
+    }
+    ends.add(Long.MAX_VALUE);
+    return ends;
   }
 
   /**

@@ -15,7 +15,7 @@ import org.junit.Test;
  */
 public class SlowSliceCaptureTest {
 
-  private static final String MOVES =
+  static final String MOVES =
       "[y] y@6969 B@6969 U@7769 B'@8365 U'@8646 B'@9412 F@9484 z'@9799 F@9799 B'@9820 z'@10235 "
       + "D@10235 B@10403 D'@10928 B'@13159 F'@14833 D'@15461 F@15789 D@16354 B'@16684 z'@17027 "
       + "F@17027 B'@17157 F@17187 z'@17401 U'@17401 F'@17712 U@17938 F@19673 z@30445 F'@30445 "
@@ -50,7 +50,7 @@ public class SlowSliceCaptureTest {
       + "L'@316796 D@316992 L@317173 U@317319 L'@317406 D'@317507 L@317618 D@317735 L'@317849 "
       + "D'@317980 L@318094 U'@318217 L'@318386 D@318680 L@319037 ";
 
-  private static final String STEPS =
+  static final String STEPS =
       "0:memo:6969:0 1:edges:97304:38875 1.0:DF-UR:800:5390 1.1:DF-UL:1674:4840 "
       + "1.2:DF-LB:14084:4646 1.3:DF-UB:10043:448 1.4:DF-FL:7621:2915 1.5:DF-FR:3208:2337 "
       + "1.6:DF-BU-DB:13751:3396 1.7:DF-BR:4346:2868 1.8:DF-FR:856:2275 1.9:DF-FU-DR:28748:2566 "

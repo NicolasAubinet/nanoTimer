@@ -48,7 +48,7 @@ public class BlindPeekCaptureTest {
       + "B'@95891 D'@96103 B@96214 D@96324 B'@96387 D'@96822 B@97181 U'@97285 B'@97420 D@97509 "
       + "B@97669 D'@97740 B'@97854 D@97952 B@98107 U@98198";
 
-  private static final String STEPS_249 =
+  static final String STEPS_249 =
       "0:memo:66957:0 1:edges:4234:10395 1.0:UF-RD-DB:761:1620 1.1:UF-UL-UR:700:1605 "
       + "1.2:UF-FR-UB:424:1498 1.3:UF-FD-LD:357:2534 1.4:UF-BR-LB:1309:1044 1.5:UF-LF-UL:683:2094 "
       + "2:corners:4388:5925 2.0:UFR-UBR-LUB:1375:1228 2.1:UFR-LDF-DBL:532:2484 "
