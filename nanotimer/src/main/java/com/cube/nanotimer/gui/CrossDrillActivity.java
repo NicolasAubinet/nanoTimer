@@ -351,6 +351,12 @@ public class CrossDrillActivity extends DrillScreenActivity {
     return rotation == null ? null : rotation.quaternion();
   }
 
+  /** A cross is planned and turned with the cube rotated freely, not held in one grip. */
+  @Override
+  protected boolean isHeldSquare() {
+    return false;
+  }
+
   private void nextRep() {
     betweenReps = false;
     solutions = null;
