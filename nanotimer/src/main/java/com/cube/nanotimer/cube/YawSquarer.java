@@ -17,7 +17,8 @@ import com.cube.nanotimer.smartcube.model.CubeRotation;
  * <p>Regrips, rotations and slices need nothing special: the gyro follows them (it turns with the
  * core), and a cube resting after one is square again, with the same small drift left to remove.
  * A hold further off square than {@link #MAX_CORRECTION_DEGREES} is taken as deliberate and left
- * alone; drift corrected every time the cube rests never gets that far.
+ * alone; drift corrected every time the cube rests never gets that far (about 2° per M2, so
+ * under 10° for any one last-layer algorithm). A peek at a side face is usually further.
  *
  * <p>For the drawn cube only. The session's {@link GyroReference} is never changed, so the frames a
  * solve is reconstructed in are not affected.
@@ -28,8 +29,8 @@ public final class YawSquarer {
   private static final long SETTLE_MS = 500;
   /** Movement below this still counts as still; a GAN i4 at rest reads about 1° of noise. */
   private static final double STILL_DEGREES = 4;
-  /** Further off square than this is a deliberate hold, not drift. */
-  static final double MAX_CORRECTION_DEGREES = 25;
+  /** Further off square than this is a deliberate hold or a peek at a side, not drift. */
+  static final double MAX_CORRECTION_DEGREES = 10;
   /** Time constant of the ease onto square, so the correction is not seen as a jump. */
   private static final double EASE_MS = 150;
 
