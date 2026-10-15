@@ -85,6 +85,47 @@ public class GanGen4ParserTest {
     }
   }
 
+  /** A slice's second packet dropped with no move after it: found on a second look, not a second later. */
+  @Test
+  public void faceletsStillAheadJustAfterAMoveAskForTheLostMove() {
+    GanGen4Parser parser = newParser();
+    parser.parse(facelets(1), 1000);
+    parser.parse(move(2, 4200), 2000);
+
+    List<GanEvent> first = parser.parse(facelets(3), 2030);
+    assertEquals(1, first.size());
+    assertTrue(first.get(0) instanceof GanEvent.StateRecheckEvent);
+
+    List<GanEvent> second = parser.parse(facelets(3), 2030 + GanBufferedParser.RECHECK_MS);
+    assertEquals(1, second.size());
+    assertTrue(second.get(0) instanceof GanEvent.HistoryRequestEvent);
+  }
+
+  /** Long enough after the move, one look is enough. */
+  @Test
+  public void faceletsAheadWellAfterAMoveAskAtOnce() {
+    GanGen4Parser parser = newParser();
+    parser.parse(facelets(1), 1000);
+    parser.parse(move(2, 4200), 2000);
+
+    List<GanEvent> events = parser.parse(facelets(3), 2000 + GanBufferedParser.LOST_AFTER_MS);
+
+    assertEquals(1, events.size());
+    assertTrue(events.get(0) instanceof GanEvent.HistoryRequestEvent);
+  }
+
+  /** The packet was only late: it lands before the second look, and nothing is asked for. */
+  @Test
+  public void aMoveThatLandsBeforeTheRecheckIsNotAskedFor() {
+    GanGen4Parser parser = newParser();
+    parser.parse(facelets(1), 1000);
+    parser.parse(move(2, 4200), 2000);
+    parser.parse(facelets(3), 2030);
+    parser.parse(move(3, 4300), 2060);
+
+    assertTrue(parser.parse(facelets(3), 2030 + GanBufferedParser.RECHECK_MS).isEmpty());
+  }
+
   @Test
   public void batteryPacketDecodesToLevel() {
     GanGen4Parser parser = newParser();

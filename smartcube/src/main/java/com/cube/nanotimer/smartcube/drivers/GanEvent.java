@@ -8,7 +8,7 @@ import com.cube.nanotimer.smartcube.model.CubeState;
 public sealed interface GanEvent
     permits GanEvent.StateEvent, GanEvent.MoveEvent, GanEvent.GyroEvent, GanEvent.DesyncEvent,
         GanEvent.HistoryRequestEvent, GanEvent.BatteryEvent, GanEvent.InfoEvent,
-        GanEvent.DisconnectEvent {
+        GanEvent.DisconnectEvent, GanEvent.StateRecheckEvent {
 
   /** The cube's own full state, which re-anchors move tracking. */
   final class StateEvent implements GanEvent {
@@ -93,6 +93,13 @@ public sealed interface GanEvent
     public int getCount() {
       return count;
     }
+  }
+
+  /**
+   * Facelets ran ahead of the model just after a move, which is either that move's packet still on
+   * its way or one that was dropped. The driver asks for facelets again, and a second look tells.
+   */
+  final class StateRecheckEvent implements GanEvent {
   }
 
   final class BatteryEvent implements GanEvent {

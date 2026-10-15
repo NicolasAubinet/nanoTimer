@@ -30,6 +30,19 @@ abstract class GanBufferedParser implements GanProtocol {
    */
   private static final int MOVE_SETTLE_MS = 500;
 
+  /**
+   * Unless the model still trails the cube this long after facelets first showed it trailing: by
+   * then the packet is not late but lost. Measured on a GAN i4, where a slice drops one of its two
+   * packets about once in ten and waiting out the settle window cost a second.
+   */
+  static final int RECHECK_MS = 100;
+
+  /**
+   * Or this long after the last move: a slice's second packet lands within 120 ms of the first
+   * when it lands at all (median 29 ms over 52 slices on a GAN i4).
+   */
+  static final int LOST_AFTER_MS = 120;
+
   /** A move's 6-bit face code, in {@code "URFDLB"} order. */
   private static final int[] FACE_CODES = {2, 32, 8, 1, 16, 4};
 
@@ -44,6 +57,9 @@ abstract class GanBufferedParser implements GanProtocol {
   private final CubeClock clock = new CubeClock();
 
   private long lastMoveHostMs = 0;
+  /** When facelets first ran ahead of the model inside the settle window, and at which serial. */
+  private long aheadSinceHostMs = -1;
+  private int aheadAtSerial;
   private Integer batteryLevel;
 
   GanBufferedParser(int[] macBytes) {
@@ -108,6 +124,9 @@ abstract class GanBufferedParser implements GanProtocol {
     if (face < 0) {
       return List.of(); // corrupt packet — drop it
     }
+    GanCube.captureLine("PKT " + hostTimeMs + " serial=" + serial + " " + FACES[face]
+        + (prime ? "'" : "") + " cube=" + cubeTimeMs + " model=" + buffer.getLastSerial()
+        + " held=" + buffer.size());
     return drain(buffer.push(
         new BufferedMove(serial, FACES[face], prime, cubeTimeMs, hostTimeMs)), hostTimeMs);
   }
@@ -126,6 +145,7 @@ abstract class GanBufferedParser implements GanProtocol {
     int startSerial = packet.val(base, 8);
     // Clamp the cube's count to what the packet can actually hold.
     int count = Math.max(0, Math.min((dataLength - 1) * 2, (packet.bitLength() - base - 8) / 4));
+    GanCube.captureLine("HREPLY " + hostTimeMs + " start=" + startSerial + " count=" + count);
 
     List<GanEvent> events = new ArrayList<>();
     for (int i = 0; i < count; i++) {
@@ -146,6 +166,8 @@ abstract class GanBufferedParser implements GanProtocol {
   final List<GanEvent> parseFacelets(GanPacket packet, long hostTimeMs) {
     int base = payloadBit();
     int serial = packet.valLe(base, 2);
+    GanCube.captureLine("F " + hostTimeMs + " serial=" + serial + " model=" + buffer.getLastSerial()
+        + " held=" + buffer.size() + " sinceMove=" + (hostTimeMs - lastMoveHostMs));
 
     int[] cp = new int[8];
     int[] co = new int[8];
@@ -164,8 +186,22 @@ abstract class GanBufferedParser implements GanProtocol {
 
     if (!needsAnchor()) {
       if (hostTimeMs - lastMoveHostMs <= MOVE_SETTLE_MS) {
-        return List.of();
+        if (serial == 0 || GanMoveBuffer.signedSerialDiff(serial, buffer.getLastSerial()) <= 0) {
+          aheadSinceHostMs = -1;
+          return List.of();
+        }
+        if (hostTimeMs - lastMoveHostMs < LOST_AFTER_MS) {
+          if (aheadSinceHostMs < 0 || aheadAtSerial != buffer.getLastSerial()) {
+            aheadSinceHostMs = hostTimeMs;
+            aheadAtSerial = buffer.getLastSerial();
+            return List.of(new GanEvent.StateRecheckEvent());
+          }
+          if (hostTimeMs - aheadSinceHostMs < RECHECK_MS) {
+            return List.of();
+          }
+        }
       }
+      aheadSinceHostMs = -1;
       GanMoveBuffer.HistoryRequest request = buffer.checkForMissedMoves(serial);
       if (request != null) {
         return List.of(new GanEvent.HistoryRequestEvent(request.getSerial(), request.getCount()));

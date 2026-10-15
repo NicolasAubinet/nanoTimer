@@ -164,6 +164,7 @@ public final class GanGen2Parser implements GanProtocol {
     if (missed == 0) {
       return List.of();
     }
+    GanCube.captureLine("PKT " + hostTimeMs + " serial=" + serial + " new=" + missed);
     lastSerial = serial;
 
     // Beyond what the packet carries, the moves in between are gone for good: applying the ones we

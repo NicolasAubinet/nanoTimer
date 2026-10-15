@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +31,8 @@ final class GanCube implements SmartCube {
 
   /**
    * Logs every gyro sample with the moment it arrived, for offline analysis by
-   * {@code tools/gyroprobe.py}.
+   * {@code tools/gyroprobe.py}, and beside it every move packet, facelets packet and history
+   * request, which is what shows a dropped packet and how long its move took to recover.
    *
    * <p>⚠️ Turn this on before tuning anything that reads the gyro. <b>No GAN has ever been
    * measured.</b> Both the pose smoothing in {@code live.html} and the still-detection the
@@ -45,6 +47,13 @@ final class GanCube implements SmartCube {
 
   /** How often to re-ask for facelets while the model is unanchored and dropping every move. */
   private static final long ANCHOR_RETRY_INTERVAL_MS = 1000;
+
+  /**
+   * How long after a move, with no other since, a one-move-per-packet cube is asked for facelets.
+   * A dropped packet that nothing follows is otherwise found only by the cube's own facelets, which
+   * come once a second.
+   */
+  private static final long MOVE_POLL_MS = 60;
 
   private final DiscoveredCube device;
   private final BlePeripheral peripheral;
@@ -75,6 +84,9 @@ final class GanCube implements SmartCube {
 
   /** The cube said it was powering down. Cleared by the next thing it says. */
   private volatile boolean asleep;
+
+  /** Counts moves, so a poll scheduled behind one can tell whether another has come since. */
+  private volatile int movesSeen;
 
   GanCube(DiscoveredCube device, BlePeripheral peripheral, int[] mac, boolean moyuAi) {
     this.device = device;
@@ -153,14 +165,22 @@ final class GanCube implements SmartCube {
         capture(nowMs, gyro.getOrientation());
       } else if (event instanceof GanEvent.StateEvent state) {
         lastState = state.getState();
+        captureLine("S " + nowMs);
         notifyState(lastState);
       } else if (event instanceof GanEvent.MoveEvent move) {
+        // arrived= is null for a move recovered from history, and older than now for one held back.
+        captureLine("M " + nowMs + " " + move.getMove().getNotation() + " cube="
+            + move.getMove().getCubeTimestampMs() + " arrived=" + move.getMove().getHostTimestampMs());
         notifyMove(move.getMove());
         lastState = move.getStateAfter();
         notifyState(lastState);
+        pollStateAfterMove();
       } else if (event instanceof GanEvent.HistoryRequestEvent history) {
         requestMoveHistory(history);
+      } else if (event instanceof GanEvent.StateRecheckEvent) {
+        recheckState();
       } else if (event instanceof GanEvent.DesyncEvent) {
+        captureLine("DESYNC " + nowMs);
         beginAnchoring();
       } else if (event instanceof GanEvent.BatteryEvent battery) {
         notifyBattery(battery.getLevel());
@@ -182,12 +202,19 @@ final class GanCube implements SmartCube {
 
   /** One gyro sample, as it arrived: {@code G <hostMs> <w> <x> <y> <z>}. */
   private static void capture(long atMs, CubeOrientation orientation) {
-    if (!CAPTURE || orientation == null) {
+    if (orientation != null) {
+      captureLine("G " + atMs + " " + orientation.getW() + " " + orientation.getX()
+          + " " + orientation.getY() + " " + orientation.getZ());
+    }
+  }
+
+  /** One line of the capture, for the parsers too: what arrived, and when the host saw it. */
+  static void captureLine(String line) {
+    if (!CAPTURE) {
       return;
     }
     try {
-      Log.i(CAPTURE_TAG, "G " + atMs + " " + orientation.getW() + " " + orientation.getX()
-          + " " + orientation.getY() + " " + orientation.getZ());
+      Log.i(CAPTURE_TAG, line);
     } catch (RuntimeException e) {
       // JVM unit tests have no android.util.Log; the capture is a hardware-only diagnostic.
     }
@@ -208,11 +235,51 @@ final class GanCube implements SmartCube {
     if (msg == null) {
       return;
     }
+    captureLine("HREQ " + System.currentTimeMillis() + " serial=" + history.getSerial()
+        + " count=" + history.getCount());
     try {
       commandChr.write(msg);
     } catch (RuntimeException e) {
+      captureLine("HREQFAIL " + System.currentTimeMillis() + " " + e);
       // A write that fails is not worth reacting to: the next move event re-detects the same gap
       // and asks again.
+    }
+  }
+
+  private void pollStateAfterMove() {
+    if (!(protocol instanceof GanBufferedParser)) {
+      return; // a Gen2 packet carries its own history
+    }
+    final int seen = ++movesSeen;
+    try {
+      anchorScheduler.schedule(() -> {
+        if (seen != movesSeen) {
+          return;
+        }
+        try {
+          request(GanRequest.FACELETS);
+        } catch (RuntimeException e) {
+          // The cube's own periodic facelets still find a gap, a second later.
+        }
+      }, MOVE_POLL_MS, TimeUnit.MILLISECONDS);
+    } catch (RejectedExecutionException e) {
+      // Disconnected since: nothing left to poll.
+    }
+  }
+
+  /** Asks for facelets again once a move packet that was merely late would have landed. */
+  private void recheckState() {
+    captureLine("RECHECK " + System.currentTimeMillis());
+    try {
+      anchorScheduler.schedule(() -> {
+        try {
+          request(GanRequest.FACELETS);
+        } catch (RuntimeException e) {
+          // The cube's own periodic facelets still find the gap, a second later.
+        }
+      }, GanBufferedParser.RECHECK_MS, TimeUnit.MILLISECONDS);
+    } catch (RejectedExecutionException e) {
+      // Disconnected since: nothing left to recheck.
     }
   }
 
