@@ -48,13 +48,6 @@ final class GanCube implements SmartCube {
   /** How often to re-ask for facelets while the model is unanchored and dropping every move. */
   private static final long ANCHOR_RETRY_INTERVAL_MS = 1000;
 
-  /**
-   * How long after a move, with no other since, a one-move-per-packet cube is asked for facelets.
-   * A dropped packet that nothing follows is otherwise found only by the cube's own facelets, which
-   * come once a second.
-   */
-  private static final long MOVE_POLL_MS = 60;
-
   private final DiscoveredCube device;
   private final BlePeripheral peripheral;
   private final int[] mac;
@@ -177,8 +170,6 @@ final class GanCube implements SmartCube {
         pollStateAfterMove();
       } else if (event instanceof GanEvent.HistoryRequestEvent history) {
         requestMoveHistory(history);
-      } else if (event instanceof GanEvent.StateRecheckEvent) {
-        recheckState();
       } else if (event instanceof GanEvent.DesyncEvent) {
         captureLine("DESYNC " + nowMs);
         beginAnchoring();
@@ -246,6 +237,10 @@ final class GanCube implements SmartCube {
     }
   }
 
+  /**
+   * A dropped packet that no move follows is otherwise found only by the cube's own facelets, a
+   * second later; asked for once a lost packet can be told from a late one.
+   */
   private void pollStateAfterMove() {
     if (!(protocol instanceof GanBufferedParser)) {
       return; // a Gen2 packet carries its own history
@@ -261,25 +256,9 @@ final class GanCube implements SmartCube {
         } catch (RuntimeException e) {
           // The cube's own periodic facelets still find a gap, a second later.
         }
-      }, MOVE_POLL_MS, TimeUnit.MILLISECONDS);
+      }, GanBufferedParser.LOST_AFTER_MS, TimeUnit.MILLISECONDS);
     } catch (RejectedExecutionException e) {
       // Disconnected since: nothing left to poll.
-    }
-  }
-
-  /** Asks for facelets again once a move packet that was merely late would have landed. */
-  private void recheckState() {
-    captureLine("RECHECK " + System.currentTimeMillis());
-    try {
-      anchorScheduler.schedule(() -> {
-        try {
-          request(GanRequest.FACELETS);
-        } catch (RuntimeException e) {
-          // The cube's own periodic facelets still find the gap, a second later.
-        }
-      }, GanBufferedParser.RECHECK_MS, TimeUnit.MILLISECONDS);
-    } catch (RejectedExecutionException e) {
-      // Disconnected since: nothing left to recheck.
     }
   }
 

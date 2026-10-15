@@ -20,6 +20,11 @@ import java.util.List;
  * and the reading itself is done once, here. What genuinely differs — opcodes, message length and
  * hardware info — stays with the subclass.
  *
+ * <p>Measured on a GAN i4: a third of slices drop one of their two packets, and a second packet
+ * that does land comes within 120 ms of the first (median 29 ms). So facelets ahead of the model
+ * past {@link #LOST_AFTER_MS} mean a lost packet, worth asking history for before the settle
+ * window ends.
+ *
  * <p>Ported from {@code afedotov/gan-web-bluetooth} (MIT).
  */
 abstract class GanBufferedParser implements GanProtocol {
@@ -30,17 +35,7 @@ abstract class GanBufferedParser implements GanProtocol {
    */
   private static final int MOVE_SETTLE_MS = 500;
 
-  /**
-   * Unless the model still trails the cube this long after facelets first showed it trailing: by
-   * then the packet is not late but lost. Measured on a GAN i4, where a slice drops one of its two
-   * packets about once in ten and waiting out the settle window cost a second.
-   */
-  static final int RECHECK_MS = 100;
-
-  /**
-   * Or this long after the last move: a slice's second packet lands within 120 ms of the first
-   * when it lands at all (median 29 ms over 52 slices on a GAN i4).
-   */
+  /** Unless facelets still run ahead this long after the move: then a packet was lost, not late. */
   static final int LOST_AFTER_MS = 120;
 
   /** A move's 6-bit face code, in {@code "URFDLB"} order. */
@@ -57,9 +52,6 @@ abstract class GanBufferedParser implements GanProtocol {
   private final CubeClock clock = new CubeClock();
 
   private long lastMoveHostMs = 0;
-  /** When facelets first ran ahead of the model inside the settle window, and at which serial. */
-  private long aheadSinceHostMs = -1;
-  private int aheadAtSerial;
   private Integer batteryLevel;
 
   GanBufferedParser(int[] macBytes) {
@@ -185,23 +177,14 @@ abstract class GanBufferedParser implements GanProtocol {
     GanFacelets.completeLastPiece(cp, co, ep, eo);
 
     if (!needsAnchor()) {
-      if (hostTimeMs - lastMoveHostMs <= MOVE_SETTLE_MS) {
-        if (serial == 0 || GanMoveBuffer.signedSerialDiff(serial, buffer.getLastSerial()) <= 0) {
-          aheadSinceHostMs = -1;
+      long sinceMoveMs = hostTimeMs - lastMoveHostMs;
+      if (sinceMoveMs <= MOVE_SETTLE_MS) {
+        boolean ahead = serial != 0
+            && GanMoveBuffer.signedSerialDiff(serial, buffer.getLastSerial()) > 0;
+        if (!ahead || sinceMoveMs < LOST_AFTER_MS) {
           return List.of();
         }
-        if (hostTimeMs - lastMoveHostMs < LOST_AFTER_MS) {
-          if (aheadSinceHostMs < 0 || aheadAtSerial != buffer.getLastSerial()) {
-            aheadSinceHostMs = hostTimeMs;
-            aheadAtSerial = buffer.getLastSerial();
-            return List.of(new GanEvent.StateRecheckEvent());
-          }
-          if (hostTimeMs - aheadSinceHostMs < RECHECK_MS) {
-            return List.of();
-          }
-        }
       }
-      aheadSinceHostMs = -1;
       GanMoveBuffer.HistoryRequest request = buffer.checkForMissedMoves(serial);
       if (request != null) {
         return List.of(new GanEvent.HistoryRequestEvent(request.getSerial(), request.getCount()));
