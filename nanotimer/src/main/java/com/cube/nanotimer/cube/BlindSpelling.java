@@ -253,6 +253,7 @@ final class BlindSpelling {
       if (SolveSolution.sliceCoreSpin(stored, i) != null) {
         // A spin the gyro reported and two opposite faces corroborate: the strongest there is.
         readings.add(new Reading(move.getOffsetMs(), Reading.SLICE, 3));
+        addPairOpeningOn(stored, i + 1, readings);
         i += 2;
         continue;
       }
@@ -260,6 +261,7 @@ final class BlindSpelling {
       if (straddled > i) {
         // The same spin, written down as a regrip between the halves: weaker, but still the gyro's.
         readings.add(new Reading(move.getOffsetMs(), Reading.SLICE, 2));
+        addPairOpeningOn(stored, straddled, readings);
         i = straddled;
         continue;
       }
@@ -270,6 +272,18 @@ final class BlindSpelling {
       }
     }
     return readings;
+  }
+
+  /**
+   * A slice's far half read as the near half of the next pair instead: in an M2 turned as four
+   * faces the gyro can vouch for the middle two, which leaves both slices a face out.
+   */
+  private static void addPairOpeningOn(List<Move> stored, int near, List<Reading> readings) {
+    int far = SolveSolution.nextFace(stored, near + 1);
+    if (far > near
+        && Slices.forPair(stored.get(near).getNotation(), stored.get(far).getNotation()) != null) {
+      readings.add(new Reading(stored.get(near).getOffsetMs(), Reading.PAIR, 1));
+    }
   }
 
   /** Every choice of {@code size} readings out of {@code count}, in index order. */

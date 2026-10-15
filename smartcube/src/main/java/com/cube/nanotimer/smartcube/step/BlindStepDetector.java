@@ -1465,6 +1465,11 @@ public final class BlindStepDetector implements StepDetector {
     if (landing.swapped()) {
       return targets.wantedSwap(landing.before, landing.buffer);
     }
+    // A break-in into a solved piece is said with the target after it kept, that being the letter
+    // the solver read right.
+    if (!brokeIntoASolvedPiece(landing).isEmpty()) {
+      return targets.wantedBreakInFor(landing.before, landing.after, landing.buffer);
+    }
     // A break-in the cube did not object to is said back as the solver made it, the target after it
     // being all that was owed; anywhere else the cube names the whole cycle it was standing in.
     return brokeInAndLandedNothing(landing).isEmpty()

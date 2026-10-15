@@ -248,6 +248,35 @@ final class BlindTargets {
     return join(names);
   }
 
+  /**
+   * What the cube owed a break-in into a piece already home: the same second target, broken in at
+   * the sticker whose piece belongs on it. Null where no piece still out belongs there.
+   */
+  String wantedBreakInFor(String before, String after, int buffer) {
+    int start = FaceletRotations.apply(holding, Cubies.PIECES[heldSlotOf(buffer)][0]);
+    int first = sentTo(before, after, start);
+    int second = first < 0 ? -1 : sentTo(before, after, first);
+    if (second < 0 || Cubies.slotOf(second) == buffer) {
+      return null;
+    }
+    for (int slot = 0; slot < Cubies.PIECES.length; slot++) {
+      if (slot == buffer || slot == Cubies.slotOf(second)
+          || Cubies.isEdge(slot) != Cubies.isEdge(buffer)) {
+        continue;
+      }
+      for (int facelet : Cubies.PIECES[slot]) {
+        if (homeFacelet(before, facelet) == second) {
+          List<String> names = new ArrayList<String>(3);
+          names.add(spell(buffer));
+          names.add(spellFrom(facelet));
+          names.add(spellFrom(second));
+          return join(names);
+        }
+      }
+    }
+    return null;
+  }
+
   /** Whether a cycle closing on that target leaves the solver a piece of the type to break into. */
   private static boolean breaksIn(String before, int buffer, int first) {
     for (int slot = 0; slot < Cubies.PIECES.length; slot++) {
