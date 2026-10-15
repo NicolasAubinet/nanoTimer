@@ -57,11 +57,15 @@ final class GanMoveBuffer {
 
   /** Take in a live move and drain whatever is now contiguous. */
   Result push(BufferedMove move) {
-    serial = move.getSerial();
     if (needsAnchor()) {
+      serial = move.getSerial();
       return new Result();
     }
-    buffer.add(move);
+    // A packet that lands after history already supplied its move must not be applied twice.
+    if (signedSerialDiff(move.getSerial(), lastSerial) > 0 && !holds(move.getSerial())) {
+      serial = move.getSerial();
+      buffer.add(move);
+    }
     return evict(true);
   }
 
@@ -96,6 +100,15 @@ final class GanMoveBuffer {
     }
     int startSerial = !buffer.isEmpty() ? buffer.get(0).getSerial() : (atSerial + 1) & 0xFF;
     return new HistoryRequest(startSerial, diff + 1);
+  }
+
+  private boolean holds(int moveSerial) {
+    for (BufferedMove held : buffer) {
+      if (held.getSerial() == moveSerial) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void inject(BufferedMove move) {

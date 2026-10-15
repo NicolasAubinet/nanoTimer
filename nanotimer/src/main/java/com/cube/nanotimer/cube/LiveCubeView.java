@@ -276,6 +276,8 @@ public class LiveCubeView implements CubeConnectionListener, CubeMoveListener, C
       cubeWeb = cubeLayout.findViewById(R.id.wvLiveCube);
       cube = new VirtualCube((WebView) cubeWeb, touchListener, this);
       cube.setGyroFollowing(true);
+      // A gyro's yaw drifts and nothing else takes it back out: a GAN loses about 2° per slice.
+      cube.setSquaring(true);
       // It draws in the same gap as the scramble's diagram, on the same bare mat, so it stands in
       // the same pool of shadow: connecting a cube swaps what is in the box, not what is under it.
       cube.setFloor(true);

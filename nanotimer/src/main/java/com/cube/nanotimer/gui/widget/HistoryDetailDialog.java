@@ -262,7 +262,7 @@ public class HistoryDetailDialog extends NanoTimerBottomSheetFragment {
     }
     setUpScrambleTools(v, solveTime, cubeType);
     setUpReplay(v, solveTime, cubeType);
-    showBlindHold(v, solveTime, cubeType);
+    showBlindHold(v, solveTime);
     setUpReportLink(v, solveTime, cubeType);
     ((TextView) v.findViewById(R.id.tvDate))
         .setText(FormatterService.INSTANCE.formatDateTime(solveTime.getTimestamp()));
@@ -338,7 +338,7 @@ public class HistoryDetailDialog extends NanoTimerBottomSheetFragment {
     flaggedCases.clear();
     breakdownSteps = null;
     breakdownMoves = null;
-    blindHold = null; // or the solve swiped to keeps the last one's, and hides its own report link
+    blindHold = null; // or the solve swiped to keeps the last one's hold line
     pickedStep = -1;
 
     View scrambleCard = v.findViewById(R.id.scrambleCard);
@@ -665,8 +665,7 @@ public class HistoryDetailDialog extends NanoTimerBottomSheetFragment {
    * recorded under: changing the setting names the solves from here on, and leaves this one as it
    * was read.
    */
-  private void showBlindHold(final View v, final SolveTime solveTime,
-      final CubeType cubeType) {
+  private void showBlindHold(final View v, final SolveTime solveTime) {
     TextView line = (TextView) v.findViewById(R.id.tvBlindHold);
     if (blindHold == null
         || v.findViewById(R.id.breakdownSection).getVisibility() != View.VISIBLE) {
@@ -687,11 +686,6 @@ public class HistoryDetailDialog extends NanoTimerBottomSheetFragment {
               handler.onBlindMethodChanged(solveTime.getSolveType());
             }
             reReadThroughTheDeclaration(v, solveTime);
-          }
-        }, new Runnable() {
-          @Override
-          public void run() {
-            DialogUtils.reportReconstruction(getActivity(), solveTime, cubeType);
           }
         });
       }
@@ -736,9 +730,7 @@ public class HistoryDetailDialog extends NanoTimerBottomSheetFragment {
    */
   private void setUpReportLink(View v, final SolveTime solveTime, final CubeType cubeType) {
     View link = v.findViewById(R.id.tvReportReconstruction);
-    // A blind solve says it on the line above instead, which opens the two settings that name it
-    // and offers the report under them: one row on the sheet rather than two saying nearly the same.
-    if (!solveTime.hasSmartcubeMoves() || blindHold != null
+    if (!solveTime.hasSmartcubeMoves()
         || v.findViewById(R.id.breakdownSection).getVisibility() != View.VISIBLE) {
       link.setVisibility(View.GONE);
       return;

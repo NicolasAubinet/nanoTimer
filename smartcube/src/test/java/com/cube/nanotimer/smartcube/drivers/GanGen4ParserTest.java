@@ -85,6 +85,41 @@ public class GanGen4ParserTest {
     }
   }
 
+  /** A slice's second packet may still be on its way. */
+  @Test
+  public void faceletsAheadJustAfterAMoveAskForNothing() {
+    GanGen4Parser parser = newParser();
+    parser.parse(facelets(1), 1000);
+    parser.parse(move(2, 4200), 2000);
+
+    assertTrue(parser.parse(facelets(3), 2030).isEmpty());
+  }
+
+  /** A slice's second packet dropped with no move after it: found well inside the settle window. */
+  @Test
+  public void faceletsStillAheadAfterTheCutoffAskForTheLostMove() {
+    GanGen4Parser parser = newParser();
+    parser.parse(facelets(1), 1000);
+    parser.parse(move(2, 4200), 2000);
+
+    List<GanEvent> events = parser.parse(facelets(3), 2000 + GanBufferedParser.LOST_AFTER_MS);
+
+    assertEquals(1, events.size());
+    assertTrue(events.get(0) instanceof GanEvent.HistoryRequestEvent);
+  }
+
+  /** The packet was only late: once it lands, the next facelets ask for nothing. */
+  @Test
+  public void aMoveThatLandsLateIsNotAskedFor() {
+    GanGen4Parser parser = newParser();
+    parser.parse(facelets(1), 1000);
+    parser.parse(move(2, 4200), 2000);
+    parser.parse(facelets(3), 2030);
+    parser.parse(move(3, 4300), 2060);
+
+    assertTrue(parser.parse(facelets(3), 2060 + GanBufferedParser.LOST_AFTER_MS).isEmpty());
+  }
+
   @Test
   public void batteryPacketDecodesToLevel() {
     GanGen4Parser parser = newParser();

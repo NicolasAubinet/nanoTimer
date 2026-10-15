@@ -39,6 +39,28 @@ public class GanMoveBufferTest {
     assertEquals(0, buffer.size());
   }
 
+  /** History filled the hole first, then the packet it stood in for turned up after all. */
+  @Test
+  public void aPacketLandingAfterItsMoveWasRecoveredIsNotAppliedTwice() {
+    GanMoveBuffer buffer = new GanMoveBuffer();
+    buffer.anchor(1);
+    buffer.checkForMissedMoves(2);
+    assertEquals(1, buffer.injectHistory(recovered(2)).getEvicted().size());
+
+    assertTrue(buffer.push(live(2)).getEvicted().isEmpty());
+    assertEquals(1, buffer.push(live(3)).getEvicted().size());
+  }
+
+  @Test
+  public void aMoveAlreadyHeldIsNotHeldTwice() {
+    GanMoveBuffer buffer = new GanMoveBuffer();
+    buffer.anchor(1);
+    buffer.push(live(3));
+    buffer.push(live(3));
+
+    assertEquals(1, buffer.size());
+  }
+
   @Test
   public void aGapHoldsTheMoveAndAsksForHistory() {
     GanMoveBuffer buffer = new GanMoveBuffer();
