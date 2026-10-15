@@ -202,7 +202,7 @@ final class GanCube implements SmartCube {
 
   /** One gyro sample, as it arrived: {@code G <hostMs> <w> <x> <y> <z>}. */
   private static void capture(long atMs, CubeOrientation orientation) {
-    if (orientation != null) {
+    if (CAPTURE && orientation != null) {
       captureLine("G " + atMs + " " + orientation.getW() + " " + orientation.getX()
           + " " + orientation.getY() + " " + orientation.getZ());
     }
