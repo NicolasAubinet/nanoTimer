@@ -13,6 +13,7 @@ import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.fragment.app.DialogFragment;
@@ -175,27 +176,31 @@ public class DialogUtils {
     View body = activity.getLayoutInflater().inflate(R.layout.report_reconstruction_dialog, null);
     final EditText tfComment = (EditText) body.findViewById(R.id.tfReportComment);
 
-    new AlertDialog.Builder(activity, R.style.NanoTimerDialogTheme)
+    final AlertDialog dialog = new AlertDialog.Builder(activity, R.style.NanoTimerDialogTheme)
         .setTitle(R.string.report_reconstruction)
         .setView(body)
-        .setPositiveButton(R.string.share_send_report, new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick(DialogInterface d, int which) {
-            withStoredSmartcubeData(activity, solveTime, cubeType, tfComment.getText().toString().trim());
-          }
-        })
-        .setNegativeButton(R.string.cancel, null)
+        .setPositiveButton(R.string.share_send_report, null)
+        .setNegativeButton(R.string.close, null)
         .show();
+    // Send leaves the dialog up, so backing out of the mail app returns to the typed comment.
+    final Button btSend = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+    btSend.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        withStoredSmartcubeData(activity, solveTime, cubeType, tfComment.getText().toString().trim(), btSend);
+      }
+    });
   }
 
   /** The track and the cube are fetched here rather than carried on the solve: the track is
    * kilobytes, and a history screen holds hundreds of solves it would never look at. */
   private static void withStoredSmartcubeData(final Activity activity, final SolveTime solveTime,
-      final CubeType cubeType, final String comment) {
+      final CubeType cubeType, final String comment, final Button btSend) {
     if (solveTime.getId() <= 0) {
       sendReport(activity, solveTime, cubeType, null, solveTime.getSmartcubeCube(), comment);
       return;
     }
+    btSend.setEnabled(false); // a second tap during the fetch would open the chooser twice
     App.INSTANCE.getService().getGyroTrack(solveTime.getId(), new DataCallback<String>() {
       @Override
       public void onData(final String gyroTrack) {
@@ -205,6 +210,7 @@ public class DialogUtils {
             activity.runOnUiThread(new Runnable() {
               @Override
               public void run() {
+                btSend.setEnabled(true);
                 if (!activity.isFinishing()) {
                   sendReport(activity, solveTime, cubeType, gyroTrack, cube, comment);
                 }
