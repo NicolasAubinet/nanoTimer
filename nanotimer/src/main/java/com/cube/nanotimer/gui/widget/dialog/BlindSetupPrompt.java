@@ -32,7 +32,7 @@ public final class BlindSetupPrompt {
       return;
     }
     Options.INSTANCE.setBlindSetupAsked(true); // asked, whatever comes of it
-    show(activity, true, solveType, null, null);
+    show(activity, true, solveType, null);
   }
 
   /**
@@ -40,16 +40,15 @@ public final class BlindSetupPrompt {
    * a blind reconstruction, where a solver looking at names they did not memorise is looking at the
    * one screen that says what this setting did.
    */
-  public static void open(Activity activity, SolveType solveType, Runnable onSaved,
-      Runnable onReport) {
+  public static void open(Activity activity, SolveType solveType, Runnable onSaved) {
     if (!activity.isFinishing()) {
-      show(activity, false, solveType, onSaved, onReport);
+      show(activity, false, solveType, onSaved);
     }
   }
 
   /** @param asked whether this is the question being put, which alone says where to answer again */
   private static void show(Activity activity, boolean asked, SolveType solveType,
-      final Runnable onSaved, final Runnable onReport) {
+      final Runnable onSaved) {
     final BlindSetupPicker picker = new BlindSetupPicker(activity, asked, solveType);
     AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.NanoTimerDialogTheme)
         .setView(picker.getView())
@@ -65,14 +64,7 @@ public final class BlindSetupPrompt {
     if (!asked) {
       builder.setNegativeButton(R.string.cancel, null); // opened to look, not only to answer
     }
-    final AlertDialog dialog = builder.show();
+    AlertDialog dialog = builder.show();
     DialogUtils.fitToWindow(dialog, picker.getView()); // a short screen scrolls the body, never the buttons off
-    picker.onReport(onReport == null ? null : new Runnable() {
-      @Override
-      public void run() {
-        dialog.dismiss(); // the report leaves this screen, so it does not sit behind the mail
-        onReport.run();
-      }
-    });
   }
 }

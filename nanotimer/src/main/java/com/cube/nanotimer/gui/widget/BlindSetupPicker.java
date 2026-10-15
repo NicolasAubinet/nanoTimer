@@ -95,22 +95,6 @@ public class BlindSetupPicker {
     buffersOf.put(method, new String[] {buffers.getEdge(), buffers.getCorner()});
   }
 
-  /** The way out for a reading that is wrong with both of these right. Hidden where nothing offers it. */
-  public void onReport(final Runnable report) {
-    View link = view.findViewById(R.id.blindSetupReport);
-    if (report == null) {
-      link.setVisibility(View.GONE);
-      return;
-    }
-    link.setVisibility(View.VISIBLE);
-    link.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View clicked) {
-        report.run();
-      }
-    });
-  }
-
   public View getView() {
     return view;
   }
