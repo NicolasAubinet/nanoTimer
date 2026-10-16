@@ -2,6 +2,8 @@ package com.cube.nanotimer.smartcube.drill;
 
 import com.cube.nanotimer.coach.CoachPayloadBuilder;
 import com.cube.nanotimer.drill.DrillSpec;
+import com.cube.nanotimer.smartcube.step.F2LPairScrambles;
+import com.cube.nanotimer.step.F2lPairCases;
 import com.cube.nanotimer.step.LastLayerAlgorithms;
 
 import org.junit.Assert;
@@ -54,6 +56,13 @@ public class DrillCaseVocabularyTest {
       dealt.add(session.getCurrentCase());
     }
     Assert.assertEquals(new HashSet<String>(cases), dealt);
+  }
+
+  /** The pair vocabulary a plan is checked against is exactly what a pair drill can deal. */
+  @Test
+  public void testThePairVocabularyIsWhatAPairDrillDeals() {
+    Assert.assertEquals(F2LPairScrambles.cases(), F2lPairCases.codes());
+    Assert.assertEquals(F2LPairScrambles.stuckCases(), F2lPairCases.stuckCodes());
   }
 
   /** A code from a family the allowlist keeps out is dropped, not dealt as if it named a case. */

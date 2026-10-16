@@ -67,6 +67,20 @@ public class CoachPlanTest {
     Assert.assertEquals(Collections.singletonList("oll"), plan.undealableDrills(payload));
   }
 
+  /** No pair is ever sent on its own, so a pair drill answers to the vocabulary, not the payload. */
+  @Test
+  public void testAPairDrillIsHeldToThePairVocabulary() {
+    DrillSpec drill = new DrillSpec("test", DrillSpec.Type.F2L_PAIR, DrillSpec.Delivery.VIRTUAL,
+        Arrays.asList("pair_a12", "pair_a1a", "pair_a99"), DrillSpec.Selection.WEIGHTED, 40, 2000,
+        "drill");
+    CoachPlan plan = new CoachPlan(CoachPlan.VERSION, CoachPlan.Source.COACH, null,
+        Collections.singletonList(new FocusArea(FocusArea.Reason.STUCK_PIECES,
+            Collections.singletonList("f2l"), Collections.<Evidence>emptyList(), null,
+            drill.toJson())));
+
+    Assert.assertEquals(Collections.singletonList("pair_a99"), plan.undealableDrills(payload()));
+  }
+
   /** A card with no drill has no button to be wrong about. */
   @Test
   public void testACardWithNoDrillIsNothingToCheck() {

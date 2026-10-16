@@ -9,13 +9,21 @@ import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
+import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
+import com.cube.nanotimer.coach.CoachPayloadBuilder;
 import com.cube.nanotimer.cube.CubePatternFormat;
 import com.cube.nanotimer.cube.SmartCubeManager;
+import com.cube.nanotimer.cube.SolveTypeMethod;
+import com.cube.nanotimer.services.db.DataCallback;
+import com.cube.nanotimer.session.MethodStatistics;
 import com.cube.nanotimer.smartcube.drill.CaseTally;
 import com.cube.nanotimer.smartcube.drill.DrillRep;
 import com.cube.nanotimer.smartcube.drill.DrillSession;
 import com.cube.nanotimer.smartcube.drill.LayerRotation;
+import com.cube.nanotimer.smartcube.drill.PairWeights;
+import com.cube.nanotimer.smartcube.step.CaseAlgorithms;
+import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.drill.DrillSpec;
 import com.cube.nanotimer.gui.widget.DrillCasePips;
 import com.cube.nanotimer.gui.widget.DrillCaseTable;
@@ -34,6 +42,7 @@ import com.cube.nanotimer.util.view.StepPalette;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Runs a case drill: the case stands on the screen's cube, the smart cube is only the input, and the
@@ -62,6 +71,9 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
    * finishes on is theirs, and a drill prescribed from outside has no way of knowing it.
    */
   public static final String EXTRA_LAYER_FACE = "drillLayerFace";
+
+  /** The solve type whose recent solves lean an F2L pair drill's draw. Optional. */
+  public static final String EXTRA_SOLVE_TYPE = "drillSolveType";
 
   /**
    * How long the solved cube stays up before the next case replaces it.
@@ -148,7 +160,35 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     label = spec.getLabel() == null ? getString(R.string.drill_title) : spec.getLabel();
     setTitle(label);
     layerFace = getIntent().getStringExtra(EXTRA_LAYER_FACE);
-    session = new DrillSession(spec, Utils.getRandom(), null, layerFace);
+    SolveType solveType = (SolveType) getIntent().getSerializableExtra(EXTRA_SOLVE_TYPE);
+    if (spec.getType() == DrillSpec.Type.F2L_PAIR && solveType != null) {
+      loadPairWeights(spec, solveType);
+    } else {
+      begin(spec, spec.getType() == DrillSpec.Type.F2L_PAIR
+          ? PairWeights.of(spec.getCases(), null) : null);
+    }
+  }
+
+  /** The pairs' recent figures lean the draw, so the session waits for them. */
+  private void loadPairWeights(final DrillSpec spec, SolveType solveType) {
+    App.INSTANCE.getService().getMethodStatistics(solveType, SolveTypeMethod.of(solveType),
+        CoachPayloadBuilder.FAMILY_WINDOW, new DataCallback<MethodStatistics>() {
+          @Override
+          public void onData(final MethodStatistics statistics) {
+            runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                if (!isFinishing()) {
+                  begin(spec, PairWeights.of(spec.getCases(), statistics));
+                }
+              }
+            });
+          }
+        });
+  }
+
+  private void begin(DrillSpec spec, Map<String, Long> weights) {
+    session = new DrillSession(spec, Utils.getRandom(), weights, layerFace);
     initRecording(spec);
 
     if (!session.isRunnable()) {
@@ -370,6 +410,9 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   }
 
   private static int familyColour(String code) {
+    if (CaseAlgorithms.isPair(code)) {
+      return R.color.step_f2l;
+    }
     return code != null && code.startsWith(FAMILY_OLL) ? R.color.step_oll : R.color.step_pll;
   }
 

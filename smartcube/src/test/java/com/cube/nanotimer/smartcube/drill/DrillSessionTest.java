@@ -13,6 +13,7 @@ import com.cube.nanotimer.smartcube.cube.CubieCube;
 import com.cube.nanotimer.smartcube.model.CubeMove;
 import com.cube.nanotimer.smartcube.model.CubeState;
 import com.cube.nanotimer.smartcube.model.Face;
+import com.cube.nanotimer.smartcube.step.F2LPairScrambles;
 import com.cube.nanotimer.smartcube.step.LastLayerScrambles;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -621,6 +622,87 @@ public class DrillSessionTest {
     DrillRep rep = hand.execute(algorithm);
     assertNotNull(code + " was not finished by " + algorithm, rep);
     assertEquals(code, rep.getCaseCode());
+  }
+
+  /** On every face a solver may finish on, and in whichever slot the pair was dealt. */
+  @Test
+  public void everyPairIsFinishedByPuttingItIn() {
+    for (String face : new String[] {"U", "D", "R", "L", "F", "B"}) {
+      Random random = new Random(face.hashCode());
+      for (String code : F2LPairScrambles.cases()) {
+        DrillSession session = new DrillSession(pairSpec(code), random, null, face);
+        Hand hand = new Hand(session);
+        assertTrue(code, hand.next());
+        DrillRep rep = hand.execute(inverse(session.getCurrentScramble()));
+        assertNotNull(code + " on " + face, rep);
+        assertEquals(code, rep.getCaseCode());
+      }
+    }
+  }
+
+  /**
+   * The rep ends when the pair is in, not when the cube is solved: undoing the scramble puts the
+   * pair in before it gets to the last layer, and the turns after that are not the rep's.
+   */
+  @Test
+  public void aPairRepEndsBeforeTheLastLayerIsSolved() {
+    DrillSession session = new DrillSession(pairSpec("pair_a12"), new Random(4), null, "D");
+    Hand hand = new Hand(session);
+    assertTrue(hand.next());
+    String solution = inverse(session.getCurrentScramble());
+    DrillRep rep = hand.execute(solution);
+    assertNotNull(rep);
+    assertTrue(rep.getMoves().size() < asReported(solution).size());
+    assertFalse(new CubieCube().toFaceCube().equals(session.getFacelets()));
+  }
+
+  /** A turn that leaves the pair out does not end the rep, wherever the pair was dealt. */
+  @Test
+  public void aPairRepDoesNotEndOnAnUnrelatedTurn() {
+    for (int seed = 0; seed < 12; seed++) {
+      DrillSession session = new DrillSession(pairSpec("pair_a12"), new Random(seed), null, "D");
+      Hand hand = new Hand(session);
+      assertTrue(hand.next());
+      assertNull(hand.execute("U"));
+    }
+  }
+
+  /** Only the first few cases are dealt, and the next one comes in as one retires. */
+  @Test
+  public void aWorkingSetDealsFromTheHeaviestCasesFirst() {
+    List<String> codes = Arrays.asList("pll_t", "pll_h", "pll_z", "pll_ua");
+    DrillSpec spec = new DrillSpec("coach", DrillSpec.Type.CASE_EXECUTION,
+        DrillSpec.Delivery.VIRTUAL, codes, DrillSpec.Selection.WEIGHTED, 40, 60_000,
+        Collections.<String, Long>emptyMap(), 1, 1, null).withWorkingSet(2);
+    Map<String, Long> weights = new HashMap<String, Long>();
+    weights.put("pll_z", 9L);
+    weights.put("pll_ua", 5L);
+    DrillSession session = new DrillSession(spec, new Random(2), weights);
+    assertEquals(Arrays.asList("pll_z", "pll_ua"), session.getActiveCases());
+
+    Hand hand = new Hand(session);
+    Set<String> dealt = new HashSet<String>();
+    while (hand.next()) {
+      dealt.add(session.getCurrentCase());
+      assertTrue(session.getActiveCases().contains(session.getCurrentCase()));
+      assertNotNull(hand.execute(inverse(session.getCurrentScramble())));
+    }
+    assertEquals(new HashSet<String>(codes), dealt);
+  }
+
+  @Test
+  public void aWorkingSetRidesInTheSpec() {
+    DrillSpec spec = pairSpec("pair_a1").withWorkingSet(5);
+    DrillSpec read = DrillSpec.fromJson(spec.toJson());
+    assertEquals(DrillSpec.VERSION, read.getSpecVersion());
+    assertEquals(5, read.getWorkingSet());
+    assertEquals(DrillSpec.Type.F2L_PAIR, read.getType());
+    assertEquals(0, DrillSpec.fromJson(spec("pll_t", 1).toJson()).getWorkingSet());
+  }
+
+  private static DrillSpec pairSpec(String code) {
+    return new DrillSpec("test", DrillSpec.Type.F2L_PAIR, DrillSpec.Delivery.VIRTUAL,
+        Collections.singletonList(code), DrillSpec.Selection.ROUND_ROBIN, 1, 0, null);
   }
 
   private static DrillSpec spec(String code, int reps) {

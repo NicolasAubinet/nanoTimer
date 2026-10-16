@@ -36,13 +36,16 @@ import org.json.JSONObject;
 public final class DrillSpec {
 
   /** The newest spec this app can run. */
-  public static final int VERSION = 3;
+  public static final int VERSION = 4;
 
   /**
    * The version a drill with no per-case targets and no retiring is written at. A drill that needs
    * nothing newer says so, so an app that only reads 2 still runs every drill that did not need 3.
    */
   private static final int VERSION_2 = 2;
+
+  /** The version a drill with per-case targets or retiring, and no working set, is written at. */
+  private static final int VERSION_3 = 3;
 
   /**
    * What a rep is timed and judged on. The two case types are the same reps and only move the
@@ -57,7 +60,12 @@ public final class DrillSpec {
      * A whole scramble's cross on one face, judged on how many moves it took against the fewest
      * there were. Named by no case, so it carries a face and a scramble rather than a case list.
      */
-    CROSS;
+    CROSS,
+    /**
+     * One F2L pair handed as a named case ({@code pair_a12}), the cross and the other slots in;
+     * done when the pair is home. Timed on the whole rep.
+     */
+    F2L_PAIR;
 
     public String code() {
       return name().toLowerCase(Locale.ROOT);
@@ -109,6 +117,7 @@ public final class DrillSpec {
   private final String label;
   private final String crossFace;
   private final long planningMs;
+  private final int workingSet;
   private final String source;
 
   /** A drill this app wrote itself, at the current version. */
@@ -136,9 +145,19 @@ public final class DrillSpec {
   public DrillSpec(String id, Type type, Delivery delivery, List<String> cases,
       Selection selection, int reps, long targetMs, Map<String, Long> caseTargetsMs,
       int winsToRetire, int minShowings, String label) {
-    this(caseTargetsMs.isEmpty() && winsToRetire == 0 ? VERSION_2 : VERSION, id, DEFAULT_PUZZLE,
+    this(caseTargetsMs.isEmpty() && winsToRetire == 0 ? VERSION_2 : VERSION_3, id, DEFAULT_PUZZLE,
         DEFAULT_METHOD, type, delivery, cases, selection, reps, targetMs, caseTargetsMs,
-        winsToRetire, minShowings, label, null, 0, null);
+        winsToRetire, minShowings, label, null, 0, 0, null);
+  }
+
+  /**
+   * The same drill dealing from only {@code size} of its cases at a time, the next one in line
+   * coming in as one retires. For a set too large to clear in one drill; 0 deals from them all.
+   */
+  public DrillSpec withWorkingSet(int size) {
+    return new DrillSpec(size > 0 ? VERSION : specVersion, id, puzzle, method, type, delivery,
+        cases, selection, reps, targetMs, caseTargetsMs, winsToRetire, minShowings, label,
+        crossFace, planningMs, size, null);
   }
 
   /**
@@ -149,13 +168,13 @@ public final class DrillSpec {
       String label) {
     return new DrillSpec(VERSION_2, id, DEFAULT_PUZZLE, DEFAULT_METHOD, Type.CROSS,
         Delivery.VIRTUAL, Collections.<String>emptyList(), Selection.ROUND_ROBIN, reps, 0,
-        Collections.<String, Long>emptyMap(), 0, 0, label, crossFace, planningMs, null);
+        Collections.<String, Long>emptyMap(), 0, 0, label, crossFace, planningMs, 0, null);
   }
 
   private DrillSpec(int specVersion, String id, String puzzle, String method, Type type,
       Delivery delivery, List<String> cases, Selection selection, int reps, long targetMs,
       Map<String, Long> caseTargetsMs, int winsToRetire, int minShowings, String label,
-      String crossFace, long planningMs, String source) {
+      String crossFace, long planningMs, int workingSet, String source) {
     if (type == null || delivery == null || selection == null) {
       throw new IllegalArgumentException("A drill needs a type, a delivery and a selection");
     }
@@ -193,6 +212,9 @@ public final class DrillSpec {
     if (winsToRetire < 0 || minShowings < 0) {
       throw new IllegalArgumentException("Retiring counts cannot be negative");
     }
+    if (workingSet < 0) {
+      throw new IllegalArgumentException("A working set cannot be negative");
+    }
     if (winsToRetire > 0) {
       // A case with nothing to beat could never retire, so the drill would only ever hit its ceiling.
       if (type == Type.CROSS) {
@@ -209,6 +231,7 @@ public final class DrillSpec {
     this.label = label;
     this.crossFace = crossFace;
     this.planningMs = planningMs;
+    this.workingSet = workingSet;
     this.source = source;
   }
 
@@ -241,6 +264,7 @@ public final class DrillSpec {
           object.optString("label", null),
           object.optString("cross_face", null),
           object.optLong("planning_ms", 0),
+          object.optInt("working_set", 0),
           json);
     } catch (JSONException e) {
       throw new IllegalArgumentException("Not a drill spec: " + e.getMessage(), e);
@@ -284,6 +308,9 @@ public final class DrillSpec {
       if (winsToRetire > 0) {
         object.put("retire_after_wins", winsToRetire);
         object.put("min_showings", minShowings);
+      }
+      if (workingSet > 0) {
+        object.put("working_set", workingSet);
       }
       if (label != null) {
         object.put("label", label);
@@ -401,6 +428,11 @@ public final class DrillSpec {
 
   public boolean retiresCases() {
     return winsToRetire > 0;
+  }
+
+  /** How many cases are dealt from at once, or 0 for all of them. */
+  public int getWorkingSet() {
+    return workingSet;
   }
 
   /** A short name to show. Whoever wrote it is responsible for its language. */

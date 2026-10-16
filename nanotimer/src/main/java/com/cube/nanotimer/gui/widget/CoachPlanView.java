@@ -35,6 +35,8 @@ import com.cube.nanotimer.coach.FocusArea;
 import com.cube.nanotimer.coach.StepShares;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.drill.DrillSpec;
+import com.cube.nanotimer.vo.SolveType;
+import com.cube.nanotimer.session.MethodStatistics;
 import com.cube.nanotimer.gui.CrossDrillActivity;
 import com.cube.nanotimer.gui.DrillActivity;
 import com.cube.nanotimer.gui.DrillScreenActivity;
@@ -76,9 +78,12 @@ public class CoachPlanView {
   private final Activity activity;
   private final LinearLayout container;
   private final LayoutInflater inflater;
+  /** Whose plan this is, for a drill that reads the solver's own recent solves. */
+  private final SolveType solveType;
 
-  public CoachPlanView(Activity activity, LinearLayout container) {
+  public CoachPlanView(Activity activity, LinearLayout container, SolveType solveType) {
     this.activity = activity;
+    this.solveType = solveType;
     this.container = container;
     this.inflater = LayoutInflater.from(activity);
   }
@@ -779,6 +784,7 @@ public class CoachPlanView {
       intent = new Intent(activity, DrillActivity.class);
       intent.putExtra(DrillActivity.EXTRA_SPEC, spec.toJson());
       intent.putExtra(DrillActivity.EXTRA_LAYER_FACE, DrillSetupActivity.layerFace().name());
+      intent.putExtra(DrillActivity.EXTRA_SOLVE_TYPE, solveType);
     }
     intent.putExtra(DrillScreenActivity.EXTRA_RECORDING, true);
     activity.startActivity(intent);

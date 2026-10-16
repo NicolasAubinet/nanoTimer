@@ -1,6 +1,7 @@
 package com.cube.nanotimer.coach;
 
 import com.cube.nanotimer.drill.DrillSpec;
+import com.cube.nanotimer.step.F2lPairCases;
 import com.cube.nanotimer.step.LastLayerAlgorithms;
 
 import java.util.ArrayList;
@@ -162,8 +163,12 @@ public class CoachPlan {
         undealable.add(area.getReasonCode());
         continue;
       }
+      // No pair is ever quoted on its own (per-case F2L figures are noise), so a pair drill is held
+      // to the vocabulary alone.
+      boolean pairs = spec.getType() == DrillSpec.Type.F2L_PAIR;
       for (String code : spec.getCases()) {
-        if (!LastLayerAlgorithms.dealsCase(code) || !payload.holds(code)) {
+        if (pairs ? !F2lPairCases.isCase(code)
+            : !LastLayerAlgorithms.dealsCase(code) || !payload.holds(code)) {
           undealable.add(code);
         }
       }

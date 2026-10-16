@@ -38,6 +38,9 @@ public final class LayerRotation {
    */
   private static final String[] TO_TOP = {"", "z'", "x", "z2", "z", "x'"};
 
+  /** Where each face goes under a y, in URFDLB order: R->F, F->L, L->B, B->R. */
+  private static final String SPIN = "UFLDBR";
+
   /** The three slices, and the face each one turns with, in the same order. */
   private static final String SLICES = "MES";
   private static final String SLICE_FACES = "LDF";
@@ -70,11 +73,7 @@ public final class LayerRotation {
     if (target == 0 || scramble == null) {
       return scramble;
     }
-    String[] turned = new String[scramble.length];
-    for (int i = 0; i < scramble.length; i++) {
-      turned[i] = turn(scramble[i], TO[target]);
-    }
-    return turned;
+    return relabel(scramble, TO[target]);
   }
 
   /** The same for a scramble written as one line, its turns separated by spaces. */
@@ -83,6 +82,39 @@ public final class LayerRotation {
       return null;
     }
     return String.join(" ", toFace(scramble.split(" ", -1), face));
+  }
+
+  /** A scramble turned by {@code quarters} y, which moves a front-right pair to another slot. */
+  static String spun(String scramble, int quarters) {
+    String turned = scramble;
+    for (int i = 0; i < quarters % 4; i++) {
+      turned = String.join(" ", relabel(turned.split(" ", -1), SPIN));
+    }
+    return turned;
+  }
+
+  /**
+   * Where a piece named by its faces ({@code "DFR"}) sits once its scramble has been through
+   * {@link #spun} and then {@link #toFace(String, String)}.
+   */
+  static String piece(String faces, int quarters, String face) {
+    StringBuilder moved = new StringBuilder();
+    for (int i = 0; i < faces.length(); i++) {
+      char letter = faces.charAt(i);
+      for (int q = 0; q < quarters % 4; q++) {
+        letter = SPIN.charAt(FROM.indexOf(letter));
+      }
+      moved.append(TO[indexOf(face)].charAt(FROM.indexOf(letter)));
+    }
+    return moved.toString();
+  }
+
+  private static String[] relabel(String[] scramble, String to) {
+    String[] turned = new String[scramble.length];
+    for (int i = 0; i < scramble.length; i++) {
+      turned[i] = turn(scramble[i], to);
+    }
+    return turned;
   }
 
   private static int indexOf(String face) {

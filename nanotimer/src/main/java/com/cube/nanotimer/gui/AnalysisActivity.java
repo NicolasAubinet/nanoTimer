@@ -208,7 +208,8 @@ public class AnalysisActivity extends NanoTimerActivity {
     headings.rankableLabel(false); // by step is solving order, cross first, as the delta card reads
     cases = new AnalysisCases(this, findViewById(R.id.llAnalysisCases), casesListener());
     cases.setFamily(getIntent().getStringExtra(EXTRA_FAMILY));
-    planView = new CoachPlanView(this, (LinearLayout) findViewById(R.id.llAnalysisPlanAreas));
+    planView = new CoachPlanView(this, (LinearLayout) findViewById(R.id.llAnalysisPlanAreas),
+        solveType);
     wireRead();
     wireSample();
 

@@ -44,9 +44,14 @@ public final class LastLayerScrambles {
   /** The scramble with its two alignment turns chosen rather than drawn. */
   static String forCase(String caseCode, int beforeQuarters, int afterQuarters) {
     String algorithm = algorithmFor(caseCode);
-    if (algorithm == null) {
-      return null;
-    }
+    return algorithm == null ? null : undoing(algorithm, beforeQuarters, afterQuarters);
+  }
+
+  /**
+   * Face turns leaving the state the algorithm solves, between two turns of U. Shared with
+   * {@link F2LPairScrambles}, whose algorithms carry the same rotations, wides and slices.
+   */
+  static String undoing(String algorithm, int beforeQuarters, int afterQuarters) {
     List<Move> moves = new ArrayList<Move>();
     alignment(moves, beforeQuarters);
     moves.addAll(upright(inverse(parse(algorithm))));

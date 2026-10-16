@@ -7,10 +7,12 @@ import com.cube.nanotimer.smartcube.cube.CubieCube;
 import com.cube.nanotimer.smartcube.model.CubeMove;
 import com.cube.nanotimer.smartcube.model.CubeState;
 import com.cube.nanotimer.smartcube.model.Face;
+import com.cube.nanotimer.smartcube.step.F2LPairScrambles;
 import com.cube.nanotimer.smartcube.step.FaceTurns;
 import com.cube.nanotimer.smartcube.step.LastLayerScrambles;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -50,6 +52,12 @@ public final class DrillSession {
   private final List<String> unknownCases = new ArrayList<String>();
   private final List<DrillRep> reps = new ArrayList<DrillRep>();
   private final List<String> pass = new ArrayList<String>();
+
+  /** An F2L pair drill, whose case is a pair and whose rep ends when that pair is in. */
+  private final boolean pairs;
+  /** The current pair's corner and edge by the faces of their slot, as dealt. */
+  private String pairCorner;
+  private String pairEdge;
 
   private CubieCube cube = new CubieCube();
   /** The user's own cube, followed only so that a turn it never reported can be recovered. */
@@ -91,9 +99,19 @@ public final class DrillSession {
     this.random = random;
     this.weights = weights;
     this.layerFace = layerFace == null ? "U" : layerFace;
-    List<String> known = LastLayerScrambles.cases();
+    this.pairs = spec.getType() == DrillSpec.Type.F2L_PAIR;
+    List<String> known = pairs ? F2LPairScrambles.cases() : LastLayerScrambles.cases();
     for (String code : spec.getCases()) {
       (known.contains(code) ? cases : unknownCases).add(code);
+    }
+    if (spec.getWorkingSet() > 0 && weights != null) {
+      // Heaviest first, so the working set opens on what is costing most; ties keep the spec's order.
+      Collections.sort(cases, new Comparator<String>() {
+        @Override
+        public int compare(String a, String b) {
+          return Long.compare(weightOf(b), weightOf(a));
+        }
+      });
     }
   }
 
@@ -122,8 +140,17 @@ public final class DrillSession {
       return false;
     }
     currentCase = pick();
-    currentScramble = LayerRotation.toFace(
-        LastLayerScrambles.forCase(currentCase, random), layerFace);
+    if (pairs) {
+      // A random slot, so the pair is not always read in the same place.
+      int spins = random.nextInt(4);
+      currentScramble = LayerRotation.toFace(
+          LayerRotation.spun(F2LPairScrambles.forCase(currentCase, random), spins), layerFace);
+      pairCorner = LayerRotation.piece("DFR", spins, layerFace);
+      pairEdge = LayerRotation.piece("FR", spins, layerFace);
+    } else {
+      currentScramble = LayerRotation.toFace(
+          LastLayerScrambles.forCase(currentCase, random), layerFace);
+    }
     cube = new CubieCube();
     FaceTurns.apply(cube, currentScramble);
     moves.clear();
@@ -301,6 +328,10 @@ public final class DrillSession {
    * one of those a solved cube is exactly the question.
    */
   private boolean isCaseDone() {
+    if (pairs) {
+      return F2LPairScrambles.isPairIn(cube.toFaceCube(),
+          LayerRotation.piece("D", 0, layerFace).charAt(0), pairCorner, pairEdge);
+    }
     if (currentCase != null && currentCase.startsWith("oll_")) {
       return isLayerOriented();
     }
@@ -367,12 +398,16 @@ public final class DrillSession {
     return Collections.unmodifiableList(cases);
   }
 
-  /** The cases still being dealt, in the order the spec named them. */
+  /**
+   * The cases still being dealt, in the order the spec named them, or by weight for a drill with a
+   * working set, which deals from only the first of them that have not retired.
+   */
   public List<String> getActiveCases() {
     CaseTally tally = getTally();
+    int limit = spec.getWorkingSet() > 0 ? spec.getWorkingSet() : Integer.MAX_VALUE;
     List<String> active = new ArrayList<String>();
     for (String code : cases) {
-      if (!tally.isCleared(code)) {
+      if (active.size() < limit && !tally.isCleared(code)) {
         active.add(code);
       }
     }
@@ -410,6 +445,7 @@ public final class DrillSession {
     if (spec.getSelection() == DrillSpec.Selection.WEIGHTED) {
       return weighted(active);
     }
+    pass.retainAll(active); // a working set can have moved on since the pass was drawn
     if (pass.isEmpty()) {
       pass.addAll(active);
       Collections.shuffle(pass, random);

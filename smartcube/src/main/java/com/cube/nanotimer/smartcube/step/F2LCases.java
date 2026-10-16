@@ -1,6 +1,10 @@
 package com.cube.nanotimer.smartcube.step;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -138,6 +142,32 @@ final class F2LCases {
   }
 
   private F2LCases() {
+  }
+
+  /** Every case either set names, the basic ones first, each set in its own numbering. */
+  static List<String> named() {
+    List<String> named = new ArrayList<>();
+    for (String name : CASES.values()) {
+      if (!SKIP.equals(name)) {
+        named.add(name);
+      }
+    }
+    Collections.sort(named, new Comparator<String>() {
+      @Override
+      public int compare(String a, String b) {
+        boolean basicA = isBasic(a);
+        if (basicA != isBasic(b)) {
+          return basicA ? -1 : 1;
+        }
+        int byNumber = Integer.compare(number(a), number(b));
+        return byNumber != 0 ? byNumber : a.compareTo(b);
+      }
+    });
+    return named;
+  }
+
+  private static int number(String name) {
+    return Integer.parseInt(name.replaceAll("\\D", ""));
   }
 
   /** Whether a case is one of the basic set's rather than an advanced one or no case at all. */
