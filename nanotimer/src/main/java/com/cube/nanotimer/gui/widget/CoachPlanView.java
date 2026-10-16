@@ -372,8 +372,10 @@ public class CoachPlanView {
     }
 
     DrillSpec drill = bindDrill(card, area, undealable);
-    // A card about a step names no case, so the cases its drill deals are shown instead.
-    if (drill != null && drill.getType() != DrillSpec.Type.CROSS && cases.getChildCount() == 0
+    // A card about a step names no case, so the cases its drill deals are shown instead. Not for a
+    // cross or a pair drill, which have no flat picture to show.
+    if (drill != null && drill.getType() != DrillSpec.Type.CROSS
+        && drill.getType() != DrillSpec.Type.F2L_PAIR && cases.getChildCount() == 0
         && (figure == null || !figure.coversCases)) {
       LinearLayout row = new LinearLayout(activity);
       row.setOrientation(LinearLayout.HORIZONTAL);

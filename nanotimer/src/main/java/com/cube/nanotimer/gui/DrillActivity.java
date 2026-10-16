@@ -429,8 +429,35 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   }
 
   private void refreshCaseProgress() {
-    casePips.show(session.getCases(), session.getTally(), session.getSpec().getWinsToRetire());
+    casePips.show(shownCases(true), session.getTally(), session.getSpec().getWinsToRetire());
     repBelow.setVisibility(repBelow.getText().length() > 0 ? View.VISIBLE : View.INVISIBLE);
+  }
+
+  /**
+   * The cases to count progress over. A drill with a working set may hold far more cases than it
+   * reaches, so only those dealt so far are shown, plus while it runs those in the set.
+   */
+  private List<String> shownCases(boolean running) {
+    if (session.getSpec().getWorkingSet() == 0) {
+      return session.getCases();
+    }
+    List<String> active = running ? session.getActiveCases() : Collections.<String>emptyList();
+    List<String> shown = new ArrayList<String>();
+    for (String code : session.getCases()) {
+      if (active.contains(code) || wasDealt(code)) {
+        shown.add(code);
+      }
+    }
+    return shown;
+  }
+
+  private boolean wasDealt(String code) {
+    for (DrillRep rep : session.getReps()) {
+      if (code.equals(rep.getCaseCode())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /** How the rep did against its case's target, said only once the rep is over. */
@@ -546,7 +573,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
    */
   private void showTargets(List<DrillRep> reps) {
     DrillSpec spec = session.getSpec();
-    List<String> cases = session.getCases();
+    List<String> cases = shownCases(false);
     CaseTally tally = CaseTally.of(spec, reps);
     List<String> over = new ArrayList<String>();
     LinearLayout rows = findViewById(R.id.llDrillTargetRows);
@@ -569,7 +596,8 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     if (session.getReps().size() >= spec.getReps()) {
       note.append(getString(R.string.drill_summary_ceiling, spec.getReps()));
     }
-    if (!over.isEmpty()) {
+    // Pairs all carry the same name, so naming those still over says nothing the rows do not.
+    if (!over.isEmpty() && spec.getType() != DrillSpec.Type.F2L_PAIR) {
       note.append(note.length() == 0 ? "" : " ")
           .append(getString(R.string.drill_summary_over_target, joined(over)));
     }
@@ -579,8 +607,8 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   }
 
   /** One case: how often it was dealt, its wins, its target, and its mean against that target. */
-  private View targetRow(LayoutInflater inflater, LinearLayout parent, String code, String name,
-      List<DrillRep> reps, CaseTally tally) {
+  private View targetRow(LayoutInflater inflater, LinearLayout parent, final String code,
+      String name, List<DrillRep> reps, CaseTally tally) {
     int dealt = 0;
     int timed = 0;
     long total = 0;
@@ -595,6 +623,12 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     }
     long target = session.getSpec().getTargetMs(code);
     View row = inflater.inflate(R.layout.drill_target_row, parent, false);
+    row.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        DialogUtils.showFragment(DrillActivity.this, CaseAlgorithmsDialog.newInstance(code));
+      }
+    });
     TextView tvName = row.findViewById(R.id.tvDrillTargetName);
     tvName.setText(name);
     tvName.setTextColor(ContextCompat.getColor(this, familyColour(code)));

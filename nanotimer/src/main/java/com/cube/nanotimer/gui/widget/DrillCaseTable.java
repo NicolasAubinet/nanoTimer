@@ -11,6 +11,7 @@ import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.dialog.CaseAlgorithmsDialog;
 import com.cube.nanotimer.smartcube.drill.DrillRep;
 import com.cube.nanotimer.smartcube.drill.DrillRepOrder;
+import com.cube.nanotimer.smartcube.step.CaseAlgorithms;
 import com.cube.nanotimer.drill.DrillSpec;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.YesNoListener;
@@ -264,9 +265,13 @@ public class DrillCaseTable {
   private void fill(CaseRow row, DrillRep rep) {
     String code = rep.getCaseCode();
     boolean gone = deleted.contains(rep);
-    row.count(String.valueOf(number(rep)))
-        .chart(code)
-        .name(Utils.toSmartCubeCaseHeadline(activity, code))
+    row.count(String.valueOf(number(rep)));
+    if (CaseAlgorithms.isPair(code)) {
+      row.dot(color(R.color.step_f2l)); // no flat picture for a pair: a tap shows it
+    } else {
+      row.chart(code);
+    }
+    row.name(Utils.toSmartCubeCaseHeadline(activity, code))
         .note(note(rep, gone))
         .struck(gone, DELETED_ALPHA);
 
