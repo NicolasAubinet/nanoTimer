@@ -217,6 +217,7 @@ public final class CaseKnowledgeStore {
         + "  JOIN " + DB.TABLE_DRILL + " d ON d." + DB.COL_ID + " = r." + DB.COL_DRILL_REP_DRILL_ID
         + " WHERE r." + DB.COL_DRILL_REP_CASE + " = ?"
         + "   AND r." + DB.COL_DRILL_REP_DELETED + " = 0"
+        + "   AND r." + DB.COL_DRILL_REP_PRACTICE + " = 0"
         + "   AND (r." + DB.COL_DRILL_REP_REVEALED + " = 1"
         + "     OR (r." + DB.COL_DRILL_REP_ABANDONED + " = 0"
         + "    AND r." + DB.COL_DRILL_REP_RESET_COUNT + " = 0))";

@@ -188,6 +188,7 @@ public class DBHelper extends SQLiteOpenHelper {
         DB.COL_DRILL_REP_REVEALED + " INTEGER NOT NULL DEFAULT 0, " +
         DB.COL_DRILL_REP_ABANDONED + " INTEGER NOT NULL DEFAULT 0, " +
         DB.COL_DRILL_REP_DELETED + " INTEGER NOT NULL DEFAULT 0, " +
+        DB.COL_DRILL_REP_PRACTICE + " INTEGER NOT NULL DEFAULT 0, " +
         "FOREIGN KEY (" + DB.COL_DRILL_REP_DRILL_ID + ") REFERENCES " + DB.TABLE_DRILL + " (" + DB.COL_ID + ") " +
       ");"
     );
@@ -500,6 +501,12 @@ public class DBHelper extends SQLiteOpenHelper {
       db.execSQL("ALTER TABLE " + DB.TABLE_TIMEHISTORY + " ADD COLUMN "
           + DB.COL_TIMEHISTORY_AVG_PB + " INTEGER DEFAULT 0");
       AverageRecordsStore.updateAll(db);
+    }
+
+    // Not < 36: a database coming from below 27 was just handed the column by createDrillTables.
+    if (oldVersion >= 27 && oldVersion < 36) {
+      db.execSQL("ALTER TABLE " + DB.TABLE_DRILL_REP + " ADD COLUMN "
+          + DB.COL_DRILL_REP_PRACTICE + " INTEGER NOT NULL DEFAULT 0");
     }
 
 //    progressDialog.hide();

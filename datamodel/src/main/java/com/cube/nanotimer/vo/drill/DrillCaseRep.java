@@ -24,6 +24,7 @@ public class DrillCaseRep {
   private final int resetCount;
   private final boolean revealed;
   private final boolean abandoned;
+  private final boolean practice;
   private boolean deleted;
 
   /**
@@ -33,10 +34,12 @@ public class DrillCaseRep {
    * @param revealed the algorithm was looked up part way through, so the time is real but is not a
    *     measure of knowing the case
    * @param abandoned given up on rather than solved, so the times are what it had reached
+   * @param practice turned in practice mode with the algorithm on screen: counted for the coach,
+   *     never a time of the case
    */
   public DrillCaseRep(int position, String caseCode, String scramble, String moves,
       long recognitionMs, long executionMs, int moveCount, int resetCount, boolean revealed,
-      boolean abandoned) {
+      boolean abandoned, boolean practice) {
     this.position = position;
     this.caseCode = caseCode;
     this.scramble = scramble;
@@ -47,14 +50,15 @@ public class DrillCaseRep {
     this.resetCount = resetCount;
     this.revealed = revealed;
     this.abandoned = abandoned;
+    this.practice = practice;
   }
 
   /** A rep read back, which may have been thrown out since it was written. */
   public DrillCaseRep(int position, String caseCode, String scramble, String moves,
       long recognitionMs, long executionMs, int moveCount, int resetCount, boolean revealed,
-      boolean abandoned, boolean deleted) {
+      boolean abandoned, boolean practice, boolean deleted) {
     this(position, caseCode, scramble, moves, recognitionMs, executionMs, moveCount, resetCount,
-        revealed, abandoned);
+        revealed, abandoned, practice);
     this.deleted = deleted;
   }
 
@@ -100,6 +104,10 @@ public class DrillCaseRep {
 
   public boolean isAbandoned() {
     return abandoned;
+  }
+
+  public boolean isPractice() {
+    return practice;
   }
 
   /** Thrown out by the user: still here, and counted by nothing. */

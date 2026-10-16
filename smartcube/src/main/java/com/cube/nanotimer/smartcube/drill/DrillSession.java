@@ -82,6 +82,8 @@ public final class DrillSession {
   private long clockSkewMs;
   private int resetCount;
   private boolean revealed;
+  /** The case being practised, dealt over and over outside the drill's reps. */
+  private String practiceCase;
 
   public DrillSession(DrillSpec spec, Random random) {
     this(spec, random, null, "U");
@@ -142,14 +144,50 @@ public final class DrillSession {
    * and says with {@link #markCaseShown}.
    */
   public boolean nextRep() {
+    if (practiceCase != null) {
+      deal(practiceCase);
+      return true;
+    }
     if (isFinished()) {
       currentCase = null;
       return false;
     }
-    currentCase = pick();
+    deal(pick());
+    return true;
+  }
+
+  /**
+   * Practises one case: it is dealt again each time it is solved, until {@link #endPractice}. A
+   * case already up and not yet turned is put back rather than spent, since leaving it was not an
+   * answer about it.
+   */
+  public void startPractice(String code) {
+    if (currentCase != null && moves.isEmpty() && practiceCase == null
+        && spec.getSelection() != DrillSpec.Selection.WEIGHTED) {
+      pass.add(currentCase); // the end of the pass is what is dealt next
+    }
+    practiceCase = code;
+    deal(code);
+  }
+
+  /** Back to the drill, whose next case the caller deals with {@link #nextRep}. */
+  public void endPractice() {
+    practiceCase = null;
+    currentCase = null;
+    caseShownAtMs = NOT_SHOWN;
+  }
+
+  /** The case being practised, or null while the drill is running. */
+  public String getPracticeCase() {
+    return practiceCase;
+  }
+
+  private void deal(String code) {
+    currentCase = code;
     if (pairs) {
-      // A random slot, so the pair is not always read in the same place.
-      int spins = random.nextInt(4);
+      // A random slot, so the pair is not always read in the same place. Practice keeps front right,
+      // where the algorithm on screen reads as written.
+      int spins = practiceCase != null ? 0 : random.nextInt(4);
       currentScramble = LayerRotation.toFace(
           LayerRotation.spun(F2LPairScrambles.forCase(currentCase, random), spins), layerFace);
       pairCorner = LayerRotation.piece("DFR", spins, layerFace);
@@ -170,7 +208,6 @@ public final class DrillSession {
     caseShownAtMs = NOT_SHOWN;
     resetCount = 0;
     revealed = false;
-    return true;
   }
 
   /**
@@ -426,12 +463,16 @@ public final class DrillSession {
     long shownAt = caseShownOnCubeClock();
     long recognition = moves.isEmpty() ? 0 : Math.max(0, algStart - shownAt);
     long execution = moves.isEmpty() ? 0 : Math.max(0, lastMoveMs - algStart);
+    boolean practice = practiceCase != null;
     DrillRep rep = new DrillRep(currentCase, currentScramble,
         new ArrayList<CubeMove>(moves), shownAt, recognition, execution, moves.size(),
-        resetCount, revealed, abandoned);
-    reps.add(rep);
+        resetCount, revealed, abandoned, practice);
+    // A practice rep is none of the drill's: it neither spends one nor counts towards retiring.
+    if (!practice) {
+      reps.add(rep);
+    }
     // A retiring drill deals nothing again: a case stays in until it has earned its way out.
-    if (!spec.retiresCases() && !abandoned && (resetCount > 0 || revealed)) {
+    if (!practice && !spec.retiresCases() && !abandoned && (resetCount > 0 || revealed)) {
       // Not for one that was skipped: giving up on a case is an answer about it, and the rep spends
       // it whether or not it had been restarted or looked up first.
       showAgain(currentCase);

@@ -218,6 +218,22 @@ public class DrillRecorderTest {
     assertEquals(0, writer.deletions.size());
   }
 
+  /** The summary prunes by a rep's place among the drill's own, which practice reps are not. */
+  @Test
+  public void aPracticeRepTakesAPositionButIsNeverPruned() {
+    Writer writer = new Writer();
+    DrillRecorder recorder = new DrillRecorder(writer, caseSpec(3), true);
+
+    recorder.record(abandonedRep());
+    recorder.record(practiceRep());
+    recorder.record(abandonedRep());
+    writer.openWith(5);
+    recorder.setCaseRepDeleted(1, true);
+
+    assertTrue(writer.caseReps.get(1).isPractice());
+    assertEquals(Arrays.asList("5/2/true"), writer.deletions);
+  }
+
   /** A casual drill stored nothing, so there is nothing to throw out of it. */
   @Test
   public void aCasualDrillWritesNothingWhenARepIsThrownOut() {
@@ -242,6 +258,13 @@ public class DrillRecorderTest {
   private static DrillRep abandonedRep() {
     DrillSession session = new DrillSession(caseSpec(20), new Random(1));
     session.nextRep();
+    session.markCaseShown(SHOWN_AT_MS);
+    return session.abandon();
+  }
+
+  private static DrillRep practiceRep() {
+    DrillSession session = new DrillSession(caseSpec(20), new Random(1));
+    session.startPractice("pll_ga");
     session.markCaseShown(SHOWN_AT_MS);
     return session.abandon();
   }

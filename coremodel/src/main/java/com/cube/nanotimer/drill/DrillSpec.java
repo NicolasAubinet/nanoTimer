@@ -38,6 +38,9 @@ public final class DrillSpec {
   /** The newest spec this app can run. */
   public static final int VERSION = 4;
 
+  /** How the id of every drill the coach prescribes begins. */
+  public static final String COACH_ID_PREFIX = "coach-";
+
   /**
    * The version a drill with no per-case targets and no retiring is written at. A drill that needs
    * nothing newer says so, so an app that only reads 2 still runs every drill that did not need 3.
@@ -361,9 +364,14 @@ public final class DrillSpec {
     return specVersion;
   }
 
-  /** The sender's handle for this drill, for reporting reps back against. Opaque here. */
+  /** The sender's handle for this drill, for reporting reps back against. */
   public String getId() {
     return id;
+  }
+
+  /** Whether the coach prescribed this drill, which every id it sends starts by saying. */
+  public boolean isFromCoach() {
+    return id != null && id.startsWith(COACH_ID_PREFIX);
   }
 
   public String getPuzzle() {

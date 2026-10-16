@@ -1795,7 +1795,7 @@ public class ServiceProviderTest {
   private DrillCaseRep caseRep(int position, String caseCode, long recognitionMs, long executionMs,
       int moveCount, int resetCount, boolean revealed, boolean abandoned) {
     return new DrillCaseRep(position, caseCode, SCRAMBLE, "R@0 U'@200", recognitionMs, executionMs,
-        moveCount, resetCount, revealed, abandoned);
+        moveCount, resetCount, revealed, abandoned, false);
   }
 
   private DrillCrossRep crossRep(int position, int moveCount, int optimalLength, boolean built) {

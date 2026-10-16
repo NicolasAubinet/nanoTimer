@@ -29,10 +29,18 @@ public final class DrillRep {
   private final int resetCount;
   private final boolean revealed;
   private final boolean abandoned;
+  private final boolean practice;
 
   DrillRep(String caseCode, String scramble, List<CubeMove> moves, long shownAtMs,
       long recognitionMs, long executionMs, int moveCount, int resetCount, boolean revealed,
       boolean abandoned) {
+    this(caseCode, scramble, moves, shownAtMs, recognitionMs, executionMs, moveCount, resetCount,
+        revealed, abandoned, false);
+  }
+
+  DrillRep(String caseCode, String scramble, List<CubeMove> moves, long shownAtMs,
+      long recognitionMs, long executionMs, int moveCount, int resetCount, boolean revealed,
+      boolean abandoned, boolean practice) {
     this.caseCode = caseCode;
     this.scramble = scramble;
     this.moves = Collections.unmodifiableList(moves);
@@ -43,6 +51,7 @@ public final class DrillRep {
     this.resetCount = resetCount;
     this.revealed = revealed;
     this.abandoned = abandoned;
+    this.practice = practice;
   }
 
   /** The case as a solve records it, {@code oll_21} or {@code pll_ga}. */
@@ -58,6 +67,18 @@ public final class DrillRep {
   /** The turns that solved it, in order, so the algorithm used can be read back off the rep. */
   public List<CubeMove> getMoves() {
     return moves;
+  }
+
+  /**
+   * The turns as notation, the way the cube reported them, for the algorithm matcher: it reads a
+   * slice arriving as two outer turns and a regrip it never saw.
+   */
+  public String getTurned() {
+    StringBuilder turned = new StringBuilder();
+    for (CubeMove move : moves) {
+      turned.append(turned.length() == 0 ? "" : " ").append(move.getNotation());
+    }
+    return turned.toString();
   }
 
   /** When the case went up, which the move timestamps are worth writing down against. */
@@ -104,6 +125,14 @@ public final class DrillRep {
     return abandoned;
   }
 
+  /**
+   * Turned in practice mode, against an algorithm on screen: counted for the coach, but no time of
+   * the case and nothing towards retiring it.
+   */
+  public boolean isPractice() {
+    return practice;
+  }
+
   /** The half the drill's target applies to. */
   public long getTimedMs(DrillSpec.Type type) {
     return type == DrillSpec.Type.CASE_RECOGNITION ? recognitionMs : executionMs;
@@ -112,6 +141,7 @@ public final class DrillRep {
   @Override
   public String toString() {
     return caseCode + "(" + recognitionMs + "ms + " + executionMs + "ms, " + moveCount
-        + " moves" + (revealed ? ", revealed" : "") + (abandoned ? ", abandoned" : "") + ")";
+        + " moves" + (revealed ? ", revealed" : "") + (abandoned ? ", abandoned" : "")
+        + (practice ? ", practice" : "") + ")";
   }
 }

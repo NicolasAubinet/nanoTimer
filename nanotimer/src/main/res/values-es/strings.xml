@@ -926,6 +926,12 @@
   <string name="drill_rep_under">bajo %s</string>
   <string name="drill_rep_over">%s de más</string>
   <string name="drill_rep_not_counted">no cuenta</string>
+  <string name="drill_practice_offer">Practicar este caso</string>
+  <string name="drill_practice_back">Volver al entrenamiento</string>
+  <string name="drill_practice_mode">Práctica, no cuenta</string>
+  <string name="drill_practice_pick">Toca Alg para elegir el algoritmo que practicar</string>
+  <string name="drill_practice_turned">Algoritmo elegido</string>
+  <string name="drill_practice_other">No es el elegido</string>
   <string name="drill_cases_cleared">%1$d de %2$d casos superados</string>
   <string name="drill_summary_cell_cleared">Superados</string>
   <string name="drill_summary_cell_of_cases">de %d casos</string>

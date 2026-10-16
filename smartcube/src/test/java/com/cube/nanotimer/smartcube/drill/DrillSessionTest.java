@@ -815,6 +815,59 @@ public class DrillSessionTest {
     assertEquals(notation(asReported("R U R'")), notation(rep.getMoves()));
   }
 
+  @Test
+  public void aPracticeRepSpendsNoneOfTheDrillAndTheCaseComesBack() {
+    DrillSession session = new DrillSession(spec("pll_t", 1), new Random(3));
+    Hand hand = new Hand(session);
+
+    hand.practise("pll_t");
+    DrillRep rep = hand.execute(inverse(session.getCurrentScramble()));
+    assertNotNull(rep);
+    assertTrue(rep.isPractice());
+    assertTrue(session.getReps().isEmpty());
+    assertFalse(session.isFinished());
+
+    assertTrue(hand.next()); // dealt again, however many reps the drill had
+    assertEquals("pll_t", session.getCurrentCase());
+    assertTrue(hand.execute(inverse(session.getCurrentScramble())).isPractice());
+
+    session.endPractice();
+    assertNull(session.getCurrentCase());
+    assertTrue(hand.next());
+    assertFalse(hand.execute(inverse(session.getCurrentScramble())).isPractice());
+    assertTrue(session.isFinished());
+  }
+
+  /** Leaving for practice is no answer about the case that was up, so it is dealt next. */
+  @Test
+  public void anUntouchedCaseLeftForPracticeIsDealtNext() {
+    DrillSession session = new DrillSession(
+        new DrillSpec("test", DrillSpec.Type.CASE_EXECUTION, DrillSpec.Delivery.VIRTUAL,
+            Arrays.asList("pll_t", "pll_y", "pll_v"), DrillSpec.Selection.ROUND_ROBIN, 3, 0,
+            null), new Random(5));
+    Hand hand = new Hand(session);
+    hand.next();
+    String left = session.getCurrentCase();
+
+    hand.practise("pll_aa");
+    session.endPractice();
+    hand.next();
+
+    assertEquals(left, session.getCurrentCase());
+  }
+
+  @Test
+  public void aRepsTurnsAreWrittenAsTheCubeReportedThem() {
+    DrillSession session = new DrillSession(spec("pll_t", 1), new Random(3));
+    Hand hand = new Hand(session);
+    hand.next();
+    DrillRep rep = hand.execute("M2 U M2 U2 M2 U M2"); // an H: it never finishes a T
+
+    assertNull(rep);
+    rep = session.abandon();
+    assertEquals(notation(asReported("M2 U M2 U2 M2 U M2")), rep.getTurned());
+  }
+
   private static final class Hand {
 
     private final DrillSession session;
@@ -833,6 +886,13 @@ public class DrillSessionTest {
       shownAtMs = clock;
       session.markCaseShown(shownAtMs);
       return true;
+    }
+
+    /** Practise one case, which is up at once. */
+    void practise(String code) {
+      session.startPractice(code);
+      shownAtMs = clock;
+      session.markCaseShown(shownAtMs);
     }
 
     /** Put the case back and look at it afresh, which is where its recognition now runs from. */

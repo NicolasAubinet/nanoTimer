@@ -52,6 +52,8 @@ public class DrillRecorder {
   private long drillId;
   private boolean opening;
   private int position;
+  /** Where each of the drill's own reps was stored, practice reps having taken positions too. */
+  private final List<Integer> drillRepPositions = new ArrayList<Integer>();
   /** Reps that finished before the drill row had an id to hang them off. */
   private final List<Object> pending = new ArrayList<Object>();
   private DrillEnd endWhenOpened;
@@ -74,10 +76,13 @@ public class DrillRecorder {
     if (!recording || ended) {
       return;
     }
+    if (!rep.isPractice()) {
+      drillRepPositions.add(position);
+    }
     store(new DrillCaseRep(position++, rep.getCaseCode(), rep.getScramble(),
         SolveMovesFormat.format(rep.getMoves(), rep.getShownAtMs()), rep.getRecognitionMs(),
         rep.getExecutionMs(), rep.getMoveCount(), rep.getResetCount(), rep.wasRevealed(),
-        rep.isAbandoned()));
+        rep.isAbandoned(), rep.isPractice()));
   }
 
   public synchronized void record(CrossDrillRep rep) {
@@ -114,11 +119,14 @@ public class DrillRecorder {
    * <p>The only write that outlives {@link #end}: pruning is done on the summary screen, which is
    * reached by ending the drill. A rep still waiting for its drill row goes in already flagged
    * rather than being written and then updated.
+   *
+   * @param drillRep the rep's place among the drill's own reps, practice reps not counted
    */
-  public synchronized void setCaseRepDeleted(int position, boolean deleted) {
-    if (!recording) {
+  public synchronized void setCaseRepDeleted(int drillRep, boolean deleted) {
+    if (!recording || drillRep < 0 || drillRep >= drillRepPositions.size()) {
       return;
     }
+    int position = drillRepPositions.get(drillRep);
     DrillCaseRep waiting = pendingCaseRep(position);
     if (waiting != null) {
       waiting.setDeleted(deleted);

@@ -1097,6 +1097,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     values.put(DB.COL_DRILL_REP_RESET_COUNT, rep.getResetCount());
     values.put(DB.COL_DRILL_REP_REVEALED, rep.wasRevealed() ? 1 : 0);
     values.put(DB.COL_DRILL_REP_ABANDONED, rep.isAbandoned() ? 1 : 0);
+    values.put(DB.COL_DRILL_REP_PRACTICE, rep.isPractice() ? 1 : 0);
     values.put(DB.COL_DRILL_REP_DELETED, rep.isDeleted() ? 1 : 0);
     db.insert(DB.TABLE_DRILL_REP, null, values);
     CaseKnowledgeStore.update(db, Collections.singletonList(rep.getCaseCode()));
@@ -1174,7 +1175,8 @@ public class ServiceProviderImpl implements ServiceProvider {
     // user threw out is not one that was completed, so a drill pruned to nothing reads as zero.
     q.append("     , (SELECT COUNT(*) FROM ").append(DB.TABLE_DRILL_REP);
     q.append("         WHERE ").append(DB.COL_DRILL_REP_DRILL_ID).append(" = d.").append(DB.COL_ID);
-    q.append("           AND ").append(DB.COL_DRILL_REP_DELETED).append(" = 0)");
+    q.append("           AND ").append(DB.COL_DRILL_REP_DELETED).append(" = 0");
+    q.append("           AND ").append(DB.COL_DRILL_REP_PRACTICE).append(" = 0)");
     q.append("     + (SELECT COUNT(*) FROM ").append(DB.TABLE_DRILL_CROSS_REP);
     q.append("         WHERE ").append(DB.COL_DRILL_CROSS_REP_DRILL_ID).append(" = d.").append(DB.COL_ID).append(")");
     q.append("  FROM ").append(DB.TABLE_DRILL).append(" d");
@@ -1207,6 +1209,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("     , ").append(DB.COL_DRILL_REP_RESET_COUNT);
     q.append("     , ").append(DB.COL_DRILL_REP_REVEALED);
     q.append("     , ").append(DB.COL_DRILL_REP_ABANDONED);
+    q.append("     , ").append(DB.COL_DRILL_REP_PRACTICE);
     // Thrown-out reps come back too, flagged. They are struck through where they are read, not
     // hidden: nine reps of which two were pruned is a different drill from seven.
     q.append("     , ").append(DB.COL_DRILL_REP_DELETED);
@@ -1220,7 +1223,8 @@ public class ServiceProviderImpl implements ServiceProvider {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         reps.add(new DrillCaseRep(cursor.getInt(0), cursor.getString(1), cursor.getString(2),
             cursor.getString(3), cursor.getLong(4), cursor.getLong(5), cursor.getInt(6),
-            cursor.getInt(7), cursor.getInt(8) == 1, cursor.getInt(9) == 1, cursor.getInt(10) == 1));
+            cursor.getInt(7), cursor.getInt(8) == 1, cursor.getInt(9) == 1, cursor.getInt(10) == 1,
+            cursor.getInt(11) == 1));
       }
       cursor.close();
     }
@@ -1268,7 +1272,8 @@ public class ServiceProviderImpl implements ServiceProvider {
    * front of the user, and a restarted one was recognised twice, the second time off a position the
    * user had already read and begun. That last recognition is near nothing and would otherwise be
    * counted at full weight, in the figures a coach reads and in the weighting that decides what to
-   * drill next. Cross reps cannot appear here at all, being in a table of their own.
+   * drill next. Cross reps cannot appear here at all, being in a table of their own. Practice reps
+   * are left out of every figure, being kept only for the coach to count.
    */
   @Override
   public List<StepStats> getDrillCaseStatistics(int lastDrills) {
@@ -1278,7 +1283,8 @@ public class ServiceProviderImpl implements ServiceProvider {
         + " WHERE EXISTS (SELECT 1 FROM " + DB.TABLE_DRILL_REP
         + "                WHERE " + DB.COL_DRILL_REP_DRILL_ID
         + "                    = " + DB.TABLE_DRILL + "." + DB.COL_ID
-        + "                  AND " + DB.COL_DRILL_REP_DELETED + " = 0)"
+        + "                  AND " + DB.COL_DRILL_REP_DELETED + " = 0"
+        + "                  AND " + DB.COL_DRILL_REP_PRACTICE + " = 0)"
         + " ORDER BY " + DB.COL_DRILL_TIMESTAMP + " DESC LIMIT " + Math.max(0, lastDrills);
     String total = "(r." + DB.COL_DRILL_REP_RECOGNITION + " + r." + DB.COL_DRILL_REP_EXECUTION + ")";
 
@@ -1297,6 +1303,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("   AND r.").append(DB.COL_DRILL_REP_REVEALED).append(" = 0");
     q.append("   AND r.").append(DB.COL_DRILL_REP_RESET_COUNT).append(" = 0");
     q.append("   AND r.").append(DB.COL_DRILL_REP_DELETED).append(" = 0");
+    q.append("   AND r.").append(DB.COL_DRILL_REP_PRACTICE).append(" = 0");
     q.append(" GROUP BY r.").append(DB.COL_DRILL_REP_CASE);
     q.append(" ORDER BY r.").append(DB.COL_DRILL_REP_CASE);
 
@@ -1345,6 +1352,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("   AND r.").append(DB.COL_DRILL_REP_REVEALED).append(" = 0");
     q.append("   AND r.").append(DB.COL_DRILL_REP_RESET_COUNT).append(" = 0");
     q.append("   AND r.").append(DB.COL_DRILL_REP_DELETED).append(" = 0");
+    q.append("   AND r.").append(DB.COL_DRILL_REP_PRACTICE).append(" = 0");
     q.append(" GROUP BY r.").append(DB.COL_DRILL_REP_CASE);
     q.append(" ORDER BY r.").append(DB.COL_DRILL_REP_CASE);
 
@@ -1389,6 +1397,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append(" WHERE r.").append(DB.COL_DRILL_REP_CASE).append(" = ?");
     q.append("   AND d.").append(DB.COL_DRILL_TIMESTAMP).append(" >= ?");
     q.append("   AND r.").append(DB.COL_DRILL_REP_DELETED).append(" = 0");
+    q.append("   AND r.").append(DB.COL_DRILL_REP_PRACTICE).append(" = 0");
     q.append(" ORDER BY d.").append(DB.COL_DRILL_TIMESTAMP).append(" DESC");
     q.append("        , r.").append(DB.COL_DRILL_REP_POSITION).append(" DESC");
 
@@ -1399,7 +1408,7 @@ public class ServiceProviderImpl implements ServiceProvider {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
         DrillCaseRep rep = new DrillCaseRep(cursor.getInt(2), caseCode, cursor.getString(3),
             cursor.getString(4), cursor.getLong(5), cursor.getLong(6), cursor.getInt(7),
-            cursor.getInt(8), cursor.getInt(9) == 1, cursor.getInt(10) == 1);
+            cursor.getInt(8), cursor.getInt(9) == 1, cursor.getInt(10) == 1, false);
         attempts.add(new DrillCaseAttempt(cursor.getLong(0), cursor.getLong(1), rep));
       }
       cursor.close();
@@ -1880,6 +1889,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     if (!cross) {
       q.append(" AND r.").append(DB.COL_DRILL_REP_ABANDONED).append(" = 0");
       q.append(" AND r.").append(DB.COL_DRILL_REP_DELETED).append(" = 0");
+      q.append(" AND r.").append(DB.COL_DRILL_REP_PRACTICE).append(" = 0");
       q.append(" AND r.").append(DB.COL_DRILL_REP_CASE).append(" IN (");
       for (int i = 0; i < spec.getCases().size(); i++) {
         q.append(i == 0 ? "?" : ",?");
@@ -2176,6 +2186,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("   AND r.").append(DB.COL_DRILL_REP_REVEALED).append(" = 0");
     q.append("   AND r.").append(DB.COL_DRILL_REP_RESET_COUNT).append(" = 0");
     q.append("   AND r.").append(DB.COL_DRILL_REP_DELETED).append(" = 0");
+    q.append("   AND r.").append(DB.COL_DRILL_REP_PRACTICE).append(" = 0");
 
     List<StepSample> samples = new ArrayList<StepSample>();
     Cursor cursor = db.rawQuery(q.toString(), null);
@@ -2300,7 +2311,8 @@ public class ServiceProviderImpl implements ServiceProvider {
         + " WHERE EXISTS (SELECT 1 FROM " + DB.TABLE_DRILL_REP
         + "                WHERE " + DB.COL_DRILL_REP_DRILL_ID
         + "                    = " + DB.TABLE_DRILL + "." + DB.COL_ID
-        + "                  AND " + DB.COL_DRILL_REP_DELETED + " = 0)"
+        + "                  AND " + DB.COL_DRILL_REP_DELETED + " = 0"
+        + "                  AND " + DB.COL_DRILL_REP_PRACTICE + " = 0)"
         + " ORDER BY " + DB.COL_DRILL_TIMESTAMP + " DESC LIMIT " + Math.max(0, lastDrills);
   }
 

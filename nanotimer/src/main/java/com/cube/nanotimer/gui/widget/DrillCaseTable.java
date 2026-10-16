@@ -73,7 +73,7 @@ public class DrillCaseTable {
     /**
      * A rep was thrown out or put back.
      *
-     * @param position where it fell in the drill, which is what it is stored under
+     * @param position where it fell among the drill's reps
      * @param counted the reps that still count, for the figures above the table
      */
     void onRepsPruned(int position, boolean deleted, List<DrillRep> counted);

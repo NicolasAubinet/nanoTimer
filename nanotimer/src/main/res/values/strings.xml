@@ -957,6 +957,12 @@
   <string name="drill_rep_under">under %s</string>
   <string name="drill_rep_over">%s over</string>
   <string name="drill_rep_not_counted">not counted</string>
+  <string name="drill_practice_offer">Practice this case</string>
+  <string name="drill_practice_back">Back to drill</string>
+  <string name="drill_practice_mode">Practice, not counted</string>
+  <string name="drill_practice_pick">Tap Alg to pick the algorithm to practice</string>
+  <string name="drill_practice_turned">Chosen algorithm</string>
+  <string name="drill_practice_other">Not the chosen one</string>
   <string name="drill_cases_cleared">%1$d of %2$d cases cleared</string>
   <string name="drill_summary_cell_cleared">Cleared</string>
   <string name="drill_summary_cell_of_cases">of %d cases</string>

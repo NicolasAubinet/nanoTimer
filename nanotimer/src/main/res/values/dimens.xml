@@ -29,4 +29,6 @@
        width: it is the shape of the rep and not its size, so every one is measured against the
        same length, and at full width a dozen of them read as a dozen progress bars. -->
   <dimen name="case_row_shape_width">96dp</dimen>
+  <!-- The bulb on a drill's practice offer, the size solve details draws it on a case chip. -->
+  <dimen name="drill_practice_offer_icon">13dp</dimen>
 </resources>
