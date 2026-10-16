@@ -1,7 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One focus of the plan, a little rounder than the hub's other cards to sit with the plan's own card. -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-   android:shape="rectangle">
-  <solid android:color="@color/hero_card"/>
-  <corners android:radius="16dp"/>
-</shape>
+<!-- One focus of the plan, a little rounder than the hub's other cards to sit with the plan's own
+     card. The Plan tab lights it in its step's colour on top (PlanCardLight). -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:left="2dp" android:right="2dp" android:top="4dp">
+    <shape android:shape="rectangle">
+      <solid android:color="@color/card_shadow_far"/>
+      <corners android:radius="16dp"/>
+    </shape>
+  </item>
+  <item android:left="1dp" android:right="1dp" android:top="2dp" android:bottom="1dp">
+    <shape android:shape="rectangle">
+      <solid android:color="@color/card_shadow_mid"/>
+      <corners android:radius="16dp"/>
+    </shape>
+  </item>
+  <item android:top="1dp" android:bottom="2dp">
+    <shape android:shape="rectangle">
+      <solid android:color="@color/card_shadow_near"/>
+      <corners android:radius="16dp"/>
+    </shape>
+  </item>
+  <item android:bottom="3dp">
+    <shape android:shape="rectangle">
+      <solid android:color="@color/card_lit_edge"/>
+      <corners android:radius="16dp"/>
+    </shape>
+  </item>
+  <item android:top="1dp" android:bottom="3dp">
+    <shape android:shape="rectangle">
+      <gradient
+         android:angle="270"
+         android:startColor="@color/card_lit_top"
+         android:centerColor="@color/card_lit_mid"
+         android:centerY="0.38"
+         android:endColor="@color/card_lit_bottom"/>
+      <corners android:radius="16dp"/>
+    </shape>
+  </item>
+</layer-list>

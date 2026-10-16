@@ -4,7 +4,7 @@
    android:fitsSystemWindows="true"
    android:layout_width="match_parent"
    android:layout_height="match_parent"
-   android:background="@color/hero_card"
+   android:background="@drawable/drawer_panel"
    android:animateLayoutChanges="true">
 
   <!-- The drawer covers the bar that carries the mark and the wordmark, so while it is open it

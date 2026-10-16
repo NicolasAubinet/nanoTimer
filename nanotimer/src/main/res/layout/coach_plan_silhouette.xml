@@ -43,6 +43,7 @@
   </LinearLayout>
 
   <com.cube.nanotimer.gui.widget.ShimmerLayout
+     android:id="@+id/flCoachPreviewHero"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
      android:background="@drawable/coach_plan_hero">

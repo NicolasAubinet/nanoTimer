@@ -2,13 +2,10 @@
 <!-- The other thing this screen can produce, and the one that carries drills and settings. It has
      no actions of its own: the bar at the bottom belongs to whichever half the segmented control
      is showing, so there is only ever one Save and one Share on screen. -->
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
    android:layout_width="match_parent"
    android:layout_height="wrap_content"
-   app:cardBackgroundColor="@color/hero_card"
-   app:cardElevation="@dimen/mainscreen_card_elevation"
-   app:cardCornerRadius="@dimen/card_corner">
+   android:background="@drawable/analysis_card">
 
   <LinearLayout
      android:layout_width="match_parent"
@@ -80,4 +77,4 @@
 
   </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+</FrameLayout>

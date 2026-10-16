@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <dimen name="mainscreen_card_elevation">3dp</dimen>
   <!-- Where the pinned history heading sets its text: the list's own side padding plus a row's,
        so the heading stands over the times it names. -->
   <dimen name="history_bar_inset">16dp</dimen>

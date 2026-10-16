@@ -114,6 +114,31 @@
   <color name="hero_inset">#343A3F</color>
   <color name="hero_divider">@color/white_wash_10</color>
 
+  <!-- Cards lit from above: lighter at the top with a 1dp highlight on the edge, and a shadow
+       drawn in the 3dp the face leaves free at the bottom. Inset tiles take the opposite light. -->
+  <color name="card_lit_top">#474E55</color>
+  <color name="card_lit_mid">#3D4349</color>
+  <color name="card_lit_bottom">#393F45</color>
+  <color name="card_lit_edge">#596066</color>
+  <color name="card_shadow_far">#1F000000</color>
+  <color name="card_shadow_mid">#2E000000</color>
+  <color name="card_shadow_near">#4D000000</color>
+  <color name="inset_lit_top">#2E3338</color>
+  <color name="inset_lit_bottom">#353A3F</color>
+  <color name="inset_edge_top">#212529</color>
+  <color name="inset_edge_bottom">#3D4247</color>
+  <!-- The timer's statistics card, the same light on its own darker tone. -->
+  <color name="timercard_lit_top">#3C4246</color>
+  <color name="timercard_lit_mid">#32373A</color>
+  <color name="timercard_lit_bottom">#2E3336</color>
+  <color name="timercard_lit_edge">#4F5558</color>
+  <color name="accent_lit_top">#84D6F1</color>
+  <color name="accent_lit_bottom">#5FC3E5</color>
+  <color name="accent_lit_edge">#AFE4F6</color>
+  <color name="accent_glow_far">#146CCCEC</color>
+  <color name="accent_glow_mid">#246CCCEC</color>
+  <color name="accent_glow_near">#3D6CCCEC</color>
+
   <color name="button_color">#3E5259</color>
   <!-- A button that cannot be pressed: neutral, and a step off the screen's own ground rather than
        equal to it, so the control is visibly there and visibly unavailable. -->

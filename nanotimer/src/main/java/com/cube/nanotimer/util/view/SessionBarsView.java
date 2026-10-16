@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
@@ -34,7 +36,7 @@ import java.util.List;
  * scale and not only a shape. A name sits on the head of the bar it belongs to, with a short lead
  * down to it, because the one thing it has to say beyond the time itself is which bar it is the
  * time of. It cannot be made to fit inside one bar's width: ten minutes is eight characters over a
- * bar a fifth as wide. So it is carried on a plate of the card's own colour, which clears the
+ * bar a fifth as wide. So it is carried on a plate cut out of the strip, which clears the
  * neighbours it crosses instead of printing over them. Room for the tallest bar's plate is kept
  * above the bars whether or not anything is said in it, so the strip does not change shape when
  * the second solve lands.
@@ -113,6 +115,7 @@ public class SessionBarsView extends View {
 
   public SessionBarsView(Context context, AttributeSet attrs) {
     super(context, attrs);
+    setLayerType(LAYER_TYPE_HARDWARE, null); // a layer of its own, so a plate can clear it
     float density = getResources().getDisplayMetrics().density;
     cornerRadius = 2f * density;
     ruleStroke = RULE_STROKE_DP * density;
@@ -131,9 +134,9 @@ public class SessionBarsView extends View {
     namePaint.setTypeface(Typeface.create(GUIUtils.appFont(context), Typeface.BOLD));
     namePaint.setFontFeatureSettings("tnum"); // tabular figures: the two names keep one rhythm
     platePaint.setStyle(Paint.Style.FILL);
-    // The card's own colour: on the ground the plate is not there at all, and over a bar it reads
-    // as a gap in the strip rather than as a box laid on top of it.
-    platePaint.setColor(ContextCompat.getColor(context, R.color.timercardbg));
+    // Cleared rather than painted: the lit card shows through, so over a bar the plate reads as a
+    // gap in the strip rather than as a box laid on top of it.
+    platePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
     leadPaint.setStyle(Paint.Style.STROKE);
     leadPaint.setStrokeWidth(1.5f * density);
     leadPaint.setStrokeCap(Paint.Cap.ROUND);

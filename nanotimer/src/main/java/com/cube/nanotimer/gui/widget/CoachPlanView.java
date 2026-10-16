@@ -100,6 +100,7 @@ public class CoachPlanView {
    * scrolls to its card. Call after {@link #setPlan}, which draws the cards the chips scroll to.
    */
   public void setHero(View hero, StoredCoachPlan stored) {
+    PlanCardLight.apply(hero, R.drawable.coach_plan_hero, accent());
     ((TextView) hero.findViewById(R.id.tvAnalysisPlanDate)).setText(activity.getString(
         R.string.coach_written,
         DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date(stored.getWrittenAt()))));
@@ -144,6 +145,8 @@ public class CoachPlanView {
   public void setPreview(View preview) {
     LinearLayout chips = preview.findViewById(R.id.llCoachPreviewChips);
     LinearLayout areas = preview.findViewById(R.id.llCoachPreviewAreas);
+    PlanCardLight.apply(preview.findViewById(R.id.flCoachPreviewHero), R.drawable.coach_plan_hero,
+        accent());
     chips.removeAllViews();
     areas.removeAllViews();
     for (int i = 0; i < PREVIEW_REASONS.length; i++) {
@@ -169,6 +172,7 @@ public class CoachPlanView {
     card.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
         FrameLayout.LayoutParams.WRAP_CONTENT));
     header(card, rank, family, colour);
+    PlanCardLight.apply(card, R.drawable.coach_focus_card, colour);
     FocusArea area = new FocusArea(reason.code(), Collections.<String>emptyList(),
         Collections.<Evidence>emptyList(), null, null);
     ((TextView) card.findViewById(R.id.tvCoachAreaTitle)).setText(title(area));
@@ -341,6 +345,7 @@ public class CoachPlanView {
     View card = inflater.inflate(R.layout.coach_focus_area, container, false);
     int colour = colour(area);
     header(card, rank, CoachFocusFigure.familyOf(area), colour);
+    PlanCardLight.apply(card, R.drawable.coach_focus_card, colour);
     ((TextView) card.findViewById(R.id.tvCoachAreaTitle)).setText(title(area));
     CoachFocusFigure figure = CoachFocusFigure.of(activity, area, payload);
     showFigure(card, figure, colour);
@@ -471,6 +476,10 @@ public class CoachPlanView {
 
   private int colour(FocusArea area) {
     return stepColour(CoachFocusFigure.familyOf(area));
+  }
+
+  private int accent() {
+    return ContextCompat.getColor(activity, R.color.lightblue);
   }
 
   /** A step's colour, as the step bar draws it, or the accent for none. */

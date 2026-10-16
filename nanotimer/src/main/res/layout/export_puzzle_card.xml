@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- One puzzle that holds solves. The head takes or drops everything under it at once and says how
      much of it is taken; the pills below are the solve types, each with the solves it holds. -->
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
    android:layout_width="match_parent"
    android:layout_height="wrap_content"
    android:layout_marginBottom="@dimen/space_s"
-   app:cardBackgroundColor="@color/hero_card"
-   app:cardElevation="@dimen/mainscreen_card_elevation"
-   app:cardCornerRadius="@dimen/card_corner">
+   android:background="@drawable/analysis_card">
 
   <LinearLayout
      android:layout_width="match_parent"
@@ -87,4 +84,4 @@
 
   </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+</FrameLayout>

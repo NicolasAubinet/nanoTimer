@@ -1,9 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- A card on the Analysis hub, in the same shape and ground the hero card and the drill cells
-     already use: the hub is read straight after the main screen and should not look like a
-     different app. -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-   android:shape="rectangle">
-  <solid android:color="@color/hero_card"/>
-  <corners android:radius="14dp"/>
-</shape>
+<!-- The app's card, lit from above: lighter at the top, a highlight on its top edge and a
+     shadow under it. The main screen, the hub, the graph and export all draw their cards with it. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:left="2dp" android:right="2dp" android:top="4dp">
+    <shape android:shape="rectangle">
+      <solid android:color="@color/card_shadow_far"/>
+      <corners android:radius="14dp"/>
+    </shape>
+  </item>
+  <item android:left="1dp" android:right="1dp" android:top="2dp" android:bottom="1dp">
+    <shape android:shape="rectangle">
+      <solid android:color="@color/card_shadow_mid"/>
+      <corners android:radius="14dp"/>
+    </shape>
+  </item>
+  <item android:top="1dp" android:bottom="2dp">
+    <shape android:shape="rectangle">
+      <solid android:color="@color/card_shadow_near"/>
+      <corners android:radius="14dp"/>
+    </shape>
+  </item>
+  <item android:bottom="3dp">
+    <shape android:shape="rectangle">
+      <solid android:color="@color/card_lit_edge"/>
+      <corners android:radius="14dp"/>
+    </shape>
+  </item>
+  <item android:top="1dp" android:bottom="3dp">
+    <shape android:shape="rectangle">
+      <gradient
+         android:angle="270"
+         android:startColor="@color/card_lit_top"
+         android:centerColor="@color/card_lit_mid"
+         android:centerY="0.38"
+         android:endColor="@color/card_lit_bottom"/>
+      <corners android:radius="14dp"/>
+    </shape>
+  </item>
+</layer-list>

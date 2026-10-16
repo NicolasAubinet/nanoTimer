@@ -3,6 +3,7 @@ package com.cube.nanotimer.gui;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -235,7 +236,7 @@ public class GraphActivity extends NanoTimerActivity {
 
     chart = (LineChart) findViewById(R.id.chart);
     chart.getDescription().setEnabled(false);
-    chart.setBackgroundColor(getResourceColor(R.color.hero_card)); // blend into the surface card
+    chart.setBackgroundColor(Color.TRANSPARENT); // the card's own light shows through
     chart.setDrawGridBackground(true); // the plot, recessed a shade into that card
     chart.setGridBackgroundColor(getResourceColor(R.color.graph_plot));
     chart.setNoDataText("");
@@ -394,7 +395,7 @@ public class GraphActivity extends NanoTimerActivity {
   private void setupBarChart() {
     barChart.getDescription().setEnabled(false);
     barChart.getLegend().setEnabled(false); // a single series, already named by the graph type
-    barChart.setBackgroundColor(getResourceColor(R.color.hero_card));
+    barChart.setBackgroundColor(Color.TRANSPARENT);
     barChart.setDrawGridBackground(true);
     barChart.setGridBackgroundColor(getResourceColor(R.color.graph_plot));
     barChart.setNoDataText("");

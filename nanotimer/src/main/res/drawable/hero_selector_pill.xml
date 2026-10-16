@@ -10,7 +10,19 @@
   </item>
   <item>
     <shape android:shape="rectangle">
-      <solid android:color="@color/hero_inset"/>
+      <gradient
+         android:angle="270"
+         android:startColor="@color/inset_edge_top"
+         android:endColor="@color/inset_edge_bottom"/>
+      <corners android:radius="12dp"/>
+    </shape>
+  </item>
+  <item android:top="1dp" android:bottom="1dp">
+    <shape android:shape="rectangle">
+      <gradient
+         android:angle="270"
+         android:startColor="@color/inset_lit_top"
+         android:endColor="@color/inset_lit_bottom"/>
       <corners android:radius="12dp"/>
     </shape>
   </item>

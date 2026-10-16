@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:app="http://schemas.android.com/apk/res-auto"
    android:orientation="vertical"
    android:fitsSystemWindows="true"
    android:background="@color/graybg"
@@ -10,16 +9,14 @@
 
   <!-- What is being drawn, and every control that changes it, on one line: the graph under it is
        the screen, and every row this card grows comes out of the plot. -->
-  <androidx.cardview.widget.CardView
+  <FrameLayout
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
      android:layout_marginTop="@dimen/space_xs"
      android:layout_marginBottom="@dimen/space_xs"
      android:layout_marginLeft="@dimen/space_m"
      android:layout_marginRight="@dimen/space_m"
-     app:cardBackgroundColor="@color/hero_card"
-     app:cardElevation="@dimen/mainscreen_card_elevation"
-     app:cardCornerRadius="@dimen/card_corner">
+     android:background="@drawable/analysis_card">
 
     <LinearLayout
        android:layout_width="match_parent"
@@ -115,19 +112,17 @@
 
     </LinearLayout>
 
-  </androidx.cardview.widget.CardView>
+  </FrameLayout>
 
   <!-- The chart takes everything left, on a card whose plot is recessed a shade into it. -->
-  <androidx.cardview.widget.CardView
+  <FrameLayout
      android:layout_width="match_parent"
      android:layout_height="0dp"
      android:layout_weight="1"
      android:layout_marginBottom="@dimen/space_xs"
      android:layout_marginLeft="@dimen/space_m"
      android:layout_marginRight="@dimen/space_m"
-     app:cardBackgroundColor="@color/hero_card"
-     app:cardElevation="@dimen/mainscreen_card_elevation"
-     app:cardCornerRadius="@dimen/card_corner">
+     android:background="@drawable/analysis_card">
 
     <com.github.mikephil.charting.charts.LineChart
        android:id="@+id/chart"
@@ -143,6 +138,6 @@
        android:visibility="gone"
        android:padding="@dimen/space_xs"/>
 
-  </androidx.cardview.widget.CardView>
+  </FrameLayout>
 
 </LinearLayout>

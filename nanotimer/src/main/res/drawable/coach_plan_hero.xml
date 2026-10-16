@@ -1,21 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The week's plan: the hub's card, lit from its top corner in the accent. -->
+<!-- The week's plan: the focus card's shape, lit in the accent by PlanCardLight. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-  <item>
+  <item android:left="2dp" android:right="2dp" android:top="4dp">
     <shape android:shape="rectangle">
-      <solid android:color="@color/hero_card"/>
+      <solid android:color="@color/card_shadow_far"/>
       <corners android:radius="16dp"/>
     </shape>
   </item>
-  <item>
+  <item android:left="1dp" android:right="1dp" android:top="2dp" android:bottom="1dp">
+    <shape android:shape="rectangle">
+      <solid android:color="@color/card_shadow_mid"/>
+      <corners android:radius="16dp"/>
+    </shape>
+  </item>
+  <item android:top="1dp" android:bottom="2dp">
+    <shape android:shape="rectangle">
+      <solid android:color="@color/card_shadow_near"/>
+      <corners android:radius="16dp"/>
+    </shape>
+  </item>
+  <item android:bottom="3dp">
+    <shape android:shape="rectangle">
+      <solid android:color="@color/card_lit_edge"/>
+      <corners android:radius="16dp"/>
+    </shape>
+  </item>
+  <item android:top="1dp" android:bottom="3dp">
     <shape android:shape="rectangle">
       <gradient
-         android:centerX="0"
-         android:centerY="0"
-         android:endColor="#006CCCEC"
-         android:gradientRadius="100%p"
-         android:startColor="#246CCCEC"
-         android:type="radial"/>
+         android:angle="270"
+         android:startColor="@color/card_lit_top"
+         android:centerColor="@color/card_lit_mid"
+         android:centerY="0.38"
+         android:endColor="@color/card_lit_bottom"/>
       <corners android:radius="16dp"/>
     </shape>
   </item>
