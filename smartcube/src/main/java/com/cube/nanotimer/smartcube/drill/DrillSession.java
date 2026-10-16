@@ -43,6 +43,11 @@ public final class DrillSession {
   /** Where the faces sit in a facelet string, which is the order {@link CubieCube} writes one in. */
   private static final String FACELET_ORDER = "URFDLB";
 
+  /** The cross and the four slots with the cross on D, each slot as its corner and its edge. */
+  private static final String[] CROSS_EDGES = {"DF", "DR", "DB", "DL"};
+  private static final String[][] SLOTS = {{"DFR", "FR"}, {"DLF", "FL"}, {"DBL", "BL"},
+      {"DRB", "BR"}};
+
   private final DrillSpec spec;
   private final Random random;
   private final Map<String, Long> weights;
@@ -58,6 +63,8 @@ public final class DrillSession {
   /** The current pair's corner and edge by the faces of their slot, as dealt. */
   private String pairCorner;
   private String pairEdge;
+  private int[] shownEdges;
+  private int[] shownCorners;
 
   private CubieCube cube = new CubieCube();
   /** The user's own cube, followed only so that a turn it never reported can be recovered. */
@@ -153,6 +160,9 @@ public final class DrillSession {
     }
     cube = new CubieCube();
     FaceTurns.apply(cube, currentScramble);
+    if (pairs) {
+      readShownPieces();
+    }
     moves.clear();
     firstMoveMs = 0;
     algStartMs = 0;
@@ -336,6 +346,54 @@ public final class DrillSession {
       return isLayerOriented();
     }
     return cube.isSolved();
+  }
+
+  /**
+   * The pieces a pair's rep is drawn with: the cross, the slots already in, and the pair, wherever
+   * its pieces are. The rest is grey, so the last layer says nothing and the slot to fill reads as
+   * the one hole; a stuck case shows the slot its piece is trapped in grey around that piece.
+   */
+  private void readShownPieces() {
+    int[] cp = new int[8];
+    int[] co = new int[8];
+    int[] ep = new int[12];
+    int[] eo = new int[12];
+    cube.toPermutation(cp, co, ep, eo);
+    List<Integer> edges = new ArrayList<Integer>();
+    List<Integer> corners = new ArrayList<Integer>();
+    for (String cross : CROSS_EDGES) {
+      edges.add(F2LPairScrambles.edgeIndex(LayerRotation.piece(cross, 0, layerFace)));
+    }
+    for (String[] slot : SLOTS) {
+      int corner = F2LPairScrambles.cornerIndex(LayerRotation.piece(slot[0], 0, layerFace));
+      int edge = F2LPairScrambles.edgeIndex(LayerRotation.piece(slot[1], 0, layerFace));
+      if (cp[corner] == corner && co[corner] == 0 && ep[edge] == edge && eo[edge] == 0) {
+        corners.add(corner);
+        edges.add(edge);
+      }
+    }
+    corners.add(F2LPairScrambles.cornerIndex(pairCorner));
+    edges.add(F2LPairScrambles.edgeIndex(pairEdge));
+    shownEdges = toArray(edges);
+    shownCorners = toArray(corners);
+  }
+
+  private static int[] toArray(List<Integer> values) {
+    int[] array = new int[values.size()];
+    for (int i = 0; i < array.length; i++) {
+      array[i] = values.get(i);
+    }
+    return array;
+  }
+
+  /** The edges a pair's rep colours, by the slot each belongs in. Null for any other drill. */
+  public int[] getShownEdges() {
+    return shownEdges == null ? null : shownEdges.clone();
+  }
+
+  /** The corners a pair's rep colours, likewise. */
+  public int[] getShownCorners() {
+    return shownCorners == null ? null : shownCorners.clone();
   }
 
   /** Whether the nine stickers of the layer's face all show the same colour. */

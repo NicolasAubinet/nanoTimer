@@ -65,6 +65,24 @@ public final class CubeStickering {
     return mask(edges, corners, all(CENTERS, true));
   }
 
+  /**
+   * The given pieces and the six centres, everything else grey.
+   *
+   * @param shownEdges edges by the slot each belongs in, in {@link #crossAndCentres}'s numbering
+   * @param shownCorners corners likewise
+   */
+  public static String pieces(int[] shownEdges, int[] shownCorners) {
+    boolean[] edges = new boolean[EDGES];
+    for (int edge : shownEdges) {
+      edges[CubePatternFormat.playerEdge(edge)] = true;
+    }
+    boolean[] corners = new boolean[CORNERS];
+    for (int corner : shownCorners) {
+      corners[CubePatternFormat.playerCorner(corner)] = true;
+    }
+    return mask(edges, corners, all(CENTERS, true));
+  }
+
   private static boolean[] all(int count, boolean shown) {
     boolean[] pieces = new boolean[count];
     for (int i = 0; i < count; i++) {

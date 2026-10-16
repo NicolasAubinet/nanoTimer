@@ -305,6 +305,8 @@ public class DrillSetupActivity extends NanoTimerActivity
     int chosenReps = Options.INSTANCE.getDrillChoice(KEY_REPS, DEFAULT_REP_CHOICE);
     reps.setSelection(noSet && chosenReps == REPS_ALL ? DEFAULT_REP_CHOICE : chosenReps);
     casesRow.setVisibility(noSet ? View.GONE : View.VISIBLE);
+    // A pair's time depends on the slot and grip it was dealt in, and no screen reads one back.
+    findViewById(R.id.llDrillRecord).setVisibility(f2l ? View.GONE : View.VISIBLE);
     if (!noSet) {
       refreshCasesCount();
     }
@@ -474,7 +476,7 @@ public class DrillSetupActivity extends NanoTimerActivity
   }
 
   private boolean isRecording() {
-    return swRecord.isChecked();
+    return chosenPractice() != PRACTICE_F2L && swRecord.isChecked();
   }
 
   private void start() {

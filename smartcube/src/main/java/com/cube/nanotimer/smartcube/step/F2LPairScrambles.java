@@ -129,8 +129,8 @@ public final class F2LPairScrambles {
   public static boolean isPairIn(String facelets, char crossFace, String corner, String edge) {
     int face = "URFDLB".indexOf(crossFace);
     return face >= 0 && Cubies.crossDone(facelets, face)
-        && Cubies.inPlace(facelets, Cubies.CORNERS[indexOf(CORNER_NAMES, corner)])
-        && Cubies.inPlace(facelets, Cubies.EDGES[indexOf(EDGE_NAMES, edge)]);
+        && Cubies.inPlace(facelets, Cubies.CORNERS[cornerIndex(corner)])
+        && Cubies.inPlace(facelets, Cubies.EDGES[edgeIndex(edge)]);
   }
 
   private static String algorithmFor(String caseCode) {
@@ -159,6 +159,16 @@ public final class F2LPairScrambles {
     }
     return LastLayerScrambles.forCase(oll.get(random.nextInt(oll.size())), random) + " "
         + LastLayerScrambles.forCase(pll.get(random.nextInt(pll.size())), random);
+  }
+
+  /** A corner by its faces ({@code "DFR"}, any order), in {@code CubieCube}'s numbering. */
+  public static int cornerIndex(String faces) {
+    return indexOf(CORNER_NAMES, faces);
+  }
+
+  /** An edge by its faces ({@code "FR"}, any order), in {@code CubieCube}'s numbering. */
+  public static int edgeIndex(String faces) {
+    return indexOf(EDGE_NAMES, faces);
   }
 
   private static int indexOf(String[] names, String piece) {

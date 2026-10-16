@@ -667,6 +667,28 @@ public class DrillSessionTest {
     }
   }
 
+  /**
+   * A basic case colours the cross, the three slots already in and the pair; a stuck one leaves the
+   * slot its piece is trapped in grey, so one slot fewer.
+   */
+  @Test
+  public void aPairRepColoursTheCrossTheSlotsInAndThePair() {
+    for (String face : new String[] {"U", "D", "R", "F"}) {
+      DrillSession basic = new DrillSession(pairSpec("pair_12"), new Random(3), null, face);
+      assertTrue(basic.nextRep());
+      assertEquals(face, 4 + 3 + 1, basic.getShownEdges().length);
+      assertEquals(face, 3 + 1, basic.getShownCorners().length);
+
+      DrillSession stuck = new DrillSession(pairSpec("pair_a25"), new Random(3), null, face);
+      assertTrue(stuck.nextRep());
+      assertEquals(face, 4 + 2 + 1, stuck.getShownEdges().length);
+      assertEquals(face, 2 + 1, stuck.getShownCorners().length);
+    }
+    DrillSession lastLayer = new DrillSession(spec("pll_t", 1), new Random(3));
+    assertTrue(lastLayer.nextRep());
+    assertNull(lastLayer.getShownEdges());
+  }
+
   /** Only the first few cases are dealt, and the next one comes in as one retires. */
   @Test
   public void aWorkingSetDealsFromTheHeaviestCasesFirst() {

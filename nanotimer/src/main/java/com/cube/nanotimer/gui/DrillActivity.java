@@ -13,6 +13,7 @@ import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.coach.CoachPayloadBuilder;
 import com.cube.nanotimer.cube.CubePatternFormat;
+import com.cube.nanotimer.cube.CubeStickering;
 import com.cube.nanotimer.cube.SmartCubeManager;
 import com.cube.nanotimer.cube.SolveTypeMethod;
 import com.cube.nanotimer.services.db.DataCallback;
@@ -352,6 +353,10 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     if (!session.nextRep()) {
       showSummary();
       return;
+    }
+    if (session.getShownEdges() != null) {
+      cube.setStickering(
+          CubeStickering.pieces(session.getShownEdges(), session.getShownCorners()));
     }
     cube.setState(CubePatternFormat.format(session.getFacelets()));
     // ⚠️ The case now on screen is deliberately not named anywhere. Only the cube says what it
