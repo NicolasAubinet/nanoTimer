@@ -1400,10 +1400,10 @@
   <string name="analysis_help_extra_body">Les coups que ces cas vous ont coûtés par rapport à l\'algorithme standard le plus court, additionnés.</string>
   <string name="analysis_help_plan_title">Votre plan</string>
   <string name="analysis_help_plan_body">Les plans font partie du coach Cubench, une fonction payante. Le coach lit vos résolutions au smart cube, trouve ce qui vous coûte le plus de temps et en fait un plan pour la semaine, avec des drills pour vos points faibles.</string>
-  <string name="analysis_help_plan_cards">Les cartes</string>
-  <string name="analysis_help_plan_cards_body">Jusqu\'à trois points à travailler, le plus rentable en premier. Chacune dit ce qui se passe, pourquoi, et une chose à faire.</string>
+  <string name="analysis_help_plan_cards">À travailler cette semaine</string>
+  <string name="analysis_help_plan_cards_body">Jusqu\'à trois points à travailler, le plus rentable en premier. Chacun dit ce qui se passe, pourquoi, et une chose à faire.</string>
   <string name="analysis_help_plan_drills">Drills</string>
-  <string name="analysis_help_plan_drills_body">Le bouton d\'une carte ouvre un drill fait pour elle. Chaque cas quitte le drill une fois son objectif battu quelques fois.</string>
+  <string name="analysis_help_plan_drills_body">Le bouton d\'un point ouvre un drill fait pour lui. Chaque cas quitte le drill une fois son objectif battu quelques fois.</string>
   <string name="analysis_help_plan_practice_body">Sous le plan, les cas qui vous coûtent le plus, prêts à travailler entre deux plans.</string>
   <string name="analysis_help_plan_new">Un nouveau plan</string>
   <string name="analysis_help_plan_new_body">Écrit à partir de vos 100 dernières résolutions au smart cube, le premier en demande donc autant. Ensuite un nouveau plan arrive chaque semaine, une fois 25 résolutions de plus faites et votre session terminée.</string>

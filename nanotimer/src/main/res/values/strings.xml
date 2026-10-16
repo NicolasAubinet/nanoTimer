@@ -1451,10 +1451,10 @@
   <string name="analysis_help_extra_body">The turns those cases cost you over the shortest standard algorithm, added up.</string>
   <string name="analysis_help_plan_title">Your plan</string>
   <string name="analysis_help_plan_body">Plans are part of the Cubench coach, a paid feature. The coach reads your smart cube solves, finds what costs you the most time, and turns it into a plan for the week, with drills for your weak points.</string>
-  <string name="analysis_help_plan_cards">The cards</string>
+  <string name="analysis_help_plan_cards">This week\'s focus</string>
   <string name="analysis_help_plan_cards_body">Up to three things to work on, the one worth the most first. Each says what is happening, why, and one thing to do about it.</string>
   <string name="analysis_help_plan_drills">Drills</string>
-  <string name="analysis_help_plan_drills_body">A card\'s button opens a drill made for it. Each case leaves the drill once you have beaten its target a few times.</string>
+  <string name="analysis_help_plan_drills_body">The button on a focus opens a drill made for it. Each case leaves the drill once you have beaten its target a few times.</string>
   <string name="analysis_help_plan_practice_body">Under the plan, the cases costing you the most, ready to practise between plans.</string>
   <string name="analysis_help_plan_new">A new plan</string>
   <string name="analysis_help_plan_new_body">Written from your last 100 smart cube solves, so the first one needs that many. After that a new plan comes every week, once you have done 25 more solves and your session is over.</string>

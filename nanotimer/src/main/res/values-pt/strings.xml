@@ -1402,10 +1402,10 @@
   <string name="analysis_help_extra_body">Os movimentos que esses casos te custaram face ao algoritmo padrão mais curto, somados.</string>
   <string name="analysis_help_plan_title">O seu plano</string>
   <string name="analysis_help_plan_body">Os planos fazem parte do coach do Cubench, uma funcionalidade paga. O coach lê as suas resoluções com smart cube, encontra o que lhe custa mais tempo e transforma isso num plano para a semana, com drills para os seus pontos fracos.</string>
-  <string name="analysis_help_plan_cards">Os cartões</string>
-  <string name="analysis_help_plan_cards_body">Até três coisas a trabalhar, a que vale mais primeiro. Cada um diz o que se passa, porquê, e uma coisa a fazer.</string>
+  <string name="analysis_help_plan_cards">Em que se concentrar</string>
+  <string name="analysis_help_plan_cards_body">Até três coisas a trabalhar, a que vale mais primeiro. Cada uma diz o que se passa, porquê, e uma coisa a fazer.</string>
   <string name="analysis_help_plan_drills">Drills</string>
-  <string name="analysis_help_plan_drills_body">O botão de um cartão abre um drill feito para ele. Cada caso sai do drill depois de bater a sua meta algumas vezes.</string>
+  <string name="analysis_help_plan_drills_body">O botão de cada ponto abre um drill feito para ele. Cada caso sai do drill depois de bater a sua meta algumas vezes.</string>
   <string name="analysis_help_plan_practice_body">Por baixo do plano, os casos que mais lhe custam, prontos a treinar entre planos.</string>
   <string name="analysis_help_plan_new">Um novo plano</string>
   <string name="analysis_help_plan_new_body">Escrito a partir das suas últimas 100 resoluções com smart cube, por isso o primeiro precisa dessas. Depois chega um novo plano todas as semanas, quando tiver feito mais 25 resoluções e a sua sessão tiver terminado.</string>
