@@ -994,6 +994,8 @@
   <string name="drill_practice_hint_pll">Um PLL a seguir ao outro, entre os casos que escolher.</string>
   <string name="drill_practice_hint_oll">Um OLL a seguir ao outro, entre os casos que escolher.</string>
   <string name="drill_practice_hint_cross">Uma mistura completa, e a cruz mais curta que lá encontrar.</string>
+  <string name="drill_practice_f2l">F2L</string>
+  <string name="drill_practice_hint_f2l">Um par F2L a seguir ao outro, com a frequência com que aparecem numa resolução.</string>
   <string name="drill_layer_colour_shared">Também usada nas misturas de Última camada, PLL e F2L</string>
   <string name="drill_cases">Casos</string>
   <string name="drill_cases_choose">Escolher</string>

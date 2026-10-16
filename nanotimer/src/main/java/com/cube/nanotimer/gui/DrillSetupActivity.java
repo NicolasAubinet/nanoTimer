@@ -34,6 +34,7 @@ import com.cube.nanotimer.smartcube.model.CubeConnection;
 import com.cube.nanotimer.smartcube.model.CubeConnectionListener;
 import com.cube.nanotimer.smartcube.step.LastLayerDiagram;
 import com.cube.nanotimer.smartcube.step.LastLayerScrambles;
+import com.cube.nanotimer.step.F2lPairCases;
 import com.cube.nanotimer.util.DrillCasePreset;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.GUIUtils;
@@ -69,6 +70,11 @@ public class DrillSetupActivity extends NanoTimerActivity
   private static final int PRACTICE_PLL = 0;
   private static final int PRACTICE_OLL = 1;
   private static final int PRACTICE_CROSS = 2;
+  private static final int PRACTICE_F2L = 3;
+
+  /** The tabs in the order drawn. The value is what is stored, so a tab can move. */
+  private static final int[] PRACTICE_ORDER =
+      {PRACTICE_PLL, PRACTICE_OLL, PRACTICE_F2L, PRACTICE_CROSS};
 
   private static final int[] REP_COUNTS = {10, 20, 30, 50};
 
@@ -149,11 +155,11 @@ public class DrillSetupActivity extends NanoTimerActivity
 
     practice = new SegmentedControl(this, (LinearLayout) findViewById(R.id.llDrillPractice),
         new String[] {getString(R.string.drill_practice_pll), getString(R.string.drill_practice_oll),
-            getString(R.string.drill_practice_cross)},
+            getString(R.string.drill_practice_f2l), getString(R.string.drill_practice_cross)},
         new SegmentedControl.Listener() {
           @Override
           public void onSegmentPicked(int index) {
-            Options.INSTANCE.setDrillChoice(KEY_PRACTICE, index);
+            Options.INSTANCE.setDrillChoice(KEY_PRACTICE, PRACTICE_ORDER[index]);
             refreshPractice();
           }
         });
@@ -206,7 +212,8 @@ public class DrillSetupActivity extends NanoTimerActivity
       }
     });
 
-    practice.setSelection(Options.INSTANCE.getDrillChoice(KEY_PRACTICE, PRACTICE_PLL));
+    practice.setSelection(
+        positionOf(Options.INSTANCE.getDrillChoice(KEY_PRACTICE, PRACTICE_PLL)));
     swRecord.setChecked(Options.INSTANCE.getDrillChoice(KEY_RECORDING, 1) == 1);
     swPlanning.setChecked(Options.INSTANCE.getDrillChoice(KEY_PLANNING_ON, 0) == 1);
     setPlanningSeconds(
@@ -274,13 +281,16 @@ public class DrillSetupActivity extends NanoTimerActivity
   }
 
   private void refreshPractice() {
-    int picked = practice.getSelection();
+    int picked = chosenPractice();
     boolean cross = picked == PRACTICE_CROSS;
+    boolean f2l = picked == PRACTICE_F2L;
     crossOptions.setVisibility(cross ? View.VISIBLE : View.GONE);
     planningSeconds.setVisibility(cross && swPlanning.isChecked() ? View.VISIBLE : View.GONE);
     int hint;
     if (cross) {
       hint = R.string.drill_practice_hint_cross;
+    } else if (f2l) {
+      hint = R.string.drill_practice_hint_f2l;
     } else if (picked == PRACTICE_OLL) {
       hint = R.string.drill_practice_hint_oll;
     } else {
@@ -289,11 +299,13 @@ public class DrillSetupActivity extends NanoTimerActivity
     tvPracticeHint.setText(hint);
     // Getting through the set is an answer for a case drill; a cross rep is a fresh scramble, so
     // there is no set to get through and the choice is taken away rather than left to mean nothing.
-    reps.setSegmentVisible(REPS_ALL, !cross);
+    // F2L pairs are dealt by how often they come up, so neither is there a set to get through.
+    boolean noSet = cross || f2l;
+    reps.setSegmentVisible(REPS_ALL, !noSet);
     int chosenReps = Options.INSTANCE.getDrillChoice(KEY_REPS, DEFAULT_REP_CHOICE);
-    reps.setSelection(cross && chosenReps == REPS_ALL ? DEFAULT_REP_CHOICE : chosenReps);
-    casesRow.setVisibility(cross ? View.GONE : View.VISIBLE);
-    if (!cross) {
+    reps.setSelection(noSet && chosenReps == REPS_ALL ? DEFAULT_REP_CHOICE : chosenReps);
+    casesRow.setVisibility(noSet ? View.GONE : View.VISIBLE);
+    if (!noSet) {
       refreshCasesCount();
     }
   }
@@ -382,7 +394,7 @@ public class DrillSetupActivity extends NanoTimerActivity
   }
 
   private String family() {
-    return practice.getSelection() == PRACTICE_OLL ? FAMILY_OLL : FAMILY_PLL;
+    return chosenPractice() == PRACTICE_OLL ? FAMILY_OLL : FAMILY_PLL;
   }
 
   /** The cases the drill will deal: what was picked, or the whole family if nothing ever was. */
@@ -447,13 +459,27 @@ public class DrillSetupActivity extends NanoTimerActivity
     return chosen == REPS_ALL ? cases : REP_COUNTS[chosen];
   }
 
+  /** The practice the selected tab stands for. */
+  private int chosenPractice() {
+    return PRACTICE_ORDER[practice.getSelection()];
+  }
+
+  private static int positionOf(int practiceValue) {
+    for (int i = 0; i < PRACTICE_ORDER.length; i++) {
+      if (PRACTICE_ORDER[i] == practiceValue) {
+        return i;
+      }
+    }
+    return 0;
+  }
+
   private boolean isRecording() {
     return swRecord.isChecked();
   }
 
   private void start() {
     Intent intent;
-    if (practice.getSelection() == PRACTICE_CROSS) {
+    if (chosenPractice() == PRACTICE_CROSS) {
       CrossFace crossFace = layerFace().opposite(); // the cross is built under the last layer
       int repCount = REP_COUNTS[reps.getSelection()];
       intent = new Intent(this, CrossDrillActivity.class);
@@ -462,6 +488,13 @@ public class DrillSetupActivity extends NanoTimerActivity
               repCount, swPlanning.isChecked() ? planningSecondsValue * 1000L : 0,
               getString(R.string.drill_cross_title))
           .toJson());
+    } else if (chosenPractice() == PRACTICE_F2L) {
+      intent = new Intent(this, DrillActivity.class);
+      intent.putExtra(DrillActivity.EXTRA_LAYER_FACE, layerFace().name());
+      intent.putExtra(DrillActivity.EXTRA_SPEC, new DrillSpec("local-f2l",
+          DrillSpec.Type.F2L_PAIR, DrillSpec.Delivery.VIRTUAL, F2lPairCases.codes(),
+          DrillSpec.Selection.WEIGHTED, REP_COUNTS[reps.getSelection()], 0,
+          getString(R.string.drill_practice_f2l)).toJson());
     } else {
       List<String> cases = pickedCases();
       if (cases.isEmpty()) {
@@ -475,7 +508,7 @@ public class DrillSetupActivity extends NanoTimerActivity
       intent.putExtra(DrillActivity.EXTRA_SPEC, new DrillSpec("local-" + family() + "picked",
           DrillSpec.Type.CASE_EXECUTION, DrillSpec.Delivery.VIRTUAL, cases,
           DrillSpec.Selection.ROUND_ROBIN, repCount, 0,
-          getString(practice.getSelection() == PRACTICE_OLL ? R.string.drill_practice_oll
+          getString(chosenPractice() == PRACTICE_OLL ? R.string.drill_practice_oll
               : R.string.drill_practice_pll)).toJson());
     }
     intent.putExtra(DrillScreenActivity.EXTRA_RECORDING, isRecording());
