@@ -76,6 +76,11 @@ public class DrillSetupActivity extends NanoTimerActivity
   private static final int[] PRACTICE_ORDER =
       {PRACTICE_PLL, PRACTICE_OLL, PRACTICE_F2L, PRACTICE_CROSS};
 
+  /** Which F2L pairs a drill deals, in the order the segments are drawn. */
+  private static final int F2L_BASIC = 0;
+  private static final int F2L_ADVANCED = 1;
+  private static final int F2L_BOTH = 2;
+
   private static final int[] REP_COUNTS = {10, 20, 30, 50};
 
   /** The last segment of the reps row: as many reps as there are cases, so each comes up once. */
@@ -95,12 +100,14 @@ public class DrillSetupActivity extends NanoTimerActivity
   private static final String KEY_RECORDING = "recording";
   private static final String KEY_PLANNING_ON = "planning_on";
   private static final String KEY_PLANNING_SECONDS = "planning_seconds";
+  private static final String KEY_F2L_CASES = "f2l_cases";
 
   private static final String FAMILY_PLL = "pll_";
   private static final String FAMILY_OLL = "oll_";
 
   private SegmentedControl practice;
   private SegmentedControl reps;
+  private SegmentedControl f2lCases;
   private Switch swRecord;
   private SmartCubeChip smartCubeChip;
   private Switch swPlanning;
@@ -176,6 +183,17 @@ public class DrillSetupActivity extends NanoTimerActivity
             Options.INSTANCE.setDrillChoice(KEY_REPS, index);
           }
         });
+
+    f2lCases = new SegmentedControl(this, (LinearLayout) findViewById(R.id.llDrillF2lCases),
+        new String[] {getString(R.string.drill_f2l_basic), getString(R.string.drill_f2l_advanced),
+            getString(R.string.drill_f2l_both)},
+        new SegmentedControl.Listener() {
+          @Override
+          public void onSegmentPicked(int index) {
+            Options.INSTANCE.setDrillChoice(KEY_F2L_CASES, index);
+          }
+        });
+    f2lCases.setSelection(Options.INSTANCE.getDrillChoice(KEY_F2L_CASES, F2L_BOTH));
 
     swRecord.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
       @Override
@@ -285,6 +303,7 @@ public class DrillSetupActivity extends NanoTimerActivity
     boolean cross = picked == PRACTICE_CROSS;
     boolean f2l = picked == PRACTICE_F2L;
     crossOptions.setVisibility(cross ? View.VISIBLE : View.GONE);
+    findViewById(R.id.llDrillF2lOptions).setVisibility(f2l ? View.VISIBLE : View.GONE);
     planningSeconds.setVisibility(cross && swPlanning.isChecked() ? View.VISIBLE : View.GONE);
     int hint;
     if (cross) {
@@ -494,7 +513,7 @@ public class DrillSetupActivity extends NanoTimerActivity
       intent = new Intent(this, DrillActivity.class);
       intent.putExtra(DrillActivity.EXTRA_LAYER_FACE, layerFace().name());
       intent.putExtra(DrillActivity.EXTRA_SPEC, new DrillSpec("local-f2l",
-          DrillSpec.Type.F2L_PAIR, DrillSpec.Delivery.VIRTUAL, F2lPairCases.codes(),
+          DrillSpec.Type.F2L_PAIR, DrillSpec.Delivery.VIRTUAL, pickedPairs(),
           DrillSpec.Selection.WEIGHTED, REP_COUNTS[reps.getSelection()], 0,
           getString(R.string.drill_practice_f2l)).toJson());
     } else {
@@ -515,6 +534,17 @@ public class DrillSetupActivity extends NanoTimerActivity
     }
     intent.putExtra(DrillScreenActivity.EXTRA_RECORDING, isRecording());
     startActivity(intent);
+  }
+
+  private List<String> pickedPairs() {
+    switch (f2lCases.getSelection()) {
+      case F2L_BASIC:
+        return F2lPairCases.basicCodes();
+      case F2L_ADVANCED:
+        return F2lPairCases.stuckCodes();
+      default:
+        return F2lPairCases.codes();
+    }
   }
 
   /** The settings screen's number dialog, so a limit is picked here the way any other one is. */

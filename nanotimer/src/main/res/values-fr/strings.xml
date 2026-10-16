@@ -1053,6 +1053,9 @@
   <string name="case_algorithms_case_open">Algorithmes pour ce cas</string>
   <string name="drill_case_algorithm">Alg</string>
   <string name="drill_reps">Essais</string>
+  <string name="drill_f2l_basic">Basiques</string>
+  <string name="drill_f2l_advanced">Avancés</string>
+  <string name="drill_f2l_both">Les deux</string>
   <string name="drill_reps_all">Tous</string>
   <string name="drill_record">Enregistrer les temps</string>
   <string name="drill_summary_recorded">Enregistré</string>

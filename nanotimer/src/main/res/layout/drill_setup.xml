@@ -100,6 +100,28 @@
       </LinearLayout>
     </LinearLayout>
 
+    <!-- Only for an F2L drill: basic pairs, advanced ones with a piece in another slot, or both. -->
+    <LinearLayout
+       android:id="@+id/llDrillF2lOptions"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="vertical"
+       android:visibility="gone">
+
+      <TextView
+         style="@style/DialogSectionLabel"
+         android:layout_marginTop="18dp"
+         android:text="@string/drill_cases"/>
+
+      <LinearLayout
+         android:id="@+id/llDrillF2lCases"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:background="@drawable/view_segment_group"
+         android:orientation="horizontal"
+         android:padding="3dp"/>
+    </LinearLayout>
+
     <TextView
        style="@style/DialogSectionLabel"
        android:layout_marginTop="18dp"

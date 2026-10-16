@@ -30,6 +30,11 @@ public final class F2lPairCases {
     return ALL;
   }
 
+  /** The cases with neither piece in another slot. */
+  public static List<String> basicCodes() {
+    return ALL.subList(0, BASIC);
+  }
+
   /** The cases with a piece trapped in another slot. */
   public static List<String> stuckCodes() {
     return STUCK;
