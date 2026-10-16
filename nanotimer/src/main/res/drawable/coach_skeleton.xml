@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A line of the plan the install does not have yet. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+   android:shape="rectangle">
+  <solid android:color="#4A525A"/>
+  <corners android:radius="7dp"/>
+</shape>

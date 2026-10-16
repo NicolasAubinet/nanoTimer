@@ -9,8 +9,8 @@
 
   <com.cube.nanotimer.gui.widget.LastLayerCaseView
      android:id="@+id/vCoachPracticeChart"
-     android:layout_width="38dp"
-     android:layout_height="38dp"/>
+     android:layout_width="48dp"
+     android:layout_height="48dp"/>
 
   <TextView
      android:id="@+id/tvCoachPracticeName"

@@ -51,6 +51,6 @@
      android:paddingLeft="@dimen/space_m"
      android:paddingRight="@dimen/space_m"
      android:text="@string/coach_pair_show"
-     style="@style/DialogActionButton"/>
+     style="@style/AccentGhostButton"/>
 
 </LinearLayout>

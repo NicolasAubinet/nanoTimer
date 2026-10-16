@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The play mark on a drill button, in the button's own text colour. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+   android:width="18dp"
+   android:height="18dp"
+   android:viewportWidth="24"
+   android:viewportHeight="24">
+  <path
+     android:fillColor="#FFFFFFFF"
+     android:pathData="M8,5 L19,12 L8,19 Z"/>
+</vector>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A focus named on the plan's card: its number in its step's colour and a short name. Taps to it. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="wrap_content"
+   android:layout_height="34dp"
+   android:layout_marginEnd="6dp"
+   android:layout_marginRight="6dp"
+   android:background="@drawable/coach_hero_chip"
+   android:gravity="center_vertical"
+   android:orientation="horizontal"
+   android:paddingLeft="8dp"
+   android:paddingRight="10dp">
+
+  <TextView
+     android:id="@+id/tvCoachChipRank"
+     android:layout_width="18dp"
+     android:layout_height="18dp"
+     android:background="@drawable/coach_rank_badge"
+     android:fontFamily="@font/roboto"
+     android:gravity="center"
+     android:textColor="@color/on_accent"
+     android:textSize="11sp"
+     android:textStyle="bold"/>
+
+  <TextView
+     android:id="@+id/tvCoachChipName"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_marginLeft="7dp"
+     android:layout_marginStart="7dp"
+     android:maxLines="1"
+     android:textColor="@color/white"
+     android:textSize="13sp"/>
+</LinearLayout>

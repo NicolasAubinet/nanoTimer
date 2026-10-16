@@ -44,8 +44,8 @@ import java.util.List;
  *
  * <p>An install that has the coach reads a card above everything else: when the next plan comes
  * on the plans' own solve type, where the plans go on another one, and that they are paused with
- * no solve type to carry them. One whose access has ended reads there that it has, with the way
- * back to the purchase.
+ * no solve type to carry them. The countdown moves into the plan's own card once there is a plan.
+ * One whose access has ended reads there that it has, with the way back to the purchase.
  *
  * <p>An install that never had the coach reads the offer inside the card that explains a plan:
  * how far it is from the solves a first plan needs, then the button that opens the purchase.
@@ -64,6 +64,9 @@ public class CoachPlanStatus {
   private final CoachBilling billing;
   /** Once per screen: a check that ends without a plan must not start the next one. */
   private boolean checked;
+  /** Where the card sits on its own, and where it moves while a written plan is on screen. */
+  private final int homeIndex;
+  private ViewGroup dock;
 
   /**
    * @param tab the Plan tab's own layout
@@ -74,15 +77,29 @@ public class CoachPlanStatus {
     this.activity = activity;
     this.tab = tab;
     this.status = tab.findViewById(R.id.llCoachPlanStatus);
+    this.homeIndex = tab.indexOfChild(status);
     this.solveType = solveType;
     this.client = client;
     this.billing = billing;
   }
 
+  /**
+   * Where the countdown to the next plan goes while a written plan is on screen: into that plan's
+   * card. Everything else the card says stays on top of the tab.
+   *
+   * @param dock the plan card's slot, or null when no plan is shown
+   */
+  public void dockIn(ViewGroup dock) {
+    if (this.dock != null && dock == null) {
+      place(false);
+    }
+    this.dock = dock;
+  }
+
   /** Reads the access and the schedule again and redraws. Main thread only. */
   public void refresh() {
     if (client == null) {
-      status.setVisibility(View.GONE);
+      hide();
       showNoOffer();
       return;
     }
@@ -106,7 +123,7 @@ public class CoachPlanStatus {
       } else if (cfop) {
         loadSchedule();
       } else {
-        status.setVisibility(View.GONE);
+        hide();
       }
     } else if (client.accessEnded() || Options.INSTANCE.isCoachPlansOn()) {
       // Weekly plans that are on with nothing to let the install in: it was let in before.
@@ -114,10 +131,10 @@ public class CoachPlanStatus {
       if (cfop) {
         showEnded();
       } else {
-        status.setVisibility(View.GONE);
+        hide();
       }
     } else {
-      status.setVisibility(View.GONE);
+      hide();
       if (CoachPlans.eligible(solveType)) {
         loadOffer();
       } else {
@@ -263,6 +280,7 @@ public class CoachPlanStatus {
       }
     }
     showCard(false);
+    place(true);
     TextView label = status.findViewById(R.id.tvCoachPlanStatusLabel);
     label.setVisibility(value == null ? View.GONE : View.VISIBLE);
     label.setText(schedule.isFirst() ? R.string.coach_strip_first : R.string.coach_strip_next);
@@ -360,6 +378,7 @@ public class CoachPlanStatus {
 
   /** The card with nothing in it but its first line, which the caller fills the rest of. */
   private void showCard(boolean ended) {
+    place(false);
     status.setVisibility(View.VISIBLE);
     status.setBackgroundResource(ended ? R.drawable.coach_card_ended : R.drawable.analysis_card);
     status.findViewById(R.id.pbCoachPlanStatus).setVisibility(View.GONE);
@@ -367,6 +386,47 @@ public class CoachPlanStatus {
     status.findViewById(R.id.pbCoachPlanMeter).setVisibility(View.GONE);
     status.findViewById(R.id.tvCoachPlanStatusBody).setVisibility(View.GONE);
     status.findViewById(R.id.buCoachPlanStatus).setVisibility(View.GONE);
+  }
+
+  private void hide() {
+    place(false);
+    status.setVisibility(View.GONE);
+  }
+
+  /**
+   * Moves the card into the plan's card, where it loses its own ground and says what the next plan
+   * will answer, or back to the top of the tab.
+   */
+  private void place(boolean docked) {
+    ViewGroup target = docked && dock != null ? dock : tab;
+    if (status.getParent() != target) {
+      ((ViewGroup) status.getParent()).removeView(status);
+      if (target == tab) {
+        tab.addView(status, homeIndex);
+      } else {
+        target.addView(status);
+      }
+    }
+    boolean inDock = target != tab;
+    if (dock != null) {
+      dock.setVisibility(inDock ? View.VISIBLE : View.GONE);
+    }
+    status.findViewById(R.id.tvCoachPlanStatusLoop)
+        .setVisibility(inDock ? View.VISIBLE : View.GONE);
+    ViewGroup.MarginLayoutParams margins = (ViewGroup.MarginLayoutParams) status.getLayoutParams();
+    margins.bottomMargin =
+        inDock ? 0 : activity.getResources().getDimensionPixelSize(R.dimen.space_m);
+    status.setLayoutParams(margins);
+    if (inDock) {
+      status.setBackground(null);
+      status.setPadding(0, dp(12), 0, 0);
+    } else {
+      status.setPadding(dp(16), dp(12), dp(16), dp(14));
+    }
+  }
+
+  private int dp(int value) {
+    return Math.round(value * activity.getResources().getDisplayMetrics().density);
   }
 
   private TextView showTitle(String title) {

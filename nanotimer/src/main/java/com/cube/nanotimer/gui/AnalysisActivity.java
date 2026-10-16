@@ -104,9 +104,6 @@ public class AnalysisActivity extends NanoTimerActivity {
   private static final int TAB_CASES = 1;
   public static final int TAB_PLAN = 2;
 
-  /** What a plan says, in the order it says it, on a tab that cannot yet say any of it. */
-  private static final int[] PLAN_POINTS = {R.string.analysis_plan_point_one,
-      R.string.analysis_plan_point_two, R.string.analysis_plan_point_three};
 
   /** How the shares are written, which is a whole number of points either way. */
   private static final String PERCENT_FORMAT = "%d%%";
@@ -211,7 +208,6 @@ public class AnalysisActivity extends NanoTimerActivity {
     headings.rankableLabel(false); // by step is solving order, cross first, as the delta card reads
     cases = new AnalysisCases(this, findViewById(R.id.llAnalysisCases), casesListener());
     cases.setFamily(getIntent().getStringExtra(EXTRA_FAMILY));
-    showPlanPoints();
     planView = new CoachPlanView(this, (LinearLayout) findViewById(R.id.llAnalysisPlanAreas));
     wireRead();
     wireSample();
@@ -704,22 +700,6 @@ public class AnalysisActivity extends NanoTimerActivity {
         .setVisibility(sampling && !ctaDismissed ? View.VISIBLE : View.GONE);
   }
 
-  /**
-   * What a plan would say, which is all this tab can say. The three points are the shapes a plan
-   * takes, never an example of one: a plan the app did not write, drawn beside figures it did, is
-   * the one arrangement that can make a true number look invented.
-   */
-  private void showPlanPoints() {
-    LinearLayout points = findViewById(R.id.llAnalysisPlanPoints);
-    LayoutInflater inflater = LayoutInflater.from(this);
-    for (int i = 0; i < PLAN_POINTS.length; i++) {
-      View point = inflater.inflate(R.layout.analysis_plan_point, points, false);
-      ((TextView) point.findViewById(R.id.tvAnalysisPointRank)).setText(String.valueOf(i + 1));
-      ((TextView) point.findViewById(R.id.tvAnalysisPointText)).setText(PLAN_POINTS[i]);
-      points.addView(point);
-    }
-  }
-
   private void wireRead() {
     coachClient = CoachClient.configured(this);
     billing = CoachBilling.of(this);
@@ -836,11 +816,19 @@ public class AnalysisActivity extends NanoTimerActivity {
    * screen, which costs the service no model call.
    */
   private void showPractice(boolean offered) {
+    View preview = findViewById(R.id.llAnalysisPlanPreview);
     if (!offered) {
+      preview.setVisibility(View.GONE);
       findViewById(R.id.llAnalysisPractice).setVisibility(View.GONE);
       return;
     }
-    if (!coachClient.hasAccess()) {
+    // A plan is never drawn as an example: what the install would get is drawn blank instead.
+    boolean locked = !coachClient.hasAccess();
+    if (locked && preview.getVisibility() != View.VISIBLE) {
+      planView.setPreview(preview);
+    }
+    preview.setVisibility(locked ? View.VISIBLE : View.GONE);
+    if (locked) {
       practiceAsked = false; // the sets are asked for once the coach lets the install in
       showPracticeLocked(true);
       findViewById(R.id.llAnalysisPractice).setVisibility(View.VISIBLE);
@@ -948,6 +936,8 @@ public class AnalysisActivity extends NanoTimerActivity {
    * it was a true reading when written, and its date says as of when.
    */
   private void showPlan(StoredCoachPlan stored) {
+    // A written plan's card takes the countdown to the next one.
+    planStatus.dockIn(stored == null ? null : (ViewGroup) findViewById(R.id.llAnalysisPlanDock));
     showRead();
     planView.setPlan(stored);
     int written = stored == null ? View.GONE : View.VISIBLE;
@@ -958,12 +948,7 @@ public class AnalysisActivity extends NanoTimerActivity {
       findViewById(R.id.tvAnalysisPlanUncited).setVisibility(View.GONE);
       return;
     }
-    String headline = stored.getPlan().getHeadline();
-    TextView tvHeadline = findViewById(R.id.tvAnalysisPlanHeadline);
-    tvHeadline.setText(headline);
-    tvHeadline.setVisibility(headline == null || headline.isEmpty() ? View.GONE : View.VISIBLE);
-    ((TextView) findViewById(R.id.tvAnalysisPlanDate)).setText(getString(R.string.coach_written,
-        DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date(stored.getWrittenAt()))));
+    planView.setHero(findViewById(R.id.llAnalysisPlanWritten), stored);
     // A figure nobody sent and a case nobody has are the same complaint to a reader, so one line.
     int invented = stored.uncited().size() + stored.unknownCodes().size();
     TextView tvUncited = findViewById(R.id.tvAnalysisPlanUncited);

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- What the coach is, for an install without it: the accent's tone, lit at the edge. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+   android:shape="rectangle">
+  <gradient
+     android:angle="315"
+     android:endColor="#34444C"
+     android:startColor="#3F5560"/>
+  <stroke android:width="1dp" android:color="#406CCCEC"/>
+  <corners android:radius="16dp"/>
+</shape>

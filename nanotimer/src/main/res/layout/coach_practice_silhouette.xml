@@ -8,8 +8,8 @@
    android:orientation="vertical">
 
   <ImageView
-     android:layout_width="38dp"
-     android:layout_height="38dp"
+     android:layout_width="48dp"
+     android:layout_height="48dp"
      android:importantForAccessibility="no"
      android:src="@drawable/coach_practice_silhouette"/>
 

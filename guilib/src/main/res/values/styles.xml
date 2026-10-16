@@ -579,6 +579,21 @@
     <item name="android:background">@drawable/hero_start_button</item>
   </style>
 
+  <!-- The one thing a card asks you to do, in the accent like Start. -->
+  <style name="AccentActionButton" parent="DialogActionButton">
+    <item name="android:layout_height">48dp</item>
+    <item name="android:textSize">15.5sp</item>
+    <item name="android:textColor">@color/on_accent</item>
+    <item name="android:background">@drawable/accent_action_button</item>
+  </style>
+
+  <!-- A secondary action beside an accent one: the accent as an outline. -->
+  <style name="AccentGhostButton" parent="DialogActionButton">
+    <item name="android:layout_height">46dp</item>
+    <item name="android:textColor">@color/lightblue</item>
+    <item name="android:background">@drawable/accent_ghost_button</item>
+  </style>
+
   <!-- Rounded tonal action button used in dialogs (+2 / DNF / Delete). -->
   <style name="DialogActionButton" parent="CustomButton">
     <item name="android:layout_height">44dp</item>

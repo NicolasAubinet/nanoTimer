@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The figure a focus leads with, inset like the main screen's statistics. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+   android:shape="rectangle">
+  <solid android:color="@color/hero_inset"/>
+  <corners android:radius="14dp"/>
+</shape>

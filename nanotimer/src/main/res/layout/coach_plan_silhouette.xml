@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The plan an install without the coach would get: the real card shapes, steps and kinds of focus,
+     with every figure, case and sentence left blank. Nothing in it is invented. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:layout_marginTop="20dp"
+   android:orientation="vertical">
+
+  <LinearLayout
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginBottom="10dp"
+     android:gravity="center_vertical"
+     android:orientation="horizontal">
+
+    <TextView
+       android:layout_width="0dp"
+       android:layout_height="wrap_content"
+       android:layout_weight="1"
+       android:fontFamily="@font/roboto_medium"
+       android:letterSpacing="0.08"
+       android:text="@string/coach_preview_title"
+       android:textAllCaps="true"
+       android:textColor="@color/secondary_text"
+       android:textSize="12.5sp"/>
+
+    <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:background="@drawable/coach_practice_locked_chip"
+       android:drawableLeft="@drawable/ic_coach_lock"
+       android:drawableStart="@drawable/ic_coach_lock"
+       android:drawablePadding="5dp"
+       android:gravity="center_vertical"
+       android:paddingLeft="10dp"
+       android:paddingRight="10dp"
+       android:paddingTop="4dp"
+       android:paddingBottom="4dp"
+       android:text="@string/coach_practice_locked"
+       android:textColor="@color/white"
+       android:textSize="12.5sp"/>
+  </LinearLayout>
+
+  <com.cube.nanotimer.gui.widget.ShimmerLayout
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:background="@drawable/coach_plan_hero">
+
+    <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="vertical"
+       android:padding="16dp">
+
+      <LinearLayout
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:gravity="center_vertical"
+         android:orientation="horizontal">
+
+        <ImageView
+           android:layout_width="44dp"
+           android:layout_height="44dp"
+           android:background="@drawable/coach_hero_icon_tile"
+           android:importantForAccessibility="no"
+           android:padding="10dp"
+           android:src="@drawable/ic_coach_target"/>
+
+        <LinearLayout
+           android:layout_width="0dp"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="12dp"
+           android:layout_marginStart="12dp"
+           android:layout_weight="1"
+           android:orientation="vertical">
+
+          <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:fontFamily="@font/roboto"
+             android:text="@string/coach_plan_title"
+             android:textColor="@color/white"
+             android:textSize="20sp"
+             android:textStyle="bold"/>
+
+          <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="@string/coach_preview_when"
+             android:textColor="@color/secondary_text"
+             android:textSize="12.5sp"/>
+        </LinearLayout>
+      </LinearLayout>
+
+      <LinearLayout
+         android:layout_width="match_parent"
+         android:layout_height="40dp"
+         android:layout_marginTop="14dp"
+         android:alpha="0.6"
+         android:background="@drawable/coach_win_line"
+         android:gravity="center_vertical"
+         android:orientation="horizontal"
+         android:paddingLeft="12dp"
+         android:paddingRight="12dp">
+
+        <ImageView
+           android:layout_width="18dp"
+           android:layout_height="18dp"
+           android:importantForAccessibility="no"
+           android:src="@drawable/ic_trend_up"/>
+
+        <View
+           android:layout_width="0dp"
+           android:layout_height="12dp"
+           android:layout_marginLeft="10dp"
+           android:layout_marginRight="60dp"
+           android:layout_weight="1"
+           android:background="@drawable/coach_skeleton"
+           android:backgroundTint="#4D7BD983"/>
+      </LinearLayout>
+
+      <View
+         android:layout_width="match_parent"
+         android:layout_height="16dp"
+         android:layout_marginTop="14dp"
+         android:layout_marginRight="10dp"
+         android:background="@drawable/coach_skeleton"/>
+
+      <View
+         android:layout_width="match_parent"
+         android:layout_height="16dp"
+         android:layout_marginTop="10dp"
+         android:layout_marginRight="40dp"
+         android:background="@drawable/coach_skeleton"/>
+
+      <View
+         android:layout_width="150dp"
+         android:layout_height="16dp"
+         android:layout_marginTop="10dp"
+         android:background="@drawable/coach_skeleton"/>
+
+      <!-- One blank chip per focus drawn under the card. -->
+      <LinearLayout
+         android:id="@+id/llCoachPreviewChips"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="14dp"
+         android:orientation="horizontal"/>
+    </LinearLayout>
+  </com.cube.nanotimer.gui.widget.ShimmerLayout>
+
+  <!-- The blank focus cards. -->
+  <LinearLayout
+     android:id="@+id/llCoachPreviewAreas"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:orientation="vertical"/>
+</LinearLayout>

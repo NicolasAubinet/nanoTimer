@@ -11,8 +11,8 @@
    android:layout_height="wrap_content"
    android:orientation="vertical">
 
-  <!-- Where the coach stands, above everything else: when the next plan comes, where the plans
-       go, or that the access has ended. Gone for an install that never had the coach, which reads
+  <!-- Where the coach stands, above everything else: when the next plan comes (docked into the
+       plan's card while there is one), where the plans go, or that the access has ended. Gone for an install that never had the coach, which reads
        the offer in the card further down. -->
   <LinearLayout
      android:id="@+id/llCoachPlanStatus"
@@ -76,6 +76,17 @@
        android:progressDrawable="@drawable/drill_progress"
        android:visibility="gone"/>
 
+    <!-- Only docked in a plan's card: what the next plan will answer. -->
+    <TextView
+       android:id="@+id/tvCoachPlanStatusLoop"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="8dp"
+       android:text="@string/coach_plan_loop"
+       android:textColor="@color/secondary_text"
+       android:textSize="12.5sp"
+       android:visibility="gone"/>
+
     <TextView
        android:id="@+id/tvCoachPlanStatusBody"
        android:layout_width="match_parent"
@@ -93,30 +104,119 @@
        android:visibility="gone"/>
   </LinearLayout>
 
-  <!-- A written plan. The headline is the coach's own sentence, which is the part being paid for. -->
+  <!-- A written plan's card: the coach's headline with what went well split off it, a chip per
+       focus, and the countdown to the next plan once the status card is docked into it. -->
   <LinearLayout
      android:id="@+id/llAnalysisPlanWritten"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
+     android:background="@drawable/coach_plan_hero"
      android:orientation="vertical"
+     android:paddingLeft="16dp"
+     android:paddingRight="16dp"
+     android:paddingTop="16dp"
+     android:paddingBottom="14dp"
      android:visibility="gone">
+
+    <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:gravity="center_vertical"
+       android:orientation="horizontal">
+
+      <ImageView
+         android:layout_width="44dp"
+         android:layout_height="44dp"
+         android:background="@drawable/coach_hero_icon_tile"
+         android:importantForAccessibility="no"
+         android:padding="10dp"
+         android:src="@drawable/ic_coach_target"/>
+
+      <LinearLayout
+         android:layout_width="0dp"
+         android:layout_height="wrap_content"
+         android:layout_marginLeft="12dp"
+         android:layout_marginStart="12dp"
+         android:layout_weight="1"
+         android:orientation="vertical">
+
+        <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:fontFamily="@font/roboto"
+           android:text="@string/coach_plan_title"
+           android:textColor="@color/white"
+           android:textSize="20sp"
+           android:textStyle="bold"/>
+
+        <TextView
+           android:id="@+id/tvAnalysisPlanDate"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:textColor="@color/secondary_text"
+           android:textSize="12.5sp"/>
+      </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+       android:id="@+id/tvAnalysisPlanWin"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="14dp"
+       android:background="@drawable/coach_win_line"
+       android:drawableLeft="@drawable/ic_trend_up"
+       android:drawableStart="@drawable/ic_trend_up"
+       android:drawablePadding="10dp"
+       android:fontFamily="@font/roboto_medium"
+       android:lineSpacingMultiplier="1.15"
+       android:paddingLeft="12dp"
+       android:paddingRight="12dp"
+       android:paddingTop="10dp"
+       android:paddingBottom="10dp"
+       android:textColor="@color/green_soft"
+       android:textSize="14sp"
+       android:visibility="gone"/>
 
     <TextView
        android:id="@+id/tvAnalysisPlanHeadline"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
+       android:layout_marginTop="12dp"
        android:fontFamily="@font/roboto_medium"
        android:lineSpacingMultiplier="1.15"
        android:textColor="@color/white"
        android:textSize="19sp"/>
 
-    <TextView
-       android:id="@+id/tvAnalysisPlanDate"
+    <!-- One coach_hero_chip per focus, scrolling sideways when they do not fit. -->
+    <HorizontalScrollView
+       android:id="@+id/hsAnalysisPlanChips"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_marginTop="4dp"
-       android:textColor="@color/secondary_text"
-       android:textSize="12.5sp"/>
+       android:layout_marginTop="14dp"
+       android:overScrollMode="never"
+       android:scrollbars="none">
+
+      <LinearLayout
+         android:id="@+id/llAnalysisPlanChips"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:orientation="horizontal"/>
+    </HorizontalScrollView>
+
+    <!-- Where the status card moves while it counts down to the next plan. -->
+    <LinearLayout
+       android:id="@+id/llAnalysisPlanDock"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="14dp"
+       android:orientation="vertical"
+       android:visibility="gone">
+
+      <View
+         android:layout_width="match_parent"
+         android:layout_height="1dp"
+         android:background="@color/hero_divider"/>
+    </LinearLayout>
   </LinearLayout>
 
   <LinearLayout
@@ -145,17 +245,21 @@
     <LinearLayout
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:background="@drawable/analysis_card"
+       android:background="@drawable/coach_offer_card"
        android:orientation="vertical"
-       android:padding="16dp">
+       android:paddingLeft="16dp"
+       android:paddingRight="16dp"
+       android:paddingTop="18dp"
+       android:paddingBottom="16dp">
 
       <TextView
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:fontFamily="@font/roboto_medium"
+         android:fontFamily="@font/roboto"
          android:text="@string/analysis_plan_headline"
          android:textColor="@color/white"
-         android:textSize="17sp"/>
+         android:textSize="19sp"
+         android:textStyle="bold"/>
 
       <TextView
          android:layout_width="match_parent"
@@ -165,13 +269,6 @@
          android:text="@string/analysis_plan_body"
          android:textColor="@color/secondary_text"
          android:textSize="13.5sp"/>
-
-      <LinearLayout
-         android:id="@+id/llAnalysisPlanPoints"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_marginTop="14dp"
-         android:orientation="vertical"/>
 
       <TextView
          android:id="@+id/tvAnalysisPlanCites"
@@ -250,7 +347,7 @@
 
         <androidx.appcompat.widget.AppCompatButton
            android:id="@+id/buCoachOffer"
-           style="@style/DialogActionButton"
+           style="@style/AccentActionButton"
            android:layout_marginTop="14dp"/>
 
         <!-- What it costs after the free weeks, once Play has said. -->
@@ -266,6 +363,15 @@
            android:visibility="gone"/>
       </LinearLayout>
     </LinearLayout>
+
+    <!-- For an install without the coach: the plan it would get, with nothing of it filled in. -->
+    <include
+       android:id="@+id/llAnalysisPlanPreview"
+       layout="@layout/coach_plan_silhouette"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="20dp"
+       android:visibility="gone"/>
 
     <!-- The honest line: the other two tabs are not the bait. -->
     <TextView

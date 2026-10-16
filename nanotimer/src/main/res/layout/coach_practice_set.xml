@@ -4,7 +4,7 @@
    android:layout_width="match_parent"
    android:layout_height="wrap_content"
    android:layout_marginTop="@dimen/space_m"
-   android:background="@drawable/coach_practice_card"
+   android:background="@drawable/coach_focus_card"
    android:orientation="vertical"
    android:padding="16dp">
 
@@ -26,7 +26,7 @@
 
   <androidx.appcompat.widget.AppCompatButton
      android:id="@+id/buCoachPracticeDrill"
-     android:layout_marginTop="@dimen/space_s"
-     style="@style/DialogActionButton"/>
+     android:layout_marginTop="@dimen/space_m"
+     style="@style/AccentGhostButton"/>
 
 </LinearLayout>

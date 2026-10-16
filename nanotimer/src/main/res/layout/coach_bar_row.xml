@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One side of a focus's comparison: what it is, its bar to the card's one scale, and its figure. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:gravity="center_vertical"
+   android:orientation="horizontal"
+   android:paddingTop="3dp"
+   android:paddingBottom="3dp">
+
+  <TextView
+     android:id="@+id/tvCoachBarLabel"
+     android:layout_width="90dp"
+     android:layout_height="wrap_content"
+     android:ellipsize="end"
+     android:maxLines="1"
+     android:textColor="@color/secondary_text"
+     android:textSize="12.5sp"/>
+
+  <LinearLayout
+     android:id="@+id/llCoachBarTrack"
+     android:layout_width="0dp"
+     android:layout_height="10dp"
+     android:layout_marginLeft="8dp"
+     android:layout_marginRight="10dp"
+     android:layout_weight="1"
+     android:background="@drawable/coach_bar_track"
+     android:orientation="horizontal">
+
+    <View
+       android:id="@+id/vCoachBarFill"
+       android:layout_width="0dp"
+       android:layout_height="match_parent"
+       android:background="@drawable/coach_bar"/>
+
+    <View
+       android:id="@+id/vCoachBarRest"
+       android:layout_width="0dp"
+       android:layout_height="match_parent"/>
+  </LinearLayout>
+
+  <TextView
+     android:id="@+id/tvCoachBarValue"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:fontFeatureSettings="tnum"
+     android:gravity="end"
+     android:minWidth="38dp"
+     android:textColor="@color/secondary_text"
+     android:textSize="12.5sp"/>
+</LinearLayout>

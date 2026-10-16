@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The week's plan: the hub's card, lit from its top corner in the accent. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <item>
+    <shape android:shape="rectangle">
+      <solid android:color="@color/hero_card"/>
+      <corners android:radius="16dp"/>
+    </shape>
+  </item>
+  <item>
+    <shape android:shape="rectangle">
+      <gradient
+         android:centerX="0"
+         android:centerY="0"
+         android:endColor="#006CCCEC"
+         android:gradientRadius="100%p"
+         android:startColor="#246CCCEC"
+         android:type="radial"/>
+      <corners android:radius="16dp"/>
+    </shape>
+  </item>
+</layer-list>

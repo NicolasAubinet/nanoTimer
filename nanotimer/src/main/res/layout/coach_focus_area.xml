@@ -1,22 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One thing to work on: what kind of problem it is, the cases or the sentence that says so, and
-     something to practise it with when there is anything to practise. The button is inside the card
-     rather than under the plan, because a drill belongs to the area that prescribed it. -->
+<!-- One thing to work on: its number and step, the figure it leads with and what that figure is
+     against, what the coach said, the cases, and something to practise it with when there is
+     anything to practise. The button is inside the card rather than under the plan, because a drill
+     belongs to the area that prescribed it. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
    android:layout_width="match_parent"
    android:layout_height="wrap_content"
    android:layout_marginTop="@dimen/space_m"
-   android:background="@drawable/analysis_card"
+   android:background="@drawable/coach_focus_card"
    android:orientation="vertical"
    android:padding="16dp">
 
-  <TextView
-     android:id="@+id/tvCoachAreaTitle"
+  <LinearLayout
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
-     android:fontFamily="@font/roboto_medium"
-     android:textColor="@color/white"
-     android:textSize="16sp"/>
+     android:gravity="center_vertical"
+     android:orientation="horizontal">
+
+    <TextView
+       android:id="@+id/tvCoachAreaRank"
+       android:layout_width="26dp"
+       android:layout_height="26dp"
+       android:background="@drawable/coach_rank_badge"
+       android:fontFamily="@font/roboto"
+       android:gravity="center"
+       android:textColor="@color/on_accent"
+       android:textSize="13sp"
+       android:textStyle="bold"/>
+
+    <LinearLayout
+       android:layout_width="0dp"
+       android:layout_height="wrap_content"
+       android:layout_marginLeft="10dp"
+       android:layout_marginStart="10dp"
+       android:layout_weight="1"
+       android:orientation="vertical">
+
+      <!-- The step the focus is about, in its colour. Gone where it is about no one step. -->
+      <TextView
+         android:id="@+id/tvCoachAreaFamily"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:fontFamily="@font/roboto"
+         android:letterSpacing="0.12"
+         android:textAllCaps="true"
+         android:textSize="11.5sp"
+         android:textStyle="bold"/>
+
+      <TextView
+         android:id="@+id/tvCoachAreaTitle"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:fontFamily="@font/roboto_medium"
+         android:textColor="@color/white"
+         android:textSize="17sp"/>
+    </LinearLayout>
+  </LinearLayout>
+
+  <!-- The figure the focus leads with, from the payload. Gone for a focus with none to lead with. -->
+  <LinearLayout
+     android:id="@+id/llCoachAreaFigure"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="14dp"
+     android:background="@drawable/coach_figure_tile"
+     android:gravity="center_vertical"
+     android:minHeight="70dp"
+     android:orientation="horizontal"
+     android:paddingLeft="14dp"
+     android:paddingRight="12dp"
+     android:paddingTop="10dp"
+     android:paddingBottom="10dp"
+     android:visibility="gone">
+
+    <TextView
+       android:id="@+id/tvCoachAreaNumber"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:fontFamily="@font/roboto"
+       android:fontFeatureSettings="tnum"
+       android:includeFontPadding="false"
+       android:maxLines="1"
+       android:textColor="@color/white"
+       android:textSize="36sp"
+       android:textStyle="bold"/>
+
+    <LinearLayout
+       android:layout_width="0dp"
+       android:layout_height="wrap_content"
+       android:layout_marginLeft="14dp"
+       android:layout_marginStart="14dp"
+       android:layout_weight="1"
+       android:orientation="vertical">
+
+      <TextView
+         android:id="@+id/tvCoachAreaUnit"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:fontFamily="@font/roboto_medium"
+         android:textColor="@color/white"
+         android:textSize="13.5sp"/>
+
+      <TextView
+         android:id="@+id/tvCoachAreaSub"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="1dp"
+         android:fontFeatureSettings="tnum"
+         android:textColor="@color/secondary_text"
+         android:textSize="12.5sp"/>
+    </LinearLayout>
+
+    <com.cube.nanotimer.gui.widget.LastLayerCaseView
+       android:id="@+id/vCoachAreaChart"
+       android:layout_width="54dp"
+       android:layout_height="54dp"
+       android:layout_marginLeft="8dp"
+       android:layout_marginStart="8dp"
+       android:visibility="gone"/>
+  </LinearLayout>
+
+  <!-- The figure against what it is compared with, as bars to one scale, or one quantity split in two. -->
+  <LinearLayout
+     android:id="@+id/llCoachAreaBars"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="14dp"
+     android:orientation="vertical"
+     android:visibility="gone"/>
 
   <!-- What the coach said about it. A plan written without a model carries none, and says what it
        means with the figures under it instead. -->
@@ -24,7 +135,7 @@
      android:id="@+id/tvCoachAreaText"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
-     android:layout_marginTop="6dp"
+     android:layout_marginTop="12dp"
      android:lineSpacingMultiplier="1.2"
      android:textColor="@color/secondary_text"
      android:textSize="13.5sp"
@@ -40,8 +151,8 @@
 
   <androidx.appcompat.widget.AppCompatButton
      android:id="@+id/buCoachAreaDrill"
-     android:layout_marginTop="@dimen/space_s"
-     android:visibility="gone"
-     style="@style/DialogActionButton"/>
+     style="@style/AccentActionButton"
+     android:layout_marginTop="@dimen/space_m"
+     android:visibility="gone"/>
 
 </LinearLayout>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The coach's mark on the plan card: a target. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+   android:width="24dp"
+   android:height="24dp"
+   android:viewportWidth="24"
+   android:viewportHeight="24">
+  <path
+     android:pathData="M12,3a9,9 0,1 1,0 18a9,9 0,1 1,0 -18M12,7a5,5 0,1 0,0 10a5,5 0,1 0,0 -10"
+     android:strokeWidth="2"
+     android:strokeColor="@color/lightblue"/>
+  <path
+     android:fillColor="@color/lightblue"
+     android:pathData="M12,10.2a1.8,1.8 0,1 1,0 3.6a1.8,1.8 0,1 1,0 -3.6z"/>
+</vector>

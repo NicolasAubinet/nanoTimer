@@ -2,24 +2,39 @@ package com.cube.nanotimer.gui.widget;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
+import java.text.BreakIterator;
+import java.text.DateFormat;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
 import androidx.fragment.app.FragmentActivity;
 
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.coach.CoachPayload;
+import com.cube.nanotimer.coach.Evidence;
 import com.cube.nanotimer.coach.FocusArea;
 import com.cube.nanotimer.coach.StepShares;
 import com.cube.nanotimer.coach.StoredCoachPlan;
 import com.cube.nanotimer.drill.DrillSpec;
-import com.cube.nanotimer.session.MethodStatistics;
 import com.cube.nanotimer.gui.CrossDrillActivity;
 import com.cube.nanotimer.gui.DrillActivity;
 import com.cube.nanotimer.gui.DrillScreenActivity;
@@ -31,6 +46,7 @@ import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.coach.CoachPractice;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
+import com.cube.nanotimer.util.view.CenteredImageSpan;
 
 /**
  * A plan drawn as cards, whoever wrote it.
@@ -49,6 +65,13 @@ public class CoachPlanView {
   /** What the teaser draws: the families the service sends sets for, at a full set's size. */
   private static final String[] TEASER_FAMILIES = {"oll", "pll"};
   private static final int TEASER_CASES = 5;
+  /** The kinds of focus the preview draws blank, with the step each is coloured by. */
+  private static final FocusArea.Reason[] PREVIEW_REASONS = {FocusArea.Reason.SLOW_CASE,
+      FocusArea.Reason.RECOGNITION_HEAVY};
+  private static final String[] PREVIEW_FAMILIES = {"pll", "oll"};
+  /** The second side of a comparison, and the first part of a split: the step's colour, washed. */
+  private static final int WASH_ALPHA = 0x57;
+  private static final int SCALE = 1000;
 
   private final Activity activity;
   private final LinearLayout container;
@@ -66,8 +89,187 @@ public class CoachPlanView {
       return;
     }
     List<String> undealable = stored.getPlan().undealableDrills(stored.getPayload());
-    for (FocusArea area : stored.getPlan().getFocus()) {
-      container.addView(areaCard(area, stored.getPayload(), undealable));
+    List<FocusArea> focus = stored.getPlan().getFocus();
+    for (int i = 0; i < focus.size(); i++) {
+      container.addView(areaCard(i + 1, focus.get(i), stored.getPayload(), undealable));
+    }
+  }
+
+  /**
+   * The plan's own card: when it was read, what went well, the headline, and a chip per focus that
+   * scrolls to its card. Call after {@link #setPlan}, which draws the cards the chips scroll to.
+   */
+  public void setHero(View hero, StoredCoachPlan stored) {
+    ((TextView) hero.findViewById(R.id.tvAnalysisPlanDate)).setText(activity.getString(
+        R.string.coach_written,
+        DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date(stored.getWrittenAt()))));
+    String[] said = splitWin(stored.getPlan().getHeadline());
+    fill(hero, R.id.tvAnalysisPlanWin, said[0]);
+    fill(hero, R.id.tvAnalysisPlanHeadline, said[1]);
+    LinearLayout chips = hero.findViewById(R.id.llAnalysisPlanChips);
+    chips.removeAllViews();
+    List<FocusArea> focus = stored.getPlan().getFocus();
+    for (int i = 0; i < focus.size(); i++) {
+      chips.addView(chip(chips, i, focus.get(i), stored.getPayload()));
+    }
+    // A single focus is the card right under it, so a chip would point at nothing new.
+    hero.findViewById(R.id.hsAnalysisPlanChips)
+        .setVisibility(focus.size() > 1 ? View.VISIBLE : View.GONE);
+  }
+
+  /**
+   * A headline written to open on what went well is two sentences, the first being that, so it is
+   * split off. A one-sentence headline, which every plan before that rule has, keeps it whole.
+   *
+   * @return what went well or null, then the rest or null
+   */
+  static String[] splitWin(String headline) {
+    if (headline == null || headline.trim().isEmpty()) {
+      return new String[] {null, null};
+    }
+    String said = headline.trim();
+    BreakIterator sentences = BreakIterator.getSentenceInstance(Locale.ENGLISH);
+    sentences.setText(said);
+    int end = sentences.next();
+    if (end == BreakIterator.DONE || end >= said.length()) {
+      return new String[] {null, said};
+    }
+    return new String[] {said.substring(0, end).trim(), said.substring(end).trim()};
+  }
+
+  /**
+   * The plan an install without the coach would get, drawn blank: the plan's card with no headline
+   * and one card per kind of focus, each with its real title and step and none of its figures.
+   */
+  public void setPreview(View preview) {
+    LinearLayout chips = preview.findViewById(R.id.llCoachPreviewChips);
+    LinearLayout areas = preview.findViewById(R.id.llCoachPreviewAreas);
+    chips.removeAllViews();
+    areas.removeAllViews();
+    for (int i = 0; i < PREVIEW_REASONS.length; i++) {
+      int colour = stepColour(PREVIEW_FAMILIES[i]);
+      View chip = inflater.inflate(R.layout.coach_hero_chip, chips, false);
+      TextView rank = chip.findViewById(R.id.tvCoachChipRank);
+      rank.setText(String.valueOf(i + 1));
+      tint(rank, colour);
+      TextView name = chip.findViewById(R.id.tvCoachChipName);
+      name.setText(Utils.toSmartCubeStepLocalizedName(activity, PREVIEW_FAMILIES[i], 0));
+      chip.setClickable(false);
+      chips.addView(chip);
+      areas.addView(blankCard(areas, i + 1, PREVIEW_REASONS[i], PREVIEW_FAMILIES[i], colour));
+    }
+  }
+
+  private View blankCard(LinearLayout parent, int rank, FocusArea.Reason reason, String family,
+      int colour) {
+    // The card's own margin goes to the frame, so the light is drawn over the card alone.
+    View card = inflater.inflate(R.layout.coach_focus_area, parent, false);
+    ShimmerLayout frame = new ShimmerLayout(activity);
+    frame.setLayoutParams(card.getLayoutParams());
+    card.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+        FrameLayout.LayoutParams.WRAP_CONTENT));
+    header(card, rank, family, colour);
+    FocusArea area = new FocusArea(reason.code(), Collections.<String>emptyList(),
+        Collections.<Evidence>emptyList(), null, null);
+    ((TextView) card.findViewById(R.id.tvCoachAreaTitle)).setText(title(area));
+
+    card.findViewById(R.id.llCoachAreaFigure).setVisibility(View.VISIBLE);
+    blank(card.findViewById(R.id.tvCoachAreaNumber), 84, 34, 0);
+    card.findViewById(R.id.tvCoachAreaNumber).getBackground()
+        .setTint(ColorUtils.setAlphaComponent(colour, 0x38));
+    ((TextView) card.findViewById(R.id.tvCoachAreaUnit)).setText(
+        reason == FocusArea.Reason.SLOW_CASE ? activity.getString(R.string.coach_fig_seconds_lost)
+            : activity.getString(R.string.coach_fig_spent_looking,
+                Utils.toSmartCubeStepLocalizedName(activity, family, 0)));
+    blank(card.findViewById(R.id.tvCoachAreaSub), 120, 10, 6);
+
+    LinearLayout bars = card.findViewById(R.id.llCoachAreaBars);
+    bars.setVisibility(View.VISIBLE);
+    if (reason == FocusArea.Reason.SLOW_CASE) {
+      bars.addView(blankBar(bars, 1, colour, true));
+      bars.addView(blankBar(bars, 0.64, colour, false));
+    } else {
+      View split = split(bars, new CoachFocusFigure.Bar[] {
+          new CoachFocusFigure.Bar("", 0.55, "", false),
+          new CoachFocusFigure.Bar("", 0.45, "", true)}, colour);
+      ((View) split.findViewById(R.id.tvCoachSplitFirst).getParent()).setVisibility(View.GONE);
+      bars.addView(split);
+    }
+    TextView text = card.findViewById(R.id.tvCoachAreaText);
+    text.setVisibility(View.VISIBLE);
+    blank(text, LinearLayout.LayoutParams.MATCH_PARENT, 12, 14);
+
+    Button drill = card.findViewById(R.id.buCoachAreaDrill);
+    drill.setVisibility(View.VISIBLE);
+    drill.setBackgroundResource(R.drawable.accent_ghost_button);
+    drill.setTextColor(ContextCompat.getColor(activity, R.color.lightblue));
+    drill.setText(withMark(drill, R.drawable.ic_coach_lock, R.string.coach_drill_cases));
+    drill.setAlpha(0.6f);
+    drill.setClickable(false);
+    frame.addView(card);
+    return frame;
+  }
+
+  private View blankBar(LinearLayout parent, double share, int colour, boolean own) {
+    View row = bar(parent, new CoachFocusFigure.Bar("", share, "", own), 1, colour);
+    blank(row.findViewById(R.id.tvCoachBarLabel), 64, 10, 0);
+    return row;
+  }
+
+  /** A line of text with nothing in it, drawn as a rounded bar of the given size in dp. */
+  private void blank(View view, int width, int height, int top) {
+    float density = activity.getResources().getDisplayMetrics().density;
+    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+    params.width = width < 0 ? width : Math.round(width * density);
+    params.height = Math.round(height * density);
+    params.topMargin = Math.round(top * density);
+    view.setLayoutParams(params);
+    if (view instanceof TextView) {
+      ((TextView) view).setText(null);
+    }
+    view.setBackgroundResource(R.drawable.coach_skeleton);
+    view.getBackground().mutate();
+  }
+
+  private View chip(LinearLayout parent, final int index, FocusArea area, CoachPayload payload) {
+    View chip = inflater.inflate(R.layout.coach_hero_chip, parent, false);
+    TextView rank = chip.findViewById(R.id.tvCoachChipRank);
+    rank.setText(String.valueOf(index + 1));
+    tint(rank, colour(area));
+    ((TextView) chip.findViewById(R.id.tvCoachChipName)).setText(shortName(area, payload));
+    chip.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        if (index < container.getChildCount()) {
+          scrollTo(container.getChildAt(index));
+        }
+      }
+    });
+    return chip;
+  }
+
+  /** A focus in a word or two: its one case, else its step, else its title. */
+  private String shortName(FocusArea area, CoachPayload payload) {
+    if (area.getCodes().size() == 1
+        && payload.value("cases." + area.getCodes().get(0) + ".mean_ms") != null) {
+      return Utils.toSmartCubeCaseHeadline(activity, area.getCodes().get(0));
+    }
+    String family = CoachFocusFigure.familyOf(area);
+    return family != null ? Utils.toSmartCubeStepLocalizedName(activity, family, 0) : title(area);
+  }
+
+  private void scrollTo(View target) {
+    int y = 0;
+    View view = target;
+    ViewParent parent = view.getParent();
+    while (parent instanceof View && !(parent instanceof ScrollView)) {
+      y += view.getTop();
+      view = (View) parent;
+      parent = view.getParent();
+    }
+    if (parent instanceof ScrollView) {
+      int margin = activity.getResources().getDimensionPixelSize(R.dimen.space_m);
+      ((ScrollView) parent).smoothScrollTo(0, Math.max(y - margin, 0));
     }
   }
 
@@ -105,8 +307,8 @@ public class CoachPlanView {
         Utils.toSmartCubeStepLocalizedName(activity, set.getFamily(), 0)));
     addCaseCharts((LinearLayout) card.findViewById(R.id.llCoachPracticeCases), set.getCases());
     Button button = card.findViewById(R.id.buCoachPracticeDrill);
-    button.setText(set.getCases().size() == 1 ? R.string.coach_drill_case
-        : R.string.coach_drill_cases);
+    button.setText(withPlay(button, set.getCases().size() == 1 ? R.string.coach_drill_case
+        : R.string.coach_drill_cases));
     button.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -135,9 +337,13 @@ public class CoachPlanView {
     return name.isEmpty() ? name : name.substring(0, 1).toUpperCase(Locale.US) + name.substring(1);
   }
 
-  private View areaCard(FocusArea area, CoachPayload payload, List<String> undealable) {
+  private View areaCard(int rank, FocusArea area, CoachPayload payload, List<String> undealable) {
     View card = inflater.inflate(R.layout.coach_focus_area, container, false);
+    int colour = colour(area);
+    header(card, rank, CoachFocusFigure.familyOf(area), colour);
     ((TextView) card.findViewById(R.id.tvCoachAreaTitle)).setText(title(area));
+    CoachFocusFigure figure = CoachFocusFigure.of(activity, area, payload);
+    showFigure(card, figure, colour);
 
     String text = area.getText() != null ? area.getText() : observation(area, payload);
     TextView tvText = card.findViewById(R.id.tvCoachAreaText);
@@ -147,7 +353,9 @@ public class CoachPlanView {
     LinearLayout cases = card.findViewById(R.id.llCoachAreaCases);
     for (String code : area.getCodes()) {
       if (payload.value("cases." + code + ".mean_ms") != null) {
-        cases.addView(caseRow(cases, area, payload, code));
+        if (figure == null || !figure.coversCases) {
+          cases.addView(caseRow(cases, area, payload, code));
+        }
       } else if (payload.value("f2l_habits." + code + ".extra_moves") != null) {
         cases.addView(pairRow(cases, payload, code));
       }
@@ -155,7 +363,8 @@ public class CoachPlanView {
 
     DrillSpec drill = bindDrill(card, area, undealable);
     // A card about a step names no case, so the cases its drill deals are shown instead.
-    if (drill != null && drill.getType() != DrillSpec.Type.CROSS && cases.getChildCount() == 0) {
+    if (drill != null && drill.getType() != DrillSpec.Type.CROSS && cases.getChildCount() == 0
+        && (figure == null || !figure.coversCases)) {
       LinearLayout row = new LinearLayout(activity);
       row.setOrientation(LinearLayout.HORIZONTAL);
       row.setPadding(0, activity.getResources().getDimensionPixelSize(R.dimen.space_s), 0, 0);
@@ -165,10 +374,138 @@ public class CoachPlanView {
     return card;
   }
 
+  /** The focus's number in its step's colour, and the step over its title. */
+  private void header(View card, int rank, String family, int colour) {
+    TextView tvRank = card.findViewById(R.id.tvCoachAreaRank);
+    tvRank.setText(String.valueOf(rank));
+    tint(tvRank, colour);
+    TextView tvFamily = card.findViewById(R.id.tvCoachAreaFamily);
+    tvFamily.setText(
+        family == null ? null : Utils.toSmartCubeStepLocalizedName(activity, family, 0));
+    tvFamily.setTextColor(colour);
+    tvFamily.setVisibility(family == null ? View.GONE : View.VISIBLE);
+  }
+
+  private void showFigure(View card, CoachFocusFigure figure, int colour) {
+    LinearLayout bars = card.findViewById(R.id.llCoachAreaBars);
+    card.findViewById(R.id.llCoachAreaFigure)
+        .setVisibility(figure == null ? View.GONE : View.VISIBLE);
+    boolean compared = figure != null && (figure.split != null || !figure.bars.isEmpty());
+    bars.setVisibility(compared ? View.VISIBLE : View.GONE);
+    if (figure == null) {
+      return;
+    }
+    SpannableString number = new SpannableString(
+        figure.suffix == null ? figure.number : figure.number + figure.suffix);
+    if (figure.suffix != null) {
+      number.setSpan(new RelativeSizeSpan(0.6f), figure.number.length(), number.length(),
+          Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    }
+    ((TextView) card.findViewById(R.id.tvCoachAreaNumber)).setText(number);
+    fill(card, R.id.tvCoachAreaUnit, figure.unit);
+    fill(card, R.id.tvCoachAreaSub, figure.sub);
+    LastLayerDiagram diagram =
+        figure.chartCode == null ? null : LastLayerDiagram.forCase(figure.chartCode);
+    LastLayerCaseView chart = card.findViewById(R.id.vCoachAreaChart);
+    chart.setDiagram(diagram);
+    chart.setVisibility(diagram == null ? View.GONE : View.VISIBLE);
+    if (figure.split != null) {
+      bars.addView(split(bars, figure.split, colour));
+      return;
+    }
+    double max = 0;
+    for (CoachFocusFigure.Bar bar : figure.bars) {
+      max = Math.max(max, bar.value);
+    }
+    for (CoachFocusFigure.Bar bar : figure.bars) {
+      bars.addView(bar(bars, bar, max, colour));
+    }
+  }
+
+  /** One side of a comparison, its bar to the scale of the largest side. */
+  private View bar(LinearLayout parent, CoachFocusFigure.Bar bar, double max, int colour) {
+    View row = inflater.inflate(R.layout.coach_bar_row, parent, false);
+    int filled = max <= 0 ? 0 : (int) Math.round(SCALE * bar.value / max);
+    weigh(row.findViewById(R.id.vCoachBarFill), filled);
+    weigh(row.findViewById(R.id.vCoachBarRest), SCALE - filled);
+    row.findViewById(R.id.vCoachBarFill).getBackground().mutate()
+        .setTint(bar.own ? colour : wash(colour));
+    int ink = ContextCompat.getColor(activity, bar.own ? R.color.white : R.color.secondary_text);
+    TextView label = row.findViewById(R.id.tvCoachBarLabel);
+    label.setText(bar.label);
+    label.setTextColor(ink);
+    TextView value = row.findViewById(R.id.tvCoachBarValue);
+    value.setText(bar.shown);
+    value.setTextColor(ink);
+    if (bar.own) {
+      value.setTypeface(value.getTypeface(), Typeface.BOLD);
+    }
+    return row;
+  }
+
+  private View split(LinearLayout parent, CoachFocusFigure.Bar[] parts, int colour) {
+    View split = inflater.inflate(R.layout.coach_split_bar, parent, false);
+    int[] bars = {R.id.vCoachSplitFirst, R.id.vCoachSplitSecond};
+    int[] labels = {R.id.tvCoachSplitFirst, R.id.tvCoachSplitSecond};
+    double total = parts[0].value + parts[1].value;
+    for (int i = 0; i < 2; i++) {
+      View part = split.findViewById(bars[i]);
+      weigh(part, total <= 0 ? 1 : (int) Math.round(SCALE * parts[i].value / total));
+      part.getBackground().mutate().setTint(parts[i].own ? colour : wash(colour));
+      ((TextView) split.findViewById(labels[i])).setText(parts[i].label);
+    }
+    return split;
+  }
+
+  private static void weigh(View view, int weight) {
+    ((LinearLayout.LayoutParams) view.getLayoutParams()).weight = weight;
+  }
+
+  private static int wash(int colour) {
+    return ColorUtils.setAlphaComponent(colour, WASH_ALPHA);
+  }
+
+  private static void tint(View view, int colour) {
+    view.getBackground().mutate().setTint(colour);
+  }
+
+  private int colour(FocusArea area) {
+    return stepColour(CoachFocusFigure.familyOf(area));
+  }
+
+  /** A step's colour, as the step bar draws it, or the accent for none. */
+  private int stepColour(String family) {
+    int colour = R.color.lightblue;
+    if ("cross".equals(family)) {
+      colour = R.color.step_cross;
+    } else if ("f2l".equals(family)) {
+      colour = R.color.step_f2l;
+    } else if ("oll".equals(family)) {
+      colour = R.color.step_oll;
+    } else if ("pll".equals(family)) {
+      colour = R.color.step_pll;
+    }
+    return ContextCompat.getColor(activity, colour);
+  }
+
+  private CharSequence withPlay(Button button, int text) {
+    return withMark(button, R.drawable.ic_drill_play, text);
+  }
+
+  /** A button's text behind a small mark in the text's own colour. */
+  private CharSequence withMark(Button button, int mark, int text) {
+    SpannableString said = new SpannableString("\u00A0\u00A0" + activity.getString(text));
+    Drawable drawn = ContextCompat.getDrawable(activity, mark).mutate();
+    int size = Math.round(button.getTextSize() * 0.9f);
+    drawn.setBounds(0, 0, size, size);
+    drawn.setTint(button.getCurrentTextColor());
+    said.setSpan(new CenteredImageSpan(drawn), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    return said;
+  }
+
   /**
-   * A plan holds one area per family per kind of problem, since a drill cannot deal OLLs and PLLs
-   * together, so the two that a solver has both of arrive as two cards saying the same words. The
-   * family is what tells them apart, and it is put in the title rather than left to the charts.
+   * The kind of focus as its title says it. The step it is about is drawn over it, so it is never
+   * written into it.
    */
   private String title(FocusArea area) {
     if (area.getReason() == null) {
@@ -176,38 +513,28 @@ public class CoachPlanView {
     }
     switch (area.getReason()) {
       case SLOW_CASE:
-        return familyTitle(area, R.string.coach_reason_slow_case);
+        return activity.getString(R.string.coach_reason_slow_case);
       case SLOW_UNDER_PRESSURE:
-        return familyTitle(area, R.string.coach_reason_slow_under_pressure);
+        return activity.getString(R.string.coach_reason_slow_under_pressure);
       case RECOGNITION_HEAVY:
         return activity.getString(R.string.coach_reason_recognition_heavy);
       case TWO_LOOK_OLL:
         return activity.getString(R.string.coach_reason_two_look_oll);
       case SLOW_STEP:
-        return familyTitle(area, R.string.coach_reason_slow_step);
+        return activity.getString(R.string.coach_reason_slow_step);
       case STUCK_PIECES:
-        return familyTitle(area, R.string.coach_reason_stuck_pieces);
+        return activity.getString(R.string.coach_reason_stuck_pieces);
       case SLOW_FIRST_PAIR:
-        return familyTitle(area, R.string.coach_reason_slow_first_pair);
+        return activity.getString(R.string.coach_reason_slow_first_pair);
       case LONG_PAIR:
         return activity.getString(R.string.coach_reason_long_pair);
       case STALLING:
-        return familyTitle(area, R.string.coach_reason_stalling);
+        return activity.getString(R.string.coach_reason_stalling);
       case UNEVEN_STEP:
-        return familyTitle(area, R.string.coach_reason_uneven_step);
+        return activity.getString(R.string.coach_reason_uneven_step);
       default:
-        // Not the consistency note: it ranks across the whole history and names no family of its own.
         return activity.getString(R.string.coach_reason_inconsistent_case);
     }
-  }
-
-  private String familyTitle(FocusArea area, int reason) {
-    if (area.getCodes().isEmpty()) {
-      return activity.getString(reason);
-    }
-    String family = MethodStatistics.familyOf(area.getCodes().get(0));
-    return activity.getString(R.string.coach_area_family,
-        Utils.toSmartCubeStepLocalizedName(activity, family, 0), activity.getString(reason));
   }
 
   /**
@@ -413,8 +740,9 @@ public class CoachPlanView {
     }
     button.setVisibility(View.VISIBLE);
     // A cross drill is named by no case at all, so counting its case list would label it "these cases".
-    button.setText(spec.getType() == DrillSpec.Type.CROSS ? R.string.drill_cross_title
-        : spec.getCases().size() == 1 ? R.string.coach_drill_case : R.string.coach_drill_cases);
+    button.setText(withPlay(button, spec.getType() == DrillSpec.Type.CROSS
+        ? R.string.drill_cross_title
+        : spec.getCases().size() == 1 ? R.string.coach_drill_case : R.string.coach_drill_cases));
     button.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
