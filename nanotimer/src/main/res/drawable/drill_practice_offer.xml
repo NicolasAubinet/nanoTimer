@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The drill's offer to practise a case: filled with the accent, so it is not missed. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+   android:color="@color/white">
+  <item>
+    <shape android:shape="rectangle">
+      <solid android:color="@color/color_accent"/>
+      <corners android:radius="999dp"/>
+    </shape>
+  </item>
+</ripple>

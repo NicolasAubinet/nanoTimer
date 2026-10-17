@@ -162,29 +162,28 @@
            android:textSize="12sp"
            android:fontFeatureSettings="tnum"
            android:visibility="gone"/>
-
-        <!-- A coach drill's offer to practise the case just turned off its list. Beside the split
-             rather than under it, so the row keeps its height. Gone at the next case's first turn. -->
-        <TextView
-           android:id="@+id/tvDrillPracticeOffer"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_marginLeft="10dp"
-           android:background="@drawable/tinted_pill"
-           android:backgroundTint="@color/color_accent"
-           android:drawablePadding="4dp"
-           android:gravity="center_vertical"
-           android:paddingLeft="8dp"
-           android:paddingRight="10dp"
-           android:paddingTop="3dp"
-           android:paddingBottom="3dp"
-           android:singleLine="true"
-           android:fontFamily="@font/roboto_medium"
-           android:textColor="@color/color_accent"
-           android:textSize="12sp"
-           android:text="@string/drill_practice_offer"
-           android:visibility="gone"/>
       </LinearLayout>
+
+      <!-- A coach drill's offer to practise the case just turned off its list, on its own line so
+           it is not missed. A coach drill holds its room, so the cube does not jump. -->
+      <TextView
+         android:id="@+id/tvDrillPracticeOffer"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="8dp"
+         android:background="@drawable/drill_practice_offer"
+         android:drawablePadding="6dp"
+         android:gravity="center_vertical"
+         android:paddingLeft="12dp"
+         android:paddingRight="16dp"
+         android:paddingTop="6dp"
+         android:paddingBottom="6dp"
+         android:singleLine="true"
+         android:fontFamily="@font/roboto_medium"
+         android:textColor="@color/on_accent"
+         android:textSize="14sp"
+         android:text="@string/drill_practice_offer"
+         android:visibility="gone"/>
     </LinearLayout>
 
     <!-- Where the drill has got to, and the mode it cannot leave. On their own line above the

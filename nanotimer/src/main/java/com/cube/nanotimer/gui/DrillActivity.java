@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentResultListener;
 
 import com.cube.nanotimer.App;
@@ -45,6 +47,7 @@ import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.util.view.DrillRepFlourish;
+import com.cube.nanotimer.util.view.PracticeOfferPulse;
 import com.cube.nanotimer.util.view.StepPalette;
 
 import java.util.ArrayList;
@@ -138,7 +141,8 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     repBelow = findViewById(R.id.tvDrillLastRepBelow);
     practiceOffer = findViewById(R.id.tvDrillPracticeOffer);
     practiceAlgorithm = findViewById(R.id.tvDrillPracticeAlg);
-    Drawable bulb = ContextCompat.getDrawable(this, R.drawable.ic_case_idea);
+    Drawable bulb = ContextCompat.getDrawable(this, R.drawable.ic_case_idea).mutate();
+    bulb.setTint(ContextCompat.getColor(this, R.color.on_accent));
     int bulbSize = getResources().getDimensionPixelSize(R.dimen.drill_practice_offer_icon);
     bulb.setBounds(0, 0, bulbSize, bulbSize);
     practiceOffer.setCompoundDrawables(bulb, null, null, null);
@@ -156,6 +160,15 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
             showPracticeAlgorithm(); // a pick in the case popup is the algorithm practised
           }
         });
+    getSupportFragmentManager().registerFragmentLifecycleCallbacks(
+        new FragmentManager.FragmentLifecycleCallbacks() {
+          @Override
+          public void onFragmentViewDestroyed(FragmentManager fm, Fragment f) {
+            if (f instanceof CaseAlgorithmsDialog) {
+              restartPractice();
+            }
+          }
+        }, false);
 
     skip = findViewById(R.id.btDrillSkip);
     skip.setOnClickListener(new View.OnClickListener() {
@@ -235,6 +248,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   private void begin(DrillSpec spec, Map<String, Long> weights) {
     session = new DrillSession(spec, Utils.getRandom(), weights, layerFace);
     initRecording(spec);
+    hidePracticeOffer();
 
     if (!session.isRunnable()) {
       showUnavailable(getString(R.string.drill_no_known_cases));
@@ -318,7 +332,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     if (!cubeReady || finished || session == null || session.getCurrentCase() == null) {
       return;
     }
-    practiceOffer.setVisibility(View.GONE); // turning the next case is the answer to the offer
+    hidePracticeOffer(); // turning the next case is the answer to the offer
     cube.addMove(move.getNotation());
     DrillRep rep = session.onMove(move);
     if (rep != null) {
@@ -403,7 +417,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
    * details lights, so never for an algorithm the user muted, picked or typed in.
    */
   private void offerPractice(DrillRep rep) {
-    practiceOffer.setVisibility(View.GONE);
+    hidePracticeOffer();
     String turned = rep.getTurned();
     if (!session.getSpec().isFromCoach() || rep.isPractice() || rep.isAbandoned()
         || !CaseAlgorithms.isWorthPointingOut(rep.getCaseCode(), turned)
@@ -412,6 +426,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     }
     offeredCase = rep.getCaseCode();
     practiceOffer.setVisibility(View.VISIBLE);
+    PracticeOfferPulse.play(practiceOffer);
   }
 
   /**
@@ -422,7 +437,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     if (session == null || offeredCase == null) {
       return;
     }
-    practiceOffer.setVisibility(View.GONE);
+    hidePracticeOffer();
     lastRepRow.removeCallbacks(showNextCase); // tapped during the beat
     session.startPractice(offeredCase);
     setPracticing(true);
@@ -437,6 +452,22 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     session.endPractice();
     setPracticing(false);
     nextRep();
+  }
+
+  /** The practice case dealt afresh, since turns made behind the popup were not an attempt at it. */
+  private void restartPractice() {
+    if (finished || session == null || session.getPracticeCase() == null) {
+      return;
+    }
+    lastRepRow.removeCallbacks(showNextCase);
+    session.nextRep();
+    drawCase();
+  }
+
+  /** A coach drill keeps the offer's room, so the cube does not jump when it shows. */
+  private void hidePracticeOffer() {
+    boolean coach = session != null && session.getSpec().isFromCoach();
+    practiceOffer.setVisibility(coach ? View.INVISIBLE : View.GONE);
   }
 
   /** Practice counts no case, so the drill's progress steps aside for a line saying so. */
@@ -547,15 +578,13 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     }
   }
 
-  /** Whether a practice rep was the algorithm picked for it, said only where one is picked. */
+  /** Flags a practice rep that was not the algorithm picked for it; a rep that was says nothing. */
   private void showPracticeVerdict(DrillRep rep) {
     String chosen = Options.INSTANCE.getCaseAlgorithm(rep.getCaseCode());
-    if (chosen == null) {
+    if (chosen == null || CaseAlgorithms.sameTurning(rep.getCaseCode(), chosen, rep.getTurned())) {
       return;
     }
-    boolean turned = CaseAlgorithms.sameTurning(rep.getCaseCode(), chosen, rep.getTurned());
-    setVerdict(getString(turned ? R.string.drill_practice_turned : R.string.drill_practice_other),
-        turned ? R.color.green_soft : R.color.secondary_text);
+    setVerdict(getString(R.string.drill_practice_other), R.color.danger_text);
   }
 
   private static int familyColour(String code) {

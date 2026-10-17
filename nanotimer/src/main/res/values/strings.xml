@@ -961,7 +961,6 @@
   <string name="drill_practice_back">Back to drill</string>
   <string name="drill_practice_mode">Practice, not counted</string>
   <string name="drill_practice_pick">Tap Alg to pick the algorithm to practice</string>
-  <string name="drill_practice_turned">Chosen algorithm</string>
   <string name="drill_practice_other">Not the chosen one</string>
   <string name="drill_cases_cleared">%1$d of %2$d cases cleared</string>
   <string name="drill_summary_cell_cleared">Cleared</string>
