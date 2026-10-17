@@ -261,7 +261,7 @@ public abstract class DrillScreenActivity extends NanoTimerActivity
       return false;
     }
     cube.setGyroFollowing(followGyro);
-    cube.setSquaring(isHeldSquare());
+    // No squaring: it snapped real peeks and regrips away, and the gyro drifts little enough now.
     // How it stands when it is let go of, which each drill answers for itself.
     cube.setHold(restingRotation());
     // The well here is most of the screen, and at the page's own distance the cube filled about a
@@ -285,14 +285,6 @@ public abstract class DrillScreenActivity extends NanoTimerActivity
    */
   protected CubeOrientation restingRotation() {
     return null;
-  }
-
-  /**
-   * Whether the cube is held square throughout, so that a yaw off square at rest is the gyro's
-   * drift and is squared away. A drill that turns the cube freely would see its real grip snapped.
-   */
-  protected boolean isHeldSquare() {
-    return true;
   }
 
   /**
