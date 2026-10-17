@@ -1369,8 +1369,14 @@
   <string name="coach_preview_title">O seu plano seria assim</string>
   <string name="coach_preview_when">Todas as semanas, a partir das suas resoluções</string>
   <string name="coach_fig_seconds_lost">segundos perdidos</string>
-  <string name="coach_fig_case_times">%1$s, %2$d vezes</string>
-  <string name="coach_fig_cases_times">%1$d casos, %2$d vezes</string>
+  <plurals name="coach_fig_case_times">
+    <item quantity="one">%1$s, %2$d vez</item>
+    <item quantity="other">%1$s, %2$d vezes</item>
+  </plurals>
+  <plurals name="coach_fig_cases_times">
+    <item quantity="one">%1$d casos, %2$d vez</item>
+    <item quantity="other">%1$d casos, %2$d vezes</item>
+  </plurals>
   <string name="coach_fig_slower_in_solve">segundos mais a resolver</string>
   <string name="coach_fig_thrown_out">deles descartados</string>
   <string name="coach_fig_spent_looking">do seu %1$s passa-se a procurar</string>
@@ -1378,13 +1384,19 @@
   <string name="coach_fig_solve_share">da sua resolução vai para o %1$s</string>
   <string name="coach_fig_usual_share">o habitual é %1$s</string>
   <string name="coach_fig_two_looks">últimas camadas em dois passos</string>
-  <string name="coach_fig_in_last_solves">nas suas últimas %1$d resoluções</string>
+  <plurals name="coach_fig_in_last_solves">
+    <item quantity="one">na sua %1$d última resolução</item>
+    <item quantity="other">nas suas últimas %1$d resoluções</item>
+  </plurals>
   <string name="coach_fig_pairs_stuck">dos seus pares começam presos</string>
   <string name="coach_fig_takes_longer">cada um leva mais %1$s</string>
   <string name="coach_fig_first_pair">segundos a mais para encontrar o primeiro par</string>
   <string name="coach_fig_first_pair_sub">do que cada par seguinte</string>
   <string name="coach_fig_extra_moves">movimentos a mais no seu F2L</string>
-  <string name="coach_fig_over_solves">em %1$d resoluções</string>
+  <plurals name="coach_fig_over_solves">
+    <item quantity="one">em %1$d resolução</item>
+    <item quantity="other">em %1$d resoluções</item>
+  </plurals>
   <string name="coach_fig_freezes">bloqueios por resolução no %1$s</string>
   <string name="coach_fig_frozen_of">%1$s dos seus %2$s</string>
   <string name="coach_fig_spread">segundos de variação no %1$s</string>

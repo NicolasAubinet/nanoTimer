@@ -12,7 +12,6 @@ import com.cube.nanotimer.coach.CoachPayload;
 import com.cube.nanotimer.coach.FocusArea;
 import com.cube.nanotimer.coach.StepShares;
 import com.cube.nanotimer.session.MethodStatistics;
-import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.helper.Utils;
 
 /**
@@ -156,12 +155,12 @@ final class CoachFocusFigure {
       String unit = context.getString(R.string.coach_fig_seconds_lost);
       if (cases.size() > 1) {
         return new CoachFocusFigure(time(lost), null, unit,
-            context.getString(R.string.coach_fig_cases_times, cases.size(), count), null,
+            plural(R.plurals.coach_fig_cases_times, count, cases.size(), count), null,
             Collections.<Bar>emptyList(), null, false);
       }
       String code = cases.get(0);
       return new CoachFocusFigure(time(lost), null, unit,
-          context.getString(R.string.coach_fig_case_times, name(code), count), code,
+          plural(R.plurals.coach_fig_case_times, count, name(code), count), code,
           againstRest(code), null, true);
     }
 
@@ -196,7 +195,7 @@ final class CoachFocusFigure {
       }
       return new CoachFocusFigure(String.valueOf(rounded(rate)), "%",
           context.getString(R.string.coach_fig_thrown_out),
-          context.getString(R.string.coach_fig_case_times, name(code), count.intValue()), code,
+          plural(R.plurals.coach_fig_case_times, count.intValue(), name(code), count.intValue()), code,
           againstRest(code), null, true);
     }
 
@@ -240,7 +239,7 @@ final class CoachFocusFigure {
       }
       return new CoachFocusFigure(String.valueOf(looks.intValue()), null,
           context.getString(R.string.coach_fig_two_looks),
-          context.getString(R.string.coach_fig_in_last_solves, solves.intValue()), null,
+          plural(R.plurals.coach_fig_in_last_solves, solves.intValue(), solves.intValue()), null,
           Collections.<Bar>emptyList(), null, false);
     }
 
@@ -248,7 +247,7 @@ final class CoachFocusFigure {
       Double share = value("f2l_groups.f2l_stuck.share");
       Double stuck = value("f2l_groups.f2l_stuck.mean_ms");
       Double basic = value("f2l_groups.f2l_basic.mean_ms");
-      if (share == null || stuck == null || basic == null) {
+      if (share == null || stuck == null || basic == null || stuck <= basic) {
         return null;
       }
       return new CoachFocusFigure(String.valueOf(rounded(share)), "%",
@@ -283,7 +282,7 @@ final class CoachFocusFigure {
       }
       return new CoachFocusFigure("+" + moves(turned - usual), null,
           context.getString(R.string.coach_fig_extra_moves),
-          context.getString(R.string.coach_fig_over_solves, solves.intValue()), null,
+          plural(R.plurals.coach_fig_over_solves, solves.intValue(), solves.intValue()), null,
           bars(new Bar(context.getString(R.string.coach_bar_you), turned, moves(turned), true),
               new Bar(context.getString(R.string.coach_bar_usual), usual, moves(usual), false)),
           null, false);
@@ -345,8 +344,13 @@ final class CoachFocusFigure {
       return Utils.toSmartCubeStepLocalizedName(context, family, 0);
     }
 
+    /** Seconds, never m:ss and never three decimals: every figure is read against "seconds". */
     private String time(double ms) {
-      return FormatterService.INSTANCE.formatSolveTime(Long.valueOf(Math.round(ms)));
+      return String.format(Locale.US, "%.2f", Math.round(ms / 10) / 100d);
+    }
+
+    private String plural(int id, int count, Object... args) {
+      return context.getResources().getQuantityString(id, count, args);
     }
 
     private String percent(double share) {

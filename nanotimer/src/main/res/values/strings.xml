@@ -1415,8 +1415,14 @@
   <string name="coach_preview_title">Your plan would look like this</string>
   <string name="coach_preview_when">Every week, from your own solves</string>
   <string name="coach_fig_seconds_lost">seconds lost</string>
-  <string name="coach_fig_case_times">%1$s, %2$d times</string>
-  <string name="coach_fig_cases_times">%1$d cases, %2$d times</string>
+  <plurals name="coach_fig_case_times">
+    <item quantity="one">%1$s, %2$d time</item>
+    <item quantity="other">%1$s, %2$d times</item>
+  </plurals>
+  <plurals name="coach_fig_cases_times">
+    <item quantity="one">%1$d cases, %2$d time</item>
+    <item quantity="other">%1$d cases, %2$d times</item>
+  </plurals>
   <string name="coach_fig_slower_in_solve">seconds slower in a solve</string>
   <string name="coach_fig_thrown_out">of them thrown out</string>
   <string name="coach_fig_spent_looking">of your %1$s is spent looking</string>
@@ -1424,13 +1430,19 @@
   <string name="coach_fig_solve_share">of your solve goes to %1$s</string>
   <string name="coach_fig_usual_share">%1$s is usual</string>
   <string name="coach_fig_two_looks">last layers in two looks</string>
-  <string name="coach_fig_in_last_solves">in your last %1$d solves</string>
+  <plurals name="coach_fig_in_last_solves">
+    <item quantity="one">in your last %1$d solve</item>
+    <item quantity="other">in your last %1$d solves</item>
+  </plurals>
   <string name="coach_fig_pairs_stuck">of your pairs start stuck</string>
   <string name="coach_fig_takes_longer">each one takes %1$s longer</string>
   <string name="coach_fig_first_pair">seconds more to find the first pair</string>
   <string name="coach_fig_first_pair_sub">than each pair after it</string>
   <string name="coach_fig_extra_moves">extra moves in your F2L</string>
-  <string name="coach_fig_over_solves">over %1$d solves</string>
+  <plurals name="coach_fig_over_solves">
+    <item quantity="one">over %1$d solve</item>
+    <item quantity="other">over %1$d solves</item>
+  </plurals>
   <string name="coach_fig_freezes">freezes a solve in %1$s</string>
   <string name="coach_fig_frozen_of">%1$s of its %2$s</string>
   <string name="coach_fig_spread">seconds of spread in %1$s</string>
