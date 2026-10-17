@@ -1121,12 +1121,22 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   @Override
-  public void addDrillTally(long timestamp, String type, String caseCode) {
+  public void addDrillTally(long drillStartedAt, int position, String type, String caseCode) {
     ContentValues values = new ContentValues();
-    values.put(DB.COL_DRILL_TALLY_TIMESTAMP, timestamp);
+    values.put(DB.COL_DRILL_TALLY_TIMESTAMP, drillStartedAt);
+    values.put(DB.COL_DRILL_TALLY_POSITION, position);
     values.put(DB.COL_DRILL_TALLY_TYPE, type);
     values.put(DB.COL_DRILL_TALLY_CASE, caseCode);
     db.insert(DB.TABLE_DRILL_TALLY, null, values);
+  }
+
+  @Override
+  public void setDrillTallyDeleted(long drillStartedAt, int position, boolean deleted) {
+    ContentValues values = new ContentValues();
+    values.put(DB.COL_DRILL_TALLY_DELETED, deleted ? 1 : 0);
+    db.update(DB.TABLE_DRILL_TALLY, values,
+        DB.COL_DRILL_TALLY_TIMESTAMP + " = ? AND " + DB.COL_DRILL_TALLY_POSITION + " = ?",
+        new String[] { String.valueOf(drillStartedAt), String.valueOf(position) });
   }
 
   @Override
@@ -1912,6 +1922,7 @@ public class ServiceProviderImpl implements ServiceProvider {
     StringBuilder tally = new StringBuilder();
     tally.append("SELECT COUNT(*) FROM ").append(DB.TABLE_DRILL_TALLY);
     tally.append(" WHERE ").append(DB.COL_DRILL_TALLY_TIMESTAMP).append(" > ?");
+    tally.append(" AND ").append(DB.COL_DRILL_TALLY_DELETED).append(" = 0");
     if (cross) {
       tally.append(" AND ").append(DB.COL_DRILL_TALLY_TYPE).append(" = ?");
       tallyArgs.add(DrillSpec.Type.CROSS.code());

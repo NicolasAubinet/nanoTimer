@@ -1,7 +1,7 @@
 package com.cube.nanotimer.util.view;
 
-import android.provider.Settings;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 
 /**
@@ -22,11 +22,8 @@ public final class PracticeOfferPulse {
     offer.animate().cancel();
     offer.setScaleX(1f);
     offer.setScaleY(1f);
-    if (Settings.Global.getFloat(offer.getContext().getContentResolver(),
-        Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f) {
-      return;
-    }
     offer.animate().scaleX(PEAK_SCALE).scaleY(PEAK_SCALE).setDuration(UP_MS)
+        .setInterpolator(new DecelerateInterpolator()) // the down phase's overshoot otherwise sticks
         .withEndAction(new Runnable() {
           @Override
           public void run() {

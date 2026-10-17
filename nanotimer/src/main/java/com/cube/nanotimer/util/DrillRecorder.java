@@ -41,7 +41,8 @@ public class DrillRecorder {
     void setCrossOptimalLength(long drillId, int position, int optimalLength);
     void setCaseRepDeleted(long drillId, int position, boolean deleted);
     void end(long drillId, DrillEnd end);
-    void addTally(long timestamp, String type, String caseCode);
+    void addTally(long drillStartedAt, int position, String type, String caseCode);
+    void setTallyDeleted(long drillStartedAt, int position, boolean deleted);
   }
 
   private final Writes writes;
@@ -75,8 +76,13 @@ public class DrillRecorder {
 
   public synchronized void record(DrillRep rep) {
     if (!recording) {
-      if (!rep.isPractice() && !rep.isAbandoned()) {
-        writes.addTally(System.currentTimeMillis(), spec.getType().code(), rep.getCaseCode());
+      if (rep.isPractice()) {
+        return;
+      }
+      int at = position++;
+      drillRepPositions.add(at);
+      if (!rep.isAbandoned()) {
+        writes.addTally(startedAtMs, at, spec.getType().code(), rep.getCaseCode());
       }
       return;
     }
@@ -94,8 +100,9 @@ public class DrillRecorder {
 
   public synchronized void record(CrossDrillRep rep) {
     if (!recording) {
+      int at = position++;
       if (rep.getMoveCount() > 0) { // Done before a single turn is a skip, not a missed cross
-        writes.addTally(System.currentTimeMillis(), spec.getType().code(), null);
+        writes.addTally(startedAtMs, at, spec.getType().code(), null);
       }
       return;
     }
@@ -136,10 +143,14 @@ public class DrillRecorder {
    * @param drillRep the rep's place among the drill's own reps, practice reps not counted
    */
   public synchronized void setCaseRepDeleted(int drillRep, boolean deleted) {
-    if (!recording || drillRep < 0 || drillRep >= drillRepPositions.size()) {
+    if (drillRep < 0 || drillRep >= drillRepPositions.size()) {
       return;
     }
     int position = drillRepPositions.get(drillRep);
+    if (!recording) {
+      writes.setTallyDeleted(startedAtMs, position, deleted); // a pruned rep is no work done either
+      return;
+    }
     DrillCaseRep waiting = pendingCaseRep(position);
     if (waiting != null) {
       waiting.setDeleted(deleted);
@@ -252,8 +263,13 @@ public class DrillRecorder {
       }
 
       @Override
-      public void addTally(long timestamp, String type, String caseCode) {
-        service.addDrillTally(timestamp, type, caseCode, IGNORED);
+      public void addTally(long drillStartedAt, int position, String type, String caseCode) {
+        service.addDrillTally(drillStartedAt, position, type, caseCode, IGNORED);
+      }
+
+      @Override
+      public void setTallyDeleted(long drillStartedAt, int position, boolean deleted) {
+        service.setDrillTallyDeleted(drillStartedAt, position, deleted, IGNORED);
       }
     };
   }

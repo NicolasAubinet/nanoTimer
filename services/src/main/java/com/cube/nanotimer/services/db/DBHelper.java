@@ -226,9 +226,14 @@ public class DBHelper extends SQLiteOpenHelper {
   private void createDrillTallyTable(SQLiteDatabase db) {
     db.execSQL("CREATE TABLE " + DB.TABLE_DRILL_TALLY + "(" +
         DB.COL_DRILL_TALLY_TIMESTAMP + " INTEGER NOT NULL, " +
+        DB.COL_DRILL_TALLY_POSITION + " INTEGER NOT NULL, " +
         DB.COL_DRILL_TALLY_TYPE + " TEXT NOT NULL, " +
-        DB.COL_DRILL_TALLY_CASE + " TEXT" +
+        DB.COL_DRILL_TALLY_CASE + " TEXT, " +
+        DB.COL_DRILL_TALLY_DELETED + " INTEGER NOT NULL DEFAULT 0" +
       ");"
+    );
+    db.execSQL("CREATE INDEX " + DB.IDX_DRILL_TALLY_TIMESTAMP +
+        " ON " + DB.TABLE_DRILL_TALLY + " (" + DB.COL_DRILL_TALLY_TIMESTAMP + ");"
     );
   }
 

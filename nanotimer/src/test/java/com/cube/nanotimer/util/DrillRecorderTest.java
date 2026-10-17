@@ -271,16 +271,19 @@ public class DrillRecorderTest {
     assertEquals(Arrays.asList("5/2/true"), writer.deletions);
   }
 
-  /** A casual drill stored nothing, so there is nothing to throw out of it. */
+  /** A casual drill stored no rep, but a pruned one leaves the coach's tally too. */
   @Test
-  public void aCasualDrillWritesNothingWhenARepIsThrownOut() {
+  public void aCasualDrillPrunesItsTallyNotARep() {
     Writer writer = new Writer();
     DrillRecorder recorder = new DrillRecorder(writer, caseSpec(3), false);
 
     recorder.record(abandonedRep());
-    recorder.setCaseRepDeleted(0, true);
+    recorder.record(practiceRep());
+    recorder.record(solvedRep());
+    recorder.setCaseRepDeleted(1, true);
 
     assertEquals(0, writer.deletions.size());
+    assertEquals(Arrays.asList("1/true"), writer.tallyDeletions);
   }
 
   private static DrillSpec caseSpec(int reps) {
@@ -368,6 +371,7 @@ public class DrillRecorderTest {
     final List<String> deletions = new ArrayList<String>();
     final List<DrillEnd> ends = new ArrayList<DrillEnd>();
     final List<String> tallies = new ArrayList<String>();
+    final List<String> tallyDeletions = new ArrayList<String>();
     private DataCallback<Long> waiting;
 
     @Override
@@ -410,8 +414,13 @@ public class DrillRecorderTest {
     }
 
     @Override
-    public void addTally(long timestamp, String type, String caseCode) {
+    public void addTally(long drillStartedAt, int position, String type, String caseCode) {
       tallies.add(type + "/" + caseCode);
+    }
+
+    @Override
+    public void setTallyDeleted(long drillStartedAt, int position, boolean deleted) {
+      tallyDeletions.add(position + "/" + deleted);
     }
   }
 }

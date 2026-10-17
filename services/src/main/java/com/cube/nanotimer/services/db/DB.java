@@ -114,9 +114,12 @@ public class DB {
   // One row per finished rep of a drill that was not recorded, so the coach can still count the work.
   // No times: an unrecorded drill is never a result.
   public static final String TABLE_DRILL_TALLY = "drill_tally";
-  public static final String COL_DRILL_TALLY_TIMESTAMP = "timestamp";
+  public static final String COL_DRILL_TALLY_TIMESTAMP = "timestamp"; // the drill's start, as drill.timestamp, so both count from the same moment
+  public static final String COL_DRILL_TALLY_POSITION = "position"; // the rep's place in its drill, so a pruned rep can be found again
   public static final String COL_DRILL_TALLY_TYPE = "type"; // spec type code, as in the drill table
   public static final String COL_DRILL_TALLY_CASE = "case_code"; // NULL for a cross rep
+  public static final String COL_DRILL_TALLY_DELETED = "deleted"; // pruned on the summary, as drill_rep.deleted
+  public static final String IDX_DRILL_TALLY_TIMESTAMP = "idx_drill_tally_timestamp";
 
   // The last plan written for a solve type, and the payload it was written from. The payload is
   // kept beside it because a plan is only checkable against the figures it was supposed to come
