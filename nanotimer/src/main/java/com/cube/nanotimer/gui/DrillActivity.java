@@ -3,6 +3,8 @@ package com.cube.nanotimer.gui;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,7 @@ import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.coach.CoachPayloadBuilder;
+import com.cube.nanotimer.cube.AlgorithmFollower;
 import com.cube.nanotimer.cube.CaseFlags;
 import com.cube.nanotimer.cube.CubePatternFormat;
 import com.cube.nanotimer.cube.CubeStickering;
@@ -48,6 +51,7 @@ import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.util.view.DrillRepFlourish;
 import com.cube.nanotimer.util.view.PracticeOfferPulse;
+import com.cube.nanotimer.util.view.ScrambleFollowAnimator;
 import com.cube.nanotimer.util.view.StepPalette;
 
 import java.util.ArrayList;
@@ -119,6 +123,9 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   private TextView practiceOffer;
   private String offeredCase;
   private TextView practiceAlgorithm;
+  /** Greys the practised algorithm's moves as they are turned; null where there is none to follow. */
+  private AlgorithmFollower algorithmFollower;
+  private ScrambleFollowAnimator algorithmAnimator;
   private Button skip;
   /** Back leaves practice for the drill rather than ending the drill. */
   private final OnBackPressedCallback practiceBack = new OnBackPressedCallback(false) {
@@ -141,6 +148,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     repBelow = findViewById(R.id.tvDrillLastRepBelow);
     practiceOffer = findViewById(R.id.tvDrillPracticeOffer);
     practiceAlgorithm = findViewById(R.id.tvDrillPracticeAlg);
+    algorithmAnimator = new ScrambleFollowAnimator(practiceAlgorithm);
     Drawable bulb = ContextCompat.getDrawable(this, R.drawable.ic_case_idea).mutate();
     bulb.setTint(ContextCompat.getColor(this, R.color.on_accent));
     int bulbSize = getResources().getDimensionPixelSize(R.dimen.drill_practice_offer_icon);
@@ -334,6 +342,10 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     }
     hidePracticeOffer(); // turning the next case is the answer to the offer
     cube.addMove(move.getNotation());
+    if (algorithmFollower != null && session.getPracticeCase() != null) {
+      algorithmFollower.onMove(move);
+      showAlgorithmProgress();
+    }
     DrillRep rep = session.onMove(move);
     if (rep != null) {
       onRepFinished(rep);
@@ -386,6 +398,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     }
     session.resetRep();
     cube.setState(CubePatternFormat.format(session.getFacelets()));
+    restartAlgorithmProgress();
     if (cubeReady) {
       caseShown();
     }
@@ -456,8 +469,8 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
 
   /** The practice case dealt afresh, since turns made behind the popup were not an attempt at it. */
   private void restartPractice() {
-    if (finished || session == null || session.getPracticeCase() == null) {
-      return;
+    if (finished || isFinishing() || session == null || session.getPracticeCase() == null) {
+      return; // also reached when the screen is torn down with the popup open
     }
     lastRepRow.removeCallbacks(showNextCase);
     session.nextRep();
@@ -493,10 +506,37 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       return;
     }
     String chosen = Options.INSTANCE.getCaseAlgorithm(code);
+    algorithmAnimator.reset();
+    algorithmFollower = null;
+    if (chosen != null) {
+      try {
+        algorithmFollower = new AlgorithmFollower(chosen);
+      } catch (IllegalArgumentException e) {
+        algorithmFollower = null; // shown as written, just not greyed
+      }
+    }
     practiceAlgorithm.setText(chosen != null ? chosen : getString(R.string.drill_practice_pick));
     practiceAlgorithm.setTextSize(TypedValue.COMPLEX_UNIT_SP, chosen != null ? 18 : 14);
     practiceAlgorithm.setTextColor(ContextCompat.getColor(this,
         chosen != null ? R.color.white : R.color.secondary_text));
+    showAlgorithmProgress();
+  }
+
+  /** The practised algorithm with its turned moves greyed, as the timer greys a scramble's. */
+  private void showAlgorithmProgress() {
+    if (algorithmFollower != null) {
+      algorithmAnimator.show(new SpannableString(TextUtils.join(" ",
+          algorithmFollower.getTokens())), algorithmFollower.getDoneCount());
+    }
+  }
+
+  /** A case dealt again starts the algorithm over. */
+  private void restartAlgorithmProgress() {
+    if (algorithmFollower != null && session.getPracticeCase() != null) {
+      algorithmFollower.reset();
+      algorithmAnimator.reset();
+      showAlgorithmProgress();
+    }
   }
 
   private void nextRep() {
@@ -514,6 +554,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
           CubeStickering.pieces(session.getShownEdges(), session.getShownCorners()));
     }
     cube.setState(CubePatternFormat.format(session.getFacelets()));
+    restartAlgorithmProgress();
     // ⚠️ The case now on screen is deliberately not named anywhere. Only the cube says what it
     // is. The line naming the rep that is over stays, since one beat is not long enough to read
     // it, but it stands back so that it cannot be taken for the name of this one.

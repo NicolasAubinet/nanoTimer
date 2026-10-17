@@ -164,27 +164,30 @@
            android:visibility="gone"/>
       </LinearLayout>
 
-      <!-- A coach drill's offer to practise the case just turned off its list, on its own line so
-           it is not missed. A coach drill holds its room, so the cube does not jump. -->
-      <TextView
-         android:id="@+id/tvDrillPracticeOffer"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_marginTop="8dp"
-         android:background="@drawable/drill_practice_offer"
-         android:drawablePadding="6dp"
-         android:gravity="center_vertical"
-         android:paddingLeft="12dp"
-         android:paddingRight="16dp"
-         android:paddingTop="6dp"
-         android:paddingBottom="6dp"
-         android:singleLine="true"
-         android:fontFamily="@font/roboto_medium"
-         android:textColor="@color/on_accent"
-         android:textSize="14sp"
-         android:text="@string/drill_practice_offer"
-         android:visibility="gone"/>
     </LinearLayout>
+
+    <!-- A coach drill's offer to practise the case just turned off its list, on its own line so it
+         is not missed, and outside the rep row so it does not fade with it. A coach drill holds its
+         room, so the cube does not jump. -->
+    <TextView
+       android:id="@+id/tvDrillPracticeOffer"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_gravity="center_horizontal"
+       android:layout_marginTop="8dp"
+       android:background="@drawable/drill_practice_offer"
+       android:drawablePadding="6dp"
+       android:gravity="center_vertical"
+       android:paddingLeft="12dp"
+       android:paddingRight="16dp"
+       android:paddingTop="6dp"
+       android:paddingBottom="6dp"
+       android:singleLine="true"
+       android:fontFamily="@font/roboto_medium"
+       android:textColor="@color/on_accent"
+       android:textSize="14sp"
+       android:text="@string/drill_practice_offer"
+       android:visibility="gone"/>
 
     <!-- Where the drill has got to, and the mode it cannot leave. On their own line above the
          controls: a third button left the rep counter no width at all, and which rep this is is

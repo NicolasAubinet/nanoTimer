@@ -55,10 +55,31 @@ public class ScrambleFollower {
   private boolean lost;
 
   public ScrambleFollower(String[] scramble) {
+    this(parseOrThrow(scramble));
+  }
+
+  /** Follows tokens already read as the outer turns each is made of: "R", "L'", "U2". */
+  static ScrambleFollower ofTurns(List<List<String>> turnsPerToken) {
+    List<List<Step>> tokens = new ArrayList<>();
+    for (List<String> turns : turnsPerToken) {
+      List<Step> steps = new ArrayList<>();
+      for (String turn : turns) {
+        steps.add(parseToken(turn));
+      }
+      tokens.add(steps);
+    }
+    return new ScrambleFollower(tokens);
+  }
+
+  private static List<List<Step>> parseOrThrow(String[] scramble) {
     List<List<Step>> tokens = parse(scramble);
     if (tokens == null) {
       throw new IllegalArgumentException("Unsupported scramble: " + String.join(" ", scramble));
     }
+    return tokens;
+  }
+
+  private ScrambleFollower(List<List<Step>> tokens) {
     tokens.removeIf(List::isEmpty); // a blank: skipping it tracks the same scramble
     CubieCube cube = new CubieCube();
     fullStates.put(cube.toFaceCube(), 0);
