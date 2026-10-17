@@ -667,6 +667,18 @@ public class ServiceImpl extends DBHelper implements Service {
   }
 
   @Override
+  public void addDrillTally(final long timestamp, final String type, final String caseCode,
+      final DataCallback<Void> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        provider.addDrillTally(timestamp, type, caseCode);
+        callback.onData(null);
+      }
+    });
+  }
+
+  @Override
   public void setDrillCaseRepDeleted(final long drillId, final int position, final boolean deleted,
       final DataCallback<Void> callback) {
     run(new Runnable() {

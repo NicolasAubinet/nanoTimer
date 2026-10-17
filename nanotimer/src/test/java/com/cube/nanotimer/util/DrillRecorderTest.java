@@ -36,16 +36,53 @@ public class DrillRecorderTest {
   private static final long GAP_MS = 40;
 
   @Test
-  public void aCasualDrillWritesNothingAtAll() {
+  public void aCasualDrillWritesNoDrillAndTalliesOnlyFinishedReps() {
     Writer writer = new Writer();
     DrillRecorder recorder = new DrillRecorder(writer, caseSpec(3), false);
 
     recorder.record(abandonedRep());
+    recorder.record(practiceRep());
+    recorder.record(solvedRep());
     recorder.end(DrillEnd.FINISHED);
 
     assertEquals(0, writer.drills.size());
     assertEquals(0, writer.caseReps.size());
     assertEquals(0, writer.ends.size());
+    assertEquals(Arrays.asList("case_execution/pll_ga"), writer.tallies);
+  }
+
+  @Test
+  public void aCasualCrossRepIsTallied() {
+    Writer writer = new Writer();
+    DrillRecorder recorder = new DrillRecorder(writer, crossSpec(), false);
+
+    recorder.record(crossRep());
+
+    assertEquals(0, writer.drills.size());
+    assertEquals(Arrays.asList("cross/null"), writer.tallies);
+  }
+
+  @Test
+  public void anUntouchedCasualCrossRepIsNotTallied() {
+    Writer writer = new Writer();
+    DrillRecorder recorder = new DrillRecorder(writer, crossSpec(), false);
+    CrossDrillSession session = new CrossDrillSession(crossSpec());
+    session.nextRep("R U F2 L' D");
+    session.markCaseShown(SHOWN_AT_MS);
+
+    recorder.record(session.declareFinished());
+
+    assertEquals(0, writer.tallies.size());
+  }
+
+  @Test
+  public void aRecordedDrillTalliesNothing() {
+    Writer writer = new Writer();
+    DrillRecorder recorder = new DrillRecorder(writer, caseSpec(3), true);
+
+    recorder.record(solvedRep());
+
+    assertEquals(0, writer.tallies.size());
   }
 
   /** A drill left before a single rep finished never happened, so there is no row saying it did. */
@@ -262,6 +299,17 @@ public class DrillRecorderTest {
     return session.abandon();
   }
 
+  private static DrillRep solvedRep() {
+    DrillSession session = new DrillSession(caseSpec(20), new Random(3));
+    session.nextRep();
+    session.markCaseShown(SHOWN_AT_MS);
+    DrillRep rep = null;
+    for (CubeMove move : moves(inverse(session.getCurrentScramble()))) {
+      rep = session.onMove(move);
+    }
+    return rep;
+  }
+
   private static DrillRep practiceRep() {
     DrillSession session = new DrillSession(caseSpec(20), new Random(1));
     session.startPractice("pll_ga");
@@ -319,6 +367,7 @@ public class DrillRecorderTest {
     final List<String> optimalUpdates = new ArrayList<String>();
     final List<String> deletions = new ArrayList<String>();
     final List<DrillEnd> ends = new ArrayList<DrillEnd>();
+    final List<String> tallies = new ArrayList<String>();
     private DataCallback<Long> waiting;
 
     @Override
@@ -358,6 +407,11 @@ public class DrillRecorderTest {
     @Override
     public void end(long drillId, DrillEnd end) {
       ends.add(end);
+    }
+
+    @Override
+    public void addTally(long timestamp, String type, String caseCode) {
+      tallies.add(type + "/" + caseCode);
     }
   }
 }

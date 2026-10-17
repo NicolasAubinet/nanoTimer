@@ -1121,6 +1121,15 @@ public class ServiceProviderImpl implements ServiceProvider {
   }
 
   @Override
+  public void addDrillTally(long timestamp, String type, String caseCode) {
+    ContentValues values = new ContentValues();
+    values.put(DB.COL_DRILL_TALLY_TIMESTAMP, timestamp);
+    values.put(DB.COL_DRILL_TALLY_TYPE, type);
+    values.put(DB.COL_DRILL_TALLY_CASE, caseCode);
+    db.insert(DB.TABLE_DRILL_TALLY, null, values);
+  }
+
+  @Override
   public void setDrillCrossRepOptimalLength(long drillId, int position, int optimalLength) {
     ContentValues values = new ContentValues();
     values.put(DB.COL_DRILL_CROSS_REP_OPTIMAL_LENGTH, optimalLength);
@@ -1861,7 +1870,8 @@ public class ServiceProviderImpl implements ServiceProvider {
 
   /**
    * The reps done after the given time on what a card's drill practises: its cases in any drill,
-   * or any cross for a cross drill. Null for a card with no drill, or one this app cannot read.
+   * or any cross for a cross drill, recorded or not. Null for a card with no drill, or one this app
+   * cannot read.
    */
   private Integer getDrillRepsSince(String drill, long since) {
     if (drill == null) {
@@ -1886,26 +1896,50 @@ public class ServiceProviderImpl implements ServiceProvider {
     q.append("    ON d.").append(DB.COL_ID).append(" = r.");
     q.append(cross ? DB.COL_DRILL_CROSS_REP_DRILL_ID : DB.COL_DRILL_REP_DRILL_ID);
     q.append(" WHERE d.").append(DB.COL_DRILL_TIMESTAMP).append(" > ?");
-    if (!cross) {
+    if (cross) {
+      // Done before a single turn is a skip, not a missed cross.
+      q.append(" AND r.").append(DB.COL_DRILL_CROSS_REP_MOVE_COUNT).append(" > 0");
+    } else {
       q.append(" AND r.").append(DB.COL_DRILL_REP_ABANDONED).append(" = 0");
       q.append(" AND r.").append(DB.COL_DRILL_REP_DELETED).append(" = 0");
       q.append(" AND r.").append(DB.COL_DRILL_REP_PRACTICE).append(" = 0");
       q.append(" AND r.").append(DB.COL_DRILL_REP_CASE).append(" IN (");
-      for (int i = 0; i < spec.getCases().size(); i++) {
-        q.append(i == 0 ? "?" : ",?");
-        args.add(spec.getCases().get(i));
-      }
-      q.append(")");
+      appendCases(q, args, spec.getCases());
     }
+
+    List<String> tallyArgs = new ArrayList<String>();
+    tallyArgs.add(String.valueOf(since));
+    StringBuilder tally = new StringBuilder();
+    tally.append("SELECT COUNT(*) FROM ").append(DB.TABLE_DRILL_TALLY);
+    tally.append(" WHERE ").append(DB.COL_DRILL_TALLY_TIMESTAMP).append(" > ?");
+    if (cross) {
+      tally.append(" AND ").append(DB.COL_DRILL_TALLY_TYPE).append(" = ?");
+      tallyArgs.add(DrillSpec.Type.CROSS.code());
+    } else {
+      tally.append(" AND ").append(DB.COL_DRILL_TALLY_CASE).append(" IN (");
+      appendCases(tally, tallyArgs, spec.getCases());
+    }
+    return Integer.valueOf(count(q.toString(), args) + count(tally.toString(), tallyArgs));
+  }
+
+  private static void appendCases(StringBuilder q, List<String> args, List<String> cases) {
+    for (int i = 0; i < cases.size(); i++) {
+      q.append(i == 0 ? "?" : ",?");
+      args.add(cases.get(i));
+    }
+    q.append(")");
+  }
+
+  private int count(String query, List<String> args) {
     int count = 0;
-    Cursor cursor = db.rawQuery(q.toString(), args.toArray(new String[0]));
+    Cursor cursor = db.rawQuery(query, args.toArray(new String[0]));
     if (cursor != null) {
       if (cursor.moveToFirst()) {
         count = cursor.getInt(0);
       }
       cursor.close();
     }
-    return Integer.valueOf(count);
+    return count;
   }
 
   /**

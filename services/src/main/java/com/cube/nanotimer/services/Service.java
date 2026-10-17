@@ -160,6 +160,8 @@ public interface Service {
   void addDrill(DrillRecord drill, DataCallback<Long> callback);
   void addDrillCaseRep(long drillId, DrillCaseRep rep, DataCallback<Void> callback);
   void addDrillCrossRep(long drillId, DrillCrossRep rep, DataCallback<Void> callback);
+  /** Counts a finished rep of a drill that is not recorded, for the coach alone. */
+  void addDrillTally(long timestamp, String type, String caseCode, DataCallback<Void> callback);
   /** Fills in the shortest solution for a cross rep whose search landed after the rep had ended. */
   void setDrillCrossRepOptimalLength(long drillId, int position, int optimalLength,
       DataCallback<Void> callback);

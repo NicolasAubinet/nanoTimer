@@ -3,7 +3,7 @@ package com.cube.nanotimer.services.db;
 public class DB {
 
   public static final String DB_NAME = "nanoTimerDB";
-  public static final int DB_VERSION = 36;
+  public static final int DB_VERSION = 37;
 
   public static final String COL_ID = "id";
 
@@ -110,6 +110,13 @@ public class DB {
   public static final String COL_DRILL_CROSS_REP_BUILT = "built";
   public static final String COL_DRILL_CROSS_REP_PLANNING_EXPIRED = "planning_expired";
   public static final String IDX_DRILL_CROSS_REP_DRILL = "idx_drill_cross_rep_drill";
+
+  // One row per finished rep of a drill that was not recorded, so the coach can still count the work.
+  // No times: an unrecorded drill is never a result.
+  public static final String TABLE_DRILL_TALLY = "drill_tally";
+  public static final String COL_DRILL_TALLY_TIMESTAMP = "timestamp";
+  public static final String COL_DRILL_TALLY_TYPE = "type"; // spec type code, as in the drill table
+  public static final String COL_DRILL_TALLY_CASE = "case_code"; // NULL for a cross rep
 
   // The last plan written for a solve type, and the payload it was written from. The payload is
   // kept beside it because a plan is only checkable against the figures it was supposed to come

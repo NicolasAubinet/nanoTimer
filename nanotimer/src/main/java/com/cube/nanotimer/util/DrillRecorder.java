@@ -16,8 +16,8 @@ import java.util.List;
 
 /**
  * Writes a drill's reps away as they finish, for a drill the user chose to record. A casual one
- * runs and is shown and leaves nothing behind, which is what choosing it means: a set drilled
- * loosely must not be claimable as a result at the end.
+ * runs and is shown and leaves only a tally of its finished reps, which the coach counts as work
+ * done: a set drilled loosely must not be claimable as a result at the end.
  *
  * <p><b>The drill row is opened by the first rep, not by the drill starting.</b> A drill nobody
  * finished a rep of is not a result and leaves no trace, and reps go in one at a time so that an
@@ -41,6 +41,7 @@ public class DrillRecorder {
     void setCrossOptimalLength(long drillId, int position, int optimalLength);
     void setCaseRepDeleted(long drillId, int position, boolean deleted);
     void end(long drillId, DrillEnd end);
+    void addTally(long timestamp, String type, String caseCode);
   }
 
   private final Writes writes;
@@ -73,7 +74,13 @@ public class DrillRecorder {
   }
 
   public synchronized void record(DrillRep rep) {
-    if (!recording || ended) {
+    if (!recording) {
+      if (!rep.isPractice() && !rep.isAbandoned()) {
+        writes.addTally(System.currentTimeMillis(), spec.getType().code(), rep.getCaseCode());
+      }
+      return;
+    }
+    if (ended) {
       return;
     }
     if (!rep.isPractice()) {
@@ -86,7 +93,13 @@ public class DrillRecorder {
   }
 
   public synchronized void record(CrossDrillRep rep) {
-    if (!recording || ended) {
+    if (!recording) {
+      if (rep.getMoveCount() > 0) { // Done before a single turn is a skip, not a missed cross
+        writes.addTally(System.currentTimeMillis(), spec.getType().code(), null);
+      }
+      return;
+    }
+    if (ended) {
       return;
     }
     lastCrossPosition = position++;
@@ -236,6 +249,11 @@ public class DrillRecorder {
       @Override
       public void end(long drillId, DrillEnd end) {
         service.endDrill(drillId, end, IGNORED);
+      }
+
+      @Override
+      public void addTally(long timestamp, String type, String caseCode) {
+        service.addDrillTally(timestamp, type, caseCode, IGNORED);
       }
     };
   }

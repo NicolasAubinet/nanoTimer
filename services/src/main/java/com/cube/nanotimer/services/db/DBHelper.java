@@ -124,6 +124,7 @@ public class DBHelper extends SQLiteOpenHelper {
     );
 
     createDrillTables(db);
+    createDrillTallyTable(db);
     createCoachPlanTable(db);
     createCaseKnowledgeTable(db);
     createSolveReadingTable(db);
@@ -218,6 +219,16 @@ public class DBHelper extends SQLiteOpenHelper {
     );
     db.execSQL("CREATE INDEX " + DB.IDX_DRILL_CROSS_REP_DRILL +
         " ON " + DB.TABLE_DRILL_CROSS_REP + " (" + DB.COL_DRILL_CROSS_REP_DRILL_ID + ");"
+    );
+  }
+
+  /** Unrecorded reps, counted for the coach; from {@link #createTables} and the upgrade to 37. */
+  private void createDrillTallyTable(SQLiteDatabase db) {
+    db.execSQL("CREATE TABLE " + DB.TABLE_DRILL_TALLY + "(" +
+        DB.COL_DRILL_TALLY_TIMESTAMP + " INTEGER NOT NULL, " +
+        DB.COL_DRILL_TALLY_TYPE + " TEXT NOT NULL, " +
+        DB.COL_DRILL_TALLY_CASE + " TEXT" +
+      ");"
     );
   }
 
@@ -507,6 +518,10 @@ public class DBHelper extends SQLiteOpenHelper {
     if (oldVersion >= 27 && oldVersion < 36) {
       db.execSQL("ALTER TABLE " + DB.TABLE_DRILL_REP + " ADD COLUMN "
           + DB.COL_DRILL_REP_PRACTICE + " INTEGER NOT NULL DEFAULT 0");
+    }
+
+    if (oldVersion < 37) {
+      createDrillTallyTable(db);
     }
 
 //    progressDialog.hide();

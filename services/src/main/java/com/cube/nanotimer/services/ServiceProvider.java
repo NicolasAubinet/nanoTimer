@@ -88,6 +88,7 @@ public interface ServiceProvider {
   long addDrill(DrillRecord drill);
   void addDrillCaseRep(long drillId, DrillCaseRep rep);
   void addDrillCrossRep(long drillId, DrillCrossRep rep);
+  void addDrillTally(long timestamp, String type, String caseCode);
   /** Fills in the shortest solution for a cross rep whose search landed after the rep had ended. */
   void setDrillCrossRepOptimalLength(long drillId, int position, int optimalLength);
   /** Throws a case rep out of every figure, or puts it back. The row stays either way. */
