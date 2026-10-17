@@ -3,8 +3,10 @@
      The figures are read off the payload rather than off the plan's own citations, so a claim that
      was invented has nothing to print. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
    android:layout_width="match_parent"
    android:layout_height="wrap_content"
+   android:background="?attr/selectableItemBackground"
    android:gravity="center_vertical"
    android:minHeight="48dp"
    android:orientation="horizontal"
@@ -50,5 +52,13 @@
        android:textColor="@color/secondary_text"
        android:textSize="12sp"/>
   </LinearLayout>
+
+  <!-- The row opens the case and its algorithms. -->
+  <ImageView
+     android:layout_width="20dp"
+     android:layout_height="20dp"
+     android:importantForAccessibility="no"
+     android:src="@drawable/ic_chevron_right"
+     app:tint="@color/secondary_text"/>
 
 </LinearLayout>

@@ -22,8 +22,10 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
@@ -334,6 +336,7 @@ public class CoachPlanView {
       chart.setDiagram(diagram);
       chart.setVisibility(diagram == null ? View.INVISIBLE : View.VISIBLE);
       ((TextView) cell.findViewById(R.id.tvCoachPracticeName)).setText(shortName(code));
+      cell.setOnClickListener(caseOpener(code));
       row.addView(cell);
     }
   }
@@ -359,10 +362,12 @@ public class CoachPlanView {
     tvText.setVisibility(text == null ? View.GONE : View.VISIBLE);
 
     LinearLayout cases = card.findViewById(R.id.llCoachAreaCases);
+    Set<String> shown = new HashSet<String>();
     for (String code : area.getCodes()) {
       if (payload.value("cases." + code + ".mean_ms") != null) {
         if (figure == null || !figure.coversCases) {
-          cases.addView(caseRow(cases, area, payload, code));
+          cases.addView(caseRow(cases, area.getReason(), payload, code));
+          shown.add(code);
         }
       } else if (payload.value("f2l_habits." + code + ".extra_moves") != null) {
         cases.addView(pairRow(cases, payload, code));
@@ -378,11 +383,11 @@ public class CoachPlanView {
       List<String> bare = new ArrayList<String>();
       boolean named = cases.getChildCount() > 0;
       for (String code : drill.getCases()) {
-        if (named && area.getCodes().contains(code)) {
+        if (shown.contains(code)) {
           continue;
         }
         if (named && payload.value("cases." + code + ".mean_ms") != null) {
-          cases.addView(caseRow(cases, area, payload, code));
+          cases.addView(caseRow(cases, null, payload, code));
         } else {
           bare.add(code);
         }
@@ -496,7 +501,6 @@ public class CoachPlanView {
   private int colour(FocusArea area) {
     return stepColour(CoachFocusFigure.familyOf(area));
   }
-
 
   /** A step's colour, as the step bar draws it, or the accent for none. */
   private int stepColour(String family) {
@@ -667,7 +671,8 @@ public class CoachPlanView {
     said.append(sentence);
   }
 
-  private View caseRow(LinearLayout parent, FocusArea area, CoachPayload payload, String code) {
+  private View caseRow(LinearLayout parent, FocusArea.Reason reason, CoachPayload payload,
+      final String code) {
     View row = inflater.inflate(R.layout.coach_case_row, parent, false);
 
     LastLayerDiagram diagram = LastLayerDiagram.forCase(code);
@@ -677,9 +682,21 @@ public class CoachPlanView {
 
     ((TextView) row.findViewById(R.id.tvCoachCaseName))
         .setText(Utils.toSmartCubeCaseHeadline(activity, code));
-    fill(row, R.id.tvCoachCaseFigures, figures(area, payload, code));
-    fill(row, R.id.tvCoachCaseCost, cost(area, payload, code));
+    fill(row, R.id.tvCoachCaseFigures, figures(reason, payload, code));
+    fill(row, R.id.tvCoachCaseCost, cost(reason, payload, code));
+    row.setOnClickListener(caseOpener(code));
     return row;
+  }
+
+  /** Opens the case with its algorithms, where one can be starred or unstarred. */
+  private View.OnClickListener caseOpener(final String code) {
+    return new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        DialogUtils.showFragment((FragmentActivity) activity,
+            CaseAlgorithmsDialog.newInstance(code));
+      }
+    };
   }
 
   /**
@@ -696,19 +713,13 @@ public class CoachPlanView {
     Double offList = payload.value("f2l_habits." + code + ".off_list_rate");
     fill(row, R.id.tvCoachCaseCost, count == null || offList == null ? null
         : activity.getString(R.string.coach_pair_off_list, count.intValue(), rounded(offList)));
-    row.findViewById(R.id.buCoachPairCase).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        DialogUtils.showFragment((FragmentActivity) activity,
-            CaseAlgorithmsDialog.newInstance(code));
-      }
-    });
+    row.findViewById(R.id.buCoachPairCase).setOnClickListener(caseOpener(code));
     return row;
   }
 
   /** What the case costs, said the way its reason wants it said. */
-  private String figures(FocusArea area, CoachPayload payload, String code) {
-    if (area.getReason() == FocusArea.Reason.SLOW_UNDER_PRESSURE) {
+  private String figures(FocusArea.Reason reason, CoachPayload payload, String code) {
+    if (reason == FocusArea.Reason.SLOW_UNDER_PRESSURE) {
       Double drilled = payload.value("drill_cases." + code + ".mean_ms");
       Double gap = payload.value("comparisons." + code + ".gap_ms");
       if (drilled != null && gap != null) {
@@ -722,8 +733,8 @@ public class CoachPlanView {
   }
 
   /** The second line: how often, and what that has added up to. */
-  private String cost(FocusArea area, CoachPayload payload, String code) {
-    if (area.getReason() == FocusArea.Reason.INCONSISTENT_CASE) {
+  private String cost(FocusArea.Reason reason, CoachPayload payload, String code) {
+    if (reason == FocusArea.Reason.INCONSISTENT_CASE) {
       Double rate = payload.value("cases." + code + ".rejection_rate");
       return rate == null ? null : activity.getString(R.string.coach_case_rejected,
           (int) Math.round(rate.doubleValue() * 100));
