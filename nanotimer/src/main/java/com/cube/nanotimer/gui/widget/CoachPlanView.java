@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import java.text.BreakIterator;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -105,7 +106,6 @@ public class CoachPlanView {
    * scrolls to its card. Call after {@link #setPlan}, which draws the cards the chips scroll to.
    */
   public void setHero(View hero, StoredCoachPlan stored) {
-    PlanCardLight.apply(hero, R.drawable.coach_plan_hero, accent());
     ((TextView) hero.findViewById(R.id.tvAnalysisPlanDate)).setText(activity.getString(
         R.string.coach_written,
         DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date(stored.getWrittenAt()))));
@@ -150,8 +150,6 @@ public class CoachPlanView {
   public void setPreview(View preview) {
     LinearLayout chips = preview.findViewById(R.id.llCoachPreviewChips);
     LinearLayout areas = preview.findViewById(R.id.llCoachPreviewAreas);
-    PlanCardLight.apply(preview.findViewById(R.id.flCoachPreviewHero), R.drawable.coach_plan_hero,
-        accent());
     chips.removeAllViews();
     areas.removeAllViews();
     for (int i = 0; i < PREVIEW_REASONS.length; i++) {
@@ -372,16 +370,30 @@ public class CoachPlanView {
     }
 
     DrillSpec drill = bindDrill(card, area, undealable);
-    // A card about a step names no case, so the cases its drill deals are shown instead. Not for a
-    // cross or a pair drill, which have no flat picture to show.
+    // Every case the drill deals is shown: a card naming some gets rows for the rest, a card about
+    // a step gets the charts. Not for a cross or a pair drill, which have no flat picture to show.
     if (drill != null && drill.getType() != DrillSpec.Type.CROSS
-        && drill.getType() != DrillSpec.Type.F2L_PAIR && cases.getChildCount() == 0
+        && drill.getType() != DrillSpec.Type.F2L_PAIR
         && (figure == null || !figure.coversCases)) {
-      LinearLayout row = new LinearLayout(activity);
-      row.setOrientation(LinearLayout.HORIZONTAL);
-      row.setPadding(0, activity.getResources().getDimensionPixelSize(R.dimen.space_s), 0, 0);
-      addCaseCharts(row, drill.getCases());
-      cases.addView(row);
+      List<String> bare = new ArrayList<String>();
+      boolean named = cases.getChildCount() > 0;
+      for (String code : drill.getCases()) {
+        if (named && area.getCodes().contains(code)) {
+          continue;
+        }
+        if (named && payload.value("cases." + code + ".mean_ms") != null) {
+          cases.addView(caseRow(cases, area, payload, code));
+        } else {
+          bare.add(code);
+        }
+      }
+      if (!bare.isEmpty()) {
+        LinearLayout row = new LinearLayout(activity);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setPadding(0, activity.getResources().getDimensionPixelSize(R.dimen.space_s), 0, 0);
+        addCaseCharts(row, bare);
+        cases.addView(row);
+      }
     }
     return card;
   }
@@ -485,9 +497,6 @@ public class CoachPlanView {
     return stepColour(CoachFocusFigure.familyOf(area));
   }
 
-  private int accent() {
-    return ContextCompat.getColor(activity, R.color.lightblue);
-  }
 
   /** A step's colour, as the step bar draws it, or the accent for none. */
   private int stepColour(String family) {
@@ -778,10 +787,11 @@ public class CoachPlanView {
     Intent intent;
     if (spec.getType() == DrillSpec.Type.CROSS) {
       // The coach cannot know the solver's cross face; the setup screen's standing answer is it.
+      // Untimed whatever the plan says: planning the whole cross at all comes before planning it fast.
       String face = DrillSetupActivity.layerFace().opposite().name();
       intent = new Intent(activity, CrossDrillActivity.class);
       intent.putExtra(CrossDrillActivity.EXTRA_SPEC, DrillSpec.cross(spec.getId(), face,
-          spec.getReps(), spec.getPlanningMs(), spec.getLabel()).toJson());
+          spec.getReps(), 0, spec.getLabel()).toJson());
     } else {
       intent = new Intent(activity, DrillActivity.class);
       intent.putExtra(DrillActivity.EXTRA_SPEC, spec.toJson());
