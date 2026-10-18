@@ -97,7 +97,8 @@ final class CoachFocusFigure {
       case SLOW_STEP:
         return read.stepShare(first(area));
       case TWO_LOOK_OLL:
-        return read.twoLook();
+      case TWO_LOOK_PLL:
+        return read.twoLook(first(area));
       case STUCK_PIECES:
         return read.stuck();
       case SLOW_FIRST_PAIR:
@@ -231,14 +232,14 @@ final class CoachFocusFigure {
           null, false);
     }
 
-    CoachFocusFigure twoLook() {
-      Double looks = value("two_look_count");
+    CoachFocusFigure twoLook(String family) {
+      Double looks = family == null ? null : value(CoachPlanView.twoLookCountPath(family));
       Double solves = value("windows.families");
       if (looks == null || solves == null) {
         return null;
       }
       return new CoachFocusFigure(String.valueOf(looks.intValue()), null,
-          context.getString(R.string.coach_fig_two_looks),
+          context.getString(R.string.coach_fig_two_looks, step(family)),
           plural(R.plurals.coach_fig_in_last_solves, solves.intValue(), solves.intValue()), null,
           Collections.<Bar>emptyList(), null, false);
     }

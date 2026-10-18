@@ -23,16 +23,18 @@ public class PreviousPlan {
 
     private final int solves;
     private final Integer twoLookCount;
+    private final Integer twoLookPllCount;
     private final StepFigure solve;
     private final List<StepFigure> families;
     private final List<StepFigure> f2lGroups;
     private final List<TurningFigure> turning;
 
     /** @param solves how many solves the figures were read from */
-    public Steps(int solves, Integer twoLookCount, StepFigure solve, List<StepFigure> families,
-        List<StepFigure> f2lGroups, List<TurningFigure> turning) {
+    public Steps(int solves, Integer twoLookCount, Integer twoLookPllCount, StepFigure solve,
+        List<StepFigure> families, List<StepFigure> f2lGroups, List<TurningFigure> turning) {
       this.solves = solves;
       this.twoLookCount = twoLookCount;
+      this.twoLookPllCount = twoLookPllCount;
       this.solve = solve;
       this.families = figures(families);
       this.f2lGroups = figures(f2lGroups);
@@ -56,6 +58,9 @@ public class PreviousPlan {
     Double value(String path) {
       if ("two_look_count".equals(path)) {
         return twoLookCount == null ? null : Double.valueOf(twoLookCount.intValue());
+      }
+      if ("two_look_pll_count".equals(path)) {
+        return twoLookPllCount == null ? null : Double.valueOf(twoLookPllCount.intValue());
       }
       if ("windows.families".equals(path)) {
         return Double.valueOf(solves);
@@ -91,6 +96,9 @@ public class PreviousPlan {
       if (twoLookCount != null) {
         json.put("two_look_count", twoLookCount.intValue());
       }
+      if (twoLookPllCount != null) {
+        json.put("two_look_pll_count", twoLookPllCount.intValue());
+      }
       if (solve != null) {
         json.put("solve", solve.toJson());
       }
@@ -106,7 +114,7 @@ public class PreviousPlan {
 
     static Steps fromJson(JSONObject json) throws JSONException {
       if (json == null) {
-        return new Steps(0, null, null, null, null, null);
+        return new Steps(0, null, null, null, null, null, null);
       }
       List<TurningFigure> turning = new ArrayList<TurningFigure>();
       JSONArray turns = json.optJSONArray("turning");
@@ -115,6 +123,8 @@ public class PreviousPlan {
       }
       return new Steps(json.optInt("solves"),
           json.has("two_look_count") ? Integer.valueOf(json.getInt("two_look_count")) : null,
+          json.has("two_look_pll_count") ? Integer.valueOf(json.getInt("two_look_pll_count"))
+              : null,
           json.has("solve") ? StepFigure.fromJson(json.getJSONObject("solve")) : null,
           stepFigures(json.optJSONArray("families")), stepFigures(json.optJSONArray("f2l_groups")),
           turning);

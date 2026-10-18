@@ -126,6 +126,14 @@ public class CoachPayloadBuilder {
   private static final Set<String> LOOK_FAMILIES = new LinkedHashSet<String>(
       Arrays.asList("ollalg", "edges", "corners"));
 
+  /** The part family a PLL's algorithms are recorded under: two of them is a solve that permuted the
+   * last layer in two looks. */
+  private static final Set<String> PERMUTATION_LOOK_FAMILIES =
+      Collections.singleton("alg");
+
+  private static final String ORIENTATION = "oll";
+  private static final String PERMUTATION = "pll";
+
   /** How far apart the two histories must be, against the solve side, before the gap is sent. */
   private static final double MIN_GAP = 0.1;
 
@@ -189,7 +197,8 @@ public class CoachPayloadBuilder {
     Set<String> sets = familiesOf(cases);
     MoveFigure f2lMoves = F2lHabits.total(pairs, FAMILY_FLOOR);
     List<MoveFigure> llMoves = LastLayerHabits.steps(lastLayer, FAMILY_FLOOR);
-    Set<Long> twoLooked = twoLookSolves(familySamples);
+    Set<Long> twoLooked = twoLookSolves(familySamples, LOOK_FAMILIES);
+    Set<Long> twoPermuted = twoLookSolves(familySamples, PERMUTATION_LOOK_FAMILIES);
     return new CoachPayload(CoachPayload.VERSION, puzzle, method, solveTimes.size(),
         caseSolveCount, drillCount, Integer.valueOf(twoLooked.size()),
         solveFigure(solveTimes),
@@ -205,7 +214,9 @@ public class CoachPayloadBuilder {
         f2lMoves == null ? null : Integer.valueOf(f2lSolveCount),
         Turnings.of(turnings, FAMILY_FLOOR), Integer.valueOf(turningSolveCount), llMoves,
         LastLayerHabits.cases(lastLayer, CASE_FLOOR), Integer.valueOf(f2lSolveCount),
-        OllLooks.of(familySamples, twoLooked, FAMILY_FLOOR), previous);
+        LastLayerLooks.of(familySamples, ORIENTATION, twoLooked, FAMILY_FLOOR), previous,
+        Integer.valueOf(twoPermuted.size()),
+        LastLayerLooks.of(familySamples, PERMUTATION, twoPermuted, FAMILY_FLOOR));
   }
 
   /**
@@ -253,10 +264,12 @@ public class CoachPayloadBuilder {
     CoachPayload written = last.getPayload();
     return new PreviousPlan(solvesSince,
         new PreviousPlan.Steps(written.getFamilyWindow(), written.getTwoLookCount(),
-            written.getSolve(), written.getFamilies(), written.getF2lGroups(),
-            written.getTurning()),
+            written.getTwoLookPllCount(), written.getSolve(), written.getFamilies(),
+            written.getF2lGroups(), written.getTurning()),
         new PreviousPlan.Steps(sinceTimes.size(),
-            Integer.valueOf(twoLookSolves(sinceSamples).size()), solveFigure(sinceTimes),
+            Integer.valueOf(twoLookSolves(sinceSamples, LOOK_FAMILIES).size()),
+            Integer.valueOf(twoLookSolves(sinceSamples, PERMUTATION_LOOK_FAMILIES).size()),
+            solveFigure(sinceTimes),
             familyFigures(statistics.getFamilies(), statistics, tallies),
             F2lGroups.of(sinceSamples, FAMILY_FLOOR), Turnings.of(sinceTurnings, FAMILY_FLOOR)),
         cards);
@@ -306,15 +319,17 @@ public class CoachPayloadBuilder {
   }
 
   /**
-   * The window's solves that took more than one look at the last layer's orientation, counted per
-   * solve rather than per look: a two-look is a technique the solver chose, and half a look is not a
-   * thing. Counted rather than inferred from a step being recorded in parts at all, so it still says
-   * what it counts if a one-look OLL should later start carrying its one algorithm as a part.
+   * The window's solves that took more than one look at a last layer step, counted per solve rather
+   * than per look: a two-look is a technique the solver chose, and half a look is not a thing.
+   * Counted from the step's algorithms rather than from it being recorded in parts at all, since a
+   * one-look step carries its one algorithm as a part too.
+   *
+   * @param families the part families the step's algorithms are recorded under
    */
-  private static Set<Long> twoLookSolves(List<StepSample> samples) {
+  private static Set<Long> twoLookSolves(List<StepSample> samples, Set<String> families) {
     Map<Long, Integer> looks = new LinkedHashMap<Long, Integer>();
     for (StepSample sample : samples) {
-      if (!sample.isPart() || !LOOK_FAMILIES.contains(MethodStatistics.familyOf(sample.getCode()))) {
+      if (!sample.isPart() || !families.contains(MethodStatistics.familyOf(sample.getCode()))) {
         continue;
       }
       Long solve = Long.valueOf(sample.getSolveId());

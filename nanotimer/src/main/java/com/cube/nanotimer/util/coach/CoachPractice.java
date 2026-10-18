@@ -25,10 +25,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * The practice sets under a plan: per family, the cases costing the solver the most, then the OLLs
- * to learn next while full OLL is not known, chosen by the coach service with no model behind it.
- * Cached as the service sent them, so the section draws at once and a failed refresh keeps the
- * last answer.
+ * The practice sets under a plan: per family, the cases costing the solver the most, then the PLLs
+ * or OLLs to learn next while either is not fully known, chosen by the coach service with no model
+ * behind it. Cached as the service sent them, so the section draws at once and a failed refresh
+ * keeps the last answer.
  */
 public final class CoachPractice {
 
@@ -56,7 +56,7 @@ public final class CoachPractice {
       return drill;
     }
 
-    /** Whether this is the "learn next" set: OLLs to learn, best first, rather than to speed up. */
+    /** Whether this is the "learn next" set: PLLs or OLLs to learn, best first, rather than to speed up. */
     public boolean isLearning() {
       return drill.isLearning();
     }

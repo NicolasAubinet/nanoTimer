@@ -892,25 +892,29 @@ public class AnalysisActivity extends NanoTimerActivity {
   }
 
   /**
-   * Whether the teaser shows the OLLs to learn next: by the service's own rule, while an OLL has
-   * been seen never done in one algorithm, or none has been seen known at all.
+   * The step whose cases the teaser shows to learn next, or null: PLL while one has been seen never
+   * done in one algorithm, as the service puts PLL first; otherwise OLL while one has, or none has
+   * been seen known at all.
    */
-  private boolean learnNextOffered() {
+  private String learnNextOffered() {
     if (!knownRead) {
-      return false; // drawn again once read, rather than shown and then taken away
+      return null; // drawn again once read, rather than shown and then taken away
     }
-    int known = 0;
+    int knownOlls = 0;
+    boolean ollToLearn = false;
     for (CaseKnowledge stepCase : readKnown) {
+      boolean toLearn = stepCase.getStatus() == CaseKnowledge.Status.TO_LEARN;
+      if (toLearn && "pll".equals(stepCase.getCaseSet())) {
+        return "pll";
+      }
       if ("oll".equals(stepCase.getCaseSet())) {
-        if (stepCase.getStatus() == CaseKnowledge.Status.TO_LEARN) {
-          return true;
-        }
+        ollToLearn |= toLearn;
         if (stepCase.getStatus() == CaseKnowledge.Status.KNOWN) {
-          known++;
+          knownOlls++;
         }
       }
     }
-    return known == 0;
+    return ollToLearn || knownOlls == 0 ? "oll" : null;
   }
 
   /** What went wrong, grouped by what the reader can do about it rather than by what broke. */

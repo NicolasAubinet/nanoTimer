@@ -1381,8 +1381,8 @@
   <string name="coach_case_gap">%1$s en drill, %2$s más al resolver</string>
   <string name="coach_case_rejected">%1$d%% de ellos descartados</string>
   <string name="coach_recognition_body">%1$s: %2$s de %3$s pasan antes del primer movimiento.</string>
-  <string name="coach_two_look_body">%1$d de las últimas %2$d resoluciones tomaron la última capa en dos miradas.</string>
-  <string name="coach_two_look_share">La última capa ocupa %1$s de tu resolución, donde %2$s es lo normal en una mirada.</string>
+  <string name="coach_two_look_body">%1$s: dos miradas en %2$d de las últimas %3$d resoluciones.</string>
+  <string name="coach_two_look_share">%1$s ocupa el %2$s de tu resolución, cuando lo habitual en una mirada es el %3$s.</string>
   <string name="coach_two_look_to_learn">Tus resoluciones muestran %1$d casos que aún no colocas con un solo algoritmo.</string>
   <string name="coach_step_share_body">%1$s ocupa el %2$s de tu resolución, cuando lo habitual es el %3$s.</string>
   <string name="coach_stuck_body">El %1$s de tus pares empiezan con una pieza atrapada en otro slot. Esos tardan %2$s, y los demás %3$s.</string>
@@ -1416,7 +1416,7 @@
   <string name="coach_fig_of_seconds">%1$s de %2$s segundos</string>
   <string name="coach_fig_solve_share">de tu resolución se va en %1$s</string>
   <string name="coach_fig_usual_share">lo habitual es %1$s</string>
-  <string name="coach_fig_two_looks">últimas capas en dos pasos</string>
+  <string name="coach_fig_two_looks">%1$s en dos pasos</string>
   <plurals name="coach_fig_in_last_solves">
     <item quantity="one">en tu %1$d última resolución</item>
     <item quantity="other">en tus últimas %1$d resoluciones</item>
@@ -1455,6 +1455,7 @@
   <string name="coach_practice_body">Siempre aquí, aparte del plan: los casos que más te cuestan, practicados hasta que batan sus objetivos. Se actualiza a medida que resuelves.</string>
   <string name="coach_practice_set">Tus casos de %1$s más costosos</string>
   <string name="coach_learn_next">Próximos OLL por aprender</string>
+  <string name="coach_learn_next_pll">Próximos PLL por aprender</string>
   <plurals name="coach_learn_next_count">
     <item quantity="one">%d caso</item>
     <item quantity="other">%d casos</item>

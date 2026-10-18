@@ -52,7 +52,9 @@ public class FocusArea {
     /** A step whose turning keeps stopping: planning inside the cross, recall inside an algorithm. */
     STALLING,
     /** A step ordinary on average and uneven from one solve to the next. */
-    UNEVEN_STEP;
+    UNEVEN_STEP,
+    /** The last layer's permutation taken in two looks where one would do. */
+    TWO_LOOK_PLL;
 
     public String code() {
       return name().toLowerCase(Locale.ROOT);

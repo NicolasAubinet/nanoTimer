@@ -301,20 +301,25 @@ public class CoachPlanView {
    * The practice sets as an install without the coach reads them: the same cards with blank
    * charts, since which cases cost it the most is the coach's to say.
    *
-   * @param learnNext whether the OLLs to learn next are drawn too, for a solver short of full OLL
+   * @param learnNext the step whose cases to learn next are drawn too, "pll" or "oll", or null for
+   *     a solver with both learnt
    */
-  public void setPracticeTeaser(LinearLayout into, boolean learnNext) {
+  public void setPracticeTeaser(LinearLayout into, String learnNext) {
     into.removeAllViews();
     for (String family : TEASER_FAMILIES) {
       into.addView(teaserCard(into, activity.getString(R.string.coach_practice_set,
           Utils.toSmartCubeStepLocalizedName(activity, family, 0)), TEASER_CASES,
           R.drawable.coach_practice_target_dots));
     }
-    if (learnNext) {
+    if (learnNext != null) {
       // Five dots: a learning case clears on five clean reps in a row.
-      into.addView(teaserCard(into, activity.getString(R.string.coach_learn_next),
+      into.addView(teaserCard(into, activity.getString(learnNextTitle(learnNext)),
           Options.INSTANCE.getLearnNextCount(), R.drawable.coach_learning_target_dots));
     }
+  }
+
+  private static int learnNextTitle(String family) {
+    return "pll".equals(family) ? R.string.coach_learn_next_pll : R.string.coach_learn_next;
   }
 
   private View teaserCard(LinearLayout parent, String title, int cases, int dots) {
@@ -331,8 +336,8 @@ public class CoachPlanView {
   }
 
   /**
-   * The OLLs to learn next, as many as the solver picks in the title's pill. Null once every case
-   * the service offered has been cleared in a drill since.
+   * The PLLs or OLLs to learn next, as many as the solver picks in the title's pill. Null once every
+   * case the service offered has been cleared in a drill since.
    */
   private View learningCard(LinearLayout parent, final CoachPractice.Set set) {
     final Set<String> learned = Options.INSTANCE.getLearnedCases();
@@ -341,7 +346,8 @@ public class CoachPlanView {
       return null;
     }
     final View card = inflater.inflate(R.layout.coach_practice_set, parent, false);
-    ((TextView) card.findViewById(R.id.tvCoachPracticeTitle)).setText(R.string.coach_learn_next);
+    ((TextView) card.findViewById(R.id.tvCoachPracticeTitle)).setText(
+        learnNextTitle(set.getFamily()));
     final int shown = Math.min(Options.INSTANCE.getLearnNextCount(), offered);
     bindLearning(card, set.firstToLearn(shown, learned));
 
@@ -639,6 +645,7 @@ public class CoachPlanView {
       case RECOGNITION_HEAVY:
         return activity.getString(R.string.coach_reason_recognition_heavy);
       case TWO_LOOK_OLL:
+      case TWO_LOOK_PLL:
         return activity.getString(R.string.coach_reason_two_look_oll);
       case SLOW_STEP:
         return activity.getString(R.string.coach_reason_slow_step);
@@ -683,7 +690,8 @@ public class CoachPlanView {
       return activity.getString(R.string.coach_step_share_body,
           Utils.toSmartCubeStepLocalizedName(activity, code, 0), percent(took), percent(should));
     }
-    if (area.getReason() == FocusArea.Reason.TWO_LOOK_OLL && !area.getCodes().isEmpty()) {
+    if ((area.getReason() == FocusArea.Reason.TWO_LOOK_OLL
+        || area.getReason() == FocusArea.Reason.TWO_LOOK_PLL) && !area.getCodes().isEmpty()) {
       return twoLook(payload, area.getCodes().get(0));
     }
     if (area.getReason() == FocusArea.Reason.STUCK_PIECES) {
@@ -731,28 +739,34 @@ public class CoachPlanView {
   }
 
   /**
-   * What the last layer costs, how often it took two looks, and how many cases are behind that. The
-   * three read as one paragraph and any of them may be missing, so they are joined rather than
-   * formatted together.
+   * What a last layer step costs, how often it took two looks, and how many of its cases are behind
+   * that. The three read as one paragraph and any of them may be missing, so they are joined rather
+   * than formatted together.
    */
   private String twoLook(CoachPayload payload, String family) {
     StringBuilder said = new StringBuilder();
+    String step = Utils.toSmartCubeStepLocalizedName(activity, family, 0);
     StepShares shares = StepShares.of(payload);
     if (overBaseline(shares, family)) {
-      said.append(activity.getString(R.string.coach_two_look_share,
+      said.append(activity.getString(R.string.coach_two_look_share, step,
           percent(shares.actual(family)), percent(shares.expected(family))));
     }
-    Double looks = payload.value("two_look_count");
+    Double looks = payload.value(twoLookCountPath(family));
     Double solves = payload.value("windows.families");
     if (looks != null && solves != null) {
-      append(said, activity.getString(R.string.coach_two_look_body, looks.intValue(),
+      append(said, activity.getString(R.string.coach_two_look_body, step, looks.intValue(),
           solves.intValue()));
     }
-    Double toLearn = payload.value("to_learn_cases.count");
+    Double toLearn = payload.value("to_learn_cases." + family + ".count");
     if (toLearn != null && toLearn.intValue() > 0) {
       append(said, activity.getString(R.string.coach_two_look_to_learn, toLearn.intValue()));
     }
     return said.length() == 0 ? null : said.toString();
+  }
+
+  /** Where a payload counts the solves that took the step in two looks. */
+  static String twoLookCountPath(String family) {
+    return "pll".equals(family) ? "two_look_pll_count" : "two_look_count";
   }
 
   private static void append(StringBuilder said, String sentence) {

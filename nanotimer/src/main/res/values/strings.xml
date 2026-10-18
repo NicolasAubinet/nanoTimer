@@ -1427,8 +1427,8 @@
   <string name="coach_case_gap">%1$s drilled, %2$s slower in a solve</string>
   <string name="coach_case_rejected">%1$d%% of them thrown out</string>
   <string name="coach_recognition_body">%1$s: %2$s of %3$s goes before the first move.</string>
-  <string name="coach_two_look_body">%1$d of the last %2$d solves took the last layer in two looks.</string>
-  <string name="coach_two_look_share">The last layer takes %1$s of your solve, where %2$s is usual in one look.</string>
+  <string name="coach_two_look_body">%1$s: two looks in %2$d of the last %3$d solves.</string>
+  <string name="coach_two_look_share">%1$s takes %2$s of your solve, where %3$s is usual in one look.</string>
   <string name="coach_two_look_to_learn">Your solves show %1$d cases you do not yet put in with one algorithm.</string>
   <string name="coach_step_share_body">%1$s takes %2$s of your solve, where %3$s is usual.</string>
   <string name="coach_stuck_body">%1$s of your pairs start with a piece stuck in another slot. Those take %2$s, where the others take %3$s.</string>
@@ -1462,7 +1462,7 @@
   <string name="coach_fig_of_seconds">%1$s of %2$s seconds</string>
   <string name="coach_fig_solve_share">of your solve goes to %1$s</string>
   <string name="coach_fig_usual_share">%1$s is usual</string>
-  <string name="coach_fig_two_looks">last layers in two looks</string>
+  <string name="coach_fig_two_looks">%1$s in two looks</string>
   <plurals name="coach_fig_in_last_solves">
     <item quantity="one">in your last %1$d solve</item>
     <item quantity="other">in your last %1$d solves</item>
@@ -1501,6 +1501,7 @@
   <string name="coach_practice_body">Always here, apart from the plan: the cases costing you the most, practised until they beat their targets. Refreshed as you solve.</string>
   <string name="coach_practice_set">Your costliest %1$s cases</string>
   <string name="coach_learn_next">Next OLLs to learn</string>
+  <string name="coach_learn_next_pll">Next PLLs to learn</string>
   <plurals name="coach_learn_next_count">
     <item quantity="one">%d case</item>
     <item quantity="other">%d cases</item>
