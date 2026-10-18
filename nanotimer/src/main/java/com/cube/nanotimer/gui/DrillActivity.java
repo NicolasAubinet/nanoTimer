@@ -49,7 +49,11 @@ import com.cube.nanotimer.smartcube.model.CubeState;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
+import com.cube.nanotimer.gui.widget.GroupLearnedPanel;
+import com.cube.nanotimer.session.CaseKnowledge;
 import com.cube.nanotimer.step.LastLayerAlgorithms;
+import com.cube.nanotimer.step.OllShapes;
+import com.cube.nanotimer.vo.CaseHistory;
 import com.cube.nanotimer.util.view.DrillRepFlourish;
 import com.cube.nanotimer.util.view.LearningAlgorithmFade;
 import com.cube.nanotimer.util.view.PracticeOfferPulse;
@@ -58,8 +62,10 @@ import com.cube.nanotimer.util.view.StepPalette;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Runs a case drill: the case stands on the screen's cube, the smart cube is only the input, and the
@@ -129,6 +135,10 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   private AlgorithmFollower algorithmFollower;
   private ScrambleFollowAnimator algorithmAnimator;
   private Button skip;
+  /** For a coach learning drill: the cases the solves know, those cleared here, a group to fete. */
+  private final Set<String> knownCases = new HashSet<String>();
+  private final Set<String> clearedHere = new HashSet<String>();
+  private String groupToCelebrate;
   /** Back leaves practice for the drill rather than ending the drill. */
   private final OnBackPressedCallback practiceBack = new OnBackPressedCallback(false) {
     @Override
@@ -168,6 +178,9 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
           @Override
           public void onFragmentResult(String key, Bundle result) {
             showPracticeAlgorithm(); // a pick in the case popup is the algorithm practised
+            if (session != null && session.getSpec().isLearning()) {
+              teachAll(); // and the one a learning drill teaches
+            }
           }
         });
     getSupportFragmentManager().registerFragmentLifecycleCallbacks(
@@ -259,6 +272,12 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     session = new DrillSession(spec, Utils.getRandom(), weights, layerFace);
     initRecording(spec);
     hidePracticeOffer();
+    if (spec.isLearning()) {
+      teachAll();
+      if (spec.isFromCoach()) {
+        loadKnownCases();
+      }
+    }
 
     if (!session.isRunnable()) {
       showUnavailable(getString(R.string.drill_no_known_cases));
@@ -364,6 +383,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
    */
   private void onRepFinished(DrillRep rep) {
     recorder.record(rep);
+    noteLearned(rep);
     if (session.getSpec().retiresCases() && !rep.isPractice()) {
       refreshCaseProgress(); // during the beat, so the dot fills beside the rep that earned it
     }
@@ -386,9 +406,87 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   private final Runnable showNextCase = new Runnable() {
     @Override
     public void run() {
+      if (groupToCelebrate != null) {
+        celebrate(groupToCelebrate);
+        return;
+      }
       nextRep();
     }
   };
+
+  /** Every case a learning drill teaches, against the algorithm the screen shows for it. */
+  private void teachAll() {
+    for (String code : session.getCases()) {
+      session.setTaughtAlgorithm(code, learningAlgorithm(code));
+    }
+  }
+
+  /** The cases the solves say are known, read once for a shape group's completion. */
+  private void loadKnownCases() {
+    App.INSTANCE.getService().getCaseHistory(0, new DataCallback<CaseHistory>() {
+      @Override
+      public void onData(final CaseHistory history) {
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            for (CaseKnowledge known : history.getCases()) {
+              if (known.getStatus() == CaseKnowledge.Status.KNOWN) {
+                knownCases.add(known.getCode());
+              }
+            }
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * A case a learning drill has just cleared counts as learned from now on; in a coach drill, one
+   * that completes its shape group is celebrated once the rep's beat is over.
+   */
+  private void noteLearned(DrillRep rep) {
+    String code = rep.getCaseCode();
+    if (!session.getSpec().isLearning() || rep.isPractice() || !session.isRetired(code)
+        || !clearedHere.add(code)) {
+      return;
+    }
+    Options.INSTANCE.addLearnedCase(code);
+    String group = OllShapes.groupOf(code);
+    if (!session.getSpec().isFromCoach() || group == null
+        || Options.INSTANCE.isGroupCelebrated(group)) {
+      return;
+    }
+    if (learnedCases().containsAll(OllShapes.casesOf(group))) {
+      groupToCelebrate = group;
+    }
+  }
+
+  private Set<String> learnedCases() {
+    Set<String> learned = new HashSet<String>(knownCases);
+    learned.addAll(Options.INSTANCE.getLearnedCases());
+    return learned;
+  }
+
+  private void celebrate(String group) {
+    groupToCelebrate = null;
+    Options.INSTANCE.setGroupCelebrated(group);
+    int learned = 0;
+    Set<String> cases = learnedCases();
+    for (String[] row : LastLayerAlgorithms.ORIENTATIONS) {
+      if (cases.contains("oll_" + row[0])) {
+        learned++;
+      }
+    }
+    GroupLearnedPanel.show(this, group, OllShapes.casesOf(group), learned,
+        LastLayerAlgorithms.ORIENTATIONS.length, new Runnable() {
+          @Override
+          public void run() {
+            if (!finished && !isFinishing()) {
+              nextRep();
+            }
+          }
+        });
+  }
 
   /**
    * Deals the same case again, for one botched by a slip rather than by not knowing it. Spends no
@@ -734,6 +832,9 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     if (session.getSpec().isLearning() && rep.isGuided() && !rep.isAbandoned()) {
       text = getString(R.string.drill_rep_guided);
       colourRes = R.color.secondary_text;
+    } else if (rep.isOffTaught()) {
+      text = getString(R.string.drill_rep_other_alg);
+      colourRes = R.color.danger_text;
     } else if (session.getSpec().isLearning() && CaseTally.isClean(rep)) {
       text = getString(R.string.drill_rep_unaided);
       colourRes = R.color.green_soft;

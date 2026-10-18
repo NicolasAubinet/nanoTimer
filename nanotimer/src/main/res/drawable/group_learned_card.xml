@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The shape-group celebration's card: the dialog surface, warmed from the top by the OLL yellow,
+     with a thin yellow edge so it reads as a reward rather than another dialog. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <item>
+    <shape android:shape="rectangle">
+      <solid android:color="@color/dialog_surface"/>
+      <corners android:radius="28dp"/>
+    </shape>
+  </item>
+  <item>
+    <shape android:shape="rectangle">
+      <gradient
+         android:angle="270"
+         android:startColor="#33E3C33C"
+         android:centerColor="#0AE3C33C"
+         android:endColor="#00E3C33C"/>
+      <corners android:radius="28dp"/>
+      <stroke
+         android:width="1.5dp"
+         android:color="#66E3C33C"/>
+    </shape>
+  </item>
+</layer-list>

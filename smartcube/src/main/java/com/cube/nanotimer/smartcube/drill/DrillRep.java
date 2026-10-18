@@ -31,6 +31,7 @@ public final class DrillRep {
   private final boolean abandoned;
   private final boolean practice;
   private final boolean guided;
+  private final boolean offTaught;
 
   DrillRep(String caseCode, String scramble, List<CubeMove> moves, long shownAtMs,
       long recognitionMs, long executionMs, int moveCount, int resetCount, boolean revealed,
@@ -49,6 +50,13 @@ public final class DrillRep {
   DrillRep(String caseCode, String scramble, List<CubeMove> moves, long shownAtMs,
       long recognitionMs, long executionMs, int moveCount, int resetCount, boolean revealed,
       boolean abandoned, boolean practice, boolean guided) {
+    this(caseCode, scramble, moves, shownAtMs, recognitionMs, executionMs, moveCount, resetCount,
+        revealed, abandoned, practice, guided, false);
+  }
+
+  DrillRep(String caseCode, String scramble, List<CubeMove> moves, long shownAtMs,
+      long recognitionMs, long executionMs, int moveCount, int resetCount, boolean revealed,
+      boolean abandoned, boolean practice, boolean guided, boolean offTaught) {
     this.caseCode = caseCode;
     this.scramble = scramble;
     this.moves = Collections.unmodifiableList(moves);
@@ -61,6 +69,7 @@ public final class DrillRep {
     this.abandoned = abandoned;
     this.practice = practice;
     this.guided = guided;
+    this.offTaught = offTaught;
   }
 
   /** The case as a solve records it, {@code oll_21} or {@code pll_ga}. */
@@ -83,6 +92,10 @@ public final class DrillRep {
    * slice arriving as two outer turns and a regrip it never saw.
    */
   public String getTurned() {
+    return notation(moves);
+  }
+
+  static String notation(List<CubeMove> moves) {
     StringBuilder turned = new StringBuilder();
     for (CubeMove move : moves) {
       turned.append(turned.length() == 0 ? "" : " ").append(move.getNotation());
@@ -150,6 +163,11 @@ public final class DrillRep {
     return guided;
   }
 
+  /** Solved in a learning drill, but not with the algorithm being learned. */
+  public boolean isOffTaught() {
+    return offTaught;
+  }
+
   /** The half the drill's target applies to. */
   public long getTimedMs(DrillSpec.Type type) {
     return type == DrillSpec.Type.CASE_RECOGNITION ? recognitionMs : executionMs;
@@ -159,6 +177,7 @@ public final class DrillRep {
   public String toString() {
     return caseCode + "(" + recognitionMs + "ms + " + executionMs + "ms, " + moveCount
         + " moves" + (revealed ? ", revealed" : "") + (abandoned ? ", abandoned" : "")
-        + (practice ? ", practice" : "") + (guided ? ", guided" : "") + ")";
+        + (practice ? ", practice" : "") + (guided ? ", guided" : "")
+        + (offTaught ? ", off the taught algorithm" : "") + ")";
   }
 }

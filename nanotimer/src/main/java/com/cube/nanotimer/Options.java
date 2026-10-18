@@ -97,6 +97,8 @@ public enum Options {
   public static final String CFOP_READING_KEY = "cfop_reading_version";
   public static final String DRILL_CASES_KEY_PREFIX = "drill_cases_";
   public static final String CASE_ALGORITHM_KEY_PREFIX = "case_alg_";
+  private static final String LEARNED_CASES_KEY = "learned_cases";
+  private static final String CELEBRATED_GROUPS_KEY = "celebrated_groups";
   public static final String DRILL_PRESETS_KEY_PREFIX = "drill_case_presets_";
   public static final String CASE_OWN_ALGORITHM_KEY_PREFIX = "case_own_alg_";
   public static final String CASE_MUTED_ALGORITHMS_KEY_PREFIX = "case_muted_algs_";
@@ -486,6 +488,32 @@ public enum Options {
    */
   public String getCaseAlgorithm(String caseCode) {
     return sharedPreferences.getString(CASE_ALGORITHM_KEY_PREFIX + caseCode, null);
+  }
+
+  /** The cases cleared in a learning drill, which count as learned for a shape group's completion. */
+  public Set<String> getLearnedCases() {
+    return new LinkedHashSet<String>(
+        sharedPreferences.getStringSet(LEARNED_CASES_KEY, new LinkedHashSet<String>()));
+  }
+
+  public void addLearnedCase(String caseCode) {
+    Set<String> learned = getLearnedCases();
+    if (learned.add(caseCode)) {
+      sharedPreferences.edit().putStringSet(LEARNED_CASES_KEY, learned).apply();
+    }
+  }
+
+  /** Whether a shape group's completion has been celebrated, so it is celebrated once. */
+  public boolean isGroupCelebrated(String group) {
+    return sharedPreferences.getStringSet(CELEBRATED_GROUPS_KEY, new LinkedHashSet<String>())
+        .contains(group);
+  }
+
+  public void setGroupCelebrated(String group) {
+    Set<String> groups = new LinkedHashSet<String>(
+        sharedPreferences.getStringSet(CELEBRATED_GROUPS_KEY, new LinkedHashSet<String>()));
+    groups.add(group);
+    sharedPreferences.edit().putStringSet(CELEBRATED_GROUPS_KEY, groups).apply();
   }
 
   /** @param algorithm the algorithm they use, or null to go back to having no preference */

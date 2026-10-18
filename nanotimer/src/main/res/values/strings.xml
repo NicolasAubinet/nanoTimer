@@ -971,6 +971,14 @@
   <string name="drill_summary_ceiling">Stopped at %d reps.</string>
   <string name="drill_summary_over_target">Still over target: %s</string>
   <string name="drill_summary_still_learning">Not yet turned without looking: %s</string>
+  <string name="drill_rep_other_alg">another algorithm</string>
+  <string name="group_learned_label">Shape group learned</string>
+  <string name="group_learned_progress">%1$d of %2$d OLLs learned</string>
+  <string name="group_learned_continue">Keep going</string>
+  <plurals name="group_learned_body">
+    <item quantity="one">You know the %2$s OLL. Whenever you see this shape, you have the algorithm.</item>
+    <item quantity="other">You know all %1$d %2$s OLLs. Whenever you see this shape, you have the algorithm.</item>
+  </plurals>
   <string name="drill_targets_column_case">Case</string>
   <string name="drill_targets_column_reps">Reps</string>
   <string name="drill_targets_column_wins">Wins</string>

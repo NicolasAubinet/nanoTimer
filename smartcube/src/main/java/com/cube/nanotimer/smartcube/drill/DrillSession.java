@@ -7,12 +7,14 @@ import com.cube.nanotimer.smartcube.cube.CubieCube;
 import com.cube.nanotimer.smartcube.model.CubeMove;
 import com.cube.nanotimer.smartcube.model.CubeState;
 import com.cube.nanotimer.smartcube.model.Face;
+import com.cube.nanotimer.smartcube.step.CaseAlgorithms;
 import com.cube.nanotimer.smartcube.step.F2LPairScrambles;
 import com.cube.nanotimer.smartcube.step.FaceTurns;
 import com.cube.nanotimer.smartcube.step.LastLayerScrambles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -60,6 +62,7 @@ public final class DrillSession {
   private final List<String> unknownCases = new ArrayList<String>();
   private final List<DrillRep> reps = new ArrayList<DrillRep>();
   private final List<String> pass = new ArrayList<String>();
+  private final Map<String, String> taught = new HashMap<String, String>();
 
   /** An F2L pair drill, whose case is a pair and whose rep ends when that pair is in. */
   private final boolean pairs;
@@ -215,6 +218,18 @@ public final class DrillSession {
     revealed = false;
     guided = spec.isLearning() && practiceCase == null
         && getTally().getGuided(code) < GUIDED_REPS;
+  }
+
+  /**
+   * The algorithm a learning drill is teaching for a case, which a rep must be turned with to count.
+   * The screen says which, since the user's own pick in the case popup wins. Null for any.
+   */
+  public void setTaughtAlgorithm(String code, String algorithm) {
+    if (algorithm == null) {
+      taught.remove(code);
+    } else {
+      taught.put(code, algorithm);
+    }
   }
 
   /** Whether the case up is a learning drill's rep turned with its algorithm on screen. */
@@ -476,9 +491,13 @@ public final class DrillSession {
     long recognition = moves.isEmpty() ? 0 : Math.max(0, algStart - shownAt);
     long execution = moves.isEmpty() ? 0 : Math.max(0, lastMoveMs - algStart);
     boolean practice = practiceCase != null;
+    String taughtAlgorithm = taught.get(currentCase);
+    boolean offTaught = spec.isLearning() && !practice && !abandoned && !guided
+        && taughtAlgorithm != null
+        && !CaseAlgorithms.sameTurning(currentCase, DrillRep.notation(moves), taughtAlgorithm);
     DrillRep rep = new DrillRep(currentCase, currentScramble,
         new ArrayList<CubeMove>(moves), shownAt, recognition, execution, moves.size(),
-        resetCount, revealed, abandoned, practice, guided && !practice);
+        resetCount, revealed, abandoned, practice, guided && !practice, offTaught);
     // A practice rep is none of the drill's: it neither spends one nor counts towards retiring.
     if (!practice) {
       reps.add(rep);

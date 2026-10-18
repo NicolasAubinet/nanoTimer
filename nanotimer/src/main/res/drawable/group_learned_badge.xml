@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The trophy's disc: OLL yellow fading out to nothing, so it glows rather than sits. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+   android:shape="oval">
+  <gradient
+     android:type="radial"
+     android:gradientRadius="50%p"
+     android:startColor="#66E3C33C"
+     android:centerColor="#26E3C33C"
+     android:endColor="#00E3C33C"/>
+</shape>

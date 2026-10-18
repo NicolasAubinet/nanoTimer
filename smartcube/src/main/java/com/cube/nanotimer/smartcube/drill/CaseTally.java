@@ -19,6 +19,7 @@ public final class CaseTally {
   private final Map<String, Integer> showings = new HashMap<String, Integer>();
   private final Map<String, Integer> wins = new HashMap<String, Integer>();
   private final Map<String, Integer> guided = new HashMap<String, Integer>();
+  private final Map<String, Boolean> cleared = new HashMap<String, Boolean>();
 
   private CaseTally(DrillSpec spec) {
     this.spec = spec;
@@ -28,8 +29,15 @@ public final class CaseTally {
     CaseTally tally = new CaseTally(spec);
     for (DrillRep rep : reps) {
       String code = rep.getCaseCode();
-      if (rep.isGuided() && !rep.isAbandoned() && rep.getResetCount() == 0) {
-        tally.guided.put(code, countOf(tally.guided, code) + 1);
+      if (rep.isGuided()) {
+        if (!rep.isAbandoned() && rep.getResetCount() == 0) {
+          tally.guided.put(code, countOf(tally.guided, code) + 1);
+        }
+        continue;
+      }
+      if (spec.isLearning()) {
+        tally.countStreak(rep);
+        continue;
       }
       if (!isClean(rep)) {
         continue;
@@ -43,6 +51,26 @@ public final class CaseTally {
   }
 
   /**
+   * A learning drill's dots are a run: each rep turned without looking, with the algorithm being
+   * learned, adds one, and anything else empties them. Reaching the target clears the case for good.
+   */
+  private void countStreak(DrillRep rep) {
+    String code = rep.getCaseCode();
+    if (cleared.containsKey(code)) {
+      return;
+    }
+    if (isWin(rep)) {
+      showings.put(code, countOf(showings, code) + 1);
+      wins.put(code, countOf(wins, code) + 1);
+      if (countOf(wins, code) >= spec.getWinsToRetire()) {
+        cleared.put(code, Boolean.TRUE);
+      }
+    } else {
+      wins.put(code, 0);
+    }
+  }
+
+  /**
    * A rep that measured the case: not skipped, not restarted, not solved with the answer shown,
    * whether looked up or shown from the start.
    */
@@ -53,12 +81,14 @@ public final class CaseTally {
 
   /**
    * Whether a clean rep came in at or under its case's target, looking and turning together: the
-   * drill is about the case getting faster, whichever half it lost. In a learning drill every clean
-   * rep wins, since turning it without the algorithm is the whole ask.
+   * drill is about the case getting faster, whichever half it lost. In a learning drill a clean rep
+   * wins when it was the algorithm being learned, whatever the time.
    */
   public boolean isWin(DrillRep rep) {
-    return isClean(rep)
-        && (spec.isLearning() || rep.getTotalMs() <= spec.getTargetMs(rep.getCaseCode()));
+    if (spec.isLearning()) {
+      return isClean(rep) && !rep.isOffTaught();
+    }
+    return isClean(rep) && rep.getTotalMs() <= spec.getTargetMs(rep.getCaseCode());
   }
 
   /** Reps of a case finished cleanly with the algorithm on screen. */
@@ -70,12 +100,16 @@ public final class CaseTally {
     return countOf(showings, code);
   }
 
+  /** Wins against the target; in a learning drill, the current run. */
   public int getWins(String code) {
     return countOf(wins, code);
   }
 
   /** Beaten its target often enough, over enough clean reps, to leave the drill. */
   public boolean isCleared(String code) {
+    if (spec.isLearning()) {
+      return cleared.containsKey(code);
+    }
     return spec.retiresCases() && getWins(code) >= spec.getWinsToRetire()
         && getShowings(code) >= spec.getMinShowings();
   }

@@ -943,6 +943,14 @@
   <string name="drill_summary_ceiling">Parado após %d repetições.</string>
   <string name="drill_summary_over_target">Ainda acima da meta: %s</string>
   <string name="drill_summary_still_learning">Ainda não feito sem olhar: %s</string>
+  <string name="drill_rep_other_alg">outro algoritmo</string>
+  <string name="group_learned_label">Grupo aprendido</string>
+  <string name="group_learned_progress">%1$d de %2$d OLL aprendidos</string>
+  <string name="group_learned_continue">Continuar</string>
+  <plurals name="group_learned_body">
+    <item quantity="one">Você conhece o OLL %2$s. Sempre que vir esta forma, tem o algoritmo.</item>
+    <item quantity="other">Você conhece os %1$d OLL %2$s. Sempre que vir esta forma, tem o algoritmo.</item>
+  </plurals>
   <string name="drill_targets_column_case">Caso</string>
   <string name="drill_targets_column_reps">Rep.</string>
   <string name="drill_targets_column_wins">Acertos</string>

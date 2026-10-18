@@ -31,4 +31,6 @@
   <dimen name="case_row_shape_width">96dp</dimen>
   <!-- The bulb on a drill's practice offer, the size solve details draws it on a case chip. -->
   <dimen name="drill_practice_offer_icon">16dp</dimen>
+  <dimen name="group_learned_case">54dp</dimen>
+  <dimen name="group_learned_case_gap">5dp</dimen>
 </resources>

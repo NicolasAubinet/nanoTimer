@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shown over a coach learning drill when its last case completes a shape group: the group's
+     cases together, and how far into OLL that brings the solver. Takes every touch until closed. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   android:background="#E6080A0C"
+   android:clickable="true"
+   android:focusable="true">
+
+  <LinearLayout
+     android:id="@+id/llGroupLearnedCard"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_gravity="center"
+     android:layout_marginStart="22dp"
+     android:layout_marginEnd="22dp"
+     android:background="@drawable/group_learned_card"
+     android:gravity="center_horizontal"
+     android:orientation="vertical"
+     android:paddingStart="22dp"
+     android:paddingTop="18dp"
+     android:paddingEnd="22dp"
+     android:paddingBottom="22dp">
+
+    <FrameLayout
+       android:id="@+id/flGroupLearnedBadge"
+       android:layout_width="96dp"
+       android:layout_height="96dp"
+       android:background="@drawable/group_learned_badge">
+
+      <ImageView
+         android:layout_width="44dp"
+         android:layout_height="44dp"
+         android:layout_gravity="center"
+         android:importantForAccessibility="no"
+         android:src="@drawable/trophy"/>
+    </FrameLayout>
+
+    <TextView
+       android:id="@+id/tvGroupLearnedLabel"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:letterSpacing="0.16"
+       android:text="@string/group_learned_label"
+       android:textAllCaps="true"
+       android:textColor="@color/step_oll"
+       android:textSize="12.5sp"
+       android:textStyle="bold"/>
+
+    <TextView
+       android:id="@+id/tvGroupLearnedTitle"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="4dp"
+       android:textColor="@color/white"
+       android:textSize="32sp"
+       android:textStyle="bold"/>
+
+    <!-- The group's cases, in rows of up to four, each popping in on its own beat. -->
+    <LinearLayout
+       android:id="@+id/llGroupLearnedCases"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="16dp"
+       android:orientation="vertical"/>
+
+    <TextView
+       android:id="@+id/tvGroupLearnedBody"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="16dp"
+       android:gravity="center"
+       android:lineSpacingExtra="2dp"
+       android:textColor="#E6FFFFFF"
+       android:textSize="15.5sp"/>
+
+    <ProgressBar
+       android:id="@+id/pbGroupLearned"
+       style="?android:attr/progressBarStyleHorizontal"
+       android:layout_width="match_parent"
+       android:layout_height="8dp"
+       android:layout_marginTop="20dp"
+       android:max="1000"
+       android:progressDrawable="@drawable/group_learned_progress"/>
+
+    <TextView
+       android:id="@+id/tvGroupLearnedProgress"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="8dp"
+       android:textColor="@color/secondary_text"
+       android:textSize="13sp"/>
+
+    <Button
+       android:id="@+id/btGroupLearnedContinue"
+       style="@style/AccentActionButton"
+       android:layout_width="match_parent"
+       android:layout_marginTop="20dp"
+       android:text="@string/group_learned_continue"/>
+  </LinearLayout>
+
+  <!-- Over the card, so the burst is seen; it takes no touch. -->
+  <com.cube.nanotimer.util.view.ParticleView
+     android:id="@+id/vGroupLearnedConfetti"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"/>
+</FrameLayout>

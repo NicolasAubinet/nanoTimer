@@ -614,6 +614,45 @@ public class DrillSessionTest {
     assertTrue(session.isFinished());
   }
 
+  /** Looking the algorithm up empties the case's run of dots. */
+  @Test
+  public void aLookUpStartsTheRunOver() {
+    DrillSession session = new DrillSession(learning(), new Random(7));
+    Hand hand = new Hand(session);
+    int reps = 0;
+    while (hand.next()) {
+      String code = session.getCurrentCase();
+      boolean unaided = !session.isGuided();
+      // The third rep without looking is looked up, once, for pll_h.
+      if (unaided && "pll_h".equals(code) && session.getTally().getWins(code) == 2
+          && session.getTally().getShowings(code) == 2) {
+        session.markRevealed();
+      }
+      hand.pause(300);
+      hand.execute(inverse(session.getCurrentScramble()));
+      reps++;
+    }
+    assertEquals("two guided and three unaided each, plus the lost run of two and its look-up",
+        13, reps);
+    assertTrue(session.isRetired("pll_h"));
+  }
+
+  /** A rep turned some other way than the algorithm being learned does not count. */
+  @Test
+  public void onlyTheTaughtAlgorithmCounts() {
+    DrillSession session = new DrillSession(learning(), new Random(7));
+    session.setTaughtAlgorithm("pll_h", "R U R' U'");
+    Hand hand = new Hand(session);
+    while (hand.next()) {
+      hand.pause(300);
+      DrillRep rep = hand.execute(inverse(session.getCurrentScramble()));
+      assertEquals(!rep.isGuided() && "pll_h".equals(rep.getCaseCode()), rep.isOffTaught());
+    }
+    assertFalse(session.isRetired("pll_h"));
+    assertTrue(session.isRetired("pll_z"));
+    assertEquals(0, session.getTally().getWins("pll_h"));
+  }
+
   /** A guided rep that was skipped does not use up the guidance. */
   @Test
   public void aSkippedGuidedRepIsGuidedAgain() {
