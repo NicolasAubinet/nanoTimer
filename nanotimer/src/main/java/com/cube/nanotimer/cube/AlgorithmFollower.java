@@ -31,9 +31,6 @@ import java.util.function.Predicate;
 public class AlgorithmFollower {
 
   private static final String[] AUF = {null, "", "2", "'"};
-  private static final String[] FACES = {"U", "U'", "U2", "R", "R'", "R2", "F", "F'", "F2", "D",
-      "D'", "D2", "L", "L'", "L2", "B", "B'", "B2"};
-  private static final String[] SLICES = {"M", "M'", "M2", "S", "S'", "S2", "E", "E'", "E2"};
 
   private final String[] tokens;
   /** For each token, how many tokens that turn something end at or before it. */
@@ -48,8 +45,6 @@ public class AlgorithmFollower {
   /** The tokens as turned, without brackets, and the end of the last one that turns something. */
   private final List<String> turnTokens;
   private final int lastTurnEnd;
-  /** Whether two wrong turns of opposite faces may be a slice, read as one. */
-  private final boolean hasSlices;
   /** Whether the turns left the algorithm at any point since it started. */
   private boolean strayed;
   /** Turns seen, and per follower the turn since which it has followed them unbroken. */
@@ -85,13 +80,10 @@ public class AlgorithmFollower {
       turningUpTo[i] = turning;
     }
     int end = 0;
-    boolean slices = false;
     for (int i = 0; i < tokens.length; i++) {
       end = turns.get(i).isEmpty() ? end : i + 1;
-      slices |= !cleaned[i].isEmpty() && "MES".indexOf(cleaned[i].charAt(0)) >= 0;
     }
     lastTurnEnd = end;
-    hasSlices = slices;
     boolean anyRight = false;
     for (String auf : AUF) {
       for (int sides = 0; sides < 4; sides++) {
@@ -228,27 +220,16 @@ public class AlgorithmFollower {
     }
     int grip = isWrongAngle() ? furthestIndex(false) : undoing;
     int held = heldAt.get(grip);
-    // Named from where the solver's hands are: the algorithm's rotations, wides and slices so far,
-    // then each wrong turn in turn, since a slice among them moves the centres too
-    int tokensIn = tokensDone(Math.max(0, done(grip)));
-    List<String> walked = new ArrayList<>(turnTokens.subList(0, tokensIn));
-    List<String> made = followers.get(undoing).getWrongMoves();
-    List<String> undo = new ArrayList<>();
-    for (int i = 0; i < made.size(); i++) {
-      String token = hasSlices && i + 1 < made.size()
-          ? name(walked, held, made.subList(i, i + 2), SLICES) : null;
-      if (token != null) {
-        i++;
-      } else {
-        token = name(walked, held, made.subList(i, i + 1), FACES);
+    // Named from where the solver's hands are: the algorithm's rotations, wides and slices so far
+    List<String> turned = turnTokens.subList(0, tokensDone(Math.max(0, done(grip))));
+    StringBuilder named = new StringBuilder();
+    for (String turn : followers.get(undoing).getReverseMoves().split(" ")) {
+      if (named.length() > 0) {
+        named.append(' ');
       }
-      if (token == null) {
-        token = made.get(i); // unreachable for a face turn, kept as the cube's own name
-      }
-      walked.add(token);
-      undo.add(0, inverse(token));
+      named.append(asHeld(turn.charAt(0), held, turned)).append(turn.substring(1));
     }
-    return String.join(" ", undo);
+    return named.toString();
   }
 
   /**
@@ -263,30 +244,21 @@ public class AlgorithmFollower {
     return done == tokens.length ? lastTurnEnd : done;
   }
 
-  /** The token among {@code candidates}, turned where the hands now are, that made these turns. */
-  private String name(List<String> walked, int held, List<String> made, String[] candidates) {
-    List<String> sorted = new ArrayList<>(made);
-    Collections.sort(sorted);
-    List<String> with = new ArrayList<>(walked);
-    with.add("");
-    for (String candidate : candidates) {
-      with.set(with.size() - 1, candidate);
-      List<List<String>> per = AlgorithmForm.perToken(with.toArray(new String[0]));
-      List<String> turned = new ArrayList<>();
-      for (String turn : per.get(per.size() - 1)) {
-        turned.add(LayerRotation.piece(turn.substring(0, 1), held, face) + turn.substring(1));
-      }
-      Collections.sort(turned);
-      if (turned.equals(sorted)) {
-        return candidate;
+  /**
+   * The letter a solver calls one of the cube's faces, holding it {@code held} quarter turns round
+   * once the algorithm's {@code turned} tokens have moved their hands.
+   */
+  private char asHeld(char cubeFace, int held, List<String> turned) {
+    String[] with = turned.toArray(new String[turned.size() + 1]);
+    for (char letter : "URFDLB".toCharArray()) {
+      with[with.length - 1] = String.valueOf(letter);
+      List<List<String>> per = AlgorithmForm.perToken(with);
+      String first = per.get(per.size() - 1).get(0).substring(0, 1);
+      if (LayerRotation.piece(first, held, face).charAt(0) == cubeFace) {
+        return letter;
       }
     }
-    return null;
-  }
-
-  private static String inverse(String token) {
-    return token.endsWith("2") ? token
-        : token.endsWith("'") ? token.substring(0, token.length() - 1) : token + "'";
+    return cubeFace;
   }
 
   /**

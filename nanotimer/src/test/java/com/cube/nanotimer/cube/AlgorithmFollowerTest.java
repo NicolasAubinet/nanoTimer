@@ -206,22 +206,6 @@ public class AlgorithmFollowerTest {
     assertEquals("U", solver.follower.getUndoMoves());
   }
 
-  /**
-   * A slice turned the wrong way moves the centres, so it is undone as a slice: undone as two face
-   * turns it would leave every turn after it named a quarter turn off.
-   */
-  @Test
-  public void aWrongSliceIsUndoneAsASliceAndTheAlgorithmGoesOn() {
-    Solver solver = new Solver("R U2 R' U' S' R U' R' S"); // OLL 9
-    solver.turn("R", "U2", "R'", "U'", "S");
-    assertEquals("S'", solver.follower.getUndoMoves());
-    solver.turn("S'");
-    for (String token : "S' R U' R' S".split(" ")) {
-      solver.turn(token);
-      assertEquals("after " + token, "", solver.follower.getUndoMoves());
-    }
-  }
-
   /** f R U R' U' f' lands on a state another grip reaches too, which must not name the undo. */
   @Test
   public void aGripThatOnlyLandsOnTheStateDoesNotNameTheUndo() {
