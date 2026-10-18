@@ -961,6 +961,7 @@
   <string name="drill_practice_back">Back to drill</string>
   <string name="drill_practice_mode">Practice, not counted</string>
   <string name="drill_practice_pick">Tap Alg to pick the algorithm to practice</string>
+  <string name="drill_wrong_angle">Wrong angle. Undo that move, then turn the cube to match the picture.</string>
   <string name="drill_practice_other">Not the chosen one</string>
   <string name="drill_cases_cleared">%1$d of %2$d cases cleared</string>
   <string name="drill_summary_cases_cleared">cases cleared</string>

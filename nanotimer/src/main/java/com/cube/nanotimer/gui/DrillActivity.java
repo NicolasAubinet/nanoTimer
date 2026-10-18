@@ -149,6 +149,8 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   /** The algorithm line with its case picture, shown and faded as one. */
   private View practiceAlgorithmRow;
   private LastLayerCaseView practiceCasePicture;
+  /** Says a side turn fits the algorithm only from an angle that does not finish the case. */
+  private TextView wrongAngle;
   /** Greys the practised algorithm's moves as they are turned; null where there is none to follow. */
   private AlgorithmFollower algorithmFollower;
   private ScrambleFollowAnimator algorithmAnimator;
@@ -183,6 +185,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     practiceAlgorithm = findViewById(R.id.tvDrillPracticeAlg);
     practiceAlgorithmRow = findViewById(R.id.llDrillPracticeAlg);
     practiceCasePicture = findViewById(R.id.cvDrillPracticeCase);
+    wrongAngle = findViewById(R.id.tvDrillWrongAngle);
     algorithmAnimator = new ScrambleFollowAnimator(practiceAlgorithm);
     Drawable bulb = ContextCompat.getDrawable(this, R.drawable.ic_case_idea).mutate();
     bulb.setTint(ContextCompat.getColor(this, R.color.on_accent));
@@ -651,6 +654,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     // A learning drill's fade may still be running, and would hide the practised algorithm.
     LearningAlgorithmFade.show(practiceAlgorithmRow);
     practiceAlgorithmRow.setVisibility(on ? View.VISIBLE : View.GONE);
+    wrongAngle.setVisibility(View.GONE);
     practiceBack.setEnabled(on);
     showPracticeAlgorithm();
   }
@@ -678,7 +682,8 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     algorithmFollower = null;
     if (algorithm != null) {
       try {
-        algorithmFollower = new AlgorithmFollower(algorithm, layerFace);
+        algorithmFollower = new AlgorithmFollower(algorithm, layerFace,
+            diagram != null && session != null ? session::wouldFinish : null);
       } catch (IllegalArgumentException e) {
         algorithmFollower = null; // shown as written, just not greyed
       }
@@ -703,6 +708,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     if (!session.isGuided()) {
       algorithmFollower = null;
       LearningAlgorithmFade.hide(practiceAlgorithmRow);
+      wrongAngle.setVisibility(View.GONE);
       return;
     }
     followAlgorithm(session.getCurrentCase(), learningAlgorithm(session.getCurrentCase()));
@@ -733,10 +739,16 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       algorithmAnimator.show(new SpannableString(TextUtils.join(" ",
           algorithmFollower.getTokens())), algorithmFollower.getDoneCount());
     }
+    wrongAngle.setVisibility(algorithmFollower != null && algorithmFollower.isWrongAngle()
+        ? View.VISIBLE : View.GONE);
   }
 
   /** A case dealt again starts the algorithm over. */
   private void restartAlgorithmProgress() {
+    if (session.getPracticeCase() != null) {
+      showPracticeAlgorithm(); // a new deal is at a new angle, so the follower is built again
+      return;
+    }
     if (algorithmFollower != null && isAlgorithmUp()) {
       algorithmFollower.reset();
       algorithmAnimator.reset();

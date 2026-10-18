@@ -402,14 +402,47 @@ public final class DrillSession {
    * one of those a solved cube is exactly the question.
    */
   private boolean isCaseDone() {
+    return isCaseDone(cube);
+  }
+
+  private boolean isCaseDone(CubieCube state) {
     if (pairs) {
-      return F2LPairScrambles.isPairIn(cube.toFaceCube(),
+      return F2LPairScrambles.isPairIn(state.toFaceCube(),
           LayerRotation.piece("D", 0, layerFace).charAt(0), pairCorner, pairEdge);
     }
     if (currentCase != null && currentCase.startsWith("oll_")) {
-      return isLayerOriented();
+      return isLayerOriented(state);
     }
-    return cube.isSolved();
+    return state.isSolved();
+  }
+
+  /**
+   * Whether these outer turns ({@code "R"}, {@code "D'"}, {@code "F2"}), made on the case as it was
+   * dealt, finish it, allowing a last turn of the layer. Tells a screen which angles an algorithm can
+   * be started from, since a case is dealt at any turn of its layer.
+   */
+  public boolean wouldFinish(List<String> turns) {
+    if (currentCase == null) {
+      return false;
+    }
+    CubieCube state = new CubieCube();
+    FaceTurns.apply(state, currentScramble);
+    for (String turn : turns) {
+      Face face = Face.valueOf(turn.substring(0, 1));
+      String modifier = turn.substring(1);
+      int quarters = modifier.startsWith("2") ? 2 : 1;
+      for (int i = 0; i < quarters; i++) {
+        state.applyMove(face, modifier.startsWith("'"));
+      }
+    }
+    Face layer = Face.valueOf(layerFace);
+    for (int i = 0; i < 4; i++) {
+      if (isCaseDone(state)) {
+        return true;
+      }
+      state.applyMove(layer, false);
+    }
+    return false;
   }
 
   /**
@@ -461,8 +494,8 @@ public final class DrillSession {
   }
 
   /** Whether the nine stickers of the layer's face all show the same colour. */
-  private boolean isLayerOriented() {
-    String facelets = cube.toFaceCube();
+  private boolean isLayerOriented(CubieCube state) {
+    String facelets = state.toFaceCube();
     int start = FACELET_ORDER.indexOf(layerFace) * 9;
     for (int i = 1; i < 9; i++) {
       if (facelets.charAt(start + i) != facelets.charAt(start)) {

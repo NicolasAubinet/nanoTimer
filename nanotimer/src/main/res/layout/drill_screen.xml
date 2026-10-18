@@ -92,6 +92,20 @@
          android:textSize="20sp"/>
     </LinearLayout>
 
+    <!-- A side turn that fits the algorithm only from an angle that does not finish the case. -->
+    <TextView
+       android:id="@+id/tvDrillWrongAngle"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginBottom="6dp"
+       android:paddingStart="16dp"
+       android:paddingEnd="16dp"
+       android:gravity="center"
+       android:text="@string/drill_wrong_angle"
+       android:textColor="@color/warning"
+       android:textSize="15sp"
+       android:visibility="gone"/>
+
     <!-- ⚠️ The rep just FINISHED: its case, its time, and where the time went. All of it belongs to
          the case that is over, never to the one on screen, which is deliberately not named anywhere:
          naming it would hand the user the answer, and a recognition drill would be timing reading.
