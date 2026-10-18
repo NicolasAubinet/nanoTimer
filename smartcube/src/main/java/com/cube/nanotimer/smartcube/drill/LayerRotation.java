@@ -95,9 +95,10 @@ public final class LayerRotation {
 
   /**
    * Where a piece named by its faces ({@code "DFR"}) sits once its scramble has been through
-   * {@link #spun} and then {@link #toFace(String, String)}.
+   * {@link #spun} and then {@link #toFace(String, String)}. A single letter names a face, which a
+   * face turn follows without changing direction.
    */
-  static String piece(String faces, int quarters, String face) {
+  public static String piece(String faces, int quarters, String face) {
     StringBuilder moved = new StringBuilder();
     for (int i = 0; i < faces.length(); i++) {
       char letter = faces.charAt(i);

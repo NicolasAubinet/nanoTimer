@@ -63,18 +63,34 @@
       <include layout="@layout/drill_gyro_chip"/>
     </FrameLayout>
 
-    <!-- Practice mode, or a learning drill's guided reps: the algorithm, in the scramble's face. -->
-    <TextView
-       android:id="@+id/tvDrillPracticeAlg"
+    <!-- Practice mode, or a learning drill's guided reps: the algorithm, in the scramble's face,
+         beside the case drawn at the angle the algorithm starts from. -->
+    <LinearLayout
+       android:id="@+id/llDrillPracticeAlg"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:layout_marginTop="4dp"
        android:layout_marginBottom="6dp"
        android:gravity="center"
-       android:lineSpacingMultiplier="1.1"
-       android:textColor="@color/white"
-       android:textSize="20sp"
-       android:visibility="gone"/>
+       android:orientation="horizontal"
+       android:visibility="gone">
+
+      <com.cube.nanotimer.gui.widget.LastLayerCaseView
+         android:id="@+id/cvDrillPracticeCase"
+         android:layout_width="56dp"
+         android:layout_height="56dp"
+         android:layout_marginEnd="12dp"
+         android:visibility="gone"/>
+
+      <TextView
+         android:id="@+id/tvDrillPracticeAlg"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:gravity="center"
+         android:lineSpacingMultiplier="1.1"
+         android:textColor="@color/white"
+         android:textSize="20sp"/>
+    </LinearLayout>
 
     <!-- ⚠️ The rep just FINISHED: its case, its time, and where the time went. All of it belongs to
          the case that is over, never to the one on screen, which is deliberately not named anywhere:

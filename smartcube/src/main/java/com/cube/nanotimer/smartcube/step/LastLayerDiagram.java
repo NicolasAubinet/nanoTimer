@@ -88,6 +88,25 @@ public final class LastLayerDiagram {
   }
 
   /**
+   * The case at the angle an algorithm starts from, for a screen teaching that algorithm: a drill
+   * deals a case at any turn of the layer, and only the picture says which one to start at. Null if
+   * the moves are not an algorithm for a last layer.
+   */
+  public static LastLayerDiagram forAlgorithm(String caseCode, String moves) {
+    if (caseCode == null || moves == null) {
+      return null;
+    }
+    String cleaned = moves.replace("(", "").replace(")", "").trim();
+    try {
+      return caseCode.startsWith("pll_")
+          ? recognised(caseCode, cleaned)
+          : new LastLayerDiagram(caseCode, false, Notation.caseState(cleaned));
+    } catch (RuntimeException e) {
+      return null; // a token that is not a turn, or moves that do not keep the centres home
+    }
+  }
+
+  /**
    * The case as the solver sees it when they recognise it: of the four states the algorithm solves
    * once they have put the layer home, the one with fewest pieces out of place.
    *

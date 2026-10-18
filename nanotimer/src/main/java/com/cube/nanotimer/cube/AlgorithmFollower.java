@@ -1,5 +1,6 @@
 package com.cube.nanotimer.cube;
 
+import com.cube.nanotimer.smartcube.drill.LayerRotation;
 import com.cube.nanotimer.smartcube.model.CubeMove;
 import com.cube.nanotimer.smartcube.step.AlgorithmForm;
 
@@ -11,17 +12,19 @@ import java.util.List;
  * How far into an algorithm the cube has got, for greying its moves as they are turned the way the
  * timer greys a scramble's.
  *
- * <p>A case is dealt with a random turn of U before it, which the algorithm does not carry, and the
- * solver may run it from any side. So {@link ScrambleFollower} runs once for each of the four U
- * turns before it and each of the four sides it can be turned from, and the one furthest along is
- * what is shown. A rotation in the algorithm turns nothing the cube sees, so it greys with the move
- * before it.
+ * <p>A case is dealt with a random turn of its layer before it, which the algorithm does not carry,
+ * and the solver may run it from any side. So {@link ScrambleFollower} runs once for each of the
+ * four layer turns before it and each of the four sides it can be turned from, and the one furthest
+ * along is what is shown. A rotation in the algorithm turns nothing the cube sees, so it greys with
+ * the move before it.
+ *
+ * <p>The cube reports turns on its own faces, so the algorithm, written with the layer on U, is
+ * moved onto the face the drill deals the layer on: with yellow on top, the solver's R U arrives as
+ * L D.
  */
 public class AlgorithmFollower {
 
-  private static final String[] AUF = {null, "U", "U2", "U'"};
-  /** The side faces in the order a y rotation carries them. */
-  private static final String Y_CYCLE = "RFLB";
+  private static final String[] AUF = {null, "", "2", "'"};
 
   private final String[] tokens;
   /** For each token, how many tokens that turn something end at or before it. */
@@ -29,9 +32,18 @@ public class AlgorithmFollower {
   private final List<ScrambleFollower> followers = new ArrayList<>();
   private final List<Boolean> prefixed = new ArrayList<>();
 
-  /** @throws IllegalArgumentException if a token is not a turn */
+  /** For an algorithm turned with the layer on U. */
   public AlgorithmFollower(String algorithm) {
-    tokens = algorithm.trim().split("\\s+");
+    this(algorithm, "U");
+  }
+
+  /**
+   * @param layerFace the face the drill deals the last layer on, as its letter; null for U
+   * @throws IllegalArgumentException if a token is not a turn
+   */
+  public AlgorithmFollower(String algorithm, String layerFace) {
+    String face = layerFace == null ? "U" : layerFace;
+    tokens = algorithm.trim().split("\s+");
     String[] cleaned = new String[tokens.length];
     for (int i = 0; i < tokens.length; i++) {
       cleaned[i] = tokens[i].replace("(", "").replace(")", "");
@@ -49,10 +61,10 @@ public class AlgorithmFollower {
       for (int sides = 0; sides < 4; sides++) {
         List<List<String>> path = new ArrayList<>();
         if (auf != null) {
-          path.add(Collections.singletonList(auf));
+          path.add(Collections.singletonList(LayerRotation.piece("U", 0, face) + auf));
         }
         for (List<String> token : turns) {
-          path.add(turnedBy(token, sides));
+          path.add(turnedBy(token, sides, face));
         }
         followers.add(ScrambleFollower.ofTurns(path));
         prefixed.add(auf != null);
@@ -94,11 +106,11 @@ public class AlgorithmFollower {
     return done;
   }
 
-  private static List<String> turnedBy(List<String> token, int sides) {
+  /** Each outer turn after {@code sides} quarter turns of the cube about U, then onto the layer. */
+  private static List<String> turnedBy(List<String> token, int sides, String face) {
     List<String> turned = new ArrayList<>(token.size());
     for (String turn : token) {
-      int at = Y_CYCLE.indexOf(turn.charAt(0));
-      turned.add(at < 0 ? turn : Y_CYCLE.charAt((at + sides) % 4) + turn.substring(1));
+      turned.add(LayerRotation.piece(turn.substring(0, 1), sides, face) + turn.substring(1));
     }
     return turned;
   }

@@ -43,6 +43,45 @@ public class LastLayerDiagramTest {
     }
   }
 
+  /** The algorithm a case is charted with draws the chart itself. */
+  @Test
+  public void drawsACaseAtItsOwnAlgorithmsAngle() {
+    for (String code : LastLayerScrambles.cases()) {
+      String moves = LastLayerCaseAlgorithms.forCase(code).get(0).getMoves();
+      assertTrue(code, sameStickers(LastLayerDiagram.forCase(code),
+          LastLayerDiagram.forAlgorithm(code, moves)));
+    }
+  }
+
+  /** Started a turn of U later, the same case is drawn a quarter turn round. */
+  @Test
+  public void drawsTheAngleAnAlgorithmStartsFrom() {
+    String sune = "R U R' U R U2 R'";
+    LastLayerDiagram asWritten = LastLayerDiagram.forAlgorithm("oll_27", sune);
+    LastLayerDiagram turned = LastLayerDiagram.forAlgorithm("oll_27", "U (" + sune + ")");
+    assertNotNull(turned);
+    assertFalse(sameStickers(asWritten, turned));
+  }
+
+  @Test
+  public void hasNoPictureForAnAlgorithmThatIsNotOne() {
+    assertNull(LastLayerDiagram.forAlgorithm("oll_27", "R U Q"));
+  }
+
+  private static boolean sameStickers(LastLayerDiagram a, LastLayerDiagram b) {
+    for (int cell = 0; cell < 9; cell++) {
+      if (a.isOriented(cell) != b.isOriented(cell) || a.arrow(cell) != b.arrow(cell)) {
+        return false;
+      }
+    }
+    for (int side = 0; side < 12; side++) {
+      if (a.sideFace(side) != b.sideFace(side)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   @Test
   public void hasNoPictureForSomethingThatIsNotACase() {
     assertNull(LastLayerDiagram.forCase("pll_zz"));

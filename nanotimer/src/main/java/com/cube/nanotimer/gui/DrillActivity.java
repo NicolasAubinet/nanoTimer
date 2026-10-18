@@ -146,6 +146,9 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   private TextView practiceOffer;
   private String offeredCase;
   private TextView practiceAlgorithm;
+  /** The algorithm line with its case picture, shown and faded as one. */
+  private View practiceAlgorithmRow;
+  private LastLayerCaseView practiceCasePicture;
   /** Greys the practised algorithm's moves as they are turned; null where there is none to follow. */
   private AlgorithmFollower algorithmFollower;
   private ScrambleFollowAnimator algorithmAnimator;
@@ -178,6 +181,8 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     casePips.setBars(true);
     practiceOffer = findViewById(R.id.tvDrillPracticeOffer);
     practiceAlgorithm = findViewById(R.id.tvDrillPracticeAlg);
+    practiceAlgorithmRow = findViewById(R.id.llDrillPracticeAlg);
+    practiceCasePicture = findViewById(R.id.cvDrillPracticeCase);
     algorithmAnimator = new ScrambleFollowAnimator(practiceAlgorithm);
     Drawable bulb = ContextCompat.getDrawable(this, R.drawable.ic_case_idea).mutate();
     bulb.setTint(ContextCompat.getColor(this, R.color.on_accent));
@@ -644,8 +649,8 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     }
     labelButtons(on);
     // A learning drill's fade may still be running, and would hide the practised algorithm.
-    LearningAlgorithmFade.show(practiceAlgorithm);
-    practiceAlgorithm.setVisibility(on ? View.VISIBLE : View.GONE);
+    LearningAlgorithmFade.show(practiceAlgorithmRow);
+    practiceAlgorithmRow.setVisibility(on ? View.VISIBLE : View.GONE);
     practiceBack.setEnabled(on);
     showPracticeAlgorithm();
   }
@@ -656,16 +661,24 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     if (code == null) {
       return;
     }
-    followAlgorithm(Options.INSTANCE.getCaseAlgorithm(code));
+    followAlgorithm(code, Options.INSTANCE.getCaseAlgorithm(code));
   }
 
-  /** Writes an algorithm under the cube and greys it as turned, or says how to pick one. */
-  private void followAlgorithm(String algorithm) {
+  /**
+   * Writes an algorithm under the cube and greys it as turned, or says how to pick one. A last
+   * layer case is drawn beside it at the angle the algorithm starts from, which nothing else says.
+   */
+  private void followAlgorithm(String code, String algorithm) {
+    LastLayerDiagram diagram = algorithm != null && code != null
+        && (code.startsWith("oll_") || code.startsWith("pll_"))
+        ? LastLayerDiagram.forAlgorithm(code, algorithm) : null;
+    practiceCasePicture.setDiagram(diagram);
+    practiceCasePicture.setVisibility(diagram != null ? View.VISIBLE : View.GONE);
     algorithmAnimator.reset();
     algorithmFollower = null;
     if (algorithm != null) {
       try {
-        algorithmFollower = new AlgorithmFollower(algorithm);
+        algorithmFollower = new AlgorithmFollower(algorithm, layerFace);
       } catch (IllegalArgumentException e) {
         algorithmFollower = null; // shown as written, just not greyed
       }
@@ -689,11 +702,11 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     }
     if (!session.isGuided()) {
       algorithmFollower = null;
-      LearningAlgorithmFade.hide(practiceAlgorithm);
+      LearningAlgorithmFade.hide(practiceAlgorithmRow);
       return;
     }
-    followAlgorithm(learningAlgorithm(session.getCurrentCase()));
-    LearningAlgorithmFade.show(practiceAlgorithm);
+    followAlgorithm(session.getCurrentCase(), learningAlgorithm(session.getCurrentCase()));
+    LearningAlgorithmFade.show(practiceAlgorithmRow);
   }
 
   /** The user's chosen algorithm, else the one the drill names if it solves the case, else the usual. */

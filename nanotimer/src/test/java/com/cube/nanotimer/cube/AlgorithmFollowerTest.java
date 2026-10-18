@@ -49,6 +49,21 @@ public class AlgorithmFollowerTest {
     assertEquals(1, follower.getDoneCount());
   }
 
+  /** Yellow on top: the cube reports the solver's R U R' U' on its own faces, as L D L' D'. */
+  @Test
+  public void followsTheAlgorithmOnTheLayerFace() {
+    AlgorithmFollower follower = new AlgorithmFollower("R U R' U'", "D");
+    turn(follower, "L D L' D'");
+    assertEquals(4, follower.getDoneCount());
+  }
+
+  @Test
+  public void aTurnOfTheLayerFaceBeforeTheAlgorithmIsNotAMove() {
+    AlgorithmFollower follower = new AlgorithmFollower("R U R' U'", "D");
+    turn(follower, "D' F D");
+    assertEquals(2, follower.getDoneCount());
+  }
+
   private static void turn(AlgorithmFollower follower, String moves) {
     for (String move : moves.split(" ")) {
       Face face = Face.valueOf(move.substring(0, 1));
