@@ -39,6 +39,8 @@ public class AlgorithmFollower {
   /** Per follower: the quarter turns about the layer it is held at, which name its turns. */
   private final List<Integer> heldAt = new ArrayList<>();
   private final String face;
+  /** After each token, the face of the algorithm's first frame each of URFDLB then names. */
+  private final List<String> frames;
   /** Whether the turns left the algorithm at any point since it started. */
   private boolean strayed;
 
@@ -61,6 +63,7 @@ public class AlgorithmFollower {
       cleaned[i] = tokens[i].replace("(", "").replace(")", "");
     }
     List<List<String>> turns = AlgorithmForm.perToken(cleaned);
+    frames = AlgorithmForm.frames(cleaned);
     turningUpTo = new int[tokens.length];
     int turning = 0;
     for (int i = 0; i < tokens.length; i++) {
@@ -172,15 +175,33 @@ public class AlgorithmFollower {
     if (undoing < 0) {
       return "";
     }
-    int held = heldAt.get(isWrongAngle() ? furthestIndex(false) : undoing);
+    int grip = isWrongAngle() ? furthestIndex(false) : undoing;
+    int held = heldAt.get(grip);
+    // A rotation, wide or slice already turned has moved the solver's hands round the cube
+    String frame = frameAfter(Math.max(0, done(grip)));
     StringBuilder named = new StringBuilder();
     for (String turn : followers.get(undoing).getReverseMoves().split(" ")) {
       if (named.length() > 0) {
         named.append(' ');
       }
-      named.append(asHeld(turn.charAt(0), held)).append(turn.substring(1));
+      named.append(asHeld(turn.charAt(0), held, frame)).append(turn.substring(1));
     }
     return named.toString();
+  }
+
+  /**
+   * The frame once {@code turned} turning tokens are done, with the rotations right after them.
+   * Before any, the picture's frame: it shows the case ahead of a leading rotation.
+   */
+  private String frameAfter(int turned) {
+    if (turned == 0) {
+      return frames.get(0);
+    }
+    int done = 0;
+    while (done < tokens.length && turningUpTo[done] <= turned) {
+      done++;
+    }
+    return frames.get(done);
   }
 
   /** Fewer turns to undo, then further along, then with no layer turn before it. */
@@ -198,10 +219,14 @@ public class AlgorithmFollower {
     return !prefixed.get(a) && prefixed.get(b);
   }
 
-  /** The letter a solver holding the cube {@code held} quarter turns round calls one of its faces. */
-  private char asHeld(char cubeFace, int held) {
+  /**
+   * The letter a solver calls one of the cube's faces, holding it {@code held} quarter turns round
+   * and with the algorithm's frame moved to {@code frame}.
+   */
+  private char asHeld(char cubeFace, int held, String frame) {
     for (char letter : "URFDLB".toCharArray()) {
-      if (LayerRotation.piece(String.valueOf(letter), held, face).charAt(0) == cubeFace) {
+      String first = String.valueOf(frame.charAt("URFDLB".indexOf(letter)));
+      if (LayerRotation.piece(first, held, face).charAt(0) == cubeFace) {
         return letter;
       }
     }

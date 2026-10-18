@@ -7,9 +7,11 @@ import static org.junit.Assert.assertTrue;
 import com.cube.nanotimer.smartcube.cube.CubieCube;
 import com.cube.nanotimer.smartcube.model.CubeMove;
 import com.cube.nanotimer.smartcube.model.Face;
+import com.cube.nanotimer.smartcube.step.AlgorithmForm;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -179,6 +181,57 @@ public class AlgorithmFollowerTest {
     AlgorithmFollower follower = new AlgorithmFollower(SUNE, "U", finishes("U' " + SUNE));
     turn(follower, "U' R U R' U R U U R'"); // the cube reports U2 as two quarters
     assertFalse(follower.hasStrayed());
+  }
+
+  /** After a y the solver's R is another face of the cube, and their slip on it is undone as R. */
+  @Test
+  public void aSlipAfterARotationIsNamedFromTheNewGrip() {
+    assertSlipNamedAsHeld("R U R' y R U R'", 3, "R'", "R");
+  }
+
+  /** A wide u turns the solver's hands round the cube like a y. */
+  @Test
+  public void aSlipAfterAWideTurnIsNamedFromTheNewGrip() {
+    assertSlipNamedAsHeld("R U R' u R U R'", 4, "R'", "R");
+  }
+
+  /** A slice tilts the frame: after M' the solver's U is what was their front. */
+  @Test
+  public void aSlipAfterASliceIsNamedFromTheNewFrame() {
+    assertSlipNamedAsHeld("R U R' M' U R U' R'", 5, "U'", "U");
+  }
+
+  /**
+   * Turns the algorithm's first {@code done} cube turns, then {@code slip} as the solver means it
+   * at that point, and expects {@code undo} named the same way.
+   */
+  private static void assertSlipNamedAsHeld(String algorithm, int done, String slip, String undo) {
+    List<String> cube = new ArrayList<>();
+    String[] tokens = algorithm.split(" ");
+    for (List<String> turns : AlgorithmForm.perToken(tokens)) {
+      cube.addAll(turns);
+    }
+    AlgorithmFollower follower =
+        new AlgorithmFollower(algorithm, "U", finishes(String.join(" ", cube)));
+    turn(follower, String.join(" ", cube.subList(0, done)));
+    assertEquals("", follower.getUndoMoves());
+    // The slip's face as the frame now names it: the letter's face in the algorithm's first frame
+    String frame = AlgorithmForm.frames(tokens).get(tokensFor(tokens, done));
+    turn(follower, frame.charAt("URFDLB".indexOf(slip.charAt(0))) + slip.substring(1));
+    assertEquals(undo, follower.getUndoMoves());
+  }
+
+  /** How many tokens, rotations included, make up the first {@code turned} cube turns. */
+  private static int tokensFor(String[] tokens, int turned) {
+    int count = 0;
+    while (count < tokens.length && turned > 0) {
+      turned -= AlgorithmForm.perToken(tokens[count]).get(0).size();
+      count++;
+    }
+    while (count < tokens.length && AlgorithmForm.perToken(tokens[count]).get(0).isEmpty()) {
+      count++; // the rotation that follows is made before the next turn
+    }
+    return count;
   }
 
   /** Whether a path finishes the case the given moves solve, allowing a last turn of U. */
