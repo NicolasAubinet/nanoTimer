@@ -20,17 +20,42 @@ final class CoachPriceText {
     this.resources = resources;
   }
 
-  /** What is paid first: "2 weeks free, then €43.99 for the first year", or the price alone. */
-  String first(CoachOffers.Offer offer) {
-    String free = length(offer.getFreePeriod());
-    String paid = paidFirst(offer);
-    return free == null ? paid : resources.getString(R.string.coach_price_free_then, free, paid);
+  /** The tile's big figure: the first price paid, the offer's lower one before the base plan's. */
+  String price(CoachOffers.Offer offer) {
+    CoachOffers.Phase intro = offer.getIntro();
+    return (intro != null ? intro : offer.getRegular()).getPrice();
   }
 
-  /** "€54.99 a year after that", or null for an offer with no lower price before it. */
-  String after(CoachOffers.Offer offer) {
+  /** What the big figure pays for: "first year", or "a year" with no lower price; null if unsaid. */
+  String per(CoachOffers.Offer offer) {
+    CoachOffers.Phase intro = offer.getIntro();
+    CoachOffers.Period period = (intro != null ? intro : offer.getRegular()).getPeriod();
+    if (period == null) {
+      return null;
+    }
+    boolean one = period.getCount() == 1;
+    if (one && period.getUnit() == 'Y') {
+      return resources.getString(intro != null ? R.string.coach_tile_first_year
+          : R.string.coach_tile_year);
+    }
+    if (one && period.getUnit() == 'M') {
+      return resources.getString(intro != null ? R.string.coach_tile_first_month
+          : R.string.coach_tile_month);
+    }
+    return resources.getString(intro != null ? R.string.coach_tile_first
+        : R.string.coach_tile_every, length(period));
+  }
+
+  /** "then €54.99 a year", or null for an offer with no lower price before it. */
+  String then(CoachOffers.Offer offer) {
     return offer.getIntro() == null ? null
-        : resources.getString(R.string.coach_price_after, regular(offer));
+        : resources.getString(R.string.coach_tile_then, regular(offer));
+  }
+
+  /** "Free for 2 weeks", or null for an offer with no free period. */
+  String free(CoachOffers.Offer offer) {
+    String free = length(offer.getFreePeriod());
+    return free == null ? null : resources.getString(R.string.coach_purchase_free, free);
   }
 
   /** "20% off", or null for an offer that takes nothing off. */

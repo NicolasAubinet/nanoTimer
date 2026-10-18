@@ -1309,8 +1309,6 @@
   <string name="coach_ended_title_access">Your coach access has ended</string>
   <string name="coach_ended_body">No new plan is written, and nothing is sent to the coach any more. Your last plan stays here.</string>
   <string name="coach_ended_button">See the subscription</string>
-  <string name="coach_purchase_label" translatable="false">Cubench Coach</string>
-  <string name="coach_purchase_headline">A plan for your week, from your own solves</string>
   <string name="coach_plan_yearly">Yearly</string>
   <string name="coach_plan_monthly">Monthly</string>
   <string name="coach_price_yearly">%1$s a year</string>
@@ -1319,8 +1317,6 @@
   <string name="coach_price_first_year">%1$s for the first year</string>
   <string name="coach_price_first_month">%1$s for the first month</string>
   <string name="coach_price_first">%1$s for %2$s</string>
-  <string name="coach_price_free_then">%1$s free, then %2$s</string>
-  <string name="coach_price_after">%1$s after that</string>
   <string name="coach_price_off">%1$d%% off</string>
   <plurals name="coach_period_days">
     <item quantity="one">%d day</item>
@@ -1343,6 +1339,15 @@
   <string name="coach_purchase_subscribe_for">Subscribe for %1$s</string>
   <string name="coach_purchase_subscribe">Subscribe</string>
   <string name="coach_purchase_note">Cancel any time in Google Play. Subscribing turns weekly plans on.</string>
+  <string name="coach_purchase_sub">From your own solves</string>
+  <string name="coach_purchase_free">Free for %1$s</string>
+  <string name="coach_tile_first_year">first year</string>
+  <string name="coach_tile_first_month">first month</string>
+  <string name="coach_tile_first">for %1$s</string>
+  <string name="coach_tile_year">a year</string>
+  <string name="coach_tile_month">a month</string>
+  <string name="coach_tile_every">every %1$s</string>
+  <string name="coach_tile_then">then %1$s</string>
   <string name="coach_purchase_unavailable">Google Play can\'t be reached right now. Try again later.</string>
   <string name="coach_manage">Manage subscription</string>
   <plurals name="coach_days">

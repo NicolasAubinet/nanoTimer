@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Where the coach is bought, risen over the Plan tab: the two base plans at the prices Play
-     lists for this buyer, and what subscribing sends, which is all the agreeing there is. The
+<!-- Where the coach is bought, risen over the Plan tab: the two base plans as tiles at the prices
+     Play lists for this buyer, and what subscribing sends, which is all the agreeing there is. The
      button stays in reach while the rest scrolls. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
    android:layout_width="match_parent"
    android:layout_height="wrap_content"
+   android:background="@drawable/coach_purchase_sheet_bg"
    android:orientation="vertical"
    android:paddingLeft="16dp"
    android:paddingRight="16dp"
@@ -32,32 +33,57 @@
        android:layout_height="wrap_content"
        android:orientation="vertical">
 
-      <TextView
+      <LinearLayout
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:fontFamily="@font/roboto_medium"
-         android:letterSpacing="0.08"
-         android:textAllCaps="true"
-         android:textColor="@color/secondary_text"
-         android:textSize="11.5sp"
-         android:text="@string/coach_purchase_label"/>
+         android:layout_marginTop="6dp"
+         android:gravity="center_vertical"
+         android:orientation="horizontal">
 
-      <TextView
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_marginTop="4dp"
-         android:layout_marginBottom="6dp"
-         android:fontFamily="@font/roboto_medium"
-         android:lineSpacingMultiplier="1.15"
-         android:text="@string/coach_purchase_headline"
-         android:textColor="@color/white"
-         android:textSize="19sp"/>
+        <ImageView
+           android:layout_width="44dp"
+           android:layout_height="44dp"
+           android:background="@drawable/coach_hero_icon_tile"
+           android:importantForAccessibility="no"
+           android:padding="10dp"
+           android:src="@drawable/ic_coach_target"/>
 
+        <LinearLayout
+           android:layout_width="0dp"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="12dp"
+           android:layout_marginStart="12dp"
+           android:layout_weight="1"
+           android:orientation="vertical">
+
+          <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:fontFamily="@font/roboto"
+             android:text="@string/analysis_plan_headline"
+             android:textColor="@color/white"
+             android:textSize="20sp"
+             android:textStyle="bold"/>
+
+          <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_marginTop="1dp"
+             android:text="@string/coach_purchase_sub"
+             android:textColor="@color/secondary_text"
+             android:textSize="13sp"/>
+        </LinearLayout>
+      </LinearLayout>
+
+      <!-- The tiles, side by side. Their badges stand above them, so nothing may clip. -->
       <LinearLayout
          android:id="@+id/llCoachPurchasePlans"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:orientation="vertical"/>
+         android:layout_marginTop="12dp"
+         android:clipChildren="false"
+         android:clipToPadding="false"
+         android:orientation="horizontal"/>
 
       <!-- While Play is asked for the prices. -->
       <ProgressBar
@@ -80,62 +106,89 @@
          android:textSize="13.5sp"
          android:visibility="gone"/>
 
+      <!-- The picked plan's free weeks. Gone when it starts paid. -->
       <TextView
+         android:id="@+id/tvCoachPurchaseFree"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:layout_marginTop="18dp"
-         android:fontFamily="@font/roboto_medium"
-         android:letterSpacing="0.08"
-         android:textAllCaps="true"
-         android:textColor="@color/secondary_text"
-         android:textSize="11.5sp"
-         android:text="@string/coach_sends_label"/>
-
-      <!-- Opens the choice only when more than one solve type can carry the plans. -->
-      <LinearLayout
-         android:id="@+id/llCoachPurchaseType"
-         android:layout_width="match_parent"
-         android:layout_height="44dp"
-         android:layout_marginTop="8dp"
-         android:background="@drawable/coach_purchase_field"
+         android:layout_marginTop="10dp"
+         android:background="@drawable/coach_win_line"
+         android:drawableLeft="@drawable/ic_coach_gift"
+         android:drawableStart="@drawable/ic_coach_gift"
+         android:drawablePadding="10dp"
          android:gravity="center_vertical"
-         android:orientation="horizontal"
          android:paddingLeft="12dp"
          android:paddingRight="12dp"
-         android:visibility="gone">
+         android:paddingTop="10dp"
+         android:paddingBottom="10dp"
+         android:textColor="@color/green_soft"
+         android:textSize="14sp"
+         android:visibility="gone"/>
 
-        <TextView
-           android:layout_width="0dp"
-           android:layout_height="wrap_content"
-           android:layout_weight="1"
-           android:text="@string/coach_plans_for"
-           android:textColor="@color/secondary_text"
-           android:textSize="13sp"/>
-
-        <TextView
-           android:id="@+id/tvCoachPurchaseType"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:fontFamily="@font/roboto_medium"
-           android:textColor="@color/lightblue"
-           android:textSize="15sp"/>
-      </LinearLayout>
-
-      <TextView
-         android:id="@+id/tvCoachPurchaseSends"
+      <LinearLayout
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:layout_marginTop="6dp"
-         android:alpha="0.8"
-         android:lineSpacingMultiplier="1.2"
-         android:textColor="@color/white"
-         android:textSize="12.5sp"/>
+         android:layout_marginTop="12dp"
+         android:background="@drawable/coach_purchase_card"
+         android:orientation="vertical"
+         android:padding="14dp">
+
+        <TextView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:fontFamily="@font/roboto_medium"
+           android:letterSpacing="0.08"
+           android:textAllCaps="true"
+           android:textColor="@color/secondary_text"
+           android:textSize="11.5sp"
+           android:text="@string/coach_sends_label"/>
+
+        <!-- Opens the choice only when more than one solve type can carry the plans. -->
+        <LinearLayout
+           android:id="@+id/llCoachPurchaseType"
+           android:layout_width="match_parent"
+           android:layout_height="44dp"
+           android:layout_marginTop="8dp"
+           android:background="@drawable/coach_purchase_field"
+           android:gravity="center_vertical"
+           android:orientation="horizontal"
+           android:paddingLeft="12dp"
+           android:paddingRight="12dp"
+           android:visibility="gone">
+
+          <TextView
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:layout_weight="1"
+             android:text="@string/coach_plans_for"
+             android:textColor="@color/secondary_text"
+             android:textSize="13sp"/>
+
+          <TextView
+             android:id="@+id/tvCoachPurchaseType"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:fontFamily="@font/roboto_medium"
+             android:textColor="@color/lightblue"
+             android:textSize="15sp"/>
+        </LinearLayout>
+
+        <TextView
+           android:id="@+id/tvCoachPurchaseSends"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="6dp"
+           android:alpha="0.85"
+           android:lineSpacingMultiplier="1.2"
+           android:textColor="@color/white"
+           android:textSize="12.5sp"/>
+      </LinearLayout>
     </LinearLayout>
   </androidx.core.widget.NestedScrollView>
 
   <androidx.appcompat.widget.AppCompatButton
      android:id="@+id/buCoachPurchase"
-     style="@style/DialogActionButton"
+     style="@style/AccentActionButton"
      android:layout_marginTop="14dp"
      android:enabled="false"
      android:text="@string/coach_purchase_subscribe"/>
@@ -143,7 +196,7 @@
   <TextView
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
-     android:layout_marginTop="6dp"
+     android:layout_marginTop="8dp"
      android:gravity="center"
      android:lineSpacingMultiplier="1.2"
      android:text="@string/coach_purchase_note"

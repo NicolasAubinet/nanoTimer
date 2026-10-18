@@ -1,80 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One base plan in the purchase sheet: its name, what is paid first and what is paid after. -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   android:layout_width="match_parent"
-   android:layout_height="wrap_content"
-   android:layout_marginTop="8dp"
-   android:background="@drawable/coach_purchase_plan"
-   android:gravity="center_vertical"
-   android:orientation="horizontal"
-   android:paddingLeft="14dp"
-   android:paddingRight="14dp"
-   android:paddingTop="11dp"
-   android:paddingBottom="11dp">
-
-  <!-- Takes the row's selected state. -->
-  <View
-     android:layout_width="18dp"
-     android:layout_height="18dp"
-     android:layout_marginEnd="12dp"
-     android:layout_marginRight="12dp"
-     android:background="@drawable/coach_purchase_radio"
-     android:duplicateParentState="true"/>
+<!-- One base plan in the purchase sheet, as a tile: its name, the first price big, what follows.
+     The badge sits on the tile's top edge, so the tile starts below it. Both tiles take the row's
+     height, so one without an offer's lines still matches the other. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   android:layout_width="0dp"
+   android:layout_height="match_parent"
+   android:layout_weight="1"
+   android:clipChildren="false">
 
   <LinearLayout
-     android:layout_width="0dp"
-     android:layout_height="wrap_content"
-     android:layout_weight="1"
-     android:orientation="vertical">
-
-    <LinearLayout
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:gravity="center_vertical"
-       android:orientation="horizontal">
-
-      <TextView
-         android:id="@+id/tvCoachPurchasePlanName"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:fontFamily="@font/roboto_medium"
-         android:textColor="@color/white"
-         android:textSize="15sp"/>
-
-      <!-- How much less the offer's price is. Gone without one. -->
-      <TextView
-         android:id="@+id/tvCoachPurchasePlanTag"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_marginStart="8dp"
-         android:layout_marginLeft="8dp"
-         android:background="@drawable/row_chip_accent"
-         android:fontFamily="@font/roboto_medium"
-         android:paddingLeft="7dp"
-         android:paddingRight="7dp"
-         android:paddingTop="1dp"
-         android:paddingBottom="1dp"
-         android:textAllCaps="true"
-         android:textColor="@color/lightblue"
-         android:textSize="10.5sp"
-         android:visibility="gone"/>
-    </LinearLayout>
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:layout_marginTop="10dp"
+     android:background="@drawable/coach_purchase_plan"
+     android:gravity="center_horizontal"
+     android:orientation="vertical"
+     android:paddingLeft="10dp"
+     android:paddingRight="10dp"
+     android:paddingTop="18dp"
+     android:paddingBottom="15dp">
 
     <TextView
-       android:id="@+id/tvCoachPurchasePlanFirst"
-       android:layout_width="match_parent"
+       android:id="@+id/tvCoachPurchasePlanName"
+       android:layout_width="wrap_content"
        android:layout_height="wrap_content"
+       android:fontFamily="@font/roboto_medium"
+       android:letterSpacing="0.08"
+       android:textAllCaps="true"
+       android:textColor="@color/secondary_text"
+       android:textSize="12sp"/>
+
+    <!-- Shrinks for a currency that writes long, rather than wrapping. -->
+    <androidx.appcompat.widget.AppCompatTextView
+       android:id="@+id/tvCoachPurchasePlanPrice"
+       android:layout_width="match_parent"
+       android:layout_height="40dp"
        android:layout_marginTop="2dp"
+       android:fontFamily="@font/roboto"
+       android:gravity="center"
+       android:maxLines="1"
        android:textColor="@color/white"
-       android:textSize="13sp"/>
+       android:textStyle="bold"
+       app:autoSizeMaxTextSize="30sp"
+       app:autoSizeMinTextSize="16sp"
+       app:autoSizeTextType="uniform"/>
 
     <TextView
-       android:id="@+id/tvCoachPurchasePlanAfter"
-       android:layout_width="match_parent"
+       android:id="@+id/tvCoachPurchasePlanPer"
+       android:layout_width="wrap_content"
        android:layout_height="wrap_content"
+       android:gravity="center"
+       android:textColor="@color/white"
+       android:alpha="0.8"
+       android:textSize="12.5sp"/>
+
+    <!-- What the base plan costs once the offer is over. Gone without an offer. -->
+    <TextView
+       android:id="@+id/tvCoachPurchasePlanThen"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="6dp"
+       android:gravity="center"
        android:textColor="@color/secondary_text"
        android:textSize="12sp"
        android:visibility="gone"/>
   </LinearLayout>
 
-</LinearLayout>
+  <!-- How much less the offer's price is. Gone without one. -->
+  <TextView
+     android:id="@+id/tvCoachPurchasePlanTag"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_gravity="top|center_horizontal"
+     android:background="@drawable/coach_purchase_badge"
+     android:fontFamily="@font/roboto_medium"
+     android:letterSpacing="0.04"
+     android:paddingLeft="9dp"
+     android:paddingRight="9dp"
+     android:paddingTop="2dp"
+     android:paddingBottom="2dp"
+     android:textAllCaps="true"
+     android:textColor="@color/coach_purchase_badge_text"
+     android:textSize="11sp"
+     android:visibility="gone"/>
+
+</FrameLayout>

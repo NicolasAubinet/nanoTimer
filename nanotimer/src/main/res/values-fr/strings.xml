@@ -1265,7 +1265,6 @@
   <string name="coach_ended_title_access">Votre accès au coach a pris fin</string>
   <string name="coach_ended_body">Aucun nouveau plan n\'est écrit, et plus rien n\'est envoyé au coach. Votre dernier plan reste ici.</string>
   <string name="coach_ended_button">Voir l\'abonnement</string>
-  <string name="coach_purchase_headline">Un plan pour votre semaine, à partir de vos propres résolutions</string>
   <string name="coach_plan_yearly">Annuel</string>
   <string name="coach_plan_monthly">Mensuel</string>
   <string name="coach_price_yearly">%1$s par an</string>
@@ -1274,8 +1273,6 @@
   <string name="coach_price_first_year">%1$s la première année</string>
   <string name="coach_price_first_month">%1$s le premier mois</string>
   <string name="coach_price_first">%1$s pendant %2$s</string>
-  <string name="coach_price_free_then">%1$s d\'essai gratuit, puis %2$s</string>
-  <string name="coach_price_after">%1$s ensuite</string>
   <string name="coach_price_off">-%1$d %%</string>
   <plurals name="coach_period_days">
     <item quantity="one">%d jour</item>
@@ -1298,6 +1295,15 @@
   <string name="coach_purchase_subscribe_for">S\'abonner pour %1$s</string>
   <string name="coach_purchase_subscribe">S\'abonner</string>
   <string name="coach_purchase_note">Annulez à tout moment dans Google Play. S\'abonner active les plans hebdomadaires.</string>
+  <string name="coach_purchase_sub">À partir de vos propres résolutions</string>
+  <string name="coach_purchase_free">Gratuit pendant %1$s</string>
+  <string name="coach_tile_first_year">la première année</string>
+  <string name="coach_tile_first_month">le premier mois</string>
+  <string name="coach_tile_first">pendant %1$s</string>
+  <string name="coach_tile_year">par an</string>
+  <string name="coach_tile_month">par mois</string>
+  <string name="coach_tile_every">tous les %1$s</string>
+  <string name="coach_tile_then">puis %1$s</string>
   <string name="coach_purchase_unavailable">Google Play est injoignable pour le moment. Réessayez plus tard.</string>
   <string name="coach_manage">Gérer l\'abonnement</string>
   <plurals name="coach_days">

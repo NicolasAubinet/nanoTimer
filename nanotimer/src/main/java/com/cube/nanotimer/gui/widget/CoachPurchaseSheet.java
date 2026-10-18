@@ -202,6 +202,8 @@ public class CoachPurchaseSheet extends NanoTimerBottomSheetFragment
         .setVisibility(plans == null ? View.VISIBLE : View.GONE);
     content.findViewById(R.id.tvCoachPurchaseUnavailable)
         .setVisibility(plans != null && plans.isEmpty() ? View.VISIBLE : View.GONE);
+    TextView free = content.findViewById(R.id.tvCoachPurchaseFree);
+    free.setVisibility(View.GONE);
     TextView button = content.findViewById(R.id.buCoachPurchase);
     button.setEnabled(false);
     button.setText(R.string.coach_purchase_subscribe);
@@ -217,24 +219,31 @@ public class CoachPurchaseSheet extends NanoTimerBottomSheetFragment
     }
     basePlan = selected.getBasePlan();
     LayoutInflater inflater = LayoutInflater.from(requireContext());
+    int gap = getResources().getDimensionPixelSize(R.dimen.coach_purchase_tile_gap);
     for (final CoachOffers.Offer plan : plans) {
-      View row = inflater.inflate(R.layout.coach_purchase_plan, rows, false);
-      ((TextView) row.findViewById(R.id.tvCoachPurchasePlanName)).setText(
+      View tile = inflater.inflate(R.layout.coach_purchase_plan, rows, false);
+      ((TextView) tile.findViewById(R.id.tvCoachPurchasePlanName)).setText(
           CoachBilling.YEARLY.equals(plan.getBasePlan()) ? R.string.coach_plan_yearly
               : R.string.coach_plan_monthly);
-      setOrHide((TextView) row.findViewById(R.id.tvCoachPurchasePlanTag), text.tag(plan));
-      ((TextView) row.findViewById(R.id.tvCoachPurchasePlanFirst)).setText(text.first(plan));
-      setOrHide((TextView) row.findViewById(R.id.tvCoachPurchasePlanAfter), text.after(plan));
-      row.setSelected(plan == selected);
-      row.setOnClickListener(new View.OnClickListener() {
+      setOrHide((TextView) tile.findViewById(R.id.tvCoachPurchasePlanTag), text.tag(plan));
+      ((TextView) tile.findViewById(R.id.tvCoachPurchasePlanPrice)).setText(text.price(plan));
+      setOrHide((TextView) tile.findViewById(R.id.tvCoachPurchasePlanPer), text.per(plan));
+      setOrHide((TextView) tile.findViewById(R.id.tvCoachPurchasePlanThen), text.then(plan));
+      if (rows.getChildCount() > 0) {
+        ((ViewGroup.MarginLayoutParams) tile.getLayoutParams()).setMarginStart(gap);
+      }
+      // Both pass down to the card and its badge, so the badge is part of what is tapped.
+      tile.setSelected(plan == selected);
+      tile.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
           basePlan = plan.getBasePlan();
           showPlans();
         }
       });
-      rows.addView(row);
+      rows.addView(tile);
     }
+    setOrHide(free, text.free(selected));
     button.setEnabled(true);
     button.setText(text.button(selected));
   }

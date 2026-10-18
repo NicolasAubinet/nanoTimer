@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A quiet card on the purchase sheet, for what subscribing sends. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+   android:shape="rectangle">
+  <solid android:color="#2D3237"/>
+  <corners android:radius="14dp"/>
+</shape>

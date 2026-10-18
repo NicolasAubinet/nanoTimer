@@ -33,4 +33,5 @@
   <dimen name="drill_practice_offer_icon">16dp</dimen>
   <dimen name="group_learned_case">54dp</dimen>
   <dimen name="group_learned_case_gap">5dp</dimen>
+  <dimen name="coach_purchase_tile_gap">10dp</dimen>
 </resources>

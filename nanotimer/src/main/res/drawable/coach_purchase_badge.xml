@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The offer's badge on a plan tile: filled on the picked tile, outlined on the other. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:state_selected="true">
+    <shape android:shape="rectangle">
+      <solid android:color="@color/lightblue"/>
+      <corners android:radius="10dp"/>
+    </shape>
+  </item>
+  <item>
+    <shape android:shape="rectangle">
+      <solid android:color="@color/dialog_surface"/>
+      <stroke android:width="1dp" android:color="#4B6A75"/>
+      <corners android:radius="10dp"/>
+    </shape>
+  </item>
+</selector>
