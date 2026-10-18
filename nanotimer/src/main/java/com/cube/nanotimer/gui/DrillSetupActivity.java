@@ -3,6 +3,8 @@ package com.cube.nanotimer.gui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -139,6 +141,7 @@ public class DrillSetupActivity extends NanoTimerActivity
   private LinearLayout llPicked;
   private View casesRow;
   private Button btStart;
+  private int[] startPadding;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -154,6 +157,8 @@ public class DrillSetupActivity extends NanoTimerActivity
     tvCasesCount = findViewById(R.id.tvDrillCasesCount);
     llPicked = findViewById(R.id.llDrillCasesPicked);
     btStart = findViewById(R.id.btDrillStart);
+    startPadding = new int[] {btStart.getPaddingLeft(), btStart.getPaddingTop(),
+        btStart.getPaddingRight(), btStart.getPaddingBottom()};
     palette = StepPalette.cfop(this);
     planningSeconds = findViewById(R.id.llDrillPlanningSeconds);
     tvPracticeHint = findViewById(R.id.tvDrillPracticeHint);
@@ -308,7 +313,8 @@ public class DrillSetupActivity extends NanoTimerActivity
   public void onConnection(CubeConnection connection) {
     // Said here rather than only on the drill screen: being turned back at the door having picked
     // everything is worse than being told at the door. Start becomes the way to connect one.
-    if (SmartCubeManager.INSTANCE.isConnected()) {
+    boolean connected = SmartCubeManager.INSTANCE.isConnected();
+    if (connected) {
       btStart.setText(R.string.drill_start);
       btStart.setBackgroundResource(R.drawable.hero_start_button);
       btStart.setTextColor(ContextCompat.getColorStateList(this, R.color.on_accent_ink));
@@ -317,6 +323,9 @@ public class DrillSetupActivity extends NanoTimerActivity
       btStart.setBackgroundResource(R.drawable.connect_cube_button);
       btStart.setTextColor(ContextCompat.getColor(this, R.color.white));
     }
+    // The outline stops above the 3dp kept for Start's shadow, so the label centres on the outline.
+    btStart.setPadding(startPadding[0], startPadding[1], startPadding[2],
+        startPadding[3] + (connected ? 0 : dp(3)));
   }
 
   /** "Connect your cube" behind the smart cube mark, both centred on the button. */
@@ -326,9 +335,34 @@ public class DrillSetupActivity extends NanoTimerActivity
     int size = dp(22);
     mark.setBounds(0, 0, size, size);
     SpannableString label = new SpannableString("  " + getString(R.string.drill_connect_cube));
-    label.setSpan(new ImageSpan(mark, ImageSpan.ALIGN_BASELINE), 0, 1,
-        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    label.setSpan(new CentredImageSpan(mark), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     return label;
+  }
+
+  /** An icon centred on the text's own middle, without making the line any taller. */
+  private static class CentredImageSpan extends ImageSpan {
+
+    CentredImageSpan(Drawable drawable) {
+      super(drawable);
+    }
+
+    @Override
+    public int getSize(Paint paint, CharSequence text, int start, int end,
+        Paint.FontMetricsInt fm) {
+      return getDrawable().getBounds().right;
+    }
+
+    @Override
+    public void draw(Canvas canvas, CharSequence text, int start, int end, float x, int top, int y,
+        int bottom, Paint paint) {
+      Drawable drawable = getDrawable();
+      Paint.FontMetricsInt metrics = paint.getFontMetricsInt();
+      float middle = y + (metrics.ascent + metrics.descent) / 2f;
+      canvas.save();
+      canvas.translate(x, middle - drawable.getBounds().height() / 2f);
+      drawable.draw(canvas);
+      canvas.restore();
+    }
   }
 
   private void buildPracticeTiles() {
