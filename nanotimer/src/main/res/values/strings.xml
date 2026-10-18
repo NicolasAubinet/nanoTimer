@@ -1289,7 +1289,7 @@
   <string name="coach_reminder_setting_summary">A notification a few days after a plan, when the next one still needs solves</string>
   <string name="coach_sends_body">Once a week, in the background, Cubench sends the figures of your %1$s solves and drills to the coach, which writes a practice plan made for you.</string>
   <string name="coach_next_retry">The coach could not write this plan. It will be asked again on %1$s.</string>
-  <string name="coach_writing">Writing your plan…</string>
+  <string name="coach_writing">Writing your plan, this takes a few minutes…</string>
   <string name="coach_strip_next">Next plan</string>
   <string name="coach_strip_first">First plan</string>
   <string name="coach_strip_session">when this session ends</string>

@@ -1245,7 +1245,7 @@
   <string name="coach_reminder_setting_summary">Une notification quelques jours après un plan, quand il manque encore des résolutions pour le suivant</string>
   <string name="coach_sends_body">Une fois par semaine, en arrière-plan, Cubench envoie au coach les chiffres de vos résolutions %1$s et de vos entraînements, et il écrit un plan d\'entraînement fait pour vous.</string>
   <string name="coach_next_retry">Le coach n\'a pas pu écrire ce plan. Il sera redemandé le %1$s.</string>
-  <string name="coach_writing">Écriture de votre plan…</string>
+  <string name="coach_writing">Écriture de votre plan, cela prend quelques minutes…</string>
   <string name="coach_strip_next">Prochain plan</string>
   <string name="coach_strip_first">Premier plan</string>
   <string name="coach_strip_session">à la fin de cette session</string>
