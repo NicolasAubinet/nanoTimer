@@ -261,7 +261,9 @@
          android:textSize="19sp"
          android:textStyle="bold"/>
 
+      <!-- For an install that has the coach and waits for a first plan. -->
       <TextView
+         android:id="@+id/tvAnalysisPlanBody"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
          android:layout_marginTop="6dp"
@@ -269,6 +271,57 @@
          android:text="@string/analysis_plan_body"
          android:textColor="@color/secondary_text"
          android:textSize="13.5sp"/>
+
+      <!-- What the coach gives, for an install that could still buy it. Takes the body's place. -->
+      <LinearLayout
+         android:id="@+id/llAnalysisPlanPoints"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="12dp"
+         android:orientation="vertical"
+         android:visibility="gone">
+
+        <TextView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:drawablePadding="12dp"
+           android:gravity="center_vertical"
+           android:lineSpacingMultiplier="1.15"
+           android:textColor="@color/white"
+           android:alpha="0.9"
+           android:textSize="14sp"
+           android:drawableLeft="@drawable/ic_coach_point_plan"
+           android:drawableStart="@drawable/ic_coach_point_plan"
+           android:text="@string/analysis_plan_point_plans"/>
+
+        <TextView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:drawablePadding="12dp"
+           android:gravity="center_vertical"
+           android:lineSpacingMultiplier="1.15"
+           android:textColor="@color/white"
+           android:alpha="0.9"
+           android:textSize="14sp"
+           android:layout_marginTop="10dp"
+           android:drawableLeft="@drawable/ic_coach_point_practice"
+           android:drawableStart="@drawable/ic_coach_point_practice"
+           android:text="@string/analysis_plan_point_practice"/>
+
+        <TextView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:drawablePadding="12dp"
+           android:gravity="center_vertical"
+           android:lineSpacingMultiplier="1.15"
+           android:textColor="@color/white"
+           android:alpha="0.9"
+           android:textSize="14sp"
+           android:layout_marginTop="10dp"
+           android:drawableLeft="@drawable/ic_coach_point_support"
+           android:drawableStart="@drawable/ic_coach_point_support"
+           android:text="@string/analysis_plan_point_support"/>
+      </LinearLayout>
 
       <TextView
          android:id="@+id/tvAnalysisPlanCites"

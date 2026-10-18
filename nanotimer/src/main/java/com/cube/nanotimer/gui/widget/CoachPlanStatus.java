@@ -444,6 +444,7 @@ public class CoachPlanStatus {
     int floor = CoachPayloadBuilder.PLAN_FLOOR;
     int more = floor - solves;
     tab.findViewById(R.id.tvAnalysisPlanCites).setVisibility(View.GONE);
+    showPoints(true);
     tab.findViewById(R.id.llCoachOffer).setVisibility(View.GONE);
     tab.findViewById(R.id.llCoachGate).setVisibility(View.VISIBLE);
     ((TextView) tab.findViewById(R.id.tvCoachGateTitle))
@@ -461,6 +462,7 @@ public class CoachPlanStatus {
   /** @param offered the solve type with enough solves, which the purchase offers the plans for */
   private void showOffer(final SolveType offered) {
     tab.findViewById(R.id.tvAnalysisPlanCites).setVisibility(View.GONE);
+    showPoints(true);
     tab.findViewById(R.id.llCoachGate).setVisibility(View.GONE);
     tab.findViewById(R.id.llCoachOffer).setVisibility(View.VISIBLE);
     // Without Play's prices the button still opens the sheet, which says they could not be read.
@@ -485,8 +487,15 @@ public class CoachPlanStatus {
   /** For an install with the coach, or with no coach to have. */
   private void showNoOffer() {
     tab.findViewById(R.id.tvAnalysisPlanCites).setVisibility(View.VISIBLE);
+    showPoints(false);
     tab.findViewById(R.id.llCoachGate).setVisibility(View.GONE);
     tab.findViewById(R.id.llCoachOffer).setVisibility(View.GONE);
+  }
+
+  /** What the coach gives, for an install that could still buy it; the sentence once it has. */
+  private void showPoints(boolean points) {
+    tab.findViewById(R.id.llAnalysisPlanPoints).setVisibility(points ? View.VISIBLE : View.GONE);
+    tab.findViewById(R.id.tvAnalysisPlanBody).setVisibility(points ? View.GONE : View.VISIBLE);
   }
 
   private void openPurchase(SolveType offered) {

@@ -1220,6 +1220,9 @@
   <string name="analysis_cases_method">Por agora só as resoluções CFOP têm os seus casos nomeados, por isso não há nada para ordenar aqui.</string>
   <string name="analysis_plan_headline">Um plano todas as semanas</string>
   <string name="analysis_plan_body">Lido das suas próprias resoluções: o que trabalhar, o drill para isso, e se o trabalho da semana passada mudou alguma coisa.</string>
+  <string name="analysis_plan_point_plans">Um plano semanal que pode aplicar, a partir das suas resoluções</string>
+  <string name="analysis_plan_point_practice">Pratique os casos que mais tempo lhe custam</string>
+  <string name="analysis_plan_point_support">Apoie o desenvolvimento do Cubench</string>
   <string name="analysis_plan_cites">Um plano é escrito a partir das suas próprias resoluções, com cada afirmação a citar um número que pode conferir nos outros dois separadores.</string>
   <string name="analysis_plan_not_yet">Ainda não há plano aqui. Resolução e Casos continuam gratuitos aconteça o que acontecer a este separador.</string>
   <string name="coach_written">Analisado a %1$s</string>
