@@ -35,8 +35,8 @@ import org.json.JSONObject;
  */
 public final class DrillSpec {
 
-  /** The newest spec this app can run. */
-  public static final int VERSION = 4;
+  /** The newest spec this app can run. 5 added the learning drill. */
+  public static final int VERSION = 5;
 
   /** How the id of every drill the coach prescribes begins. */
   public static final String COACH_ID_PREFIX = "coach-";
@@ -49,6 +49,9 @@ public final class DrillSpec {
 
   /** The version a drill with per-case targets or retiring, and no working set, is written at. */
   private static final int VERSION_3 = 3;
+
+  /** The version a drill with a working set, and no learning, is written at. */
+  private static final int VERSION_4 = 4;
 
   /**
    * What a rep is timed and judged on. The two case types are the same reps and only move the
@@ -121,6 +124,8 @@ public final class DrillSpec {
   private final String crossFace;
   private final long planningMs;
   private final int workingSet;
+  private final boolean learning;
+  private final Map<String, String> caseAlgorithms;
   private final String source;
 
   /** A drill this app wrote itself, at the current version. */
@@ -150,7 +155,8 @@ public final class DrillSpec {
       int winsToRetire, int minShowings, String label) {
     this(caseTargetsMs.isEmpty() && winsToRetire == 0 ? VERSION_2 : VERSION_3, id, DEFAULT_PUZZLE,
         DEFAULT_METHOD, type, delivery, cases, selection, reps, targetMs, caseTargetsMs,
-        winsToRetire, minShowings, label, null, 0, 0, null);
+        winsToRetire, minShowings, label, null, 0, 0, false,
+        Collections.<String, String>emptyMap(), null);
   }
 
   /**
@@ -158,9 +164,21 @@ public final class DrillSpec {
    * coming in as one retires. For a set too large to clear in one drill; 0 deals from them all.
    */
   public DrillSpec withWorkingSet(int size) {
-    return new DrillSpec(size > 0 ? VERSION : specVersion, id, puzzle, method, type, delivery,
-        cases, selection, reps, targetMs, caseTargetsMs, winsToRetire, minShowings, label,
-        crossFace, planningMs, size, null);
+    return new DrillSpec(size > 0 ? Math.max(VERSION_4, specVersion) : specVersion, id, puzzle,
+        method, type, delivery, cases, selection, reps, targetMs, caseTargetsMs, winsToRetire,
+        minShowings, label, crossFace, planningMs, size, learning, caseAlgorithms, null);
+  }
+
+  /**
+   * A learning drill: each case's algorithm is shown for its first reps and then fades, and a case
+   * retires after {@code winsToRetire} clean reps turned without it, whatever the time.
+   * {@code algorithms} names the algorithm to show per case; a case it leaves out shows the usual one.
+   */
+  public static DrillSpec learning(String id, Type type, List<String> cases, Selection selection,
+      int reps, int winsToRetire, Map<String, String> algorithms, String label) {
+    return new DrillSpec(VERSION, id, DEFAULT_PUZZLE, DEFAULT_METHOD, type, Delivery.VIRTUAL,
+        cases, selection, reps, 0, Collections.<String, Long>emptyMap(), winsToRetire,
+        winsToRetire, label, null, 0, 0, true, algorithms, null);
   }
 
   /**
@@ -171,13 +189,15 @@ public final class DrillSpec {
       String label) {
     return new DrillSpec(VERSION_2, id, DEFAULT_PUZZLE, DEFAULT_METHOD, Type.CROSS,
         Delivery.VIRTUAL, Collections.<String>emptyList(), Selection.ROUND_ROBIN, reps, 0,
-        Collections.<String, Long>emptyMap(), 0, 0, label, crossFace, planningMs, 0, null);
+        Collections.<String, Long>emptyMap(), 0, 0, label, crossFace, planningMs, 0, false,
+        Collections.<String, String>emptyMap(), null);
   }
 
   private DrillSpec(int specVersion, String id, String puzzle, String method, Type type,
       Delivery delivery, List<String> cases, Selection selection, int reps, long targetMs,
       Map<String, Long> caseTargetsMs, int winsToRetire, int minShowings, String label,
-      String crossFace, long planningMs, int workingSet, String source) {
+      String crossFace, long planningMs, int workingSet, boolean learning,
+      Map<String, String> caseAlgorithms, String source) {
     if (type == null || delivery == null || selection == null) {
       throw new IllegalArgumentException("A drill needs a type, a delivery and a selection");
     }
@@ -218,7 +238,11 @@ public final class DrillSpec {
     if (workingSet < 0) {
       throw new IllegalArgumentException("A working set cannot be negative");
     }
-    if (winsToRetire > 0) {
+    if (learning && (winsToRetire == 0 || type == Type.CROSS)) {
+      throw new IllegalArgumentException("A learning drill retires its cases, and a cross has none");
+    }
+    // A learning drill retires on reps turned without looking, so a case needs no time to beat.
+    if (winsToRetire > 0 && !learning) {
       // A case with nothing to beat could never retire, so the drill would only ever hit its ceiling.
       if (type == Type.CROSS) {
         throw new IllegalArgumentException("A cross drill does not retire cases");
@@ -235,6 +259,14 @@ public final class DrillSpec {
     this.crossFace = crossFace;
     this.planningMs = planningMs;
     this.workingSet = workingSet;
+    this.learning = learning;
+    Map<String, String> algorithms = new LinkedHashMap<String, String>();
+    for (Map.Entry<String, String> algorithm : caseAlgorithms.entrySet()) {
+      if (algorithm.getValue() != null && !algorithm.getValue().trim().isEmpty()) {
+        algorithms.put(algorithm.getKey(), algorithm.getValue().trim());
+      }
+    }
+    this.caseAlgorithms = Collections.unmodifiableMap(algorithms);
     this.source = source;
   }
 
@@ -268,6 +300,8 @@ public final class DrillSpec {
           object.optString("cross_face", null),
           object.optLong("planning_ms", 0),
           object.optInt("working_set", 0),
+          object.optBoolean("learn", false),
+          algorithms(object.optJSONObject("case_algorithms")),
           json);
     } catch (JSONException e) {
       throw new IllegalArgumentException("Not a drill spec: " + e.getMessage(), e);
@@ -315,6 +349,12 @@ public final class DrillSpec {
       if (workingSet > 0) {
         object.put("working_set", workingSet);
       }
+      if (learning) {
+        object.put("learn", true);
+        if (!caseAlgorithms.isEmpty()) {
+          object.put("case_algorithms", new JSONObject(caseAlgorithms));
+        }
+      }
       if (label != null) {
         object.put("label", label);
       }
@@ -347,6 +387,19 @@ public final class DrillSpec {
       targets.put(code, Long.valueOf(object.getLong(code)));
     }
     return targets;
+  }
+
+  private static Map<String, String> algorithms(JSONObject object) throws JSONException {
+    Map<String, String> algorithms = new LinkedHashMap<String, String>();
+    if (object == null) {
+      return algorithms;
+    }
+    Iterator<String> codes = object.keys();
+    while (codes.hasNext()) {
+      String code = codes.next();
+      algorithms.put(code, object.getString(code));
+    }
+    return algorithms;
   }
 
   private static <T extends Enum<T>> T value(Class<T> type, String code, String what) {
@@ -436,6 +489,19 @@ public final class DrillSpec {
 
   public boolean retiresCases() {
     return winsToRetire > 0;
+  }
+
+  /**
+   * Whether this drill teaches its cases rather than speeding them up: the algorithm is shown before
+   * a case's first reps, and a case retires on reps turned without it rather than on a time.
+   */
+  public boolean isLearning() {
+    return learning;
+  }
+
+  /** The algorithm a learning drill shows for a case, or null for the case's usual one. */
+  public String getCaseAlgorithm(String caseCode) {
+    return caseAlgorithms.get(caseCode);
   }
 
   /** How many cases are dealt from at once, or 0 for all of them. */

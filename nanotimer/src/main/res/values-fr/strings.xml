@@ -927,6 +927,8 @@
   <string name="drill_rep_under">sous %s</string>
   <string name="drill_rep_over">%s de trop</string>
   <string name="drill_rep_not_counted">non compté</string>
+  <string name="drill_rep_guided">avec l\'algorithme</string>
+  <string name="drill_rep_unaided">sans regarder</string>
   <string name="drill_practice_offer">Travailler ce cas</string>
   <string name="drill_practice_back">Retour à l\'entraînement</string>
   <string name="drill_practice_mode">Pratique, non comptée</string>
@@ -938,6 +940,7 @@
   <string name="drill_summary_cell_at_most">%d au plus</string>
   <string name="drill_summary_ceiling">Arrêté à %d essais.</string>
   <string name="drill_summary_over_target">Encore au-dessus de l\'objectif : %s</string>
+  <string name="drill_summary_still_learning">Pas encore fait sans regarder : %s</string>
   <string name="drill_targets_column_case">Cas</string>
   <string name="drill_targets_column_reps">Essais</string>
   <string name="drill_targets_column_wins">Réussis</string>
@@ -1425,6 +1428,7 @@
   <string name="coach_bar_best">Meilleur</string>
   <string name="coach_drill_case">Travailler ce cas</string>
   <string name="coach_drill_cases">Travailler ces cas</string>
+  <string name="coach_learn_cases">Apprendre ces cas</string>
   <string name="coach_practice_title">Entraînement libre</string>
   <string name="coach_practice_body">Toujours là, à côté du plan : les cas qui vous coûtent le plus, chacun travaillé jusqu\'à battre son objectif. Mis à jour au fil de vos résolutions.</string>
   <string name="coach_practice_set">Vos cas de %1$s les plus coûteux</string>

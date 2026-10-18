@@ -30,6 +30,7 @@ public final class DrillRep {
   private final boolean revealed;
   private final boolean abandoned;
   private final boolean practice;
+  private final boolean guided;
 
   DrillRep(String caseCode, String scramble, List<CubeMove> moves, long shownAtMs,
       long recognitionMs, long executionMs, int moveCount, int resetCount, boolean revealed,
@@ -41,6 +42,13 @@ public final class DrillRep {
   DrillRep(String caseCode, String scramble, List<CubeMove> moves, long shownAtMs,
       long recognitionMs, long executionMs, int moveCount, int resetCount, boolean revealed,
       boolean abandoned, boolean practice) {
+    this(caseCode, scramble, moves, shownAtMs, recognitionMs, executionMs, moveCount, resetCount,
+        revealed, abandoned, practice, false);
+  }
+
+  DrillRep(String caseCode, String scramble, List<CubeMove> moves, long shownAtMs,
+      long recognitionMs, long executionMs, int moveCount, int resetCount, boolean revealed,
+      boolean abandoned, boolean practice, boolean guided) {
     this.caseCode = caseCode;
     this.scramble = scramble;
     this.moves = Collections.unmodifiableList(moves);
@@ -52,6 +60,7 @@ public final class DrillRep {
     this.revealed = revealed;
     this.abandoned = abandoned;
     this.practice = practice;
+    this.guided = guided;
   }
 
   /** The case as a solve records it, {@code oll_21} or {@code pll_ga}. */
@@ -133,6 +142,14 @@ public final class DrillRep {
     return practice;
   }
 
+  /**
+   * Turned in a learning drill with the algorithm on screen from the start: it says the case went in,
+   * not that it was known, so like a revealed rep it is no measure of the case.
+   */
+  public boolean isGuided() {
+    return guided;
+  }
+
   /** The half the drill's target applies to. */
   public long getTimedMs(DrillSpec.Type type) {
     return type == DrillSpec.Type.CASE_RECOGNITION ? recognitionMs : executionMs;
@@ -142,6 +159,6 @@ public final class DrillRep {
   public String toString() {
     return caseCode + "(" + recognitionMs + "ms + " + executionMs + "ms, " + moveCount
         + " moves" + (revealed ? ", revealed" : "") + (abandoned ? ", abandoned" : "")
-        + (practice ? ", practice" : "") + ")";
+        + (practice ? ", practice" : "") + (guided ? ", guided" : "") + ")";
   }
 }

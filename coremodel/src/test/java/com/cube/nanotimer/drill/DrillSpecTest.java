@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.Test;
@@ -200,6 +202,36 @@ public class DrillSpecTest {
         + " \"reps\": 3}", "face");
     refuses("{\"spec_version\": 2, \"type\": \"cross\", \"delivery\": \"virtual\","
         + " \"reps\": 3, \"cross_face\": \"M\"}", "face");
+  }
+
+  @Test
+  public void aLearningDrillNeedsNoTargetAndKeepsItsAlgorithms() {
+    Map<String, String> algorithms = new HashMap<String, String>();
+    algorithms.put("oll_26", "R U2 R' U' R U' R'");
+    DrillSpec spec = DrillSpec.learning("coach-learn", DrillSpec.Type.CASE_EXECUTION,
+        Arrays.asList("oll_26", "oll_27"), DrillSpec.Selection.ROUND_ROBIN, 40, 3, algorithms,
+        null);
+    DrillSpec read = DrillSpec.fromJson(spec.toJson());
+    assertEquals(DrillSpec.VERSION, read.getSpecVersion());
+    assertTrue(read.isLearning());
+    assertEquals("R U2 R' U' R U' R'", read.getCaseAlgorithm("oll_26"));
+    assertNull("left out is the usual one", read.getCaseAlgorithm("oll_27"));
+    assertEquals(3, read.getWinsToRetire());
+  }
+
+  @Test
+  public void aDrillWithoutLearningStaysReadableByAnOlderApp() {
+    DrillSpec spec = new DrillSpec("coach-f2l", DrillSpec.Type.F2L_PAIR,
+        DrillSpec.Delivery.VIRTUAL, Arrays.asList("pair_a1"), DrillSpec.Selection.WEIGHTED, 40,
+        900, Collections.<String, Long>emptyMap(), 3, 5, null).withWorkingSet(5);
+    assertEquals(4, DrillSpec.fromJson(spec.toJson()).getSpecVersion());
+    assertFalse(spec.isLearning());
+  }
+
+  @Test
+  public void refusesALearningDrillThatCannotRetire() {
+    refuses("{\"spec_version\": 5, \"type\": \"case_execution\", \"delivery\": \"virtual\","
+        + " \"cases\": [\"oll_26\"], \"reps\": 10, \"learn\": true}", "learning");
   }
 
   @Test

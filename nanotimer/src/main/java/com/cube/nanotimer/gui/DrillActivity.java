@@ -49,7 +49,9 @@ import com.cube.nanotimer.smartcube.model.CubeState;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
+import com.cube.nanotimer.step.LastLayerAlgorithms;
 import com.cube.nanotimer.util.view.DrillRepFlourish;
+import com.cube.nanotimer.util.view.LearningAlgorithmFade;
 import com.cube.nanotimer.util.view.PracticeOfferPulse;
 import com.cube.nanotimer.util.view.ScrambleFollowAnimator;
 import com.cube.nanotimer.util.view.StepPalette;
@@ -342,7 +344,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     }
     hidePracticeOffer(); // turning the next case is the answer to the offer
     cube.addMove(move.getNotation());
-    if (algorithmFollower != null && session.getPracticeCase() != null) {
+    if (algorithmFollower != null && isAlgorithmUp()) {
       algorithmFollower.onMove(move);
       showAlgorithmProgress();
     }
@@ -437,6 +439,11 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
         || CaseFlags.isTheirs(rep.getCaseCode(), turned)) {
       return;
     }
+    // A learning drill's own algorithm is what it asked for, even when off the usual list.
+    if (session.getSpec().isLearning() && CaseAlgorithms.sameTurning(rep.getCaseCode(), turned,
+        learningAlgorithm(rep.getCaseCode()))) {
+      return;
+    }
     offeredCase = rep.getCaseCode();
     practiceOffer.setVisibility(View.VISIBLE);
     PracticeOfferPulse.play(practiceOffer);
@@ -494,6 +501,8 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       progress.setText(R.string.drill_practice_mode);
     }
     skip.setText(on ? R.string.drill_practice_back : R.string.drill_skip);
+    // A learning drill's fade may still be running, and would hide the practised algorithm.
+    LearningAlgorithmFade.show(practiceAlgorithm);
     practiceAlgorithm.setVisibility(on ? View.VISIBLE : View.GONE);
     practiceBack.setEnabled(on);
     showPracticeAlgorithm();
@@ -505,21 +514,58 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     if (code == null) {
       return;
     }
-    String chosen = Options.INSTANCE.getCaseAlgorithm(code);
+    followAlgorithm(Options.INSTANCE.getCaseAlgorithm(code));
+  }
+
+  /** Writes an algorithm under the cube and greys it as turned, or says how to pick one. */
+  private void followAlgorithm(String algorithm) {
     algorithmAnimator.reset();
     algorithmFollower = null;
-    if (chosen != null) {
+    if (algorithm != null) {
       try {
-        algorithmFollower = new AlgorithmFollower(chosen);
+        algorithmFollower = new AlgorithmFollower(algorithm);
       } catch (IllegalArgumentException e) {
         algorithmFollower = null; // shown as written, just not greyed
       }
     }
-    practiceAlgorithm.setText(chosen != null ? chosen : getString(R.string.drill_practice_pick));
-    practiceAlgorithm.setTextSize(TypedValue.COMPLEX_UNIT_SP, chosen != null ? 18 : 14);
+    practiceAlgorithm.setText(algorithm != null ? algorithm
+        : getString(R.string.drill_practice_pick));
+    practiceAlgorithm.setTextSize(TypedValue.COMPLEX_UNIT_SP, algorithm != null ? 18 : 14);
     practiceAlgorithm.setTextColor(ContextCompat.getColor(this,
-        chosen != null ? R.color.white : R.color.secondary_text));
+        algorithm != null ? R.color.white : R.color.secondary_text));
     showAlgorithmProgress();
+  }
+
+  /** A learning drill shows the case's algorithm for its first reps, then lets it fade. */
+  private void showLearningAlgorithm() {
+    if (!session.getSpec().isLearning() || session.getPracticeCase() != null) {
+      return;
+    }
+    if (!session.isGuided()) {
+      algorithmFollower = null;
+      LearningAlgorithmFade.hide(practiceAlgorithm);
+      return;
+    }
+    followAlgorithm(learningAlgorithm(session.getCurrentCase()));
+    LearningAlgorithmFade.show(practiceAlgorithm);
+  }
+
+  /** The user's chosen algorithm, else the one the drill names if it solves the case, else the usual. */
+  private String learningAlgorithm(String code) {
+    String chosen = Options.INSTANCE.getCaseAlgorithm(code);
+    if (chosen != null) {
+      return chosen;
+    }
+    String named = session.getSpec().getCaseAlgorithm(code);
+    if (named != null && CaseAlgorithms.solves(code, named)) {
+      return named;
+    }
+    return LastLayerAlgorithms.forCaseCode(code);
+  }
+
+  /** Whether an algorithm is on screen for the case up: practice, or a guided learning rep. */
+  private boolean isAlgorithmUp() {
+    return session.getPracticeCase() != null || session.isGuided();
   }
 
   /** The practised algorithm with its turned moves greyed, as the timer greys a scramble's. */
@@ -532,7 +578,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
 
   /** A case dealt again starts the algorithm over. */
   private void restartAlgorithmProgress() {
-    if (algorithmFollower != null && session.getPracticeCase() != null) {
+    if (algorithmFollower != null && isAlgorithmUp()) {
       algorithmFollower.reset();
       algorithmAnimator.reset();
       showAlgorithmProgress();
@@ -555,6 +601,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     }
     cube.setState(CubePatternFormat.format(session.getFacelets()));
     restartAlgorithmProgress();
+    showLearningAlgorithm();
     // ⚠️ The case now on screen is deliberately not named anywhere. Only the cube says what it
     // is. The line naming the rep that is over stays, since one beat is not long enough to read
     // it, but it stands back so that it cannot be taken for the name of this one.
@@ -684,7 +731,13 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     long target = session.getSpec().getTargetMs(rep.getCaseCode());
     String text;
     int colourRes;
-    if (!CaseTally.isClean(rep)) {
+    if (session.getSpec().isLearning() && rep.isGuided() && !rep.isAbandoned()) {
+      text = getString(R.string.drill_rep_guided);
+      colourRes = R.color.secondary_text;
+    } else if (session.getSpec().isLearning() && CaseTally.isClean(rep)) {
+      text = getString(R.string.drill_rep_unaided);
+      colourRes = R.color.green_soft;
+    } else if (!CaseTally.isClean(rep)) {
       text = getString(R.string.drill_rep_not_counted);
       colourRes = R.color.secondary_text;
     } else if (session.getTally().isWin(rep)) {
@@ -823,8 +876,9 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     }
     // Pairs all carry the same name, so naming those still over says nothing the rows do not.
     if (!over.isEmpty() && spec.getType() != DrillSpec.Type.F2L_PAIR) {
-      note.append(note.length() == 0 ? "" : " ")
-          .append(getString(R.string.drill_summary_over_target, joined(over)));
+      note.append(note.length() == 0 ? "" : " ").append(getString(spec.isLearning()
+          ? R.string.drill_summary_still_learning : R.string.drill_summary_over_target,
+          joined(over)));
     }
     TextView tvNote = findViewById(R.id.tvDrillSummaryNote);
     tvNote.setText(note);
@@ -860,10 +914,15 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     ((TextView) row.findViewById(R.id.tvDrillTargetReps)).setText(String.valueOf(dealt));
     ((DrillCasePips) row.findViewById(R.id.vDrillTargetWins))
         .show(Collections.singletonList(code), tally, session.getSpec().getWinsToRetire());
-    ((TextView) row.findViewById(R.id.tvDrillTargetTarget))
-        .setText(FormatterService.INSTANCE.formatSolveTime(target));
+    // A learning drill has no time to beat, only reps without looking.
+    boolean learning = session.getSpec().isLearning();
+    ((TextView) row.findViewById(R.id.tvDrillTargetTarget)).setText(learning
+        ? getString(R.string.drill_case_no_time) : FormatterService.INSTANCE.formatSolveTime(target));
     TextView tvMean = row.findViewById(R.id.tvDrillTargetMean);
-    if (timed == 0) {
+    if (learning && timed > 0) {
+      tvMean.setText(FormatterService.INSTANCE.formatSolveTime(total / timed));
+      tvMean.setTextColor(ContextCompat.getColor(this, R.color.white));
+    } else if (timed == 0) {
       tvMean.setText(R.string.drill_case_no_time);
       tvMean.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
     } else {

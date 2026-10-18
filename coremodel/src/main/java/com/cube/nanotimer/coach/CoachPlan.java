@@ -164,11 +164,11 @@ public class CoachPlan {
         continue;
       }
       // No pair is ever quoted on its own (per-case F2L figures are noise), so a pair drill is held
-      // to the vocabulary alone.
+      // to the vocabulary alone; so is a learning drill, whose cases may never have come up.
       boolean pairs = spec.getType() == DrillSpec.Type.F2L_PAIR;
       for (String code : spec.getCases()) {
-        if (pairs ? !F2lPairCases.isCase(code)
-            : !LastLayerAlgorithms.dealsCase(code) || !payload.holds(code)) {
+        if (pairs ? !F2lPairCases.isCase(code) : !LastLayerAlgorithms.dealsCase(code)
+            || (!spec.isLearning() && !payload.holds(code))) {
           undealable.add(code);
         }
       }

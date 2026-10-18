@@ -589,6 +589,51 @@ public class DrillSessionTest {
     assertEquals(0, session.getTally().getShowings("pll_h"));
   }
 
+  /** Each case is guided twice, then retires on three reps turned without the algorithm. */
+  @Test
+  public void aLearningDrillGuidesEachCaseThenRetiresItWithoutLooking() {
+    DrillSpec spec = learning();
+    DrillSession session = new DrillSession(spec, new Random(7));
+    Map<String, Integer> guided = new HashMap<String, Integer>();
+    Hand hand = new Hand(session);
+    while (hand.next()) {
+      String code = session.getCurrentCase();
+      boolean wasGuided = session.isGuided();
+      if (wasGuided) {
+        guided.put(code, guided.containsKey(code) ? guided.get(code) + 1 : 1);
+      }
+      hand.pause(300);
+      DrillRep rep = hand.execute(inverse(session.getCurrentScramble()));
+      assertEquals(wasGuided, rep.isGuided());
+    }
+    assertEquals(DrillSession.GUIDED_REPS, guided.get("pll_h").intValue());
+    assertEquals(DrillSession.GUIDED_REPS, guided.get("pll_z").intValue());
+    assertEquals("no time to beat, so every clean rep wins", 3,
+        session.getTally().getWins("pll_h"));
+    assertEquals(10, session.getReps().size());
+    assertTrue(session.isFinished());
+  }
+
+  /** A guided rep that was skipped does not use up the guidance. */
+  @Test
+  public void aSkippedGuidedRepIsGuidedAgain() {
+    DrillSpec spec = learning();
+    DrillSession session = new DrillSession(spec, new Random(7));
+    Hand hand = new Hand(session);
+    for (int i = 0; i < 6; i++) {
+      assertTrue(hand.next());
+      assertTrue(session.isGuided());
+      assertTrue(session.abandon().isGuided());
+    }
+    assertEquals(0, session.getTally().getGuided("pll_h"));
+  }
+
+  private static DrillSpec learning() {
+    return DrillSpec.learning("coach-learn", DrillSpec.Type.CASE_EXECUTION,
+        Arrays.asList("pll_h", "pll_z"), DrillSpec.Selection.ROUND_ROBIN, 40, 3,
+        Collections.<String, String>emptyMap(), null);
+  }
+
   /** How often each case was dealt over a whole drill, every rep solved at once. */
   private static Map<String, Integer> solveAll(DrillSession session, boolean reveal) {
     Map<String, Integer> dealt = new HashMap<String, Integer>();
@@ -716,7 +761,7 @@ public class DrillSessionTest {
   public void aWorkingSetRidesInTheSpec() {
     DrillSpec spec = pairSpec("pair_a1").withWorkingSet(5);
     DrillSpec read = DrillSpec.fromJson(spec.toJson());
-    assertEquals(DrillSpec.VERSION, read.getSpecVersion());
+    assertEquals("a working set needs 4, not the learning drill's 5", 4, read.getSpecVersion());
     assertEquals(5, read.getWorkingSet());
     assertEquals(DrillSpec.Type.F2L_PAIR, read.getType());
     assertEquals(0, DrillSpec.fromJson(spec("pll_t", 1).toJson()).getWorkingSet());

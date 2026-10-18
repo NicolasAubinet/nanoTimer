@@ -957,6 +957,8 @@
   <string name="drill_rep_under">under %s</string>
   <string name="drill_rep_over">%s over</string>
   <string name="drill_rep_not_counted">not counted</string>
+  <string name="drill_rep_guided">with the algorithm</string>
+  <string name="drill_rep_unaided">without looking</string>
   <string name="drill_practice_offer">Practice this case</string>
   <string name="drill_practice_back">Back to drill</string>
   <string name="drill_practice_mode">Practice, not counted</string>
@@ -968,6 +970,7 @@
   <string name="drill_summary_cell_at_most">%d at most</string>
   <string name="drill_summary_ceiling">Stopped at %d reps.</string>
   <string name="drill_summary_over_target">Still over target: %s</string>
+  <string name="drill_summary_still_learning">Not yet turned without looking: %s</string>
   <string name="drill_targets_column_case">Case</string>
   <string name="drill_targets_column_reps">Reps</string>
   <string name="drill_targets_column_wins">Wins</string>
@@ -1473,6 +1476,7 @@
   <string name="coach_bar_best">Best</string>
   <string name="coach_drill_case">Drill this case</string>
   <string name="coach_drill_cases">Drill these cases</string>
+  <string name="coach_learn_cases">Learn these cases</string>
   <string name="coach_practice_title">Practice any time</string>
   <string name="coach_practice_body">Always here, apart from the plan: the cases costing you the most, each one practised until it beats its target. Refreshed as you solve.</string>
   <string name="coach_practice_set">Your costliest %1$s cases</string>

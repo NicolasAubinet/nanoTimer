@@ -40,6 +40,9 @@ public final class DrillSession {
 
   private static final long NOT_SHOWN = -1;
 
+  /** Clean reps a learning drill turns with the algorithm on screen before it fades. */
+  public static final int GUIDED_REPS = 2;
+
   /** Where the faces sit in a facelet string, which is the order {@link CubieCube} writes one in. */
   private static final String FACELET_ORDER = "URFDLB";
 
@@ -82,6 +85,8 @@ public final class DrillSession {
   private long clockSkewMs;
   private int resetCount;
   private boolean revealed;
+  /** Whether the case up is shown with its algorithm, decided when it is dealt. */
+  private boolean guided;
   /** The case being practised, dealt over and over outside the drill's reps. */
   private String practiceCase;
 
@@ -208,6 +213,13 @@ public final class DrillSession {
     caseShownAtMs = NOT_SHOWN;
     resetCount = 0;
     revealed = false;
+    guided = spec.isLearning() && practiceCase == null
+        && getTally().getGuided(code) < GUIDED_REPS;
+  }
+
+  /** Whether the case up is a learning drill's rep turned with its algorithm on screen. */
+  public boolean isGuided() {
+    return guided && currentCase != null;
   }
 
   /**
@@ -466,7 +478,7 @@ public final class DrillSession {
     boolean practice = practiceCase != null;
     DrillRep rep = new DrillRep(currentCase, currentScramble,
         new ArrayList<CubeMove>(moves), shownAt, recognition, execution, moves.size(),
-        resetCount, revealed, abandoned, practice);
+        resetCount, revealed, abandoned, practice, guided && !practice);
     // A practice rep is none of the drill's: it neither spends one nor counts towards retiring.
     if (!practice) {
       reps.add(rep);

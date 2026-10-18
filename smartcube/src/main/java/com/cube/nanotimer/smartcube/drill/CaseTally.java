@@ -18,6 +18,7 @@ public final class CaseTally {
   private final DrillSpec spec;
   private final Map<String, Integer> showings = new HashMap<String, Integer>();
   private final Map<String, Integer> wins = new HashMap<String, Integer>();
+  private final Map<String, Integer> guided = new HashMap<String, Integer>();
 
   private CaseTally(DrillSpec spec) {
     this.spec = spec;
@@ -26,10 +27,13 @@ public final class CaseTally {
   public static CaseTally of(DrillSpec spec, List<DrillRep> reps) {
     CaseTally tally = new CaseTally(spec);
     for (DrillRep rep : reps) {
+      String code = rep.getCaseCode();
+      if (rep.isGuided() && !rep.isAbandoned() && rep.getResetCount() == 0) {
+        tally.guided.put(code, countOf(tally.guided, code) + 1);
+      }
       if (!isClean(rep)) {
         continue;
       }
-      String code = rep.getCaseCode();
       tally.showings.put(code, countOf(tally.showings, code) + 1);
       if (tally.isWin(rep)) {
         tally.wins.put(code, countOf(tally.wins, code) + 1);
@@ -38,17 +42,28 @@ public final class CaseTally {
     return tally;
   }
 
-  /** A rep that measured the case: not skipped, not restarted, not solved with the answer shown. */
+  /**
+   * A rep that measured the case: not skipped, not restarted, not solved with the answer shown,
+   * whether looked up or shown from the start.
+   */
   public static boolean isClean(DrillRep rep) {
-    return !rep.isAbandoned() && rep.getResetCount() == 0 && !rep.wasRevealed();
+    return !rep.isAbandoned() && rep.getResetCount() == 0 && !rep.wasRevealed()
+        && !rep.isGuided();
   }
 
   /**
    * Whether a clean rep came in at or under its case's target, looking and turning together: the
-   * drill is about the case getting faster, whichever half it lost.
+   * drill is about the case getting faster, whichever half it lost. In a learning drill every clean
+   * rep wins, since turning it without the algorithm is the whole ask.
    */
   public boolean isWin(DrillRep rep) {
-    return isClean(rep) && rep.getTotalMs() <= spec.getTargetMs(rep.getCaseCode());
+    return isClean(rep)
+        && (spec.isLearning() || rep.getTotalMs() <= spec.getTargetMs(rep.getCaseCode()));
+  }
+
+  /** Reps of a case finished cleanly with the algorithm on screen. */
+  public int getGuided(String code) {
+    return countOf(guided, code);
   }
 
   public int getShowings(String code) {
