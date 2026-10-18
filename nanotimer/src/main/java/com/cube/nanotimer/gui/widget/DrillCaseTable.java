@@ -94,6 +94,8 @@ public class DrillCaseTable {
   /** A thrown-out line: still legible, and plainly not one of the reps being read. */
   private static final float DELETED_ALPHA = 0.45f;
 
+  private static final String PAIR_FAMILY = "f2l";
+
   private final FragmentActivity activity;
   private final LinearLayout rows;
   private final List<DrillRep> reps;
@@ -105,6 +107,8 @@ public class DrillCaseTable {
   private final TimeColorScale[] scales = new TimeColorScale[KEYS.length];
   private final StepPalette palette;
   private final Listener listener;
+  /** The longest timed rep, which an F2L pair's bar is measured against. */
+  private final long longestMs;
 
   private CaseTableHeadings headings;
 
@@ -123,9 +127,14 @@ public class DrillCaseTable {
     this.palette = StepPalette.cfop(activity);
     this.reps = new ArrayList<DrillRep>(reps);
     this.dealt = new ArrayList<DrillRep>(reps);
+    long longest = 0;
     for (int i = 0; i < dealt.size(); i++) {
       positions.put(dealt.get(i), i);
+      if (!dealt.get(i).isAbandoned()) {
+        longest = Math.max(longest, dealt.get(i).getTotalMs());
+      }
     }
+    this.longestMs = longest;
     buildScales();
 
     LayoutInflater inflater = LayoutInflater.from(activity);
@@ -161,7 +170,11 @@ public class DrillCaseTable {
             refresh();
           }
         });
-    headings.setLabel(R.string.drill_summary_cases);
+    headings.setLabel(type == DrillSpec.Type.F2L_PAIR ? R.string.drill_summary_pairs
+        : R.string.drill_summary_cases);
+    if (!this.reps.isEmpty()) {
+      headings.setAccent(hueOf(this.reps.get(0).getCaseCode()));
+    }
     activity.findViewById(R.id.llDrillCasesSection)
         .setVisibility(this.reps.isEmpty() ? View.GONE : View.VISIBLE);
     refresh();
@@ -266,9 +279,8 @@ public class DrillCaseTable {
     String code = rep.getCaseCode();
     boolean gone = deleted.contains(rep);
     row.count(String.valueOf(number(rep)));
-    if (CaseAlgorithms.isPair(code)) {
-      row.dot(color(R.color.step_f2l)); // no flat picture for a pair: a tap shows it
-    } else {
+    boolean pair = CaseAlgorithms.isPair(code);
+    if (!pair) {
       row.chart(code);
     }
     row.name(Utils.toSmartCubeCaseHeadline(activity, code))
@@ -288,9 +300,21 @@ public class DrillCaseTable {
       }
     }
 
-    // Where the rep's time went. A rep with no time to divide has no shape, so it shows none.
-    row.shape(rep.getRecognitionMs(), rep.getExecutionMs(), palette.colorFor(code))
-        .hideBar(rep.isAbandoned());
+    // Where the rep's time went. A rep with no time to divide has no shape, so it shows none. A
+    // pair has no picture and every pair has the same name, so its bar is the line's picture.
+    if (pair) {
+      row.proportion(rep.getRecognitionMs(), rep.getExecutionMs(), hueOf(code),
+          longestMs == 0 ? 0 : rep.getTotalMs() / (float) longestMs,
+          activity.getResources().getDimensionPixelSize(R.dimen.drill_pair_bar_height));
+    } else {
+      row.shape(rep.getRecognitionMs(), rep.getExecutionMs(), hueOf(code));
+    }
+    row.hideBar(rep.isAbandoned());
+  }
+
+  /** A pair's code names no step family, so it is given F2L's colour by hand. */
+  private int hueOf(String code) {
+    return palette.colorFor(CaseAlgorithms.isPair(code) ? PAIR_FAMILY : code);
   }
 
   /** Where the rep fell in the drill, counted as a person counts: the first one is 1. */

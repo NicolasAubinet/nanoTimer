@@ -14,142 +14,94 @@
 
   <include layout="@layout/crossdrill_running"/>
 
-  <!-- What the drill leaves behind: four figures, the warning that the cube is scrambled, and the
-       way out under the thumb. On the app's own ground and its own cells, like every other screen
-       that reports numbers. -->
-  <ScrollView
+  <!-- What the drill leaves behind: the card, then each rep's cross against the shortest one. Done
+       stays outside the scroll, as on the case drill's summary. -->
+  <LinearLayout
      android:id="@+id/drillSummary"
      android:layout_width="match_parent"
      android:layout_height="match_parent"
      android:background="@color/graybg"
-     android:fillViewport="true"
+     android:orientation="vertical"
      android:visibility="gone">
+
+  <ScrollView
+     android:layout_width="match_parent"
+     android:layout_height="0dp"
+     android:layout_weight="1"
+     android:fillViewport="true">
 
     <LinearLayout
        android:layout_width="match_parent"
-       android:layout_height="match_parent"
+       android:layout_height="wrap_content"
        android:orientation="vertical"
-       android:paddingLeft="16dp"
-       android:paddingRight="16dp"
-       android:paddingTop="6dp"
-       android:paddingBottom="16dp">
+       android:paddingLeft="@dimen/space_m"
+       android:paddingRight="@dimen/space_m"
+       android:paddingTop="@dimen/space_xs"
+       android:paddingBottom="@dimen/space_l">
 
-      <TextView
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:text="@string/drill_finished"
-         android:textColor="@color/white"
-         android:textSize="26sp"
-         android:fontFamily="@font/roboto_medium"
-         android:textStyle="normal"/>
+      <include layout="@layout/drill_summary_card"/>
 
-      <!-- What was drilled and in which mode, since the drill is over and its own bar is gone. -->
-      <TextView
-         android:id="@+id/tvDrillSummarySubtitle"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_marginTop="2dp"
-         android:textColor="@color/secondary_text"
-         android:textSize="13sp"/>
-
-      <!-- match_parent on the cells, so the tallest sets the height and the row never goes ragged. -->
       <LinearLayout
-         android:id="@+id/llDrillSummaryCells"
+         android:id="@+id/llDrillCrossReps"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:layout_marginTop="14dp"
-         android:baselineAligned="false"
-         android:orientation="horizontal">
+         android:layout_marginTop="18dp"
+         android:orientation="vertical"
+         android:visibility="gone">
 
         <LinearLayout
-           android:id="@+id/llDrillCellOne"
-           android:layout_width="0dp"
-           android:layout_height="match_parent"
-           android:layout_weight="1"
-           android:layout_marginRight="3dp"
-           android:orientation="vertical"
-           android:background="@drawable/drill_stat_cell"
-           android:paddingLeft="6dp"
-           android:paddingRight="6dp"
-           android:paddingTop="8dp"
-           android:paddingBottom="8dp">
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvDrillCellKeyOne" style="@style/HeroStatKey"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvDrillCellValueOne" style="@style/HeroStatValue"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvDrillCellSubOne" style="@style/HeroStatSub"/>
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:paddingLeft="@dimen/space_xs"
+           android:paddingRight="@dimen/space_xs"
+           android:paddingBottom="8dp"
+           android:orientation="horizontal">
+
+          <TextView
+             style="@style/DrillTargetHeading"
+             android:layout_width="@dimen/drill_case_position_column"
+             android:text="@string/drill_summary_column_position"/>
+
+          <TextView
+             style="@style/DrillTargetHeading"
+             android:layout_width="0dp"
+             android:layout_weight="1"
+             android:text="@string/drill_cross_column_moves"/>
+
+          <TextView
+             style="@style/DrillTargetHeading"
+             android:layout_width="@dimen/drill_cross_planning_column"
+             android:gravity="end"
+             android:text="@string/drill_summary_cell_planning"/>
         </LinearLayout>
 
-        <LinearLayout
-           android:id="@+id/llDrillCellTwo"
-           android:layout_width="0dp"
-           android:layout_height="match_parent"
-           android:layout_weight="1"
-           android:layout_marginLeft="3dp"
-           android:layout_marginRight="3dp"
-           android:orientation="vertical"
-           android:background="@drawable/drill_stat_cell"
-           android:paddingLeft="6dp"
-           android:paddingRight="6dp"
-           android:paddingTop="8dp"
-           android:paddingBottom="8dp">
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvDrillCellKeyTwo" style="@style/HeroStatKey"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvDrillCellValueTwo" style="@style/HeroStatValue"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvDrillCellSubTwo" style="@style/HeroStatSub"/>
-        </LinearLayout>
+        <View
+           android:layout_width="match_parent"
+           android:layout_height="1dp"
+           android:background="@color/hero_divider"/>
 
         <LinearLayout
-           android:id="@+id/llDrillCellThree"
-           android:layout_width="0dp"
-           android:layout_height="match_parent"
-           android:layout_weight="1"
-           android:layout_marginLeft="3dp"
+           android:id="@+id/llDrillCrossRepRows"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:divider="@drawable/stat_rule_h"
            android:orientation="vertical"
-           android:background="@drawable/drill_stat_cell"
-           android:paddingLeft="6dp"
-           android:paddingRight="6dp"
-           android:paddingTop="8dp"
-           android:paddingBottom="8dp">
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvDrillCellKeyThree" style="@style/HeroStatKey"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvDrillCellValueThree" style="@style/HeroStatValue"/>
-          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvDrillCellSubThree" style="@style/HeroStatSub"/>
-        </LinearLayout>
+           android:showDividers="middle"/>
       </LinearLayout>
-
-      <!-- The figure that has no cell of its own: the half the drill was not scored on. -->
-      <TextView
-         android:id="@+id/tvDrillSummaryExtra"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_marginTop="10dp"
-         android:textColor="@color/secondary_text"
-         android:textSize="14sp"
-         android:fontFeatureSettings="tnum"/>
-
-      <!-- Instead of the cells, for a drill with nothing to average. -->
-      <TextView
-         android:id="@+id/tvDrillSummaryEmpty"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_marginTop="20dp"
-         android:textColor="@color/white"
-         android:textSize="17sp"
-         android:visibility="gone"/>
-
-      <View
-         android:layout_width="match_parent"
-         android:layout_height="0dp"
-         android:layout_weight="1"
-         android:minHeight="8dp"/>
-
-      <!-- The sheet's own action, in the accent the main screen's Start wears. The case drill's
-           summary says it the same way. -->
-      <androidx.appcompat.widget.AppCompatButton
-         android:id="@+id/btDrillDone"
-         style="@style/HeroStartButton"
-         android:layout_marginTop="16dp"
-         android:text="@string/drill_done"/>
 
     </LinearLayout>
   </ScrollView>
+
+    <androidx.appcompat.widget.AppCompatButton
+       android:id="@+id/btDrillDone"
+       style="@style/HeroStartButton"
+       android:layout_marginTop="12dp"
+       android:layout_marginLeft="@dimen/space_m"
+       android:layout_marginRight="@dimen/space_m"
+       android:layout_marginBottom="16dp"
+       android:text="@string/drill_done"/>
+
+  </LinearLayout>
 
   <TextView
      android:id="@+id/tvDrillUnavailable"

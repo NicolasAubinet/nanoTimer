@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One entry in the key under the cross drill's strip: a swatch, then what it means. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="wrap_content"
+   android:layout_height="wrap_content"
+   android:layout_marginEnd="14dp"
+   android:drawablePadding="5dp"
+   android:gravity="center_vertical"
+   android:singleLine="true"
+   android:textColor="@color/secondary_text"
+   android:textSize="12sp"/>

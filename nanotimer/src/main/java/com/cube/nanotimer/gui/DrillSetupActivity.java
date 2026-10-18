@@ -9,7 +9,6 @@ import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -37,6 +36,7 @@ import com.cube.nanotimer.gui.widget.DrillHelpDialog;
 import com.cube.nanotimer.gui.widget.LastLayerCaseView;
 import com.cube.nanotimer.gui.widget.SegmentedControl;
 import com.cube.nanotimer.gui.widget.SmartCubeConnectDialog;
+import com.cube.nanotimer.gui.widget.StepCardBackground;
 import com.cube.nanotimer.gui.widget.dialog.DrillCasesDialog;
 import com.cube.nanotimer.gui.widget.preferences.LastLayerColourDialog;
 import com.cube.nanotimer.gui.widget.preferences.NumberEntryDialog;
@@ -107,8 +107,7 @@ public class DrillSetupActivity extends NanoTimerActivity
   /** The case strip's slots; past this many cases the last slot counts the rest instead. */
   private static final int STRIP_SLOTS = 6;
   private static final int REPS_CELL_DP = 34;
-  /** The step colour's strength in the card's top glow, a selected tile, and the cases chip. */
-  private static final int WASH_ALPHA = 0x3D;
+  /** The step colour's strength in a selected tile and the cases chip. */
   private static final int TILE_ALPHA = 0x2E;
   private static final int CHIP_ALPHA = 0x29;
   /** The step colour of each practice, in StepPalette's codes. */
@@ -422,20 +421,7 @@ public class DrillSetupActivity extends NanoTimerActivity
 
   /** The card, lit from the top in the practice's colour, and every coloured mark under it. */
   private void paintPracticeColour(int colour) {
-    View hero = findViewById(R.id.llDrillHero);
-    GradientDrawable wash = new GradientDrawable();
-    wash.setGradientType(GradientDrawable.RADIAL_GRADIENT);
-    wash.setColors(new int[] {withAlpha(colour, WASH_ALPHA), withAlpha(colour, 0)});
-    wash.setGradientCenter(0.5f, 0f);
-    wash.setGradientRadius(getResources().getDisplayMetrics().widthPixels * 0.7f);
-    wash.setCornerRadius(getResources().getDimension(R.dimen.card_corner));
-    LayerDrawable card = new LayerDrawable(new Drawable[] {
-        ContextCompat.getDrawable(this, R.drawable.analysis_card), wash});
-    card.setLayerInset(1, 0, dp(1), 0, dp(3));
-    int left = hero.getPaddingLeft(), top = hero.getPaddingTop();
-    int right = hero.getPaddingRight(), bottom = hero.getPaddingBottom();
-    hero.setBackground(card);
-    hero.setPadding(left, top, right, bottom);
+    StepCardBackground.paint(findViewById(R.id.llDrillHero), colour);
 
     int[] icons = {R.id.ivDrillRepsIcon, R.id.ivDrillRecordIcon, R.id.ivDrillPlanningIcon,
         R.id.ivDrillLayerIcon};

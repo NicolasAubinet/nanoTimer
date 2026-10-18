@@ -48,6 +48,8 @@ public class CaseTableHeadings {
   private int label;
   private boolean labelRankable;
   private boolean labelOpensDescending;
+  /** The ranked heading's colour, or 0 for white. */
+  private int accent;
 
   /**
    * @param root the view holding the strip, which is the screen or the table it was included in
@@ -119,6 +121,11 @@ public class CaseTableHeadings {
         .setVisibility(reserved ? View.INVISIBLE : View.GONE);
   }
 
+  /** Lights the ranked heading in a colour of its own rather than white. */
+  public void setAccent(int color) {
+    accent = color;
+  }
+
   /** Names the list itself, on the line the headings share. */
   public void setLabel(int label) {
     this.label = label;
@@ -152,8 +159,8 @@ public class CaseTableHeadings {
   private void draw(TextView heading, String name, boolean ranked) {
     heading.setText(ranked ? root.getContext().getString(R.string.drill_summary_column_sorted,
         name, descending ? DESCENDING : ASCENDING) : name);
-    heading.setTextColor(ContextCompat.getColor(root.getContext(),
-        ranked ? R.color.white : R.color.secondary_text));
+    heading.setTextColor(ranked && accent != 0 ? accent : ContextCompat.getColor(
+        root.getContext(), ranked ? R.color.white : R.color.secondary_text));
   }
 
   private void rank(int picked) {

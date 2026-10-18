@@ -2,6 +2,8 @@ package com.cube.nanotimer.gui;
 
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -40,12 +42,14 @@ import com.cube.nanotimer.smartcube.drill.DrillSession;
 import com.cube.nanotimer.smartcube.drill.LayerRotation;
 import com.cube.nanotimer.smartcube.drill.PairWeights;
 import com.cube.nanotimer.smartcube.step.CaseAlgorithms;
+import com.cube.nanotimer.smartcube.step.LastLayerDiagram;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.drill.DrillSpec;
 import com.cube.nanotimer.gui.widget.DrillCasePips;
 import com.cube.nanotimer.gui.widget.DrillCaseTable;
 import com.cube.nanotimer.gui.widget.DrillLiveCells;
-import com.cube.nanotimer.gui.widget.DrillStatCells;
+import com.cube.nanotimer.gui.widget.LastLayerCaseView;
+import com.cube.nanotimer.gui.widget.StepCardBackground;
 import com.cube.nanotimer.gui.widget.dialog.CaseAlgorithmsDialog;
 import com.cube.nanotimer.smartcube.model.CubeMove;
 import com.cube.nanotimer.smartcube.model.CubeOrientation;
@@ -126,6 +130,8 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   private String layerFace;
   /** The one family this drill deals, whose colour the meter and the mean cell are written in. */
   private int familyHue;
+  /** A case still to clear, on a coach drill's summary: a faint wash of the drill's colour. */
+  private static final int UNCLEARED_ALPHA = 0x10;
 
   /** The whole rep line, since the beat scales it and the hold is posted to it. */
   private View lastRepRow;
@@ -249,8 +255,9 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       showUnavailable(getString(R.string.drill_spec_unreadable));
       return;
     }
-    familyHue = StepPalette.cfop(this)
-        .colorFor(spec.getCases().isEmpty() ? null : spec.getCases().get(0));
+    // A pair's code names no step family, so F2L's colour is asked for by name.
+    familyHue = StepPalette.cfop(this).colorFor(spec.getType() == DrillSpec.Type.F2L_PAIR ? "f2l"
+        : spec.getCases().isEmpty() ? null : spec.getCases().get(0));
     label = spec.getLabel() == null ? getString(R.string.drill_title) : spec.getLabel();
     setTitle(label);
     layerFace = getIntent().getStringExtra(EXTRA_LAYER_FACE);
@@ -930,7 +937,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     finished = true;
     practiceBack.setEnabled(false);
     practiceOffer.setVisibility(View.GONE);
-    showSummaryFor(label);
+    showSummaryFor(familyHue);
 
     // Before the figures give up: a drill where every case was skipped still has something to
     // report, which is which cases they were. It is also what prunes a rep, hence counted().
@@ -949,13 +956,15 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     showFigures(counted);
   }
 
-  /** The cells over the table, from the reps that count. Redrawn whenever that stops being all. */
+  /** The card over the table, from the reps that count. Redrawn whenever that stops being all. */
   private void showFigures(List<DrillRep> reps) {
     DrillSpec spec = session.getSpec();
+    boolean pairs = spec.getType() == DrillSpec.Type.F2L_PAIR;
     if (spec.retiresCases()) {
       showTargets(reps);
     } else {
-      setSummaryCell(0, getString(R.string.drill_summary_cell_reps), String.valueOf(reps.size()),
+      setSummaryCell(0, getString(pairs ? R.string.drill_summary_pairs
+              : R.string.drill_summary_cell_reps), String.valueOf(reps.size()),
           getString(R.string.drill_summary_cell_of, spec.getReps()));
     }
 
@@ -963,8 +972,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     // follow: a case you gave up on is not a slow time.
     long recognitionTotal = 0;
     long executionTotal = 0;
-    long best = Long.MAX_VALUE;
-    String bestCase = null;
+    DrillRep best = null;
     int timed = 0;
     for (DrillRep rep : reps) {
       if (rep.isAbandoned()) {
@@ -972,9 +980,8 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       }
       recognitionTotal += rep.getRecognitionMs();
       executionTotal += rep.getExecutionMs();
-      if (rep.getTotalMs() < best) {
-        best = rep.getTotalMs();
-        bestCase = rep.getCaseCode();
+      if (best == null || rep.getTotalMs() < best.getTotalMs()) {
+        best = rep;
       }
       timed++;
     }
@@ -983,34 +990,34 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       return;
     }
     showSummaryFigures(); // a drill pruned to nothing and then put back has these to get back
-    // Both halves, side by side and the same size, whichever one the drill was scored on. Reading
-    // a case is half of what a drill trains, and the half the target happens to name says nothing
-    // about whether the other one is where the time went.
-    ((TextView) findViewById(R.id.tvDrillCellKeyTwo)).setText(R.string.drill_summary_cell_mean);
-    DrillStatCells.nameHalves(this, familyHue);
-    ((TextView) findViewById(R.id.tvDrillMeanRecognition))
-        .setText(FormatterService.INSTANCE.formatSolveTime(recognitionTotal / timed));
-    ((TextView) findViewById(R.id.tvDrillMeanExecution))
-        .setText(FormatterService.INSTANCE.formatSolveTime(executionTotal / timed));
-    // The best rep is the best of both halves together, and says which case it was: a time with no
-    // case attached was the one figure on this screen that could not be acted on.
+    long recognition = recognitionTotal / timed;
+    long execution = executionTotal / timed;
     if (spec.retiresCases()) {
-      // A coach drill's length is a result of its own, so it takes the cell the best rep had.
-      setSummaryCell(2, getString(R.string.drill_summary_cell_reps), String.valueOf(reps.size()),
-          getString(R.string.drill_summary_cell_at_most, spec.getReps()));
-      // The cell is laid out for a best time, in the best time's green; a count is not one.
-      ((TextView) findViewById(R.id.tvDrillCellValueThree))
-          .setTextColor(ContextCompat.getColor(this, R.color.white));
+      // The hero is the cases cleared, so the mean goes under the bar between its two halves.
+      setSummarySplit(recognition, execution, recognition + execution);
+      return;
+    }
+    setSummaryHero(FormatterService.INSTANCE.formatSolveTime(recognition + execution), null,
+        getString(R.string.drill_summary_cell_average));
+    setSummarySplit(recognition, execution, -1);
+    // The best rep says which it was: a time with no case attached could not be acted on. A pair
+    // has no picture and no name of its own, so it is named by where it fell in the drill.
+    setSummaryCell(1, getString(R.string.drill_summary_cell_best),
+        FormatterService.INSTANCE.formatSolveTime(best.getTotalMs()), null);
+    setSummaryCellColor(1, ContextCompat.getColor(this, R.color.session_best));
+    if (pairs) {
+      setSummaryCellCase(null, getString(R.string.drill_summary_rep_number,
+          session.getReps().indexOf(best) + 1));
     } else {
-      setSummaryCell(2, getString(R.string.drill_summary_cell_best),
-          FormatterService.INSTANCE.formatSolveTime(best),
-          Utils.toSmartCubeCaseHeadline(this, bestCase));
+      setSummaryCellCase(best.getCaseCode(),
+          Utils.toSmartCubeCaseHeadline(this, best.getCaseCode()));
     }
   }
 
   /**
-   * A coach drill's summary: how many cases cleared, what stopped it, and each case against its
-   * target. Read off the reps that count, so throwing a rep out below can take a clearing with it.
+   * A coach drill's card and its case list: how many cases cleared, what stopped it, and each case
+   * against its target. Read off the reps that count, so throwing a rep out below can take a
+   * clearing with it.
    */
   private void showTargets(List<DrillRep> reps) {
     DrillSpec spec = session.getSpec();
@@ -1029,9 +1036,11 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     }
     findViewById(R.id.llDrillTargets).setVisibility(View.VISIBLE);
 
-    setSummaryCell(0, getString(R.string.drill_summary_cell_cleared),
-        String.valueOf(cases.size() - over.size()),
-        getString(R.string.drill_summary_cell_of_cases, cases.size()));
+    hideSummaryCells();
+    setSummaryEyebrow(finishedAfter(reps.size()));
+    setSummaryHero(String.valueOf(cases.size() - over.size()),
+        getString(R.string.drill_summary_cell_of, cases.size()),
+        getString(R.string.drill_summary_cases_cleared));
 
     StringBuilder note = new StringBuilder();
     if (session.getReps().size() >= spec.getReps()) {
@@ -1043,12 +1052,10 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
           ? R.string.drill_summary_still_learning : R.string.drill_summary_over_target,
           joined(over)));
     }
-    TextView tvNote = findViewById(R.id.tvDrillSummaryNote);
-    tvNote.setText(note);
-    tvNote.setVisibility(note.length() == 0 ? View.GONE : View.VISIBLE);
+    setSummaryNote(note);
   }
 
-  /** One case: how often it was dealt, its wins, its target, and its mean against that target. */
+  /** One case: its chart, how often it was dealt, its wins, its target, and its mean against it. */
   private View targetRow(LayoutInflater inflater, LinearLayout parent, final String code,
       String name, List<DrillRep> reps, CaseTally tally) {
     int dealt = 0;
@@ -1071,12 +1078,20 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
         DialogUtils.showFragment(DrillActivity.this, CaseAlgorithmsDialog.newInstance(code));
       }
     });
-    TextView tvName = row.findViewById(R.id.tvDrillTargetName);
-    tvName.setText(name);
-    tvName.setTextColor(ContextCompat.getColor(this, familyColour(code)));
+    LastLayerCaseView chart = row.findViewById(R.id.vDrillTargetChart);
+    if (CaseAlgorithms.isPair(code)) {
+      chart.setVisibility(View.GONE);
+    } else {
+      chart.setDiagram(LastLayerDiagram.forCase(code));
+    }
+    if (!tally.isCleared(code)) {
+      tintUncleared(row);
+    }
+    ((TextView) row.findViewById(R.id.tvDrillTargetName)).setText(name);
     ((TextView) row.findViewById(R.id.tvDrillTargetReps)).setText(String.valueOf(dealt));
-    ((DrillCasePips) row.findViewById(R.id.vDrillTargetWins))
-        .show(Collections.singletonList(code), tally, session.getSpec().getWinsToRetire());
+    DrillCasePips wins = row.findViewById(R.id.vDrillTargetWins);
+    wins.setBars(true);
+    wins.show(Collections.singletonList(code), tally, session.getSpec().getWinsToRetire());
     // A learning drill has no time to beat, only reps without looking.
     boolean learning = session.getSpec().isLearning();
     ((TextView) row.findViewById(R.id.tvDrillTargetTarget)).setText(learning
@@ -1095,6 +1110,17 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
           mean <= target ? R.color.green_soft : R.color.danger_text));
     }
     return row;
+  }
+
+  /** A case still to clear stands out in a faint wash of the drill's colour. */
+  private void tintUncleared(View row) {
+    float density = getResources().getDisplayMetrics().density;
+    GradientDrawable wash = new GradientDrawable();
+    wash.setCornerRadius(10 * density);
+    wash.setColor(StepCardBackground.withAlpha(familyHue, UNCLEARED_ALPHA));
+    LayerDrawable background = new LayerDrawable(new Drawable[] {row.getBackground(), wash});
+    background.setLayerInset(1, 0, Math.round(3 * density), 0, Math.round(2 * density));
+    row.setBackground(background);
   }
 
   private static String joined(List<String> names) {

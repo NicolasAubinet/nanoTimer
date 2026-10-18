@@ -286,13 +286,8 @@
 
   </LinearLayout>
 
-  <!-- What the drill leaves behind: the figures for the run, then the case-by-case table that says
-       where those figures came from, the warning that the cube is scrambled, and the way out under
-       the thumb. On the app's own ground and its own cells, like every other screen that reports
-       numbers.
-
-       The way out is outside the scroll: the table is as long as the drill had cases, and a drill
-       of all 57 OLLs would otherwise bury Done under fifty-seven rows. -->
+  <!-- What the drill leaves behind: the card, a coach drill's cases against their targets, then the
+       reps. Done stays outside the scroll, so a drill of all 57 OLLs cannot bury it. -->
   <LinearLayout
      android:id="@+id/drillSummary"
      android:layout_width="match_parent"
@@ -311,58 +306,14 @@
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:orientation="vertical"
-       android:paddingLeft="16dp"
-       android:paddingRight="16dp"
-       android:paddingTop="6dp"
-       android:paddingBottom="16dp">
+       android:paddingLeft="@dimen/space_m"
+       android:paddingRight="@dimen/space_m"
+       android:paddingTop="@dimen/space_xs"
+       android:paddingBottom="@dimen/space_l">
 
-      <TextView
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:text="@string/drill_finished"
-         android:textColor="@color/white"
-         android:textSize="26sp"
-         android:fontFamily="@font/roboto_medium"
-         android:textStyle="normal"/>
+      <include layout="@layout/drill_summary_card"/>
 
-      <!-- What was drilled and in which mode, since the drill is over and its own bar is gone. -->
-      <TextView
-         android:id="@+id/tvDrillSummarySubtitle"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_marginTop="2dp"
-         android:textColor="@color/secondary_text"
-         android:textSize="13sp"/>
-
-      <!-- The three figures the drill is read from. Shared with the drill stats screen. -->
-      <include
-         layout="@layout/drill_stat_cells"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_marginTop="14dp"/>
-
-      <!-- Instead of the cells, for a drill with nothing to average. -->
-      <TextView
-         android:id="@+id/tvDrillSummaryEmpty"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_marginTop="20dp"
-         android:textColor="@color/white"
-         android:textSize="17sp"
-         android:visibility="gone"/>
-
-      <!-- A coach drill's ending: what stopped it, and which cases are still over target. -->
-      <TextView
-         android:id="@+id/tvDrillSummaryNote"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_marginTop="14dp"
-         android:textColor="@color/white"
-         android:textSize="14sp"
-         android:lineSpacingMultiplier="1.1"
-         android:visibility="gone"/>
-
-      <!-- A coach drill's cases against their targets: one line per case, dots as on the drill. -->
+      <!-- A coach drill's cases against their targets. -->
       <LinearLayout
          android:id="@+id/llDrillTargets"
          android:layout_width="match_parent"
@@ -374,41 +325,46 @@
         <LinearLayout
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
+           android:paddingLeft="@dimen/space_xs"
+           android:paddingRight="@dimen/space_xs"
            android:paddingBottom="8dp"
            android:orientation="horizontal">
 
           <TextView
              style="@style/DrillTargetHeading"
              android:layout_width="0dp"
-             android:layout_weight="1.5"
+             android:layout_weight="1"
              android:text="@string/drill_targets_column_case"/>
 
           <TextView
              style="@style/DrillTargetHeading"
-             android:layout_width="0dp"
-             android:layout_weight="0.7"
+             android:layout_width="@dimen/drill_target_reps_column"
+             android:gravity="center_horizontal"
              android:text="@string/drill_targets_column_reps"/>
 
           <TextView
              style="@style/DrillTargetHeading"
-             android:layout_width="0dp"
-             android:layout_weight="1.1"
+             android:layout_width="@dimen/drill_target_wins_column"
+             android:gravity="center_horizontal"
              android:text="@string/drill_targets_column_wins"/>
 
           <TextView
              style="@style/DrillTargetHeading"
-             android:layout_width="0dp"
-             android:layout_weight="0.9"
+             android:layout_width="@dimen/drill_target_time_column"
              android:gravity="end"
              android:text="@string/drill_targets_column_target"/>
 
           <TextView
              style="@style/DrillTargetHeading"
-             android:layout_width="0dp"
-             android:layout_weight="0.9"
+             android:layout_width="@dimen/drill_target_time_column"
              android:gravity="end"
              android:text="@string/drill_summary_cell_mean"/>
         </LinearLayout>
+
+        <View
+           android:layout_width="match_parent"
+           android:layout_height="1dp"
+           android:background="@color/hero_divider"/>
 
         <LinearLayout
            android:id="@+id/llDrillTargetRows"
@@ -417,13 +373,7 @@
            android:orientation="vertical"/>
       </LinearLayout>
 
-      <!-- Where the figures above came from. One line per case rather than per rep, because the
-           question a finished drill answers is which cases the time went to, and a case dealt four
-           times is one answer and not four.
-
-           The three headings are the sort: tapping one ranks the table by that column and taps
-           again to turn it round, and the ranked column is the one written in white. A control of
-           its own above the table would have had to name the same three things a second time. -->
+      <!-- One line per rep. The headings are the sort, and a line opens its case's algorithms. -->
       <LinearLayout
          android:id="@+id/llDrillCasesSection"
          android:layout_width="match_parent"
@@ -435,20 +385,18 @@
            layout="@layout/case_table"
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
-           android:layout_marginTop="22dp"/>
+           android:layout_marginTop="14dp"/>
       </LinearLayout>
 
     </LinearLayout>
   </ScrollView>
 
-    <!-- The sheet's own action, in the accent the main screen's Start wears: it is the only thing
-         to do here, and a tonal slab beside a page of colour read as one more disabled control. -->
     <androidx.appcompat.widget.AppCompatButton
        android:id="@+id/btDrillDone"
        style="@style/HeroStartButton"
        android:layout_marginTop="12dp"
-       android:layout_marginLeft="16dp"
-       android:layout_marginRight="16dp"
+       android:layout_marginLeft="@dimen/space_m"
+       android:layout_marginRight="@dimen/space_m"
        android:layout_marginBottom="16dp"
        android:text="@string/drill_done"/>
 

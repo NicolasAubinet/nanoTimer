@@ -1,16 +1,22 @@
 package com.cube.nanotimer.gui;
 
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
 
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.cube.CubePatternFormat;
 import com.cube.nanotimer.cube.CubeStickering;
 import com.cube.nanotimer.gui.widget.CrossSolutionPanel;
+import com.cube.nanotimer.gui.widget.DrillOutcomeStrip;
 import com.cube.nanotimer.scrambler.ScramblerService;
 import com.cube.nanotimer.scrambler.cross.CrossFace;
 import com.cube.nanotimer.scrambler.cross.CrossFormatter;
@@ -25,6 +31,7 @@ import com.cube.nanotimer.smartcube.model.CubeRotation;
 import com.cube.nanotimer.smartcube.model.Face;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.view.DrillRepFlourish;
+import com.cube.nanotimer.util.view.StepPalette;
 import com.cube.nanotimer.vo.CubeType;
 
 import java.util.List;
@@ -86,6 +93,9 @@ public class CrossDrillActivity extends DrillScreenActivity {
 
   /** How many scrambles to refuse for having their cross already built before taking one anyway. */
   private static final int MAX_DEAL_ATTEMPTS = 5;
+
+  /** The step family the summary takes its colour from. */
+  private static final String CROSS_FAMILY = "cross";
 
   /**
    * How long a stepped turn takes to draw. Several times the speed the cube is mirrored at, which
@@ -588,11 +598,11 @@ public class CrossDrillActivity extends DrillScreenActivity {
     }
     finished = true;
     handler.removeCallbacksAndMessages(null);
-    showSummaryFor(label);
+    showSummaryFor(StepPalette.cfop(this).colorFor(CROSS_FAMILY));
 
     List<CrossDrillRep> reps = session.getReps();
-    setSummaryCell(0, getString(R.string.drill_summary_cell_reps), String.valueOf(reps.size()),
-        getString(R.string.drill_summary_cell_of, session.getSpec().getReps()));
+    setSummaryEyebrow(finishedAfter(reps.size()));
+    showRepRows(reps);
 
     // A rep whose cross was not there is counted apart rather than folded in: its moves went
     // somewhere else, and averaging them in would flatter a drill that kept missing.
@@ -600,26 +610,85 @@ public class CrossDrillActivity extends DrillScreenActivity {
     int optimal = 0;
     int extraTotal = 0;
     long planningTotal = 0;
-    for (CrossDrillRep rep : reps) {
+    int[] outcomes = new int[reps.size()];
+    for (int i = 0; i < reps.size(); i++) {
+      CrossDrillRep rep = reps.get(i);
+      outcomes[i] = outcomeOf(rep);
       if (!rep.isBuilt()) {
         continue;
       }
       built++;
       extraTotal += rep.getExtraMoves();
       planningTotal += rep.getPlanningMs();
-      if (rep.getExtraMoves() == 0 && rep.getOptimalLength() > 0) {
+      if (outcomes[i] == DrillOutcomeStrip.OPTIMAL) {
         optimal++;
       }
     }
     if (built == 0) {
       showSummaryEmpty(R.string.drill_cross_summary_none_built);
+      hideSummaryCells();
       return;
     }
+    setSummaryHero(String.valueOf(optimal), getString(R.string.drill_summary_cell_of, built),
+        getString(R.string.drill_cross_summary_found));
+    setSummaryStrip(outcomes, new CharSequence[] {getString(R.string.drill_cross_verdict_optimal),
+        getString(R.string.drill_summary_cell_extra), getString(R.string.drill_cross_row_missed),
+        null});
     String average = getString(R.string.drill_summary_cell_average);
-    setSummaryCell(1, getString(R.string.drill_summary_cell_extra),
+    setSummaryCell(0, getString(R.string.drill_summary_cell_extra),
         String.format("%.1f", extraTotal / (double) built), average);
-    setSummaryCell(2, getString(R.string.drill_summary_cell_planning),
+    setSummaryCell(1, getString(R.string.drill_summary_cell_planning),
         FormatterService.INSTANCE.formatSolveTime(planningTotal / built), average);
-    setSummaryExtra(getString(R.string.drill_cross_summary_optimal, optimal, built));
+  }
+
+  /** How a rep finished, for the strip and its line: a rep with no shortest to compare is unscored. */
+  private static int outcomeOf(CrossDrillRep rep) {
+    if (!rep.isBuilt()) {
+      return DrillOutcomeStrip.MISSED;
+    }
+    if (rep.getOptimalLength() <= 0) {
+      return DrillOutcomeStrip.UNSCORED;
+    }
+    return rep.getExtraMoves() == 0 ? DrillOutcomeStrip.OPTIMAL : DrillOutcomeStrip.LONGER;
+  }
+
+  /** One line per rep, in the order dealt: its moves against the shortest, and its planning. */
+  private void showRepRows(List<CrossDrillRep> reps) {
+    LinearLayout rows = findViewById(R.id.llDrillCrossRepRows);
+    rows.removeAllViews();
+    LayoutInflater inflater = LayoutInflater.from(this);
+    for (int i = 0; i < reps.size(); i++) {
+      CrossDrillRep rep = reps.get(i);
+      View row = inflater.inflate(R.layout.drill_cross_rep_row, rows, false);
+      ((TextView) row.findViewById(R.id.tvDrillCrossRepNumber)).setText(String.valueOf(i + 1));
+      TextView moves = row.findViewById(R.id.tvDrillCrossRepMoves);
+      TextView planning = row.findViewById(R.id.tvDrillCrossRepPlanning);
+      if (rep.isBuilt()) {
+        moves.setText(getString(R.string.drill_cross_rep_moves, rep.getMoveCount()));
+        planning.setText(FormatterService.INSTANCE.formatSolveTime(rep.getPlanningMs()));
+      } else {
+        moves.setText(R.string.drill_cross_row_missed);
+        moves.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
+        planning.setText(R.string.drill_case_no_time);
+        planning.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
+      }
+      TextView verdict = row.findViewById(R.id.tvDrillCrossRepVerdict);
+      int outcome = outcomeOf(rep);
+      if (outcome == DrillOutcomeStrip.OPTIMAL || outcome == DrillOutcomeStrip.LONGER) {
+        boolean shortest = outcome == DrillOutcomeStrip.OPTIMAL;
+        verdict.setText(shortest ? getString(R.string.drill_cross_verdict_optimal)
+            : getString(R.string.drill_cross_verdict_extra, rep.getExtraMoves()));
+        verdict.setTextColor(ContextCompat.getColor(this, R.color.on_accent));
+        GradientDrawable chip = new GradientDrawable();
+        chip.setCornerRadius(11 * getResources().getDisplayMetrics().density);
+        chip.setColor(ContextCompat.getColor(this,
+            shortest ? R.color.green_soft : R.color.warning));
+        verdict.setBackground(chip);
+      } else {
+        verdict.setVisibility(View.GONE);
+      }
+      rows.addView(row);
+    }
+    findViewById(R.id.llDrillCrossReps).setVisibility(reps.isEmpty() ? View.GONE : View.VISIBLE);
   }
 }

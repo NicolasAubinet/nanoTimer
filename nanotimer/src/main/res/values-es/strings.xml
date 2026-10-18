@@ -934,9 +934,13 @@
   <string name="drill_practice_pick">Toca Alg para elegir el algoritmo que practicar</string>
   <string name="drill_practice_other">No es el elegido</string>
   <string name="drill_cases_cleared">%1$d de %2$d casos superados</string>
-  <string name="drill_summary_cell_cleared">Superados</string>
-  <string name="drill_summary_cell_of_cases">de %d casos</string>
-  <string name="drill_summary_cell_at_most">%d como máximo</string>
+  <string name="drill_summary_cases_cleared">casos superados</string>
+  <string name="drill_summary_pairs">Pares</string>
+  <string name="drill_summary_rep_number">Repetición %d</string>
+  <plurals name="drill_summary_reps">
+    <item quantity="one">%d repetición</item>
+    <item quantity="other">%d repeticiones</item>
+  </plurals>
   <string name="drill_summary_ceiling">Detenido tras %d repeticiones.</string>
   <string name="drill_summary_over_target">Aún por encima del objetivo: %s</string>
   <string name="drill_summary_still_learning">Aún sin hacer sin mirar: %s</string>
@@ -1093,7 +1097,9 @@
   <string name="drill_cross_verdict_extra">%d de más</string>
   <string name="drill_cross_badge_optimal">Cruz óptima</string>
   <string name="drill_cross_rep_missed">Eso no era la cruz</string>
-  <string name="drill_cross_summary_optimal">%1$d de %2$d encontraron la forma más corta</string>
+  <string name="drill_cross_summary_found">encontraron la forma más corta</string>
+  <string name="drill_cross_row_missed">Sin cruz</string>
+  <string name="drill_cross_column_moves">Movimientos</string>
   <string name="drill_cross_summary_none_built">No se completó ninguna cruz</string>
   <string name="drill_cross_start_position">Posición inicial</string>
   <string name="drill_cross_other_ways">Otras formas</string>

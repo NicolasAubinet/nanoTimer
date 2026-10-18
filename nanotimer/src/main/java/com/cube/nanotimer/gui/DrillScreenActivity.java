@@ -1,11 +1,17 @@
 package com.cube.nanotimer.gui;
 
 import android.content.res.ColorStateList;
+import android.graphics.drawable.GradientDrawable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -19,7 +25,10 @@ import com.cube.nanotimer.cube.GyroReferenceListener;
 import com.cube.nanotimer.cube.SmartCubeChip;
 import com.cube.nanotimer.cube.SmartCubeManager;
 import com.cube.nanotimer.cube.VirtualCube;
+import com.cube.nanotimer.gui.widget.DrillOutcomeStrip;
+import com.cube.nanotimer.gui.widget.LastLayerCaseView;
 import com.cube.nanotimer.gui.widget.SmartCubeConnectDialog;
+import com.cube.nanotimer.gui.widget.StepCardBackground;
 import com.cube.nanotimer.drill.DrillSpec;
 import com.cube.nanotimer.smartcube.model.CubeConnection;
 import com.cube.nanotimer.smartcube.model.CubeConnectionListener;
@@ -27,8 +36,11 @@ import com.cube.nanotimer.smartcube.model.CubeMoveListener;
 import com.cube.nanotimer.smartcube.model.CubeOrientation;
 import com.cube.nanotimer.smartcube.model.CubeState;
 import com.cube.nanotimer.smartcube.model.CubeStateListener;
+import com.cube.nanotimer.smartcube.step.LastLayerDiagram;
 import com.cube.nanotimer.util.DrillRecorder;
+import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.helper.DialogUtils;
+import com.cube.nanotimer.util.view.DrillSplitBarView;
 import com.cube.nanotimer.vo.drill.DrillEnd;
 
 /**
@@ -52,9 +64,9 @@ import com.cube.nanotimer.vo.drill.DrillEnd;
  * mean the two screens cannot drift apart on the one rule that matters here, which is that the line
  * is about the rep that is over and never about the case on screen.
  *
- * <p>The summary sheet is shared too, down to its three cells: what a drill leaves behind is a
- * handful of figures whatever it asked, so the slots live here and each drill says what goes in
- * them.
+ * <p>The summary's card is shared too: a hero figure, a bar or a strip under it, and two cells, lit
+ * in the step colour of what was drilled as the setup screen's card is. What a drill leaves behind
+ * is a handful of figures whatever it asked, so the slots live here and each drill fills them.
  */
 public abstract class DrillScreenActivity extends NanoTimerActivity
     implements CubeMoveListener, CubeStateListener, CubeConnectionListener, GyroReferenceListener,
@@ -66,14 +78,9 @@ public abstract class DrillScreenActivity extends NanoTimerActivity
    */
   public static final String EXTRA_RECORDING = "drillRecording";
 
-  private static final int[] CELL_ROWS =
-      {R.id.llDrillCellOne, R.id.llDrillCellTwo, R.id.llDrillCellThree};
-  private static final int[] CELL_KEYS =
-      {R.id.tvDrillCellKeyOne, R.id.tvDrillCellKeyTwo, R.id.tvDrillCellKeyThree};
-  private static final int[] CELL_VALUES =
-      {R.id.tvDrillCellValueOne, R.id.tvDrillCellValueTwo, R.id.tvDrillCellValueThree};
-  private static final int[] CELL_SUBS =
-      {R.id.tvDrillCellSubOne, R.id.tvDrillCellSubTwo, R.id.tvDrillCellSubThree};
+  private static final int[] CELL_KEYS = {R.id.tvDrillCellKeyOne, R.id.tvDrillCellKeyTwo};
+  private static final int[] CELL_VALUES = {R.id.tvDrillCellValueOne, R.id.tvDrillCellValueTwo};
+  private static final int[] CELL_SUBS = {R.id.tvDrillCellSubOne, R.id.tvDrillCellSubTwo};
 
   /** How far back the camera stands over a well that takes most of the screen. */
   private static final double CUBE_CAMERA_DISTANCE = 5.2;
@@ -131,6 +138,11 @@ public abstract class DrillScreenActivity extends NanoTimerActivity
    * the same result as one the user walked out of at rep 6.
    */
   private DrillEnd endReason = DrillEnd.FINISHED;
+
+  /** The step colour the summary is lit in, which its bar takes too. */
+  private int summaryHue;
+  /** Whether the summary counts finishes on the strip rather than dividing time on the bar. */
+  private boolean stripShown;
 
   /** Deals the first case. Called once, when there is a cube to run the drill with. */
   protected abstract void startDrill();
@@ -481,67 +493,197 @@ public abstract class DrillScreenActivity extends NanoTimerActivity
     meter.setProgress(rep);
   }
 
-  /** One of the summary's three cells: what the figure is, the figure, and what it is of. */
+  /** One of the card's two cells: what the figure is, the figure, and what it is of. */
   protected void setSummaryCell(int index, CharSequence key, CharSequence value, CharSequence sub) {
+    findViewById(R.id.llDrillSummaryCells).setVisibility(View.VISIBLE);
     ((TextView) findViewById(CELL_KEYS[index])).setText(key);
-    ((TextView) findViewById(CELL_VALUES[index])).setText(value);
-    ((TextView) findViewById(CELL_SUBS[index])).setText(sub);
+    TextView tvValue = findViewById(CELL_VALUES[index]);
+    tvValue.setText(value);
+    tvValue.setTextColor(ContextCompat.getColor(this, R.color.white));
+    TextView tvSub = findViewById(CELL_SUBS[index]);
+    tvSub.setText(sub);
+    tvSub.setVisibility(sub == null || sub.length() == 0 ? View.GONE : View.VISIBLE);
+  }
+
+  /** A cell's figure in a colour of its own, for the one the table below colours the same way. */
+  protected void setSummaryCellColor(int index, int color) {
+    ((TextView) findViewById(CELL_VALUES[index])).setTextColor(color);
   }
 
   /**
-   * The figure with no cell of its own, under them. A screen whose figures all have a cell has no
-   * such line, and does not have to grow an empty one to be a drill screen.
+   * Which case the second cell's figure was: its chart and short name, or only a caption.
+   *
+   * @param chartCode the case to draw, or null for a figure with no picture
    */
-  protected void setSummaryExtra(CharSequence text) {
-    TextView extra = findViewById(R.id.tvDrillSummaryExtra);
-    if (extra != null) {
-      extra.setText(text);
+  protected void setSummaryCellCase(String chartCode, CharSequence caption) {
+    findViewById(R.id.llDrillCellCaseTwo).setVisibility(View.VISIBLE);
+    LastLayerCaseView chart = findViewById(R.id.vDrillCellChartTwo);
+    if (chartCode == null) {
+      chart.setVisibility(View.GONE);
+    } else {
+      chart.setVisibility(View.VISIBLE);
+      chart.setDiagram(LastLayerDiagram.forCase(chartCode));
+    }
+    ((TextView) findViewById(R.id.tvDrillCellCaseTwo)).setText(caption);
+  }
+
+  /** A summary with no cells, whose figures all sit in the hero and the bar. */
+  protected void hideSummaryCells() {
+    findViewById(R.id.llDrillSummaryCells).setVisibility(View.GONE);
+  }
+
+  /**
+   * The one figure the drill is read by.
+   *
+   * @param of what a count is out of, or null for a figure that is not a count
+   * @param unit what the figure is
+   */
+  protected void setSummaryHero(CharSequence value, CharSequence of, CharSequence unit) {
+    ((TextView) findViewById(R.id.tvDrillSummaryHero)).setText(value);
+    TextView tvOf = findViewById(R.id.tvDrillSummaryHeroOf);
+    tvOf.setText(of);
+    tvOf.setVisibility(of == null ? View.GONE : View.VISIBLE);
+    ((TextView) findViewById(R.id.tvDrillSummaryHeroUnit)).setText(unit);
+  }
+
+  /** What a coach drill's ending has to say in words, or null for nothing. */
+  protected void setSummaryNote(CharSequence note) {
+    TextView tvNote = findViewById(R.id.tvDrillSummaryNote);
+    tvNote.setText(note);
+    tvNote.setVisibility(note == null || note.length() == 0 ? View.GONE : View.VISIBLE);
+  }
+
+  /** The line over the hero, which by default only says the drill is over. */
+  protected void setSummaryEyebrow(CharSequence text) {
+    ((TextView) findViewById(R.id.tvDrillSummaryEyebrow)).setText(text);
+  }
+
+  /**
+   * Where the drill's time went, drawn as the drill screen draws a rep, with both halves named.
+   *
+   * @param meanMs the whole mean, for a summary whose hero is not already it, or -1
+   */
+  protected void setSummarySplit(long recognitionMs, long executionMs, long meanMs) {
+    ((DrillSplitBarView) findViewById(R.id.vDrillSummarySplit))
+        .setSplit(recognitionMs, executionMs, summaryHue);
+    ((TextView) findViewById(R.id.tvDrillSummaryRecognition)).setText(
+        legend(getString(R.string.drill_summary_column_recognition), recognitionMs));
+    ((TextView) findViewById(R.id.tvDrillSummaryExecution)).setText(
+        legend(getString(R.string.drill_summary_column_execution), executionMs));
+    TextView mean = findViewById(R.id.tvDrillSummaryMean);
+    mean.setVisibility(meanMs < 0 ? View.GONE : View.VISIBLE);
+    if (meanMs >= 0) {
+      mean.setText(legend(getString(R.string.drill_summary_cell_average), meanMs));
     }
   }
 
   /**
-   * Puts the figure cells back, for a summary whose reps changed after it was drawn. A rep thrown
-   * out can be put back, so nothing {@link #showSummaryEmpty} does may be one way only.
+   * The cross drill's reps by how each finished, in place of the bar, with a key naming the
+   * finishes that occur.
+   *
+   * @param outcomes one {@link DrillOutcomeStrip} outcome per rep, in the order dealt
+   * @param names what each outcome is called, indexed by outcome; null for one with no key
+   */
+  protected void setSummaryStrip(int[] outcomes, CharSequence[] names) {
+    stripShown = true;
+    findViewById(R.id.llDrillSummarySplit).setVisibility(View.GONE);
+    findViewById(R.id.llDrillSummaryStrip).setVisibility(View.VISIBLE);
+    DrillOutcomeStrip strip = findViewById(R.id.vDrillSummaryStrip);
+    strip.setOutcomes(outcomes);
+    LinearLayout key = findViewById(R.id.llDrillSummaryStripKey);
+    key.removeAllViews();
+    boolean[] seen = new boolean[names.length];
+    for (int outcome : outcomes) {
+      seen[outcome] = true;
+    }
+    LayoutInflater inflater = LayoutInflater.from(this);
+    for (int outcome = 0; outcome < names.length; outcome++) {
+      if (!seen[outcome] || names[outcome] == null) {
+        continue;
+      }
+      TextView item = (TextView) inflater.inflate(R.layout.drill_summary_key, key, false);
+      item.setText(names[outcome]);
+      item.setCompoundDrawablesRelativeWithIntrinsicBounds(
+          keySwatch(strip.colorOf(outcome), outcome == DrillOutcomeStrip.MISSED), null, null, null);
+      key.addView(item);
+    }
+  }
+
+  /**
+   * Puts the figures back, for a summary whose reps changed after it was drawn. A rep thrown out
+   * can be put back, so nothing {@link #showSummaryEmpty} does may be one way only.
    */
   protected void showSummaryFigures() {
-    findViewById(CELL_ROWS[1]).setVisibility(View.VISIBLE);
-    findViewById(CELL_ROWS[2]).setVisibility(View.VISIBLE);
-    View extra = findViewById(R.id.tvDrillSummaryExtra);
-    if (extra != null) {
-      extra.setVisibility(View.VISIBLE);
-    }
+    findViewById(R.id.llDrillSummaryHero).setVisibility(View.VISIBLE);
+    findViewById(R.id.llDrillSummarySplit).setVisibility(stripShown ? View.GONE : View.VISIBLE);
+    findViewById(R.id.llDrillSummaryStrip).setVisibility(stripShown ? View.VISIBLE : View.GONE);
+    findViewById(R.id.llDrillCellTwo).setVisibility(View.VISIBLE);
     findViewById(R.id.tvDrillSummaryEmpty).setVisibility(View.GONE);
   }
 
   /**
-   * A drill with nothing to average. The reps cell stays: how far it got is still the result, and
-   * it is the one figure a drill that timed nothing still has.
+   * A drill with nothing to average. The first cell stays: how far it got is still the result,
+   * and it is the one figure a drill that timed nothing still has.
    */
   protected void showSummaryEmpty(int messageId) {
-    findViewById(CELL_ROWS[1]).setVisibility(View.GONE);
-    findViewById(CELL_ROWS[2]).setVisibility(View.GONE);
-    View extra = findViewById(R.id.tvDrillSummaryExtra);
-    if (extra != null) {
-      extra.setVisibility(View.GONE);
-    }
+    findViewById(R.id.llDrillSummaryHero).setVisibility(View.GONE);
+    findViewById(R.id.llDrillSummarySplit).setVisibility(View.GONE);
+    findViewById(R.id.llDrillSummaryStrip).setVisibility(View.GONE);
+    findViewById(R.id.llDrillCellTwo).setVisibility(View.INVISIBLE);
     TextView empty = findViewById(R.id.tvDrillSummaryEmpty);
     empty.setVisibility(View.VISIBLE);
     empty.setText(messageId);
   }
 
   /**
-   * What was drilled and in which mode, since the drill is over and its own bar is gone. Also where
-   * the recording is closed off, this being the one point every ending passes through. A drill that
-   * never reaches it was killed rather than ended, and is stored with no ending at all.
+   * Turns the screen over to the summary, lit in the drill's step colour, and closes the recording,
+   * this being the one point every ending passes through. A drill that never reaches it was killed
+   * rather than ended, and is stored with no ending at all.
+   *
+   * @param hue the step colour of what was drilled
    */
-  protected void showSummaryFor(String label) {
+  protected void showSummaryFor(int hue) {
     if (recorder != null) {
       recorder.end(endReason);
     }
+    summaryHue = hue;
     runningLayout.setVisibility(View.GONE);
     summaryLayout.setVisibility(View.VISIBLE);
-    ((TextView) findViewById(R.id.tvDrillSummarySubtitle)).setText(
-        getString(R.string.drill_summary_subtitle, label, getString(modeName())));
+    StepCardBackground.paint(findViewById(R.id.llDrillSummaryCard), hue);
+    TextView eyebrow = findViewById(R.id.tvDrillSummaryEyebrow);
+    eyebrow.setTextColor(hue);
+    eyebrow.setText(R.string.drill_finished);
+    ((TextView) findViewById(R.id.tvDrillSummaryMode)).setText(modeName());
+  }
+
+  /** "Drill finished" and how many reps it ran, for a summary with no cell to count them in. */
+  protected CharSequence finishedAfter(int reps) {
+    return getString(R.string.drill_summary_subtitle, getString(R.string.drill_finished),
+        getResources().getQuantityString(R.plurals.drill_summary_reps, reps, reps));
+  }
+
+  /** A half of the mean as the legend says it: its name, then the figure in white. */
+  private CharSequence legend(String name, long ms) {
+    SpannableStringBuilder text = new SpannableStringBuilder(name).append(' ');
+    int start = text.length();
+    text.append(FormatterService.INSTANCE.formatSolveTime(ms));
+    text.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.white)), start,
+        text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    return text;
+  }
+
+  /** The key's mark for one finish: a filled chip, or a dashed one for a cross never built. */
+  private GradientDrawable keySwatch(int color, boolean dashed) {
+    float density = getResources().getDisplayMetrics().density;
+    GradientDrawable swatch = new GradientDrawable();
+    swatch.setCornerRadius(2 * density);
+    swatch.setSize(Math.round(10 * density), Math.round(6 * density));
+    if (dashed) {
+      swatch.setStroke(Math.round(density), color, 2 * density, 2 * density);
+    } else {
+      swatch.setColor(color);
+    }
+    return swatch;
   }
 
   private int modeName() {

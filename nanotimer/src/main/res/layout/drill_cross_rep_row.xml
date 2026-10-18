@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One rep of a cross drill on its summary: where it fell, the moves it took and how that compares
+     with the shortest, and how long it was planned for. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:gravity="center_vertical"
+   android:minHeight="46dp"
+   android:orientation="horizontal"
+   android:paddingLeft="@dimen/space_xs"
+   android:paddingRight="@dimen/space_xs">
+
+  <TextView
+     android:id="@+id/tvDrillCrossRepNumber"
+     style="@style/DrillCasePosition"/>
+
+  <TextView
+     android:id="@+id/tvDrillCrossRepMoves"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:fontFeatureSettings="tnum"
+     android:singleLine="true"
+     android:textColor="@color/white"
+     android:textSize="15sp"/>
+
+  <TextView
+     android:id="@+id/tvDrillCrossRepVerdict"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_marginLeft="10dp"
+     android:fontFamily="@font/roboto_medium"
+     android:paddingLeft="9dp"
+     android:paddingRight="9dp"
+     android:paddingTop="2dp"
+     android:paddingBottom="2dp"
+     android:singleLine="true"
+     android:textSize="12sp"/>
+
+  <View
+     android:layout_width="0dp"
+     android:layout_height="1dp"
+     android:layout_weight="1"/>
+
+  <TextView
+     android:id="@+id/tvDrillCrossRepPlanning"
+     android:layout_width="@dimen/drill_cross_planning_column"
+     android:layout_height="wrap_content"
+     android:fontFeatureSettings="tnum"
+     android:gravity="end"
+     android:singleLine="true"
+     android:textColor="@color/white"
+     android:textSize="15sp"/>
+</LinearLayout>

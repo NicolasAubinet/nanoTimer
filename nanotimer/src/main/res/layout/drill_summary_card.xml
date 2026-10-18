@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A finished drill's card, shared by both summaries and lit in code in the step colour, as the
+     setup screen's card is. A case drill shows the bar, a cross drill the strip. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:id="@+id/llDrillSummaryCard"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:orientation="vertical"
+   android:paddingLeft="14dp"
+   android:paddingRight="14dp"
+   android:paddingTop="12dp"
+   android:paddingBottom="12dp">
+
+  <LinearLayout
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:gravity="center_vertical"
+     android:orientation="horizontal">
+
+    <TextView
+       android:id="@+id/tvDrillSummaryEyebrow"
+       android:layout_width="0dp"
+       android:layout_height="wrap_content"
+       android:layout_weight="1"
+       android:ellipsize="end"
+       android:letterSpacing="0.14"
+       android:maxLines="2"
+       android:textAllCaps="true"
+       android:textSize="11sp"
+       android:textStyle="bold"/>
+
+    <!-- Fixed before the drill, so it is said rather than offered. -->
+    <TextView
+       android:id="@+id/tvDrillSummaryMode"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginLeft="@dimen/space_s"
+       android:background="@drawable/drill_summary_pill"
+       android:paddingLeft="10dp"
+       android:paddingRight="10dp"
+       android:paddingTop="3dp"
+       android:paddingBottom="3dp"
+       android:textColor="@color/secondary_text"
+       android:textSize="12sp"/>
+  </LinearLayout>
+
+  <LinearLayout
+     android:id="@+id/llDrillSummaryHero"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:baselineAligned="false"
+     android:gravity="bottom"
+     android:orientation="horizontal">
+
+    <TextView
+       android:id="@+id/tvDrillSummaryHero"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:fontFeatureSettings="tnum"
+       android:includeFontPadding="false"
+       android:maxLines="1"
+       android:textColor="@color/white"
+       android:textSize="50sp"
+       android:textStyle="bold"/>
+
+    <!-- What the figure is out of, for a count: smaller, so the count stays the thing read. -->
+    <TextView
+       android:id="@+id/tvDrillSummaryHeroOf"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginLeft="6dp"
+       android:fontFeatureSettings="tnum"
+       android:includeFontPadding="false"
+       android:maxLines="1"
+       android:paddingBottom="@dimen/drill_summary_of_drop"
+       android:textColor="@color/secondary_text"
+       android:textSize="24sp"
+       android:textStyle="bold"
+       android:visibility="gone"/>
+
+    <TextView
+       android:id="@+id/tvDrillSummaryHeroUnit"
+       android:layout_width="0dp"
+       android:layout_height="wrap_content"
+       android:layout_weight="1"
+       android:layout_marginLeft="8dp"
+       android:includeFontPadding="false"
+       android:maxLines="2"
+       android:paddingBottom="@dimen/drill_summary_unit_drop"
+       android:textColor="@color/secondary_text"
+       android:textSize="15sp"/>
+  </LinearLayout>
+
+  <!-- A coach drill's ending: what stopped it, and which cases are still over target. -->
+  <TextView
+     android:id="@+id/tvDrillSummaryNote"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="2dp"
+     android:lineSpacingMultiplier="1.1"
+     android:textColor="@color/white"
+     android:textSize="14sp"
+     android:visibility="gone"/>
+
+  <!-- Instead of the figures, for a drill with nothing to average. -->
+  <TextView
+     android:id="@+id/tvDrillSummaryEmpty"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="6dp"
+     android:textColor="@color/white"
+     android:textSize="17sp"
+     android:visibility="gone"/>
+
+  <!-- Where the drill's time went, as the drill screen draws a rep: the looking, then the turning. -->
+  <LinearLayout
+     android:id="@+id/llDrillSummarySplit"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="8dp"
+     android:orientation="vertical">
+
+    <com.cube.nanotimer.util.view.DrillSplitBarView
+       android:id="@+id/vDrillSummarySplit"
+       android:layout_width="match_parent"
+       android:layout_height="8dp"/>
+
+    <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="6dp"
+       android:orientation="horizontal">
+
+      <TextView
+         android:id="@+id/tvDrillSummaryRecognition"
+         style="@style/DrillSummaryLegend"
+         android:layout_width="0dp"
+         android:layout_weight="1"
+         android:gravity="start"/>
+
+      <!-- Only where the hero is not already the mean. -->
+      <TextView
+         android:id="@+id/tvDrillSummaryMean"
+         style="@style/DrillSummaryLegend"
+         android:layout_width="0dp"
+         android:layout_weight="1"
+         android:gravity="center_horizontal"
+         android:visibility="gone"/>
+
+      <TextView
+         android:id="@+id/tvDrillSummaryExecution"
+         style="@style/DrillSummaryLegend"
+         android:layout_width="0dp"
+         android:layout_weight="1"
+         android:gravity="end"/>
+    </LinearLayout>
+  </LinearLayout>
+
+  <!-- The cross drill's reps in the order dealt, each by how it finished. -->
+  <LinearLayout
+     android:id="@+id/llDrillSummaryStrip"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="8dp"
+     android:orientation="vertical"
+     android:visibility="gone">
+
+    <com.cube.nanotimer.gui.widget.DrillOutcomeStrip
+       android:id="@+id/vDrillSummaryStrip"
+       android:layout_width="match_parent"
+       android:layout_height="8dp"/>
+
+    <LinearLayout
+       android:id="@+id/llDrillSummaryStripKey"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="7dp"
+       android:orientation="horizontal"/>
+  </LinearLayout>
+
+  <LinearLayout
+     android:id="@+id/llDrillSummaryCells"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="12dp"
+     android:baselineAligned="false"
+     android:orientation="horizontal">
+
+    <LinearLayout
+       android:id="@+id/llDrillCellOne"
+       style="@style/DrillSummaryCell"
+       android:layout_marginRight="4dp">
+
+      <LinearLayout
+         android:layout_width="0dp"
+         android:layout_height="wrap_content"
+         android:layout_weight="1"
+         android:orientation="vertical">
+        <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvDrillCellKeyOne" style="@style/DrillSummaryCellKey"/>
+        <LinearLayout style="@style/DrillSummaryCellLine">
+          <TextView android:id="@+id/tvDrillCellValueOne" style="@style/DrillSummaryCellValue"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvDrillCellSubOne" style="@style/DrillSummaryCellSub"/>
+        </LinearLayout>
+      </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+       android:id="@+id/llDrillCellTwo"
+       style="@style/DrillSummaryCell"
+       android:layout_marginLeft="4dp">
+
+      <LinearLayout
+         android:layout_width="0dp"
+         android:layout_height="wrap_content"
+         android:layout_weight="1"
+         android:orientation="vertical">
+        <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvDrillCellKeyTwo" style="@style/DrillSummaryCellKey"/>
+        <LinearLayout style="@style/DrillSummaryCellLine">
+          <TextView android:id="@+id/tvDrillCellValueTwo" style="@style/DrillSummaryCellValue"/>
+          <com.cube.nanotimer.util.view.FontFitTextView android:id="@+id/tvDrillCellSubTwo" style="@style/DrillSummaryCellSub"/>
+        </LinearLayout>
+      </LinearLayout>
+
+      <!-- Which case the figure was, for a cell that names one. -->
+      <LinearLayout
+         android:id="@+id/llDrillCellCaseTwo"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginLeft="@dimen/space_s"
+         android:gravity="center_horizontal"
+         android:orientation="vertical"
+         android:visibility="gone">
+
+        <com.cube.nanotimer.gui.widget.LastLayerCaseView
+           android:id="@+id/vDrillCellChartTwo"
+           android:layout_width="30dp"
+           android:layout_height="30dp"/>
+
+        <TextView
+           android:id="@+id/tvDrillCellCaseTwo"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="2dp"
+           android:maxLines="1"
+           android:textColor="@color/secondary_text"
+           android:textSize="11sp"/>
+      </LinearLayout>
+    </LinearLayout>
+  </LinearLayout>
+
+</LinearLayout>

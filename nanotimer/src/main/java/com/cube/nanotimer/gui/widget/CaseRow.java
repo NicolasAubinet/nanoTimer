@@ -124,6 +124,34 @@ public class CaseRow {
     return this;
   }
 
+  /**
+   * The bar as the line's whole picture, for a row with no chart and no name to tell it apart: as
+   * long as its share of the table's longest rep, and taller, so the rows compare at a glance.
+   *
+   * @param share this line's time over the longest one's, 0 to 1
+   */
+  public CaseRow proportion(long recognitionMs, long executionMs, int hue, float share,
+      int heightPx) {
+    bar(recognitionMs, executionMs, hue);
+    line.findViewById(R.id.vCaseRowChart).setVisibility(View.GONE);
+    line.findViewById(R.id.vCaseRowDot).setVisibility(View.GONE);
+    ((View) line.findViewById(R.id.tvCaseRowName).getParent()).setVisibility(View.GONE);
+    line.findViewById(R.id.tvCaseRowRecognition).setVisibility(View.GONE);
+    line.findViewById(R.id.tvCaseRowExecution).setVisibility(View.GONE);
+    android.widget.LinearLayout meter = line.findViewById(R.id.llCaseRowMeter);
+    meter.setWeightSum(1f);
+    ((ViewGroup.MarginLayoutParams) meter.getLayoutParams()).topMargin = 0;
+    View bar = line.findViewById(R.id.vCaseRowBar);
+    android.widget.LinearLayout.LayoutParams params =
+        (android.widget.LinearLayout.LayoutParams) bar.getLayoutParams();
+    params.width = 0;
+    params.height = heightPx;
+    params.weight = Math.max(0.05f, Math.min(1f, share));
+    params.leftMargin = 0;
+    bar.setLayoutParams(params);
+    return this;
+  }
+
   /** A line with nothing to say about where its time went. */
   public CaseRow noMeter() {
     line.findViewById(R.id.llCaseRowMeter).setVisibility(View.GONE);

@@ -963,9 +963,13 @@
   <string name="drill_practice_pick">Tap Alg to pick the algorithm to practice</string>
   <string name="drill_practice_other">Not the chosen one</string>
   <string name="drill_cases_cleared">%1$d of %2$d cases cleared</string>
-  <string name="drill_summary_cell_cleared">Cleared</string>
-  <string name="drill_summary_cell_of_cases">of %d cases</string>
-  <string name="drill_summary_cell_at_most">%d at most</string>
+  <string name="drill_summary_cases_cleared">cases cleared</string>
+  <string name="drill_summary_pairs">Pairs</string>
+  <string name="drill_summary_rep_number">Rep %d</string>
+  <plurals name="drill_summary_reps">
+    <item quantity="one">%d rep</item>
+    <item quantity="other">%d reps</item>
+  </plurals>
   <string name="drill_summary_ceiling">Stopped at %d reps.</string>
   <string name="drill_summary_over_target">Still over target: %s</string>
   <string name="drill_summary_still_learning">Not yet turned without looking: %s</string>
@@ -1136,7 +1140,9 @@
   <string name="drill_cross_verdict_extra">%d extra</string>
   <string name="drill_cross_badge_optimal">Optimal cross</string>
   <string name="drill_cross_rep_missed">That was not the cross</string>
-  <string name="drill_cross_summary_optimal">%1$d of %2$d found the shortest way</string>
+  <string name="drill_cross_summary_found">found the shortest way</string>
+  <string name="drill_cross_row_missed">No cross</string>
+  <string name="drill_cross_column_moves">Moves</string>
   <string name="drill_cross_summary_none_built">No cross was built</string>
   <string name="drill_cross_start_position">Start position</string>
   <string name="drill_cross_other_ways">Other ways</string>
