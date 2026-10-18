@@ -116,20 +116,6 @@ public final class AlgorithmForm {
     return folded(held);
   }
 
-  /**
-   * The frame each token leaves, as the starting frame's faces the letters URFDLB then name:
-   * entry 0 is "URFDLB", and after a {@code y} the solver's R is the starting frame's B.
-   *
-   * @throws IllegalArgumentException if a token is not a turn
-   */
-  public static List<String> frames(String... tokens) {
-    List<String> frames = new ArrayList<String>(tokens.length + 1);
-    for (char[] named : framesOf(tokens)) {
-      frames.add(new String(named));
-    }
-    return frames;
-  }
-
   /** The frame each token leaves behind, read as a spelling would be: {@code frames.get(0)} is none. */
   private static List<char[]> framesOf(String[] tokens) {
     List<char[]> frames = new ArrayList<char[]>(tokens.length + 1);

@@ -182,56 +182,81 @@ public class AlgorithmFollowerTest {
     turn(follower, "U' R U R' U R U U R'"); // the cube reports U2 as two quarters
     assertFalse(follower.hasStrayed());
   }
-
   /** After a y the solver's R is another face of the cube, and their slip on it is undone as R. */
   @Test
   public void aSlipAfterARotationIsNamedFromTheNewGrip() {
-    assertSlipNamedAsHeld("R U R' y R U R'", 3, "R'", "R");
+    Solver solver = new Solver("R U R' y R U R'");
+    solver.turn("R", "U", "R'", "y", "R'");
+    assertEquals("R", solver.follower.getUndoMoves());
   }
 
   /** A wide u turns the solver's hands round the cube like a y. */
   @Test
   public void aSlipAfterAWideTurnIsNamedFromTheNewGrip() {
-    assertSlipNamedAsHeld("R U R' u R U R'", 4, "R'", "R");
+    Solver solver = new Solver("R U R' u R U R'");
+    solver.turn("R", "U", "R'", "u", "R'");
+    assertEquals("R", solver.follower.getUndoMoves());
   }
 
   /** A slice tilts the frame: after M' the solver's U is what was their front. */
   @Test
   public void aSlipAfterASliceIsNamedFromTheNewFrame() {
-    assertSlipNamedAsHeld("R U R' M' U R U' R'", 5, "U'", "U");
+    Solver solver = new Solver("R U R' M' U R U' R'");
+    solver.turn("R", "U", "R'", "M'", "U'");
+    assertEquals("U", solver.follower.getUndoMoves());
   }
 
   /**
-   * Turns the algorithm's first {@code done} cube turns, then {@code slip} as the solver means it
-   * at that point, and expects {@code undo} named the same way.
+   * A slice turned the wrong way moves the centres, so it is undone as a slice: undone as two face
+   * turns it would leave every turn after it named a quarter turn off.
    */
-  private static void assertSlipNamedAsHeld(String algorithm, int done, String slip, String undo) {
-    List<String> cube = new ArrayList<>();
-    String[] tokens = algorithm.split(" ");
-    for (List<String> turns : AlgorithmForm.perToken(tokens)) {
-      cube.addAll(turns);
+  @Test
+  public void aWrongSliceIsUndoneAsASliceAndTheAlgorithmGoesOn() {
+    Solver solver = new Solver("R U2 R' U' S' R U' R' S"); // OLL 9
+    solver.turn("R", "U2", "R'", "U'", "S");
+    assertEquals("S'", solver.follower.getUndoMoves());
+    solver.turn("S'");
+    for (String token : "S' R U' R' S".split(" ")) {
+      solver.turn(token);
+      assertEquals("after " + token, "", solver.follower.getUndoMoves());
     }
-    AlgorithmFollower follower =
-        new AlgorithmFollower(algorithm, "U", finishes(String.join(" ", cube)));
-    turn(follower, String.join(" ", cube.subList(0, done)));
-    assertEquals("", follower.getUndoMoves());
-    // The slip's face as the frame now names it: the letter's face in the algorithm's first frame
-    String frame = AlgorithmForm.frames(tokens).get(tokensFor(tokens, done));
-    turn(follower, frame.charAt("URFDLB".indexOf(slip.charAt(0))) + slip.substring(1));
-    assertEquals(undo, follower.getUndoMoves());
   }
 
-  /** How many tokens, rotations included, make up the first {@code turned} cube turns. */
-  private static int tokensFor(String[] tokens, int turned) {
-    int count = 0;
-    while (count < tokens.length && turned > 0) {
-      turned -= AlgorithmForm.perToken(tokens[count]).get(0).size();
-      count++;
+  /** f R U R' U' f' lands on a state another grip reaches too, which must not name the undo. */
+  @Test
+  public void aGripThatOnlyLandsOnTheStateDoesNotNameTheUndo() {
+    Solver solver = new Solver("f R U R' U' f' U' F R U R' U' F'"); // OLL 3
+    solver.turn("f", "R", "U", "R'", "U'", "f'", "R");
+    assertEquals("R'", solver.follower.getUndoMoves());
+  }
+
+  /** A solver turning tokens from the algorithm's frame, with the cube reporting outer turns. */
+  private static final class Solver {
+
+    final AlgorithmFollower follower;
+    private final List<String> turned = new ArrayList<>();
+
+    Solver(String algorithm) {
+      List<String> cube = new ArrayList<>();
+      for (List<String> turns : AlgorithmForm.perToken(algorithm.split(" "))) {
+        cube.addAll(turns);
+      }
+      follower = new AlgorithmFollower(algorithm, "U", finishes(String.join(" ", cube)));
     }
-    while (count < tokens.length && AlgorithmForm.perToken(tokens[count]).get(0).isEmpty()) {
-      count++; // the rotation that follows is made before the next turn
+
+    /** Each token as the cube reports it, named from where the tokens before it left the hands. */
+    void turn(String... tokens) {
+      for (String token : tokens) {
+        turned.add(token);
+        List<List<String>> per = AlgorithmForm.perToken(turned.toArray(new String[0]));
+        for (String turn : per.get(per.size() - 1)) {
+          Face face = Face.valueOf(turn.substring(0, 1));
+          for (int q = 0; q < (turn.endsWith("2") ? 2 : 1); q++) {
+            follower.onMove(new CubeMove(face, turn.endsWith("'"), 0));
+          }
+        }
+      }
     }
-    return count;
   }
 
   /** Whether a path finishes the case the given moves solve, allowing a last turn of U. */

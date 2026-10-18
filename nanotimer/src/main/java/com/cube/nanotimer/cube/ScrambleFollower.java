@@ -292,6 +292,17 @@ public class ScrambleFollower {
     return sb.toString();
   }
 
+  /** The turns made off the path, oldest first, e.g. "F'" "R2"; empty when on track. */
+  public List<String> getWrongMoves() {
+    List<String> made = new ArrayList<>();
+    for (java.util.Iterator<Deviation> it = wrongMoves.descendingIterator(); it.hasNext(); ) {
+      Deviation deviation = it.next();
+      made.add(deviation.face.name()
+          + (deviation.quarters == 2 ? "2" : deviation.quarters == 3 ? "'" : ""));
+    }
+    return made;
+  }
+
   public int getMoveCount() {
     return moveCount;
   }

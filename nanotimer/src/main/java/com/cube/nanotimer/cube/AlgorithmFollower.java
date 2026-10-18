@@ -5,6 +5,7 @@ import com.cube.nanotimer.smartcube.model.CubeMove;
 import com.cube.nanotimer.smartcube.step.AlgorithmForm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
@@ -28,6 +29,9 @@ import java.util.function.Predicate;
 public class AlgorithmFollower {
 
   private static final String[] AUF = {null, "", "2", "'"};
+  private static final String[] FACES = {"U", "U'", "U2", "R", "R'", "R2", "F", "F'", "F2", "D",
+      "D'", "D2", "L", "L'", "L2", "B", "B'", "B2"};
+  private static final String[] SLICES = {"M", "M'", "M2", "S", "S'", "S2", "E", "E'", "E2"};
 
   private final String[] tokens;
   /** For each token, how many tokens that turn something end at or before it. */
@@ -39,10 +43,16 @@ public class AlgorithmFollower {
   /** Per follower: the quarter turns about the layer it is held at, which name its turns. */
   private final List<Integer> heldAt = new ArrayList<>();
   private final String face;
-  /** After each token, the face of the algorithm's first frame each of URFDLB then names. */
-  private final List<String> frames;
+  /** The tokens as turned, without brackets, and the end of the last one that turns something. */
+  private final List<String> turnTokens;
+  private final int lastTurnEnd;
+  /** Whether two wrong turns of opposite faces may be a slice, read as one. */
+  private final boolean hasSlices;
   /** Whether the turns left the algorithm at any point since it started. */
   private boolean strayed;
+  /** Turns seen, and per follower the turn since which it has followed them unbroken. */
+  private int turnsSeen;
+  private final List<Integer> followingSince = new ArrayList<>();
 
   /** For an algorithm turned with the layer on U, from any angle. */
   public AlgorithmFollower(String algorithm) {
@@ -63,7 +73,7 @@ public class AlgorithmFollower {
       cleaned[i] = tokens[i].replace("(", "").replace(")", "");
     }
     List<List<String>> turns = AlgorithmForm.perToken(cleaned);
-    frames = AlgorithmForm.frames(cleaned);
+    turnTokens = Arrays.asList(cleaned);
     turningUpTo = new int[tokens.length];
     int turning = 0;
     for (int i = 0; i < tokens.length; i++) {
@@ -72,6 +82,14 @@ public class AlgorithmFollower {
       }
       turningUpTo[i] = turning;
     }
+    int end = 0;
+    boolean slices = false;
+    for (int i = 0; i < tokens.length; i++) {
+      end = turns.get(i).isEmpty() ? end : i + 1;
+      slices |= !cleaned[i].isEmpty() && "MES".indexOf(cleaned[i].charAt(0)) >= 0;
+    }
+    lastTurnEnd = end;
+    hasSlices = slices;
     boolean anyRight = false;
     for (String auf : AUF) {
       for (int sides = 0; sides < 4; sides++) {
@@ -85,6 +103,7 @@ public class AlgorithmFollower {
         followers.add(ScrambleFollower.ofTurns(path));
         prefixed.add(auf != null);
         heldAt.add(sides);
+        followingSince.add(0);
         boolean right = finishes == null || finishes.test(flattened(path));
         rightAngle.add(right);
         anyRight |= right;
@@ -101,8 +120,13 @@ public class AlgorithmFollower {
   }
 
   public void onMove(CubeMove move) {
-    for (ScrambleFollower follower : followers) {
-      follower.onMove(move);
+    turnsSeen++;
+    for (int i = 0; i < followers.size(); i++) {
+      boolean wasWrong = followers.get(i).isWrong();
+      followers.get(i).onMove(move);
+      if (wasWrong && !followers.get(i).isWrong()) {
+        followingSince.set(i, turnsSeen); // back on it, perhaps only by landing on its states
+      }
     }
     strayed |= isOffTrack();
   }
@@ -111,6 +135,8 @@ public class AlgorithmFollower {
     for (ScrambleFollower follower : followers) {
       follower.reset();
     }
+    Collections.fill(followingSince, 0);
+    turnsSeen = 0;
     strayed = false;
   }
 
@@ -177,39 +203,79 @@ public class AlgorithmFollower {
     }
     int grip = isWrongAngle() ? furthestIndex(false) : undoing;
     int held = heldAt.get(grip);
-    // A rotation, wide or slice already turned has moved the solver's hands round the cube
-    String frame = frameAfter(Math.max(0, done(grip)));
-    StringBuilder named = new StringBuilder();
-    for (String turn : followers.get(undoing).getReverseMoves().split(" ")) {
-      if (named.length() > 0) {
-        named.append(' ');
+    // Named from where the solver's hands are: the algorithm's rotations, wides and slices so far,
+    // then each wrong turn in turn, since a slice among them moves the centres too
+    int tokensIn = tokensDone(Math.max(0, done(grip)));
+    List<String> walked = new ArrayList<>(turnTokens.subList(0, tokensIn));
+    List<String> made = followers.get(undoing).getWrongMoves();
+    List<String> undo = new ArrayList<>();
+    for (int i = 0; i < made.size(); i++) {
+      String token = hasSlices && i + 1 < made.size()
+          ? name(walked, held, made.subList(i, i + 2), SLICES) : null;
+      if (token != null) {
+        i++;
+      } else {
+        token = name(walked, held, made.subList(i, i + 1), FACES);
       }
-      named.append(asHeld(turn.charAt(0), held, frame)).append(turn.substring(1));
+      if (token == null) {
+        token = made.get(i); // unreachable for a face turn, kept as the cube's own name
+      }
+      walked.add(token);
+      undo.add(0, inverse(token));
     }
-    return named.toString();
+    return String.join(" ", undo);
   }
 
   /**
-   * The frame once {@code turned} turning tokens are done, with the rotations right after them.
-   * Before any, the picture's frame: it shows the case ahead of a leading rotation.
+   * How many tokens the first {@code turned} turning tokens take, with the rotations after them:
+   * a regrip is made before the next turn, and one closing the algorithm is never made at all.
    */
-  private String frameAfter(int turned) {
-    if (turned == 0) {
-      return frames.get(0);
-    }
+  private int tokensDone(int turned) {
     int done = 0;
     while (done < tokens.length && turningUpTo[done] <= turned) {
       done++;
     }
-    return frames.get(done);
+    return done == tokens.length ? lastTurnEnd : done;
   }
 
-  /** Fewer turns to undo, then further along, then with no layer turn before it. */
+  /** The token among {@code candidates}, turned where the hands now are, that made these turns. */
+  private String name(List<String> walked, int held, List<String> made, String[] candidates) {
+    List<String> sorted = new ArrayList<>(made);
+    Collections.sort(sorted);
+    List<String> with = new ArrayList<>(walked);
+    with.add("");
+    for (String candidate : candidates) {
+      with.set(with.size() - 1, candidate);
+      List<List<String>> per = AlgorithmForm.perToken(with.toArray(new String[0]));
+      List<String> turned = new ArrayList<>();
+      for (String turn : per.get(per.size() - 1)) {
+        turned.add(LayerRotation.piece(turn.substring(0, 1), held, face) + turn.substring(1));
+      }
+      Collections.sort(turned);
+      if (turned.equals(sorted)) {
+        return candidate;
+      }
+    }
+    return null;
+  }
+
+  private static String inverse(String token) {
+    return token.endsWith("2") ? token
+        : token.endsWith("'") ? token.substring(0, token.length() - 1) : token + "'";
+  }
+
+  /**
+   * Fewer turns to undo, then followed unbroken for longer, then further along, then with no layer
+   * turn before it. Two grips can share a state part way; the one the turns kept to is the grip.
+   */
   private boolean closer(int a, int b) {
     int undoA = followers.get(a).getReverseMoves().split(" ").length;
     int undoB = followers.get(b).getReverseMoves().split(" ").length;
     if (undoA != undoB) {
       return undoA < undoB;
+    }
+    if (!followingSince.get(a).equals(followingSince.get(b))) {
+      return followingSince.get(a) < followingSince.get(b);
     }
     int doneA = done(a);
     int doneB = done(b);
@@ -217,20 +283,6 @@ public class AlgorithmFollower {
       return doneA > doneB;
     }
     return !prefixed.get(a) && prefixed.get(b);
-  }
-
-  /**
-   * The letter a solver calls one of the cube's faces, holding it {@code held} quarter turns round
-   * and with the algorithm's frame moved to {@code frame}.
-   */
-  private char asHeld(char cubeFace, int held, String frame) {
-    for (char letter : "URFDLB".toCharArray()) {
-      String first = String.valueOf(frame.charAt("URFDLB".indexOf(letter)));
-      if (LayerRotation.piece(first, held, face).charAt(0) == cubeFace) {
-        return letter;
-      }
-    }
-    return cubeFace;
   }
 
   private int done(int follower) {
