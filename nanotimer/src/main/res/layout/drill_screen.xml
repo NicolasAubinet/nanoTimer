@@ -65,12 +65,29 @@
 
     <!-- Practice mode, or a learning drill's guided reps: the algorithm, in the scramble's face,
          beside the case drawn at the angle the algorithm starts from. -->
+    <FrameLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="4dp"
+       android:layout_marginBottom="6dp">
+
+    <!-- A learning drill's faded algorithm, back for one rep: it costs the case's run. -->
+    <Button
+       android:id="@+id/btDrillShowAlg"
+       style="@style/DrillGhostButton"
+       android:layout_width="wrap_content"
+       android:layout_height="40dp"
+       android:layout_gravity="center"
+       android:minWidth="140dp"
+       android:paddingLeft="18dp"
+       android:paddingRight="18dp"
+       android:text="@string/drill_show_alg"
+       android:visibility="gone"/>
+
     <LinearLayout
        android:id="@+id/llDrillPracticeAlg"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_marginTop="4dp"
-       android:layout_marginBottom="6dp"
        android:gravity="center"
        android:orientation="horizontal"
        android:visibility="gone">
@@ -91,6 +108,7 @@
          android:textColor="@color/white"
          android:textSize="20sp"/>
     </LinearLayout>
+    </FrameLayout>
 
     <!-- A side turn that fits the algorithm only from an angle that does not finish the case. -->
     <TextView
@@ -209,9 +227,22 @@
        android:text="@string/drill_practice_offer"
        android:visibility="gone"/>
 
+    <!-- A learning drill's cases with no starred algorithm, before the first rep: the case's
+         algorithms, the one tapped being the one followed, and a way into the full popup. -->
+    <LinearLayout
+       android:id="@+id/llDrillChoose"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="10dp"
+       android:background="@drawable/analysis_card"
+       android:orientation="vertical"
+       android:padding="4dp"
+       android:visibility="gone"/>
+
     <!-- The drill so far, on the app's own card: where it has got, the mode it cannot leave, and
          the figures the summary will open on. -->
     <LinearLayout
+       android:id="@+id/llDrillCard"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:layout_marginTop="10dp"
@@ -280,7 +311,22 @@
 
     <!-- None of the three is a start or stop control: the cube still reports both ends of a rep.
          Quiet pills, so they do not outshout the cube; DrillControlLabels sizes the words. -->
+    <!-- Stars the algorithm being tried and moves to the next case to choose for. -->
+    <TextView
+       android:id="@+id/btDrillUseThis"
+       android:layout_width="match_parent"
+       android:layout_height="48dp"
+       android:layout_marginTop="10dp"
+       android:background="@drawable/drill_practice_offer"
+       android:fontFamily="@font/roboto_medium"
+       android:gravity="center"
+       android:text="@string/drill_choose_use"
+       android:textColor="@color/on_accent"
+       android:textSize="15sp"
+       android:visibility="gone"/>
+
     <LinearLayout
+       android:id="@+id/llDrillButtons"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:layout_marginTop="10dp"

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One algorithm to try in a learning drill's choose step: tapping it makes it the one followed. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:minHeight="44dp"
+   android:background="?android:attr/selectableItemBackground"
+   android:gravity="center_vertical"
+   android:orientation="horizontal"
+   android:paddingLeft="8dp"
+   android:paddingRight="10dp">
+
+  <RadioButton
+     android:id="@+id/rbChooseRow"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:buttonTint="@color/lightblue"
+     android:clickable="false"
+     android:focusable="false"/>
+
+  <TextView
+     android:id="@+id/tvChooseRowAlg"
+     android:layout_width="0dp"
+     android:layout_height="wrap_content"
+     android:layout_weight="1"
+     android:maxLines="2"
+     android:ellipsize="end"
+     android:textColor="@color/white"
+     android:textSize="14sp"/>
+
+  <TextView
+     android:id="@+id/tvChooseRowTag"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_marginLeft="8dp"
+     android:textColor="@color/lightblue"
+     android:textSize="12sp"/>
+</LinearLayout>

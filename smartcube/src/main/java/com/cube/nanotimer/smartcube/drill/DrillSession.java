@@ -273,6 +273,11 @@ public final class DrillSession {
     }
   }
 
+  /** The turns made on the case up so far, for a screen that starts following them part way. */
+  public List<CubeMove> getMovesSoFar() {
+    return Collections.unmodifiableList(moves);
+  }
+
   /**
    * Puts the case back as it was and starts the rep over, for one botched by a slip rather than by
    * not knowing it. Costs no rep: the case comes round again here and now, where skipping it would

@@ -11,6 +11,7 @@ import android.view.animation.AccelerateInterpolator;
 public final class LearningAlgorithmFade {
 
   private static final long FADE_MS = 900;
+  private static final long APPEAR_MS = 200;
 
   private LearningAlgorithmFade() {
   }
@@ -37,5 +38,21 @@ public final class LearningAlgorithmFade {
             algorithm.setAlpha(1f);
           }
         });
+  }
+
+  /**
+   * Brings in what takes the algorithm's place once its fade is over, so the two never overlap.
+   *
+   * @param fading whether the algorithm was on screen and is fading now
+   */
+  public static void appearAfter(View view, boolean fading) {
+    view.animate().cancel();
+    view.setVisibility(View.VISIBLE);
+    if (!fading) {
+      view.setAlpha(1f);
+      return;
+    }
+    view.setAlpha(0f);
+    view.animate().alpha(1f).setStartDelay(FADE_MS).setDuration(APPEAR_MS);
   }
 }
