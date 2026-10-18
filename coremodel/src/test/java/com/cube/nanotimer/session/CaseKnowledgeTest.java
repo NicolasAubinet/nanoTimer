@@ -67,7 +67,7 @@ public class CaseKnowledgeTest {
   @Test
   public void testACaseNeverPutInWithOneAlgorithmIsToLearnHoweverOftenItHasComeUp() {
     Assert.assertEquals(Status.TO_LEARN, CaseKnowledge.read(occurrences("HHHHHHH")));
-    Assert.assertEquals(Status.TO_LEARN, CaseKnowledge.read(occurrences("HSHSH")));
+    Assert.assertEquals(Status.TO_LEARN, CaseKnowledge.read(occurrences("HcHLH")));
   }
 
   /** One unaided occurrence, however long ago and however buried, is what separates the two. */
@@ -77,19 +77,62 @@ public class CaseKnowledgeTest {
     Assert.assertEquals(Status.NEEDS_REVIEW, CaseKnowledge.read(occurrences("UHHHHHH")));
   }
 
-  /** A drill hands the case over with nothing to recognise, so a clean rep promotes nothing. */
   @Test
-  public void testACleanDrillRepSaysNothingEitherWay() {
-    Assert.assertNull(CaseKnowledge.read(occurrences("SSS")));
-    Assert.assertEquals(Status.TO_LEARN, CaseKnowledge.read(occurrences("HSSS")));
-    Assert.assertEquals(Status.KNOWN, CaseKnowledge.read(occurrences("USSS")));
+  public void testCleanDrillRepsShortOfARunSayNothing() {
+    Assert.assertNull(CaseKnowledge.read(occurrences("cccc")));
+    Assert.assertNull(CaseKnowledge.read(occurrences("CC")));
+    Assert.assertEquals(Status.TO_LEARN, CaseKnowledge.read(occurrences("Hcccc")));
+    Assert.assertEquals(Status.KNOWN, CaseKnowledge.read(occurrences("Uccc")));
   }
 
-  /** Asking to be shown counts as a lapse, drill or not, and is forgiven or not on the same terms. */
   @Test
-  public void testBeingShownTheAlgorithmCountsAsALapse() {
-    Assert.assertEquals(Status.KNOWN, CaseKnowledge.read(occurrences("USH")));
-    Assert.assertEquals(Status.NEEDS_REVIEW, CaseKnowledge.read(occurrences("USHH")));
+  public void testFiveCleanRepsInARowMakeACaseKnown() {
+    Assert.assertEquals(Status.KNOWN, CaseKnowledge.read(occurrences("ccccc")));
+    Assert.assertEquals(Status.KNOWN, CaseKnowledge.read(occurrences("HHccccc")));
+  }
+
+  /** Three from a large pool, but only three of those in a row: a small-pool rep breaks that count. */
+  @Test
+  public void testThreeCleanRepsFromALargePoolAreEnough() {
+    Assert.assertEquals(Status.KNOWN, CaseKnowledge.read(occurrences("CCC")));
+    Assert.assertEquals(Status.KNOWN, CaseKnowledge.read(occurrences("ccCCC")));
+    Assert.assertNull(CaseKnowledge.read(occurrences("CCcC")));
+    Assert.assertEquals(Status.KNOWN, CaseKnowledge.read(occurrences("CCcCc")));
+  }
+
+  @Test
+  public void testALookupStartsTheRunAgain() {
+    Assert.assertNull(CaseKnowledge.read(occurrences("ccccLc")));
+    Assert.assertNull(CaseKnowledge.read(occurrences("CCLC")));
+    Assert.assertEquals(Status.KNOWN, CaseKnowledge.read(occurrences("ccLccccc")));
+  }
+
+  /** The panel is opened to compare algorithms too, so a lookup alone never moves a case down. */
+  @Test
+  public void testALookupNeverMovesACaseDown() {
+    Assert.assertNull(CaseKnowledge.read(occurrences("LLL")));
+    Assert.assertEquals(Status.KNOWN, CaseKnowledge.read(occurrences("ULLLL")));
+    Assert.assertEquals(Status.KNOWN, CaseKnowledge.read(occurrences("cccccLL")));
+  }
+
+  @Test
+  public void testALapseInASolveBreaksTheRun() {
+    Assert.assertEquals(Status.TO_LEARN, CaseKnowledge.read(occurrences("cccHcc")));
+  }
+
+  /** The one lapse is forgiven only where a solve has put the case in since the lapse before. */
+  @Test
+  public void testKnownFromDrillsAloneGetsNoGrace() {
+    Assert.assertEquals(Status.NEEDS_REVIEW, CaseKnowledge.read(occurrences("cccccH")));
+    Assert.assertEquals(Status.NEEDS_REVIEW, CaseKnowledge.read(occurrences("UHcccccH")));
+    Assert.assertEquals(Status.KNOWN, CaseKnowledge.read(occurrences("UcccccH")));
+  }
+
+  @Test
+  public void testARunCountsAsOneOccurrence() {
+    Assert.assertEquals(1, CaseKnowledge.evidenceCount(occurrences("cccccccccc")));
+    Assert.assertEquals(3, CaseKnowledge.evidenceCount(occurrences("UcccccH")));
+    Assert.assertEquals(0, CaseKnowledge.evidenceCount(occurrences("ccccLLc")));
   }
 
   @Test
@@ -102,13 +145,20 @@ public class CaseKnowledgeTest {
     Assert.assertNull(Status.forCode(""));
   }
 
-  /** Oldest first: U went in unaided, H needed help, S said nothing. */
+  /**
+   * Oldest first: U and H are solves in one algorithm and in more, c and C clean drill reps from a
+   * small and a large pool, L a rep with the algorithm on screen.
+   */
   private static List<Evidence> occurrences(String reading) {
     List<Evidence> occurrences = new ArrayList<Evidence>();
     for (int i = 0; i < reading.length(); i++) {
-      char said = reading.charAt(i);
-      occurrences.add(said == 'U' ? Evidence.UNAIDED : said == 'H' ? Evidence.HELPED
-          : Evidence.SILENT);
+      switch (reading.charAt(i)) {
+        case 'U': occurrences.add(Evidence.UNAIDED); break;
+        case 'H': occurrences.add(Evidence.HELPED); break;
+        case 'c': occurrences.add(Evidence.CLEAN_REP); break;
+        case 'C': occurrences.add(Evidence.CLEAN_REP_LARGE_POOL); break;
+        default: occurrences.add(Evidence.LOOKED_UP); break;
+      }
     }
     return occurrences;
   }

@@ -37,12 +37,21 @@ import java.util.List;
  *
  * <p>Both of the statuses below describe rather than accuse.
  *
- * <p><b>What counts as an occurrence.</b> A solve that was handed the case, and a drill rep of it
- * that had to be shown. A solve says {@link Evidence#UNAIDED} where its last layer step went in one
- * algorithm and {@link Evidence#HELPED} where it took more; a rep whose algorithm was revealed says
- * HELPED, since asking is the answer. <b>A clean drill rep says nothing</b>: a drill hands the
- * solver the case with no recognition to survive and no fatigue behind it, so letting one call a
- * case known would collapse the "known but slow" distinction this whole fact exists to make.
+ * <p><b>What counts as an occurrence.</b> A solve that was handed the case, and a drill rep of it.
+ * A solve says {@link Evidence#UNAIDED} where its last layer step went in one algorithm and
+ * {@link Evidence#HELPED} where it took more.
+ *
+ * <p><b>Drill reps count as a run, never one at a time.</b> A drill never names the case, so a clean
+ * rep was recognised, but out of a pool the solver picked and with no solve around it. That is
+ * weaker than a solve, so it takes {@link #RUN_TO_KNOW} clean reps in a row to call a case known, or
+ * {@link #RUN_TO_KNOW_LARGE_POOL} from a pool of at least {@link #LARGE_POOL} cases, where picking
+ * the case out of many is most of the work. A rep with the algorithm looked up or on screen starts
+ * the run again and says nothing else: the panel is also opened to compare algorithms, so only a
+ * solve moves a case down. A fumbled or restarted rep never reaches the rule at all.
+ *
+ * <p><b>Known from drills alone gets no grace.</b> The single lapse forgiven above is forgiven only
+ * where a solve has put the case in alone since the lapse before it. A case drills made known and
+ * then taken in two looks in its next solve has shown what drills cannot: it needs review.
  *
  * <p><b>Absence is still never evidence.</b> A case with nothing behind it has no status at all
  * rather than a bad one, and nothing downstream may read that silence as "does not know it".
@@ -92,19 +101,39 @@ public class CaseKnowledge {
    * hang an upgrade off. Bumping this is what tells the app to throw the table away once and read it
    * back. <b>Bump it for any change to {@link #read}.</b>
    */
-  public static final int RULE_VERSION = 5;
+  public static final int RULE_VERSION = 6;
+
+  /** Clean drill reps in a row that make a case known. */
+  public static final int RUN_TO_KNOW = 5;
+
+  /** The same, for reps dealt out of a pool of at least {@link #LARGE_POOL} cases. */
+  public static final int RUN_TO_KNOW_LARGE_POOL = 3;
+
+  /** The fewest cases a drill deals from for its reps to count as a large pool. */
+  public static final int LARGE_POOL = 10;
 
   /** What one occurrence of a case says about whether the solver knows it. */
   public enum Evidence {
 
-    /** A solve whose last layer step went in one algorithm with nothing shown. */
+    /** A solve whose last layer step went in one algorithm. */
     UNAIDED,
 
-    /** A solve that took more than one algorithm, or a drill rep whose algorithm had to be shown. */
+    /** A solve whose last layer step took more than one algorithm. */
     HELPED,
 
-    /** A clean drill rep, or a rep fumbled and restarted: neither says anything either way. */
-    SILENT,
+    /** A clean drill rep, dealt out of a small pool. */
+    CLEAN_REP,
+
+    /** A clean drill rep, dealt out of at least {@link #LARGE_POOL} cases. */
+    CLEAN_REP_LARGE_POOL,
+
+    /** A drill rep turned with the algorithm looked up or on screen. */
+    LOOKED_UP,
+  }
+
+  /** What the occurrences come to once drill reps are read as runs. */
+  private enum Said {
+    SOLVED, DRILLED, LAPSED
   }
 
   private final String caseSet;
@@ -117,7 +146,7 @@ public class CaseKnowledge {
    * @param caseSet the family the case belongs to, "oll" — kept apart from the code so a COLL or a
    *     CMLL later costs a row and not a migration
    * @param evidenceCount how many occurrences of the case said anything either way, which is not
-   *     how many times it came up: a clean drill rep is not one of them
+   *     how many times it came up: a whole run of drill reps is one of them
    */
   public CaseKnowledge(String caseSet, String caseCode, Status status, int evidenceCount,
       long lastSeenMs) {
@@ -129,31 +158,64 @@ public class CaseKnowledge {
   }
 
   /**
-   * Where a case stands, read from the occurrences that said anything.
+   * Where a case stands, read from its occurrences.
    *
    * @param occurrences oldest first
    * @return the status, or null where nothing has been seen that says either way
    */
   public static Status read(List<Evidence> occurrences) {
-    if (occurrences == null) {
-      return null;
-    }
-    List<Evidence> said = new ArrayList<Evidence>(); // newest first, the silent ones dropped
-    for (int i = occurrences.size() - 1; i >= 0; i--) {
-      if (occurrences.get(i) != Evidence.SILENT) {
-        said.add(occurrences.get(i));
-      }
-    }
+    List<Said> said = said(occurrences);
     if (said.isEmpty()) {
       return null;
     }
-    if (said.get(0) == Evidence.UNAIDED) {
+    if (said.get(0) != Said.LAPSED) {
       return Status.KNOWN;
     }
-    if (!said.contains(Evidence.UNAIDED)) {
+    if (!said.contains(Said.SOLVED) && !said.contains(Said.DRILLED)) {
       return Status.TO_LEARN; // never once put in with a single algorithm
     }
-    return said.get(1) == Evidence.HELPED ? Status.NEEDS_REVIEW : Status.KNOWN;
+    for (int i = 1; i < said.size() && said.get(i) != Said.LAPSED; i++) {
+      if (said.get(i) == Said.SOLVED) {
+        return Status.KNOWN; // one lapse against a solve-proven record is a slip
+      }
+    }
+    return Status.NEEDS_REVIEW;
+  }
+
+  /** How many occurrences said anything, a whole run of drill reps counting as one. */
+  public static int evidenceCount(List<Evidence> occurrences) {
+    return said(occurrences).size();
+  }
+
+  /** Newest first. A run counts once, and a lapse in a solve breaks it as a lookup does. */
+  private static List<Said> said(List<Evidence> occurrences) {
+    List<Said> said = new ArrayList<Said>();
+    if (occurrences == null) {
+      return said;
+    }
+    int run = 0;
+    int largeRun = 0;
+    boolean counted = false;
+    for (Evidence occurrence : occurrences) {
+      if (occurrence == Evidence.UNAIDED) {
+        said.add(0, Said.SOLVED);
+      } else if (occurrence == Evidence.HELPED || occurrence == Evidence.LOOKED_UP) {
+        if (occurrence == Evidence.HELPED) {
+          said.add(0, Said.LAPSED);
+        }
+        run = 0;
+        largeRun = 0;
+        counted = false;
+      } else {
+        run++;
+        largeRun = occurrence == Evidence.CLEAN_REP_LARGE_POOL ? largeRun + 1 : 0;
+        if (!counted && (run >= RUN_TO_KNOW || largeRun >= RUN_TO_KNOW_LARGE_POOL)) {
+          said.add(0, Said.DRILLED);
+          counted = true;
+        }
+      }
+    }
+    return said;
   }
 
   /** The code a solve and a drill both record the case under, "oll_53". */

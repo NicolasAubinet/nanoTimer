@@ -1368,9 +1368,9 @@ public class ServiceProviderTest {
     assertNull(knowledgeOf("oll_21"));
   }
 
-  /** Asking to be shown the algorithm is the plainest thing in the database. */
+  /** The panel is opened to compare algorithms too, so a lookup alone moves nothing down. */
   @Test
-  public void testADrillRepShownItsAlgorithmCountsAgainstTheCase() {
+  public void testADrillRepShownItsAlgorithmMovesNothing() {
     deleteDrills();
     provider.deleteHistory();
     long drillId = provider.addDrill(drill("case_execution", 3));
@@ -1378,12 +1378,11 @@ public class ServiceProviderTest {
       provider.addDrillCaseRep(drillId, caseRep(i, "pll_ga", 900, 1400, 13, 0, true, false));
     }
 
-    assertEquals(CaseKnowledge.Status.TO_LEARN, knowledgeOf("pll_ga"));
+    assertNull(knowledgeOf("pll_ga"));
   }
 
-  /** A drill hands the case over with nothing to recognise, so a clean rep promotes nothing. */
   @Test
-  public void testDrillRepsGoingInCleanSayNothingEitherWay() {
+  public void testCleanDrillRepsShortOfARunSayNothing() {
     deleteDrills();
     provider.deleteHistory();
     long drillId = provider.addDrill(drill("case_execution", 3));
@@ -1392,6 +1391,34 @@ public class ServiceProviderTest {
     }
 
     assertNull(knowledgeOf("pll_ga"));
+  }
+
+  @Test
+  public void testFiveCleanDrillRepsInARowMakeACaseKnown() {
+    deleteDrills();
+    provider.deleteHistory();
+    long drillId = provider.addDrill(drill("case_execution", 5));
+    for (int i = 0; i < 5; i++) {
+      provider.addDrillCaseRep(drillId, caseRep(i, "pll_ga", 900, 1400, 13, 0, false, false));
+    }
+
+    assertEquals(CaseKnowledge.Status.KNOWN, knowledgeOf("pll_ga"));
+  }
+
+  /** The pool is read off the drill's stored spec: ten cases dealt from is large, nine is not. */
+  @Test
+  public void testThreeCleanRepsFromALargePoolMakeACaseKnown() {
+    deleteDrills();
+    provider.deleteHistory();
+    long large = provider.addDrill(drillOfCases(10));
+    long small = provider.addDrill(drillOfCases(9));
+    for (int i = 0; i < 3; i++) {
+      provider.addDrillCaseRep(large, caseRep(i, "oll_21", 900, 1400, 13, 0, false, false));
+      provider.addDrillCaseRep(small, caseRep(i, "oll_22", 900, 1400, 13, 0, false, false));
+    }
+
+    assertEquals(CaseKnowledge.Status.KNOWN, knowledgeOf("oll_21"));
+    assertNull(knowledgeOf("oll_22"));
   }
 
   /** And it cannot take back a solve either: what promotes is the only thing that demotes. */
@@ -1428,9 +1455,9 @@ public class ServiceProviderTest {
       saveCubeSolve(CubeMethod.CFOP, null, lastLayer("oll_21", 1));
       saveCubeSolve(CubeMethod.CFOP, null, lastLayer("pll_t", 2));
     }
-    long drillId = provider.addDrill(drill("case_execution", 3));
+    long drillId = provider.addDrill(drillOfCases(10));
     for (int i = 0; i < 3; i++) {
-      provider.addDrillCaseRep(drillId, caseRep(i, "pll_ga", 900, 1400, 13, 0, true, false));
+      provider.addDrillCaseRep(drillId, caseRep(i, "pll_ga", 900, 1400, 13, 0, false, false));
     }
     List<String> running = knowledgeCodes();
 
@@ -1439,7 +1466,7 @@ public class ServiceProviderTest {
     assertEquals(running, knowledgeCodes());
     assertEquals(CaseKnowledge.Status.KNOWN, knowledgeOf("oll_21"));
     assertEquals(CaseKnowledge.Status.TO_LEARN, knowledgeOf("pll_t"));
-    assertEquals(CaseKnowledge.Status.TO_LEARN, knowledgeOf("pll_ga"));
+    assertEquals(CaseKnowledge.Status.KNOWN, knowledgeOf("pll_ga"));
   }
 
   /** Deleting the solves takes back what they said, rather than leaving a status behind them. */
@@ -1790,6 +1817,17 @@ public class ServiceProviderTest {
     String spec = "{\"spec_version\":2,\"id\":\"local-test\",\"type\":\"" + type + "\",\"reps\":"
         + repsAsked + ",\"unknown_later_field\":\"kept\"}";
     return new DrillRecord(timestamp, spec, "local-test", type, repsAsked);
+  }
+
+  /** A case drill dealing from the first {@code pool} OLLs. */
+  private DrillRecord drillOfCases(int pool) {
+    StringBuilder cases = new StringBuilder();
+    for (int i = 1; i <= pool; i++) {
+      cases.append(i > 1 ? "," : "").append("\"oll_").append(i).append('"');
+    }
+    String spec = "{\"spec_version\":2,\"id\":\"local-test\",\"type\":\"case_execution\","
+        + "\"delivery\":\"virtual\",\"cases\":[" + cases + "],\"reps\":30}";
+    return new DrillRecord(5000, spec, "local-test", "case_execution", 30);
   }
 
   private DrillCaseRep caseRep(int position, String caseCode, long recognitionMs, long executionMs,

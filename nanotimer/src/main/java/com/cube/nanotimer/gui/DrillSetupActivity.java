@@ -635,14 +635,12 @@ public class DrillSetupActivity extends NanoTimerActivity
    * <p><b>It runs casual, whatever the setup screen was last left on.</b> The rep count and the
    * layer face are that screen's standing answers and are inherited; recording is not, because it
    * is the one of the three that writes something down. A drill offered off a finding is a thing to
-   * try, and a rep whose algorithm had to be shown is evidence against the case, so recording one
-   * would let a suggestion the reader accepted count against them.
+   * try, not a set of reps the reader sat down to count.
    */
   public static Intent drillOf(Context context, List<String> cases, String title) {
     Intent intent = new Intent(context, DrillActivity.class);
     intent.putExtra(DrillActivity.EXTRA_LAYER_FACE, layerFace().name());
-    // Never recorded. A drill somebody was sent to is not a set of reps they sat down to count,
-    // and a revealed rep in one would demote the very case that sent them there.
+    // Never recorded: a drill somebody was sent to is not a set of reps they sat down to count.
     intent.putExtra(DrillScreenActivity.EXTRA_RECORDING, false);
     intent.putExtra(DrillActivity.EXTRA_SPEC, new DrillSpec("local-picked",
         DrillSpec.Type.CASE_EXECUTION, DrillSpec.Delivery.VIRTUAL, cases,

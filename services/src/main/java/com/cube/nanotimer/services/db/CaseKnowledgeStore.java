@@ -4,12 +4,14 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.cube.nanotimer.drill.DrillSpec;
 import com.cube.nanotimer.session.CaseKnowledge;
 import com.cube.nanotimer.session.MethodStatistics;
 import com.cube.nanotimer.vo.ScrambleType;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -31,8 +33,8 @@ import java.util.Set;
  *   <li>A last layer step naming a case, with fewer than two parts, went in one algorithm. Parts are
  *       only recorded where a step took more than one, and that holds for the codes an OLL was
  *       recorded under before it was split by algorithm as much as for the ones it is now.
- *   <li>A drill rep says the same thing, with {@code revealed} as the plainest negative evidence
- *       there is: the solver asked to be shown the algorithm.
+ *   <li>A clean drill rep counts towards a run, by the size of the pool its drill dealt from, and a
+ *       {@code revealed} one starts the run again: the algorithm was on screen.
  *   <li>The step a solve stopped inside is left out. It holds only the parts that were finished, so
  *       counting them would read an abandoned step as one clean algorithm.
  * </ul>
@@ -84,9 +86,10 @@ public final class CaseKnowledgeStore {
    */
   public static void rebuild(SQLiteDatabase db) {
     Map<String, List<Occurrence>> history = new LinkedHashMap<String, List<Occurrence>>();
+    Map<Long, Boolean> largePools = new HashMap<Long, Boolean>();
     for (String code : casesWithEvidence(db)) {
       if (namesACase(code)) {
-        history.put(code, occurrences(db, code));
+        history.put(code, occurrences(db, code, largePools));
       }
     }
     db.beginTransaction();
@@ -111,10 +114,11 @@ public final class CaseKnowledgeStore {
    * history rather than from a half-rewritten one.
    */
   public static void update(SQLiteDatabase db, Collection<String> codes) {
+    Map<Long, Boolean> largePools = new HashMap<Long, Boolean>();
     for (String code : codes) {
       if (namesACase(code)) {
         write(db, MethodStatistics.familyOf(code), MethodStatistics.caseOf(code),
-            occurrences(db, code));
+            occurrences(db, code, largePools));
       }
     }
   }
@@ -128,10 +132,8 @@ public final class CaseKnowledgeStore {
   private static void write(SQLiteDatabase db, String caseSet, String caseName,
       List<Occurrence> occurrences) {
     List<CaseKnowledge.Evidence> said = new ArrayList<CaseKnowledge.Evidence>();
-    int spoke = 0;
     for (Occurrence occurrence : occurrences) {
       said.add(occurrence.says);
-      spoke += occurrence.says == CaseKnowledge.Evidence.SILENT ? 0 : 1;
     }
     CaseKnowledge.Status status = CaseKnowledge.read(said);
     String where = DB.COL_CASE_KNOWLEDGE_SET + " = ? AND " + DB.COL_CASE_KNOWLEDGE_CASE + " = ?";
@@ -144,7 +146,7 @@ public final class CaseKnowledgeStore {
     values.put(DB.COL_CASE_KNOWLEDGE_SET, caseSet);
     values.put(DB.COL_CASE_KNOWLEDGE_CASE, caseName);
     values.put(DB.COL_CASE_KNOWLEDGE_STATUS, status.code());
-    values.put(DB.COL_CASE_KNOWLEDGE_EVIDENCE, spoke);
+    values.put(DB.COL_CASE_KNOWLEDGE_EVIDENCE, CaseKnowledge.evidenceCount(said));
     values.put(DB.COL_CASE_KNOWLEDGE_LAST_SEEN, occurrences.get(occurrences.size() - 1).atMs);
     values.put(DB.COL_CASE_KNOWLEDGE_UPDATED, System.currentTimeMillis());
     if (db.update(DB.TABLE_CASE_KNOWLEDGE, values, where, args) == 0) {
@@ -180,10 +182,13 @@ public final class CaseKnowledgeStore {
    *
    * <p>A rep that was abandoned or restarted is left out rather than counted against the case: it
    * says the rep was fumbled, and what is being answered here is whether the algorithm is known, not
-   * how fluently it runs. A rep the solver asked to be shown counts however it ended, since asking
-   * is the answer.
+   * how fluently it runs. A rep turned with the algorithm on screen counts however it ended, since
+   * it starts the run again.
+   *
+   * @param largePools whether each drill dealt from a large pool, filled as drills are met
    */
-  private static List<Occurrence> occurrences(SQLiteDatabase db, String code) {
+  private static List<Occurrence> occurrences(SQLiteDatabase db, String code,
+      Map<Long, Boolean> largePools) {
     String parts = "(SELECT COUNT(*) FROM " + DB.TABLE_SMARTCUBE_SOLVESTEP + " p"
         + " WHERE p." + DB.COL_SMARTCUBE_SOLVESTEP_TIMEHISTORY_ID
         + "     = s." + DB.COL_SMARTCUBE_SOLVESTEP_TIMEHISTORY_ID
@@ -195,6 +200,7 @@ public final class CaseKnowledgeStore {
         + "     , 1 AS from_solve"
         + "     , h." + DB.COL_TIMEHISTORY_TIMESTAMP + " AS seen_at"
         + "     , 0 AS ordinal"
+        + "     , 0 AS drill"
         + "  FROM " + DB.TABLE_SMARTCUBE_SOLVESTEP + " s"
         + "  JOIN " + DB.TABLE_TIMEHISTORY + " h ON h." + DB.COL_ID
         + "     = s." + DB.COL_SMARTCUBE_SOLVESTEP_TIMEHISTORY_ID
@@ -213,6 +219,7 @@ public final class CaseKnowledgeStore {
         + "     , 0 AS from_solve"
         + "     , d." + DB.COL_DRILL_TIMESTAMP + " AS seen_at"
         + "     , r." + DB.COL_DRILL_REP_POSITION + " AS ordinal"
+        + "     , d." + DB.COL_ID + " AS drill"
         + "  FROM " + DB.TABLE_DRILL_REP + " r"
         + "  JOIN " + DB.TABLE_DRILL + " d ON d." + DB.COL_ID + " = r." + DB.COL_DRILL_REP_DRILL_ID
         + " WHERE r." + DB.COL_DRILL_REP_CASE + " = ?"
@@ -227,21 +234,54 @@ public final class CaseKnowledgeStore {
         + " ORDER BY seen_at DESC, ordinal DESC", new String[] { code, code });
     if (cursor != null) {
       for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-        // unaided, from_solve, seen_at: the order the two halves of the union both select in.
-        occurrences.add(0, new Occurrence(says(cursor.getInt(0) == 1, cursor.getInt(1) == 1),
-            cursor.getLong(2)));
+        // unaided, from_solve, seen_at, ordinal, drill: the order both halves of the union select in.
+        boolean unaided = cursor.getInt(0) == 1;
+        CaseKnowledge.Evidence says;
+        if (cursor.getInt(1) == 1) {
+          says = unaided ? CaseKnowledge.Evidence.UNAIDED : CaseKnowledge.Evidence.HELPED;
+        } else if (!unaided) {
+          says = CaseKnowledge.Evidence.LOOKED_UP;
+        } else {
+          says = isLargePool(db, cursor.getLong(4), largePools)
+              ? CaseKnowledge.Evidence.CLEAN_REP_LARGE_POOL : CaseKnowledge.Evidence.CLEAN_REP;
+        }
+        occurrences.add(0, new Occurrence(says, cursor.getLong(2)));
       }
       cursor.close();
     }
     return occurrences;
   }
 
-  /** A clean drill rep is the one occurrence that says nothing: nothing had to be recognised. */
-  private static CaseKnowledge.Evidence says(boolean unaided, boolean fromSolve) {
-    if (!unaided) {
-      return CaseKnowledge.Evidence.HELPED;
+  /** Whether a drill dealt from enough cases at once to count as a large pool. */
+  private static boolean isLargePool(SQLiteDatabase db, long drillId,
+      Map<Long, Boolean> largePools) {
+    Boolean large = largePools.get(drillId);
+    if (large != null) {
+      return large;
     }
-    return fromSolve ? CaseKnowledge.Evidence.UNAIDED : CaseKnowledge.Evidence.SILENT;
+    large = Boolean.FALSE;
+    Cursor cursor = db.rawQuery("SELECT " + DB.COL_DRILL_SPEC + " FROM " + DB.TABLE_DRILL
+        + " WHERE " + DB.COL_ID + " = ?", new String[] { String.valueOf(drillId) });
+    if (cursor != null) {
+      if (cursor.moveToFirst() && !cursor.isNull(0)) {
+        large = poolOf(cursor.getString(0)) >= CaseKnowledge.LARGE_POOL;
+      }
+      cursor.close();
+    }
+    largePools.put(drillId, large);
+    return large;
+  }
+
+  /** The cases a drill deals from at once: its working set where it has one. 0 if unreadable. */
+  private static int poolOf(String spec) {
+    DrillSpec drill;
+    try {
+      drill = DrillSpec.fromJson(spec);
+    } catch (IllegalArgumentException e) {
+      return 0;
+    }
+    int pool = drill.getCases().size();
+    return drill.getWorkingSet() > 0 ? Math.min(pool, drill.getWorkingSet()) : pool;
   }
 
   /** One time the case came up, and what it said about whether the algorithm is known. */
