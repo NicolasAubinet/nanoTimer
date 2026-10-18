@@ -117,6 +117,41 @@ public class AlgorithmFollowerTest {
     assertEquals(2, follower.getDoneCount());
   }
 
+  @Test
+  public void onTheAlgorithmThereIsNothingToUndo() {
+    AlgorithmFollower follower = new AlgorithmFollower(SUNE, "U", finishes(SUNE));
+    turn(follower, "R U");
+    assertEquals("", follower.getUndoMoves());
+  }
+
+  /** A slip off the right angle is undone as the timer undoes a scramble's: its inverse. */
+  @Test
+  public void aSlipIsUndoneByItsInverse() {
+    AlgorithmFollower follower = new AlgorithmFollower(SUNE, "U", finishes(SUNE));
+    turn(follower, "R U D");
+    assertEquals("D'", follower.getUndoMoves());
+    turn(follower, "D'");
+    assertEquals("", follower.getUndoMoves());
+    assertEquals(2, follower.getDoneCount());
+  }
+
+  /** Yellow on top, the solver's R turned as the cube's L: the undo is named as they hold it. */
+  @Test
+  public void theUndoIsNamedAsTheCubeIsHeld() {
+    AlgorithmFollower follower = new AlgorithmFollower("R U R' U'", "D", null);
+    turn(follower, "L D L' R");
+    assertEquals("L'", follower.getUndoMoves());
+  }
+
+  /** An R turned from the left side reaches the cube as F, and is undone as the R' it was. */
+  @Test
+  public void aWrongAngleIsUndoneAsHeld() {
+    AlgorithmFollower follower = new AlgorithmFollower(SUNE, "U", finishes(SUNE));
+    turn(follower, "F U");
+    assertTrue(follower.isWrongAngle());
+    assertEquals("U' R'", follower.getUndoMoves());
+  }
+
   /** Whether a path finishes the case the given moves solve, allowing a last turn of U. */
   private static Predicate<List<String>> finishes(String solution) {
     CubieCube dealt = new CubieCube();

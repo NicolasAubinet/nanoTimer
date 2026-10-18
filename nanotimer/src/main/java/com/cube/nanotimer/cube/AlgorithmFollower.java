@@ -36,6 +36,9 @@ public class AlgorithmFollower {
   private final List<Boolean> prefixed = new ArrayList<>();
   /** Per follower: whether its angle finishes the case. */
   private final List<Boolean> rightAngle = new ArrayList<>();
+  /** Per follower: the quarter turns about the layer it is held at, which name its turns. */
+  private final List<Integer> heldAt = new ArrayList<>();
+  private final String face;
 
   /** For an algorithm turned with the layer on U, from any angle. */
   public AlgorithmFollower(String algorithm) {
@@ -49,8 +52,8 @@ public class AlgorithmFollower {
    * @throws IllegalArgumentException if a token is not a turn
    */
   public AlgorithmFollower(String algorithm, String layerFace, Predicate<List<String>> finishes) {
-    String face = layerFace == null ? "U" : layerFace;
-    tokens = algorithm.trim().split("\s+");
+    face = layerFace == null ? "U" : layerFace;
+    tokens = algorithm.trim().split("\\s+");
     String[] cleaned = new String[tokens.length];
     for (int i = 0; i < tokens.length; i++) {
       cleaned[i] = tokens[i].replace("(", "").replace(")", "");
@@ -76,6 +79,7 @@ public class AlgorithmFollower {
         }
         followers.add(ScrambleFollower.ofTurns(path));
         prefixed.add(auf != null);
+        heldAt.add(sides);
         boolean right = finishes == null || finishes.test(flattened(path));
         rightAngle.add(right);
         anyRight |= right;
@@ -120,6 +124,81 @@ public class AlgorithmFollower {
   public boolean isWrongAngle() {
     int wrong = furthest(false);
     return wrong > 0 && wrong > furthest(true);
+  }
+
+  /**
+   * The turns that take the cube back onto the algorithm, as the timer offers for a scramble: each
+   * turn off it undone, newest first. Empty while it is on the algorithm from a right angle.
+   *
+   * <p>The cube reports turns on its own faces, so they are named as the solver holds it: from the
+   * wrong angle they are turning from, or else from the right one they were on, which before any turn
+   * is the angle the case's picture shows.
+   */
+  public String getUndoMoves() {
+    int undoing = -1;
+    for (int i = 0; i < followers.size(); i++) {
+      if (!rightAngle.get(i)) {
+        continue;
+      }
+      if (!followers.get(i).isWrong()) {
+        return "";
+      }
+      if (undoing < 0 || closer(i, undoing)) {
+        undoing = i;
+      }
+    }
+    if (undoing < 0) {
+      return "";
+    }
+    int held = heldAt.get(isWrongAngle() ? furthestIndex(false) : undoing);
+    StringBuilder named = new StringBuilder();
+    for (String turn : followers.get(undoing).getReverseMoves().split(" ")) {
+      if (named.length() > 0) {
+        named.append(' ');
+      }
+      named.append(asHeld(turn.charAt(0), held)).append(turn.substring(1));
+    }
+    return named.toString();
+  }
+
+  /** Fewer turns to undo, then further along, then with no layer turn before it. */
+  private boolean closer(int a, int b) {
+    int undoA = followers.get(a).getReverseMoves().split(" ").length;
+    int undoB = followers.get(b).getReverseMoves().split(" ").length;
+    if (undoA != undoB) {
+      return undoA < undoB;
+    }
+    int doneA = done(a);
+    int doneB = done(b);
+    if (doneA != doneB) {
+      return doneA > doneB;
+    }
+    return !prefixed.get(a) && prefixed.get(b);
+  }
+
+  /** The letter a solver holding the cube {@code held} quarter turns round calls one of its faces. */
+  private char asHeld(char cubeFace, int held) {
+    for (char letter : "URFDLB".toCharArray()) {
+      if (LayerRotation.piece(String.valueOf(letter), held, face).charAt(0) == cubeFace) {
+        return letter;
+      }
+    }
+    return cubeFace;
+  }
+
+  private int done(int follower) {
+    return followers.get(follower).getDoneCount() - (prefixed.get(follower) ? 1 : 0);
+  }
+
+  /** The follower furthest along an angle that does, or does not, finish the case. */
+  private int furthestIndex(boolean right) {
+    int best = -1;
+    for (int i = 0; i < followers.size(); i++) {
+      if (rightAngle.get(i) == right && (best < 0 || done(i) > done(best))) {
+        best = i;
+      }
+    }
+    return best;
   }
 
   /** The most algorithm turns done along an angle that does, or does not, finish the case. */

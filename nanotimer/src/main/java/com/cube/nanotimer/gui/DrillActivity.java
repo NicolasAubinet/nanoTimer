@@ -44,6 +44,7 @@ import com.cube.nanotimer.smartcube.drill.LayerRotation;
 import com.cube.nanotimer.smartcube.drill.PairWeights;
 import com.cube.nanotimer.smartcube.step.CaseAlgorithms;
 import com.cube.nanotimer.smartcube.step.LastLayerCaseAlgorithms;
+import com.cube.nanotimer.smartcube.step.LastLayerCaseNames;
 import com.cube.nanotimer.smartcube.step.LastLayerDiagram;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.drill.DrillSpec;
@@ -59,6 +60,7 @@ import com.cube.nanotimer.smartcube.model.CubeRotation;
 import com.cube.nanotimer.smartcube.model.CubeState;
 import com.cube.nanotimer.util.FormatterService;
 import com.cube.nanotimer.util.helper.DialogUtils;
+import com.cube.nanotimer.util.ScrambleFormatterService;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.gui.widget.GroupLearnedPanel;
 import com.cube.nanotimer.session.CaseKnowledge;
@@ -151,8 +153,6 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   /** The algorithm line with its case picture, shown and faded as one. */
   private View practiceAlgorithmRow;
   private LastLayerCaseView practiceCasePicture;
-  /** Says a side turn fits the algorithm only from an angle that does not finish the case. */
-  private TextView wrongAngle;
   /** Brings a learning drill's faded algorithm back for the rep up, at the cost of its run. */
   private Button showAlg;
   /** Whether the rep up had its algorithm brought back. */
@@ -206,7 +206,6 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     practiceAlgorithm = findViewById(R.id.tvDrillPracticeAlg);
     practiceAlgorithmRow = findViewById(R.id.llDrillPracticeAlg);
     practiceCasePicture = findViewById(R.id.cvDrillPracticeCase);
-    wrongAngle = findViewById(R.id.tvDrillWrongAngle);
     showAlg = findViewById(R.id.btDrillShowAlg);
     showAlg.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -221,6 +220,15 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
         useTriedAlgorithm();
       }
     });
+    Button chooseReset = findViewById(R.id.btDrillChooseReset);
+    chooseReset.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        resetRep();
+      }
+    });
+    DrillControlLabels.apply(new Button[] {chooseReset}, new int[] {R.drawable.ic_drill_reset},
+        new int[] {R.string.drill_reset});
     algorithmAnimator = new ScrambleFollowAnimator(practiceAlgorithm);
     Drawable bulb = ContextCompat.getDrawable(this, R.drawable.ic_case_idea).mutate();
     bulb.setTint(ContextCompat.getColor(this, R.color.on_accent));
@@ -700,7 +708,9 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     choosing = toChoose.get(chooseIndex);
     suggestedAlgorithm = learningAlgorithm(choosing);
     tryingAlgorithm = suggestedAlgorithm;
-    setTitle(getString(R.string.drill_choose_title, chooseIndex + 1, toChoose.size()));
+    setTitle(getString(R.string.drill_choose_title, getString(choosing.startsWith("oll_")
+        ? R.string.case_title_oll : R.string.case_title_pll,
+        LastLayerCaseNames.shortName(choosing))));
     session.startPractice(choosing);
     setChoosing(true);
     buildChooseRows();
@@ -734,7 +744,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     findViewById(R.id.llDrillCard).setVisibility(on ? View.GONE : View.VISIBLE);
     findViewById(R.id.llDrillButtons).setVisibility(on ? View.GONE : View.VISIBLE);
     chooseList.setVisibility(on ? View.VISIBLE : View.GONE);
-    findViewById(R.id.btDrillUseThis).setVisibility(on ? View.VISIBLE : View.GONE);
+    findViewById(R.id.llDrillChooseButtons).setVisibility(on ? View.VISIBLE : View.GONE);
   }
 
   /**
@@ -834,7 +844,6 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     // A learning drill's fade may still be running, and would hide the practised algorithm.
     LearningAlgorithmFade.show(practiceAlgorithmRow);
     practiceAlgorithmRow.setVisibility(on ? View.VISIBLE : View.GONE);
-    wrongAngle.setVisibility(View.GONE);
     showAlg.setVisibility(View.GONE);
     practiceBack.setEnabled(on);
     showPracticeAlgorithm();
@@ -891,7 +900,6 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       algorithmFollower = null;
       boolean fading = practiceAlgorithmRow.getVisibility() == View.VISIBLE;
       LearningAlgorithmFade.hide(practiceAlgorithmRow);
-      wrongAngle.setVisibility(View.GONE);
       LearningAlgorithmFade.appearAfter(showAlg, fading);
       return;
     }
@@ -940,14 +948,24 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     return session.getPracticeCase() != null || session.isGuided() || shownThisRep;
   }
 
-  /** The practised algorithm with its turned moves greyed, as the timer greys a scramble's. */
+  /**
+   * The practised algorithm with its turned moves greyed, as the timer greys a scramble's, or in its
+   * place, as the timer does, the turns that undo a slip, said to be a wrong angle where it is one.
+   */
   private void showAlgorithmProgress() {
-    if (algorithmFollower != null) {
-      algorithmAnimator.show(new SpannableString(TextUtils.join(" ",
-          algorithmFollower.getTokens())), algorithmFollower.getDoneCount());
+    if (algorithmFollower == null) {
+      return;
     }
-    wrongAngle.setVisibility(algorithmFollower != null && algorithmFollower.isWrongAngle()
-        ? View.VISIBLE : View.GONE);
+    String undo = algorithmFollower.getUndoMoves();
+    if (!undo.isEmpty()) {
+      algorithmAnimator.reset();
+      practiceAlgorithm.setText(ScrambleFormatterService.INSTANCE.formatReverseMoves(
+          getString(algorithmFollower.isWrongAngle() ? R.string.drill_wrong_angle
+              : R.string.smart_cube_undo), undo));
+      return;
+    }
+    algorithmAnimator.show(new SpannableString(TextUtils.join(" ",
+        algorithmFollower.getTokens())), algorithmFollower.getDoneCount());
   }
 
   /** A case dealt again starts the algorithm over. */

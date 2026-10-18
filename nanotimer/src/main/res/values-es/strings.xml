@@ -932,9 +932,9 @@
   <string name="drill_practice_back">Volver al entrenamiento</string>
   <string name="drill_practice_mode">Práctica, no cuenta</string>
   <string name="drill_practice_pick">Toca Alg para elegir el algoritmo que practicar</string>
-  <string name="drill_wrong_angle">Ángulo incorrecto. Deshaz ese movimiento y gira el cubo como en la imagen.</string>
+  <string name="drill_wrong_angle">Ángulo incorrecto: deshaz esto y gira el cubo como en la imagen</string>
   <string name="drill_show_alg">Ver alg</string>
-  <string name="drill_choose_title">Elige un algoritmo (%1$d de %2$d)</string>
+  <string name="drill_choose_title">Algoritmo para %1$s</string>
   <string name="drill_choose_use">Usar este</string>
   <string name="drill_choose_suggested">Sugerido</string>
   <string name="drill_choose_yours">El tuyo</string>
