@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Five empty dots under a learning silhouette: the reps in a row that clear a case. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+   android:width="46dp"
+   android:height="6dp"
+   android:viewportWidth="46"
+   android:viewportHeight="6">
+  <path
+     android:strokeColor="#66FFFFFF"
+     android:strokeWidth="1"
+     android:pathData="M0.5,3a2.5,2.5 0 1 0 5,0a2.5,2.5 0 1 0 -5,0M10.5,3a2.5,2.5 0 1 0 5,0a2.5,2.5 0 1 0 -5,0M20.5,3a2.5,2.5 0 1 0 5,0a2.5,2.5 0 1 0 -5,0M30.5,3a2.5,2.5 0 1 0 5,0a2.5,2.5 0 1 0 -5,0M40.5,3a2.5,2.5 0 1 0 5,0a2.5,2.5 0 1 0 -5,0"/>
+</vector>

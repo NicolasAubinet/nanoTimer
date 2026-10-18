@@ -71,6 +71,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Where the time goes: one solve type's last so many cube-read solves, read three ways.
@@ -134,6 +135,8 @@ public class AnalysisActivity extends NanoTimerActivity {
   private CoachRead.Listener readListener;
   /** Whether this screen has asked the service for practice sets yet: once is enough. */
   private boolean practiceAsked;
+  /** The cases cleared in learning drills when the sets were asked for: a new one asks again. */
+  private Set<String> learnedAtAsk = Collections.emptySet();
   private CoachPlanStatus planStatus;
   private CoachBilling billing;
   private CoachBilling.Listener billingListener;
@@ -143,6 +146,7 @@ public class AnalysisActivity extends NanoTimerActivity {
   /** What the query returned, kept apart from what is drawn: the sample stands in front of it. */
   private MethodStatistics read;
   private List<CaseKnowledge> readKnown = Collections.emptyList();
+  private boolean knownRead;
   /** The standard-algorithms card's figures, null until the window's solves have been read again. */
   private Map<String, AlgorithmFigures> algorithmFigures;
   /** Whether that read is on its way, which is what the card shows in place of its rows. */
@@ -226,6 +230,10 @@ public class AnalysisActivity extends NanoTimerActivity {
   protected void onResume() {
     super.onResume();
     planStatus.refresh(); // days pass, and the solve types may have changed behind this screen
+    if (practiceAsked && !learnedAtAsk.equals(Options.INSTANCE.getLearnedCases())) {
+      practiceAsked = false; // a learning drill cleared a case, so the next ones are due
+      showRead();
+    }
   }
 
   @Override
@@ -471,10 +479,16 @@ public class AnalysisActivity extends NanoTimerActivity {
           @Override
           public void run() {
             readKnown = history.getCases();
+            knownRead = true;
             // Which read lands first is not fixed, and the sample owns both halves or neither.
             if (!sampling()) {
               known = readKnown;
               showCases();
+            }
+            if (findViewById(R.id.llAnalysisPractice).getVisibility() == View.VISIBLE
+                && findViewById(R.id.tvAnalysisPracticeLocked).getVisibility() == View.VISIBLE) {
+              planView.setPracticeTeaser((LinearLayout) findViewById(R.id.llAnalysisPracticeSets),
+                  learnNextOffered());
             }
           }
         });
@@ -833,7 +847,8 @@ public class AnalysisActivity extends NanoTimerActivity {
       practiceAsked = false; // the sets are asked for once the coach lets the install in
       showPracticeLocked(true);
       findViewById(R.id.llAnalysisPractice).setVisibility(View.VISIBLE);
-      planView.setPracticeTeaser((LinearLayout) findViewById(R.id.llAnalysisPracticeSets));
+      planView.setPracticeTeaser((LinearLayout) findViewById(R.id.llAnalysisPracticeSets),
+          learnNextOffered());
       return;
     }
     if (practiceAsked) {
@@ -843,6 +858,7 @@ public class AnalysisActivity extends NanoTimerActivity {
       return;
     }
     practiceAsked = true;
+    learnedAtAsk = Options.INSTANCE.getLearnedCases();
     drawPractice(CoachPractice.kept(solveType));
     CoachPractice.refresh(coachClient, solveType, method, new CoachPractice.Listener() {
       @Override
@@ -869,8 +885,32 @@ public class AnalysisActivity extends NanoTimerActivity {
 
   private void drawPractice(List<CoachPractice.Set> sets) {
     showPracticeLocked(false);
-    findViewById(R.id.llAnalysisPractice).setVisibility(sets.isEmpty() ? View.GONE : View.VISIBLE);
-    planView.setPractice((LinearLayout) findViewById(R.id.llAnalysisPracticeSets), sets);
+    LinearLayout into = findViewById(R.id.llAnalysisPracticeSets);
+    planView.setPractice(into, sets);
+    findViewById(R.id.llAnalysisPractice)
+        .setVisibility(into.getChildCount() == 0 ? View.GONE : View.VISIBLE);
+  }
+
+  /**
+   * Whether the teaser shows the OLLs to learn next: by the service's own rule, while an OLL has
+   * been seen never done in one algorithm, or none has been seen known at all.
+   */
+  private boolean learnNextOffered() {
+    if (!knownRead) {
+      return false; // drawn again once read, rather than shown and then taken away
+    }
+    int known = 0;
+    for (CaseKnowledge stepCase : readKnown) {
+      if ("oll".equals(stepCase.getCaseSet())) {
+        if (stepCase.getStatus() == CaseKnowledge.Status.TO_LEARN) {
+          return true;
+        }
+        if (stepCase.getStatus() == CaseKnowledge.Status.KNOWN) {
+          known++;
+        }
+      }
+    }
+    return known == 0;
   }
 
   /** What went wrong, grouped by what the reader can do about it rather than by what broke. */

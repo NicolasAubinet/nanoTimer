@@ -11,10 +11,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.text.BreakIterator;
@@ -31,6 +35,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 import androidx.fragment.app.FragmentActivity;
 
+import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.coach.CoachPayload;
 import com.cube.nanotimer.coach.Evidence;
@@ -286,27 +291,113 @@ public class CoachPlanView {
   public void setPractice(LinearLayout into, List<CoachPractice.Set> sets) {
     into.removeAllViews();
     for (CoachPractice.Set set : sets) {
-      into.addView(practiceCard(into, set));
+      View card = set.isLearning() ? learningCard(into, set) : practiceCard(into, set);
+      if (card != null) {
+        into.addView(card);
+      }
     }
   }
 
   /**
    * The practice sets as an install without the coach reads them: the same cards with blank
    * charts, since which cases cost it the most is the coach's to say.
+   *
+   * @param learnNext whether the OLLs to learn next are drawn too, for a solver short of full OLL
    */
-  public void setPracticeTeaser(LinearLayout into) {
+  public void setPracticeTeaser(LinearLayout into, boolean learnNext) {
     into.removeAllViews();
     for (String family : TEASER_FAMILIES) {
-      View card = inflater.inflate(R.layout.coach_practice_set, into, false);
-      ((TextView) card.findViewById(R.id.tvCoachPracticeTitle)).setText(activity.getString(
-          R.string.coach_practice_set, Utils.toSmartCubeStepLocalizedName(activity, family, 0)));
-      LinearLayout row = card.findViewById(R.id.llCoachPracticeCases);
-      for (int i = 0; i < TEASER_CASES; i++) {
-        row.addView(inflater.inflate(R.layout.coach_practice_silhouette, row, false));
-      }
-      card.findViewById(R.id.buCoachPracticeDrill).setVisibility(View.GONE);
-      into.addView(card);
+      into.addView(teaserCard(into, activity.getString(R.string.coach_practice_set,
+          Utils.toSmartCubeStepLocalizedName(activity, family, 0)), TEASER_CASES,
+          R.drawable.coach_practice_target_dots));
     }
+    if (learnNext) {
+      // Five dots: a learning case clears on five clean reps in a row.
+      into.addView(teaserCard(into, activity.getString(R.string.coach_learn_next),
+          Options.INSTANCE.getLearnNextCount(), R.drawable.coach_learning_target_dots));
+    }
+  }
+
+  private View teaserCard(LinearLayout parent, String title, int cases, int dots) {
+    View card = inflater.inflate(R.layout.coach_practice_set, parent, false);
+    ((TextView) card.findViewById(R.id.tvCoachPracticeTitle)).setText(title);
+    LinearLayout row = card.findViewById(R.id.llCoachPracticeCases);
+    for (int i = 0; i < cases; i++) {
+      View silhouette = inflater.inflate(R.layout.coach_practice_silhouette, row, false);
+      ((ImageView) silhouette.findViewById(R.id.ivCoachPracticeDots)).setImageResource(dots);
+      row.addView(silhouette);
+    }
+    card.findViewById(R.id.buCoachPracticeDrill).setVisibility(View.GONE);
+    return card;
+  }
+
+  /**
+   * The OLLs to learn next, as many as the solver picks in the title's pill. Null once every case
+   * the service offered has been cleared in a drill since.
+   */
+  private View learningCard(LinearLayout parent, final CoachPractice.Set set) {
+    final Set<String> learned = Options.INSTANCE.getLearnedCases();
+    final int offered = set.countToLearn(learned);
+    if (offered == 0) {
+      return null;
+    }
+    final View card = inflater.inflate(R.layout.coach_practice_set, parent, false);
+    ((TextView) card.findViewById(R.id.tvCoachPracticeTitle)).setText(R.string.coach_learn_next);
+    final int shown = Math.min(Options.INSTANCE.getLearnNextCount(), offered);
+    bindLearning(card, set.firstToLearn(shown, learned));
+
+    final Spinner spinner = card.findViewById(R.id.spCoachPracticeCount);
+    List<String> counts = new ArrayList<String>();
+    for (int i = 1; i <= offered; i++) {
+      counts.add(activity.getResources().getQuantityString(R.plurals.coach_learn_next_count, i, i));
+    }
+    // The list marks the count on show, as the graph's period pill does.
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity,
+        R.layout.pill_spinner_item, counts) {
+      @Override
+      public View getDropDownView(int position, View convertView, ViewGroup group) {
+        TextView row = (TextView) super.getDropDownView(position, convertView, group);
+        row.setTextColor(ContextCompat.getColor(activity,
+            position == spinner.getSelectedItemPosition() ? R.color.lightblue
+                : R.color.secondary_text));
+        return row;
+      }
+    };
+    adapter.setDropDownViewResource(R.layout.pill_spinner_dropdown_item);
+    spinner.setAdapter(adapter);
+    spinner.setSelection(shown - 1, false);
+    spinner.setVisibility(View.VISIBLE);
+    spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+      private int count = shown;
+
+      @Override
+      public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+        if (position + 1 != count) {
+          count = position + 1;
+          Options.INSTANCE.setLearnNextCount(count);
+          bindLearning(card, set.firstToLearn(count, learned));
+        }
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> adapterView) {
+      }
+    });
+    return card;
+  }
+
+  private void bindLearning(View card, final CoachPractice.Set shown) {
+    LinearLayout row = card.findViewById(R.id.llCoachPracticeCases);
+    row.removeAllViews();
+    addCaseCharts(row, shown.getCases());
+    Button button = card.findViewById(R.id.buCoachPracticeDrill);
+    button.setText(withPlay(button, R.string.coach_learn_cases));
+    button.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        launch(shown.getDrill());
+      }
+    });
   }
 
   private View practiceCard(LinearLayout parent, final CoachPractice.Set set) {

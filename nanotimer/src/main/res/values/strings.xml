@@ -1486,8 +1486,13 @@
   <string name="coach_drill_cases">Drill these cases</string>
   <string name="coach_learn_cases">Learn these cases</string>
   <string name="coach_practice_title">Practice any time</string>
-  <string name="coach_practice_body">Always here, apart from the plan: the cases costing you the most, each one practised until it beats its target. Refreshed as you solve.</string>
+  <string name="coach_practice_body">Always here, apart from the plan: the cases costing you the most, practised until they beat their targets. Refreshed as you solve.</string>
   <string name="coach_practice_set">Your costliest %1$s cases</string>
+  <string name="coach_learn_next">Next OLLs to learn</string>
+  <plurals name="coach_learn_next_count">
+    <item quantity="one">%d case</item>
+    <item quantity="other">%d cases</item>
+  </plurals>
   <string name="coach_practice_locked">With the coach</string>
 
   <!-- Example mode: the whole hub filled with an invented solver, for a reader no cube has ever

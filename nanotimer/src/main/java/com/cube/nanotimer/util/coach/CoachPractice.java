@@ -14,17 +14,21 @@ import com.cube.nanotimer.vo.CubeMethod;
 import com.cube.nanotimer.vo.SolveType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * The practice sets under a plan: per family, the cases costing the solver the most, chosen by the
- * coach service with no model behind it. Cached as the service sent them, so the section draws at
- * once and a failed refresh keeps the last answer.
+ * The practice sets under a plan: per family, the cases costing the solver the most, then the OLLs
+ * to learn next while full OLL is not known, chosen by the coach service with no model behind it.
+ * Cached as the service sent them, so the section draws at once and a failed refresh keeps the
+ * last answer.
  */
 public final class CoachPractice {
 
@@ -50,6 +54,45 @@ public final class CoachPractice {
 
     public DrillSpec getDrill() {
       return drill;
+    }
+
+    /** Whether this is the "learn next" set: OLLs to learn, best first, rather than to speed up. */
+    public boolean isLearning() {
+      return drill.isLearning();
+    }
+
+    /**
+     * The first {@code count} cases of a learning set and the drill of just them, leaving out any
+     * cleared in a drill since the service answered. Null when none are left.
+     */
+    public Set firstToLearn(int count, Collection<String> learned) {
+      List<String> left = new ArrayList<String>();
+      Map<String, String> algorithms = new LinkedHashMap<String, String>();
+      for (String code : cases) {
+        if (left.size() < count && !learned.contains(code)) {
+          left.add(code);
+          if (drill.getCaseAlgorithm(code) != null) {
+            algorithms.put(code, drill.getCaseAlgorithm(code));
+          }
+        }
+      }
+      if (left.isEmpty()) {
+        return null;
+      }
+      return new Set(family, left, DrillSpec.learning(drill.getId(), drill.getType(), left,
+          drill.getSelection(), drill.getReps(), drill.getWinsToRetire(), algorithms,
+          drill.getLabel()));
+    }
+
+    /** How many cases a learning set still has to offer, the cleared ones left out. */
+    public int countToLearn(Collection<String> learned) {
+      int count = 0;
+      for (String code : cases) {
+        if (!learned.contains(code)) {
+          count++;
+        }
+      }
+      return count;
     }
   }
 
@@ -87,7 +130,8 @@ public final class CoachPractice {
             new Thread(new Runnable() {
               @Override
               public void run() {
-                String reply = client.requestPractice(CoachClient.requestBody(payload, null));
+                String reply = client.requestPractice(
+                    CoachClient.practiceBody(payload, Options.INSTANCE.getLearnedCases()));
                 final List<Set> sets = parse(reply);
                 if (reply == null && !client.hasAccess()) {
                   main.post(new Runnable() {

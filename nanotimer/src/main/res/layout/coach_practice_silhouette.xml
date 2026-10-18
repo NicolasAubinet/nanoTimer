@@ -14,7 +14,8 @@
      android:src="@drawable/coach_practice_silhouette"/>
 
   <ImageView
-     android:layout_width="26dp"
+     android:id="@+id/ivCoachPracticeDots"
+     android:layout_width="wrap_content"
      android:layout_height="6dp"
      android:layout_marginTop="7dp"
      android:importantForAccessibility="no"

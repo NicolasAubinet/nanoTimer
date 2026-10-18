@@ -86,6 +86,8 @@ public enum Options {
   private static final String COACH_PENDING_KEY_PREFIX = "coach_pending_";
   private static final String COACH_PENDING_AT_KEY_PREFIX = "coach_pending_at_";
   private static final String COACH_PRACTICE_KEY_PREFIX = "coach_practice_";
+  private static final String LEARN_NEXT_COUNT_KEY = "learn_next_count";
+  private static final int DEFAULT_LEARN_NEXT_COUNT = 3;
   private static final String COACH_ID_KEY = "coach_id";
   private static final String COACH_PLANS_ON_KEY = "coach_plans_on";
   private static final String COACH_PLANS_SOLVE_TYPE_KEY = "coach_plans_solve_type";
@@ -354,6 +356,15 @@ public enum Options {
 
   public void setCoachPractice(int solveTypeId, String reply) {
     sharedPreferences.edit().putString(COACH_PRACTICE_KEY_PREFIX + solveTypeId, reply).apply();
+  }
+
+  /** How many OLLs the "learn next" practice set shows, as the solver picked it. */
+  public int getLearnNextCount() {
+    return sharedPreferences.getInt(LEARN_NEXT_COUNT_KEY, DEFAULT_LEARN_NEXT_COUNT);
+  }
+
+  public void setLearnNextCount(int count) {
+    sharedPreferences.edit().putInt(LEARN_NEXT_COUNT_KEY, count).apply();
   }
 
   /** The id the coach service knows this install by, made the first time it is read. */

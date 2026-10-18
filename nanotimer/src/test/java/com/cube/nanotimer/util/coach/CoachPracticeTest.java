@@ -3,6 +3,7 @@ package com.cube.nanotimer.util.coach;
 import com.cube.nanotimer.drill.DrillSpec;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
@@ -39,6 +40,26 @@ public class CoachPracticeTest {
 
     Assert.assertEquals(1, sets.size());
     Assert.assertEquals("pll", sets.get(0).getFamily());
+  }
+
+  /** The solver picks how many of the next OLLs to see; one cleared since is skipped. */
+  @Test
+  public void aLearningSetShowsItsFirstCasesWithTheirAlgorithms() {
+    DrillSpec learning = DrillSpec.learning("coach-learn-oll", DrillSpec.Type.CASE_EXECUTION,
+        Arrays.asList("oll_26", "oll_27", "oll_21", "oll_45"), DrillSpec.Selection.ROUND_ROBIN, 40,
+        5, Collections.singletonMap("oll_26", "R U2 R' U' R U' R'"), null);
+    CoachPractice.Set set = CoachPractice.parse("{\"sets\":[{\"family\":\"oll\",\"drill\":"
+        + learning.toJson() + "}]}").get(0);
+
+    CoachPractice.Set shown = set.firstToLearn(2, Collections.singleton("oll_27"));
+
+    Assert.assertTrue(set.isLearning());
+    Assert.assertEquals(3, set.countToLearn(Collections.singleton("oll_27")));
+    Assert.assertEquals(Arrays.asList("oll_26", "oll_21"), shown.getCases());
+    Assert.assertTrue(shown.getDrill().isLearning());
+    Assert.assertEquals(5, shown.getDrill().getWinsToRetire());
+    Assert.assertEquals("R U2 R' U' R U' R'", shown.getDrill().getCaseAlgorithm("oll_26"));
+    Assert.assertNull(set.firstToLearn(3, set.getCases()));
   }
 
   @Test

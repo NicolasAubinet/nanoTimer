@@ -1437,8 +1437,13 @@
   <string name="coach_drill_cases">Practicar estos casos</string>
   <string name="coach_learn_cases">Aprender estos casos</string>
   <string name="coach_practice_title">Práctica libre</string>
-  <string name="coach_practice_body">Siempre aquí, aparte del plan: los casos que más te cuestan, cada uno practicado hasta que bata su objetivo. Se actualiza a medida que resuelves.</string>
+  <string name="coach_practice_body">Siempre aquí, aparte del plan: los casos que más te cuestan, practicados hasta que batan sus objetivos. Se actualiza a medida que resuelves.</string>
   <string name="coach_practice_set">Tus casos de %1$s más costosos</string>
+  <string name="coach_learn_next">Próximos OLL por aprender</string>
+  <plurals name="coach_learn_next_count">
+    <item quantity="one">%d caso</item>
+    <item quantity="other">%d casos</item>
+  </plurals>
   <string name="coach_practice_locked">Con el coach</string>
 
   <string name="analysis_sample_subtitle">No son tus tiempos</string>

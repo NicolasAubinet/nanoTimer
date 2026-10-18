@@ -12,7 +12,9 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -227,6 +229,21 @@ public final class CoachClient {
       return new JSONObject()
           .put("payload", new JSONObject(payload.toJson()))
           .put("stream", stream)
+          .toString();
+    } catch (JSONException e) {
+      throw new IllegalStateException(e); // toJson wrote it, so it parses
+    }
+  }
+
+  /**
+   * A practice request: the payload, and beside it the cases cleared in a learning drill, which no
+   * solve figure holds and which the "learn next" set moves past.
+   */
+  static String practiceBody(CoachPayload payload, Collection<String> learned) {
+    try {
+      return new JSONObject()
+          .put("payload", new JSONObject(payload.toJson()))
+          .put("learned_cases", new JSONArray(learned))
           .toString();
     } catch (JSONException e) {
       throw new IllegalStateException(e); // toJson wrote it, so it parses
