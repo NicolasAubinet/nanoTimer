@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One practice on the drill setup card: its icon in its step colour over its name. Four share the
+     row; the background and colours are painted in code. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="0dp"
+   android:layout_height="68dp"
+   android:layout_weight="1"
+   android:clickable="true"
+   android:focusable="true"
+   android:gravity="center"
+   android:orientation="vertical">
+
+  <ImageView
+     android:id="@+id/ivPracticeIcon"
+     android:layout_width="26dp"
+     android:layout_height="26dp"
+     android:importantForAccessibility="no"/>
+
+  <TextView
+     android:id="@+id/tvPracticeName"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="5dp"
+     android:maxLines="1"
+     android:textSize="14sp"/>
+
+</LinearLayout>

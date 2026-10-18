@@ -1000,7 +1000,6 @@
 
   <!-- Eleccion del entrenamiento -->
   <string name="drill_setup_title">Nuevo entrenamiento</string>
-  <string name="drill_practice">Practicar</string>
   <string name="drill_practice_pll">PLL</string>
   <string name="drill_practice_oll">OLL</string>
   <string name="drill_practice_cross">Cruz</string>
@@ -1010,7 +1009,6 @@
   <string name="drill_practice_f2l">F2L</string>
   <string name="drill_practice_hint_f2l">Un par F2L tras otro, los casos comunes más a menudo.</string>
   <string name="drill_layer_colour_shared">También se usa en las mezclas de Última capa, PLL y F2L</string>
-  <string name="drill_cases">Casos</string>
   <string name="drill_cases_choose">Elegir</string>
   <string name="drill_cases_count">%1$d de %2$d elegidos</string>
   <string name="drill_cases_title_oll">Casos OLL</string>
@@ -1020,7 +1018,6 @@
   <string name="drill_cases_empty">Elige al menos un caso para practicar.</string>
   <string name="drill_cases_hint">Mantén pulsado un caso para ver sus algoritmos.</string>
   <string name="drill_cases_all_count">Los %d casos</string>
-  <string name="drill_cases_drilling">A practicar</string>
   <string name="drill_cases_count_preset">%1$d de %2$d · %3$s</string>
   <plurals name="drill_preset_and_count">
     <item quantity="one">%1$s · %2$d caso</item>
@@ -1072,11 +1069,14 @@
   <string name="drill_help_title">Sobre este entrenamiento</string>
   <string name="drill_help_body">Lo que un entrenamiento fija antes de repartir su primer caso.</string>
   <string name="drill_help_record">Activado, cada repetición se guarda: su tiempo y si pediste ver el algoritmo. Esas repeticiones alimentan las Estadísticas de entrenamiento y «Algoritmos que conoces» en Análisis. Desactívalo para practicar sin afectarlos.</string>
-  <string name="drill_planning">Planificación</string>
   <string name="drill_planning_limit">Límite de planificación</string>
   <string name="drill_planning_seconds">segundos</string>
   <string name="drill_planning_hint">Desactivado por defecto: aprender la cruz completa lleva más que los 15 segundos oficiales.</string>
   <string name="drill_start">Empezar entrenamiento</string>
+  <string name="drill_connect_cube">Conecta tu cubo</string>
+  <string name="drill_cases_family">Casos %1$s</string>
+  <string name="drill_title_f2l">Pares</string>
+  <string name="drill_title_cross">Cruz más corta</string>
 
   <!-- Entrenamiento de cruz -->
   <string name="drill_cross_title">Entrenamiento de cruz</string>

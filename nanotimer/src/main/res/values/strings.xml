@@ -1041,7 +1041,6 @@
 
   <!-- Drill selection -->
   <string name="drill_setup_title">New drill</string>
-  <string name="drill_practice">Practice</string>
   <string name="drill_practice_pll">PLL</string>
   <string name="drill_practice_oll">OLL</string>
   <string name="drill_practice_cross">Cross</string>
@@ -1051,7 +1050,6 @@
   <string name="drill_practice_f2l">F2L</string>
   <string name="drill_practice_hint_f2l">One F2L pair after another, the common cases more often.</string>
   <string name="drill_layer_colour_shared">Also used for Last layer, PLL and F2L scrambles</string>
-  <string name="drill_cases">Cases</string>
   <string name="drill_cases_choose">Choose</string>
   <string name="drill_cases_count">%1$d of %2$d picked</string>
   <string name="drill_cases_title_oll">OLL cases</string>
@@ -1061,7 +1059,6 @@
   <string name="drill_cases_empty">Pick at least one case to drill.</string>
   <string name="drill_cases_hint">Hold a case for its algorithms.</string>
   <string name="drill_cases_all_count">All %d cases</string>
-  <string name="drill_cases_drilling">Drilling</string>
   <string name="drill_cases_more" translatable="false">+%d</string>
   <!-- A named pick of a family: a saved subset of the cases, applied again in one tap. -->
   <string name="drill_cases_count_preset">%1$d of %2$d · %3$s</string>
@@ -1115,11 +1112,14 @@
   <string name="drill_help_title">About this drill</string>
   <string name="drill_help_body">What a drill settles before it deals its first case.</string>
   <string name="drill_help_record">When on, each rep is saved: its time, and whether you asked to see the algorithm. Saved reps feed Drill stats and \"Algorithms you know\" in Analysis. Turn it off to practise without affecting them.</string>
-  <string name="drill_planning">Planning</string>
   <string name="drill_planning_limit">Planning limit</string>
   <string name="drill_planning_seconds">seconds</string>
   <string name="drill_planning_hint">Off by default: learning the full cross takes longer than the official 15 seconds.</string>
   <string name="drill_start">Start drill</string>
+  <string name="drill_connect_cube">Connect your cube</string>
+  <string name="drill_cases_family">%1$s cases</string>
+  <string name="drill_title_f2l">Pairs</string>
+  <string name="drill_title_cross">Shortest cross</string>
 
   <!-- Cross drill -->
   <string name="drill_cross_title">Cross drill</string>

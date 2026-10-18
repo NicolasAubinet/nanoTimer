@@ -2,15 +2,24 @@ package com.cube.nanotimer.gui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.PorterDuff;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.RippleDrawable;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
-import android.view.Gravity;
+import android.text.style.ImageSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -21,6 +30,7 @@ import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.cube.SmartCubeChip;
 import com.cube.nanotimer.cube.SmartCubeManager;
+import com.cube.nanotimer.gui.widget.DrillFacePicture;
 import com.cube.nanotimer.gui.widget.DrillHelpDialog;
 import com.cube.nanotimer.gui.widget.LastLayerCaseView;
 import com.cube.nanotimer.gui.widget.SegmentedControl;
@@ -38,6 +48,7 @@ import com.cube.nanotimer.step.F2lPairCases;
 import com.cube.nanotimer.util.DrillCasePreset;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.GUIUtils;
+import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.util.view.StepPalette;
 
 import java.util.ArrayList;
@@ -91,9 +102,15 @@ public class DrillSetupActivity extends NanoTimerActivity
   private static final int MIN_PLANNING_SECONDS = 1;
   private static final int MAX_PLANNING_SECONDS = 600;
 
-  /** How many of the picked cases the row draws before it starts counting them instead. */
-  private static final int PICKED_SHOWN = 6;
-  private static final int PICKED_SIZE_DP = 32;
+  /** The case strip's slots; past this many cases the last slot counts the rest instead. */
+  private static final int STRIP_SLOTS = 6;
+  private static final int REPS_CELL_DP = 34;
+  /** The step colour's strength in the card's top glow, a selected tile, and the cases chip. */
+  private static final int WASH_ALPHA = 0x3D;
+  private static final int TILE_ALPHA = 0x2E;
+  private static final int CHIP_ALPHA = 0x29;
+  /** The step colour of each practice, in StepPalette's codes. */
+  private static final String[] PRACTICE_CODES = {"pll", "oll", "cross", "f2l"};
 
   private static final String KEY_PRACTICE = "practice";
   private static final String KEY_REPS = "reps";
@@ -105,7 +122,9 @@ public class DrillSetupActivity extends NanoTimerActivity
   private static final String FAMILY_PLL = "pll_";
   private static final String FAMILY_OLL = "oll_";
 
-  private SegmentedControl practice;
+  private final List<View> practiceTiles = new ArrayList<View>();
+  private int practiceIndex;
+  private StepPalette palette;
   private SegmentedControl reps;
   private SegmentedControl f2lCases;
   private Switch swRecord;
@@ -117,9 +136,9 @@ public class DrillSetupActivity extends NanoTimerActivity
   private View planningSeconds;
   private TextView tvPracticeHint;
   private TextView tvCasesCount;
-  private TextView tvPickedLabel;
   private LinearLayout llPicked;
   private View casesRow;
+  private Button btStart;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -133,8 +152,9 @@ public class DrillSetupActivity extends NanoTimerActivity
     crossOptions = findViewById(R.id.llDrillCrossOptions);
     casesRow = findViewById(R.id.llDrillCases);
     tvCasesCount = findViewById(R.id.tvDrillCasesCount);
-    tvPickedLabel = findViewById(R.id.tvDrillCasesDrilling);
     llPicked = findViewById(R.id.llDrillCasesPicked);
+    btStart = findViewById(R.id.btDrillStart);
+    palette = StepPalette.cfop(this);
     planningSeconds = findViewById(R.id.llDrillPlanningSeconds);
     tvPracticeHint = findViewById(R.id.tvDrillPracticeHint);
     final View layerChip = findViewById(R.id.vColourChip);
@@ -146,6 +166,7 @@ public class DrillSetupActivity extends NanoTimerActivity
           @Override
           public void run() {
             LastLayerColourDialog.paintChip(layerChip);
+            refreshPractice(); // the cross picture is drawn in the face opposite this one
           }
         });
       }
@@ -160,16 +181,7 @@ public class DrillSetupActivity extends NanoTimerActivity
       }
     });
 
-    practice = new SegmentedControl(this, (LinearLayout) findViewById(R.id.llDrillPractice),
-        new String[] {getString(R.string.drill_practice_pll), getString(R.string.drill_practice_oll),
-            getString(R.string.drill_practice_f2l), getString(R.string.drill_practice_cross)},
-        new SegmentedControl.Listener() {
-          @Override
-          public void onSegmentPicked(int index) {
-            Options.INSTANCE.setDrillChoice(KEY_PRACTICE, PRACTICE_ORDER[index]);
-            refreshPractice();
-          }
-        });
+    buildPracticeTiles();
 
     String[] repLabels = new String[REP_COUNTS.length + 1];
     for (int i = 0; i < REP_COUNTS.length; i++) {
@@ -183,6 +195,7 @@ public class DrillSetupActivity extends NanoTimerActivity
             Options.INSTANCE.setDrillChoice(KEY_REPS, index);
           }
         });
+    reps.setCompact(REPS_CELL_DP);
 
     f2lCases = new SegmentedControl(this, (LinearLayout) findViewById(R.id.llDrillF2lCases),
         new String[] {getString(R.string.drill_f2l_basic), getString(R.string.drill_f2l_advanced),
@@ -201,7 +214,7 @@ public class DrillSetupActivity extends NanoTimerActivity
         Options.INSTANCE.setDrillChoice(KEY_RECORDING, checked ? 1 : 0);
       }
     });
-    findViewById(R.id.llDrillRecord).setOnClickListener(new View.OnClickListener() {
+    findViewById(R.id.llDrillRecordRow).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
         swRecord.toggle();
@@ -223,15 +236,18 @@ public class DrillSetupActivity extends NanoTimerActivity
       }
     });
 
-    findViewById(R.id.btDrillStart).setOnClickListener(new View.OnClickListener() {
+    btStart.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        start();
+        if (SmartCubeManager.INSTANCE.isConnected()) {
+          start();
+        } else {
+          openSmartCubeConnect();
+        }
       }
     });
 
-    practice.setSelection(
-        positionOf(Options.INSTANCE.getDrillChoice(KEY_PRACTICE, PRACTICE_PLL)));
+    practiceIndex = positionOf(Options.INSTANCE.getDrillChoice(KEY_PRACTICE, PRACTICE_PLL));
     swRecord.setChecked(Options.INSTANCE.getDrillChoice(KEY_RECORDING, 1) == 1);
     swPlanning.setChecked(Options.INSTANCE.getDrillChoice(KEY_PLANNING_ON, 0) == 1);
     setPlanningSeconds(
@@ -291,19 +307,164 @@ public class DrillSetupActivity extends NanoTimerActivity
   @Override
   public void onConnection(CubeConnection connection) {
     // Said here rather than only on the drill screen: being turned back at the door having picked
-    // everything is worse than being told at the door. The button goes with the line, so it is not
-    // fully lit above a sentence explaining that it cannot run.
-    boolean connected = SmartCubeManager.INSTANCE.isConnected();
-    findViewById(R.id.tvDrillNoCube).setVisibility(connected ? View.GONE : View.VISIBLE);
-    findViewById(R.id.btDrillStart).setEnabled(connected);
+    // everything is worse than being told at the door. Start becomes the way to connect one.
+    if (SmartCubeManager.INSTANCE.isConnected()) {
+      btStart.setText(R.string.drill_start);
+      btStart.setBackgroundResource(R.drawable.hero_start_button);
+      btStart.setTextColor(ContextCompat.getColorStateList(this, R.color.on_accent_ink));
+    } else {
+      btStart.setText(connectLabel());
+      btStart.setBackgroundResource(R.drawable.connect_cube_button);
+      btStart.setTextColor(ContextCompat.getColor(this, R.color.white));
+    }
+  }
+
+  /** "Connect your cube" behind the smart cube mark, both centred on the button. */
+  private CharSequence connectLabel() {
+    Drawable mark = ContextCompat.getDrawable(this, R.drawable.ic_smart_cube).mutate();
+    mark.setColorFilter(ContextCompat.getColor(this, R.color.lightblue), PorterDuff.Mode.SRC_IN);
+    int size = dp(22);
+    mark.setBounds(0, 0, size, size);
+    SpannableString label = new SpannableString("  " + getString(R.string.drill_connect_cube));
+    label.setSpan(new ImageSpan(mark, ImageSpan.ALIGN_BASELINE), 0, 1,
+        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    return label;
+  }
+
+  private void buildPracticeTiles() {
+    LinearLayout row = findViewById(R.id.llDrillPractice);
+    String[] names = {getString(R.string.drill_practice_pll), getString(R.string.drill_practice_oll),
+        getString(R.string.drill_practice_f2l), getString(R.string.drill_practice_cross)};
+    int[] icons = {R.drawable.ic_practice_pll, R.drawable.ic_practice_oll,
+        R.drawable.ic_practice_f2l, R.drawable.ic_practice_cross};
+    for (int i = 0; i < PRACTICE_ORDER.length; i++) {
+      final int index = i;
+      View tile = getLayoutInflater().inflate(R.layout.drill_practice_tile, row, false);
+      ((ImageView) tile.findViewById(R.id.ivPracticeIcon)).setImageResource(icons[i]);
+      ((TextView) tile.findViewById(R.id.tvPracticeName)).setText(names[i]);
+      if (i > 0) {
+        ((LinearLayout.LayoutParams) tile.getLayoutParams()).leftMargin = dp(8);
+      }
+      tile.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          if (practiceIndex != index) {
+            practiceIndex = index;
+            Options.INSTANCE.setDrillChoice(KEY_PRACTICE, PRACTICE_ORDER[index]);
+            refreshPractice();
+          }
+        }
+      });
+      practiceTiles.add(tile);
+      row.addView(tile);
+    }
+  }
+
+  /** The picked tile is lit in its own colour; the others keep theirs, receded, as a preview. */
+  private void paintPracticeTiles() {
+    for (int i = 0; i < practiceTiles.size(); i++) {
+      View tile = practiceTiles.get(i);
+      int colour = practiceColour(PRACTICE_ORDER[i]);
+      boolean on = i == practiceIndex;
+      GradientDrawable ground = new GradientDrawable();
+      ground.setCornerRadius(dp(14));
+      if (on) {
+        ground.setColor(withAlpha(colour, TILE_ALPHA));
+        ground.setStroke(Math.round(1.5f * getResources().getDisplayMetrics().density), colour);
+      } else {
+        ground.setColor(ContextCompat.getColor(this, R.color.hero_inset));
+      }
+      tile.setBackground(new RippleDrawable(
+          ColorStateList.valueOf(withAlpha(colour, 0x55)), ground, null));
+      tile.setSelected(on);
+      ImageView icon = tile.findViewById(R.id.ivPracticeIcon);
+      icon.setColorFilter(colour, PorterDuff.Mode.SRC_IN);
+      icon.setAlpha(on ? 1f : 0.7f);
+      TextView name = tile.findViewById(R.id.tvPracticeName);
+      name.setTextColor(ContextCompat.getColor(this, on ? R.color.white : R.color.secondary_text));
+      GUIUtils.setWeight(name, on ? Typeface.BOLD : Typeface.NORMAL);
+    }
+  }
+
+  /** The card, lit from the top in the practice's colour, and every coloured mark under it. */
+  private void paintPracticeColour(int colour) {
+    View hero = findViewById(R.id.llDrillHero);
+    GradientDrawable wash = new GradientDrawable();
+    wash.setGradientType(GradientDrawable.RADIAL_GRADIENT);
+    wash.setColors(new int[] {withAlpha(colour, WASH_ALPHA), withAlpha(colour, 0)});
+    wash.setGradientCenter(0.5f, 0f);
+    wash.setGradientRadius(getResources().getDisplayMetrics().widthPixels * 0.7f);
+    wash.setCornerRadius(getResources().getDimension(R.dimen.card_corner));
+    LayerDrawable card = new LayerDrawable(new Drawable[] {
+        ContextCompat.getDrawable(this, R.drawable.analysis_card), wash});
+    card.setLayerInset(1, 0, dp(1), 0, dp(3));
+    int left = hero.getPaddingLeft(), top = hero.getPaddingTop();
+    int right = hero.getPaddingRight(), bottom = hero.getPaddingBottom();
+    hero.setBackground(card);
+    hero.setPadding(left, top, right, bottom);
+
+    int[] icons = {R.id.ivDrillRepsIcon, R.id.ivDrillRecordIcon, R.id.ivDrillPlanningIcon,
+        R.id.ivDrillLayerIcon};
+    for (int id : icons) {
+      ((ImageView) findViewById(id)).setColorFilter(colour, PorterDuff.Mode.SRC_IN);
+    }
+    reps.setAccent(colour);
+    f2lCases.setAccent(colour);
+    ((TextView) findViewById(R.id.tvDrillCasesFamily)).setTextColor(colour);
+    ((TextView) findViewById(R.id.tvDrillPictureLabel)).setTextColor(colour);
+    TextView choose = findViewById(R.id.tvDrillCasesChoose);
+    choose.setTextColor(colour);
+    GradientDrawable chip = new GradientDrawable();
+    chip.setCornerRadius(dp(12));
+    chip.setColor(withAlpha(colour, CHIP_ALPHA));
+    choose.setBackground(chip);
+  }
+
+  /** A drill with no case set shows its practice as a face: the cross, or an open F2L slot. */
+  private void showPicture(int practiceValue) {
+    boolean cross = practiceValue == PRACTICE_CROSS;
+    int blank = ContextCompat.getColor(this, R.color.case_blank);
+    int ink;
+    int[] stickers;
+    if (cross) {
+      ink = ContextCompat.getColor(this,
+          Utils.getFaceColorRes(layerFace().opposite().name().charAt(0)));
+      stickers = new int[] {blank, ink, blank, ink, ink, ink, blank, ink, blank};
+    } else {
+      ink = ContextCompat.getColor(this, Utils.getFaceColorRes('F'));
+      stickers = new int[] {blank, blank, blank, ink, ink, blank, ink, ink, blank};
+    }
+    ((DrillFacePicture) findViewById(R.id.vDrillPicture)).setStickers(stickers);
+    ((TextView) findViewById(R.id.tvDrillPictureLabel)).setText(cross
+        ? R.string.drill_practice_cross : R.string.drill_practice_f2l);
+    ((TextView) findViewById(R.id.tvDrillPictureTitle)).setText(cross
+        ? R.string.drill_title_cross : R.string.drill_title_f2l);
+  }
+
+  private int practiceColour(int practiceValue) {
+    return palette.colorFor(PRACTICE_CODES[practiceValue]);
+  }
+
+  private static int withAlpha(int colour, int alpha) {
+    return (colour & 0x00FFFFFF) | (alpha << 24);
+  }
+
+  private int dp(int value) {
+    return Math.round(value * getResources().getDisplayMetrics().density);
   }
 
   private void refreshPractice() {
     int picked = chosenPractice();
     boolean cross = picked == PRACTICE_CROSS;
     boolean f2l = picked == PRACTICE_F2L;
+    paintPracticeTiles();
+    paintPracticeColour(practiceColour(picked));
     crossOptions.setVisibility(cross ? View.VISIBLE : View.GONE);
-    findViewById(R.id.llDrillF2lOptions).setVisibility(f2l ? View.VISIBLE : View.GONE);
+    findViewById(R.id.llDrillF2lCases).setVisibility(f2l ? View.VISIBLE : View.GONE);
+    findViewById(R.id.llDrillPicture).setVisibility(cross || f2l ? View.VISIBLE : View.GONE);
+    if (cross || f2l) {
+      showPicture(picked);
+    }
     planningSeconds.setVisibility(cross && swPlanning.isChecked() ? View.VISIBLE : View.GONE);
     int hint;
     if (cross) {
@@ -327,6 +488,9 @@ public class DrillSetupActivity extends NanoTimerActivity
     // A pair's time depends on the slot and grip it was dealt in, and no screen reads one back.
     findViewById(R.id.llDrillRecord).setVisibility(f2l ? View.GONE : View.VISIBLE);
     if (!noSet) {
+      ((TextView) findViewById(R.id.tvDrillCasesFamily)).setText(getString(
+          R.string.drill_cases_family, getString(picked == PRACTICE_OLL
+              ? R.string.drill_practice_oll : R.string.drill_practice_pll)));
       refreshCasesCount();
     }
   }
@@ -338,8 +502,8 @@ public class DrillSetupActivity extends NanoTimerActivity
 
   /**
    * What the drill will deal, which is what the user is about to spend the session on. Everything
-   * picked reads as one line: "57 of 57 picked" is a sum where "All 57 cases" is an answer, and the
-   * strip under it would then be the whole family drawn out for nothing.
+   * picked reads as one line: "57 of 57 picked" is a sum where "All 57 cases" is an answer. The
+   * strip under it draws the first few cases either way, as the card's picture of the drill.
    */
   private void refreshCasesCount() {
     List<String> all = casesOf(family());
@@ -357,37 +521,33 @@ public class DrillSetupActivity extends NanoTimerActivity
     } else {
       tvCasesCount.setText(countWithFamilyColour(picked.size(), all.size()));
     }
-    // Nothing to draw for the whole family, which the line above already answers, nor for none.
-    boolean strip = !allPicked && !picked.isEmpty();
-    tvPickedLabel.setVisibility(strip ? View.VISIBLE : View.GONE);
-    llPicked.setVisibility(strip ? View.VISIBLE : View.GONE);
+    llPicked.setVisibility(picked.isEmpty() ? View.GONE : View.VISIBLE);
     llPicked.removeAllViews();
-    if (!strip) {
-      return;
-    }
-    for (int i = 0; i < Math.min(PICKED_SHOWN, picked.size()); i++) {
-      LastLayerCaseView chart = new LastLayerCaseView(this);
-      chart.setDiagram(LastLayerDiagram.forCase(picked.get(i)));
-      chart.setLayoutParams(stripCell());
-      llPicked.addView(chart);
-    }
-    if (picked.size() > PICKED_SHOWN) {
-      TextView more = GUIUtils.newTextView(this);
-      more.setText(getString(R.string.drill_cases_more, picked.size() - PICKED_SHOWN));
-      more.setTextSize(11);
-      more.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
-      more.setGravity(Gravity.CENTER);
-      more.setBackgroundResource(R.drawable.case_more);
-      more.setLayoutParams(stripCell());
-      llPicked.addView(more);
+    boolean overflow = picked.size() > STRIP_SLOTS;
+    int charts = overflow ? STRIP_SLOTS - 1 : picked.size();
+    // Every slot is laid out, empty ones invisible, so a short pick keeps the same cell width.
+    for (int i = 0; i < STRIP_SLOTS; i++) {
+      View cell = getLayoutInflater().inflate(R.layout.drill_setup_case, llPicked, false);
+      LastLayerCaseView chart = cell.findViewById(R.id.vDrillCaseChart);
+      if (i < charts) {
+        chart.setDiagram(LastLayerDiagram.forCase(picked.get(i)));
+        ((TextView) cell.findViewById(R.id.tvDrillCaseName)).setText(shortName(picked.get(i)));
+      } else if (overflow) {
+        chart.setVisibility(View.INVISIBLE);
+        TextView more = cell.findViewById(R.id.tvDrillCaseMore);
+        more.setVisibility(View.VISIBLE);
+        more.setText(getString(R.string.drill_cases_more, picked.size() - charts));
+      } else {
+        cell.setVisibility(View.INVISIBLE);
+      }
+      llPicked.addView(cell);
     }
   }
 
-  private LinearLayout.LayoutParams stripCell() {
-    int size = (int) (PICKED_SIZE_DP * getResources().getDisplayMetrics().density);
-    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size, size);
-    params.rightMargin = getResources().getDimensionPixelSize(R.dimen.space_xs);
-    return params;
+  /** A case as a cuber writes it under its chart: Rb, 21. */
+  private static String shortName(String code) {
+    String name = code.substring(code.indexOf('_') + 1);
+    return name.isEmpty() ? name : name.substring(0, 1).toUpperCase(Locale.US) + name.substring(1);
   }
 
   private CharSequence countWithFamilyColour(int picked, int total) {
@@ -482,7 +642,7 @@ public class DrillSetupActivity extends NanoTimerActivity
 
   /** The practice the selected tab stands for. */
   private int chosenPractice() {
-    return PRACTICE_ORDER[practice.getSelection()];
+    return PRACTICE_ORDER[practiceIndex];
   }
 
   private static int positionOf(int practiceValue) {

@@ -31,6 +31,7 @@ public class SegmentedControl {
   private final List<TextView> cells = new ArrayList<TextView>();
 
   private int selection;
+  private int accent;
 
   public SegmentedControl(Context context, LinearLayout container, String[] labels,
       Listener listener) {
@@ -76,6 +77,23 @@ public class SegmentedControl {
     cells.get(index).setVisibility(visible ? View.VISIBLE : View.GONE);
   }
 
+  /** Fills the picked cell with this colour instead of the app's accent wash; 0 restores that. */
+  public void setAccent(int colour) {
+    accent = colour;
+    refresh();
+  }
+
+  /** Smaller cells sized to their label, at least this wide, for a row ending a settings line. */
+  public void setCompact(int minCellWidthDp) {
+    for (TextView cell : cells) {
+      cell.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+          LinearLayout.LayoutParams.WRAP_CONTENT));
+      cell.setMinWidth(dp(minCellWidthDp));
+      cell.setTextSize(13);
+      cell.setPadding(dp(6), dp(6), dp(6), dp(6));
+    }
+  }
+
   /** Shows a pick without announcing it, for a caller restoring one. */
   public void setSelection(int index) {
     selection = index;
@@ -88,7 +106,7 @@ public class SegmentedControl {
 
   private void refresh() {
     for (int i = 0; i < cells.size(); i++) {
-      ViewSegments.style(cells.get(i), i == selection);
+      ViewSegments.style(cells.get(i), i == selection, accent);
     }
   }
 

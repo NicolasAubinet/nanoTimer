@@ -1001,7 +1001,6 @@
 
   <!-- Choix de l\'entrainement -->
   <string name="drill_setup_title">Nouvel entraînement</string>
-  <string name="drill_practice">Travailler</string>
   <string name="drill_practice_pll">PLL</string>
   <string name="drill_practice_oll">OLL</string>
   <string name="drill_practice_cross">Croix</string>
@@ -1011,7 +1010,6 @@
   <string name="drill_practice_f2l">F2L</string>
   <string name="drill_practice_hint_f2l">Les paires F2L l\'une après l\'autre, les cas fréquents plus souvent.</string>
   <string name="drill_layer_colour_shared">Utilisée aussi pour les mélanges Last Layer, PLL et F2L</string>
-  <string name="drill_cases">Cas</string>
   <string name="drill_cases_choose">Choisir</string>
   <string name="drill_cases_count">%1$d sur %2$d choisis</string>
   <string name="drill_cases_title_oll">Cas OLL</string>
@@ -1021,7 +1019,6 @@
   <string name="drill_cases_empty">Choisissez au moins un cas à travailler.</string>
   <string name="drill_cases_hint">Restez appuyé sur un cas pour voir ses algorithmes.</string>
   <string name="drill_cases_all_count">Les %d cas</string>
-  <string name="drill_cases_drilling">Au programme</string>
   <string name="drill_cases_count_preset">%1$d sur %2$d · %3$s</string>
   <plurals name="drill_preset_and_count">
     <item quantity="one">%1$s · %2$d cas</item>
@@ -1073,11 +1070,14 @@
   <string name="drill_help_title">À propos de cet entraînement</string>
   <string name="drill_help_body">Ce qu\'un entraînement fixe avant de distribuer son premier cas.</string>
   <string name="drill_help_record">Activé, chaque essai est enregistré : son temps, et si vous avez demandé à voir l\'algorithme. Ces essais alimentent les Stats d\'entraînement et « Algorithmes connus » dans Analyse. Désactivez-le pour vous entraîner sans les modifier.</string>
-  <string name="drill_planning">Planification</string>
   <string name="drill_planning_limit">Temps de réflexion limité</string>
   <string name="drill_planning_seconds">secondes</string>
   <string name="drill_planning_hint">Désactivé par défaut : apprendre la croix complète demande plus que les 15 secondes officielles.</string>
   <string name="drill_start">Lancer l\'entraînement</string>
+  <string name="drill_connect_cube">Connecter votre cube</string>
+  <string name="drill_cases_family">Cas %1$s</string>
+  <string name="drill_title_f2l">Paires</string>
+  <string name="drill_title_cross">Croix la plus courte</string>
 
   <!-- Entrainement de croix -->
   <string name="drill_cross_title">Entraînement de croix</string>

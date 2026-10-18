@@ -1,301 +1,417 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Picking a drill: what to practise, how many reps, and whether the reps are recorded. The three
-     controls above the fold are the ones every drill has; what a cross drill needs on top hangs
-     below them and is hidden for the others. -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Picking a drill. The card on top is the choice itself: the practice, then what it will deal.
+     The rows under it are the drill's settings, and Start stays pinned at the bottom. The card and
+     the row icons take the practice's step colour, painted in code. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:tools="http://schemas.android.com/tools"
    android:layout_width="match_parent"
    android:layout_height="match_parent"
-   android:fillViewport="true"
-   android:fitsSystemWindows="true">
+   android:fitsSystemWindows="true"
+   android:orientation="vertical">
 
-  <LinearLayout
+  <ScrollView
      android:layout_width="match_parent"
-     android:layout_height="wrap_content"
-     android:orientation="vertical"
-     android:padding="16dp">
-
-    <TextView
-       style="@style/DialogSectionLabel"
-       android:text="@string/drill_practice"/>
+     android:layout_height="0dp"
+     android:layout_weight="1"
+     android:fillViewport="true">
 
     <LinearLayout
-       android:id="@+id/llDrillPractice"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:background="@drawable/view_segment_group"
-       android:orientation="horizontal"
-       android:padding="3dp"/>
+       android:orientation="vertical"
+       android:paddingLeft="@dimen/space_m"
+       android:paddingRight="@dimen/space_m"
+       android:paddingTop="@dimen/space_xs"
+       android:paddingBottom="@dimen/space_m">
 
-    <TextView
-       android:id="@+id/tvDrillPracticeHint"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:layout_marginTop="6dp"
-       android:textColor="@color/secondary_text"
-       android:textSize="13sp"/>
-
-    <!-- Only a case drill has a set to pick from; a cross drill's case is a whole scramble. -->
-    <LinearLayout
-       android:id="@+id/llDrillCases"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:orientation="vertical">
-
-      <TextView
-         style="@style/DialogSectionLabel"
-         android:layout_marginTop="18dp"
-         android:text="@string/drill_cases"/>
-
-      <!-- The row says what the drill will deal. Untouched it is one line and takes no room; once
-           cases are off it grows a strip of the ones that will come up, since a picked set is
-           worth a look before starting and the whole family drawn out is not. -->
       <LinearLayout
-         android:id="@+id/llDrillCasesPick"
+         android:id="@+id/llDrillHero"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:background="@drawable/choice_card"
          android:orientation="vertical"
-         android:paddingLeft="12dp"
-         android:paddingRight="12dp"
-         android:paddingTop="10dp"
-         android:paddingBottom="10dp">
+         android:paddingLeft="@dimen/space_s"
+         android:paddingRight="@dimen/space_s"
+         android:paddingTop="9dp"
+         android:paddingBottom="11dp">
 
+        <!-- One tile per practice, filled in code. -->
         <LinearLayout
+           android:id="@+id/llDrillPractice"
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
-           android:gravity="center_vertical"
-           android:orientation="horizontal">
+           android:orientation="horizontal"/>
 
-          <TextView
-             android:id="@+id/tvDrillCasesCount"
-             android:layout_width="0dp"
-             android:layout_height="wrap_content"
-             android:layout_weight="1"
-             android:textColor="@color/white"
-             android:textSize="15sp"/>
-
-          <TextView
-             style="@style/RowChipAccent"
-             android:layout_marginLeft="8dp"
-             android:text="@string/drill_cases_choose"
-             android:textSize="12sp"/>
-        </LinearLayout>
-
-        <TextView
-           android:id="@+id/tvDrillCasesDrilling"
-           style="@style/DialogSectionLabel"
-           android:layout_marginTop="10dp"
-           android:text="@string/drill_cases_drilling"
-           android:textSize="10sp"
-           android:visibility="gone"/>
-
-        <!-- Charts of the picked cases, populated in code. -->
+        <!-- A case drill: what it deals, and the first few of those cases drawn out. -->
         <LinearLayout
-           android:id="@+id/llDrillCasesPicked"
+           android:id="@+id/llDrillCases"
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
-           android:layout_marginTop="5dp"
-           android:orientation="horizontal"
-           android:visibility="gone"/>
-      </LinearLayout>
-    </LinearLayout>
+           android:orientation="vertical">
 
-    <!-- Only for an F2L drill: basic pairs, advanced ones with a piece in another slot, or both. -->
-    <LinearLayout
-       android:id="@+id/llDrillF2lOptions"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:orientation="vertical"
-       android:visibility="gone">
-
-      <TextView
-         style="@style/DialogSectionLabel"
-         android:layout_marginTop="18dp"
-         android:text="@string/drill_cases"/>
-
-      <LinearLayout
-         android:id="@+id/llDrillF2lCases"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:background="@drawable/view_segment_group"
-         android:orientation="horizontal"
-         android:padding="3dp"/>
-    </LinearLayout>
-
-    <TextView
-       style="@style/DialogSectionLabel"
-       android:layout_marginTop="18dp"
-       android:text="@string/drill_reps"/>
-
-    <LinearLayout
-       android:id="@+id/llDrillReps"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:background="@drawable/view_segment_group"
-       android:orientation="horizontal"
-       android:padding="3dp"/>
-
-    <!-- Whether the reps are kept, as a plain switch: the choice is only ever on or off. -->
-    <LinearLayout
-       android:id="@+id/llDrillRecord"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:layout_marginTop="18dp"
-       android:background="@drawable/drill_note_card"
-       android:gravity="center_vertical"
-       android:orientation="horizontal"
-       android:padding="12dp">
-
-      <TextView
-         android:layout_width="0dp"
-         android:layout_height="wrap_content"
-         android:layout_weight="1"
-         android:text="@string/drill_record"
-         android:textColor="@color/white"
-         android:textSize="15sp"/>
-
-      <Switch
-         android:id="@+id/swDrillRecord"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_marginLeft="12dp"/>
-    </LinearLayout>
-
-    <!-- Only for a cross drill: how long there is to plan it. One row on a card rather than a
-         checkbox with a field under it, so the limit and the seconds read as one setting. -->
-    <LinearLayout
-       android:id="@+id/llDrillCrossOptions"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:orientation="vertical"
-       android:visibility="gone">
-
-      <TextView
-         style="@style/DialogSectionLabel"
-         android:layout_marginTop="18dp"
-         android:text="@string/drill_planning"/>
-
-      <LinearLayout
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:background="@drawable/drill_note_card"
-         android:gravity="center_vertical"
-         android:orientation="horizontal"
-         android:padding="12dp">
-
-        <TextView
-           android:layout_width="0dp"
-           android:layout_height="wrap_content"
-           android:layout_weight="1"
-           android:text="@string/drill_planning_limit"
-           android:textColor="@color/white"
-           android:textSize="15sp"/>
-
-        <LinearLayout
-           android:id="@+id/llDrillPlanningSeconds"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_marginLeft="8dp"
-           android:gravity="center_vertical"
-           android:orientation="horizontal"
-           android:visibility="gone">
-
-          <!-- The number stays on the row rather than behind a second screen, but it is picked
-               from the app's presets-and-stepper dialog: typing two digits into a chip this size
-               is the one thing a phone makes hard. -->
-          <TextView
-             android:id="@+id/tvDrillPlanningSeconds"
-             android:layout_width="wrap_content"
+          <LinearLayout
+             android:id="@+id/llDrillCasesPick"
+             android:layout_width="match_parent"
              android:layout_height="wrap_content"
-             android:background="@drawable/row_chip_accent"
+             android:layout_marginTop="10dp"
+             android:background="@drawable/hero_selector_row"
              android:clickable="true"
              android:focusable="true"
-             android:gravity="center"
-             android:minWidth="44dp"
-             android:paddingLeft="10dp"
-             android:paddingRight="10dp"
-             android:paddingTop="4dp"
-             android:paddingBottom="4dp"
-             android:textColor="@color/lightblue"
-             android:textSize="15sp"/>
+             android:gravity="center_vertical"
+             android:minHeight="52dp"
+             android:orientation="horizontal"
+             android:paddingLeft="@dimen/space_xs"
+             android:paddingRight="@dimen/space_xs">
 
-          <TextView
-             android:layout_width="wrap_content"
+            <LinearLayout
+               android:layout_width="0dp"
+               android:layout_height="wrap_content"
+               android:layout_weight="1"
+               android:orientation="vertical">
+
+              <TextView
+                 android:id="@+id/tvDrillCasesFamily"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:letterSpacing="0.14"
+                 android:textAllCaps="true"
+                 android:textSize="11sp"
+                 android:textStyle="bold"/>
+
+              <TextView
+                 android:id="@+id/tvDrillCasesCount"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:ellipsize="end"
+                 android:maxLines="1"
+                 android:textColor="@color/white"
+                 android:textSize="22sp"
+                 android:textStyle="bold"/>
+            </LinearLayout>
+
+            <TextView
+               android:id="@+id/tvDrillCasesChoose"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginLeft="@dimen/space_s"
+               android:paddingLeft="10dp"
+               android:paddingRight="10dp"
+               android:paddingTop="4dp"
+               android:paddingBottom="4dp"
+               android:text="@string/drill_cases_choose"
+               android:textSize="13sp"/>
+          </LinearLayout>
+
+          <!-- Charts of the cases the drill will deal, each on its own stage, populated in code. -->
+          <LinearLayout
+             android:id="@+id/llDrillCasesPicked"
+             android:baselineAligned="false"
+             android:layout_width="match_parent"
              android:layout_height="wrap_content"
-             android:layout_marginLeft="6dp"
-             android:text="@string/drill_planning_seconds"
-             android:textColor="@color/secondary_text"
-             android:textSize="13sp"/>
+             android:layout_marginTop="@dimen/space_s"
+             android:orientation="horizontal"
+             android:paddingLeft="0dp"
+             android:paddingRight="0dp"
+             android:paddingTop="2dp"
+             android:paddingBottom="0dp"/>
         </LinearLayout>
 
-        <Switch
-           android:id="@+id/swDrillPlanning"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_marginLeft="12dp"/>
-      </LinearLayout>
-    </LinearLayout>
-
-    <!-- The last layer colour setting, pickable here: every drill deals onto it, a cross drill
-         building its cross on the opposite face. Last, as the choice changed least often. -->
-    <LinearLayout
-       android:id="@+id/llDrillLayerColour"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:layout_marginTop="18dp"
-       android:background="@drawable/choice_card"
-       android:gravity="center_vertical"
-       android:orientation="horizontal"
-       android:paddingLeft="12dp"
-       android:paddingRight="12dp"
-       android:paddingTop="10dp"
-       android:paddingBottom="10dp">
-
-      <LinearLayout
-         android:layout_width="0dp"
-         android:layout_height="wrap_content"
-         android:layout_marginRight="12dp"
-         android:layout_weight="1"
-         android:orientation="vertical">
-
-        <TextView
+        <!-- F2L and cross: no set to pick, so a picture of the practice in its place. -->
+        <LinearLayout
+           android:id="@+id/llDrillPicture"
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
-           android:text="@string/last_layer_colour"
-           android:textColor="@color/white"
-           android:textSize="15sp"/>
+           android:layout_marginTop="14dp"
+           android:gravity="center_vertical"
+           android:orientation="horizontal"
+           android:paddingLeft="@dimen/space_xs"
+           android:visibility="gone">
 
-        <!-- Says the pick is the app-wide setting, not this screen's own. -->
-        <TextView
+          <com.cube.nanotimer.gui.widget.DrillFacePicture
+             android:id="@+id/vDrillPicture"
+             android:layout_width="72dp"
+             android:layout_height="72dp"/>
+
+          <LinearLayout
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:layout_marginLeft="14dp"
+             android:layout_weight="1"
+             android:orientation="vertical">
+
+            <TextView
+               android:id="@+id/tvDrillPictureLabel"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:letterSpacing="0.14"
+               android:textAllCaps="true"
+               android:textSize="11sp"
+               android:textStyle="bold"/>
+
+            <TextView
+               android:id="@+id/tvDrillPictureTitle"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:textColor="@color/white"
+               android:textSize="22sp"
+               android:textStyle="bold"/>
+          </LinearLayout>
+        </LinearLayout>
+
+        <!-- Only for an F2L drill: basic pairs, advanced ones with a piece in another slot, or both. -->
+        <LinearLayout
+           android:id="@+id/llDrillF2lCases"
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
-           android:layout_marginTop="2dp"
-           android:text="@string/drill_layer_colour_shared"
+           android:layout_marginTop="12dp"
+           android:background="@drawable/view_segment_group"
+           android:orientation="horizontal"
+           android:padding="3dp"
+           android:visibility="gone"/>
+
+        <TextView
+           android:id="@+id/tvDrillPracticeHint"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="@dimen/space_s"
+           android:paddingLeft="@dimen/space_xs"
+           android:paddingRight="@dimen/space_xs"
            android:textColor="@color/secondary_text"
            android:textSize="13sp"/>
       </LinearLayout>
 
-      <include layout="@layout/preference_colour_chip"/>
+      <!-- The drill's settings. Each optional row carries its own divider above it. -->
+      <LinearLayout
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginLeft="@dimen/space_s"
+         android:layout_marginRight="@dimen/space_s"
+         android:layout_marginTop="@dimen/space_l"
+         android:orientation="vertical">
+
+        <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:gravity="center_vertical"
+           android:minHeight="54dp"
+           android:orientation="horizontal">
+
+          <ImageView
+             android:id="@+id/ivDrillRepsIcon"
+             android:layout_width="20dp"
+             android:layout_height="20dp"
+             android:importantForAccessibility="no"
+             android:src="@drawable/ic_drill_reps"/>
+
+          <TextView
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:layout_marginLeft="@dimen/space_m"
+             android:layout_weight="1"
+             android:text="@string/drill_reps"
+             android:textColor="@color/white"
+             android:textSize="15sp"/>
+
+          <LinearLayout
+             android:id="@+id/llDrillReps"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:background="@drawable/view_segment_group"
+             android:orientation="horizontal"
+             android:padding="2dp"/>
+        </LinearLayout>
+
+        <!-- Whether the reps are kept, as a plain switch: the choice is only ever on or off. -->
+        <LinearLayout
+           android:id="@+id/llDrillRecord"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="vertical">
+
+          <View
+             android:layout_width="match_parent"
+             android:layout_height="1dp"
+             android:background="@color/listview_divider"/>
+
+          <LinearLayout
+             android:id="@+id/llDrillRecordRow"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:background="?attr/selectableItemBackground"
+             android:gravity="center_vertical"
+             android:minHeight="54dp"
+             android:orientation="horizontal">
+
+            <ImageView
+               android:id="@+id/ivDrillRecordIcon"
+               android:layout_width="20dp"
+               android:layout_height="20dp"
+               android:importantForAccessibility="no"
+               android:src="@drawable/ic_drill_record"/>
+
+            <TextView
+               android:layout_width="0dp"
+               android:layout_height="wrap_content"
+               android:layout_marginLeft="@dimen/space_m"
+               android:layout_weight="1"
+               android:text="@string/drill_record"
+               android:textColor="@color/white"
+               android:textSize="15sp"/>
+
+            <Switch
+               android:id="@+id/swDrillRecord"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginLeft="@dimen/space_m"/>
+          </LinearLayout>
+        </LinearLayout>
+
+        <!-- Only for a cross drill: how long there is to plan it, limit and seconds on one row. -->
+        <LinearLayout
+           android:id="@+id/llDrillCrossOptions"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="vertical"
+           android:visibility="gone">
+
+          <View
+             android:layout_width="match_parent"
+             android:layout_height="1dp"
+             android:background="@color/listview_divider"/>
+
+          <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:gravity="center_vertical"
+             android:minHeight="54dp"
+             android:orientation="horizontal">
+
+            <ImageView
+               android:id="@+id/ivDrillPlanningIcon"
+               android:layout_width="20dp"
+               android:layout_height="20dp"
+               android:importantForAccessibility="no"
+               android:src="@drawable/ic_drill_planning"/>
+
+            <TextView
+               android:layout_width="0dp"
+               android:layout_height="wrap_content"
+               android:layout_marginLeft="@dimen/space_m"
+               android:layout_weight="1"
+               android:text="@string/drill_planning_limit"
+               android:textColor="@color/white"
+               android:textSize="15sp"/>
+
+            <LinearLayout
+               android:id="@+id/llDrillPlanningSeconds"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginLeft="@dimen/space_s"
+               android:gravity="center_vertical"
+               android:orientation="horizontal"
+               android:visibility="gone">
+
+              <!-- Picked from the app's presets-and-stepper dialog: typing two digits into a chip
+                   this size is the one thing a phone makes hard. -->
+              <TextView
+                 android:id="@+id/tvDrillPlanningSeconds"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:background="@drawable/row_chip_accent"
+                 android:clickable="true"
+                 android:focusable="true"
+                 android:gravity="center"
+                 android:minWidth="44dp"
+                 android:paddingLeft="10dp"
+                 android:paddingRight="10dp"
+                 android:paddingTop="4dp"
+                 android:paddingBottom="4dp"
+                 android:textColor="@color/lightblue"
+                 android:textSize="15sp"/>
+
+              <TextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_marginLeft="6dp"
+                 android:text="@string/drill_planning_seconds"
+                 android:textColor="@color/secondary_text"
+                 android:textSize="13sp"/>
+            </LinearLayout>
+
+            <Switch
+               android:id="@+id/swDrillPlanning"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginLeft="@dimen/space_m"/>
+          </LinearLayout>
+        </LinearLayout>
+
+        <!-- The last layer colour setting, pickable here: every drill deals onto it, a cross drill
+             building its cross on the opposite face. -->
+        <View
+           android:layout_width="match_parent"
+           android:layout_height="1dp"
+           android:background="@color/listview_divider"/>
+
+        <LinearLayout
+           android:id="@+id/llDrillLayerColour"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:background="?attr/selectableItemBackground"
+           android:gravity="center_vertical"
+           android:minHeight="58dp"
+           android:orientation="horizontal"
+           android:paddingTop="@dimen/space_s"
+           android:paddingBottom="@dimen/space_s">
+
+          <ImageView
+             android:id="@+id/ivDrillLayerIcon"
+             android:layout_width="20dp"
+             android:layout_height="20dp"
+             android:importantForAccessibility="no"
+             android:src="@drawable/ic_drill_layer"/>
+
+          <LinearLayout
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:layout_marginLeft="@dimen/space_m"
+             android:layout_marginRight="@dimen/space_m"
+             android:layout_weight="1"
+             android:orientation="vertical">
+
+            <TextView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text="@string/last_layer_colour"
+               android:textColor="@color/white"
+               android:textSize="15sp"/>
+
+            <!-- Says the pick is the app-wide setting, not this screen's own. -->
+            <TextView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_marginTop="2dp"
+               android:text="@string/drill_layer_colour_shared"
+               android:textColor="@color/secondary_text"
+               android:textSize="12sp"/>
+          </LinearLayout>
+
+          <include layout="@layout/preference_colour_chip"/>
+        </LinearLayout>
+      </LinearLayout>
     </LinearLayout>
+  </ScrollView>
 
-    <!-- The accent, not the tonal button: it is the one thing on the screen you came to press, and
-         beside a screen full of filled blue segments a tonal one reads as disabled. -->
-    <Button
-       android:id="@+id/btDrillStart"
-       style="@style/HeroStartButton"
-       android:layout_marginTop="16dp"
-       android:text="@string/drill_start"/>
+  <!-- Start, or while no cube is connected the button that connects one, so the main control is
+       never a dead slab. -->
+  <Button
+     android:id="@+id/btDrillStart"
+     style="@style/HeroStartButton"
+     android:layout_width="match_parent"
+     android:layout_marginLeft="@dimen/space_m"
+     android:layout_marginRight="@dimen/space_m"
+     android:layout_marginTop="@dimen/space_s"
+     android:layout_marginBottom="@dimen/space_l"
+     android:text="@string/drill_start"
+     tools:ignore="ButtonStyle"/>
 
-    <TextView
-       android:id="@+id/tvDrillNoCube"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:layout_marginTop="10dp"
-       android:gravity="center"
-       android:text="@string/drill_needs_cube"
-       android:textColor="@color/secondary_text"
-       android:textSize="13sp"
-       android:visibility="gone"/>
-
-  </LinearLayout>
-</ScrollView>
+</LinearLayout>

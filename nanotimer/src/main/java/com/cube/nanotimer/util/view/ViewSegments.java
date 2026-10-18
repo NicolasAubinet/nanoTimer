@@ -1,6 +1,7 @@
 package com.cube.nanotimer.util.view;
 
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
@@ -16,6 +17,28 @@ import com.cube.nanotimer.util.helper.GUIUtils;
 public class ViewSegments {
 
   private ViewSegments() {
+  }
+
+  /**
+   * The same, with the chosen option filled in {@code accent} and inked dark on it, for a control
+   * that carries a step's colour. An accent of 0 is the plain style.
+   */
+  public static void style(TextView segment, boolean chosen, int accent) {
+    if (accent == 0) {
+      style(segment, chosen);
+      return;
+    }
+    if (chosen) {
+      GradientDrawable fill = new GradientDrawable();
+      fill.setColor(accent);
+      fill.setCornerRadius(14 * segment.getResources().getDisplayMetrics().density);
+      segment.setBackground(fill);
+    } else {
+      segment.setBackground(null);
+    }
+    segment.setTextColor(ContextCompat.getColor(segment.getContext(),
+        chosen ? R.color.gray900 : R.color.secondary_text));
+    GUIUtils.setWeight(segment, chosen ? Typeface.BOLD : Typeface.NORMAL);
   }
 
   public static void style(TextView segment, boolean chosen) {

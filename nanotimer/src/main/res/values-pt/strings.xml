@@ -1003,7 +1003,6 @@
 
   <!-- Escolha do treino -->
   <string name="drill_setup_title">Novo treino</string>
-  <string name="drill_practice">Praticar</string>
   <string name="drill_practice_pll">PLL</string>
   <string name="drill_practice_oll">OLL</string>
   <string name="drill_practice_cross">Cruz</string>
@@ -1013,7 +1012,6 @@
   <string name="drill_practice_f2l">F2L</string>
   <string name="drill_practice_hint_f2l">Um par F2L a seguir ao outro, os casos comuns mais vezes.</string>
   <string name="drill_layer_colour_shared">Também usada nas misturas de Última camada, PLL e F2L</string>
-  <string name="drill_cases">Casos</string>
   <string name="drill_cases_choose">Escolher</string>
   <string name="drill_cases_count">%1$d de %2$d escolhidos</string>
   <string name="drill_cases_title_oll">Casos OLL</string>
@@ -1023,7 +1021,6 @@
   <string name="drill_cases_empty">Escolha pelo menos um caso para praticar.</string>
   <string name="drill_cases_hint">Mantenha premido um caso para ver os algoritmos.</string>
   <string name="drill_cases_all_count">Os %d casos</string>
-  <string name="drill_cases_drilling">A treinar</string>
   <string name="drill_cases_count_preset">%1$d de %2$d · %3$s</string>
   <plurals name="drill_preset_and_count">
     <item quantity="one">%1$s · %2$d caso</item>
@@ -1075,11 +1072,14 @@
   <string name="drill_help_title">Sobre este treino</string>
   <string name="drill_help_body">O que um treino fixa antes de dar o primeiro caso.</string>
   <string name="drill_help_record">Ativado, cada repetição é guardada: o tempo e se pediu para ver o algoritmo. Essas repetições alimentam as Estatísticas de treino e «Algoritmos que você conhece» em Análise. Desative para treinar sem os alterar.</string>
-  <string name="drill_planning">Planeamento</string>
   <string name="drill_planning_limit">Limite de planeamento</string>
   <string name="drill_planning_seconds">segundos</string>
   <string name="drill_planning_hint">Desligado por omissão: aprender a cruz completa leva mais do que os 15 segundos oficiais.</string>
   <string name="drill_start">Começar treino</string>
+  <string name="drill_connect_cube">Ligue o seu cubo</string>
+  <string name="drill_cases_family">Casos %1$s</string>
+  <string name="drill_title_f2l">Pares</string>
+  <string name="drill_title_cross">Cruz mais curta</string>
 
   <!-- Treino de cruz -->
   <string name="drill_cross_title">Treino de cruz</string>
