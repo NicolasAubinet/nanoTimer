@@ -20,6 +20,22 @@ import org.junit.Test;
  */
 public class LastLayerScramblesTest {
 
+  /** A turn of the whole cube about U before an algorithm is dropped; anywhere else it stays. */
+  @Test
+  public void dropsTheTurnOfTheCubeAnAlgorithmStartsWith() {
+    assertEquals("L' U' L U L F' L' F",
+        LastLayerScrambles.withoutLeadingY("y2 L' U' L U L F' L' F"));
+    assertEquals("F' r U r'", LastLayerScrambles.withoutLeadingY("y' F' r U r'"));
+    assertEquals("(R U R')", LastLayerScrambles.withoutLeadingY("(y R U R')"));
+    assertEquals("R U y R'", LastLayerScrambles.withoutLeadingY("R U y R'"));
+    assertEquals("x R U", LastLayerScrambles.withoutLeadingY("x R U"));
+  }
+
+  @Test
+  public void dealsNothingForMovesThatAreNotAnAlgorithm() {
+    assertNull(LastLayerScrambles.forAlgorithm("R U Q"));
+  }
+
   /** The last layer is up, so the cross is on D. */
   private static final int CROSS = Cubies.D;
 

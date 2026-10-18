@@ -41,6 +41,47 @@ public final class LastLayerScrambles {
     return forCase(caseCode, random.nextInt(4), random.nextInt(4));
   }
 
+  /**
+   * A scramble leaving the case an algorithm solves at that algorithm's own angle, with no turn of
+   * the layer either side: the solver runs it at once. Null if the moves cannot be read.
+   */
+  public static String forAlgorithm(String algorithm) {
+    if (algorithm == null) {
+      return null;
+    }
+    try {
+      return undoing(algorithm.replace("(", "").replace(")", ""), 0, 0);
+    } catch (RuntimeException e) {
+      return null; // a token that is not a turn
+    }
+  }
+
+  /**
+   * The algorithm with the turns of the whole cube about U it starts with dropped, as it is run on a
+   * case dealt at its own angle. A bracket opened on a dropped turn moves to the next one.
+   */
+  public static String withoutLeadingY(String algorithm) {
+    String[] tokens = algorithm.trim().split("\\s+");
+    int start = 0;
+    String carried = "";
+    while (start < tokens.length - 1) {
+      String bare = tokens[start].replace("(", "");
+      if (!bare.matches("y2?'?")) {
+        break;
+      }
+      carried += tokens[start].substring(0, tokens[start].length() - bare.length());
+      start++;
+    }
+    StringBuilder rest = new StringBuilder(carried);
+    for (int i = start; i < tokens.length; i++) {
+      if (i > start) {
+        rest.append(' ');
+      }
+      rest.append(tokens[i]);
+    }
+    return rest.toString();
+  }
+
   /** The scramble with its two alignment turns chosen rather than drawn. */
   static String forCase(String caseCode, int beforeQuarters, int afterQuarters) {
     String algorithm = algorithmFor(caseCode);

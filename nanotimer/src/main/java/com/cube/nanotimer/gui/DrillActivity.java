@@ -46,6 +46,7 @@ import com.cube.nanotimer.smartcube.step.CaseAlgorithms;
 import com.cube.nanotimer.smartcube.step.LastLayerCaseAlgorithms;
 import com.cube.nanotimer.smartcube.step.LastLayerCaseNames;
 import com.cube.nanotimer.smartcube.step.LastLayerDiagram;
+import com.cube.nanotimer.smartcube.step.LastLayerScrambles;
 import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.drill.DrillSpec;
 import com.cube.nanotimer.gui.widget.DrillCasePips;
@@ -251,6 +252,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
               String starred = Options.INSTANCE.getCaseAlgorithm(choosing);
               if (starred != null) {
                 tryingAlgorithm = starred;
+                session.setPracticeAlgorithm(fromTheFront(starred));
               }
               buildChooseRows();
             }
@@ -711,10 +713,18 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     setTitle(getString(R.string.drill_choose_title, getString(choosing.startsWith("oll_")
         ? R.string.case_title_oll : R.string.case_title_pll,
         LastLayerCaseNames.shortName(choosing))));
-    session.startPractice(choosing);
+    session.startPractice(choosing, fromTheFront(tryingAlgorithm));
     setChoosing(true);
     buildChooseRows();
     drawCase();
+  }
+
+  /**
+   * An algorithm as tried while choosing: the case is dealt at its own angle, so a turn of the cube
+   * it starts with is dropped rather than asked for. What gets starred is the algorithm as listed.
+   */
+  private static String fromTheFront(String algorithm) {
+    return algorithm == null ? null : LastLayerScrambles.withoutLeadingY(algorithm);
   }
 
   /** Stars the algorithm being tried, which the drill then teaches, and moves on. */
@@ -792,7 +802,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     View row = LayoutInflater.from(this).inflate(R.layout.drill_choose_row, chooseList, false);
     ((RadioButton) row.findViewById(R.id.rbChooseRow)).setChecked(algorithm.equals(tryingAlgorithm));
     TextView moves = row.findViewById(R.id.tvChooseRowAlg);
-    moves.setText(algorithm);
+    moves.setText(fromTheFront(algorithm));
     if (algorithmFace == null) {
       algorithmFace = Typeface.createFromAsset(getAssets(), "fonts/JetBrainsMono-Medium.ttf");
     }
@@ -807,6 +817,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
           return;
         }
         tryingAlgorithm = algorithm;
+        session.setPracticeAlgorithm(fromTheFront(algorithm));
         buildChooseRows();
         restartPractice(); // dealt afresh, so the new one is tried from the start
       }
@@ -855,7 +866,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     if (code == null) {
       return;
     }
-    followAlgorithm(code, code.equals(choosing) ? tryingAlgorithm
+    followAlgorithm(code, code.equals(choosing) ? fromTheFront(tryingAlgorithm)
         : Options.INSTANCE.getCaseAlgorithm(code));
   }
 

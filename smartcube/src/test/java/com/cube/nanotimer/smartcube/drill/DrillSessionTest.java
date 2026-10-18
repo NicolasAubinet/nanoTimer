@@ -667,6 +667,28 @@ public class DrillSessionTest {
     assertEquals(0, session.getTally().getGuided("pll_h"));
   }
 
+  /**
+   * Choosing an algorithm, the case is dealt at that algorithm's own angle, never at a random turn
+   * of the layer, so it is run at once: whatever the draw, and on a yellow layer too.
+   */
+  @Test
+  public void practisingAnAlgorithmDealsTheCaseAtItsAngle() {
+    DrillSpec spec = DrillSpec.learning("coach-learn", DrillSpec.Type.CASE_EXECUTION,
+        Arrays.asList("oll_33"), DrillSpec.Selection.ROUND_ROBIN, 40, 3,
+        Collections.<String, String>emptyMap(), null);
+    for (String algorithm : new String[] {"R U R' U' R' F R F'", "L' U' L U L F' L' F"}) {
+      for (String layer : new String[] {"U", "D"}) {
+        for (int seed = 0; seed < 8; seed++) {
+          DrillSession session = new DrillSession(spec, new Random(seed), null, layer);
+          Hand hand = new Hand(session);
+          hand.practise("oll_33", algorithm);
+          assertNotNull(algorithm + " on " + layer + ", seed " + seed,
+              hand.execute(LayerRotation.toFace(algorithm, layer)));
+        }
+      }
+    }
+  }
+
   private static DrillSpec learning() {
     return DrillSpec.learning("coach-learn", DrillSpec.Type.CASE_EXECUTION,
         Arrays.asList("pll_h", "pll_z"), DrillSpec.Selection.ROUND_ROBIN, 40, 3,
@@ -974,7 +996,12 @@ public class DrillSessionTest {
 
     /** Practise one case, which is up at once. */
     void practise(String code) {
-      session.startPractice(code);
+      practise(code, null);
+    }
+
+    /** Practise one case with an algorithm being tried for it, dealt at that algorithm's angle. */
+    void practise(String code, String algorithm) {
+      session.startPractice(code, algorithm);
       shownAtMs = clock;
       session.markCaseShown(shownAtMs);
     }

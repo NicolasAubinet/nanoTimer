@@ -92,6 +92,8 @@ public final class DrillSession {
   private boolean guided;
   /** The case being practised, dealt over and over outside the drill's reps. */
   private String practiceCase;
+  /** An algorithm being tried for it, which deals it at that algorithm's angle; null for any. */
+  private String practiceAlgorithm;
 
   public DrillSession(DrillSpec spec, Random random) {
     this(spec, random, null, "U");
@@ -170,17 +172,35 @@ public final class DrillSession {
    * answer about it.
    */
   public void startPractice(String code) {
+    startPractice(code, null);
+  }
+
+  /**
+   * Practises one case with an algorithm being tried for it, dealt at that algorithm's own angle so
+   * it is run at once, with no turn of the layer or of the cube to find first.
+   *
+   * @param algorithm written with the layer on U, any leading turn of the cube already dropped; null
+   *     deals the case at any angle
+   */
+  public void startPractice(String code, String algorithm) {
     if (currentCase != null && moves.isEmpty() && practiceCase == null
         && spec.getSelection() != DrillSpec.Selection.WEIGHTED) {
       pass.add(currentCase); // the end of the pass is what is dealt next
     }
     practiceCase = code;
+    practiceAlgorithm = algorithm;
     deal(code);
+  }
+
+  /** The algorithm the practised case is dealt for from its next deal on; null for any angle. */
+  public void setPracticeAlgorithm(String algorithm) {
+    practiceAlgorithm = algorithm;
   }
 
   /** Back to the drill, whose next case the caller deals with {@link #nextRep}. */
   public void endPractice() {
     practiceCase = null;
+    practiceAlgorithm = null;
     currentCase = null;
     caseShownAtMs = NOT_SHOWN;
   }
@@ -201,8 +221,10 @@ public final class DrillSession {
       pairCorner = LayerRotation.piece("DFR", spins, layerFace);
       pairEdge = LayerRotation.piece("FR", spins, layerFace);
     } else {
-      currentScramble = LayerRotation.toFace(
-          LastLayerScrambles.forCase(currentCase, random), layerFace);
+      String atItsAngle = practiceCase != null
+          ? LastLayerScrambles.forAlgorithm(practiceAlgorithm) : null;
+      currentScramble = LayerRotation.toFace(atItsAngle != null ? atItsAngle
+          : LastLayerScrambles.forCase(currentCase, random), layerFace);
     }
     cube = new CubieCube();
     FaceTurns.apply(cube, currentScramble);
