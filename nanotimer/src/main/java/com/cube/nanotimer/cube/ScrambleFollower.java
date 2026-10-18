@@ -200,6 +200,12 @@ public class ScrambleFollower {
     return apply(tracked.toFaceCube(), move);
   }
 
+  /** Turns the cube made but never reported, applied on top of those it did. */
+  public boolean onMissed(CubieCube missed) {
+    tracked.fromFacelet(tracked.multiply(missed).toFaceCube());
+    return apply(tracked.toFaceCube(), null);
+  }
+
   /** Reconcile against an absolute state; only re-anchors when the move stream desynced. */
   public boolean onState(CubeState state) {
     String facelets = state.getFacelets();

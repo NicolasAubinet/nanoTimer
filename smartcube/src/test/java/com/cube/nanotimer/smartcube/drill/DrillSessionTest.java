@@ -209,6 +209,11 @@ public class DrillSessionTest {
         }
         DrillSession.Correction correction = session.onState(state(hands));
         assertEquals("only the missed turn is a repair", i == dropped, correction.isRepaired());
+        if (i == dropped) { // handed on, so whatever follows the turns can take it too
+          CubieCube turn = new CubieCube();
+          turn.applyMove(move.getFace(), move.isPrime());
+          assertEquals(turn, correction.getMissed());
+        }
         rep = rep == null ? correction.getRep() : rep;
       }
       assertNotNull("turn " + dropped + " went missing and the rep never ended", rep);
@@ -1002,9 +1007,11 @@ public class DrillSessionTest {
 
     assertNotNull(rep);
     assertEquals(AlgorithmTimes.Verdict.COUNTED,
-        AlgorithmTimes.judge(rep, OLL_37_LISTED_Y, false));
+        AlgorithmTimes.judge(rep, OLL_37_LISTED_Y, null));
     assertEquals("another algorithm's turns are not this one's time",
-        AlgorithmTimes.Verdict.WRONG_MOVES, AlgorithmTimes.judge(rep, OLL_37, false));
+        AlgorithmTimes.Verdict.WRONG_MOVES, AlgorithmTimes.judge(rep, OLL_37, null));
+    assertEquals("a follower that kept up, dropped turns and all, outranks the recorded turns",
+        AlgorithmTimes.Verdict.COUNTED, AlgorithmTimes.judge(rep, OLL_37, false));
   }
 
   @Test

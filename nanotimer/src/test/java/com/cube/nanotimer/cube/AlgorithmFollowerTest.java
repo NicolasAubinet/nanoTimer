@@ -230,6 +230,33 @@ public class AlgorithmFollowerTest {
     assertEquals("R'", solver.follower.getUndoMoves());
   }
 
+  /** A turn the cube dropped, recovered from its next state, is followed like a reported one. */
+  @Test
+  public void aTurnTheCubeDroppedIsFollowedOnceRecovered() {
+    AlgorithmFollower follower = new AlgorithmFollower(SUNE, "U", finishes(SUNE));
+    turn(follower, "R U");
+    CubieCube dropped = new CubieCube();
+    dropped.applyMove(Face.R, true);
+    follower.onMissed(dropped);
+    turn(follower, "U R U U R'");
+    assertEquals("", follower.getUndoMoves());
+    assertFalse(follower.hasStrayed());
+    assertEquals(7, follower.getDoneCount()); // all of it
+  }
+
+  /** Two dropped at once cannot be told apart as turns, and are placed by the state they leave. */
+  @Test
+  public void twoDroppedTurnsArePlacedByTheirState() {
+    AlgorithmFollower follower = new AlgorithmFollower(SUNE, "U", finishes(SUNE));
+    turn(follower, "R");
+    CubieCube dropped = new CubieCube();
+    dropped.applyMove(Face.U, false);
+    dropped.applyMove(Face.R, true);
+    follower.onMissed(dropped);
+    assertEquals("", follower.getUndoMoves());
+    assertEquals(3, follower.getDoneCount());
+  }
+
   /** A solver turning tokens from the algorithm's frame, with the cube reporting outer turns. */
   private static final class Solver {
 

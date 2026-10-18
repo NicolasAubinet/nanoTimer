@@ -448,6 +448,10 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       return;
     }
     cube.setState(CubePatternFormat.format(session.getFacelets()));
+    if (algorithmFollower != null && isAlgorithmUp()) {
+      algorithmFollower.onMissed(correction.getMissed()); // or it reads the next turns as slips
+      showAlgorithmProgress();
+    }
     if (correction.getRep() != null) {
       onRepFinished(correction.getRep());
     }
@@ -759,7 +763,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       return null;
     }
     AlgorithmTimes.Verdict verdict = AlgorithmTimes.judge(rep, tryingAlgorithm,
-        algorithmFollower != null && algorithmFollower.hasStrayed());
+        algorithmFollower != null ? algorithmFollower.hasStrayed() : null);
     if (verdict == AlgorithmTimes.Verdict.COUNTED) {
       AlgorithmTimes times = loadTimes(choosing);
       times.add(tryingAlgorithm, rep.getExecutionMs());

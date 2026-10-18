@@ -37,18 +37,20 @@ public final class AlgorithmTimes {
   }
 
   /**
-   * @param strayed whether the turns left the algorithm at some point, which a slip undone at once
-   *     or a wrong angle put right no longer show in the turns as a whole
+   * @param strayed whether a follower of the algorithm saw the turns leave it, even once put right;
+   *     null with no follower, when the rep's turns are compared with the algorithm instead. A
+   *     follower is trusted over them, as it also takes the turns a state showed the cube dropped
    */
-  public static Verdict judge(DrillRep rep, String algorithm, boolean strayed) {
+  public static Verdict judge(DrillRep rep, String algorithm, Boolean strayed) {
     if (rep.isAbandoned() || rep.wasRevealed()) {
       return Verdict.NONE;
     }
     if (rep.getResetCount() > 0) {
       return Verdict.RESET;
     }
-    return !strayed && CaseAlgorithms.sameTurning(rep.getCaseCode(), rep.getTurned(), algorithm)
-        ? Verdict.COUNTED : Verdict.WRONG_MOVES;
+    boolean kept = strayed != null ? !strayed
+        : CaseAlgorithms.sameTurning(rep.getCaseCode(), rep.getTurned(), algorithm);
+    return kept ? Verdict.COUNTED : Verdict.WRONG_MOVES;
   }
 
   /** Read back from {@link #toString}; anything unreadable is dropped rather than failing. */

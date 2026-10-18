@@ -1,7 +1,9 @@
 package com.cube.nanotimer.cube;
 
 import com.cube.nanotimer.smartcube.drill.LayerRotation;
+import com.cube.nanotimer.smartcube.cube.CubieCube;
 import com.cube.nanotimer.smartcube.model.CubeMove;
+import com.cube.nanotimer.smartcube.model.Face;
 import com.cube.nanotimer.smartcube.step.AlgorithmForm;
 
 import java.util.ArrayList;
@@ -127,6 +129,29 @@ public class AlgorithmFollower {
       if (wasWrong && !followers.get(i).isWrong()) {
         followingSince.set(i, turnsSeen); // back on it, perhaps only by landing on its states
       }
+    }
+    strayed |= isOffTrack();
+  }
+
+  /**
+   * Turns the cube made but never reported, found from a state it sent later. Fast turning drops
+   * them; unfollowed, every turn after one reads as a slip. A single turn goes in as that turn.
+   */
+  public void onMissed(CubieCube missed) {
+    for (Face face : Face.values()) {
+      CubieCube quarter = new CubieCube();
+      for (int quarters = 1; quarters <= 3; quarters++) {
+        quarter.applyMove(face, false);
+        if (quarter.equals(missed)) {
+          for (int i = 0; i < (quarters == 2 ? 2 : 1); i++) {
+            onMove(new CubeMove(face, quarters == 3, 0)); // a half turn as two quarters
+          }
+          return;
+        }
+      }
+    }
+    for (ScrambleFollower follower : followers) {
+      follower.onMissed(missed); // more than one: placed by state alone
     }
     strayed |= isOffTrack();
   }

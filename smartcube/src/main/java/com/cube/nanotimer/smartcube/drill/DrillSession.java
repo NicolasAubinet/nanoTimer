@@ -390,7 +390,7 @@ public final class DrillSession {
       return Correction.NONE;
     }
     cube = cube.multiply(missed);
-    return new Correction(true, isCaseDone() ? complete(false) : null);
+    return new Correction(true, isCaseDone() ? complete(false) : null, missed);
   }
 
   /**
@@ -399,14 +399,21 @@ public final class DrillSession {
    */
   public static final class Correction {
 
-    private static final Correction NONE = new Correction(false, null);
+    private static final Correction NONE = new Correction(false, null, null);
 
     private final boolean repaired;
     private final DrillRep rep;
+    private final CubieCube missed;
 
-    private Correction(boolean repaired, DrillRep rep) {
+    private Correction(boolean repaired, DrillRep rep, CubieCube missed) {
       this.repaired = repaired;
       this.rep = rep;
+      this.missed = missed;
+    }
+
+    /** The turns the cube missed, as a state to apply on top of the turns it did report. */
+    public CubieCube getMissed() {
+      return missed;
     }
 
     /** Whether the case has moved under the drawing, and so has to be drawn again. */
