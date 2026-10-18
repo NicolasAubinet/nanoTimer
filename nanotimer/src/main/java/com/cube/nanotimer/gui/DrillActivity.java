@@ -420,10 +420,19 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     // No wash for a rep that was skipped: nothing was solved to dwell on. The hold stays, since
     // what the user could not place is the one thing worth reading off a skipped rep, and the line
     // goes with the case.
-    if (!rep.isAbandoned()) {
+    if (isOverTarget(rep)) {
+      DrillRepFlourish.playQuietly(repWash, lastRepRow); // green would contradict the red verdict
+    } else if (!rep.isAbandoned()) {
       DrillRepFlourish.play(repWash, lastRepRow);
     }
     holdThenNext();
+  }
+
+  /** A counted coach-drill rep that missed its case's target. */
+  private boolean isOverTarget(DrillRep rep) {
+    DrillSpec spec = session.getSpec();
+    return spec.retiresCases() && !spec.isLearning() && !rep.isPractice() && !rep.isAbandoned()
+        && CaseTally.isClean(rep) && !session.getTally().isWin(rep);
   }
 
   private void holdThenNext() {
