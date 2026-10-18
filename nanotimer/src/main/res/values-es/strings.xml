@@ -936,9 +936,14 @@
   <string name="drill_show_alg">Ver alg</string>
   <string name="drill_choose_title">Algoritmo para %1$s</string>
   <string name="drill_choose_use">Usar este</string>
-  <string name="drill_choose_suggested">Sugerido</string>
   <string name="drill_choose_yours">El tuyo</string>
   <string name="drill_choose_more">Más algoritmos…</string>
+  <plurals name="drill_choose_last">
+    <item quantity="one">el último</item>
+    <item quantity="other">últimos %d</item>
+  </plurals>
+  <string name="drill_choose_not_counted_moves">no cuenta: movimientos erróneos</string>
+  <string name="drill_choose_not_counted_reset">no cuenta: reiniciado</string>
   <string name="drill_practice_other">No es el elegido</string>
   <string name="drill_cases_cleared">%1$d de %2$d casos superados</string>
   <string name="drill_summary_cases_cleared">casos superados</string>

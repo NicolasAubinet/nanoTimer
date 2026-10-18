@@ -28,11 +28,36 @@
      android:textColor="@color/white"
      android:textSize="14sp"/>
 
-  <TextView
-     android:id="@+id/tvChooseRowTag"
+  <!-- The tag over the algorithm's execution average and how many reps it is of. -->
+  <LinearLayout
      android:layout_width="wrap_content"
      android:layout_height="wrap_content"
      android:layout_marginLeft="8dp"
-     android:textColor="@color/lightblue"
-     android:textSize="12sp"/>
+     android:gravity="right"
+     android:orientation="vertical">
+
+    <TextView
+       android:id="@+id/tvChooseRowTag"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:textColor="@color/lightblue"
+       android:textSize="12sp"/>
+
+    <TextView
+       android:id="@+id/tvChooseRowAverage"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:fontFeatureSettings="tnum"
+       android:textColor="@color/white"
+       android:textSize="15sp"
+       android:visibility="gone"/>
+
+    <TextView
+       android:id="@+id/tvChooseRowCount"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:textColor="@color/secondary_text"
+       android:textSize="11sp"
+       android:visibility="gone"/>
+  </LinearLayout>
 </LinearLayout>

@@ -965,9 +965,14 @@
   <string name="drill_show_alg">Show alg</string>
   <string name="drill_choose_title">Algorithm for %1$s</string>
   <string name="drill_choose_use">Use this one</string>
-  <string name="drill_choose_suggested">Suggested</string>
   <string name="drill_choose_yours">Yours</string>
   <string name="drill_choose_more">More algorithms…</string>
+  <plurals name="drill_choose_last">
+    <item quantity="one">last %d</item>
+    <item quantity="other">last %d</item>
+  </plurals>
+  <string name="drill_choose_not_counted_moves">not counted: wrong moves</string>
+  <string name="drill_choose_not_counted_reset">not counted: reset</string>
   <string name="drill_practice_other">Not the chosen one</string>
   <string name="drill_cases_cleared">%1$d of %2$d cases cleared</string>
   <string name="drill_summary_cases_cleared">cases cleared</string>

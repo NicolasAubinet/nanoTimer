@@ -103,6 +103,7 @@ public enum Options {
   private static final String CELEBRATED_GROUPS_KEY = "celebrated_groups";
   public static final String DRILL_PRESETS_KEY_PREFIX = "drill_case_presets_";
   public static final String CASE_OWN_ALGORITHM_KEY_PREFIX = "case_own_alg_";
+  public static final String CASE_ALGORITHM_TIMES_KEY_PREFIX = "case_alg_times_";
   public static final String CASE_MUTED_ALGORITHMS_KEY_PREFIX = "case_muted_algs_";
 
   private static final int MAX_STEPS_COUNT = 8;
@@ -553,6 +554,15 @@ public enum Options {
     } else {
       sharedPreferences.edit().putString(key, algorithm).apply();
     }
+  }
+
+  /** Each algorithm's last execution times for a case, as {@code AlgorithmTimes} writes them. */
+  public String getCaseAlgorithmTimes(String caseCode) {
+    return sharedPreferences.getString(CASE_ALGORITHM_TIMES_KEY_PREFIX + caseCode, null);
+  }
+
+  public void setCaseAlgorithmTimes(String caseCode, String times) {
+    sharedPreferences.edit().putString(CASE_ALGORITHM_TIMES_KEY_PREFIX + caseCode, times).apply();
   }
 
   /**

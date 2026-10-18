@@ -152,6 +152,35 @@ public class AlgorithmFollowerTest {
     assertEquals("U' R'", follower.getUndoMoves());
   }
 
+  /** A slip put right leaves nothing to undo, but the rep still strayed from the algorithm. */
+  @Test
+  public void aSlipPutRightIsStillRemembered() {
+    AlgorithmFollower follower = new AlgorithmFollower(SUNE, "U", finishes(SUNE));
+    turn(follower, "R U");
+    assertFalse(follower.hasStrayed());
+    turn(follower, "D D'");
+    assertEquals("", follower.getUndoMoves());
+    assertTrue(follower.hasStrayed());
+    follower.reset();
+    assertFalse(follower.hasStrayed());
+  }
+
+  @Test
+  public void aWrongAnglePutRightIsStillRemembered() {
+    AlgorithmFollower follower = new AlgorithmFollower(SUNE, "U", finishes(SUNE));
+    turn(follower, "F U U' F'");
+    assertFalse(follower.isWrongAngle());
+    assertTrue(follower.hasStrayed());
+  }
+
+  /** Squaring the layer up first and then the algorithm is no stray. */
+  @Test
+  public void theAlgorithmAfterALayerTurnNeverStrays() {
+    AlgorithmFollower follower = new AlgorithmFollower(SUNE, "U", finishes("U' " + SUNE));
+    turn(follower, "U' R U R' U R U U R'"); // the cube reports U2 as two quarters
+    assertFalse(follower.hasStrayed());
+  }
+
   /** Whether a path finishes the case the given moves solve, allowing a last turn of U. */
   private static Predicate<List<String>> finishes(String solution) {
     CubieCube dealt = new CubieCube();

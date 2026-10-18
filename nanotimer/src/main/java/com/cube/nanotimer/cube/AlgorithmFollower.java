@@ -39,6 +39,8 @@ public class AlgorithmFollower {
   /** Per follower: the quarter turns about the layer it is held at, which name its turns. */
   private final List<Integer> heldAt = new ArrayList<>();
   private final String face;
+  /** Whether the turns left the algorithm at any point since it started. */
+  private boolean strayed;
 
   /** For an algorithm turned with the layer on U, from any angle. */
   public AlgorithmFollower(String algorithm) {
@@ -99,12 +101,32 @@ public class AlgorithmFollower {
     for (ScrambleFollower follower : followers) {
       follower.onMove(move);
     }
+    strayed |= isOffTrack();
   }
 
   public void reset() {
     for (ScrambleFollower follower : followers) {
       follower.reset();
     }
+    strayed = false;
+  }
+
+  /** Whether {@link #getUndoMoves} had anything to undo at any point, even once put right. */
+  public boolean hasStrayed() {
+    return strayed;
+  }
+
+  private boolean isOffTrack() {
+    boolean any = false;
+    for (int i = 0; i < followers.size(); i++) {
+      if (rightAngle.get(i)) {
+        if (!followers.get(i).isWrong()) {
+          return false;
+        }
+        any = true;
+      }
+    }
+    return any;
   }
 
   /** How many of the algorithm's tokens are done, a rotation counting with the move before it. */

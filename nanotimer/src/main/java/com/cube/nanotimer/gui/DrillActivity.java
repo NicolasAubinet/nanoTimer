@@ -37,6 +37,7 @@ import com.cube.nanotimer.cube.SmartCubeManager;
 import com.cube.nanotimer.cube.SolveTypeMethod;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.session.MethodStatistics;
+import com.cube.nanotimer.smartcube.drill.AlgorithmTimes;
 import com.cube.nanotimer.smartcube.drill.CaseTally;
 import com.cube.nanotimer.smartcube.drill.DrillRep;
 import com.cube.nanotimer.smartcube.drill.DrillSession;
@@ -164,9 +165,9 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
    */
   private final List<String> toChoose = new ArrayList<String>();
   private int chooseIndex;
-  /** The case being chosen for, the algorithm it suggested, and the one being tried; null outside. */
+  /** The case being chosen for, the algorithm it starts on, and the one being tried; null outside. */
   private String choosing;
-  private String suggestedAlgorithm;
+  private String firstAlgorithm;
   private String tryingAlgorithm;
   private LinearLayout chooseList;
   /** Greys the practised algorithm's moves as they are turned; null where there is none to follow. */
@@ -485,11 +486,12 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   private void onRepFinished(DrillRep rep) {
     recorder.record(rep);
     noteLearned(rep);
+    AlgorithmTimes.Verdict timed = noteChooseTime(rep);
     showAlg.setVisibility(View.GONE); // no case is up during the beat; the next one brings it back
     if (session.getSpec().retiresCases() && !rep.isPractice()) {
       refreshCaseProgress(); // during the beat, so the dot fills beside the rep that earned it
     }
-    showLastRep(rep);
+    showLastRep(rep, timed);
     offerPractice(rep);
     // No wash for a rep that was skipped: nothing was solved to dwell on. The hold stays, since
     // what the user could not place is the one thing worth reading off a skipped rep, and the line
@@ -708,8 +710,11 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       return;
     }
     choosing = toChoose.get(chooseIndex);
-    suggestedAlgorithm = learningAlgorithm(choosing);
-    tryingAlgorithm = suggestedAlgorithm;
+    // Starts on the one the case popup recommends, unless the drill names its own
+    String recommended = recommendedAlgorithm(choosing);
+    firstAlgorithm = recommended != null && session.getSpec().getCaseAlgorithm(choosing) == null
+        ? recommended : learningAlgorithm(choosing);
+    tryingAlgorithm = firstAlgorithm;
     setTitle(getString(R.string.drill_choose_title, getString(choosing.startsWith("oll_")
         ? R.string.case_title_oll : R.string.case_title_pll,
         LastLayerCaseNames.shortName(choosing))));
@@ -738,9 +743,39 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     chooseNext();
   }
 
+  /** The listed algorithm the case popup marks as recommended, or null where the vote is close. */
+  private static String recommendedAlgorithm(String code) {
+    for (LastLayerCaseAlgorithms.Algorithm listed : LastLayerCaseAlgorithms.listed(code)) {
+      if (listed.isRecommended()) {
+        return listed.getMoves();
+      }
+    }
+    return null;
+  }
+
+  /** Keeps a choose-step rep's execution time against the algorithm tried, if it counts. */
+  private AlgorithmTimes.Verdict noteChooseTime(DrillRep rep) {
+    if (choosing == null || !rep.isPractice() || tryingAlgorithm == null) {
+      return null;
+    }
+    AlgorithmTimes.Verdict verdict = AlgorithmTimes.judge(rep, tryingAlgorithm,
+        algorithmFollower != null && algorithmFollower.hasStrayed());
+    if (verdict == AlgorithmTimes.Verdict.COUNTED) {
+      AlgorithmTimes times = loadTimes(choosing);
+      times.add(tryingAlgorithm, rep.getExecutionMs());
+      Options.INSTANCE.setCaseAlgorithmTimes(choosing, times.toString());
+      buildChooseRows();
+    }
+    return verdict;
+  }
+
+  private static AlgorithmTimes loadTimes(String code) {
+    return AlgorithmTimes.parse(code, Options.INSTANCE.getCaseAlgorithmTimes(code));
+  }
+
   private void endChoosing() {
     choosing = null;
-    suggestedAlgorithm = null;
+    firstAlgorithm = null;
     tryingAlgorithm = null;
     setTitle(label);
     session.endPractice();
@@ -758,20 +793,24 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   }
 
   /**
-   * The suggested algorithm first, then the case's listed ones, then the user's own, and a way into
+   * The algorithm it starts on, then the case's listed ones, then the user's own, and a way into
    * the full popup for anything else, where a star or a typed algorithm comes back as the one tried.
    */
   private void buildChooseRows() {
     chooseList.removeAllViews();
     List<String> shown = new ArrayList<String>();
-    addChooseRow(shown, suggestedAlgorithm, getString(R.string.drill_choose_suggested));
+    addIfNew(shown, firstAlgorithm);
     for (LastLayerCaseAlgorithms.Algorithm listed : LastLayerCaseAlgorithms.listed(choosing)) {
-      addChooseRow(shown, listed.getMoves(), null);
+      addIfNew(shown, listed.getMoves());
     }
-    addChooseRow(shown, Options.INSTANCE.getOwnCaseAlgorithm(choosing),
-        getString(R.string.drill_choose_yours));
-    addChooseRow(shown, Options.INSTANCE.getCaseAlgorithm(choosing), null);
-    addChooseRow(shown, tryingAlgorithm, null);
+    addIfNew(shown, Options.INSTANCE.getOwnCaseAlgorithm(choosing));
+    addIfNew(shown, Options.INSTANCE.getCaseAlgorithm(choosing));
+    addIfNew(shown, tryingAlgorithm);
+    AlgorithmTimes times = loadTimes(choosing);
+    String fastest = times.fastest(shown);
+    for (String algorithm : shown) {
+      addChooseRow(algorithm, times, fastest);
+    }
 
     View moreRow = LayoutInflater.from(this).inflate(R.layout.drill_choose_row, chooseList, false);
     moreRow.findViewById(R.id.rbChooseRow).setVisibility(View.INVISIBLE);
@@ -788,8 +827,8 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     chooseList.addView(moreRow);
   }
 
-  /** One algorithm to try, unless it is one already listed or none at all. */
-  private void addChooseRow(List<String> shown, final String algorithm, String tag) {
+  /** Adds an algorithm to try, unless it is one already listed or none at all. */
+  private void addIfNew(List<String> shown, String algorithm) {
     if (algorithm == null) {
       return;
     }
@@ -799,6 +838,24 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       }
     }
     shown.add(algorithm);
+  }
+
+  /** The marks the case popup gives the same algorithm, joined. */
+  private String chooseTag(String algorithm) {
+    List<String> marks = new ArrayList<String>();
+    if (CaseAlgorithms.sameTurning(choosing, algorithm,
+        Options.INSTANCE.getOwnCaseAlgorithm(choosing))) {
+      marks.add(getString(R.string.drill_choose_yours));
+    }
+    if (CaseAlgorithms.sameTurning(choosing, algorithm, recommendedAlgorithm(choosing))) {
+      marks.add(getString(R.string.case_algorithm_recommended));
+    }
+    return marks.isEmpty() ? null : TextUtils.join(" · ", marks);
+  }
+
+  /** One algorithm to try, with its execution average once a rep of it has counted. */
+  private void addChooseRow(final String algorithm, AlgorithmTimes times, String fastest) {
+    String tag = chooseTag(algorithm);
     View row = LayoutInflater.from(this).inflate(R.layout.drill_choose_row, chooseList, false);
     ((RadioButton) row.findViewById(R.id.rbChooseRow)).setChecked(algorithm.equals(tryingAlgorithm));
     TextView moves = row.findViewById(R.id.tvChooseRowAlg);
@@ -810,6 +867,19 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     TextView tagView = row.findViewById(R.id.tvChooseRowTag);
     tagView.setText(tag);
     tagView.setVisibility(tag == null ? View.GONE : View.VISIBLE);
+    int reps = times.get(algorithm).size();
+    if (reps > 0) {
+      TextView average = row.findViewById(R.id.tvChooseRowAverage);
+      average.setText(FormatterService.INSTANCE.formatSolveTime(times.mean(algorithm)));
+      // Grey until a full average, green for the fastest of those
+      average.setTextColor(ContextCompat.getColor(this, reps < AlgorithmTimes.KEPT
+          ? R.color.secondary_text : algorithm.equals(fastest) ? R.color.green_soft
+          : R.color.white));
+      average.setVisibility(View.VISIBLE);
+      TextView count = row.findViewById(R.id.tvChooseRowCount);
+      count.setText(getResources().getQuantityString(R.plurals.drill_choose_last, reps, reps));
+      count.setVisibility(View.VISIBLE);
+    }
     row.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -1046,7 +1116,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
    * The rep that has just ended, named and timed together. Naming it is only safe here: the case is
    * over, so it can say what was done, or for a skipped one what it was the user could not place.
    */
-  private void showLastRep(DrillRep rep) {
+  private void showLastRep(DrillRep rep, AlgorithmTimes.Verdict timed) {
     String name = Utils.toSmartCubeCaseHeadline(this, rep.getCaseCode());
     int colour = familyColour(rep.getCaseCode());
     boolean retiring = session.getSpec().retiresCases();
@@ -1061,6 +1131,10 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       repSplit.setVisibility(View.INVISIBLE); // keeps its room, so the cube does not move
       return;
     }
+    if (timed != null) {
+      showChooseRep(rep, name, colour, timed);
+      return;
+    }
     setLastRep(name, colour, FormatterService.INSTANCE.formatSolveTime(rep.getTotalMs()), false,
         splitWords(rep));
     repSplit.setSplit(rep.getRecognitionMs(), rep.getExecutionMs(),
@@ -1070,6 +1144,18 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       showPracticeVerdict(rep);
     } else if (retiring) {
       showVerdict(rep);
+    }
+  }
+
+  /** A choose-step rep: its execution alone, which is what the algorithms are compared on. */
+  private void showChooseRep(DrillRep rep, String name, int colour, AlgorithmTimes.Verdict timed) {
+    setLastRep(name, colour, FormatterService.INSTANCE.formatSolveTime(rep.getExecutionMs()), false,
+        getString(R.string.drill_summary_column_execution));
+    repSplit.setVisibility(View.INVISIBLE);
+    if (timed == AlgorithmTimes.Verdict.WRONG_MOVES) {
+      setVerdict(getString(R.string.drill_choose_not_counted_moves), R.color.secondary_text);
+    } else if (timed == AlgorithmTimes.Verdict.RESET) {
+      setVerdict(getString(R.string.drill_choose_not_counted_reset), R.color.secondary_text);
     }
   }
 

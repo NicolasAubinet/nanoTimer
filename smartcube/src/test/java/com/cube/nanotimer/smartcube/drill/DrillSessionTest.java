@@ -974,6 +974,52 @@ public class DrillSessionTest {
     assertEquals(notation(asReported("M2 U M2 U2 M2 U M2")), rep.getTurned());
   }
 
+  /** OLL 37's algorithm, and another of its algorithms as listed, led by a turn of the cube. */
+  private static final String OLL_37 = "F R' F' R U R U' R'";
+  private static final String OLL_37_LISTED_Y = "y F' r U r' U' r' F r";
+
+  @Test
+  public void anAlgorithmTurnedAloneCountsItsExecutionTime() {
+    DrillSession session = new DrillSession(spec("oll_37", 1), new Random(3));
+    Hand hand = new Hand(session);
+    hand.practise("oll_37", OLL_37);
+    DrillRep rep = hand.execute(OLL_37);
+
+    assertNotNull(rep);
+    assertEquals(AlgorithmTimes.Verdict.COUNTED, AlgorithmTimes.judge(rep, OLL_37, false));
+    assertEquals("a slip the follower saw, even put right, is not the algorithm's time",
+        AlgorithmTimes.Verdict.WRONG_MOVES, AlgorithmTimes.judge(rep, OLL_37, true));
+  }
+
+  /** Dealt from the front, judged against the spelling the list has, leading y and all. */
+  @Test
+  public void aListedSpellingWithItsTurnOfTheCubeStillCounts() {
+    String fromTheFront = "F' r U r' U' r' F r";
+    DrillSession session = new DrillSession(spec("oll_37", 1), new Random(3));
+    Hand hand = new Hand(session);
+    hand.practise("oll_37", fromTheFront);
+    DrillRep rep = hand.execute(fromTheFront);
+
+    assertNotNull(rep);
+    assertEquals(AlgorithmTimes.Verdict.COUNTED,
+        AlgorithmTimes.judge(rep, OLL_37_LISTED_Y, false));
+    assertEquals("another algorithm's turns are not this one's time",
+        AlgorithmTimes.Verdict.WRONG_MOVES, AlgorithmTimes.judge(rep, OLL_37, false));
+  }
+
+  @Test
+  public void aResetRepIsNotTheAlgorithmsTime() {
+    DrillSession session = new DrillSession(spec("oll_37", 1), new Random(3));
+    Hand hand = new Hand(session);
+    hand.practise("oll_37", OLL_37);
+    assertNull(hand.execute("F R'"));
+    hand.reset();
+    DrillRep rep = hand.execute(OLL_37);
+
+    assertNotNull(rep);
+    assertEquals(AlgorithmTimes.Verdict.RESET, AlgorithmTimes.judge(rep, OLL_37, false));
+  }
+
   private static final class Hand {
 
     private final DrillSession session;
