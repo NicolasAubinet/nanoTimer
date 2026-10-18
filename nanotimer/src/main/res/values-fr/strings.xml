@@ -1009,7 +1009,7 @@
   <string name="drill_practice_hint_oll">Les OLL l\'une après l\'autre, parmi les cas que vous choisissez.</string>
   <string name="drill_practice_hint_cross">Un mélange complet, et la croix la plus courte que vous y trouvez.</string>
   <string name="drill_practice_f2l">F2L</string>
-  <string name="drill_practice_hint_f2l">Les paires F2L l\'une après l\'autre, aussi souvent qu\'elles apparaissent en résolution.</string>
+  <string name="drill_practice_hint_f2l">Les paires F2L l\'une après l\'autre, les cas fréquents plus souvent.</string>
   <string name="drill_layer_colour_shared">Utilisée aussi pour les mélanges Last Layer, PLL et F2L</string>
   <string name="drill_cases">Cas</string>
   <string name="drill_cases_choose">Choisir</string>

@@ -1051,7 +1051,7 @@
   <string name="drill_practice_hint_oll">One OLL after another, from the cases you pick.</string>
   <string name="drill_practice_hint_cross">A whole scramble, and the shortest cross you can find in it.</string>
   <string name="drill_practice_f2l">F2L</string>
-  <string name="drill_practice_hint_f2l">One F2L pair after another, dealt as often as they come up in a solve.</string>
+  <string name="drill_practice_hint_f2l">One F2L pair after another, the common cases more often.</string>
   <string name="drill_layer_colour_shared">Also used for Last layer, PLL and F2L scrambles</string>
   <string name="drill_cases">Cases</string>
   <string name="drill_cases_choose">Choose</string>
