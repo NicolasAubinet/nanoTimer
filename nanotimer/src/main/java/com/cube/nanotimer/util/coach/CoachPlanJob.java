@@ -9,6 +9,7 @@ import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
@@ -216,7 +217,8 @@ final class CoachPlanJob {
         .putExtra(AnalysisActivity.EXTRA_TAB, AnalysisActivity.TAB_PLAN)
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     manager.notify(id, new NotificationCompat.Builder(context, channel)
-        .setSmallIcon(R.drawable.menu_coach)
+        .setSmallIcon(R.drawable.ic_stat_coach)
+        .setColor(ContextCompat.getColor(context, R.color.cube_blue))
         .setContentTitle(title)
         .setContentText(text)
         .setContentIntent(PendingIntent.getActivity(context, 0, open,
