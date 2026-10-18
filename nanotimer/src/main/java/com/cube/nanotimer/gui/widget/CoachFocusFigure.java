@@ -299,11 +299,12 @@ final class CoachFocusFigure {
       return new CoachFocusFigure(moves(stalls), null,
           context.getString(R.string.coach_fig_freezes, step(family)),
           context.getString(R.string.coach_fig_frozen_of, time(stopped), time(mean)), null,
+          // Waiting first and faded, turning second and full, as every other split draws it.
           Collections.<Bar>emptyList(), new Bar[] {
-              new Bar(context.getString(R.string.coach_split_turning, time(turning)), turning,
-                  time(turning), false),
               new Bar(context.getString(R.string.coach_split_stopped, time(stopped)), stopped,
-                  time(stopped), true)}, false);
+                  time(stopped), false),
+              new Bar(context.getString(R.string.coach_split_turning, time(turning)), turning,
+                  time(turning), true)}, false);
     }
 
     CoachFocusFigure uneven(String family) {

@@ -57,6 +57,7 @@ import com.cube.nanotimer.util.coach.CoachPractice;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.util.view.CenteredImageSpan;
+import com.cube.nanotimer.util.view.StepPalette;
 
 /**
  * A plan drawn as cards, whoever wrote it.
@@ -79,8 +80,6 @@ public class CoachPlanView {
   private static final FocusArea.Reason[] PREVIEW_REASONS = {FocusArea.Reason.SLOW_CASE,
       FocusArea.Reason.RECOGNITION_HEAVY};
   private static final String[] PREVIEW_FAMILIES = {"pll", "oll"};
-  /** The second side of a comparison, and the first part of a split: the step's colour, washed. */
-  private static final int WASH_ALPHA = 0x57;
   private static final int SCALE = 1000;
 
   private final Activity activity;
@@ -581,8 +580,9 @@ public class CoachPlanView {
     ((LinearLayout.LayoutParams) view.getLayoutParams()).weight = weight;
   }
 
+  /** The second side of a comparison, and the first part of a split, as every split bar fades it. */
   private static int wash(int colour) {
-    return ColorUtils.setAlphaComponent(colour, WASH_ALPHA);
+    return StepPalette.wash(colour);
   }
 
   private static void tint(View view, int colour) {
