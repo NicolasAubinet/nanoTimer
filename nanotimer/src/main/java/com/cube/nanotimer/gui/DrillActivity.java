@@ -259,7 +259,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       loadPairWeights(spec, solveType);
     } else {
       begin(spec, spec.getType() == DrillSpec.Type.F2L_PAIR
-          ? PairWeights.of(spec.getCases(), null) : null);
+          ? PairWeights.of(spec, null) : null);
     }
   }
 
@@ -273,7 +273,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
               @Override
               public void run() {
                 if (!isFinishing()) {
-                  begin(spec, PairWeights.of(spec.getCases(), statistics));
+                  begin(spec, PairWeights.of(spec, statistics));
                 }
               }
             });
