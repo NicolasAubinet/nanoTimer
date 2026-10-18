@@ -589,7 +589,7 @@ public class DrillSessionTest {
     assertEquals(0, session.getTally().getShowings("pll_h"));
   }
 
-  /** Each case is guided twice, then retires on three reps turned without the algorithm. */
+  /** Each case is guided three times, then retires on three reps turned without the algorithm. */
   @Test
   public void aLearningDrillGuidesEachCaseThenRetiresItWithoutLooking() {
     DrillSpec spec = learning();
@@ -610,7 +610,7 @@ public class DrillSessionTest {
     assertEquals(DrillSession.GUIDED_REPS, guided.get("pll_z").intValue());
     assertEquals("no time to beat, so every clean rep wins", 3,
         session.getTally().getWins("pll_h"));
-    assertEquals(10, session.getReps().size());
+    assertEquals(12, session.getReps().size());
     assertTrue(session.isFinished());
   }
 
@@ -632,8 +632,8 @@ public class DrillSessionTest {
       hand.execute(inverse(session.getCurrentScramble()));
       reps++;
     }
-    assertEquals("two guided and three unaided each, plus the lost run of two and its look-up",
-        13, reps);
+    assertEquals("three guided and three unaided each, plus the lost run of two and its look-up",
+        15, reps);
     assertTrue(session.isRetired("pll_h"));
   }
 

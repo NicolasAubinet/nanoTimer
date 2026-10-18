@@ -43,7 +43,7 @@ public final class DrillSession {
   private static final long NOT_SHOWN = -1;
 
   /** Clean reps a learning drill turns with the algorithm on screen before it fades. */
-  public static final int GUIDED_REPS = 2;
+  public static final int GUIDED_REPS = 3;
 
   /** Where the faces sit in a facelet string, which is the order {@link CubieCube} writes one in. */
   private static final String FACELET_ORDER = "URFDLB";
