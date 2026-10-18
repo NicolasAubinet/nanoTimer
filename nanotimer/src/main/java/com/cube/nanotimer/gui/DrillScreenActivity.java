@@ -96,9 +96,9 @@ public abstract class DrillScreenActivity extends NanoTimerActivity
    */
   private static final double VIEW_LONGITUDE = 30;
 
-  /** The rep line at headline size, and stood down for a rep with no time to show. */
-  private static final float REP_VALUE_SP = 24;
-  private static final float REP_VALUE_QUIET_SP = 17;
+  /** A rep with no time to show is stood down from the layout's headline size, to at most this. */
+  private static final float REP_VALUE_QUIET_RATIO = 0.7f;
+  private static final float REP_VALUE_QUIET_MAX_SP = 22;
 
   protected VirtualCube cube;
 
@@ -264,10 +264,15 @@ public abstract class DrillScreenActivity extends NanoTimerActivity
     // No squaring: it snapped real peeks and regrips away, and the gyro drifts little enough now.
     // How it stands when it is let go of, which each drill answers for itself.
     cube.setHold(restingRotation());
-    // The well here is most of the screen, and at the page's own distance the cube filled about a
-    // third of it. The same value the scramble dialog measured for its own box.
-    cube.setCameraDistance(CUBE_CAMERA_DISTANCE);
-    cube.setNudge(CUBE_NUDGE);
+    if (standsOnMat()) {
+      // The timer's own camera, which is what the page's pool of shadow is drawn for.
+      cube.setFloor(true);
+    } else {
+      // The well here is most of the screen, and at the page's own distance the cube filled about
+      // a third of it. The same value the scramble dialog measured for its own box.
+      cube.setCameraDistance(CUBE_CAMERA_DISTANCE);
+      cube.setNudge(CUBE_NUDGE);
+    }
     // A drill can be the first thing a session does, and the cube on screen only follows the
     // physical one once there is a grip to measure from. Fills an empty one; never re-takes.
     SmartCubeManager.INSTANCE.anchorGyroIfUnset();
@@ -276,6 +281,14 @@ public abstract class DrillScreenActivity extends NanoTimerActivity
     // is followed is still drawn square on; the page holds this until that grip goes.
     cube.setView(VIEW_LATITUDE, VIEW_LONGITUDE);
     return true;
+  }
+
+  /**
+   * Whether the cube stands on the screen's bare ground in a pool of shadow, as the timer's does,
+   * rather than in a lit well of its own.
+   */
+  protected boolean standsOnMat() {
+    return false;
   }
 
   /**
@@ -390,6 +403,9 @@ public abstract class DrillScreenActivity extends NanoTimerActivity
     }
   }
 
+  /** The layout's size for the rep's figure, read once before anything changes it. */
+  private float repValuePx = -1;
+
   /** What the line about the rep before the one being worked is worth: readable, not current. */
   private static final float PAST_REP_ALPHA = 0.45f;
   private static final long PAST_REP_FADE_MS = 200;
@@ -419,7 +435,12 @@ public abstract class DrillScreenActivity extends NanoTimerActivity
     }
     TextView tvValue = findViewById(R.id.tvDrillLastRep);
     tvValue.setText(value);
-    tvValue.setTextSize(TypedValue.COMPLEX_UNIT_SP, quiet ? REP_VALUE_QUIET_SP : REP_VALUE_SP);
+    if (repValuePx < 0) {
+      repValuePx = tvValue.getTextSize(); // each screen sets its headline size in its layout
+    }
+    float quietPx = Math.min(repValuePx * REP_VALUE_QUIET_RATIO, TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_SP, REP_VALUE_QUIET_MAX_SP, getResources().getDisplayMetrics()));
+    tvValue.setTextSize(TypedValue.COMPLEX_UNIT_PX, quiet ? quietPx : repValuePx);
     tvValue.setTextColor(ContextCompat.getColor(this, valueColorRes));
     TextView tvSub = findViewById(R.id.tvDrillLastRepSplit);
     tvSub.setText(sub);

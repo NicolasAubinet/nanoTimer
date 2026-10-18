@@ -13,16 +13,25 @@
      android:layout_width="match_parent"
      android:layout_height="match_parent"
      android:orientation="vertical"
-     android:padding="12dp">
+     android:paddingLeft="12dp"
+     android:paddingRight="12dp"
+     android:paddingBottom="12dp">
 
-    <!-- The cube sits in a well rather than on the background: 3D on a flat surface needs
-         something under it or it reads as floating. -->
+    <!-- The cube stands on the bare mat, in the pool of shadow the timer's cube stands in, rather
+         than in a well of its own: the screen's ground is the app's ground. -->
     <FrameLayout
        android:layout_width="match_parent"
        android:layout_height="0dp"
-       android:layout_weight="1"
-       android:layout_marginTop="10dp"
-       android:background="@drawable/cube_stage">
+       android:layout_weight="1">
+
+      <!-- The beat a solved case gets: light round the cube, under it so the cube stays readable.
+           Not clickable, and gone between reps. -->
+      <View
+         android:id="@+id/drillRepWash"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:background="@drawable/drill_rep_glow"
+         android:visibility="gone"/>
 
       <!-- ⚠️ INVISIBLE until the page has drawn, never GONE: a GONE WebView is not laid out, so
            the player would build into a 0x0 viewport and stay that size once shown. -->
@@ -40,15 +49,6 @@
          android:layout_height="wrap_content"
          android:layout_gravity="center"/>
 
-      <!-- The beat a solved case gets. Not clickable, and gone between reps so it can never sit
-           over a case the user is trying to read. -->
-      <View
-         android:id="@+id/drillRepWash"
-         android:layout_width="match_parent"
-         android:layout_height="match_parent"
-         android:background="@drawable/drill_rep_wash"
-         android:visibility="gone"/>
-
       <TextView
          android:id="@+id/tvDrillFallback"
          android:layout_width="match_parent"
@@ -63,26 +63,26 @@
       <include layout="@layout/drill_gyro_chip"/>
     </FrameLayout>
 
-    <!-- Practice mode only: the algorithm being practised, or how to pick one. -->
+    <!-- Practice mode, or a learning drill's guided reps: the algorithm, in the scramble's face. -->
     <TextView
        android:id="@+id/tvDrillPracticeAlg"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_marginTop="10dp"
+       android:layout_marginTop="4dp"
+       android:layout_marginBottom="6dp"
        android:gravity="center"
+       android:lineSpacingMultiplier="1.1"
        android:textColor="@color/white"
-       android:textSize="18sp"
+       android:textSize="20sp"
        android:visibility="gone"/>
 
-    <!-- ⚠️ The rep just FINISHED: its case, then its time, then how the time was spent. All three
-         belong to the case that is over, never to the one on screen, which is deliberately not
-         named anywhere: naming it would hand the user the answer, and a recognition drill would be
-         timing reading. The name sits with the time rather than under the cube, where at headline
-         size it read as a caption for the cube and so as the name of the case being looked at.
+    <!-- ⚠️ The rep just FINISHED: its case, its time, and where the time went. All of it belongs to
+         the case that is over, never to the one on screen, which is deliberately not named anywhere:
+         naming it would hand the user the answer, and a recognition drill would be timing reading.
 
-         Three pieces rather than one sentence, so the time is the thing the eye lands on. A
-         minimum height rather than a fixed one: the row must not change height as reps come and
-         go, or the cube above it jumps, but at a large system font it has to be allowed to grow.
+         The time is the screen's headline, as the timer's is. A minimum height holding all three
+         lines, so the cube above does not jump as reps come and go; at a large system font it may
+         still grow.
 
          This is also the only clock a drill shows. A running one would have to start somewhere,
          and a rep starts when its case is drawn, not when a frame is painted. -->
@@ -90,64 +90,18 @@
        android:id="@+id/llDrillLastRep"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_marginTop="12dp"
-       android:minHeight="46dp"
+       android:minHeight="104dp"
        android:gravity="center"
        android:orientation="vertical">
 
-      <LinearLayout
+      <TextView
+         android:id="@+id/tvDrillLastRepName"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:gravity="center"
-         android:orientation="horizontal">
+         android:letterSpacing="0.06"
+         android:fontFamily="@font/roboto_medium"
+         android:textSize="13sp"/>
 
-        <TextView
-           android:id="@+id/tvDrillLastRepName"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_marginRight="8dp"
-           android:letterSpacing="0.02"
-           android:fontFamily="@font/roboto_medium"
-           android:textSize="13sp"/>
-
-        <TextView
-           android:id="@+id/tvDrillLastRep"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:textColor="@color/white"
-           android:fontFamily="@font/roboto_medium"
-           android:textSize="24sp"
-           android:fontFeatureSettings="tnum"/>
-
-        <!-- A coach drill's verdict on the rep, against its case's target. Gone on every other. -->
-        <TextView
-           android:id="@+id/tvDrillLastRepVerdict"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_marginLeft="8dp"
-           android:background="@drawable/tinted_pill"
-           android:paddingLeft="10dp"
-           android:paddingRight="10dp"
-           android:paddingTop="3dp"
-           android:paddingBottom="3dp"
-           android:singleLine="true"
-           android:fontFamily="@font/roboto_medium"
-           android:textSize="12sp"
-           android:fontFeatureSettings="tnum"
-           android:visibility="gone"/>
-
-        <TextView
-           android:id="@+id/tvDrillLastRepSplit"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_marginLeft="8dp"
-           android:textColor="@color/secondary_text"
-           android:textSize="12sp"
-           android:fontFeatureSettings="tnum"/>
-      </LinearLayout>
-
-      <!-- The split, for a coach drill whose verdict took its place on the line above. Such a drill
-           holds its room from the first rep, so the cube does not jump when it first fills. -->
       <LinearLayout
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
@@ -155,15 +109,51 @@
          android:orientation="horizontal">
 
         <TextView
-           android:id="@+id/tvDrillLastRepBelow"
+           android:id="@+id/tvDrillLastRep"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           android:textColor="@color/secondary_text"
-           android:textSize="12sp"
+           android:includeFontPadding="false"
+           android:textColor="@color/white"
+           android:fontFamily="@font/roboto_bold"
+           android:textSize="50sp"
+           android:fontFeatureSettings="tnum"/>
+
+        <!-- A coach drill's verdict on the rep, against its case's target. Gone on every other. -->
+        <TextView
+           android:id="@+id/tvDrillLastRepVerdict"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="10dp"
+           android:background="@drawable/smart_cube_pill"
+           android:paddingLeft="10dp"
+           android:paddingRight="10dp"
+           android:paddingTop="4dp"
+           android:paddingBottom="4dp"
+           android:singleLine="true"
+           android:fontFamily="@font/roboto_medium"
+           android:textColor="@color/on_accent"
+           android:textSize="13sp"
            android:fontFeatureSettings="tnum"
            android:visibility="gone"/>
       </LinearLayout>
 
+      <!-- Where the time went, drawn and then said: the looking as a wash of the family's colour,
+           the turning at full strength, the same two inks as the case stats. -->
+      <com.cube.nanotimer.util.view.DrillSplitBarView
+         android:id="@+id/vDrillRepSplit"
+         android:layout_width="220dp"
+         android:layout_height="6dp"
+         android:layout_marginTop="6dp"
+         android:visibility="gone"/>
+
+      <TextView
+         android:id="@+id/tvDrillLastRepSplit"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="4dp"
+         android:textColor="@color/secondary_text"
+         android:textSize="13sp"
+         android:fontFeatureSettings="tnum"/>
     </LinearLayout>
 
     <!-- A coach drill's offer to practise the case just turned off its list, on its own line so it
@@ -189,103 +179,108 @@
        android:text="@string/drill_practice_offer"
        android:visibility="gone"/>
 
-    <!-- Where the drill has got to, and the mode it cannot leave. On their own line above the
-         controls: a third button left the rep counter no width at all, and which rep this is is
-         not the thing to drop. -->
+    <!-- The drill so far, on the app's own card: where it has got, the mode it cannot leave, and
+         the figures the summary will open on. -->
     <LinearLayout
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_marginTop="14dp"
-       android:gravity="center_vertical"
-       android:orientation="horizontal">
+       android:layout_marginTop="10dp"
+       android:background="@drawable/analysis_card"
+       android:orientation="vertical"
+       android:paddingLeft="12dp"
+       android:paddingRight="12dp"
+       android:paddingTop="10dp"
+       android:paddingBottom="13dp">
 
-      <!-- A coach drill's progress, a group of dots per case, in place of the rep count. -->
+      <LinearLayout
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:gravity="center_vertical"
+         android:orientation="horizontal">
+
+        <TextView
+           android:id="@+id/tvDrillProgress"
+           android:layout_width="0dp"
+           android:layout_height="wrap_content"
+           android:layout_weight="1"
+           android:singleLine="true"
+           android:ellipsize="end"
+           android:textColor="@color/secondary_text"
+           android:textSize="13sp"
+           android:fontFeatureSettings="tnum"/>
+
+        <!-- The mode picked before the drill started, shown because it cannot be changed now. -->
+        <TextView
+           android:id="@+id/tvDrillMode"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:background="@drawable/smart_cube_pill"
+           android:backgroundTint="@color/white_wash_10"
+           android:paddingLeft="10dp"
+           android:paddingRight="10dp"
+           android:paddingTop="3dp"
+           android:paddingBottom="3dp"
+           android:textColor="@color/secondary_text"
+           android:textSize="12sp"/>
+      </LinearLayout>
+
+      <!-- A coach drill's progress, a bar per case, in place of the rep count's meter. -->
       <com.cube.nanotimer.gui.widget.DrillCasePips
          android:id="@+id/vDrillCasePips"
-         android:layout_width="0dp"
+         android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:layout_weight="1"
+         android:layout_marginTop="10dp"
          android:visibility="gone"/>
 
-      <TextView
-         android:id="@+id/tvDrillProgress"
-         android:layout_width="0dp"
-         android:layout_height="wrap_content"
-         android:layout_weight="1"
-         android:singleLine="true"
-         android:ellipsize="end"
-         android:textColor="@color/secondary_text"
-         android:textSize="14sp"
-         android:fontFeatureSettings="tnum"/>
+      <!-- Not tappable, so it is not a control: a drill has a known end. -->
+      <ProgressBar
+         android:id="@+id/pbDrillProgress"
+         style="?android:attr/progressBarStyleHorizontal"
+         android:layout_width="match_parent"
+         android:layout_height="4dp"
+         android:layout_marginTop="10dp"
+         android:progressDrawable="@drawable/drill_progress"/>
 
-      <!-- The mode picked before the drill started, shown because it cannot be changed now. -->
-      <TextView
-         android:id="@+id/tvDrillMode"
-         android:layout_width="wrap_content"
+      <include
+         layout="@layout/drill_live_cells"
+         android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:background="@drawable/smart_cube_pill"
-         android:backgroundTint="@color/white_wash_10"
-         android:paddingLeft="10dp"
-         android:paddingRight="10dp"
-         android:paddingTop="3dp"
-         android:paddingBottom="3dp"
-         android:textColor="@color/secondary_text"
-         android:textSize="12sp"/>
+         android:layout_marginTop="12dp"/>
     </LinearLayout>
 
-    <!-- Not tappable, so it is not a control: a drill has a known end, and until now it said so in
-         words only. -->
-    <ProgressBar
-       android:id="@+id/pbDrillProgress"
-       style="?android:attr/progressBarStyleHorizontal"
-       android:layout_width="match_parent"
-       android:layout_height="3dp"
-       android:layout_marginTop="8dp"
-       android:progressDrawable="@drawable/drill_progress"/>
-
     <!-- None of the three is a start or stop control: the cube still reports both ends of a rep.
-         Autosized down to 12sp rather than left to wrap: a third of the row is 107dp, which every
-         translation fits today, and a future one shrinks by a point instead of breaking mid-word. -->
+         Quiet pills, so they do not outshout the cube; DrillControlLabels sizes the words. -->
     <LinearLayout
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_marginTop="8dp"
+       android:layout_marginTop="10dp"
        android:orientation="horizontal">
 
       <!-- The case's algorithms, for a case that has gone. The rep runs on: stopping its clock for
            this would teach looking it up, so the rep is marked instead. -->
       <Button
          android:id="@+id/btDrillAlgorithm"
-         style="@style/DialogActionButton"
+         style="@style/DrillGhostButton"
          android:layout_width="0dp"
          android:layout_weight="1"
-         app:autoSizeTextType="uniform"
-         app:autoSizeMinTextSize="12sp"
-         app:autoSizeMaxTextSize="15sp"
          android:text="@string/drill_case_algorithm"/>
 
       <!-- Deals the same case again for a slip, and costs no rep. -->
       <Button
          android:id="@+id/btDrillReset"
-         style="@style/DialogActionButton"
+         style="@style/DrillGhostButton"
          android:layout_width="0dp"
          android:layout_weight="1"
          android:layout_marginLeft="8dp"
-         app:autoSizeTextType="uniform"
-         app:autoSizeMinTextSize="12sp"
-         app:autoSizeMaxTextSize="15sp"
          android:text="@string/drill_reset"/>
 
       <!-- Skipping spends the rep rather than escaping it: a case you could not do is a result. -->
       <Button
          android:id="@+id/btDrillSkip"
-         style="@style/DialogActionButton"
+         style="@style/DrillGhostButton"
          android:layout_width="0dp"
          android:layout_weight="1"
          android:layout_marginLeft="8dp"
-         app:autoSizeTextType="uniform"
-         app:autoSizeMinTextSize="12sp"
-         app:autoSizeMaxTextSize="15sp"
          android:text="@string/drill_skip"/>
     </LinearLayout>
 

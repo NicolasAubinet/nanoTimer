@@ -946,8 +946,6 @@
   <string name="drill_skip">Skip</string>
   <string name="drill_done">Done</string>
   <string name="drill_finished">Drill finished</string>
-  <!-- Recognition then execution, under the total they add up to. -->
-  <string name="drill_rep_split" translatable="false">%1$s + %2$s</string>
   <string name="drill_rep_skipped">Skipped</string>
   <string name="drill_summary_nothing_timed">Nothing was timed</string>
   <string name="drill_summary_cell_reps">Reps</string>

@@ -2,8 +2,12 @@ package com.cube.nanotimer.gui;
 
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -40,6 +44,7 @@ import com.cube.nanotimer.vo.SolveType;
 import com.cube.nanotimer.drill.DrillSpec;
 import com.cube.nanotimer.gui.widget.DrillCasePips;
 import com.cube.nanotimer.gui.widget.DrillCaseTable;
+import com.cube.nanotimer.gui.widget.DrillLiveCells;
 import com.cube.nanotimer.gui.widget.DrillStatCells;
 import com.cube.nanotimer.gui.widget.dialog.CaseAlgorithmsDialog;
 import com.cube.nanotimer.smartcube.model.CubeMove;
@@ -58,6 +63,8 @@ import com.cube.nanotimer.util.view.DrillRepFlourish;
 import com.cube.nanotimer.util.view.LearningAlgorithmFade;
 import com.cube.nanotimer.util.view.PracticeOfferPulse;
 import com.cube.nanotimer.util.view.ScrambleFollowAnimator;
+import com.cube.nanotimer.util.view.DrillControlLabels;
+import com.cube.nanotimer.util.view.DrillSplitBarView;
 import com.cube.nanotimer.util.view.StepPalette;
 
 import java.util.ArrayList;
@@ -123,10 +130,12 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   /** The whole rep line, since the beat scales it and the hold is posted to it. */
   private View lastRepRow;
   private View repWash;
-  /** A coach drill's cases, its verdict on a rep, and the split that verdict pushed down a line. */
+  /** A coach drill's cases, its verdict on a rep, and where that rep's time went. */
   private DrillCasePips casePips;
   private TextView repVerdict;
-  private TextView repBelow;
+  private DrillSplitBarView repSplit;
+  /** The rep the line is about, which the case bars ring; null before one or after practice. */
+  private DrillRep lastRep;
   /** The offer to practise a case just turned off its list, and the case it is for. */
   private TextView practiceOffer;
   private String offeredCase;
@@ -134,6 +143,8 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   /** Greys the practised algorithm's moves as they are turned; null where there is none to follow. */
   private AlgorithmFollower algorithmFollower;
   private ScrambleFollowAnimator algorithmAnimator;
+  /** The scramble's own face: an algorithm being followed reads like a scramble being turned. */
+  private Typeface algorithmFace;
   private Button skip;
   /** For a coach learning drill: the cases the solves know, those cleared here, a group to fete. */
   private final Set<String> knownCases = new HashSet<String>();
@@ -157,7 +168,8 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     repWash = findViewById(R.id.drillRepWash);
     casePips = findViewById(R.id.vDrillCasePips);
     repVerdict = findViewById(R.id.tvDrillLastRepVerdict);
-    repBelow = findViewById(R.id.tvDrillLastRepBelow);
+    repSplit = findViewById(R.id.vDrillRepSplit);
+    casePips.setBars(true);
     practiceOffer = findViewById(R.id.tvDrillPracticeOffer);
     practiceAlgorithm = findViewById(R.id.tvDrillPracticeAlg);
     algorithmAnimator = new ScrambleFollowAnimator(practiceAlgorithm);
@@ -207,6 +219,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
         }
       }
     });
+    labelButtons(false);
     findViewById(R.id.btDrillAlgorithm).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -314,6 +327,21 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   @Override
   protected void onCaseVisible() {
     caseShown();
+  }
+
+  @Override
+  protected boolean standsOnMat() {
+    return true;
+  }
+
+  /** The three controls, each with its icon; practice turns Skip into the way back. */
+  private void labelButtons(boolean practising) {
+    DrillControlLabels.apply(
+        new Button[] {findViewById(R.id.btDrillAlgorithm), findViewById(R.id.btDrillReset), skip},
+        new int[] {R.drawable.ic_drill_alg, R.drawable.ic_drill_reset,
+            practising ? R.drawable.ic_drill_back : R.drawable.ic_drill_skip},
+        new int[] {R.string.drill_case_algorithm, R.string.drill_reset,
+            practising ? R.string.drill_practice_back : R.string.drill_skip});
   }
 
   /**
@@ -593,12 +621,12 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     boolean retiring = session.getSpec().retiresCases();
     casePips.setVisibility(!on && retiring ? View.VISIBLE : View.GONE);
     TextView progress = findViewById(R.id.tvDrillProgress);
-    progress.setVisibility(on || !retiring ? View.VISIBLE : View.GONE);
+    progress.setVisibility(View.VISIBLE); // the card's heading in every mode
     findViewById(R.id.pbDrillProgress).setVisibility(!on && !retiring ? View.VISIBLE : View.GONE);
     if (on) {
       progress.setText(R.string.drill_practice_mode);
     }
-    skip.setText(on ? R.string.drill_practice_back : R.string.drill_skip);
+    labelButtons(on);
     // A learning drill's fade may still be running, and would hide the practised algorithm.
     LearningAlgorithmFade.show(practiceAlgorithm);
     practiceAlgorithm.setVisibility(on ? View.VISIBLE : View.GONE);
@@ -629,6 +657,10 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     practiceAlgorithm.setText(algorithm != null ? algorithm
         : getString(R.string.drill_practice_pick));
     practiceAlgorithm.setTextSize(TypedValue.COMPLEX_UNIT_SP, algorithm != null ? 18 : 14);
+    if (algorithmFace == null) {
+      algorithmFace = Typeface.createFromAsset(getAssets(), "fonts/JetBrainsMono-Medium.ttf");
+    }
+    practiceAlgorithm.setTypeface(algorithm != null ? algorithmFace : Typeface.DEFAULT);
     practiceAlgorithm.setTextColor(ContextCompat.getColor(this,
         algorithm != null ? R.color.white : R.color.secondary_text));
     showAlgorithmProgress();
@@ -741,27 +773,43 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     int colour = familyColour(rep.getCaseCode());
     boolean retiring = session.getSpec().retiresCases();
     repVerdict.setVisibility(View.GONE);
+    lastRep = rep.isPractice() ? null : rep;
+    DrillLiveCells.show(this, session.getReps());
+    if (retiring) {
+      refreshCaseProgress(); // rings the case this line is about
+    }
     if (rep.isAbandoned()) {
       setLastRep(name, colour, getString(R.string.drill_rep_skipped), true, null);
-      repBelow.setText(null);
+      repSplit.setVisibility(View.INVISIBLE); // keeps its room, so the cube does not move
       return;
     }
-    String split = getString(R.string.drill_rep_split,
-        FormatterService.INSTANCE.formatSolveTime(rep.getRecognitionMs()),
-        FormatterService.INSTANCE.formatSolveTime(rep.getExecutionMs()));
     setLastRep(name, colour, FormatterService.INSTANCE.formatSolveTime(rep.getTotalMs()), false,
-        retiring ? null : split);
+        splitWords(rep));
+    repSplit.setSplit(rep.getRecognitionMs(), rep.getExecutionMs(),
+        ContextCompat.getColor(this, colour));
+    repSplit.setVisibility(View.VISIBLE);
     if (rep.isPractice()) {
       showPracticeVerdict(rep);
     } else if (retiring) {
       showVerdict(rep);
     }
-    if (retiring) {
-      repBelow.setText(split);
-    }
-    if (rep.isPractice()) {
-      repBelow.setVisibility(View.VISIBLE); // no case progress is refreshed to show it
-    }
+  }
+
+  /** The split bar's two halves in words: each name quiet, its figure in white. */
+  private CharSequence splitWords(DrillRep rep) {
+    SpannableStringBuilder words = new SpannableStringBuilder();
+    appendHalf(words, R.string.drill_summary_column_recognition, rep.getRecognitionMs());
+    words.append("   ");
+    appendHalf(words, R.string.drill_summary_column_execution, rep.getExecutionMs());
+    return words;
+  }
+
+  private void appendHalf(SpannableStringBuilder words, int nameRes, long ms) {
+    words.append(getString(nameRes)).append(' ');
+    int start = words.length();
+    words.append(FormatterService.INSTANCE.formatSolveTime(ms));
+    words.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.white)), start,
+        words.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
   }
 
   /** Flags a practice rep that was not the algorithm picked for it; a rep that was says nothing. */
@@ -780,21 +828,27 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     return code != null && code.startsWith(FAMILY_OLL) ? R.color.step_oll : R.color.step_pll;
   }
 
-  /**
-   * A coach drill counts cases, not reps: the dots take the rep count's place and its meter's, and
-   * the split holds a line of its own from the start so the cube does not move when it first fills.
-   */
+  /** A coach drill counts cases, not reps: a bar per case takes the rep count's meter's place. */
   private void useCaseProgress() {
-    findViewById(R.id.tvDrillProgress).setVisibility(View.GONE);
     findViewById(R.id.pbDrillProgress).setVisibility(View.GONE);
     casePips.setVisibility(View.VISIBLE);
-    repBelow.setVisibility(View.INVISIBLE);
     refreshCaseProgress();
   }
 
   private void refreshCaseProgress() {
-    casePips.show(shownCases(true), session.getTally(), session.getSpec().getWinsToRetire());
-    repBelow.setVisibility(repBelow.getText().length() > 0 ? View.VISIBLE : View.INVISIBLE);
+    List<String> cases = shownCases(true);
+    CaseTally tally = session.getTally();
+    boolean won = lastRep != null && CaseTally.isClean(lastRep) && tally.isWin(lastRep);
+    casePips.show(cases, tally, session.getSpec().getWinsToRetire(),
+        lastRep == null ? null : lastRep.getCaseCode(), won);
+    if (session.getPracticeCase() == null) {
+      int cleared = 0;
+      for (String code : cases) {
+        cleared += tally.isCleared(code) ? 1 : 0;
+      }
+      ((TextView) findViewById(R.id.tvDrillProgress))
+          .setText(getString(R.string.drill_cases_cleared, cleared, cases.size()));
+    }
   }
 
   /**
@@ -854,8 +908,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
 
   private void setVerdict(String text, int colourRes) {
     int colour = ContextCompat.getColor(this, colourRes);
-    repVerdict.setText(text);
-    repVerdict.setTextColor(colour);
+    repVerdict.setText(text); // dark ink on a chip filled with the verdict's colour
     repVerdict.setBackgroundTintList(ColorStateList.valueOf(colour));
     repVerdict.setVisibility(View.VISIBLE);
   }

@@ -601,6 +601,12 @@
     <item name="android:background">@drawable/dialog_action_button</item>
   </style>
 
+  <!-- A running drill's controls: quiet pills, so the cube and the rep's time stay the loudest. -->
+  <style name="DrillGhostButton" parent="DialogActionButton">
+    <item name="android:textColor">@color/breakdown_chip_text</item>
+    <item name="android:background">@drawable/drill_ghost_button</item>
+  </style>
+
   <style name="CustomSpinner">
     <item name="android:layout_width">match_parent</item>
     <item name="android:layout_height">wrap_content</item>
