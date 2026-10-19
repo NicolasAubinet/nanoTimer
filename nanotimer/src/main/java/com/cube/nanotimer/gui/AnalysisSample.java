@@ -77,6 +77,13 @@ public final class AnalysisSample {
     return new MethodStatistics(steps, SOLVES);
   }
 
+  /** The example's cases as the Cases table reads them: its solver takes every one in one look. */
+  public static List<StepStats> oneAlgorithmCases() {
+    List<StepStats> cases = new ArrayList<StepStats>(orientations());
+    cases.addAll(permutations());
+    return cases;
+  }
+
   /**
    * Where the solver stands on every case of both sets, which the Cases tab needs as much as the
    * figures: without it the ring reads nothing known and the whole set falls under "not yet seen",

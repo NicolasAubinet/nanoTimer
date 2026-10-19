@@ -1699,15 +1699,8 @@ public class ServiceProviderImpl implements ServiceProvider {
    */
   @Override
   public MethodStatistics getMethodStatistics(SolveType solveType, CubeMethod method, int lastSolves) {
-    int windowSize = Math.max(0, lastSolves); // a negative LIMIT is SQLite for "all of them"
-    // The window is written into the query rather than bound: a bound value arrives as text, and
-    // LIMIT has no column affinity to turn it back into a number.
-    String window = "SELECT " + DB.COL_ID + ", " + DB.COL_TIMEHISTORY_SMARTCUBE_STOPPED_STEP
-        + " FROM " + DB.TABLE_TIMEHISTORY
-        + " WHERE " + DB.COL_TIMEHISTORY_SOLVETYPE_ID + " = ?"
-        + "   AND " + DB.COL_TIMEHISTORY_TIME + " > 0"
-        + "   AND " + DB.COL_TIMEHISTORY_SMARTCUBE_METHOD + " = ?"
-        + " ORDER BY " + DB.COL_TIMEHISTORY_TIMESTAMP + " DESC LIMIT " + windowSize;
+    int windowSize = Math.max(0, lastSolves);
+    String window = methodSolvesWindow(lastSolves);
 
     StringBuilder q = new StringBuilder();
     q.append("SELECT s.").append(DB.COL_SMARTCUBE_SOLVESTEP_NAME);
@@ -1745,6 +1738,67 @@ public class ServiceProviderImpl implements ServiceProvider {
       cursor.close();
     }
     return new MethodStatistics(steps, parts, getMethodSolvesCount(solveType, method, windowSize));
+  }
+
+  /**
+   * One algorithm is fewer than two parts, as in {@link CaseKnowledgeStore}: parts are only stored
+   * where a step took more than one.
+   */
+  @Override
+  public List<StepStats> getOneAlgorithmCaseStatistics(SolveType solveType, CubeMethod method,
+      int lastSolves) {
+    String parts = "(SELECT COUNT(*) FROM " + DB.TABLE_SMARTCUBE_SOLVESTEP + " p"
+        + " WHERE p." + DB.COL_SMARTCUBE_SOLVESTEP_TIMEHISTORY_ID
+        + "     = s." + DB.COL_SMARTCUBE_SOLVESTEP_TIMEHISTORY_ID
+        + "   AND p." + DB.COL_SMARTCUBE_SOLVESTEP_STEP_INDEX
+        + "     = s." + DB.COL_SMARTCUBE_SOLVESTEP_STEP_INDEX
+        + "   AND p." + DB.COL_SMARTCUBE_SOLVESTEP_SUB_INDEX + " IS NOT NULL)";
+
+    StringBuilder q = new StringBuilder();
+    q.append("SELECT s.").append(DB.COL_SMARTCUBE_SOLVESTEP_NAME);
+    q.append("     , COUNT(*)");
+    q.append("     , SUM(s.").append(DB.COL_SMARTCUBE_SOLVESTEP_TIME).append(")");
+    q.append("     , SUM(s.").append(DB.COL_SMARTCUBE_SOLVESTEP_RECOGNITION).append(")");
+    q.append("     , MIN(s.").append(DB.COL_SMARTCUBE_SOLVESTEP_TIME).append(")");
+    q.append("     , MAX(s.").append(DB.COL_SMARTCUBE_SOLVESTEP_TIME).append(")");
+    q.append("     , SUM(1.0 * s.").append(DB.COL_SMARTCUBE_SOLVESTEP_TIME);
+    q.append("            * s.").append(DB.COL_SMARTCUBE_SOLVESTEP_TIME).append(")");
+    q.append("  FROM ").append(DB.TABLE_SMARTCUBE_SOLVESTEP).append(" s");
+    q.append("  JOIN (").append(methodSolvesWindow(lastSolves)).append(") h");
+    q.append("    ON h.").append(DB.COL_ID).append(" = s.").append(DB.COL_SMARTCUBE_SOLVESTEP_TIMEHISTORY_ID);
+    q.append(" WHERE s.").append(DB.COL_SMARTCUBE_SOLVESTEP_SUB_INDEX).append(" IS NULL");
+    q.append("   AND (h.").append(DB.COL_TIMEHISTORY_SMARTCUBE_STOPPED_STEP).append(" IS NULL");
+    q.append("     OR h.").append(DB.COL_TIMEHISTORY_SMARTCUBE_STOPPED_STEP);
+    q.append("    <> s.").append(DB.COL_SMARTCUBE_SOLVESTEP_STEP_INDEX).append(")");
+    q.append("   AND ").append(parts).append(" < 2");
+    q.append(" GROUP BY s.").append(DB.COL_SMARTCUBE_SOLVESTEP_NAME);
+
+    List<StepStats> cases = new ArrayList<StepStats>();
+    Cursor cursor = db.rawQuery(q.toString(),
+        new String[] { String.valueOf(solveType.getId()), method.getCode() });
+    if (cursor != null) {
+      for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+        cases.add(new StepStats(cursor.getString(0), cursor.getInt(1), cursor.getLong(2),
+            cursor.getLong(3), cursor.getLong(4), cursor.getLong(5), cursor.getDouble(6)));
+      }
+      cursor.close();
+    }
+    return cases;
+  }
+
+  /**
+   * The ids and stopped steps of a solve type's last solves in one method, binding the solve type
+   * then the method. The size is written in rather than bound: a bound value arrives as text, and
+   * LIMIT has no column affinity to turn it back into a number. Clamped at 0, since a negative LIMIT
+   * is SQLite for "all of them".
+   */
+  private static String methodSolvesWindow(int lastSolves) {
+    return "SELECT " + DB.COL_ID + ", " + DB.COL_TIMEHISTORY_SMARTCUBE_STOPPED_STEP
+        + " FROM " + DB.TABLE_TIMEHISTORY
+        + " WHERE " + DB.COL_TIMEHISTORY_SOLVETYPE_ID + " = ?"
+        + "   AND " + DB.COL_TIMEHISTORY_TIME + " > 0"
+        + "   AND " + DB.COL_TIMEHISTORY_SMARTCUBE_METHOD + " = ?"
+        + " ORDER BY " + DB.COL_TIMEHISTORY_TIMESTAMP + " DESC LIMIT " + Math.max(0, lastSolves);
   }
 
   @Override
@@ -2182,12 +2236,7 @@ public class ServiceProviderImpl implements ServiceProvider {
   /** Every step of the window's solves, unaggregated, filtered exactly as {@link #getMethodStatistics}. */
   private List<StepSample> getMethodStepSamples(SolveType solveType, CubeMethod method,
       int lastSolves) {
-    String window = "SELECT " + DB.COL_ID + ", " + DB.COL_TIMEHISTORY_SMARTCUBE_STOPPED_STEP
-        + " FROM " + DB.TABLE_TIMEHISTORY
-        + " WHERE " + DB.COL_TIMEHISTORY_SOLVETYPE_ID + " = ?"
-        + "   AND " + DB.COL_TIMEHISTORY_TIME + " > 0"
-        + "   AND " + DB.COL_TIMEHISTORY_SMARTCUBE_METHOD + " = ?"
-        + " ORDER BY " + DB.COL_TIMEHISTORY_TIMESTAMP + " DESC LIMIT " + Math.max(0, lastSolves);
+    String window = methodSolvesWindow(lastSolves);
 
     StringBuilder q = new StringBuilder();
     q.append("SELECT s.").append(DB.COL_SMARTCUBE_SOLVESTEP_NAME);

@@ -49,10 +49,11 @@ import java.util.Map;
  * slow it runs, how good it has been and how steady it is, and the reader weighs them.
  *
  * <p><b>The set is shown whole, in two parts, and they run on two different clocks.</b> The table is
- * the window's cases and every figure in it is the window's; the section under it is the rest of the
- * set, which the window has no figures for at all, and where each of those stands is read from every
- * solve there has ever been. That is not a "never seen" list: a case known cold that did not come up
- * in the last hundred solves is in it. Nothing there is ordered by what to learn first and nothing
+ * the window's cases that went in with one algorithm, each figure over those solves only, since a
+ * two-look time is not the time of an algorithm the solver has; the section under it is the rest of
+ * the set, and where each of those stands is read from every solve there has ever been. That is
+ * not a "never seen" list: a case known cold that did not come up in the last hundred solves is in
+ * it. Nothing there is ordered by what to learn first and nothing
  * is recommended — the list is a sort over the solver's own history, which is all it claims to be.
  *
  * <p><b>A case has two names, and each gets its own control.</b> A solve names a case by its number,
@@ -137,6 +138,7 @@ public class AnalysisCases {
   private final LinearLayout rows;
 
   private MethodStatistics statistics;
+  private List<StepStats> oneAlgorithm;
   private StepPalette palette;
   private final Map<String, CaseKnowledge.Status> statuses =
       new LinkedHashMap<String, CaseKnowledge.Status>();
@@ -178,9 +180,14 @@ public class AnalysisCases {
     return families.contains(family);
   }
 
-  public void show(MethodStatistics statistics, List<CaseKnowledge> known, StepPalette palette,
-      CubeMethod method) {
+  /**
+   * @param oneAlgorithm each case over only the window's solves where it went in one algorithm,
+   *     which is all the table shows: a two-looked case is not one the solver has an algorithm for
+   */
+  public void show(MethodStatistics statistics, List<StepStats> oneAlgorithm,
+      List<CaseKnowledge> known, StepPalette palette, CubeMethod method) {
     this.statistics = statistics;
+    this.oneAlgorithm = oneAlgorithm;
     this.palette = palette;
     statuses.clear();
     for (CaseKnowledge caseKnown : known) {
@@ -490,8 +497,8 @@ public class AnalysisCases {
   }
 
   /**
-   * The rest of the step's set: every case of it this window holds no figures for, grouped under
-   * where it stands.
+   * The rest of the step's set: every case of it the table does not hold, grouped under where it
+   * stands. A case the window only saw two-looked is here, under its standing.
    *
    * <p><b>Where a case stands is read over every solve, and the table above is read over the
    * window.</b> Two clocks on one screen: a case the solver knows cold that has not come up in the
@@ -578,11 +585,13 @@ public class AnalysisCases {
     return rest;
   }
 
-  /** The picked family's cases that the window holds figures for, narrowed to the picked shape. */
+  /** The picked family's cases the window put in with one algorithm, narrowed to the picked shape. */
   private List<StepStats> casesOf(String picked) {
     List<StepStats> cases = new ArrayList<StepStats>();
-    for (StepStats stepCase : drawnCases(picked)) {
-      if (ANY.equals(shape) || shape.equals(LastLayerCaseNames.group(stepCase.getCode()))) {
+    for (StepStats stepCase : oneAlgorithm) {
+      String code = stepCase.getCode();
+      if (DRAWN.containsKey(code) && picked.equals(MethodStatistics.familyOf(code))
+          && (ANY.equals(shape) || shape.equals(LastLayerCaseNames.group(code)))) {
         cases.add(stepCase);
       }
     }

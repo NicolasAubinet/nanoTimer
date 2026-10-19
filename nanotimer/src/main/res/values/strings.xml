@@ -1558,12 +1558,12 @@
   <string name="analysis_help_plan_new">A new plan</string>
   <string name="analysis_help_plan_new_body">Written from your last 100 smart cube solves, so the first one needs that many. After that a new plan comes every week, once you have done 25 more solves and your session is over.</string>
   <string name="analysis_help_cases_title">Case by case</string>
-  <string name="analysis_help_cases_body">The cases of the selected step, over the window shown at the top.</string>
+  <string name="analysis_help_cases_body">The cases of the selected step that you put in with one algorithm, over the window shown at the top. Only those solves count: a time where you took two looks is left out.</string>
   <string name="analysis_help_standing">Where a case stands</string>
   <string name="analysis_help_standing_body">Known went in with one algorithm and no help, recently enough for that to still hold. Needs review went in that way before, but took two looks the last two times. To learn has never gone in with one algorithm. All of it is read from your solves, not from a list you tick.</string>
   <string name="analysis_help_shape">Shape</string>
   <string name="analysis_help_shape_body">On OLL, a Shape button narrows the table to one group of shapes, with each group\'s size beside it.</string>
-  <string name="analysis_help_rest_body">Under the table, the cases that did not come up in the window, grouped by where they stand over all your solves. Tap one for its algorithms.</string>
+  <string name="analysis_help_rest_body">Under the table, the cases that did not go in with one algorithm in the window, grouped by where they stand over all your solves. Tap one for its algorithms.</string>
   <string name="analysis_help_sample">Example</string>
   <string name="analysis_help_sample_body">Nothing on these tabs is yours. These figures are made up, and they are here so the screen has something to show before you own a smart cube. Connect one and your own take their place.</string>
 

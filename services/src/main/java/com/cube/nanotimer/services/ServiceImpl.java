@@ -466,6 +466,17 @@ public class ServiceImpl extends DBHelper implements Service {
   }
 
   @Override
+  public void getOneAlgorithmCaseStatistics(final SolveType solveType, final CubeMethod method,
+      final int lastSolves, final DataCallback<List<StepStats>> callback) {
+    run(new Runnable() {
+      @Override
+      public void run() {
+        callback.onData(provider.getOneAlgorithmCaseStatistics(solveType, method, lastSolves));
+      }
+    });
+  }
+
+  @Override
   public void getSmartcubeSolvesCount(final SolveType solveType,
       final DataCallback<Integer> callback) {
     run(new Runnable() {

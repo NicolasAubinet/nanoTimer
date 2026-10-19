@@ -71,6 +71,13 @@ public interface Service {
   void getMethodStatistics(SolveType solveType, CubeMethod method, int lastSolves,
       DataCallback<MethodStatistics> callback);
 
+  /**
+   * Each step over the same window as {@link #getMethodStatistics}, counting only the solves where
+   * it went in one algorithm: a last layer case over the times it was not two-looked.
+   */
+  void getOneAlgorithmCaseStatistics(SolveType solveType, CubeMethod method, int lastSolves,
+      DataCallback<List<StepStats>> callback);
+
   /** How many of a solve type's solves a smart cube drove, and so could be read again. */
   void getSmartcubeSolvesCount(SolveType solveType, DataCallback<Integer> callback);
 

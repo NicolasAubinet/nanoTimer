@@ -1512,12 +1512,12 @@
   <string name="analysis_help_plan_new">Um novo plano</string>
   <string name="analysis_help_plan_new_body">Escrito a partir das suas últimas 100 resoluções com smart cube, por isso o primeiro precisa dessas. Depois chega um novo plano todas as semanas, quando tiver feito mais 25 resoluções e a sua sessão tiver terminado.</string>
   <string name="analysis_help_cases_title">Caso a caso</string>
-  <string name="analysis_help_cases_body">Os casos da etapa escolhida, sobre a janela indicada em cima.</string>
+  <string name="analysis_help_cases_body">Os casos da etapa escolhida que resolveste com um só algoritmo, sobre a janela indicada em cima. Só contam essas resoluções: um tempo em dois looks fica de fora.</string>
   <string name="analysis_help_standing">Como está um caso</string>
   <string name="analysis_help_standing_body">Conhecido: saiu com um só algoritmo, sem ajuda, e há pouco tempo para que isso ainda valha. Para rever: saía assim antes, mas levou dois olhares das duas últimas vezes. Para aprender: nunca saiu com um só algoritmo. Tudo é lido das tuas resoluções, não de uma lista que marcas.</string>
   <string name="analysis_help_shape">Forma</string>
   <string name="analysis_help_shape_body">No OLL, um botão Forma reduz a tabela a um grupo de formas, com o tamanho de cada grupo ao lado.</string>
-  <string name="analysis_help_rest_body">Sob a tabela, os casos que não saíram na janela, agrupados por como estão em todas as tuas resoluções. Toca num deles para ver os seus algoritmos.</string>
+  <string name="analysis_help_rest_body">Sob a tabela, os casos que não resolveste com um só algoritmo na janela, agrupados por como estão em todas as tuas resoluções. Toca num deles para ver os seus algoritmos.</string>
   <string name="analysis_help_sample">Exemplo</string>
   <string name="analysis_help_sample_body">Nada nestes separadores é seu. Estes números são inventados, e estão aqui para que o ecrã tenha algo para mostrar antes de ter um smart cube. Ligue um e os seus tomam o lugar deles.</string>
 

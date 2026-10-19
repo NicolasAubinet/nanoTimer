@@ -141,10 +141,12 @@ public class AnalysisActivity extends NanoTimerActivity {
   private CoachBilling billing;
   private CoachBilling.Listener billingListener;
   private MethodStatistics statistics;
+  private List<StepStats> oneAlgorithmCases = Collections.emptyList();
   private List<CaseKnowledge> known = Collections.emptyList();
 
   /** What the query returned, kept apart from what is drawn: the sample stands in front of it. */
   private MethodStatistics read;
+  private List<StepStats> readOneAlgorithm = Collections.emptyList();
   private List<CaseKnowledge> readKnown = Collections.emptyList();
   private boolean knownRead;
   /** The standard-algorithms card's figures, null until the window's solves have been read again. */
@@ -521,12 +523,18 @@ public class AnalysisActivity extends NanoTimerActivity {
         new DataCallback<MethodStatistics>() {
           @Override
           public void onData(final MethodStatistics statistics) {
-            runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                show(statistics);
-              }
-            });
+            App.INSTANCE.getService().getOneAlgorithmCaseStatistics(solveType, method,
+                window.solves(), new DataCallback<List<StepStats>>() {
+                  @Override
+                  public void onData(final List<StepStats> oneAlgorithm) {
+                    runOnUiThread(new Runnable() {
+                      @Override
+                      public void run() {
+                        show(statistics, oneAlgorithm);
+                      }
+                    });
+                  }
+                });
           }
         });
   }
@@ -628,8 +636,9 @@ public class AnalysisActivity extends NanoTimerActivity {
     key.addView(entry);
   }
 
-  private void show(MethodStatistics statistics) {
+  private void show(MethodStatistics statistics, List<StepStats> oneAlgorithm) {
     read = statistics;
+    readOneAlgorithm = oneAlgorithm;
     loaded = true;
     draw();
   }
@@ -648,6 +657,7 @@ public class AnalysisActivity extends NanoTimerActivity {
   private void draw() {
     boolean sampling = sampling();
     statistics = sampling ? AnalysisSample.statistics() : read;
+    oneAlgorithmCases = sampling ? AnalysisSample.oneAlgorithmCases() : readOneAlgorithm;
     known = sampling ? AnalysisSample.knowledge() : readKnown;
     // The example solves CFOP whatever the reader's own type resolves to, and a figure keyed on
     // the method has to name the solve being drawn rather than the one that is not there.
@@ -1004,7 +1014,7 @@ public class AnalysisActivity extends NanoTimerActivity {
   /** The Cases tab, which waits on two reads and is drawn by whichever of them lands second. */
   private void showCases() {
     if (statistics != null) {
-      cases.show(statistics, known, palette, method);
+      cases.show(statistics, oneAlgorithmCases, known, palette, method);
     }
   }
 
