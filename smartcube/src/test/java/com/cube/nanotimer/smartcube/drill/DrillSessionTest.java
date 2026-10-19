@@ -1053,6 +1053,122 @@ public class DrillSessionTest {
     assertEquals(AlgorithmTimes.Verdict.RESET, AlgorithmTimes.judge(rep, OLL_37, false));
   }
 
+  /**
+   * In practice the same case comes next, so a fast user turns it before it is up: those turns are
+   * the next rep's, timed from the first of them, and the case is not left behind the user's hands.
+   */
+  @Test
+  public void turnsBeforeTheNextPracticeRepIsShownAreItsOwn() {
+    DrillSession session = new DrillSession(spec("oll_37", 1), new Random(3));
+    Hand hand = new Hand(session);
+    hand.practise("oll_37", OLL_37);
+    assertNotNull(hand.execute(OLL_37));
+    String dealt = scrambledBy(session, OLL_37);
+
+    long startedAt = hand.clock;
+    assertNull(hand.execute("F R'")); // during the beat, no case up
+    assertTrue(session.nextRep());
+    DrillSession.Shown shown = session.showCase(hand.clock + 300);
+    assertEquals(2, shown.getTurns().size());
+    assertNull(shown.getRep());
+    assertNotEquals("the case has the two turns on it", dealt, session.getFacelets());
+
+    DrillRep rep = hand.execute("F' R U R U' R'");
+    assertNotNull(rep);
+    assertEquals(8, rep.getMoveCount());
+    assertEquals(0, rep.getRecognitionMs());
+    assertEquals(7 * GAP_MS, rep.getExecutionMs());
+    assertEquals("shown no later than its first turn", startedAt, rep.getShownAtMs());
+    assertEquals(AlgorithmTimes.Verdict.COUNTED, AlgorithmTimes.judge(rep, OLL_37, false));
+  }
+
+  /** One made in the beat but delivered once the case is up is the rep's too, not a stray. */
+  @Test
+  public void aBeatTurnDeliveredLateStillCountsInPractice() {
+    DrillSession session = new DrillSession(spec("oll_37", 1), new Random(3));
+    Hand hand = new Hand(session);
+    hand.practise("oll_37", OLL_37);
+    assertNotNull(hand.execute(OLL_37));
+
+    assertTrue(session.nextRep());
+    long turnedAt = hand.clock;
+    assertTrue(session.showCase(turnedAt + 200).getTurns().isEmpty());
+    CubeMove late = new CubeMove(Face.F, false, turnedAt);
+    assertFalse(session.isFromBeforeTheCase(late));
+    assertNull(session.onMove(late));
+    hand.clock = turnedAt + GAP_MS;
+    DrillRep rep = hand.execute("R' F' R U R U' R'");
+    assertNotNull(rep);
+    assertEquals(8, rep.getMoveCount());
+  }
+
+  /** A turn the cube never reported in the beat is recovered for the next rep like any other. */
+  @Test
+  public void aTurnMissedBetweenPracticeRepsIsRecovered() {
+    DrillSession session = new DrillSession(spec("oll_37", 1), new Random(3));
+    Hand hand = new Hand(session);
+    hand.practise("oll_37", OLL_37);
+    CubieCube hands = new CubieCube();
+    session.onState(state(hands)); // seeds what a dropped turn is measured against
+    for (CubeMove move : asReported(OLL_37)) {
+      hands.applyMove(move.getFace(), move.isPrime());
+    }
+    assertNotNull(hand.execute(OLL_37));
+
+    hands.applyMove(Face.F, false);
+    assertNull(session.onMove(new CubeMove(Face.F, false, hand.clock)));
+    hands.applyMove(Face.R, true); // turned, never reported
+    assertFalse(session.onState(state(hands)).isRepaired());
+    assertTrue(session.hasCarriedTurns());
+
+    assertTrue(session.nextRep());
+    DrillSession.Shown shown = session.showCase(hand.clock + 100);
+    assertEquals(2, shown.getTurns().size());
+    assertNotNull(shown.getTurns().get(1).getMissed());
+    hand.clock += 2 * GAP_MS;
+    assertNotNull("the recovered turn is on the case", hand.execute("F' R U R U' R'"));
+  }
+
+  /** Outside practice the next case is unknown, so a turn before it is up is still not for it. */
+  @Test
+  public void turnsBetweenDrillRepsAreStillDropped() {
+    DrillSession session = new DrillSession(spec("oll_37", 2), new Random(3));
+    Hand hand = new Hand(session);
+    assertTrue(hand.next());
+    assertNotNull(hand.execute(inverse(session.getCurrentScramble())));
+    assertFalse(session.isCarrying());
+
+    assertNull(hand.execute("F R'"));
+    assertTrue(session.nextRep());
+    String dealt = session.getFacelets();
+    assertTrue(session.showCase(hand.clock).getTurns().isEmpty());
+    assertEquals(dealt, session.getFacelets());
+  }
+
+  /** A case dealt afresh, for another algorithm tried, is not the one the beat's turns were for. */
+  @Test
+  public void aPracticeCaseDealtAfreshDropsTheBeatsTurns() {
+    DrillSession session = new DrillSession(spec("oll_37", 1), new Random(3));
+    Hand hand = new Hand(session);
+    hand.practise("oll_37", OLL_37);
+    assertNotNull(hand.execute(OLL_37));
+    assertNull(hand.execute("F R'"));
+
+    session.dropCarriedTurns();
+    assertTrue(session.nextRep());
+    String dealt = session.getFacelets();
+    assertTrue(session.showCase(hand.clock).getTurns().isEmpty());
+    assertEquals(dealt, session.getFacelets());
+    assertNotNull(hand.execute(OLL_37));
+  }
+
+  /** The case an algorithm finishes, as the session deals it for practice. */
+  private static String scrambledBy(DrillSession session, String algorithm) {
+    DrillSession fresh = new DrillSession(session.getSpec(), new Random(3));
+    fresh.startPractice(session.getPracticeCase(), algorithm);
+    return fresh.getFacelets();
+  }
+
   private static final class Hand {
 
     private final DrillSession session;

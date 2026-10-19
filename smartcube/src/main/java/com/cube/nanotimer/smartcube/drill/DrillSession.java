@@ -94,6 +94,13 @@ public final class DrillSession {
   private String practiceCase;
   /** An algorithm being tried for it, which deals it at that algorithm's angle; null for any. */
   private String practiceAlgorithm;
+  /**
+   * Turns made after a practice rep ended and before the next one is shown, kept for that one: the
+   * same case comes next, so a fast start is already on it. Null outside that gap.
+   */
+  private List<CarriedTurn> carried;
+  /** Whether the rep up follows straight on from a practice rep, owning the turns made between. */
+  private boolean followsOn;
 
   public DrillSession(DrillSpec spec, Random random) {
     this(spec, random, null, "U");
@@ -189,6 +196,7 @@ public final class DrillSession {
     }
     practiceCase = code;
     practiceAlgorithm = algorithm;
+    carried = null; // another case, or another angle: nothing turned before was meant for it
     deal(code);
   }
 
@@ -201,6 +209,7 @@ public final class DrillSession {
   public void endPractice() {
     practiceCase = null;
     practiceAlgorithm = null;
+    carried = null;
     currentCase = null;
     caseShownAtMs = NOT_SHOWN;
   }
@@ -277,10 +286,95 @@ public final class DrillSession {
    * is what this used to do, charged every one of those beats to the user's recognition.
    */
   public void markCaseShown(long hostMs) {
+    showCase(hostMs);
+  }
+
+  /**
+   * {@link #markCaseShown}, returning the turns made since the last practice rep ended, which
+   * the case up has been given: the caller has to give them to whatever else follows the case.
+   * Empty unless this rep follows straight on from a practice rep of the same case.
+   */
+  public Shown showCase(long hostMs) {
     caseShownAtMs = hostMs;
-    // Turns count from here, so what the cube did before this is not something to recover: the
-    // caller says where it stands now, and anything it misses from now on is measured against that.
-    twin.reset();
+    List<CarriedTurn> kept = carried != null && practiceCase != null && currentCase != null
+        ? carried : null;
+    carried = null;
+    followsOn = kept != null;
+    if (!followsOn) {
+      // Turns count from here, so what the cube did before this is not something to recover: the
+      // next state it sends is what anything it misses from now on is measured against.
+      twin.reset();
+      return Shown.NONE;
+    }
+    // The twin is kept: it has followed the cube through the gap, so a turn missed in it is known.
+    for (CarriedTurn turn : kept) {
+      if (turn.getMove() != null) {
+        addTurn(turn.getMove());
+      } else {
+        cube = cube.multiply(turn.getMissed());
+      }
+    }
+    return new Shown(kept, isCaseDone() ? complete(false) : null);
+  }
+
+  /** Forgets the turns kept for the next practice rep, for a case dealt afresh rather than next. */
+  public void dropCarriedTurns() {
+    carried = null;
+  }
+
+  /** Whether turns made since a practice rep ended are being kept for the next one. */
+  public boolean hasCarriedTurns() {
+    return carried != null && !carried.isEmpty();
+  }
+
+  /** Whether this is the gap after a practice rep, whose turns are kept for the next one. */
+  public boolean isCarrying() {
+    return carried != null;
+  }
+
+  /** A turn made between two practice reps: reported, or recovered from a state the cube sent. */
+  public static final class CarriedTurn {
+
+    private final CubeMove move;
+    private final CubieCube missed;
+
+    CarriedTurn(CubeMove move, CubieCube missed) {
+      this.move = move;
+      this.missed = missed;
+    }
+
+    /** The turn as reported, or null for one recovered from a state. */
+    public CubeMove getMove() {
+      return move;
+    }
+
+    /** The turns recovered from a state, or null for a reported one. */
+    public CubieCube getMissed() {
+      return missed;
+    }
+  }
+
+  /** What showing a case gave it from the gap before it, and the rep that finished, if any. */
+  public static final class Shown {
+
+    private static final Shown NONE = new Shown(Collections.<CarriedTurn>emptyList(), null);
+
+    private final List<CarriedTurn> turns;
+    private final DrillRep rep;
+
+    private Shown(List<CarriedTurn> turns, DrillRep rep) {
+      this.turns = turns;
+      this.rep = rep;
+    }
+
+    public List<CarriedTurn> getTurns() {
+      return Collections.unmodifiableList(turns);
+    }
+
+    /** The rep those turns finished, or null if it is still going. */
+    public DrillRep getRep() {
+      return rep;
+    }
   }
 
   /**
@@ -334,22 +428,39 @@ public final class DrillSession {
    * than queued: the cube on screen missed them too, so the two stay in step, and a rep cannot be
    * timed against a case the user could not yet see.
    *
+   * <p><b>Except in practice</b>, where the next case is the same one at the same angle and a fast
+   * user is already turning it before it is up. Those turns are kept for it (see
+   * {@link #showCase}); dropping them left the case a few turns behind the user's hands.
+   *
    * @return the finished rep if that turn solved the case, null while it is still going
    */
   public DrillRep onMove(CubeMove move) {
     // Before the drop: the twin follows the cube itself, so a turn this rep has no use for is
     // still not one the cube is later found to have "missed".
     twin.onMove(move);
+    if (move.getHostTimestampMs() != null) {
+      clockSkewMs = move.getHostTimestampMs() - move.getCubeTimestampMs();
+    }
+    if (currentCase == null && carried != null) {
+      carried.add(new CarriedTurn(move, null));
+      return null;
+    }
     if (currentCase == null || caseShownAtMs == NOT_SHOWN) {
       return null;
     }
     if (isFromBeforeTheCase(move)) {
       return null; // the previous case's turn, delivered late: like one delivered on time, dropped
     }
-    if (move.getHostTimestampMs() != null) {
-      clockSkewMs = move.getHostTimestampMs() - move.getCubeTimestampMs();
-    }
+    return addTurn(move);
+  }
+
+  /** One of the rep's own turns, counted and timed. */
+  private DrillRep addTurn(CubeMove move) {
     long at = move.getCubeTimestampMs();
+    if (at < caseShownOnCubeClock()) {
+      // Only a rep following on: started before it was shown, on a case the user already knew
+      caseShownAtMs = at + clockSkewMs;
+    }
     if (moves.isEmpty()) {
       firstMoveMs = at;
     }
@@ -382,6 +493,10 @@ public final class DrillSession {
    */
   public Correction onState(CubeState state) {
     CubieCube missed = twin.missing(state);
+    if (missed != null && currentCase == null && carried != null) {
+      carried.add(new CarriedTurn(null, missed)); // missed in the gap, so the next rep's
+      return Correction.NONE;
+    }
     if (missed == null || currentCase == null || caseShownAtMs == NOT_SHOWN) {
       return Correction.NONE;
     }
@@ -573,6 +688,8 @@ public final class DrillSession {
     }
     currentCase = null;
     caseShownAtMs = NOT_SHOWN;
+    // The same case comes next in practice, so what is turned before it is up is already on it
+    carried = practice ? new ArrayList<CarriedTurn>() : null;
     return rep;
   }
 
@@ -610,10 +727,14 @@ public final class DrillSession {
   /**
    * Whether a turn was made before the case up was shown, though delivered after: the end of the
    * previous case, or a start made too soon. It belongs to no rep, nor to anything following one.
+   * Never for a practice rep following on from the last, which owns every turn since that ended.
    */
   public boolean isFromBeforeTheCase(CubeMove move) {
     if (currentCase == null || caseShownAtMs == NOT_SHOWN) {
       return true;
+    }
+    if (followsOn) {
+      return false;
     }
     long skew = move.getHostTimestampMs() != null
         ? move.getHostTimestampMs() - move.getCubeTimestampMs() : clockSkewMs;

@@ -442,7 +442,14 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     if (!cubeReady || finished || session == null) {
       return;
     }
+    boolean between = session.getCurrentCase() == null;
     DrillSession.Correction correction = session.onState(state);
+    if (between) {
+      if (session.hasCarriedTurns()) {
+        showNextCaseNow(); // a turn missed between practice reps starts the next one too
+      }
+      return;
+    }
     if (!correction.isRepaired()) {
       return;
     }
@@ -460,10 +467,20 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
    * A turn made before the case is on screen is dropped, not queued. Both cubes here miss it
    * equally, so they stay in step, and the physical cube's own state never mattered; timing a rep
    * against a case the user could not yet see would.
+   *
+   * <p>Not in practice: the same case comes next, so a turn during the beat is the next rep
+   * started. It ends the beat and goes onto that rep's case.
    */
   @Override
   public void onMove(CubeMove move) {
-    if (!cubeReady || finished || session == null || session.getCurrentCase() == null) {
+    if (!cubeReady || finished || session == null) {
+      return;
+    }
+    if (session.getCurrentCase() == null) {
+      if (session.isCarrying()) {
+        session.onMove(move); // kept for the next practice rep
+        showNextCaseNow();
+      }
       return;
     }
     if (session.isFromBeforeTheCase(move)) {
@@ -522,6 +539,12 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   private void holdThenNext() {
     lastRepRow.removeCallbacks(showNextCase);
     lastRepRow.postDelayed(showNextCase, REP_HOLD_MS);
+  }
+
+  /** Ends the beat early, for a practice rep the user has already started turning. */
+  private void showNextCaseNow() {
+    lastRepRow.removeCallbacks(showNextCase);
+    showNextCase.run();
   }
 
   private final Runnable showNextCase = new Runnable() {
@@ -909,6 +932,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       return; // also reached when the screen is torn down with the popup open
     }
     lastRepRow.removeCallbacks(showNextCase);
+    session.dropCarriedTurns(); // dealt afresh, not next: turns before it were not an attempt
     session.nextRep();
     drawCase();
   }
@@ -1113,9 +1137,29 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
    * <p>The cube's next reported state seeds what a turn it drops is measured against. Not the state
    * read now: that runs ahead of turns still queued, which would then count twice and "repair" the
    * new case by undoing them, two turns off whenever the user was already turning.
+   *
+   * <p>A practice rep started during the beat already has turns, which the session has put on
+   * the case; the screen's cube and the algorithm's greying get them here.
    */
   private void caseShown() {
-    session.markCaseShown(System.currentTimeMillis());
+    DrillSession.Shown shown = session.showCase(System.currentTimeMillis());
+    if (shown.getTurns().isEmpty()) {
+      return;
+    }
+    cube.setState(CubePatternFormat.format(session.getFacelets()));
+    if (algorithmFollower != null && isAlgorithmUp()) {
+      for (DrillSession.CarriedTurn turn : shown.getTurns()) {
+        if (turn.getMove() != null) {
+          algorithmFollower.onMove(turn.getMove());
+        } else {
+          algorithmFollower.onMissed(turn.getMissed());
+        }
+      }
+      showAlgorithmProgress();
+    }
+    if (shown.getRep() != null) {
+      onRepFinished(shown.getRep());
+    }
   }
 
   /**
