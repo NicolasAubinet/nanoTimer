@@ -24,15 +24,16 @@ import org.junit.Test;
 public class OneLookOllTest {
 
   /**
-   * Two algorithms written as one, which is what the table's own rows for these cases are: a corner
-   * algorithm and then an edge one, with the layers standing in between. The solve holds nothing
-   * that tells them from a solver taking two looks, and reading them as two is the honest answer.
-   * Two of the 48 face-turn OLL rows are like this.
+   * The standard OLL 42 and 41, an Antisune or a Sune and then the T, with the layers standing in
+   * between. Turned straight through they are one algorithm; a stop between the halves is two looks.
    */
   private static final String[] COMPOSITES = {
     "R' U' R U' R' U2 R F R U R' U' F'",
     "R U R' U R U2 R' F R U R' U' F'",
   };
+
+  /** Where the T starts in each, after the seven turns of the Sune. */
+  private static final int SECOND_HALF = 7;
 
   private final List<String> wrong = new ArrayList<>();
   private int run;
@@ -40,7 +41,7 @@ public class OneLookOllTest {
   @Test
   public void readsAOneLookOllAsTheOneAlgorithmItWas() {
     for (String[] row : LastLayerCaseAlgorithms.rows()) {
-      if (!row[0].startsWith("oll_") || !isFaceTurns(row[1]) || isComposite(row[1])) {
+      if (!row[0].startsWith("oll_") || !isFaceTurns(row[1])) {
         continue;
       }
       run++;
@@ -50,11 +51,10 @@ public class OneLookOllTest {
     assertTrue("one-look OLLs not read as one algorithm: " + wrong, wrong.isEmpty());
   }
 
-  /** The composites read as two, which is right: the solve holds nothing that says otherwise. */
   @Test
-  public void readsAnAlgorithmWrittenAsTwoAsTwo() {
+  public void readsACompositeWithAStopBetweenItsHalvesAsTwoLooks() {
     for (String composite : COMPOSITES) {
-      CFOPStepDetector detector = play(composite);
+      CFOPStepDetector detector = play(composite, SECOND_HALF, 700);
       if (detector.subStepCount(CFOPStepDetector.OLL) != 2) {
         wrong.add(composite + " -> " + names(detector));
       }
@@ -62,9 +62,21 @@ public class OneLookOllTest {
     assertTrue("not read as two algorithms: " + wrong, wrong.isEmpty());
   }
 
+  @Test
+  public void readsACompositeWithAShortBreathAsOneAlgorithm() {
+    check("oll_41", COMPOSITES[1], 350);
+    check("oll_42", COMPOSITES[0], 350);
+    assertTrue("not read as one algorithm: " + wrong, wrong.isEmpty());
+  }
+
   /** The one algorithm names the case the step was handed: it is the case it solved. */
   private void check(String code, String algorithm) {
-    CFOPStepDetector detector = play(algorithm);
+    check(code, algorithm, 0);
+  }
+
+  /** @param pauseMs added before the composite's second half, where it has one */
+  private void check(String code, String algorithm, long pauseMs) {
+    CFOPStepDetector detector = play(algorithm, SECOND_HALF, pauseMs);
     String expected = "ollalg_" + code.substring(code.indexOf('_') + 1);
     if (detector.subStepCount(CFOPStepDetector.OLL) != 1
         || !expected.equals(detector.subStepName(CFOPStepDetector.OLL, 0))) {
@@ -72,8 +84,11 @@ public class OneLookOllTest {
     }
   }
 
-  /** The algorithm turned on the case it solves, one state at a time as a cube would report it. */
-  private static CFOPStepDetector play(String algorithm) {
+  /**
+   * The algorithm turned on the case it solves, one state at a time as a cube would report it, 100
+   * ms a turn and {@code pauseMs} more before the token at {@code pauseAt}.
+   */
+  private static CFOPStepDetector play(String algorithm, int pauseAt, long pauseMs) {
     CubieCube cube = new CubieCube();
     CFOPStepDetector detector = new CFOPStepDetector();
     for (String token : inverse(algorithm)) { // the case is the algorithm undone
@@ -82,7 +97,12 @@ public class OneLookOllTest {
     detector.reset(new CubeState(cube.toFaceCube()), 0);
 
     long timestampMs = 0;
-    for (String token : algorithm.split(" ")) {
+    String[] tokens = algorithm.split(" ");
+    for (int t = 0; t < tokens.length; t++) {
+      String token = tokens[t];
+      if (t == pauseAt) {
+        timestampMs += pauseMs;
+      }
       Face face = Face.valueOf(token.substring(0, 1));
       boolean prime = token.endsWith("'");
       for (int i = 0; i < (token.endsWith("2") ? 2 : 1); i++) {
@@ -109,15 +129,6 @@ public class OneLookOllTest {
       }
     }
     return true;
-  }
-
-  private static boolean isComposite(String algorithm) {
-    for (String composite : COMPOSITES) {
-      if (composite.equals(algorithm)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   private static List<String> inverse(String algorithm) {

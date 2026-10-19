@@ -5,8 +5,10 @@ import com.cube.nanotimer.smartcube.model.CubeState;
 import com.cube.nanotimer.smartcube.model.Face;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Detects the CFOP milestones (Cross, F2L, OLL, PLL) on the live facelet stream. Each one is a
@@ -496,19 +498,38 @@ public final class CFOPStepDetector implements StepDetector {
    * holds the standard algorithms to that, since OLL is where those states are the easier to hit: an
    * OLL runs between states that only need the first two layers, a PLL between states that need them
    * oriented as well.
+   *
+   * <p>The standard OLL 41 and 42 do pass through one: each is a Sune or an Antisune followed by
+   * {@code F R U R' U' F'}. They are read as one algorithm when the second half starts within
+   * {@link #COMPOSITE_PAUSE_MS} of the first ending. On real solves those halves were 150-415 ms
+   * apart, against 600 ms or more for a solver stopping to take a second look.
    */
   private static final class AlgorithmTrack {
 
     /** Stands where an algorithm's name would, for the moves that got back to where they started. */
     static final String RESTART = "restart";
 
+    static final long COMPOSITE_PAUSE_MS = 500;
+
+    /** The OLLs whose standard algorithm is two others run together, by the halves it is read as. */
+    private static final Map<String, List<String>> COMPOSITES = new HashMap<>();
+
+    static {
+      COMPOSITES.put("41", Arrays.asList("27", "45"));
+      COMPOSITES.put("42", Arrays.asList("26", "45"));
+    }
+
     /** Whether the step permutes the layer (a PLL) or orients it (an OLL). */
     private final boolean permutes;
 
     private final List<String> cases = new ArrayList<>();
     private final List<Long> times = new ArrayList<>();
+    /** When each algorithm first left the states the step runs between, its first real turn. */
+    private final List<Long> starts = new ArrayList<>();
+    private String handedState;
     private String landedState; // what the algorithm being turned started from
     private boolean leftTheCase;
+    private long leftAtMs;
     private boolean finished;
 
     AlgorithmTrack(boolean permutes) {
@@ -518,6 +539,8 @@ public final class CFOPStepDetector implements StepDetector {
     void reset() {
       cases.clear();
       times.clear();
+      starts.clear();
+      handedState = null;
       landedState = null;
       leftTheCase = false;
       finished = false;
@@ -532,6 +555,7 @@ public final class CFOPStepDetector implements StepDetector {
         return;
       }
       if (landedState == null) {
+        handedState = handed;
         landedState = handed;
         finished = done(landedState, crossFace); // the step was already solved on arrival
       }
@@ -539,6 +563,9 @@ public final class CFOPStepDetector implements StepDetector {
         return;
       }
       if (!resting) {
+        if (!leftTheCase) {
+          leftAtMs = timestampMs;
+        }
         leftTheCase = true;
         return;
       }
@@ -556,16 +583,37 @@ public final class CFOPStepDetector implements StepDetector {
         // is measured from this point rather than from where the fumble started.
         cases.add(RESTART);
         times.add(Long.valueOf(timestampMs));
+        starts.add(Long.valueOf(leftAtMs));
         landedState = facelets;
         leftTheCase = false;
         return; // the case still stands, so the step cannot be done
       }
       cases.add(executed);
       times.add(Long.valueOf(timestampMs));
+      starts.add(Long.valueOf(leftAtMs));
       landedState = facelets;
       leftTheCase = false;
       // Landed on nothing left to do: whatever is turned after it belongs to the step that follows.
       finished = done(facelets, crossFace);
+      if (finished) {
+        joinComposite(crossFace);
+      }
+    }
+
+    /** Reads a composite OLL turned without a stop between its halves as the one algorithm it is. */
+    private void joinComposite(int crossFace) {
+      if (permutes || cases.size() != 2) {
+        return;
+      }
+      String handedCase = LastLayerCases.orientation(handedState, crossFace);
+      if (!cases.equals(COMPOSITES.get(handedCase))
+          || starts.get(1) - times.get(0) >= COMPOSITE_PAUSE_MS) {
+        return;
+      }
+      cases.subList(0, 1).clear();
+      times.subList(0, 1).clear();
+      starts.subList(1, 2).clear();
+      cases.set(0, handedCase);
     }
 
     private boolean done(String facelets, int crossFace) {

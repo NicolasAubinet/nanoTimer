@@ -40,9 +40,9 @@ public final class SolveReading {
   /**
    * Bump on any change to how a solve is read: the stepping, the algorithm lists, or what counts
    * as one of them. Rows written by another version are read again rather than believed. Version 2
-   * added each step's turning.
+   * added each step's turning, version 3 reads the standard OLL 41 and 42 as one algorithm.
    */
-  public static final int VERSION = 2;
+  public static final int VERSION = 3;
 
   /** The F2L step, whose parts are read a pair at a time where a last layer step is read whole. */
   public static final String F2L = "f2l";
