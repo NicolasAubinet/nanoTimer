@@ -263,6 +263,32 @@ public class DrillSessionTest {
     assertEquals("the case is still up, untouched", facelets, session.getFacelets());
   }
 
+  /**
+   * Turns made just before a case went up, delivered after it: the previous case's last turns, or
+   * a start made too soon. They reach neither the case nor the state its dropped turns are measured
+   * against, which is seeded by the next state the cube sends, a state that already holds them.
+   */
+  @Test
+  public void turnsDeliveredAfterTheCaseWentUpLeaveItAsDealt() {
+    DrillSession session = new DrillSession(spec("pll_t", 1), new Random(3));
+    assertTrue(session.nextRep());
+    String dealt = session.getFacelets();
+    CubieCube hands = new CubieCube();
+    hands.applyMove(Face.R, false);
+    hands.applyMove(Face.U, false);
+
+    session.markCaseShown(10_000);
+    CubeMove r = new CubeMove(Face.R, false, 9_900);
+    CubeMove u = new CubeMove(Face.U, false, 9_950);
+    assertTrue(session.isFromBeforeTheCase(r));
+    assertNull(session.onMove(r));
+    assertNull(session.onMove(u));
+    assertFalse(session.onState(state(hands)).isRepaired());
+
+    assertEquals(dealt, session.getFacelets());
+    assertFalse(session.isFromBeforeTheCase(new CubeMove(Face.R, false, 10_100)));
+  }
+
   /** The scramble a case is dealt with, for a test that has to know it before the rep starts. */
   private static String scrambleFor(String code) {
     DrillSession session = new DrillSession(spec(code, 1), new Random(5));

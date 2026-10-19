@@ -33,7 +33,6 @@ import com.cube.nanotimer.cube.AlgorithmFollower;
 import com.cube.nanotimer.cube.CaseFlags;
 import com.cube.nanotimer.cube.CubePatternFormat;
 import com.cube.nanotimer.cube.CubeStickering;
-import com.cube.nanotimer.cube.SmartCubeManager;
 import com.cube.nanotimer.cube.SolveTypeMethod;
 import com.cube.nanotimer.services.db.DataCallback;
 import com.cube.nanotimer.session.MethodStatistics;
@@ -465,6 +464,11 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   @Override
   public void onMove(CubeMove move) {
     if (!cubeReady || finished || session == null || session.getCurrentCase() == null) {
+      return;
+    }
+    if (session.isFromBeforeTheCase(move)) {
+      // The previous case's turn delivered late: neither the case nor its algorithm has it
+      session.onMove(move);
       return;
     }
     hidePracticeOffer(); // turning the next case is the answer to the offer
@@ -1106,14 +1110,12 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
    * The case is in front of the user, which is where the rep's looking runs from and where the
    * turns that count start.
    *
-   * <p>The cube is asked where it stands at the same moment. From here on, a turn it makes without
-   * reporting has to be recoverable, and it is only recoverable against a state: waiting for the
-   * next one to arrive by itself would leave the first turn of the rep the one turn whose loss
-   * nothing later could put right.
+   * <p>The cube's next reported state seeds what a turn it drops is measured against. Not the state
+   * read now: that runs ahead of turns still queued, which would then count twice and "repair" the
+   * new case by undoing them, two turns off whenever the user was already turning.
    */
   private void caseShown() {
     session.markCaseShown(System.currentTimeMillis());
-    session.onState(SmartCubeManager.INSTANCE.getCurrentState());
   }
 
   /**

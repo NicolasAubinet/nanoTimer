@@ -343,17 +343,13 @@ public final class DrillSession {
     if (currentCase == null || caseShownAtMs == NOT_SHOWN) {
       return null;
     }
+    if (isFromBeforeTheCase(move)) {
+      return null; // the previous case's turn, delivered late: like one delivered on time, dropped
+    }
     if (move.getHostTimestampMs() != null) {
       clockSkewMs = move.getHostTimestampMs() - move.getCubeTimestampMs();
     }
     long at = move.getCubeTimestampMs();
-    if (at < caseShownOnCubeClock()) {
-      // Turned before this case was up and delivered late: the cube still has to have it, or the
-      // two fall out of step, but it is the previous case's turn and cannot start this rep, and it
-      // is not one of the turns the rep is made of.
-      cube.applyMove(move.getFace(), move.isPrime());
-      return isCaseDone() ? complete(false) : null;
-    }
     if (moves.isEmpty()) {
       firstMoveMs = at;
     }
@@ -609,6 +605,19 @@ public final class DrillSession {
       }
     }
     return active;
+  }
+
+  /**
+   * Whether a turn was made before the case up was shown, though delivered after: the end of the
+   * previous case, or a start made too soon. It belongs to no rep, nor to anything following one.
+   */
+  public boolean isFromBeforeTheCase(CubeMove move) {
+    if (currentCase == null || caseShownAtMs == NOT_SHOWN) {
+      return true;
+    }
+    long skew = move.getHostTimestampMs() != null
+        ? move.getHostTimestampMs() - move.getCubeTimestampMs() : clockSkewMs;
+    return move.getCubeTimestampMs() < caseShownAtMs - skew;
   }
 
   /** When the case went up, said in the clock the moves are stamped on. */
