@@ -1306,8 +1306,14 @@
     <item quantity="other">Do %d more solves to get your next plan</item>
   </plurals>
   <string name="coach_reminder_text">Smart cube solves on %1$s.</string>
+  <string name="coach_reminder_due_tomorrow">Your next plan is due tomorrow</string>
+  <string name="coach_reminder_due_today">Your next plan is due today</string>
+  <plurals name="coach_reminder_on_time">
+    <item quantity="one">Do %1$d more smart cube solve on %2$s to get it on time.</item>
+    <item quantity="other">Do %1$d more smart cube solves on %2$s to get it on time.</item>
+  </plurals>
   <string name="coach_reminder_setting">Solve reminder</string>
-  <string name="coach_reminder_setting_summary">A notification a few days after a plan, when the next one still needs solves</string>
+  <string name="coach_reminder_setting_summary">A notification the day before your next plan is due, when it still needs solves</string>
   <string name="coach_sends_body">Once a week, in the background, Cubench sends the figures of your %1$s solves and drills to the coach, which writes a practice plan made for you.</string>
   <string name="coach_next_retry">The coach could not write this plan. It will be asked again on %1$s.</string>
   <string name="coach_writing">Writing your plan, this takes a few minutes…</string>

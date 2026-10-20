@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
@@ -22,6 +23,7 @@ import com.cube.nanotimer.vo.CubeMethod;
 import com.cube.nanotimer.vo.CubeType;
 import com.cube.nanotimer.vo.SolveType;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -172,8 +174,8 @@ final class CoachPlanJob {
   }
 
   /**
-   * Tells the solver once per plan, some days after it, how many solves the next one still needs.
-   * A session holds it back, so the job comes back when the session is over.
+   * Tells the solver once per plan, the day before the next one is due, how many solves it still
+   * needs. A session holds it back, so the job comes back when the session is over.
    */
   private static void remind(Context context, SolveType solveType, PlanSchedule schedule,
       long now) {
@@ -190,11 +192,41 @@ final class CoachPlanJob {
     }
     Options.INSTANCE.setCoachLastNudgeAt(now);
     int needed = schedule.getSolvesNeeded();
+    String type = Utils.toSolveTypeLocalizedName(context, solveType.getName());
+    Resources res = context.getResources();
+    int days = schedule.getState() == PlanSchedule.State.NOT_DUE
+        ? calendarDaysBetween(now, schedule.getDueAt()) : -1;
+    String title;
+    String text;
+    if (days == 0 || days == 1) {
+      title = context.getString(days == 0 ? R.string.coach_reminder_due_today
+          : R.string.coach_reminder_due_tomorrow);
+      text = res.getQuantityString(R.plurals.coach_reminder_on_time, needed, needed, type);
+    } else {
+      // Past due (a session held the reminder back), or a clock change: no day to name.
+      title = res.getQuantityString(R.plurals.coach_reminder_title, needed, needed);
+      text = context.getString(R.string.coach_reminder_text, type);
+    }
     notify(context, REMINDERS_CHANNEL, R.string.coach_channel_reminders, REMINDER_NOTIF_ID,
-        context.getResources().getQuantityString(R.plurals.coach_reminder_title, needed, needed),
-        context.getString(R.string.coach_reminder_text,
-            Utils.toSolveTypeLocalizedName(context, solveType.getName())),
-        solveType);
+        title, text, solveType);
+  }
+
+  /** How many midnights lie between two times, in the device's time zone. */
+  private static int calendarDaysBetween(long from, long to) {
+    Calendar day = Calendar.getInstance();
+    day.setTimeInMillis(from);
+    int count = 0;
+    while (true) {
+      day.set(Calendar.HOUR_OF_DAY, 0);
+      day.set(Calendar.MINUTE, 0);
+      day.set(Calendar.SECOND, 0);
+      day.set(Calendar.MILLISECOND, 0);
+      day.add(Calendar.DAY_OF_MONTH, 1);
+      if (day.getTimeInMillis() > to || count > 7) {
+        return count;
+      }
+      count++;
+    }
   }
 
   private static void notifyPlanReady(Context context, SolveType solveType) {
@@ -221,6 +253,7 @@ final class CoachPlanJob {
         .setColor(ContextCompat.getColor(context, R.color.cube_blue))
         .setContentTitle(title)
         .setContentText(text)
+        .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
         .setContentIntent(PendingIntent.getActivity(context, 0, open,
             PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
         .setAutoCancel(true)

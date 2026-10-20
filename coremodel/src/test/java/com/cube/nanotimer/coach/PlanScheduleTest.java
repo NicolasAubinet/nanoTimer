@@ -106,16 +106,16 @@ public class PlanScheduleTest {
   }
 
   @Test
-  public void testTheNudgeComesOncePerPlanAfterFourDays() {
-    Assert.assertFalse(schedule(5, PLAN + 4 * DAY - 1).nudgeDue(0));
-    Assert.assertTrue(schedule(5, PLAN + 4 * DAY).nudgeDue(0));
-    Assert.assertTrue(schedule(5, PLAN + 4 * DAY).nudgeDue(PLAN - DAY)); // told before that plan
-    Assert.assertFalse(schedule(5, PLAN + 30 * DAY).nudgeDue(PLAN + 4 * DAY));
+  public void testTheNudgeComesOncePerPlanTheDayBeforeItIsDue() {
+    Assert.assertFalse(schedule(5, PLAN + 6 * DAY - 1).nudgeDue(0));
+    Assert.assertTrue(schedule(5, PLAN + 6 * DAY).nudgeDue(0));
+    Assert.assertTrue(schedule(5, PLAN + 6 * DAY).nudgeDue(PLAN - DAY)); // told before that plan
+    Assert.assertFalse(schedule(5, PLAN + 30 * DAY).nudgeDue(PLAN + 6 * DAY));
   }
 
   @Test
   public void testNoNudgeWithEnoughSolvesOrBeforeAFirstPlanOrDuringASession() {
-    long now = PLAN + 5 * DAY;
+    long now = PLAN + 6 * DAY + MINUTE;
     Assert.assertFalse(schedule(SINCE, now).nudgeDue(0));
     Assert.assertFalse(PlanSchedule.of(0, FLOOR - 3, 0, DAY, now).nudgeDue(0));
     Assert.assertFalse(PlanSchedule.of(PLAN, 300, 5, now - MINUTE, now).nudgeDue(0));
@@ -124,11 +124,11 @@ public class PlanScheduleTest {
   /** A nudge a session holds back is still owed, so the job comes back for it. */
   @Test
   public void testANudgeHeldBackByASessionIsStillOwed() {
-    long now = PLAN + 5 * DAY;
+    long now = PLAN + 6 * DAY + MINUTE;
     PlanSchedule inSession = PlanSchedule.of(PLAN, 300, 5, now - MINUTE, now);
 
     Assert.assertTrue(inSession.nudgeOwed(0));
-    Assert.assertFalse(inSession.nudgeOwed(PLAN + 4 * DAY));
+    Assert.assertFalse(inSession.nudgeOwed(PLAN + 6 * DAY));
     Assert.assertFalse(schedule(SINCE, now).nudgeOwed(0));
   }
 

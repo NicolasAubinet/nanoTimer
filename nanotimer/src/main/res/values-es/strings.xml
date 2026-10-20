@@ -1261,8 +1261,14 @@
     <item quantity="other">Haz %d resoluciones más para recibir tu próximo plan</item>
   </plurals>
   <string name="coach_reminder_text">Resoluciones con smart cube en %1$s.</string>
+  <string name="coach_reminder_due_tomorrow">Tu próximo plan llega mañana</string>
+  <string name="coach_reminder_due_today">Tu próximo plan llega hoy</string>
+  <plurals name="coach_reminder_on_time">
+    <item quantity="one">Haz %1$d resolución más con smart cube en %2$s para recibirlo a tiempo.</item>
+    <item quantity="other">Haz %1$d resoluciones más con smart cube en %2$s para recibirlo a tiempo.</item>
+  </plurals>
   <string name="coach_reminder_setting">Recordatorio de resoluciones</string>
-  <string name="coach_reminder_setting_summary">Una notificación unos días después de un plan, cuando al siguiente aún le faltan resoluciones</string>
+  <string name="coach_reminder_setting_summary">Una notificación el día antes de tu próximo plan, cuando aún le faltan resoluciones</string>
   <string name="coach_sends_body">Una vez por semana, en segundo plano, Cubench envía al coach las cifras de tus resoluciones de %1$s y de tus entrenamientos, y este escribe un plan de práctica hecho para ti.</string>
   <string name="coach_next_retry">El coach no pudo escribir este plan. Se le volverá a pedir el %1$s.</string>
   <string name="coach_writing">Escribiendo tu plan, tarda unos minutos…</string>

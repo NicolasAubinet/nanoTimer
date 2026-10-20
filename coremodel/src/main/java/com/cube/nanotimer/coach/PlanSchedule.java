@@ -17,8 +17,8 @@ public final class PlanSchedule {
   /** How long after a solve a plan is not asked for, so it reads the whole session. */
   public static final long QUIET_MS = 15L * 60 * 1000;
 
-  /** How long after a plan the solver is told how many solves the next one still needs. */
-  public static final long NUDGE_AFTER_MS = 4 * DAY_MS;
+  /** The day before the next plan is due, the solver is told how many solves it still needs. */
+  public static final long NUDGE_AFTER_MS = PERIOD_MS - DAY_MS;
 
   public enum State {
     /** Less than a week since the last plan. */
@@ -107,8 +107,8 @@ public final class PlanSchedule {
   }
 
   /**
-   * Whether to tell the solver how many solves are missing: once per plan, some days after it,
-   * and never during a session.
+   * Whether to tell the solver how many solves are missing: once per plan, the day before the next
+   * one is due, and never during a session.
    *
    * @param lastNudgeAt when the solver was last told, 0 when never
    */
