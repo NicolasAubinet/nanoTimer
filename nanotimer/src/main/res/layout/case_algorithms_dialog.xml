@@ -1,25 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One case, big: the chart to recognise it by and the algorithms people actually use for it. -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- One case, big: the chart to recognise it by and the algorithms people actually use for it.
+     The whole body scrolls, so a long list on a short screen never pushes Close off. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:paddingLeft="16dp"
+   android:paddingRight="16dp"
+   android:fadeScrollbars="false"
+   android:scrollbarStyle="outsideOverlay">
+
+<LinearLayout
    android:layout_width="match_parent"
    android:layout_height="wrap_content"
    android:orientation="vertical"
-   android:paddingLeft="16dp"
-   android:paddingRight="16dp"
-   android:paddingTop="8dp">
+   android:paddingTop="8dp"
+   android:paddingBottom="4dp">
 
   <com.cube.nanotimer.gui.widget.LastLayerCaseView
      android:id="@+id/vCaseChart"
-     android:layout_width="160dp"
-     android:layout_height="160dp"
+     android:layout_width="128dp"
+     android:layout_height="128dp"
      android:layout_gravity="center_horizontal"/>
 
   <!-- An F2L pair's case, drawn on the 3D cube with only the cross and the pair in colour. A GONE
        WebView is never laid out, so the dialog only shows this well for a pair. -->
   <FrameLayout
      android:id="@+id/flCaseCube"
-     android:layout_width="196dp"
-     android:layout_height="196dp"
+     android:layout_width="164dp"
+     android:layout_height="164dp"
      android:layout_gravity="center_horizontal"
      android:background="@drawable/cube_stage"
      android:visibility="gone">
@@ -91,3 +99,4 @@
      android:textSize="12sp"/>
 
 </LinearLayout>
+</ScrollView>

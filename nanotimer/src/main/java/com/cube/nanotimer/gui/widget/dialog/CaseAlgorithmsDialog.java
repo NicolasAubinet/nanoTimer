@@ -3,6 +3,7 @@ package com.cube.nanotimer.gui.widget.dialog;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.InputType;
@@ -137,6 +138,8 @@ public class CaseAlgorithmsDialog extends NanoTimerDialogFragment {
   private LinearLayout yours;
   private View yoursLabel;
   private VirtualCube cube;
+  /** The scrolling body, capped to the room the Close button leaves. */
+  private View body;
 
   public static CaseAlgorithmsDialog newInstance(String caseCode) {
     return newInstance(caseCode, null);
@@ -162,6 +165,7 @@ public class CaseAlgorithmsDialog extends NanoTimerDialogFragment {
     chosen = Options.INSTANCE.getCaseAlgorithm(caseCode);
     own = Options.INSTANCE.getOwnCaseAlgorithm(caseCode);
     View view = LayoutInflater.from(getActivity()).inflate(R.layout.case_algorithms_dialog, null);
+    body = view;
     boolean pair = CaseAlgorithms.isPair(caseCode);
 
     TextView shape = view.findViewById(R.id.tvCaseShape);
@@ -231,6 +235,25 @@ public class CaseAlgorithmsDialog extends NanoTimerDialogFragment {
     super.onResume();
     if (cube != null) {
       cube.onResume();
+    }
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    fit();
+  }
+
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    fit();
+  }
+
+  /** A long list scrolls inside the dialog instead of pushing Close off a short screen. */
+  private void fit() {
+    if (getDialog() instanceof AlertDialog && getDialog().isShowing()) {
+      DialogUtils.fitToWindow((AlertDialog) getDialog(), body);
     }
   }
 
@@ -323,6 +346,7 @@ public class CaseAlgorithmsDialog extends NanoTimerDialogFragment {
     boolean any = yours.getChildCount() > 0;
     yoursLabel.setVisibility(any ? View.VISIBLE : View.GONE);
     yours.setVisibility(any ? View.VISIBLE : View.GONE);
+    fit(); // the solves read later can add rows
   }
 
   /**
