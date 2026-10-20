@@ -1053,7 +1053,6 @@
   <string name="case_title_pll">PLL %s</string>
   <string name="case_title_oll">OLL %s</string>
   <string name="case_algorithms">Algoritmos</string>
-  <string name="case_algorithms_source">Los más usados primero, según los votos de la comunidad de SpeedCubeDB. Toca el que uses.</string>
   <string name="case_algorithm_mine">El que usas</string>
   <string name="case_algorithm_unusual">Poco común</string>
   <string name="case_algorithm_used">Esta resolución</string>

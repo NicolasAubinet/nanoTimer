@@ -174,7 +174,6 @@ public class CaseAlgorithmsDialog extends NanoTimerDialogFragment {
       shape.setVisibility(View.GONE);
       view.findViewById(R.id.flCaseCube).setVisibility(View.VISIBLE);
       showPairCase((WebView) view.findViewById(R.id.wvCaseCube));
-      ((TextView) view.findViewById(R.id.tvCaseSource)).setText(R.string.case_algorithms_order);
     } else {
       ((LastLayerCaseView) view.findViewById(R.id.vCaseChart))
           .setDiagram(LastLayerDiagram.forCase(caseCode));
