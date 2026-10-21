@@ -81,6 +81,8 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+        // java.util.function, streams and the like exist only from API 24; minSdk is 21
+        coreLibraryDesugaringEnabled true
     }
 }
 
@@ -99,6 +101,8 @@ dependencies {
     implementation 'com.google.android.play:review:2.0.2' // Play In-App Review API
     implementation 'androidx.work:work-runtime:2.10.5' // the weekly coach plan; 2.11 needs API 23
     implementation 'com.android.billingclient:billing:8.0.0' // 8.1 needs API 23
+
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20231013' // android.jar's org.json is a stub in unit tests
