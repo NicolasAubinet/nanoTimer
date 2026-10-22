@@ -69,6 +69,15 @@ public final class F2LPairScrambles {
   }
 
   /**
+   * A scramble leaving the case an algorithm solves at front right, with no turn of the layer first:
+   * the algorithm, leading rotation included, runs at once. Null if the moves cannot be read.
+   */
+  public static String forAlgorithm(String algorithm, Random random) {
+    String undone = LastLayerScrambles.forAlgorithm(algorithm);
+    return undone == null ? null : lastLayer(random) + " " + undone;
+  }
+
+  /**
    * How many of the 384 placements of a pair's corner and edge (the cross in) read as this case, 0
    * for a code that is not one. What a case is dealt by: a piece in the last layer can be met under
    * four turns of it, so such a case is four times as likely as one with both pieces in slots.

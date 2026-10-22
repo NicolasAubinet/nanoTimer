@@ -13,6 +13,7 @@ import com.cube.nanotimer.smartcube.cube.CubieCube;
 import com.cube.nanotimer.smartcube.model.CubeMove;
 import com.cube.nanotimer.smartcube.model.CubeState;
 import com.cube.nanotimer.smartcube.model.Face;
+import com.cube.nanotimer.smartcube.step.CaseAlgorithms;
 import com.cube.nanotimer.smartcube.step.F2LPairScrambles;
 import com.cube.nanotimer.smartcube.step.LastLayerScrambles;
 import java.util.ArrayList;
@@ -1160,6 +1161,46 @@ public class DrillSessionTest {
     assertTrue(session.showCase(hand.clock).getTurns().isEmpty());
     assertEquals(dealt, session.getFacelets());
     assertNotNull(hand.execute(OLL_37));
+  }
+
+  /** A listed spelling led by a turn of the cube is dealt so its turns run without that turn. */
+  @Test
+  public void aListedSpellingLedByATurnOfTheCubeIsDealtFromItsFront() {
+    for (int seed = 0; seed < 8; seed++) {
+      DrillSession session = new DrillSession(spec("oll_37", 1), new Random(seed));
+      Hand hand = new Hand(session);
+      hand.practise("oll_37", OLL_37_LISTED_Y);
+      assertNotNull("seed " + seed, hand.execute("F' r U r' U' r' F r"));
+    }
+  }
+
+  /**
+   * Every F2L algorithm, practised, is dealt so its turns after the leading y run as written: the
+   * pair is spun into the slot that y would have brought to front right. On D, only the ones with
+   * no rotation left, which the test cannot relabel.
+   */
+  @Test
+  public void everyPairAlgorithmIsDealtSoItRunsWithoutItsLeadingTurn() {
+    StringBuilder wrong = new StringBuilder();
+    for (String code : F2LPairScrambles.cases()) {
+      for (CaseAlgorithms.Listed listed : CaseAlgorithms.shown(code)) {
+        String algorithm = listed.getMoves();
+        String run = LastLayerScrambles.withoutLeadingY(algorithm);
+        for (String layer : new String[] {"U", "D"}) {
+          if (layer.equals("D") && run.matches(".*[xyz].*")) {
+            continue;
+          }
+          DrillSession session = new DrillSession(pairSpec(code), new Random(7), null, layer);
+          Hand hand = new Hand(session);
+          hand.practise(code, algorithm);
+          if (hand.execute(LayerRotation.toFace(run, layer)) == null) {
+            wrong.append(code).append(' ').append(algorithm).append(" on ").append(layer)
+                .append('\n');
+          }
+        }
+      }
+    }
+    assertEquals("", wrong.toString());
   }
 
   /** The case an algorithm finishes, as the session deals it for practice. */

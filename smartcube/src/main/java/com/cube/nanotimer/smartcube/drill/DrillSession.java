@@ -174,20 +174,13 @@ public final class DrillSession {
   }
 
   /**
-   * Practises one case: it is dealt again each time it is solved, until {@link #endPractice}. A
-   * case already up and not yet turned is put back rather than spent, since leaving it was not an
-   * answer about it.
-   */
-  public void startPractice(String code) {
-    startPractice(code, null);
-  }
-
-  /**
-   * Practises one case with an algorithm being tried for it, dealt at that algorithm's own angle so
-   * it is run at once, with no turn of the layer or of the cube to find first.
+   * Practises one case with an algorithm for it, dealt again each time it is solved until
+   * {@link #endPractice}. It is dealt at the algorithm's own angle, so the algorithm is run at once
+   * with its leading turn of the cube dropped: a last layer case is turned to face it, and an F2L
+   * pair is put in the slot that turn would have brought to front right. A case already up and not
+   * yet turned is put back rather than spent, since leaving it was not an answer about it.
    *
-   * @param algorithm written with the layer on U, any leading turn of the cube already dropped; null
-   *     deals the case at any angle
+   * @param algorithm as listed, leading turn of the cube included; null deals the case at any angle
    */
   public void startPractice(String code, String algorithm) {
     if (currentCase != null && moves.isEmpty() && practiceCase == null
@@ -222,16 +215,20 @@ public final class DrillSession {
   private void deal(String code) {
     currentCase = code;
     if (pairs) {
-      // A random slot, so the pair is not always read in the same place. Practice keeps front right,
-      // where the algorithm on screen reads as written.
-      int spins = practiceCase != null ? 0 : random.nextInt(4);
-      currentScramble = LayerRotation.toFace(
-          LayerRotation.spun(F2LPairScrambles.forCase(currentCase, random), spins), layerFace);
+      // A random slot, so the pair is not always read in the same place. Practice spins it by the
+      // algorithm's leading y, so the moves after it run with no rotation.
+      String atItsAngle = practiceCase != null && practiceAlgorithm != null
+          ? F2LPairScrambles.forAlgorithm(practiceAlgorithm, random) : null;
+      int spins = atItsAngle != null ? LastLayerScrambles.leadingYQuarters(practiceAlgorithm)
+          : practiceCase != null ? 0 : random.nextInt(4);
+      currentScramble = LayerRotation.toFace(LayerRotation.spun(atItsAngle != null ? atItsAngle
+          : F2LPairScrambles.forCase(currentCase, random), spins), layerFace);
       pairCorner = LayerRotation.piece("DFR", spins, layerFace);
       pairEdge = LayerRotation.piece("FR", spins, layerFace);
     } else {
-      String atItsAngle = practiceCase != null
-          ? LastLayerScrambles.forAlgorithm(practiceAlgorithm) : null;
+      String atItsAngle = practiceCase != null && practiceAlgorithm != null
+          ? LastLayerScrambles.forAlgorithm(
+              LastLayerScrambles.withoutLeadingY(practiceAlgorithm)) : null;
       currentScramble = LayerRotation.toFace(atItsAngle != null ? atItsAngle
           : LastLayerScrambles.forCase(currentCase, random), layerFace);
     }

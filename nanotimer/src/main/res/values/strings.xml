@@ -960,7 +960,6 @@
   <string name="drill_practice_offer">Practice this case</string>
   <string name="drill_practice_back">Back to drill</string>
   <string name="drill_practice_mode">Practice, not counted</string>
-  <string name="drill_practice_pick">Tap Alg to pick the algorithm to practice</string>
   <string name="drill_wrong_angle">Wrong angle: undo these, then turn the cube to match the picture</string>
   <string name="drill_show_alg">Show alg</string>
   <string name="drill_choose_title">Algorithm for %1$s</string>

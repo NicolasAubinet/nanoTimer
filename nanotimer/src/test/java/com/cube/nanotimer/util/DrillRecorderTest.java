@@ -315,7 +315,7 @@ public class DrillRecorderTest {
 
   private static DrillRep practiceRep() {
     DrillSession session = new DrillSession(caseSpec(20), new Random(1));
-    session.startPractice("pll_ga");
+    session.startPractice("pll_ga", null);
     session.markCaseShown(SHOWN_AT_MS);
     return session.abandon();
   }

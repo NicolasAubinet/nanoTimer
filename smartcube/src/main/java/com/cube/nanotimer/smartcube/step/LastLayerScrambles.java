@@ -82,6 +82,22 @@ public final class LastLayerScrambles {
     return rest.toString();
   }
 
+  /**
+   * How far the turns of the whole cube about U an algorithm starts with turn it, in quarters
+   * clockwise from above: 1 for y, 2 for y2, 3 for y'. 0 when it starts with a turn of a face.
+   */
+  public static int leadingYQuarters(String algorithm) {
+    int quarters = 0;
+    for (String token : algorithm.trim().split("\\s+")) {
+      String bare = token.replace("(", "").replace(")", "");
+      if (!bare.matches("y2?'?")) {
+        break;
+      }
+      quarters += bare.startsWith("y2") ? 2 : bare.endsWith("'") ? 3 : 1;
+    }
+    return quarters % 4;
+  }
+
   /** The scramble with its two alignment turns chosen rather than drawn. */
   static String forCase(String caseCode, int beforeQuarters, int afterQuarters) {
     String algorithm = algorithmFor(caseCode);

@@ -168,6 +168,10 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   private String choosing;
   private String firstAlgorithm;
   private String tryingAlgorithm;
+  /** Choosing what to practise, from the drill's offer, rather than at a learning drill's start. */
+  private boolean choosingToPractise;
+  /** The algorithm practised once one is kept, as listed; null outside practice. */
+  private String practisedAlgorithm;
   private LinearLayout chooseList;
   /** Greys the practised algorithm's moves as they are turned; null where there is none to follow. */
   private AlgorithmFollower algorithmFollower;
@@ -183,7 +187,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   private final OnBackPressedCallback practiceBack = new OnBackPressedCallback(false) {
     @Override
     public void handleOnBackPressed() {
-      if (choosing != null) {
+      if (choosing != null && !choosingToPractise) {
         finish(); // no rep has been dealt, so there is no drill to sum up
         return;
       }
@@ -205,6 +209,9 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     casePips.setBars(true);
     practiceOffer = findViewById(R.id.tvDrillPracticeOffer);
     practiceAlgorithm = findViewById(R.id.tvDrillPracticeAlg);
+    algorithmFace = Typeface.createFromAsset(getAssets(), "fonts/JetBrainsMono-Medium.ttf");
+    practiceAlgorithm.setTypeface(algorithmFace);
+    practiceAlgorithm.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
     practiceAlgorithmRow = findViewById(R.id.llDrillPracticeAlg);
     practiceCasePicture = findViewById(R.id.cvDrillPracticeCase);
     showAlg = findViewById(R.id.btDrillShowAlg);
@@ -215,12 +222,14 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       }
     });
     chooseList = findViewById(R.id.llDrillChoose);
-    findViewById(R.id.btDrillUseThis).setOnClickListener(new View.OnClickListener() {
+    View.OnClickListener keep = new View.OnClickListener() {
       @Override
       public void onClick(View v) {
         useTriedAlgorithm();
       }
-    });
+    };
+    findViewById(R.id.btDrillUseThis).setOnClickListener(keep);
+    findViewById(R.id.btDrillUseThisWide).setOnClickListener(keep);
     Button chooseReset = findViewById(R.id.btDrillChooseReset);
     chooseReset.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -228,8 +237,13 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
         resetRep();
       }
     });
-    DrillControlLabels.apply(new Button[] {chooseReset}, new int[] {R.drawable.ic_drill_reset},
-        new int[] {R.string.drill_reset});
+    Button chooseBack = findViewById(R.id.btDrillChooseBack);
+    chooseBack.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        leavePractice();
+      }
+    });
     algorithmAnimator = new ScrambleFollowAnimator(practiceAlgorithm);
     Drawable bulb = ContextCompat.getDrawable(this, R.drawable.ic_case_idea).mutate();
     bulb.setTint(ContextCompat.getColor(this, R.color.on_accent));
@@ -252,9 +266,15 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
               String starred = Options.INSTANCE.getCaseAlgorithm(choosing);
               if (starred != null) {
                 tryingAlgorithm = starred;
-                session.setPracticeAlgorithm(fromTheFront(starred));
+                session.setPracticeAlgorithm(starred);
               }
               buildChooseRows();
+            } else if (session != null && session.getPracticeCase() != null) {
+              String starred = Options.INSTANCE.getCaseAlgorithm(session.getPracticeCase());
+              if (starred != null) {
+                practisedAlgorithm = starred;
+                session.setPracticeAlgorithm(starred); // dealt at its angle once the popup closes
+              }
             }
             showPracticeAlgorithm(); // a pick in the case popup is the algorithm practised
             if (session != null && session.getSpec().isLearning()) {
@@ -700,27 +720,38 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   }
 
   /**
-   * The offered case, over and over against the algorithm the user picks, until they go back. The
-   * popup opens on its own while no algorithm is picked for the case.
+   * The offered case, over and over until they go back: first with its algorithms to try on the
+   * cube, starting on the starred one, then against the one kept.
    */
   private void enterPractice() {
     if (session == null || offeredCase == null) {
       return;
     }
+    String starred = Options.INSTANCE.getCaseAlgorithm(offeredCase);
+    String recommended = recommendedAlgorithm(offeredCase);
+    List<CaseAlgorithms.Listed> listed = CaseAlgorithms.shown(offeredCase);
+    String first = starred != null ? starred : recommended != null ? recommended
+        : listed.isEmpty() ? null : listed.get(0).getMoves();
+    if (first == null) {
+      return;
+    }
     hidePracticeOffer();
     lastRepRow.removeCallbacks(showNextCase); // tapped during the beat
-    session.startPractice(offeredCase);
-    setPracticing(true);
-    drawCase();
-    if (Options.INSTANCE.getCaseAlgorithm(offeredCase) == null) {
-      showAlgorithms();
-    }
+    choosingToPractise = true;
+    beginChoosing(offeredCase, first);
   }
 
+  /** Back to the drill, from practice or from choosing what to practise. */
   private void leavePractice() {
     lastRepRow.removeCallbacks(showNextCase);
     session.endPractice();
-    setPracticing(false);
+    practisedAlgorithm = null;
+    if (choosing != null) {
+      clearChoosing();
+      setChoosing(false);
+    } else {
+      setPracticing(false);
+    }
     nextRep();
   }
 
@@ -748,35 +779,61 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       endChoosing();
       return;
     }
-    choosing = toChoose.get(chooseIndex);
+    String code = toChoose.get(chooseIndex);
     // Starts on the one the case popup recommends, unless the drill names its own
-    String recommended = recommendedAlgorithm(choosing);
-    firstAlgorithm = recommended != null && session.getSpec().getCaseAlgorithm(choosing) == null
-        ? recommended : learningAlgorithm(choosing);
-    tryingAlgorithm = firstAlgorithm;
-    setTitle(getString(R.string.drill_choose_title, getString(choosing.startsWith("oll_")
-        ? R.string.case_title_oll : R.string.case_title_pll,
-        LastLayerCaseNames.shortName(choosing))));
-    session.startPractice(choosing, fromTheFront(tryingAlgorithm));
+    String recommended = recommendedAlgorithm(code);
+    beginChoosing(code, recommended != null && session.getSpec().getCaseAlgorithm(code) == null
+        ? recommended : learningAlgorithm(code));
+  }
+
+  /** The case dealt at the first algorithm's angle, with its algorithms in the card's place. */
+  private void beginChoosing(String code, String first) {
+    choosing = code;
+    firstAlgorithm = first;
+    tryingAlgorithm = first;
+    setTitle(getString(R.string.drill_choose_title, CaseAlgorithms.isPair(code)
+        ? getString(R.string.case_title_f2l)
+        : getString(code.startsWith("oll_") ? R.string.case_title_oll : R.string.case_title_pll,
+            LastLayerCaseNames.shortName(code))));
+    session.startPractice(code, first);
     setChoosing(true);
     buildChooseRows();
     drawCase();
   }
 
+  private void clearChoosing() {
+    choosing = null;
+    firstAlgorithm = null;
+    tryingAlgorithm = null;
+    choosingToPractise = false;
+    setTitle(label);
+  }
+
   /**
-   * An algorithm as tried while choosing: the case is dealt at its own angle, so a turn of the cube
-   * it starts with is dropped rather than asked for. What gets starred is the algorithm as listed.
+   * An algorithm as practised: the case is dealt at its own angle, so a turn of the cube it starts
+   * with is dropped rather than asked for. What gets starred is the algorithm as listed.
    */
   private static String fromTheFront(String algorithm) {
     return algorithm == null ? null : LastLayerScrambles.withoutLeadingY(algorithm);
   }
 
-  /** Stars the algorithm being tried, which the drill then teaches, and moves on. */
+  /** Stars the algorithm being tried: practice goes on with it, a learning drill teaches it. */
   private void useTriedAlgorithm() {
     if (choosing == null || tryingAlgorithm == null) {
       return;
     }
     Options.INSTANCE.setCaseAlgorithm(choosing, tryingAlgorithm);
+    if (choosingToPractise) {
+      practisedAlgorithm = tryingAlgorithm;
+      clearChoosing();
+      setChoosing(false);
+      setPracticing(true);
+      if (session.getSpec().isLearning()) {
+        teachAll();
+      }
+      restartPractice(); // dealt afresh, so the kept one is followed from its first turn
+      return;
+    }
     session.setTaughtAlgorithm(choosing, tryingAlgorithm);
     chooseIndex++;
     chooseNext();
@@ -784,7 +841,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
 
   /** The listed algorithm the case popup marks as recommended, or null where the vote is close. */
   private static String recommendedAlgorithm(String code) {
-    for (LastLayerCaseAlgorithms.Algorithm listed : LastLayerCaseAlgorithms.listed(code)) {
+    for (CaseAlgorithms.Listed listed : CaseAlgorithms.shown(code)) {
       if (listed.isRecommended()) {
         return listed.getMoves();
       }
@@ -813,22 +870,39 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   }
 
   private void endChoosing() {
-    choosing = null;
-    firstAlgorithm = null;
-    tryingAlgorithm = null;
-    setTitle(label);
+    clearChoosing();
     session.endPractice();
     setChoosing(false);
     nextRep();
   }
 
-  /** Practice, with the case's algorithms and a button to keep one in place of the drill's card. */
+  /**
+   * Practice, with the case's algorithms and a button to keep one in place of the drill's card.
+   * Choosing what to practise also gets a way back to the drill without keeping any.
+   */
   private void setChoosing(boolean on) {
     setPracticing(on);
     findViewById(R.id.llDrillCard).setVisibility(on ? View.GONE : View.VISIBLE);
     findViewById(R.id.llDrillButtons).setVisibility(on ? View.GONE : View.VISIBLE);
     chooseList.setVisibility(on ? View.VISIBLE : View.GONE);
     findViewById(R.id.llDrillChooseButtons).setVisibility(on ? View.VISIBLE : View.GONE);
+    Button chooseBack = findViewById(R.id.btDrillChooseBack);
+    chooseBack.setVisibility(on && choosingToPractise ? View.VISIBLE : View.GONE);
+    findViewById(R.id.btDrillUseThis).setVisibility(choosingToPractise ? View.GONE : View.VISIBLE);
+    findViewById(R.id.btDrillUseThisWide)
+        .setVisibility(choosingToPractise ? View.VISIBLE : View.GONE);
+    if (on) {
+      // Fitted once the row's buttons are known, since a hidden one has no width to fit in
+      Button chooseReset = findViewById(R.id.btDrillChooseReset);
+      if (choosingToPractise) {
+        DrillControlLabels.apply(new Button[] {chooseReset, chooseBack},
+            new int[] {R.drawable.ic_drill_reset, R.drawable.ic_drill_back},
+            new int[] {R.string.drill_reset, R.string.drill_practice_back});
+      } else {
+        DrillControlLabels.apply(new Button[] {chooseReset}, new int[] {R.drawable.ic_drill_reset},
+            new int[] {R.string.drill_reset});
+      }
+    }
   }
 
   /**
@@ -839,7 +913,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     chooseList.removeAllViews();
     List<String> shown = new ArrayList<String>();
     addIfNew(shown, firstAlgorithm);
-    for (LastLayerCaseAlgorithms.Algorithm listed : LastLayerCaseAlgorithms.listed(choosing)) {
+    for (CaseAlgorithms.Listed listed : CaseAlgorithms.shown(choosing)) {
       addIfNew(shown, listed.getMoves());
     }
     addIfNew(shown, Options.INSTANCE.getOwnCaseAlgorithm(choosing));
@@ -899,9 +973,6 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     ((RadioButton) row.findViewById(R.id.rbChooseRow)).setChecked(algorithm.equals(tryingAlgorithm));
     TextView moves = row.findViewById(R.id.tvChooseRowAlg);
     moves.setText(fromTheFront(algorithm));
-    if (algorithmFace == null) {
-      algorithmFace = Typeface.createFromAsset(getAssets(), "fonts/JetBrainsMono-Medium.ttf");
-    }
     moves.setTypeface(algorithmFace);
     TextView tagView = row.findViewById(R.id.tvChooseRowTag);
     tagView.setText(tag);
@@ -926,7 +997,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
           return;
         }
         tryingAlgorithm = algorithm;
-        session.setPracticeAlgorithm(fromTheFront(algorithm));
+        session.setPracticeAlgorithm(algorithm);
         buildChooseRows();
         restartPractice(); // dealt afresh, so the new one is tried from the start
       }
@@ -970,19 +1041,19 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     showPracticeAlgorithm();
   }
 
-  /** The algorithm picked for the case being practised, or being tried for it, or how to pick one. */
+  /** The algorithm kept for the case being practised, or being tried for it, as it is dealt. */
   private void showPracticeAlgorithm() {
     String code = session == null ? null : session.getPracticeCase();
     if (code == null) {
       return;
     }
-    followAlgorithm(code, code.equals(choosing) ? fromTheFront(tryingAlgorithm)
-        : Options.INSTANCE.getCaseAlgorithm(code));
+    followAlgorithm(code, fromTheFront(code.equals(choosing) ? tryingAlgorithm
+        : practisedAlgorithm));
   }
 
   /**
-   * Writes an algorithm under the cube and greys it as turned, or says how to pick one. A last
-   * layer case is drawn beside it at the angle the algorithm starts from, which nothing else says.
+   * Writes an algorithm under the cube and greys it as turned. A last layer case is drawn beside it
+   * at the angle the algorithm starts from, which nothing else says.
    */
   private void followAlgorithm(String code, String algorithm) {
     LastLayerDiagram diagram = algorithm != null && code != null
@@ -1000,15 +1071,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
         algorithmFollower = null; // shown as written, just not greyed
       }
     }
-    practiceAlgorithm.setText(algorithm != null ? algorithm
-        : getString(R.string.drill_practice_pick));
-    practiceAlgorithm.setTextSize(TypedValue.COMPLEX_UNIT_SP, algorithm != null ? 18 : 14);
-    if (algorithmFace == null) {
-      algorithmFace = Typeface.createFromAsset(getAssets(), "fonts/JetBrainsMono-Medium.ttf");
-    }
-    practiceAlgorithm.setTypeface(algorithm != null ? algorithmFace : Typeface.DEFAULT);
-    practiceAlgorithm.setTextColor(ContextCompat.getColor(this,
-        algorithm != null ? R.color.white : R.color.secondary_text));
+    practiceAlgorithm.setText(algorithm);
     showAlgorithmProgress();
   }
 

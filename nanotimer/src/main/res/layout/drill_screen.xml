@@ -298,34 +298,53 @@
     <!-- None of the three is a start or stop control: the cube still reports both ends of a rep.
          Quiet pills, so they do not outshout the cube; DrillControlLabels sizes the words. -->
     <!-- While choosing: the case dealt again from the start, and the algorithm being tried starred
-         before moving to the next case to choose for. -->
+         before moving to the next case to choose for. Choosing what to practise adds a way back to
+         the drill, which leaves no room for the keep button beside it, so that one gets a row. -->
     <LinearLayout
        android:id="@+id/llDrillChooseButtons"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:layout_marginTop="10dp"
-       android:orientation="horizontal"
+       android:orientation="vertical"
        android:visibility="gone">
 
-      <Button
-         android:id="@+id/btDrillChooseReset"
-         style="@style/DrillGhostButton"
-         android:layout_width="0dp"
-         android:layout_weight="1"
-         android:text="@string/drill_reset"/>
+      <LinearLayout
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:orientation="horizontal">
+
+        <Button
+           android:id="@+id/btDrillChooseReset"
+           style="@style/DrillGhostButton"
+           android:layout_width="0dp"
+           android:layout_weight="1"
+           android:text="@string/drill_reset"/>
+
+        <Button
+           android:id="@+id/btDrillChooseBack"
+           style="@style/DrillGhostButton"
+           android:layout_width="0dp"
+           android:layout_weight="1"
+           android:layout_marginLeft="8dp"
+           android:text="@string/drill_practice_back"
+           android:visibility="gone"/>
+
+        <TextView
+           android:id="@+id/btDrillUseThis"
+           style="@style/DrillKeepButton"
+           android:text="@string/drill_choose_use"
+           android:layout_width="0dp"
+           android:layout_weight="2"
+           android:layout_marginLeft="8dp"/>
+      </LinearLayout>
 
       <TextView
-         android:id="@+id/btDrillUseThis"
-         android:layout_width="0dp"
-         android:layout_height="48dp"
-         android:layout_weight="2"
-         android:layout_marginLeft="8dp"
-         android:background="@drawable/drill_practice_offer"
-         android:fontFamily="@font/roboto_medium"
-         android:gravity="center"
+         android:id="@+id/btDrillUseThisWide"
+         style="@style/DrillKeepButton"
          android:text="@string/drill_choose_use"
-         android:textColor="@color/on_accent"
-         android:textSize="15sp"/>
+         android:layout_width="match_parent"
+         android:layout_marginTop="10dp"
+         android:visibility="gone"/>
     </LinearLayout>
 
     <LinearLayout

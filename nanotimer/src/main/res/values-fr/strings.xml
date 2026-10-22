@@ -932,7 +932,6 @@
   <string name="drill_practice_offer">Travailler ce cas</string>
   <string name="drill_practice_back">Retour à l\'entraînement</string>
   <string name="drill_practice_mode">Pratique, non comptée</string>
-  <string name="drill_practice_pick">Touchez Alg pour choisir l\'algorithme à travailler</string>
   <string name="drill_wrong_angle">Mauvais angle : annulez ceci, puis tournez le cube comme sur l\'image</string>
   <string name="drill_show_alg">Voir l\'algo</string>
   <string name="drill_choose_title">Algorithme pour %1$s</string>
