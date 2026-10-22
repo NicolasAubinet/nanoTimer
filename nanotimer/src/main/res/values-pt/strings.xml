@@ -932,8 +932,6 @@
   <string name="drill_rep_guided">com o algoritmo</string>
   <string name="drill_rep_unaided">sem olhar</string>
   <string name="drill_practice_offer">Praticar este caso</string>
-  <string name="drill_practice_back">Voltar ao treino</string>
-  <string name="drill_practice_mode">Prática, não conta</string>
   <string name="drill_wrong_angle">Ângulo errado: desfaça isto e gire o cubo como na imagem</string>
   <string name="drill_show_alg">Ver alg</string>
   <string name="drill_choose_title">Algoritmo para %1$s</string>
@@ -946,7 +944,6 @@
   </plurals>
   <string name="drill_choose_not_counted_moves">não conta: movimentos errados</string>
   <string name="drill_choose_not_counted_reset">não conta: recomeçado</string>
-  <string name="drill_practice_other">Não é o escolhido</string>
   <string name="drill_cases_cleared">%1$d de %2$d casos concluídos</string>
   <string name="drill_summary_cases_cleared">casos concluídos</string>
   <string name="drill_summary_pairs">Pares</string>

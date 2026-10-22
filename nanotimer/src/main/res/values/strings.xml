@@ -958,8 +958,6 @@
   <string name="drill_rep_guided">with the algorithm</string>
   <string name="drill_rep_unaided">without looking</string>
   <string name="drill_practice_offer">Practice this case</string>
-  <string name="drill_practice_back">Back to drill</string>
-  <string name="drill_practice_mode">Practice, not counted</string>
   <string name="drill_wrong_angle">Wrong angle: undo these, then turn the cube to match the picture</string>
   <string name="drill_show_alg">Show alg</string>
   <string name="drill_choose_title">Algorithm for %1$s</string>
@@ -972,7 +970,6 @@
   </plurals>
   <string name="drill_choose_not_counted_moves">not counted: wrong moves</string>
   <string name="drill_choose_not_counted_reset">not counted: reset</string>
-  <string name="drill_practice_other">Not the chosen one</string>
   <string name="drill_cases_cleared">%1$d of %2$d cases cleared</string>
   <string name="drill_summary_cases_cleared">cases cleared</string>
   <string name="drill_summary_pairs">Pairs</string>
