@@ -84,7 +84,9 @@ public final class DrillControlLabels {
         continue;
       }
       Drawable icon = ContextCompat.getDrawable(button.getContext(), icons[i]).mutate();
-      icon.setTint(ContextCompat.getColor(button.getContext(), R.color.color_accent));
+      // An activated button is filled with the accent, so its icon takes the label's colour.
+      icon.setTint(button.isActivated() ? button.getCurrentTextColor()
+          : ContextCompat.getColor(button.getContext(), R.color.color_accent));
       int size = Math.round(button.getTextSize() * ICON_RATIO);
       icon.setBounds(0, 0, size, size);
       SpannableStringBuilder label = new SpannableStringBuilder(" " + GAP);

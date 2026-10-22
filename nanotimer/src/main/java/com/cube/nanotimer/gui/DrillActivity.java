@@ -407,8 +407,16 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     return true;
   }
 
-  /** The three controls, each with its icon; practice turns Skip into the way back. */
+  /**
+   * The three controls, each with its icon; practice turns Skip into the way back, filled like the
+   * offer that led in, so the way out of practice is not missed.
+   */
   private void labelButtons(boolean practising) {
+    skip.setBackgroundResource(
+        practising ? R.drawable.drill_practice_offer : R.drawable.drill_ghost_button);
+    skip.setTextColor(ContextCompat.getColor(this,
+        practising ? R.color.on_accent : R.color.breakdown_chip_text));
+    skip.setActivated(practising);
     DrillControlLabels.apply(
         new Button[] {findViewById(R.id.btDrillAlgorithm), findViewById(R.id.btDrillReset), skip},
         new int[] {R.drawable.ic_drill_alg, R.drawable.ic_drill_reset,
