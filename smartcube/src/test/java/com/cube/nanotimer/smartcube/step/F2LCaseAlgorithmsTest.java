@@ -28,6 +28,18 @@ public class F2LCaseAlgorithmsTest {
     assertEquals("", wrong.toString());
   }
 
+  /** A slot's rotation glued onto a sheet's own read as "y y'" on screen. */
+  @Test
+  public void noAlgorithmStartsWithTwoRotations() {
+    StringBuilder wrong = new StringBuilder();
+    for (String[] row : F2LCaseAlgorithms.rows()) {
+      if (row[1].matches("y['2]? y['2]?( .*)?")) {
+        wrong.append(row[0]).append(": ").append(row[1]).append('\n');
+      }
+    }
+    assertEquals("", wrong.toString());
+  }
+
   @Test
   public void onlyTheNamedEmptySlotIsDisturbed() {
     StringBuilder wrong = new StringBuilder();
