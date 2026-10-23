@@ -577,6 +577,121 @@ public class DrillSessionTest {
     assertTrue("nine times the weight should show: " + costly, costly > 25);
   }
 
+  private static final List<String> FIVE_PLLS =
+      Arrays.asList("pll_h", "pll_z", "pll_t", "pll_ua", "pll_rb");
+
+  /** The coach's drill: five cases, weighted with no weights, 3 wins over 5 clean reps to clear. */
+  private static DrillSpec coachDrill(long rbTarget) {
+    Map<String, Long> targets = new HashMap<String, Long>();
+    for (String code : FIVE_PLLS) {
+      targets.put(code, 60_000L);
+    }
+    targets.put("pll_rb", rbTarget);
+    return new DrillSpec("coach", DrillSpec.Type.CASE_EXECUTION, DrillSpec.Delivery.VIRTUAL,
+        FIVE_PLLS, DrillSpec.Selection.WEIGHTED, 40, 0, targets, 3, 5, null);
+  }
+
+  /** The order a whole drill dealt its cases in, every rep solved at once. */
+  private static List<String> dealOrder(DrillSession session) {
+    List<String> order = new ArrayList<String>();
+    Hand hand = new Hand(session);
+    while (hand.next()) {
+      order.add(session.getCurrentCase());
+      hand.pause(300);
+      assertNotNull(hand.execute(inverse(session.getCurrentScramble())));
+    }
+    return order;
+  }
+
+  /** A weighted drill deals in passes too: a case cannot sit out while the others clear. */
+  @Test
+  public void aWeightedDrillDealsEveryCaseInEachPass() {
+    for (int seed = 0; seed < 200; seed++) {
+      List<String> order = dealOrder(new DrillSession(coachDrill(60_000), new Random(seed)));
+      // The fifth pass is where cases clear and cleared ones are mixed back in
+      for (int start = 0; start < 20; start += 5) {
+        assertEquals("seed " + seed + ": " + order, new HashSet<String>(FIVE_PLLS),
+            new HashSet<String>(order.subList(start, start + 5)));
+      }
+    }
+  }
+
+  @Test
+  public void noCaseIsDealtTwiceInARowWhileThreeOrMoreAreLeft() {
+    for (int seed = 0; seed < 200; seed++) {
+      List<String> order = dealOrder(new DrillSession(coachDrill(60_000), new Random(seed)));
+      for (int i = 1; i <= 20; i++) { // up to the fifth pass's first case: five still left
+        assertNotEquals("seed " + seed + ": " + order, order.get(i - 1), order.get(i));
+      }
+    }
+  }
+
+  /** The last case left is mixed with cleared ones, so its turn cannot be seen coming. */
+  @Test
+  public void theLastCaseLeftIsMixedWithClearedOnes() {
+    int last = 0;
+    int mixedIn = 0;
+    for (int seed = 0; seed < 100; seed++) {
+      DrillSession session = new DrillSession(coachDrill(1), new Random(seed));
+      List<String> order = dealOrder(session);
+      assertEquals(40, order.size()); // Rb never beats 1 ms, so the ceiling ends it
+      int alone = 0;
+      while (!othersCleared(order, alone)) {
+        alone++;
+      }
+      for (String code : order.subList(alone, order.size())) {
+        if ("pll_rb".equals(code)) {
+          last++;
+        } else {
+          mixedIn++;
+        }
+      }
+    }
+    double share = (double) last / (last + mixedIn);
+    assertTrue("the last case should come up about half the time: " + share,
+        share > 0.4 && share < 0.6);
+  }
+
+  /** Whether every case but Rb has had its five winning reps, and so cleared, by this point. */
+  private static boolean othersCleared(List<String> order, int at) {
+    for (String code : FIVE_PLLS) {
+      if (!"pll_rb".equals(code) && Collections.frequency(order.subList(0, at), code) < 5) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /** Weight puts extra copies of a case in a pass, never so many that the rest wait long. */
+  @Test
+  public void aHeavyCaseTakesAtMostThreeTurnsAPass() {
+    List<String> codes = Arrays.asList("pll_h", "pll_z", "pll_t");
+    Map<String, Long> weights = new HashMap<String, Long>();
+    weights.put("pll_h", 20L);
+    for (int seed = 0; seed < 50; seed++) {
+      DrillSpec spec = new DrillSpec("w", DrillSpec.Type.CASE_EXECUTION,
+          DrillSpec.Delivery.VIRTUAL, codes, DrillSpec.Selection.WEIGHTED, 15, 0, null);
+      List<String> order = dealOrder(new DrillSession(spec, new Random(seed), weights));
+      for (int start = 0; start < 15; start += 5) {
+        List<String> pass = order.subList(start, start + 5);
+        assertEquals("seed " + seed + ": " + order, 3, Collections.frequency(pass, "pll_h"));
+        assertEquals(new HashSet<String>(codes), new HashSet<String>(pass));
+      }
+    }
+  }
+
+  @Test
+  public void anUntouchedCaseLeftForPracticeIsDealtNextInAWeightedDrillToo() {
+    DrillSession session = new DrillSession(coachDrill(60_000), new Random(5));
+    Hand hand = new Hand(session);
+    hand.next();
+    String left = session.getCurrentCase();
+    hand.practise("pll_aa");
+    session.endPractice();
+    hand.next();
+    assertEquals(left, session.getCurrentCase());
+  }
+
   @Test
   public void givingUpSpendsTheRep() {
     DrillSession session = new DrillSession(spec("oll_21", 2), new Random(2));
@@ -606,7 +721,7 @@ public class DrillSessionTest {
     DrillSession session = new DrillSession(retiring(60_000, 1, 20, 3, 3), new Random(7));
     Map<String, Integer> dealt = solveAll(session, false);
     assertEquals(3, dealt.get("pll_h").intValue());
-    assertEquals(17, dealt.get("pll_z").intValue());
+    assertEquals(20, session.getReps().size());
     assertEquals(0, session.getTally().getWins("pll_z"));
     assertEquals(Collections.singletonList("pll_z"), session.getActiveCases());
   }
@@ -628,8 +743,10 @@ public class DrillSessionTest {
     DrillSession session = new DrillSession(spec, new Random(7));
     Map<String, Integer> guided = new HashMap<String, Integer>();
     Hand hand = new Hand(session);
+    int reps = 0;
     while (hand.next()) {
       String code = session.getCurrentCase();
+      reps += session.isRetired(code) ? 0 : 1;
       boolean wasGuided = session.isGuided();
       if (wasGuided) {
         guided.put(code, guided.containsKey(code) ? guided.get(code) + 1 : 1);
@@ -642,7 +759,7 @@ public class DrillSessionTest {
     assertEquals(DrillSession.GUIDED_REPS, guided.get("pll_z").intValue());
     assertEquals("no time to beat, so every clean rep wins", 3,
         session.getTally().getWins("pll_h"));
-    assertEquals(12, session.getReps().size());
+    assertEquals(12, reps);
     assertTrue(session.isFinished());
   }
 
@@ -660,9 +777,9 @@ public class DrillSessionTest {
           && session.getTally().getShowings(code) == 2) {
         session.markRevealed();
       }
+      reps += session.isRetired(code) ? 0 : 1; // a cleared case mixed back in is not its run
       hand.pause(300);
       hand.execute(inverse(session.getCurrentScramble()));
-      reps++;
     }
     assertEquals("three guided and three unaided each, plus the lost run of two and its look-up",
         15, reps);
@@ -727,13 +844,15 @@ public class DrillSessionTest {
         Collections.<String, String>emptyMap(), null);
   }
 
-  /** How often each case was dealt over a whole drill, every rep solved at once. */
+  /** How often each case was dealt before it cleared, every rep solved at once. */
   private static Map<String, Integer> solveAll(DrillSession session, boolean reveal) {
     Map<String, Integer> dealt = new HashMap<String, Integer>();
     Hand hand = new Hand(session);
     while (hand.next()) {
       String code = session.getCurrentCase();
-      dealt.put(code, dealt.containsKey(code) ? dealt.get(code) + 1 : 1);
+      if (!session.isRetired(code)) {
+        dealt.put(code, dealt.containsKey(code) ? dealt.get(code) + 1 : 1);
+      }
       if (reveal) {
         session.markRevealed();
       }
@@ -844,7 +963,9 @@ public class DrillSessionTest {
     Set<String> dealt = new HashSet<String>();
     while (hand.next()) {
       dealt.add(session.getCurrentCase());
-      assertTrue(session.getActiveCases().contains(session.getCurrentCase()));
+      assertTrue("in the set, or cleared and mixed back in",
+          session.getActiveCases().contains(session.getCurrentCase())
+              || session.isRetired(session.getCurrentCase()));
       assertNotNull(hand.execute(inverse(session.getCurrentScramble())));
     }
     assertEquals(new HashSet<String>(codes), dealt);

@@ -48,6 +48,11 @@ public final class DrillSession {
   /** Where the faces sit in a facelet string, which is the order {@link CubieCube} writes one in. */
   private static final String FACELET_ORDER = "URFDLB";
 
+  /** Most copies of one case a weighted pass holds, so a heavy case cannot crowd out the rest. */
+  private static final int MAX_COPIES = 3;
+  /** Cases left below which cleared ones are mixed back in. */
+  private static final int MIN_MIX = 3;
+
   /** The cross and the four slots with the cross on D, each slot as its corner and its edge. */
   private static final String[] CROSS_EDGES = {"DF", "DR", "DB", "DL"};
   private static final String[][] SLOTS = {{"DFR", "FR"}, {"DLF", "FL"}, {"DBL", "BL"},
@@ -62,6 +67,10 @@ public final class DrillSession {
   private final List<String> unknownCases = new ArrayList<String>();
   private final List<DrillRep> reps = new ArrayList<DrillRep>();
   private final List<String> pass = new ArrayList<String>();
+  /** The case last dealt by the drill, which the next deal avoids where it can. */
+  private String lastDealt;
+  /** A case left untouched for practice, dealt first when the drill resumes. */
+  private String dealNext;
   private final Map<String, String> taught = new HashMap<String, String>();
 
   /** An F2L pair drill, whose case is a pair and whose rep ends when that pair is in. */
@@ -183,9 +192,8 @@ public final class DrillSession {
    * @param algorithm as listed, leading turn of the cube included; null deals the case at any angle
    */
   public void startPractice(String code, String algorithm) {
-    if (currentCase != null && moves.isEmpty() && practiceCase == null
-        && spec.getSelection() != DrillSpec.Selection.WEIGHTED) {
-      pass.add(currentCase); // the end of the pass is what is dealt next
+    if (currentCase != null && moves.isEmpty() && practiceCase == null) {
+      dealNext = currentCase;
     }
     practiceCase = code;
     practiceAlgorithm = algorithm;
@@ -749,8 +757,7 @@ public final class DrillSession {
    * drill with nothing to say about it, and on a short drill it never comes round again.
    *
    * <p>Never as the next case, which is what {@link #resetRep} already offers and what nobody needs
-   * twice. Nothing is done where the pass is spent, since the next one deals every case anyway, and
-   * nothing for a drill drawing by weight, which can deal any case at any time.
+   * twice. Nothing is done where the pass is spent, since the next one deals every case anyway.
    *
    * <p><b>And nothing where the drill has no rep to spare.</b> The extra showing is a rep like any
    * other and comes out of the same count, so on a drill of one rep per case it was paid for by the
@@ -759,37 +766,82 @@ public final class DrillSession {
    */
   private void showAgain(String code) {
     if (!pass.isEmpty() && spec.getReps() - reps.size() > pass.size()) {
-      pass.add(random.nextInt(pass.size()), code);
+      pass.add(code); // the pass is drawn from at random, and never repeats the case just dealt
     }
   }
 
-  /** Every case in turn, the order redrawn each pass so that the next one cannot be guessed. */
+  /**
+   * Every case in turn, each pass drawn in a fresh order so the next one cannot be guessed. A
+   * weighted drill puts up to {@link #MAX_COPIES} of a heavy case in each pass, so no case goes
+   * unseen for long. Where fewer than {@link #MIN_MIX} cases are left, cleared ones are mixed back in
+   * now and then, so the last case is not known to be coming.
+   */
   private String pick() {
     List<String> active = getActiveCases();
-    if (spec.getSelection() == DrillSpec.Selection.WEIGHTED) {
-      return weighted(active);
+    String next = dealNext;
+    dealNext = null;
+    if (next == null || !active.contains(next)) {
+      next = mixedIn(active);
     }
-    pass.retainAll(active); // a working set can have moved on since the pass was drawn
-    if (pass.isEmpty()) {
-      pass.addAll(active);
-      Collections.shuffle(pass, random);
+    if (next == null) {
+      pass.retainAll(active); // a case can have cleared since the pass was drawn
+      boolean fresh = pass.isEmpty();
+      if (fresh) {
+        fillPass(active);
+      }
+      // Across two passes only where enough cases are left that it does not become a pattern
+      next = drawFromPass(fresh && active.size() < MIN_MIX ? null : lastDealt);
     }
-    return pass.remove(pass.size() - 1);
+    lastDealt = next;
+    return next;
   }
 
-  private String weighted(List<String> active) {
-    long total = 0;
-    for (String code : active) {
-      total += weightOf(code);
+  /** A cleared case to deal instead, one time in (cases left + 1), or null. */
+  private String mixedIn(List<String> active) {
+    if (active.size() >= MIN_MIX) {
+      return null;
     }
-    long draw = (long) (random.nextDouble() * total);
-    for (String code : active) {
-      draw -= weightOf(code);
-      if (draw < 0) {
-        return code;
+    CaseTally tally = getTally();
+    List<String> cleared = new ArrayList<String>();
+    for (String code : cases) {
+      if (tally.isCleared(code) && !code.equals(lastDealt)) {
+        cleared.add(code);
       }
     }
-    return active.get(active.size() - 1);
+    if (cleared.isEmpty() || random.nextInt(active.size() + 1) != 0) {
+      return null;
+    }
+    return cleared.get(random.nextInt(cleared.size()));
+  }
+
+  private void fillPass(List<String> active) {
+    long lightest = Long.MAX_VALUE;
+    for (String code : active) {
+      lightest = Math.min(lightest, weightOf(code));
+    }
+    boolean weighted = spec.getSelection() == DrillSpec.Selection.WEIGHTED;
+    for (String code : active) {
+      long copies = weighted ? Math.round((double) weightOf(code) / lightest) : 1;
+      for (long i = 0; i < Math.max(1, Math.min(MAX_COPIES, copies)); i++) {
+        pass.add(code);
+      }
+    }
+  }
+
+  /** A random case of the pass, other than {@code avoid} where the pass holds another. */
+  private String drawFromPass(String avoid) {
+    List<Integer> allowed = new ArrayList<Integer>();
+    for (int i = 0; i < pass.size(); i++) {
+      if (!pass.get(i).equals(avoid)) {
+        allowed.add(i);
+      }
+    }
+    if (allowed.isEmpty()) {
+      allowed.add(0); // every copy left is the case to avoid
+    }
+    // No draw for a single choice, so a one-case drill's scrambles keep their random sequence
+    int index = allowed.size() == 1 ? allowed.get(0) : allowed.get(random.nextInt(allowed.size()));
+    return pass.remove(index);
   }
 
   private long weightOf(String code) {
