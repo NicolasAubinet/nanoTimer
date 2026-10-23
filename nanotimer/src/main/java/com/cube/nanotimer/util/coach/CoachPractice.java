@@ -67,18 +67,26 @@ public final class CoachPractice {
      */
     public Set firstToLearn(int count, Collection<String> learned) {
       List<String> left = new ArrayList<String>();
-      Map<String, String> algorithms = new LinkedHashMap<String, String>();
       for (String code : cases) {
         if (left.size() < count && !learned.contains(code)) {
           left.add(code);
-          if (drill.getCaseAlgorithm(code) != null) {
-            algorithms.put(code, drill.getCaseAlgorithm(code));
-          }
         }
       }
-      if (left.isEmpty()) {
-        return null;
+      return left.isEmpty() ? null : withCases(left);
+    }
+
+    /**
+     * This learning set's drill on cases the user chose. The service's algorithm is kept for any
+     * case it sent; the others fall back to the user's star or the choose step.
+     */
+    public Set withCases(List<String> chosen) {
+      Map<String, String> algorithms = new LinkedHashMap<String, String>();
+      for (String code : chosen) {
+        if (drill.getCaseAlgorithm(code) != null) {
+          algorithms.put(code, drill.getCaseAlgorithm(code));
+        }
       }
+      List<String> left = new ArrayList<String>(chosen);
       return new Set(family, left, DrillSpec.learning(drill.getId(), drill.getType(), left,
           drill.getSelection(), drill.getReps(), drill.getWinsToRetire(), algorithms,
           drill.getLabel()));

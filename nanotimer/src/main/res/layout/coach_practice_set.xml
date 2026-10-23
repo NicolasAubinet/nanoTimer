@@ -34,7 +34,31 @@
        android:dropDownVerticalOffset="8dp"
        android:visibility="gone"/>
 
+    <!-- The learning set only: opens the case picker to choose the cases instead. -->
+    <TextView
+       android:id="@+id/tvCoachPracticeChoose"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginStart="@dimen/space_s"
+       android:paddingLeft="10dp"
+       android:paddingRight="10dp"
+       android:paddingTop="4dp"
+       android:paddingBottom="4dp"
+       android:text="@string/drill_cases_choose"
+       android:textSize="13sp"
+       android:visibility="gone"/>
+
   </LinearLayout>
+
+  <!-- The learning set only, while the user's own pick stands in for the suggestion. -->
+  <TextView
+     android:id="@+id/tvCoachPracticeNote"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:text="@string/learn_pick_own"
+     android:textColor="@color/secondary_text"
+     android:textSize="12sp"
+     android:visibility="gone"/>
 
   <!-- One coach_practice_case per case, costliest first. -->
   <LinearLayout

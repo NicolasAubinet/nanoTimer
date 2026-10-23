@@ -1483,6 +1483,9 @@
   <string name="coach_practice_set">Tus casos de %1$s más costosos</string>
   <string name="coach_learn_next">Próximos OLL por aprender</string>
   <string name="coach_learn_next_pll">Próximos PLL por aprender</string>
+  <string name="learn_pick_suggested">Sugeridos</string>
+  <string name="learn_pick_show_known">Mostrar los casos que ya conozco</string>
+  <string name="learn_pick_own">Tu elección</string>
   <plurals name="coach_learn_next_count">
     <item quantity="one">%d caso</item>
     <item quantity="other">%d casos</item>

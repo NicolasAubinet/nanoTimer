@@ -33,6 +33,7 @@ import com.cube.nanotimer.gui.widget.CaseTableHeadings;
 import com.cube.nanotimer.gui.widget.CoachPlanStatus;
 import com.cube.nanotimer.gui.widget.CoachPlanView;
 import com.cube.nanotimer.gui.widget.dialog.CaseAlgorithmsDialog;
+import com.cube.nanotimer.gui.widget.dialog.DrillCasesDialog;
 import com.cube.nanotimer.gui.widget.SegmentedControl;
 import com.cube.nanotimer.gui.widget.SmartCubeConnectDialog;
 import com.cube.nanotimer.services.db.DataCallback;
@@ -93,7 +94,7 @@ import java.util.Set;
  * standing over a screen they have a real version of. That is the arrangement never allowed here,
  * because an invented figure beside a real one is what makes the true number look invented.
  */
-public class AnalysisActivity extends NanoTimerActivity {
+public class AnalysisActivity extends NanoTimerActivity implements DrillCasesDialog.Listener {
 
   public static final String EXTRA_SOLVE_TYPE = "analysisSolveType";
   /** Which tab to open on, by ordinal, for a door that knows what it is pointing at. */
@@ -137,6 +138,8 @@ public class AnalysisActivity extends NanoTimerActivity {
   private boolean practiceAsked;
   /** The cases cleared in learning drills when the sets were asked for: a new one asks again. */
   private Set<String> learnedAtAsk = Collections.emptySet();
+  /** The practice sets on show, drawn again when the user changes the cases to learn. */
+  private List<CoachPractice.Set> practiceSets = Collections.emptyList();
   private CoachPlanStatus planStatus;
   private CoachBilling billing;
   private CoachBilling.Listener billingListener;
@@ -893,7 +896,15 @@ public class AnalysisActivity extends NanoTimerActivity {
     findViewById(R.id.tvAnalysisPracticeBody).setVisibility(locked ? View.GONE : View.VISIBLE);
   }
 
+  @Override
+  public void onDrillCasesPicked(String family) {
+    if (!isFinishing() && !practiceSets.isEmpty()) {
+      drawPractice(practiceSets);
+    }
+  }
+
   private void drawPractice(List<CoachPractice.Set> sets) {
+    practiceSets = sets;
     showPracticeLocked(false);
     LinearLayout into = findViewById(R.id.llAnalysisPracticeSets);
     planView.setPractice(into, sets);

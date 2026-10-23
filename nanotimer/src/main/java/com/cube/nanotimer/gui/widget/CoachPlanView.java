@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
@@ -50,6 +51,7 @@ import com.cube.nanotimer.gui.DrillActivity;
 import com.cube.nanotimer.gui.DrillScreenActivity;
 import com.cube.nanotimer.gui.DrillSetupActivity;
 import com.cube.nanotimer.gui.widget.dialog.CaseAlgorithmsDialog;
+import com.cube.nanotimer.gui.widget.dialog.DrillCasesDialog;
 import com.cube.nanotimer.smartcube.step.CaseAlgorithms;
 import com.cube.nanotimer.smartcube.step.LastLayerDiagram;
 import com.cube.nanotimer.util.FormatterService;
@@ -81,6 +83,9 @@ public class CoachPlanView {
       FocusArea.Reason.RECOGNITION_HEAVY};
   private static final String[] PREVIEW_FAMILIES = {"pll", "oll"};
   private static final int SCALE = 1000;
+  private static final int LEARNING_ROW = 5;
+  /** The Choose chip's fill, as the drill setup screen's. */
+  private static final int CHOOSE_CHIP_ALPHA = 0x29;
 
   private final Activity activity;
   private final LinearLayout container;
@@ -342,14 +347,22 @@ public class CoachPlanView {
   private View learningCard(LinearLayout parent, final CoachPractice.Set set) {
     final Set<String> learned = Options.INSTANCE.getLearnedCases();
     final int offered = set.countToLearn(learned);
-    if (offered == 0) {
+    Set<String> own = Options.INSTANCE.getLearnPick(set.getFamily() + "_");
+    if (offered == 0 && own == null) {
       return null;
     }
     final View card = inflater.inflate(R.layout.coach_practice_set, parent, false);
     ((TextView) card.findViewById(R.id.tvCoachPracticeTitle)).setText(
         learnNextTitle(set.getFamily()));
+    bindChoose(card, set, learned);
+    if (own != null) {
+      // The user's own pick stays as chosen; a case cleared since is ticked, not dropped.
+      card.findViewById(R.id.tvCoachPracticeNote).setVisibility(View.VISIBLE);
+      bindLearning(card, set.withCases(new ArrayList<String>(own)), learned);
+      return card;
+    }
     final int shown = Math.min(Options.INSTANCE.getLearnNextCount(), offered);
-    bindLearning(card, set.firstToLearn(shown, learned));
+    bindLearning(card, set.firstToLearn(shown, learned), learned);
 
     final Spinner spinner = card.findViewById(R.id.spCoachPracticeCount);
     List<String> counts = new ArrayList<String>();
@@ -380,7 +393,7 @@ public class CoachPlanView {
         if (position + 1 != count) {
           count = position + 1;
           Options.INSTANCE.setLearnNextCount(count);
-          bindLearning(card, set.firstToLearn(count, learned));
+          bindLearning(card, set.firstToLearn(count, learned), learned);
         }
       }
 
@@ -391,10 +404,47 @@ public class CoachPlanView {
     return card;
   }
 
-  private void bindLearning(View card, final CoachPractice.Set shown) {
-    LinearLayout row = card.findViewById(R.id.llCoachPracticeCases);
-    row.removeAllViews();
-    addCaseCharts(row, shown.getCases());
+  /** The chip in the step's colour that opens the case picker on this family. */
+  private void bindChoose(View card, final CoachPractice.Set set, final Set<String> learned) {
+    TextView choose = card.findViewById(R.id.tvCoachPracticeChoose);
+    final String family = set.getFamily() + "_";
+    int colour = StepPalette.cfop(activity).colorFor(family);
+    choose.setTextColor(colour);
+    GradientDrawable chip = new GradientDrawable();
+    chip.setCornerRadius(12 * activity.getResources().getDisplayMetrics().density);
+    chip.setColor((colour & 0x00FFFFFF) | (CHOOSE_CHIP_ALPHA << 24));
+    choose.setBackground(chip);
+    choose.setVisibility(View.VISIBLE);
+    choose.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        CoachPractice.Set suggested =
+            set.firstToLearn(Options.INSTANCE.getLearnNextCount(), learned);
+        DialogUtils.showFragment((FragmentActivity) activity, DrillCasesDialog.newLearning(family,
+            suggested == null ? Collections.<String>emptyList() : suggested.getCases()));
+      }
+    });
+  }
+
+  private void bindLearning(View card, final CoachPractice.Set shown, Set<String> learned) {
+    LinearLayout rows = card.findViewById(R.id.llCoachPracticeCases);
+    rows.removeAllViews();
+    rows.setOrientation(LinearLayout.VERTICAL);
+    // Rows of five, the last padded so its charts keep the others' width.
+    List<String> cases = shown.getCases();
+    for (int from = 0; from < cases.size(); from += LEARNING_ROW) {
+      LinearLayout row = new LinearLayout(activity);
+      row.setOrientation(LinearLayout.HORIZONTAL);
+      if (from > 0) {
+        row.setPadding(0, activity.getResources().getDimensionPixelSize(R.dimen.space_s), 0, 0);
+      }
+      List<String> slice = cases.subList(from, Math.min(from + LEARNING_ROW, cases.size()));
+      addCaseCharts(row, slice, learned);
+      for (int i = slice.size(); i < LEARNING_ROW && cases.size() > LEARNING_ROW; i++) {
+        row.addView(new View(activity), new LinearLayout.LayoutParams(0, 0, 1));
+      }
+      rows.addView(row);
+    }
     Button button = card.findViewById(R.id.buCoachPracticeDrill);
     button.setText(withPlay(button, R.string.coach_learn_cases));
     button.setOnClickListener(new View.OnClickListener() {
@@ -425,13 +475,19 @@ public class CoachPlanView {
 
   /** One small chart per case, each over its short name, sharing the row equally. */
   private void addCaseCharts(LinearLayout row, List<String> codes) {
+    addCaseCharts(row, codes, Collections.<String>emptySet());
+  }
+
+  /** @param ticked cases whose name carries a tick, as learned */
+  private void addCaseCharts(LinearLayout row, List<String> codes, Set<String> ticked) {
     for (String code : codes) {
       View cell = inflater.inflate(R.layout.coach_practice_case, row, false);
       LastLayerDiagram diagram = LastLayerDiagram.forCase(code);
       LastLayerCaseView chart = cell.findViewById(R.id.vCoachPracticeChart);
       chart.setDiagram(diagram);
       chart.setVisibility(diagram == null ? View.INVISIBLE : View.VISIBLE);
-      ((TextView) cell.findViewById(R.id.tvCoachPracticeName)).setText(shortName(code));
+      ((TextView) cell.findViewById(R.id.tvCoachPracticeName)).setText(ticked.contains(code)
+          ? activity.getString(R.string.learn_pick_known_case, shortName(code)) : shortName(code));
       cell.setOnClickListener(caseOpener(code));
       row.addView(cell);
     }

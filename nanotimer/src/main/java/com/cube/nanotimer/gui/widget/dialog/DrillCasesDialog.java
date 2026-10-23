@@ -1,5 +1,6 @@
 package com.cube.nanotimer.gui.widget.dialog;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -13,16 +14,21 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
+import com.cube.nanotimer.App;
 import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.gui.widget.LastLayerCaseView;
 import com.cube.nanotimer.gui.widget.NanoTimerDialogFragment;
+import com.cube.nanotimer.services.db.DataCallback;
+import com.cube.nanotimer.session.CaseKnowledge;
 import com.cube.nanotimer.smartcube.step.LastLayerCaseNames;
 import com.cube.nanotimer.smartcube.step.LastLayerDiagram;
 import com.cube.nanotimer.smartcube.step.LastLayerScrambles;
@@ -30,10 +36,14 @@ import com.cube.nanotimer.util.DrillCasePreset;
 import com.cube.nanotimer.util.helper.GUIUtils;
 import com.cube.nanotimer.util.view.StepPalette;
 import com.cube.nanotimer.util.view.ViewSegments;
+import com.cube.nanotimer.vo.CaseHistory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -64,15 +74,22 @@ public class DrillCasesDialog extends NanoTimerDialogFragment
   }
 
   private static final String ARG_FAMILY = "family";
+  private static final String ARG_SUGGESTED = "suggested";
 
   /** Of the screen: how tall the picker may grow, leaving the dialog theme its own margins. */
   private static final float MAX_HEIGHT = 0.92f;
 
   private String family;
   private final List<String> cases = new ArrayList<String>();
-  private final List<LastLayerDiagram> charts = new ArrayList<LastLayerDiagram>();
+  private final Map<String, LastLayerDiagram> charts = new HashMap<String, LastLayerDiagram>();
   private final Set<String> picked = new LinkedHashSet<String>();
   private List<DrillCasePreset> presets;
+
+  /** Choosing the cases to learn next rather than a drill's cases; null when not. */
+  private List<String> suggested;
+  private final Set<String> known = new HashSet<String>();
+  private final List<String> shown = new ArrayList<String>();
+  private CheckBox cbShowKnown;
 
   private TextView tvCount;
   private TextView tvAll;
@@ -90,28 +107,65 @@ public class DrillCasesDialog extends NanoTimerDialogFragment
     return frag;
   }
 
+  /**
+   * The same picker choosing the cases to learn next. "Suggested" takes the place of "All", known
+   * cases are left out unless asked for, and the pick is kept apart from a drill's.
+   *
+   * @param family the case code prefix, {@code "oll_"} or {@code "pll_"}
+   * @param suggested the cases the coach suggests now, ticked while the user follows it
+   */
+  public static DrillCasesDialog newLearning(String family, List<String> suggested) {
+    DrillCasesDialog frag = newInstance(family);
+    frag.getArguments().putStringArrayList(ARG_SUGGESTED, new ArrayList<String>(suggested));
+    return frag;
+  }
+
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
     family = getArguments().getString(ARG_FAMILY);
+    suggested = getArguments().getStringArrayList(ARG_SUGGESTED);
     cases.clear();
     charts.clear();
     picked.clear();
     for (String code : LastLayerScrambles.cases()) {
       if (code.startsWith(family)) {
         cases.add(code);
-        charts.add(LastLayerDiagram.forCase(code));
+        charts.put(code, LastLayerDiagram.forCase(code));
       }
     }
-    Set<String> stored = Options.INSTANCE.getDrillCases(family);
-    picked.addAll(stored == null ? cases : stored);
+    if (isLearning()) {
+      Set<String> own = Options.INSTANCE.getLearnPick(family);
+      picked.addAll(own == null ? suggested : own);
+      known.addAll(Options.INSTANCE.getLearnedCases());
+      loadKnown();
+    } else {
+      Set<String> stored = Options.INSTANCE.getDrillCases(family);
+      picked.addAll(stored == null ? cases : stored);
+    }
     presets = Options.INSTANCE.getDrillCasePresets(family);
 
     View view = LayoutInflater.from(getActivity()).inflate(R.layout.drill_cases_dialog, null);
     tvCount = view.findViewById(R.id.tvCasesCount);
     tvAll = view.findViewById(R.id.tvCasesAll);
     tvNone = view.findViewById(R.id.tvCasesNone);
-    ((TextView) view.findViewById(R.id.tvCasesTitle)).setText(family.startsWith("oll")
-        ? R.string.drill_cases_title_oll : R.string.drill_cases_title_pll);
+    cbShowKnown = view.findViewById(R.id.cbCasesShowKnown);
+    TextView title = view.findViewById(R.id.tvCasesTitle);
+    if (isLearning()) {
+      title.setText(family.startsWith("oll") ? R.string.coach_learn_next
+          : R.string.coach_learn_next_pll);
+      tvAll.setText(R.string.learn_pick_suggested);
+      cbShowKnown.setVisibility(View.VISIBLE);
+      cbShowKnown.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton button, boolean checked) {
+          refreshShown();
+        }
+      });
+    } else {
+      title.setText(family.startsWith("oll") ? R.string.drill_cases_title_oll
+          : R.string.drill_cases_title_pll);
+    }
+    refreshShown();
     adapter = new CasesAdapter();
     grid = view.findViewById(R.id.gvCases);
     // A first guess, corrected to whole rows once there is a laid-out cell to measure. Inside a
@@ -123,7 +177,7 @@ public class DrillCasesDialog extends NanoTimerDialogFragment
     grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View item, int position, long id) {
-        toggle(cases.get(position));
+        toggle(shown.get(position));
       }
     });
     // Holding a case shows it instead of picking it. Tapping has to stay the pick, since picking is
@@ -131,7 +185,7 @@ public class DrillCasesDialog extends NanoTimerDialogFragment
     grid.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
       @Override
       public boolean onItemLongClick(AdapterView<?> parent, View item, int position, long id) {
-        CaseAlgorithmsDialog.newInstance(cases.get(position))
+        CaseAlgorithmsDialog.newInstance(shown.get(position))
             .show(getParentFragmentManager(), "caseAlgorithms");
         return true;
       }
@@ -155,6 +209,7 @@ public class DrillCasesDialog extends NanoTimerDialogFragment
         DrillPresetsDialog.show(getActivity(), family, picked, DrillCasesDialog.this);
       }
     });
+    buPresets.setVisibility(isLearning() ? View.GONE : View.VISIBLE);
     refreshCount();
 
     return new AlertDialog.Builder(getActivity(), R.style.NanoTimerDialogTheme)
@@ -193,7 +248,7 @@ public class DrillCasesDialog extends NanoTimerDialogFragment
     }
     int chrome = dialog.getWindow().getDecorView().getHeight() - grid.getHeight();
     int room = (int) (getResources().getDisplayMetrics().heightPixels * MAX_HEIGHT) - chrome;
-    int rows = (cases.size() + columns - 1) / columns;
+    int rows = (shown.size() + columns - 1) / columns;
     int height = Math.min(rows, Math.max(1, room / pitch)) * pitch - spacing;
     if (height != grid.getLayoutParams().height) {
       grid.getLayoutParams().height = height;
@@ -204,6 +259,9 @@ public class DrillCasesDialog extends NanoTimerDialogFragment
   @Override
   public void onDismiss(DialogInterface dialog) {
     super.onDismiss(dialog);
+    if (isLearning() && picked.isEmpty()) {
+      Options.INSTANCE.setLearnPick(family, null); // nothing chosen is no choice: back to the suggestion
+    }
     if (getActivity() instanceof Listener) {
       ((Listener) getActivity()).onDrillCasesPicked(family);
     }
@@ -216,20 +274,83 @@ public class DrillCasesDialog extends NanoTimerDialogFragment
     save();
   }
 
+  /** @param all every case, or when choosing what to learn, the suggestion */
   private void pickAll(boolean all) {
     picked.clear();
     if (all) {
-      picked.addAll(cases);
+      picked.addAll(isLearning() ? suggested : cases);
     }
     save();
   }
 
-  /** Everything ticked is stored as no choice at all, so a case added later is drilled too. */
+  /**
+   * Everything ticked is stored as no choice at all, so a case added later is drilled too. A pick
+   * of what to learn that matches the suggestion is stored the same way, so it keeps following it.
+   */
   private void save() {
-    Options.INSTANCE.setDrillCases(family,
-        picked.size() == cases.size() ? null : new LinkedHashSet<String>(picked));
+    if (isLearning()) {
+      boolean following = picked.equals(new HashSet<String>(suggested));
+      Options.INSTANCE.setLearnPick(family, following ? null : inCaseOrder(picked));
+    } else {
+      Options.INSTANCE.setDrillCases(family,
+          picked.size() == cases.size() ? null : new LinkedHashSet<String>(picked));
+    }
     adapter.notifyDataSetChanged();
     refreshCount();
+  }
+
+  private boolean isLearning() {
+    return suggested != null;
+  }
+
+  private Set<String> inCaseOrder(Set<String> codes) {
+    Set<String> ordered = new LinkedHashSet<String>();
+    for (String code : cases) {
+      if (codes.contains(code)) {
+        ordered.add(code);
+      }
+    }
+    return ordered;
+  }
+
+  /** Known cases count as learned for the drill too: from the solves, or cleared in a drill. */
+  private void loadKnown() {
+    App.INSTANCE.getService().getCaseHistory(0, new DataCallback<CaseHistory>() {
+      @Override
+      public void onData(final CaseHistory history) {
+        final Activity activity = getActivity();
+        if (activity == null) {
+          return;
+        }
+        activity.runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            for (CaseKnowledge stepCase : history.getCases()) {
+              if (stepCase.getStatus() == CaseKnowledge.Status.KNOWN) {
+                known.add(stepCase.getCode());
+              }
+            }
+            if (adapter != null && isAdded()) {
+              refreshShown();
+            }
+          }
+        });
+      }
+    });
+  }
+
+  /** The cases on the grid: all of them, but for known ones nobody asked to see. A picked one stays. */
+  private void refreshShown() {
+    shown.clear();
+    boolean showKnown = cbShowKnown == null || cbShowKnown.isChecked();
+    for (String code : cases) {
+      if (!isLearning() || showKnown || !known.contains(code) || picked.contains(code)) {
+        shown.add(code);
+      }
+    }
+    if (adapter != null) {
+      adapter.notifyDataSetChanged();
+    }
   }
 
   @Override
@@ -263,7 +384,8 @@ public class DrillCasesDialog extends NanoTimerDialogFragment
           at, at + count.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
     tvCount.setText(spanned);
-    markSegment(tvAll, picked.size() == cases.size());
+    markSegment(tvAll, isLearning() ? Options.INSTANCE.getLearnPick(family) == null
+        : picked.size() == cases.size());
     markSegment(tvNone, picked.isEmpty());
     refreshPresets(preset);
   }
@@ -286,12 +408,12 @@ public class DrillCasesDialog extends NanoTimerDialogFragment
 
     @Override
     public int getCount() {
-      return cases.size();
+      return shown.size();
     }
 
     @Override
     public Object getItem(int position) {
-      return cases.get(position);
+      return shown.get(position);
     }
 
     @Override
@@ -306,17 +428,19 @@ public class DrillCasesDialog extends NanoTimerDialogFragment
         cell = LayoutInflater.from(getActivity())
             .inflate(R.layout.drill_cases_cell, parent, false);
       }
-      String code = cases.get(position);
+      String code = shown.get(position);
       boolean on = picked.contains(code);
 
       LastLayerCaseView chart = cell.findViewById(R.id.vCaseChart);
-      chart.setDiagram(charts.get(position));
+      chart.setDiagram(charts.get(code));
       // Turned down rather than hidden: an unpicked case still has to be findable to be picked
       // again. The chart dims itself, so the name and the edge keep the colours they were given.
       chart.setDimmed(!on);
 
       TextView name = cell.findViewById(R.id.tvCaseName);
-      name.setText(LastLayerCaseNames.shortName(code));
+      String shortName = LastLayerCaseNames.shortName(code);
+      name.setText(isLearning() && known.contains(code)
+          ? getString(R.string.learn_pick_known_case, shortName) : shortName);
       name.setTextColor(ContextCompat.getColor(getActivity(),
           on ? R.color.case_name : R.color.case_name_off));
 

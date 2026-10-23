@@ -100,6 +100,7 @@ public enum Options {
   public static final String CASE_KNOWLEDGE_RULE_KEY = "case_knowledge_rule";
   public static final String CFOP_READING_KEY = "cfop_reading_version";
   public static final String DRILL_CASES_KEY_PREFIX = "drill_cases_";
+  private static final String LEARN_PICK_KEY_PREFIX = "learn_pick_";
   public static final String CASE_ALGORITHM_KEY_PREFIX = "case_alg_";
   private static final String LEARNED_CASES_KEY = "learned_cases";
   private static final String CELEBRATED_GROUPS_KEY = "celebrated_groups";
@@ -442,7 +443,31 @@ public enum Options {
    * @param family the case code prefix, {@code "oll_"} or {@code "pll_"}
    */
   public Set<String> getDrillCases(String family) {
-    String stored = sharedPreferences.getString(DRILL_CASES_KEY_PREFIX + family, null);
+    return getCodes(DRILL_CASES_KEY_PREFIX + family);
+  }
+
+  /** @param cases the picked cases, or null to go back to every case in the family */
+  public void setDrillCases(String family, Set<String> cases) {
+    setCodes(DRILL_CASES_KEY_PREFIX + family, cases);
+  }
+
+  /**
+   * The cases the user chose to learn next in place of the coach's suggestion, or null while they
+   * follow the suggestion.
+   *
+   * @param family the case code prefix, {@code "oll_"} or {@code "pll_"}
+   */
+  public Set<String> getLearnPick(String family) {
+    return getCodes(LEARN_PICK_KEY_PREFIX + family);
+  }
+
+  /** @param cases the chosen cases, or null to follow the suggestion again */
+  public void setLearnPick(String family, Set<String> cases) {
+    setCodes(LEARN_PICK_KEY_PREFIX + family, cases);
+  }
+
+  private Set<String> getCodes(String key) {
+    String stored = sharedPreferences.getString(key, null);
     if (stored == null) {
       return null;
     }
@@ -455,9 +480,7 @@ public enum Options {
     return cases;
   }
 
-  /** @param cases the picked cases, or null to go back to every case in the family */
-  public void setDrillCases(String family, Set<String> cases) {
-    String key = DRILL_CASES_KEY_PREFIX + family;
+  private void setCodes(String key, Set<String> cases) {
     if (cases == null) {
       sharedPreferences.edit().remove(key).apply();
       return;
