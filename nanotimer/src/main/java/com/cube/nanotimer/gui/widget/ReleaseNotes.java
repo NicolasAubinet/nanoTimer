@@ -46,14 +46,19 @@ public class ReleaseNotes {
       // first launch
       editor.putString(VERSION_KEY, curVersion);
       editor.apply();
+      SmartCubeNewsSheet.showOnLaunch(context, true);
     } else {
-      if (!prefVersion.equals(curVersion)) {
-        // app upgrade
+      boolean upgraded = !prefVersion.equals(curVersion);
+      if (upgraded) {
         editor.putString(VERSION_KEY, curVersion);
         editor.apply();
-        if (!prefs.getBoolean(HIDE_ON_UPDATE_KEY, false)) {
-          showReleaseNotesDialog(context);
-        }
+      }
+      // Checked on every start, not only on an upgrade: a test build can keep its version name.
+      if (SmartCubeNewsSheet.showOnLaunch(context, false)) {
+        return;
+      }
+      if (upgraded && !prefs.getBoolean(HIDE_ON_UPDATE_KEY, false)) {
+        showReleaseNotesDialog(context);
       }
     }
   }

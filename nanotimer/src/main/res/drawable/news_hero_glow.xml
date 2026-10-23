@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The light the news sheet's glyph stands in: the accent, fading out from the middle. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+   android:shape="oval">
+  <gradient
+     android:type="radial"
+     android:gradientRadius="50%p"
+     android:centerColor="@color/accent_glow_mid"
+     android:startColor="@color/accent_glow_near"
+     android:endColor="#006CCCEC"/>
+</shape>

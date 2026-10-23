@@ -498,7 +498,20 @@
 
   <string name="release_notes_features_html">
     <![CDATA[
-    <u><b>v2.1.1 <i>(New version)</i></b></u><br/>
+    <u><b>v2.2.0 <i>(New version)</i></b></u><br/>
+    <b>Smart cubes</b>
+    <ul>
+      <li>Cubench now connects to GAN, MoYu and QiYi Bluetooth smart cubes</li>
+      <li>The timer starts on your first turn and stops when the cube is solved</li>
+      <li>The scramble follows your turns, and a wrong move is caught and corrected</li>
+      <li>Every solve is split into its steps (cross, F2L pairs, OLL, PLL), with thinking and turning times and the full reconstruction</li>
+      <li>Any solve can be replayed in 3D</li>
+      <li>New Analysis screen: your slowest steps and cases, and the algorithms you use</li>
+      <li>New drills, to practise cases on your own cube</li>
+      <li>New AI coach: a weekly training plan written from your solves</li>
+      <li>The last cube can be reconnected automatically when the app opens</li>
+    </ul>
+    <u><b>v2.1.1</b></u><br/>
     <ul>
       <li>2x2 scrambles are now 11 moves using R, U and F only, like official ones</li>
       <li>The history can now be sorted by best Ao5, Ao12, Ao50 or Ao100</li>
@@ -1569,4 +1582,42 @@
   <string name="analysis_help_sample">Example</string>
   <string name="analysis_help_sample_body">Nothing on these tabs is yours. These figures are made up, and they are here so the screen has something to show before you own a smart cube. Connect one and your own take their place.</string>
 
+  <!-- The smart-cube news sheet: shown once after updating into the smart cube -->
+  <string name="news_pill">New</string>
+  <string name="news_title">Smart cubes are here</string>
+  <string name="news_body">Connect a Bluetooth smart cube and Cubench reads every turn you make. No more tapping the screen, and every solve is taken apart for you.</string>
+  <string name="news_timing_title">Hands-free timing</string>
+  <string name="news_timing_body">The timer starts on your first turn and stops the moment the cube is solved.</string>
+  <string name="news_scramble_title">Scrambles that follow you</string>
+  <string name="news_scramble_body">Each move lights up as you turn it, and a wrong turn is caught and corrected with you.</string>
+  <string name="news_breakdown_title">Every solve taken apart</string>
+  <string name="news_breakdown_body">Cross, F2L pairs, OLL and PLL: thinking and turning times, and the full reconstruction.</string>
+  <string name="news_replay_title">3D replays</string>
+  <string name="news_replay_body">Watch any solve again in 3D, move by move, at the speed you choose.</string>
+  <string name="news_analysis_title">Analysis</string>
+  <string name="news_analysis_body">Your slowest steps and cases, and the algorithms you really use.</string>
+  <string name="news_drills_title">Drills</string>
+  <string name="news_drills_body">Practise your weakest cases on your own cube, against targets that get you faster.</string>
+  <string name="news_coach_title">AI coach</string>
+  <string name="news_coach_body">A training plan written from your own solves, every week.</string>
+  <string name="news_cubes">Works with GAN, MoYu and QiYi smart cubes.</string>
+  <string name="news_all_notes">All release notes</string>
+  <string name="news_later">Later</string>
+  <string name="news_connect">Connect my cube</string>
+  <!-- The coach beta invitation, in internal testing builds only -->
+  <string name="beta_coach_pill">Beta testers</string>
+  <string name="beta_coach_title">Try the AI coach for free</string>
+  <string name="beta_coach_body">Thanks for testing smart cube support! Testers can also use the Cubench coach for free: it reads your smart cube solves and writes you a training plan every week.</string>
+  <string name="beta_coach_plan_title">A plan every week</string>
+  <string name="beta_coach_plan_body">Built from your latest solves: what is going well, and what to work on next.</string>
+  <string name="beta_coach_drills_title">Drills on what costs you most</string>
+  <string name="beta_coach_drills_body">The cases and steps losing you the most time, ready to practise.</string>
+  <string name="beta_coach_learn_title">What to learn next</string>
+  <string name="beta_coach_learn_body">The next algorithms to learn, in the order that pays off soonest.</string>
+  <string name="beta_coach_needs">For 3x3 CFOP solvers with a supported smart cube. Your first plan comes after 100 solves.</string>
+  <string name="beta_coach_apply">Try the coach for free</string>
+  <string name="beta_coach_no_payment">No payment information needed</string>
+  <string name="beta_coach_not_now">Not now</string>
+  <string name="beta_coach_also_new">Also new with a smart cube</string>
+  <string name="beta_coach_reopen">Free coach for beta testers</string>
 </resources>

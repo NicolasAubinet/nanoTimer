@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The smart cube's arrival: what it brings, after an update. In a coach beta build the coach's
+     free offer leads instead, and the smart cube's features follow it. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:orientation="vertical"
+   android:paddingLeft="20dp"
+   android:paddingRight="20dp"
+   android:paddingTop="8dp"
+   android:paddingBottom="14dp">
+
+  <View
+     android:layout_width="32dp"
+     android:layout_height="4dp"
+     android:layout_gravity="center_horizontal"
+     android:background="@drawable/bottomsheet_drag_handle"/>
+
+  <androidx.core.widget.NestedScrollView
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_weight="1"
+     android:layout_marginTop="4dp">
+
+    <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="vertical">
+
+      <FrameLayout
+         android:id="@+id/newsHero"
+         android:layout_width="160dp"
+         android:layout_height="160dp"
+         android:layout_gravity="center_horizontal">
+        <View
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:background="@drawable/news_hero_glow"/>
+        <com.cube.nanotimer.util.view.SmartCubeRadarView
+           android:id="@+id/newsRadar"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"/>
+        <ImageView
+           android:id="@+id/imgNewsGlyph"
+           android:layout_width="54dp"
+           android:layout_height="54dp"
+           android:layout_gravity="center"
+           android:src="@drawable/ic_smart_cube"
+           android:tint="@color/lightblue"
+           android:contentDescription="@null"/>
+      </FrameLayout>
+
+      <TextView
+         android:id="@+id/tvNewsPill"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_gravity="center_horizontal"
+         android:background="@drawable/smart_cube_pill"
+         android:backgroundTint="@color/pill_scan_bg"
+         android:paddingLeft="12dp"
+         android:paddingRight="12dp"
+         android:paddingTop="3dp"
+         android:paddingBottom="3dp"
+         android:textAllCaps="true"
+         android:textColor="@color/lightblue"
+         android:textSize="11.5sp"
+         android:textStyle="bold"
+         android:letterSpacing="0.08"/>
+
+      <TextView
+         android:id="@+id/tvNewsTitle"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="10dp"
+         android:gravity="center"
+         android:textColor="@color/white"
+         android:textSize="24sp"
+         android:textStyle="bold"/>
+
+      <TextView
+         android:id="@+id/tvNewsBody"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="8dp"
+         android:gravity="center"
+         android:lineSpacingMultiplier="1.15"
+         android:textColor="@color/secondary_text"
+         android:textSize="14sp"/>
+
+      <!-- The coach's free offer, in a coach beta build only. -->
+      <LinearLayout
+         android:id="@+id/newsCoachCard"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="18dp"
+         android:background="@drawable/coach_offer_card"
+         android:orientation="vertical"
+         android:paddingLeft="16dp"
+         android:paddingRight="16dp"
+         android:paddingTop="2dp"
+         android:paddingBottom="16dp"
+         android:visibility="gone">
+        <LinearLayout
+           android:id="@+id/newsCoachPoints"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="vertical"/>
+        <TextView
+           android:id="@+id/tvNewsCoachNeeds"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="14dp"
+           android:text="@string/beta_coach_needs"
+           android:textColor="@color/secondary_text"
+           android:textSize="12.5sp"/>
+        <androidx.appcompat.widget.AppCompatButton
+           android:id="@+id/buNewsCoachApply"
+           android:layout_width="match_parent"
+           android:layout_marginTop="14dp"
+           android:text="@string/beta_coach_apply"
+           style="@style/AccentActionButton"/>
+        <TextView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="6dp"
+           android:gravity="center"
+           android:text="@string/beta_coach_no_payment"
+           android:textColor="@color/secondary_text"
+           android:textSize="12sp"/>
+      </LinearLayout>
+
+      <TextView
+         android:id="@+id/tvNewsFeaturesLabel"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="22dp"
+         android:text="@string/beta_coach_also_new"
+         android:textAllCaps="true"
+         android:textColor="@color/secondary_text"
+         android:textSize="11.5sp"
+         android:textStyle="bold"
+         android:letterSpacing="0.08"
+         android:visibility="gone"/>
+
+      <LinearLayout
+         android:id="@+id/newsFeatures"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="4dp"
+         android:orientation="vertical"/>
+
+      <TextView
+         android:id="@+id/tvNewsCubes"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="18dp"
+         android:gravity="center"
+         android:text="@string/news_cubes"
+         android:textColor="@color/secondary_text"
+         android:textSize="12.5sp"/>
+
+      <TextView
+         android:id="@+id/tvNewsAllNotes"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_gravity="center_horizontal"
+         android:layout_marginTop="6dp"
+         android:padding="8dp"
+         android:background="?android:attr/selectableItemBackground"
+         android:text="@string/news_all_notes"
+         android:textColor="@color/lightblue"
+         android:textSize="13sp"/>
+    </LinearLayout>
+  </androidx.core.widget.NestedScrollView>
+
+  <LinearLayout
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="12dp"
+     android:orientation="horizontal">
+    <androidx.appcompat.widget.AppCompatButton
+       android:id="@+id/buNewsLater"
+       android:layout_width="0dp"
+       android:layout_weight="1"
+       android:text="@string/news_later"
+       android:background="@drawable/dialog_action_button_ghost"
+       style="@style/DialogActionButton"/>
+    <androidx.appcompat.widget.AppCompatButton
+       android:id="@+id/buNewsConnect"
+       android:layout_width="0dp"
+       android:layout_weight="1.4"
+       android:layout_marginLeft="10dp"
+       android:layout_marginStart="10dp"
+       android:text="@string/news_connect"
+       style="@style/AccentActionButton"/>
+  </LinearLayout>
+</LinearLayout>

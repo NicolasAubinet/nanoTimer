@@ -36,6 +36,7 @@ import com.cube.nanotimer.smartcube.model.CubeConnectionListener;
 import com.cube.nanotimer.smartcube.model.CubeState;
 import com.cube.nanotimer.smartcube.model.CubeStateListener;
 import com.cube.nanotimer.smartcube.model.DiscoveredCube;
+import com.cube.nanotimer.util.coach.CoachBetaInvite;
 import com.cube.nanotimer.util.helper.DialogUtils;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.util.view.SmartCubeRadarView;
@@ -139,6 +140,11 @@ public class SmartCubeConnectDialog extends NanoTimerBottomSheetFragment {
 
     btnHelp = v.findViewById(R.id.buSmartCubeHelp);
     btnHelp.setOnClickListener(view -> showIntro());
+    if (CoachBetaInvite.ENABLED) {
+      View betaCoach = v.findViewById(R.id.buSmartCubeBetaCoach);
+      betaCoach.setVisibility(View.VISIBLE);
+      betaCoach.setOnClickListener(view -> SmartCubeNewsSheet.show(requireActivity()));
+    }
     btnIntroContinue.setOnClickListener(view -> {
       Options.INSTANCE.setSmartCubeIntroSeen(true);
       showPairing();

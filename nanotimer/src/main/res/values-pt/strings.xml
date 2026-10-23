@@ -481,7 +481,20 @@
 
   <string name="release_notes_features_html">
     <![CDATA[
-    <u><b>v2.1.1 <i>(Nova versão)</i></b></u><br/>
+    <u><b>v2.2.0 <i>(Nova versão)</i></b></u><br/>
+    <b>Smart cubes</b>
+    <ul>
+      <li>O Cubench agora se conecta aos smart cubes Bluetooth GAN, MoYu e QiYi</li>
+      <li>O cronômetro começa no seu primeiro giro e para quando o cubo é resolvido</li>
+      <li>O embaralhamento acompanha seus giros, e um movimento errado é detectado e corrigido</li>
+      <li>Cada resolução é dividida em etapas (cruz, pares F2L, OLL, PLL), com tempos de reconhecimento e execução e a reconstrução completa</li>
+      <li>Qualquer resolução pode ser revista em 3D</li>
+      <li>Nova tela de Análise: suas etapas e casos mais lentos, e os algoritmos que você usa</li>
+      <li>Novos treinos, para praticar casos no seu próprio cubo</li>
+      <li>Novo coach com IA: um plano de treino semanal escrito a partir das suas resoluções</li>
+      <li>O último cubo pode se reconectar automaticamente ao abrir o aplicativo</li>
+    </ul>
+    <u><b>v2.1.1</b></u><br/>
     <ul>
       <li>Os scrambles de 2x2 têm agora 11 movimentos, só com R, U e F, como os oficiais</li>
       <li>O histórico pode agora ser ordenado pela melhor Ao5, Ao12, Ao50 ou Ao100</li>
@@ -1523,4 +1536,42 @@
   <string name="analysis_help_sample">Exemplo</string>
   <string name="analysis_help_sample_body">Nada nestes separadores é seu. Estes números são inventados, e estão aqui para que o ecrã tenha algo para mostrar antes de ter um smart cube. Ligue um e os seus tomam o lugar deles.</string>
 
+  <!-- The smart-cube news sheet: shown once after updating into the smart cube -->
+  <string name="news_pill">Novo</string>
+  <string name="news_title">Os smart cubes chegaram</string>
+  <string name="news_body">Conecte um smart cube Bluetooth e o Cubench lê cada giro que você faz. Sem tocar na tela, e cada resolução é destrinchada para você.</string>
+  <string name="news_timing_title">Cronômetro sem as mãos</string>
+  <string name="news_timing_body">O cronômetro começa no seu primeiro giro e para assim que o cubo é resolvido.</string>
+  <string name="news_scramble_title">Embaralhamentos que te acompanham</string>
+  <string name="news_scramble_body">Cada movimento acende quando você o faz, e um giro errado é detectado e corrigido com você.</string>
+  <string name="news_breakdown_title">Cada resolução destrinchada</string>
+  <string name="news_breakdown_body">Cruz, pares F2L, OLL e PLL: tempos de reconhecimento e execução, e a reconstrução completa.</string>
+  <string name="news_replay_title">Replays em 3D</string>
+  <string name="news_replay_body">Reveja qualquer resolução em 3D, movimento a movimento, na velocidade que quiser.</string>
+  <string name="news_analysis_title">Análise</string>
+  <string name="news_analysis_body">Suas etapas e casos mais lentos, e os algoritmos que você realmente usa.</string>
+  <string name="news_drills_title">Treinos</string>
+  <string name="news_drills_body">Pratique seus casos mais fracos no seu próprio cubo, com metas que te deixam mais rápido.</string>
+  <string name="news_coach_title">Coach com IA</string>
+  <string name="news_coach_body">Um plano de treino escrito a partir das suas próprias resoluções, toda semana.</string>
+  <string name="news_cubes">Funciona com smart cubes GAN, MoYu e QiYi.</string>
+  <string name="news_all_notes">Todas as notas de versão</string>
+  <string name="news_later">Depois</string>
+  <string name="news_connect">Conectar meu cubo</string>
+  <!-- The coach beta invitation, in internal testing builds only -->
+  <string name="beta_coach_pill">Beta testers</string>
+  <string name="beta_coach_title">Experimente o coach com IA grátis</string>
+  <string name="beta_coach_body">Obrigado por testar os smart cubes! Os testers também podem usar o coach do Cubench de graça: ele lê suas resoluções com smart cube e escreve um plano de treino para você toda semana.</string>
+  <string name="beta_coach_plan_title">Um plano toda semana</string>
+  <string name="beta_coach_plan_body">Feito a partir das suas últimas resoluções: o que vai bem e no que trabalhar a seguir.</string>
+  <string name="beta_coach_drills_title">Treinos no que mais te custa</string>
+  <string name="beta_coach_drills_body">Os casos e etapas que mais te fazem perder tempo, prontos para praticar.</string>
+  <string name="beta_coach_learn_title">O que aprender a seguir</string>
+  <string name="beta_coach_learn_body">Os próximos algoritmos para aprender, na ordem que dá resultado mais cedo.</string>
+  <string name="beta_coach_needs">Para cubistas de 3x3 com CFOP e um smart cube compatível. Seu primeiro plano chega após 100 resoluções.</string>
+  <string name="beta_coach_apply">Experimentar o coach grátis</string>
+  <string name="beta_coach_no_payment">Nenhuma informação de pagamento necessária</string>
+  <string name="beta_coach_not_now">Agora não</string>
+  <string name="beta_coach_also_new">Também novo com um smart cube</string>
+  <string name="beta_coach_reopen">Coach grátis para beta testers</string>
 </resources>
