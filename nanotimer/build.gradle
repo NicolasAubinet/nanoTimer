@@ -41,7 +41,21 @@ gradle.taskGraph.whenReady { graph ->
     }
 }
 
+// Release signing from local.properties; a password left out there is read from the environment,
+// so deploy-phone.ps1 can ask for it instead of storing it.
+def releaseStoreFile = localProperties.getProperty('release.storeFile', '')
+
 android {
+    signingConfigs {
+        if (releaseStoreFile) {
+            release {
+                storeFile file(releaseStoreFile)
+                storePassword localProperties.getProperty('release.storePassword') ?: System.getenv('CUBENCH_STORE_PASSWORD')
+                keyAlias localProperties.getProperty('release.keyAlias')
+                keyPassword localProperties.getProperty('release.keyPassword') ?: System.getenv('CUBENCH_KEY_PASSWORD')
+            }
+        }
+    }
     defaultConfig {
         applicationId "com.cube.nanotimer"
         minSdkVersion 21
@@ -67,6 +81,9 @@ android {
             resValue 'string', 'coach_url', releaseCoachUrl
             resValue 'string', 'coach_token', releaseCoachToken
             resValue 'bool', 'coach_purchase_debug', releasePurchaseDebug.toString()
+            if (releaseStoreFile) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
