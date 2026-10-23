@@ -162,7 +162,8 @@ final class BlindSpelling {
       if (choices != spelled) {
         spent++;
         spelled = choices;
-        steps = SolveSolution.stepsOf(SolveSolution.spell(stored, grip, choices), solveSteps);
+        steps = SolveSolution.stepsOf(SolveSolution.spell(stored, grip, choices, solveSteps),
+            solveSteps);
       }
       return steps;
     }

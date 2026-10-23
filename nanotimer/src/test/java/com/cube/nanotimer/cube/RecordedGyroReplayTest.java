@@ -75,7 +75,7 @@ public class RecordedGyroReplayTest {
     String shown = new RecordedGyroReplay("roux140.txt").display();
     assertEquals(shown, 0, count(shown, "E"));
     assertEquals(shown, 0, count(shown, "S"));
-    assertEquals(shown, 17, count(shown, "M")); // 15 before mid-rock frames stopped being regrips
+    assertEquals(shown, 18, count(shown, "M")); // 17 before r R' read as the M' it is
     assertTrue(shown, shown.contains("R' U' R' F R2 U' R' U' R U R' F'")); // the CMLL, a T perm
   }
 
@@ -100,14 +100,15 @@ public class RecordedGyroReplayTest {
   public void theRouxCaptureReadsItsSecondBlockWides() {
     String shown = new RecordedGyroReplay("roux140.txt").display();
 
-    assertEquals(shown, "r r l' r' r r' r", wides(shown));
+    assertEquals(shown, "r r l' r' r' r", wides(shown));
   }
 
   /**
    * What wides are worth here, measured rather than assumed: five rotations the solver never made
    * are gone. The move count rises by one against the 92 this reads without the wide pass, which is
    * the cost of the {@code l'} above being a swing that came back rather than a wide — the rotation
-   * correcting it lands between two {@code L}s and stops them reading as one {@code L2}.
+   * correcting it lands between two {@code L}s and stops them reading as one {@code L2}. Reading
+   * {@code r R'} as the {@code M'} it is takes that one back off.
    */
   @Test
   public void theRouxCaptureLosesRotationsAndBarelyMovesTheCount() {
@@ -115,7 +116,7 @@ public class RecordedGyroReplayTest {
     int rotations = count(shown, "x") + count(shown, "y") + count(shown, "z");
 
     assertEquals(shown, 17, rotations); // 24 before the wides were read, 19 before tilts folded
-    assertEquals(shown, 93, shown.split(" ").length - rotations);
+    assertEquals(shown, 92, shown.split(" ").length - rotations);
   }
 
   /**

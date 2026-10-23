@@ -128,7 +128,7 @@ public final class SolveSolution {
     List<Move> stored = SolveMovesFormat.parse(storedMoves);
     CubeRotation grip = method == CubeMethod.BLIND ? gripOf(storedMoves) : null;
     BlindChoices choices = grip == null ? null : blindChoices(storedMoves, stored, grip, solveSteps);
-    List<Move> moves = inSolversFrame(stored, null, grip, choices);
+    List<Move> moves = inSolversFrame(stored, null, grip, choices, splitsOf(solveSteps));
     if (grip == null) { // a blind solve shows no rotations to fold
       moves = RotationRoundTrips.fold(moves);
     }
@@ -217,8 +217,9 @@ public final class SolveSolution {
   }
 
   /** The stored stream spelled under one set of choices, for a reading that is weighing them. */
-  static List<Move> spell(List<Move> stored, CubeRotation grip, BlindChoices choices) {
-    return inSolversFrame(stored, null, grip, choices);
+  static List<Move> spell(List<Move> stored, CubeRotation grip, BlindChoices choices,
+      List<SolveStep> solveSteps) {
+    return inSolversFrame(stored, null, grip, choices, splitsOf(solveSteps));
   }
 
   /**
@@ -230,7 +231,7 @@ public final class SolveSolution {
    * apart. Rotation tokens are kept, since the whole point of a replay is to turn with the solver.
    */
   public static List<Move> timedSolution(String storedMoves) {
-    return inSolversFrame(SolveMovesFormat.parse(storedMoves), null, null, null);
+    return inSolversFrame(SolveMovesFormat.parse(storedMoves), null, null, null, null);
   }
 
   /**
@@ -248,7 +249,7 @@ public final class SolveSolution {
     List<Move> stored = SolveMovesFormat.parse(storedMoves);
     CubeRotation grip = gripOf(storedMoves);
     return inSolversFrame(stored, framesOut, grip,
-        blindChoices(storedMoves, stored, grip, solveSteps));
+        blindChoices(storedMoves, stored, grip, solveSteps), splitsOf(solveSteps));
   }
 
   private static BlindChoices blindChoices(String storedMoves, List<Move> stored, CubeRotation grip,
@@ -397,7 +398,7 @@ public final class SolveSolution {
    */
   public static List<FrameAt> framesOf(String storedMoves) {
     List<FrameAt> frames = new ArrayList<FrameAt>();
-    inSolversFrame(SolveMovesFormat.parse(storedMoves), frames, null, null);
+    inSolversFrame(SolveMovesFormat.parse(storedMoves), frames, null, null, null);
     return frames;
   }
 
@@ -433,11 +434,16 @@ public final class SolveSolution {
    * <p>The stored stream stays raw for exactly this reason: the frame is rebuilt on the way out, so
    * a correction here fixes solves already recorded.
    *
+   * <p>A wide next to the opposite face turned the same way is the slice ({@code r R'} is
+   * {@code M'}), however far apart the two were, since the wide's spin is the slice's. Only the
+   * algorithm boundaries stop it: merged across one, the far half would be shown in the wrong one.
+   *
    * @param heldIn the one grip the solve was turned in, or null where it cannot be known. See the
    *     class javadoc for what only a blind solve can promise.
+   * @param splits where each algorithm ends ({@link #splitsOf}), or null where none are known
    */
   private static List<Move> inSolversFrame(List<Move> stored, List<FrameAt> framesOut,
-      CubeRotation heldIn, BlindChoices choices) {
+      CubeRotation heldIn, BlindChoices choices, List<Long> splits) {
     CubeRotation frame = heldIn != null ? heldIn : CubeRotation.byNotation("");
     List<Move> rewritten = new ArrayList<Move>(stored.size());
     if (heldIn != null && !heldIn.getNotation().isEmpty()) {
@@ -456,10 +462,15 @@ public final class SolveSolution {
           String wide = Wides.forFaceAndSpin(relabelFace(frame, face.getNotation()),
               spin.getNotation());
           if (wide != null) {
+            int far = sliceAfterWide(stored, i, splits);
+            if (far > i) { // r R' is M': the same spin, so the frame turns the same either way
+              wide = Slices.forPair(relabelFace(frame, face.getNotation()),
+                  relabelFace(frame, stored.get(far).getNotation()))[0];
+            }
             rewritten.add(new Move(wide, face.getOffsetMs()));
             frame = frame.then(spin);
             record(framesOut, face.getOffsetMs(), frame);
-            i++; // the face is spoken for: it is half of the move just written
+            i = far > i ? far : i + 1; // the face, and any far half, are spoken for
             continue;
           }
         }
@@ -486,6 +497,9 @@ public final class SolveSolution {
           straddled = -1;
         }
         int far = sensed ? i + 1 : straddled > i ? straddled : foldedFar(stored, i, choices);
+        if (far == i) {
+          far = wideAfterFace(stored, i, choices, splits); // R' r is M' too
+        }
         if (far > i) {
           // An opposite-face pair the gyro vouches for, or one the name check does: the solver did
           // one M/E/S, named in their frame. The spin is the same physical event as the move, not a
@@ -705,7 +719,8 @@ public final class SolveSolution {
     if (i + 2 >= stored.size()) {
       return null;
     }
-    String[] slice = slicePair(stored.get(i), stored.get(i + 1));
+    // No time limit: the gyro's spin makes the pair that slice exactly, however long it took.
+    String[] slice = Slices.forPair(stored.get(i).getNotation(), stored.get(i + 1).getNotation());
     Move spin = stored.get(i + 2);
     if (slice == null || !spin.getNotation().equals(slice[1])) {
       return null;
@@ -749,6 +764,62 @@ public final class SolveSolution {
   }
 
   /**
+   * The opposite face that makes the wide whose spin is {@code stored[spin]} a slice
+   * ({@code r R'}), or -1. A face the gyro paired with its own neighbour is left to that pair.
+   */
+  private static int sliceAfterWide(List<Move> stored, int spin, List<Long> splits) {
+    int far = spin + 2;
+    if (far >= stored.size() || SolveMovesFormat.isRotation(stored.get(far).getNotation())
+        || sliceCoreSpin(stored, far) != null) {
+      return -1;
+    }
+    return makesSlice(stored.get(spin), stored.get(spin + 1), stored.get(far), splits) ? far : -1;
+  }
+
+  /** The wide's face when {@code stored[i]} and the believed wide after it are a slice, or -1. */
+  private static int wideAfterFace(List<Move> stored, int i, BlindChoices choices,
+      List<Long> splits) {
+    if (i + 2 >= stored.size() || !SolveMovesFormat.isRotation(stored.get(i + 1).getNotation())
+        || wideFace(stored, i + 1) == null
+        || choices != null && !choices.believesWide(stored.get(i + 1).getOffsetMs())) {
+      return -1;
+    }
+    return makesSlice(stored.get(i + 1), stored.get(i + 2), stored.get(i), splits) ? i + 2 : -1;
+  }
+
+  /** Whether a wide and an opposite face are one slice turned in one algorithm. */
+  private static boolean makesSlice(Move spin, Move wideFace, Move face, List<Long> splits) {
+    String[] slice = Slices.forPair(wideFace.getNotation(), face.getNotation());
+    return slice != null && slice[1].equals(spin.getNotation())
+        && !splitBetween(splits, Math.min(wideFace.getOffsetMs(), face.getOffsetMs()),
+            Math.max(wideFace.getOffsetMs(), face.getOffsetMs()));
+  }
+
+  /** Where each algorithm's moves end, as the breakdown splits them; null for no steps. */
+  private static List<Long> splitsOf(List<SolveStep> solveSteps) {
+    if (solveSteps == null) {
+      return null;
+    }
+    List<Long> splits = new ArrayList<Long>();
+    for (Algorithm algorithm : algorithmsOf(solveSteps)) {
+      splits.add(algorithm.endMs);
+    }
+    return splits;
+  }
+
+  /** Whether an algorithm ends at or after {@code fromMs} and before {@code toMs}. */
+  private static boolean splitBetween(List<Long> splits, long fromMs, long toMs) {
+    if (splits != null) {
+      for (long split : splits) {
+        if (fromMs <= split && split < toMs) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
    * The far half of a pair {@link BlindSpelling} settled was one slice, or {@code i} where the
    * reading has no such answer. The gyro said nothing about this one — that is why it is in
    * question — so what stands for its spin is the pair's own, which is the same turn either way.
@@ -771,13 +842,6 @@ public final class SolveSolution {
       }
     }
     return -1;
-  }
-
-  /** The slice and spin for two moves close enough together to be one, or null. */
-  private static String[] slicePair(Move a, Move b) {
-    return b.getOffsetMs() - a.getOffsetMs() > Slices.WINDOW_MS
-        ? null
-        : Slices.forPair(a.getNotation(), b.getNotation());
   }
 
   private static String relabelFace(CubeRotation frame, String notation) {

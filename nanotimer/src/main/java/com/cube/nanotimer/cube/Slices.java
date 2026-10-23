@@ -16,12 +16,13 @@ import java.util.Map;
 final class Slices {
 
   /**
-   * How far apart a slice's two turns may land. Measured over nine captured solves: a slow L4E
-   * reports them up to 233 ms apart, and at the old 70 ms a third of them were never even looked at,
-   * printing as the {@code R L'} the cube reported. Widening cannot fold a deliberate pair, since
-   * the gyro still has to have seen the core rock; what it does risk is a whole-cube rotation
-   * between the two turns matching that rock exactly, which is why this stops at the gap two halves
-   * of an {@code M2} are allowed rather than going wider.
+   * How far apart a slice's two turns usually land: a slow L4E reports them up to 233 ms apart,
+   * measured over nine captured solves.
+   *
+   * <p>With a gyro this is <b>not a limit on what folds</b>. A pair plus the spin it names is that
+   * slice exactly, whatever the gap, so pairs further apart are still read, after the close ones
+   * and the wides. Without a gyro, timing is all there is to read a slice by, and there it is the
+   * limit.
    */
   static final long WINDOW_MS = 250;
 

@@ -1,6 +1,7 @@
 package com.cube.nanotimer.cube;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import com.cube.nanotimer.smartcube.model.CubeMove;
 import com.cube.nanotimer.smartcube.model.CubeOrientation;
@@ -102,15 +103,34 @@ public class SliceSpinDetectorTest {
     assertEquals(0, detector.possiblePairs().size());
   }
 
+  /** The pair plus the spin is that slice exactly, so a slow one is still read as one. */
   @Test
-  public void leavesFacesTurnedTooFarApartAlone() {
-    // Beyond the slice window the two turns are a deliberate pair, however the core moved — here
-    // it moved between them, which is a solver reorienting mid-pair and is neither face's wide.
+  public void readsASlowPairWithACoreRockAsASlice() {
     SliceSpinDetector detector = new SliceSpinDetector();
     detector.onMove(move("L", 1000));
     detector.onMove(move("R'", 1500));
 
-    assertEquals(0, detector.coreSpins(rockedAt(1250, BEFORE_M_PRIME, AFTER_M_PRIME)).size());
+    List<RotationTracker.Rotation> spins =
+        detector.coreSpins(rockedAt(1250, BEFORE_M_PRIME, AFTER_M_PRIME));
+
+    assertEquals(1, spins.size());
+    assertEquals("x", spins.get(0).getNotation());
+    assertEquals(1501, spins.get(0).getTimestampMs());
+  }
+
+  /** A rock settled at one face is that face's wide; the display merges it with the other face. */
+  @Test
+  public void readsASlowPairRockingAtOneFaceAsThatFacesWide() {
+    SliceSpinDetector detector = new SliceSpinDetector();
+    detector.onMove(move("L", 1000));
+    detector.onMove(move("R'", 1500));
+
+    List<RotationTracker.Rotation> spins =
+        detector.coreSpins(rockedAt(1100, BEFORE_M_PRIME, AFTER_M_PRIME));
+
+    assertEquals(1, spins.size());
+    assertTrue(spins.get(0).isWide());
+    assertEquals(999, spins.get(0).getTimestampMs());
   }
 
   @Test

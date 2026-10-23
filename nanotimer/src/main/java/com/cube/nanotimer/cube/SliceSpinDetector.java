@@ -85,7 +85,35 @@ public final class SliceSpinDetector {
       claim(claimed, i, i + 1);
       i++; // both faces are spoken for: the second cannot also open a pair
     }
-    return merged(spins, wideSpins(claimed, orientations));
+    List<RotationTracker.Rotation> wides = wideSpins(claimed, orientations);
+    spins.addAll(slowSliceSpins(claimed, orientations));
+    return merged(spins, wides);
+  }
+
+  /**
+   * The slices turned slower than {@link Slices#WINDOW_MS}: a pair plus the spin it names is that
+   * slice whatever the gap, so only the gyro decides.
+   *
+   * <p>Read after the wides. A wide beside the opposite face is this same slice, and the display
+   * merges the two, except across an algorithm boundary, which a spin stored here cannot respect.
+   * That also leaves only rocks more than {@link #SETTLE_MS} from both faces, so a pair's window
+   * never holds its neighbour's rock.
+   */
+  private List<RotationTracker.Rotation> slowSliceSpins(boolean[] claimed,
+      Orientations orientations) {
+    List<RotationTracker.Rotation> spins = new ArrayList<RotationTracker.Rotation>();
+    for (int i = 0; i + 1 < turns.size(); i++) {
+      String[] slice = Slices.forPair(turns.get(i).notation, turns.get(i + 1).notation);
+      if (slice == null || claimed[i] || claimed[i + 1]
+          || !rocked(turns.get(i), turns.get(i + 1), slice[1], orientations)) {
+        continue;
+      }
+      spins.add(new RotationTracker.Rotation(slice[1], turns.get(i + 1).atMs + 1,
+          turns.get(i).atMs));
+      claim(claimed, i, i + 1);
+      i++;
+    }
+    return spins;
   }
 
   /**
@@ -105,6 +133,7 @@ public final class SliceSpinDetector {
       String spin = claimed[i] ? null : Wides.spinFor(turn.notation);
       if (spin != null && rocked(turn, turn, spin, orientations)) {
         spins.add(new RotationTracker.Rotation(spin, turn.atMs - 1, turn.atMs - 1, true));
+        claimed[i] = true;
       }
     }
     return spins;
@@ -116,12 +145,9 @@ public final class SliceSpinDetector {
     }
   }
 
-  /** The two sorted runs as one, since {@link RotationTracker} folds them in by time. */
+  /** Every spin in time order, since {@link RotationTracker} folds them in by time. */
   private static List<RotationTracker.Rotation> merged(List<RotationTracker.Rotation> slices,
       List<RotationTracker.Rotation> wides) {
-    if (wides.isEmpty()) {
-      return slices;
-    }
     List<RotationTracker.Rotation> all = new ArrayList<RotationTracker.Rotation>(slices);
     all.addAll(wides);
     // Stable, so a slice keeps the claim where the two land on the same millisecond.

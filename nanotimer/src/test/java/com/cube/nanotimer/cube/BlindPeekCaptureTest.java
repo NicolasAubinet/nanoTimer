@@ -97,8 +97,8 @@ public class BlindPeekCaptureTest {
   /** Nothing here may reach a solve the solver was looking at: they turn the cube on purpose. */
   @Test
   public void aSightedReadingKeepsEveryWideTheDetectorClaimed() {
-    assertEquals(whole(null), 6, wides(whole(null)));
-    assertEquals(whole(CubeMethod.BLIND), 4, wides(whole(CubeMethod.BLIND)));
+    assertEquals(whole(null), 5, wides(whole(null))); // a sixth, u U', is the E' it was
+    assertEquals(whole(CubeMethod.BLIND), 3, wides(whole(CubeMethod.BLIND))); // and here
   }
 
   /**

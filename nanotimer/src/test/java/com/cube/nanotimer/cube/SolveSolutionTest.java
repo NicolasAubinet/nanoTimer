@@ -423,6 +423,50 @@ public class SolveSolutionTest {
     assertEquals("r2", solution.getSteps().get(0).getMoves());
   }
 
+  /** A wide's spin is the slice's, so the wide and the opposite face turned with it are the slice. */
+  @Test
+  public void foldsAWideAndTheOppositeFaceIntoTheSlice() {
+    assertEquals("M'", displayed(moves("x@99", "L@100", "R'@123")));
+    assertEquals("E'", displayed(moves("y@99", "D@100", "U'@123")));
+    assertEquals("S", displayed(moves("z@99", "B@100", "F'@123")));
+    assertEquals(1, SolveSolution.from(moves("x@99", "L@100", "R'@123"),
+        Arrays.asList(step("f2l", 0, 1000))).getMoveCount());
+  }
+
+  @Test
+  public void foldsAFaceAndTheOppositeWideAfterItIntoTheSlice() {
+    assertEquals("M'", displayed(moves("R'@100", "x@499", "L@500")));
+  }
+
+  /** The identity holds however long the pause, so timing plays no part. */
+  @Test
+  public void foldsAWideIntoTheSliceWhateverTheGap() {
+    SolveSolution solution = SolveSolution.from(moves("x@99", "L@100", "R'@3000"),
+        Arrays.asList(step("f2l", 0, 5000)));
+
+    assertEquals("M'", solution.getSteps().get(0).getMoves());
+  }
+
+  /** Merged, the far half would be shown in the algorithm before its own. */
+  @Test
+  public void leavesAWideAndAFaceInTwoAlgorithmsApart() {
+    SolveSolution solution = SolveSolution.from(moves("x@99", "L@100", "R'@1500"),
+        Arrays.asList(step("edges", 0, 5000, step("UF-UB-DL", 0, 1000), step("UF-LB-BU", 0, 4000))));
+    SolveSolution.Step step = solution.getSteps().get(0);
+
+    assertEquals("r", step.getPartMoves(0));
+    assertEquals("R'", step.getPartMoves(1));
+  }
+
+  /** A pair and the gyro's spin after it is the slice however slowly it was turned. */
+  @Test
+  public void foldsASlowPairWithItsSpin() {
+    SolveSolution solution = SolveSolution.from(moves("L@100", "R'@900", "x@901"),
+        Arrays.asList(step("f2l", 0, 1000)));
+
+    assertEquals("M'", solution.getSteps().get(0).getMoves());
+  }
+
   /** A replay turns with the solver, so it gets the wide too rather than the raw face and spin. */
   @Test
   public void keepsWidesForReplay() {
