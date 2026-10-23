@@ -633,7 +633,7 @@ public class SmartCubeConnectDialog extends NanoTimerBottomSheetFragment {
    * it shares the sheet with is what has to fit without scrolling.
    */
   private void setRadarCompact(boolean compact) {
-    int size = Math.round(getResources().getDisplayMetrics().density * (compact ? 104 : 148));
+    int size = Math.round(getResources().getDisplayMetrics().density * (compact ? 84 : 148));
     ViewGroup.LayoutParams lp = radarWell.getLayoutParams();
     if (lp.height != size) {
       lp.height = size;

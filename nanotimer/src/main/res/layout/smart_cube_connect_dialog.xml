@@ -146,9 +146,9 @@
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
            android:orientation="vertical"
-           android:layout_marginTop="16dp"
+           android:layout_marginTop="12dp"
            android:background="@drawable/cross_section_card"
-           android:padding="12dp"
+           android:padding="10dp"
            android:visibility="gone">
           <!-- The state the app currently reads off the cube, so "the app thinks your cube is
                scrambled" is something to check rather than something to guess at. It follows the
@@ -160,8 +160,8 @@
           <WebView
              android:id="@+id/wvSmartCubeState"
              android:layout_width="match_parent"
-             android:layout_height="84dp"
-             android:layout_marginBottom="6dp"/>
+             android:layout_height="72dp"
+             android:layout_marginBottom="4dp"/>
           <TextView
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
@@ -171,7 +171,8 @@
           <Button
              android:id="@+id/btnSmartCubeResync"
              android:layout_width="match_parent"
-             android:layout_marginTop="10dp"
+             android:layout_height="40dp"
+             android:layout_marginTop="8dp"
              android:text="@string/smart_cube_resync"
              android:background="@drawable/dialog_action_button_ghost"
              style="@style/DialogActionButton"/>
@@ -181,7 +182,8 @@
           <Button
              android:id="@+id/btnSmartCubeStraighten"
              android:layout_width="match_parent"
-             android:layout_marginTop="8dp"
+             android:layout_height="40dp"
+             android:layout_marginTop="6dp"
              android:text="@string/smart_cube_straighten"
              android:background="@drawable/dialog_action_button_ghost"
              android:textColor="@color/lightblue"
@@ -192,8 +194,8 @@
            android:id="@+id/cbSmartCubeAutoConnect"
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
-           android:layout_marginTop="10dp"
-           android:minHeight="40dp"
+           android:layout_marginTop="2dp"
+           android:minHeight="36dp"
            android:button="@drawable/release_notes_check"
            android:background="@null"
            android:paddingLeft="10dp"
@@ -351,7 +353,7 @@
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
      android:orientation="horizontal"
-     android:layout_marginTop="16dp">
+     android:layout_marginTop="10dp">
     <androidx.appcompat.widget.AppCompatButton
        android:id="@+id/btnSmartCubeDisconnect"
        android:layout_width="0dp"
