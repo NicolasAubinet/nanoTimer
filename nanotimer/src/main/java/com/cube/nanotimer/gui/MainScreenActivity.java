@@ -487,8 +487,12 @@ public class MainScreenActivity extends DrawerLayoutActivity implements Selectio
 
   /** A hub row the current solve type cannot open: dimmed and untappable, but still listed. */
   private boolean isUnavailableHubEntry(int entry) {
-    return (entry == MENU_ANALYSIS || entry == MENU_COACHING)
-        && !AnalysisActivity.canAnalyse(curSolveType);
+    if (entry != MENU_ANALYSIS && entry != MENU_COACHING) {
+      return false;
+    }
+    // A blind hub has a Solve tab only: the coach plans out of cases, which a blind solve has none of.
+    return !AnalysisActivity.canAnalyse(curSolveType)
+        || (entry == MENU_COACHING && curSolveType.isBlind());
   }
 
   private void openAnalysis(int tab) {
