@@ -1571,4 +1571,5 @@
   <string name="beta_coach_not_now">Ahora no</string>
   <string name="beta_coach_also_new">También nuevo con un smart cube</string>
   <string name="beta_coach_reopen">Entrenador gratis para beta testers</string>
+  <string name="beta_coach_later_hint">Lo tienes siempre en el icono de Bluetooth y luego el regalo.</string>
 </resources>

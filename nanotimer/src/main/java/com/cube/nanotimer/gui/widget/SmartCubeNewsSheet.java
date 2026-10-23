@@ -130,7 +130,12 @@ public class SmartCubeNewsSheet extends NanoTimerBottomSheetFragment {
     });
     Button later = v.findViewById(R.id.buNewsLater);
     Button connect = v.findViewById(R.id.buNewsConnect);
-    later.setOnClickListener(view -> dismiss());
+    later.setOnClickListener(view -> {
+      if (beta) {
+        DialogUtils.showInfoMessage(requireContext(), getString(R.string.beta_coach_later_hint));
+      }
+      dismiss();
+    });
     // The beta's one loud button is the offer, and a cube already linked needs no connecting.
     if (beta || SmartCubeManager.INSTANCE.isConnected()) {
       connect.setVisibility(View.GONE);
