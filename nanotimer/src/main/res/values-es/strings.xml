@@ -1557,16 +1557,16 @@
   <string name="news_connect">Conectar mi cubo</string>
   <!-- The coach beta invitation, in internal testing builds only -->
   <string name="beta_coach_pill">Beta testers</string>
-  <string name="beta_coach_title">Prueba gratis el entrenador IA</string>
-  <string name="beta_coach_body">¡Gracias por probar los smart cubes! Los testers también pueden usar gratis el entrenador de Cubench: lee tus resoluciones con smart cube y te escribe un plan de entrenamiento cada semana.</string>
+  <string name="beta_coach_title">Prueba gratis el entrenador IA de CFOP</string>
+  <string name="beta_coach_body">¡Gracias por probar los smart cubes! Si resuelves el 3x3 con CFOP, también puedes probar gratis el entrenador de Cubench. Cada semana lee tus resoluciones con smart cube y te escribe un plan de entrenamiento, y a cambio me cuentas qué tal te pareció.</string>
   <string name="beta_coach_plan_title">Un plan cada semana</string>
   <string name="beta_coach_plan_body">Hecho a partir de tus últimas resoluciones: lo que va bien y en qué trabajar después.</string>
   <string name="beta_coach_drills_title">Entrenamientos en lo que más te cuesta</string>
   <string name="beta_coach_drills_body">Los casos y pasos que más tiempo te hacen perder, listos para practicar.</string>
   <string name="beta_coach_learn_title">Qué aprender después</string>
   <string name="beta_coach_learn_body">Los próximos algoritmos que aprender, en el orden que antes da resultado.</string>
-  <string name="beta_coach_needs">Para cuberos de 3x3 con CFOP y un smart cube compatible. Tu primer plan llega tras 100 resoluciones.</string>
-  <string name="beta_coach_apply">Probar el entrenador gratis</string>
+  <string name="beta_coach_needs">Para cuberos de 3x3 con CFOP y un smart cube compatible. Tu primer plan llega tras 100 resoluciones, y un breve formulario tras cada plan ayuda a mejorar el entrenador.</string>
+  <string name="beta_coach_apply">Solicitar probar el entrenador</string>
   <string name="beta_coach_no_payment">No se pide ningún dato de pago</string>
   <string name="beta_coach_not_now">Ahora no</string>
   <string name="beta_coach_also_new">También nuevo con un smart cube</string>

@@ -1606,16 +1606,16 @@
   <string name="news_connect">Connect my cube</string>
   <!-- The coach beta invitation, in internal testing builds only -->
   <string name="beta_coach_pill">Beta testers</string>
-  <string name="beta_coach_title">Try the AI coach for free</string>
-  <string name="beta_coach_body">Thanks for testing smart cube support! Testers can also use the Cubench coach for free: it reads your smart cube solves and writes you a training plan every week.</string>
+  <string name="beta_coach_title">Test the AI CFOP coach for free</string>
+  <string name="beta_coach_body">Thanks for testing smart cube support! If you solve 3x3 with CFOP, you can also test the Cubench coach for free. Each week it reads your smart cube solves and writes you a training plan, and in return you tell me how good that plan was.</string>
   <string name="beta_coach_plan_title">A plan every week</string>
   <string name="beta_coach_plan_body">Built from your latest solves: what is going well, and what to work on next.</string>
   <string name="beta_coach_drills_title">Drills on what costs you most</string>
   <string name="beta_coach_drills_body">The cases and steps losing you the most time, ready to practise.</string>
   <string name="beta_coach_learn_title">What to learn next</string>
   <string name="beta_coach_learn_body">The next algorithms to learn, in the order that pays off soonest.</string>
-  <string name="beta_coach_needs">For 3x3 CFOP solvers with a supported smart cube. Your first plan comes after 100 solves.</string>
-  <string name="beta_coach_apply">Try the coach for free</string>
+  <string name="beta_coach_needs">For 3x3 CFOP solvers with a supported smart cube. Your first plan comes after 100 solves, then a short feedback form after each plan helps make the coach better.</string>
+  <string name="beta_coach_apply">Apply to test the coach</string>
   <string name="beta_coach_no_payment">No payment information needed</string>
   <string name="beta_coach_not_now">Not now</string>
   <string name="beta_coach_also_new">Also new with a smart cube</string>
