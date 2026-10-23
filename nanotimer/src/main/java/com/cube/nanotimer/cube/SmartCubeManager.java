@@ -1,5 +1,6 @@
 package com.cube.nanotimer.cube;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
@@ -83,6 +84,7 @@ public enum SmartCubeManager {
 
   private Context context;
   private CubeScanner scanner;
+  private SmartCubeScanListener scanOwner; // main thread only
   private final Handler mainHandler = new Handler(Looper.getMainLooper());
   private final ExecutorService bleExecutor = Executors.newSingleThreadExecutor();
 
@@ -110,9 +112,32 @@ public enum SmartCubeManager {
     this.context = context.getApplicationContext();
   }
 
+  /** Replaces any scan already running: there is one radio, and the newest asker owns it. */
   public void startScan(SmartCubeScanListener listener) {
     ensureScanner();
     scanner.scan(found -> mainHandler.post(() -> listener.onCubeDiscovered(found)));
+    scanOwner = listener;
+  }
+
+  /** Stops the scan only if this listener still owns it: an auto-connect must not end the sheet's. */
+  public void stopScan(SmartCubeScanListener owner) {
+    if (scanOwner == owner) {
+      stopScan();
+    }
+  }
+
+  public boolean isScanning() {
+    return scanOwner != null;
+  }
+
+  /** What scanning and connecting need granted, by Android version: none below Android 6. */
+  public static String[] requiredPermissions() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      return new String[] {Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT};
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      return new String[] {Manifest.permission.ACCESS_FINE_LOCATION};
+    }
+    return new String[0];
   }
 
   /** Whether the device has a Bluetooth adapter and it is currently on. */
@@ -128,6 +153,7 @@ public enum SmartCubeManager {
   }
 
   public void stopScan() {
+    scanOwner = null;
     if (scanner != null) {
       scanner.stopScan();
     }
@@ -139,7 +165,7 @@ public enum SmartCubeManager {
 
   public void connect(DiscoveredCube device, String macAddress, ConnectCallback callback) {
     ensureScanner();
-    scanner.stopScan();
+    stopScan();
     updateConnection(CubeConnection.CONNECTING);
     bleExecutor.execute(() -> {
       disconnectInternal();

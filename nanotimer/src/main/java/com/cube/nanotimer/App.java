@@ -1,6 +1,8 @@
 package com.cube.nanotimer;
 
+import android.app.Application;
 import android.content.Context;
+import com.cube.nanotimer.cube.SmartCubeAutoConnect;
 import com.cube.nanotimer.cube.SmartCubeManager;
 import com.cube.nanotimer.cube.SolveReinterpreter;
 import com.cube.nanotimer.gui.MainScreenActivity;
@@ -60,6 +62,7 @@ public enum App {
       Options.INSTANCE.setContext(context);
       ScramblerService.INSTANCE.init(context);
       SmartCubeManager.INSTANCE.init(context);
+      SmartCubeAutoConnect.INSTANCE.init((Application) context.getApplicationContext());
       initRandomStateGenListener(context);
 
       refreshCaseKnowledge();

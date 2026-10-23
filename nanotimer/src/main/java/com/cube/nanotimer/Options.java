@@ -68,6 +68,8 @@ public enum Options {
   public static final String DRILL_FOLLOW_GYRO_KEY = "drill_follow_gyro";
   public static final String SCRAMBLE_VIEW_3D_KEY = "scramble_view_3d";
   public static final String SMART_CUBE_INTRO_SEEN_KEY = "smart_cube_intro_seen";
+  public static final String SMART_CUBE_AUTO_CONNECT_KEY = "smart_cube_auto_connect";
+  public static final String SMART_CUBE_LAST_ID_KEY = "smart_cube_last_id";
   public static final String SMART_CUBE_METHOD_KEY = "smart_cube_method";
   public static final String SMART_CUBE_METHOD_ASKED_KEY = "smart_cube_method_asked";
   public static final String SMART_CUBE_EDGE_BUFFER_KEY = "smart_cube_edge_buffer";
@@ -669,6 +671,23 @@ public enum Options {
 
   public void setSmartCubeIntroSeen(boolean seen) {
     sharedPreferences.edit().putBoolean(SMART_CUBE_INTRO_SEEN_KEY, seen).apply();
+  }
+
+  public boolean isSmartCubeAutoConnect() {
+    return sharedPreferences.getBoolean(SMART_CUBE_AUTO_CONNECT_KEY, false);
+  }
+
+  public void setSmartCubeAutoConnect(boolean autoConnect) {
+    sharedPreferences.edit().putBoolean(SMART_CUBE_AUTO_CONNECT_KEY, autoConnect).apply();
+  }
+
+  // The platform id of the last cube connected, which auto-connect looks for. Null before any.
+  public String getSmartCubeLastId() {
+    return sharedPreferences.getString(SMART_CUBE_LAST_ID_KEY, null);
+  }
+
+  public void setSmartCubeLastId(String id) {
+    sharedPreferences.edit().putString(SMART_CUBE_LAST_ID_KEY, id).apply();
   }
 
   // The method new solve types are created with, stored as its code. Defaults to the most common

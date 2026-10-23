@@ -175,6 +175,21 @@
              style="@style/DialogActionButton"/>
         </LinearLayout>
 
+        <CheckBox
+           android:id="@+id/cbSmartCubeAutoConnect"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="10dp"
+           android:minHeight="40dp"
+           android:button="@drawable/release_notes_check"
+           android:background="@null"
+           android:paddingLeft="10dp"
+           android:paddingStart="10dp"
+           android:text="@string/smart_cube_auto_connect"
+           android:textColor="@color/secondary_text"
+           android:textSize="13sp"
+           android:visibility="gone"/>
+
       </LinearLayout>
 
       <!-- ===== Intro panel: what a smart cube is for ===== -->

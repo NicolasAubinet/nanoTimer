@@ -1,13 +1,11 @@
 package com.cube.nanotimer.gui.widget;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.LayoutInflater;
@@ -15,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -28,7 +27,9 @@ import com.cube.nanotimer.Options;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.cube.ConnectCallback;
 import com.cube.nanotimer.cube.CubePatternFormat;
+import com.cube.nanotimer.cube.SmartCubeAutoConnect;
 import com.cube.nanotimer.cube.SmartCubeManager;
+import com.cube.nanotimer.cube.SmartCubeScanListener;
 import com.cube.nanotimer.cube.VirtualCube;
 import com.cube.nanotimer.smartcube.model.CubeBatteryListener;
 import com.cube.nanotimer.smartcube.model.CubeConnectionListener;
@@ -70,6 +71,7 @@ public class SmartCubeConnectDialog extends NanoTimerBottomSheetFragment {
   private VirtualCube stateCube;
   private Button btnResync;
   private Button btnDisconnect;
+  private CheckBox cbAutoConnect;
 
   /** The sighted methods a solve can be broken down into, in order of how common they are. */
   private static final CubeMethod[] METHOD_CHOICES =
@@ -86,6 +88,7 @@ public class SmartCubeConnectDialog extends NanoTimerBottomSheetFragment {
   private final CubeConnectionListener connectionListener = connection -> updateUi();
   private final CubeBatteryListener batteryListener = level -> updateUi();
   private final CubeStateListener stateListener = state -> showState();
+  private final SmartCubeScanListener scanListener = this::onDiscovered;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -150,7 +153,14 @@ public class SmartCubeConnectDialog extends NanoTimerBottomSheetFragment {
       SmartCubeManager.INSTANCE.reanchorGyro();
       DialogUtils.showShortInfoMessage(getActivity(), R.string.smart_cube_straightened);
     });
-    btnDisconnect.setOnClickListener(view -> SmartCubeManager.INSTANCE.disconnect());
+    btnDisconnect.setOnClickListener(view -> {
+      SmartCubeAutoConnect.INSTANCE.holdOff();
+      SmartCubeManager.INSTANCE.disconnect();
+    });
+    cbAutoConnect = v.findViewById(R.id.cbSmartCubeAutoConnect);
+    cbAutoConnect.setChecked(Options.INSTANCE.isSmartCubeAutoConnect());
+    cbAutoConnect.setOnCheckedChangeListener(
+        (button, checked) -> Options.INSTANCE.setSmartCubeAutoConnect(checked));
     v.findViewById(R.id.buSmartCubeDone).setOnClickListener(view -> dismiss());
 
     return v;
@@ -242,7 +252,7 @@ public class SmartCubeConnectDialog extends NanoTimerBottomSheetFragment {
     discovered.clear();
     cubeList.removeAllViews();
     try {
-      SmartCubeManager.INSTANCE.startScan(this::onDiscovered);
+      SmartCubeManager.INSTANCE.startScan(scanListener);
       scanning = true;
       showSearching();
     } catch (SecurityException e) {
@@ -255,7 +265,7 @@ public class SmartCubeConnectDialog extends NanoTimerBottomSheetFragment {
 
   private void stopScan() {
     scanning = false;
-    SmartCubeManager.INSTANCE.stopScan();
+    SmartCubeManager.INSTANCE.stopScan(scanListener);
   }
 
   /** A cube already on the list is re-advertising: keep its bars live rather than ignoring it. */
@@ -488,6 +498,7 @@ public class SmartCubeConnectDialog extends NanoTimerBottomSheetFragment {
     tvListLabel.setVisibility(View.GONE);
     cubeList.setVisibility(View.GONE);
     resyncBlock.setVisibility(View.VISIBLE);
+    cbAutoConnect.setVisibility(View.VISIBLE);
     setRadarCompact(true);
     showState();
     btnDisconnect.setVisibility(View.VISIBLE);
@@ -533,6 +544,7 @@ public class SmartCubeConnectDialog extends NanoTimerBottomSheetFragment {
     cubeList.setVisibility(empty ? View.GONE : View.VISIBLE);
     btnFix.setVisibility(View.GONE);
     resyncBlock.setVisibility(View.GONE);
+    cbAutoConnect.setVisibility(View.GONE);
     setRadarCompact(false);
     btnDisconnect.setVisibility(View.GONE);
   }
@@ -605,6 +617,7 @@ public class SmartCubeConnectDialog extends NanoTimerBottomSheetFragment {
     tvListLabel.setVisibility(View.GONE);
     cubeList.setVisibility(View.GONE);
     resyncBlock.setVisibility(View.GONE);
+    cbAutoConnect.setVisibility(View.GONE);
     setRadarCompact(false);
     btnDisconnect.setVisibility(View.GONE);
   }
@@ -643,15 +656,8 @@ public class SmartCubeConnectDialog extends NanoTimerBottomSheetFragment {
   }
 
   private String[] missingPermissions() {
-    List<String> required = new ArrayList<>();
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-      required.add(Manifest.permission.BLUETOOTH_SCAN);
-      required.add(Manifest.permission.BLUETOOTH_CONNECT);
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      required.add(Manifest.permission.ACCESS_FINE_LOCATION);
-    }
     List<String> missing = new ArrayList<>();
-    for (String permission : required) {
+    for (String permission : SmartCubeManager.requiredPermissions()) {
       if (ContextCompat.checkSelfPermission(requireContext(), permission) != PackageManager.PERMISSION_GRANTED) {
         missing.add(permission);
       }

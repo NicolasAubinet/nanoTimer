@@ -788,6 +788,7 @@
   <string name="smart_cube_connect_failed">Échec de la connexion: %s</string>
   <string name="smart_cube_intro_body">Un smart cube Bluetooth transmet à Cubench chacun de vos mouvements au moment où vous le faites. Une fois le vôtre appairé, trois choses changent.</string>
   <string name="smart_cube_done">Terminé</string>
+  <string name="smart_cube_auto_connect">Se connecter à ce cube à l\'ouverture de l\'application</string>
   <string name="smart_cube_resync">Réinitialiser l\'état</string>
   <string name="smart_cube_resync_hint">Si l\'application croit que votre cube est mélangé alors qu\'il ne l\'est pas, c\'est que le cube s\'est perdu. Résolvez-le, puis réinitialisez l\'état.</string>
   <string name="smart_cube_resynced">État du cube réaligné</string>
