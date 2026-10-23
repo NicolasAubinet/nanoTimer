@@ -1614,7 +1614,7 @@
   <string name="beta_coach_drills_body">The cases costing you the most time.</string>
   <string name="beta_coach_learn_title">What to learn next</string>
   <string name="beta_coach_learn_body">The algorithms that pay off soonest.</string>
-  <string name="beta_coach_needs">For 3x3 CFOP solvers with a supported smart cube. First plan after 100 solves, then a 2-minute form after each plan.</string>
+  <string name="beta_coach_needs">First plan after 100 solves, and a 2-minute form after each plan.</string>
   <string name="beta_coach_apply">Join the coach beta</string>
   <string name="beta_coach_no_payment">No payment information needed</string>
   <string name="beta_coach_not_now">Not now</string>
