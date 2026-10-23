@@ -807,8 +807,7 @@ public class HistoryDetailDialog extends NanoTimerBottomSheetFragment {
     int[][] partPositions = Utils.getSmartCubeSubStepPositions(steps);
     SolveStepBarView bar = (SolveStepBarView) v.findViewById(R.id.breakdownBar);
     bar.setSteps(steps, colors);
-    breakdownPauses = split && !solution.getSteps().isEmpty()
-        ? new ArrayList<long[]>(solution.getSteps().get(0).getStallSpans()) : null;
+    breakdownPauses = split ? SolveStepBars.firstStepPauses(solution) : null;
     if (breakdownPauses != null) {
       bar.setFirstStepPauses(breakdownPauses);
     }

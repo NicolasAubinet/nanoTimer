@@ -95,6 +95,7 @@ import com.cube.nanotimer.util.view.ScalingLinearLayout;
 import com.cube.nanotimer.util.view.ScrambleFollowAnimator;
 import com.cube.nanotimer.util.view.ScrambleStatePreview;
 import com.cube.nanotimer.util.view.SessionBarsView;
+import com.cube.nanotimer.util.view.SolveStepBars;
 import com.cube.nanotimer.util.view.SolveTypeIcons;
 import com.cube.nanotimer.util.view.TimePlinth;
 import com.cube.nanotimer.vo.CubeMethod;
@@ -157,6 +158,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
   private List<SolveStep> shownSteps = Collections.emptyList();
   private String[] shownStepNames;
   private int shownDoneCount; // of the shown steps, how many are solved rather than still to come
+  private List<long[]> shownPauses = Collections.emptyList(); // the stops paled in the first step
   private CharSequence shownStats;
   private boolean discardWhenSaved; // discard confirmed while the solve was still being saved
   private boolean recordPending; // the stopped solve is still waiting on the cube before it is saved
@@ -1612,7 +1614,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
    */
   private void showStepsSoFar() {
     drawStepBar(SolveBreakdown.inProgress(stepsTimes.toArray(new Long[0]), solveType.getSteps().length),
-        stepNames(), stepsTimes.size());
+        stepNames(), stepsTimes.size(), Collections.<long[]>emptyList());
   }
 
   private void resetTimer() {
@@ -2021,11 +2023,13 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
     // The tail is drawn but never stored, so lastSolveSteps stays the form that gets saved.
     List<SolveStep> barSteps = SolveBreakdown.withTail(lastSolveSteps, lastSolveStoppedStep,
         solveDurationMs, lastSolveMoves, lastSolveMethod);
-    drawStepBar(SolveBreakdown.withoutTail(barSteps), null);
-    solveStepBar.animateIn(); // a small sweep-in, so a finished cube solve feels less abrupt
     // The stats read the whole thing, gap included, so the move count is the same number the detail
     // sheet shows — only the bar leaves it out.
-    showSolveStats(SolveSolution.from(lastSolveMoves, barSteps, lastSolveMethod));
+    SolveSolution solution = SolveSolution.from(lastSolveMoves, barSteps, lastSolveMethod);
+    List<SolveStep> shown = SolveBreakdown.withoutTail(barSteps);
+    drawStepBar(shown, null, shown.size(), SolveStepBars.firstStepPauses(solution));
+    solveStepBar.animateIn(); // a small sweep-in, so a finished cube solve feels less abrupt
+    showSolveStats(solution);
   }
 
   /**
@@ -2039,7 +2043,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
       hideStepBreakdown();
       return;
     }
-    drawStepBar(steps, stepNames());
+    drawStepBar(steps, stepNames(), steps.size(), Collections.<long[]>emptyList());
     solveStepBar.animateIn();
     // The steps were timed by tapping, so there are only moves to count when a cube drove them too;
     // with none, this hides itself and the bar stands alone.
@@ -2087,21 +2091,20 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
     return stats;
   }
 
-  private void drawStepBar(List<SolveStep> steps, String[] stepNames) {
-    drawStepBar(steps, stepNames, steps.size());
-  }
-
   /**
    * Draws the bar, and remembers what it drew so a rotation can put the same thing back.
    *
    * @param doneCount how many of the steps are solved; the rest draw as the empty slots of a solve
    *     still running
+   * @param pauses the stops to pale in the first step; empty for the user's own steps
    */
-  private void drawStepBar(List<SolveStep> steps, String[] stepNames, int doneCount) {
+  private void drawStepBar(List<SolveStep> steps, String[] stepNames, int doneCount,
+      List<long[]> pauses) {
     shownSteps = steps;
     shownStepNames = stepNames;
     shownDoneCount = doneCount;
-    solveStepBar.setSteps(steps, stepNames, doneCount);
+    shownPauses = pauses;
+    solveStepBar.setSteps(steps, stepNames, doneCount, pauses);
     solveStepBar.setVisibility(View.VISIBLE);
     refreshTimePlinth();
     // The legend can wrap to another row, so where the block is parked has to be read again.
@@ -2124,7 +2127,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
       reserveStepBreakdownSpace();
       return;
     }
-    solveStepBar.setSteps(shownSteps, shownStepNames, shownDoneCount);
+    solveStepBar.setSteps(shownSteps, shownStepNames, shownDoneCount, shownPauses);
     solveStepBar.setVisibility(View.VISIBLE);
     refreshTimePlinth();
     if (tvSolveStats != null && shownStats != null) { // absent in landscape
@@ -2136,6 +2139,7 @@ public class TimerActivity extends NanoTimerActivity implements ResultListener, 
   private void hideStepBreakdown() {
     shownSteps = Collections.emptyList();
     shownStepNames = null;
+    shownPauses = Collections.emptyList();
     shownStats = null;
     solveStepBar.setVisibility(breakdownRidesInGap() ? View.INVISIBLE : View.GONE);
     refreshTimePlinth();

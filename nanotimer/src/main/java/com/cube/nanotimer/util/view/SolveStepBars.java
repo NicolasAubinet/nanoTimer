@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat;
 
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.cube.SolveBreakdown;
+import com.cube.nanotimer.cube.SolveSolution;
 import com.cube.nanotimer.util.helper.Utils;
 import com.cube.nanotimer.vo.SolveStep;
 import com.cube.nanotimer.vo.SolveTime;
@@ -118,6 +119,16 @@ public final class SolveStepBars {
       }
     }
     return legend;
+  }
+
+  /**
+   * The stops inside a solve's first step, which a bar pales as that step's thinking (see
+   * {@link SolveStepBarView#setFirstStepPauses}). One rule for every bar of a method's breakdown,
+   * so the timer and the solve's sheet pale the same stops. Empty where the solution has no steps.
+   */
+  public static ArrayList<long[]> firstStepPauses(SolveSolution solution) {
+    return solution.getSteps().isEmpty() ? new ArrayList<long[]>()
+        : new ArrayList<long[]>(solution.getSteps().get(0).getStallSpans());
   }
 
   /** One colour per step, in step order, shared by every bar in the app. */

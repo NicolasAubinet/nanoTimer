@@ -19,6 +19,7 @@ import com.cube.nanotimer.util.view.SolveStepBarView;
 import com.cube.nanotimer.util.view.SolveStepBars;
 import com.cube.nanotimer.vo.SolveStep;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -84,7 +85,17 @@ public class SolveStepBar extends LinearLayout {
    *     left without a time, which is the legend of a solve still running
    */
   public void setSteps(List<SolveStep> steps, String[] stepNames, int doneCount) {
+    setSteps(steps, stepNames, doneCount, Collections.<long[]>emptyList());
+  }
+
+  /**
+   * @param firstStepPauses the stops the bar pales in its first step, as
+   *     {@link SolveStepBars#firstStepPauses} gives them
+   */
+  public void setSteps(List<SolveStep> steps, String[] stepNames, int doneCount,
+      List<long[]> firstStepPauses) {
     bar.setSteps(steps, colors, doneCount);
+    bar.setFirstStepPauses(firstStepPauses);
     List<SolveStepBars.LegendEntry> legend = SolveStepBars.legend(steps);
     buildLegend(legend.size());
     for (int cell = 0; cell < legend.size(); cell++) {
