@@ -1558,14 +1558,14 @@
   <!-- The coach beta invitation, in internal testing builds only -->
   <string name="beta_coach_pill">Beta testers</string>
   <string name="beta_coach_title">Ayuda a dar forma al entrenador IA de CFOP</string>
-  <string name="beta_coach_body">¡Gracias por probar los smart cubes! Estoy creando un entrenador IA para cuberos de CFOP y me encantaría tu ayuda para que sea realmente bueno. Cada semana lee tus resoluciones con smart cube y te escribe un plan de entrenamiento. Tu opinión sobre esos planes es lo que lo hará mejorar. Es gratis para todos los que ayuden.</string>
+  <string name="beta_coach_body">Estoy creando un entrenador IA para cuberos de CFOP y me encantaría contar con testers para que sea realmente bueno. Es gratis para todos los que ayuden.</string>
   <string name="beta_coach_plan_title">Un plan cada semana</string>
-  <string name="beta_coach_plan_body">Hecho a partir de tus últimas resoluciones: lo que va bien y en qué trabajar después.</string>
+  <string name="beta_coach_plan_body">Lo que va bien y en qué trabajar después.</string>
   <string name="beta_coach_drills_title">Entrenamientos en lo que más te cuesta</string>
-  <string name="beta_coach_drills_body">Los casos y pasos que más tiempo te hacen perder, listos para practicar.</string>
+  <string name="beta_coach_drills_body">Los casos que más tiempo te cuestan.</string>
   <string name="beta_coach_learn_title">Qué aprender después</string>
-  <string name="beta_coach_learn_body">Los próximos algoritmos que aprender, en el orden que antes da resultado.</string>
-  <string name="beta_coach_needs">Para cuberos de 3x3 con CFOP y un smart cube compatible. Tu primer plan llega tras 100 resoluciones. Después de cada plan, un formulario de 2 minutos me dice qué funcionó y qué no.</string>
+  <string name="beta_coach_learn_body">Los algoritmos que antes dan resultado.</string>
+  <string name="beta_coach_needs">Para cuberos de 3x3 con CFOP y un smart cube compatible. Primer plan tras 100 resoluciones, y después un formulario de 2 minutos tras cada plan.</string>
   <string name="beta_coach_apply">Unirme a la beta del entrenador</string>
   <string name="beta_coach_no_payment">No se pide ningún dato de pago</string>
   <string name="beta_coach_not_now">Ahora no</string>

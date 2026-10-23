@@ -41,6 +41,9 @@ public class SmartCubeNewsSheet extends NanoTimerBottomSheetFragment {
   // The rows arrive once the sheet has risen, not behind it.
   private static final long ENTER_LEAD_MS = 220;
 
+  private static final int BETA_HERO_DP = 112;
+  private static final int BETA_GLYPH_DP = 42;
+
   /** The smart cube's features, icon, title and sentence, in the order they are listed. */
   private static final int[][] FEATURES = {
       {R.drawable.ic_intro_timing, R.string.news_timing_title, R.string.news_timing_body},
@@ -105,6 +108,9 @@ public class SmartCubeNewsSheet extends NanoTimerBottomSheetFragment {
         : R.string.news_body);
     if (beta) {
       ((ImageView) v.findViewById(R.id.imgNewsGlyph)).setImageResource(R.drawable.menu_coach);
+      // A smaller hero, so the offer's button shows without scrolling.
+      resize(v.findViewById(R.id.newsHero), BETA_HERO_DP);
+      resize(v.findViewById(R.id.imgNewsGlyph), BETA_GLYPH_DP);
     }
 
     List<View> rows = new ArrayList<View>();
@@ -159,6 +165,12 @@ public class SmartCubeNewsSheet extends NanoTimerBottomSheetFragment {
     ((TextView) view.findViewById(R.id.tvNewsRowBody)).setText(row[2]);
     parent.addView(view);
     return view;
+  }
+
+  private static void resize(View view, int dp) {
+    ViewGroup.LayoutParams lp = view.getLayoutParams();
+    lp.width = lp.height = Math.round(view.getResources().getDisplayMetrics().density * dp);
+    view.setLayoutParams(lp);
   }
 
   private void apply() {
