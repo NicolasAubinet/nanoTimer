@@ -2,12 +2,16 @@ package com.cube.nanotimer.util.helper;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ActivityNotFoundException;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.net.Uri;
 import android.os.Build;
 import android.view.View;
@@ -19,6 +23,7 @@ import android.widget.Toast;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.core.app.ShareCompat;
+import androidx.core.content.ContextCompat;
 import com.cube.nanotimer.App;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.cube.SolveShareFormat;
@@ -182,12 +187,37 @@ public class DialogUtils {
         .setPositiveButton(R.string.share_send_report, null)
         .setNegativeButton(R.string.close, null)
         .show();
-    // Send leaves the dialog up, so backing out of the mail app returns to the typed comment.
-    final Button btSend = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-    btSend.setOnClickListener(new View.OnClickListener() {
+    // Send leaves the dialog up until an app is picked, so backing out of the chooser keeps the comment.
+    closeOnAppChosen(activity, dialog);
+    dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        withStoredSmartcubeData(activity, solveTime, cubeType, tfComment.getText().toString().trim(), btSend);
+        withStoredSmartcubeData(activity, solveTime, cubeType, tfComment.getText().toString().trim(), dialog);
+      }
+    });
+  }
+
+  private static String reportAppChosenAction(Context context) {
+    return context.getPackageName() + ".REPORT_APP_CHOSEN";
+  }
+
+  /** The chooser reports the app picked (API 22+), and that pick is the send. */
+  private static void closeOnAppChosen(final Activity activity, final AlertDialog dialog) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1) {
+      return;
+    }
+    final BroadcastReceiver receiver = new BroadcastReceiver() {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+        dialog.dismiss();
+      }
+    };
+    ContextCompat.registerReceiver(activity, receiver, new IntentFilter(reportAppChosenAction(activity)),
+        ContextCompat.RECEIVER_NOT_EXPORTED);
+    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+      @Override
+      public void onDismiss(DialogInterface d) {
+        activity.unregisterReceiver(receiver);
       }
     });
   }
@@ -195,11 +225,12 @@ public class DialogUtils {
   /** The track and the cube are fetched here rather than carried on the solve: the track is
    * kilobytes, and a history screen holds hundreds of solves it would never look at. */
   private static void withStoredSmartcubeData(final Activity activity, final SolveTime solveTime,
-      final CubeType cubeType, final String comment, final Button btSend) {
+      final CubeType cubeType, final String comment, final AlertDialog dialog) {
     if (solveTime.getId() <= 0) {
       sendReport(activity, solveTime, cubeType, null, solveTime.getSmartcubeCube(), comment);
       return;
     }
+    final Button btSend = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
     btSend.setEnabled(false); // a second tap during the fetch would open the chooser twice
     App.INSTANCE.getService().getGyroTrack(solveTime.getId(), new DataCallback<String>() {
       @Override
@@ -249,8 +280,20 @@ public class DialogUtils {
         .putExtra(Intent.EXTRA_EMAIL, new String[] { activity.getString(R.string.email) })
         .putExtra(Intent.EXTRA_SUBJECT, subject)
         .putExtra(Intent.EXTRA_TEXT, text);
+    String title = activity.getString(R.string.send_via);
+    Intent chooser;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+      // Mutable so the chooser can fill in the app picked; the package keeps the intent explicit.
+      int flags = PendingIntent.FLAG_UPDATE_CURRENT
+          | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_MUTABLE : 0);
+      Intent chosen = new Intent(reportAppChosenAction(activity)).setPackage(activity.getPackageName());
+      IntentSender onChosen = PendingIntent.getBroadcast(activity, 0, chosen, flags).getIntentSender();
+      chooser = Intent.createChooser(mail, title, onChosen);
+    } else {
+      chooser = Intent.createChooser(mail, title);
+    }
     try {
-      activity.startActivity(Intent.createChooser(mail, activity.getString(R.string.send_via)));
+      activity.startActivity(chooser);
     } catch (ActivityNotFoundException e) {
       shareData(activity, subject, text, null, "text/plain");
     }
