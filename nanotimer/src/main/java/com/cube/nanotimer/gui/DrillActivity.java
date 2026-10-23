@@ -1300,7 +1300,8 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       text = getString(R.string.drill_rep_not_counted);
       colourRes = R.color.secondary_text;
     } else if (session.getTally().isWin(rep)) {
-      text = getString(R.string.drill_rep_under, FormatterService.INSTANCE.formatSolveTime(target));
+      text = getString(R.string.drill_rep_under,
+          FormatterService.INSTANCE.formatSolveTime(target - rep.getTotalMs()));
       colourRes = R.color.green_soft;
     } else {
       text = getString(R.string.drill_rep_over,

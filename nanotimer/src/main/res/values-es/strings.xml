@@ -937,7 +937,7 @@
   <string name="drill_summary_cell_of">de %d</string>
   <string name="drill_summary_cell_mean">Media</string>
   <string name="drill_summary_cell_best">Mejor</string>
-  <string name="drill_rep_under">bajo %s</string>
+  <string name="drill_rep_under">%s de menos</string>
   <string name="drill_rep_over">%s de más</string>
   <string name="drill_rep_not_counted">no cuenta</string>
   <string name="drill_rep_guided">con el algoritmo</string>

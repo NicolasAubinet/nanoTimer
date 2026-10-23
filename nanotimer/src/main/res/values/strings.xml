@@ -966,7 +966,7 @@
   <string name="drill_summary_cell_of">of %d</string>
   <string name="drill_summary_cell_mean">Mean</string>
   <string name="drill_summary_cell_best">Best</string>
-  <string name="drill_rep_under">under %s</string>
+  <string name="drill_rep_under">%s under</string>
   <string name="drill_rep_over">%s over</string>
   <string name="drill_rep_not_counted">not counted</string>
   <string name="drill_rep_guided">with the algorithm</string>
