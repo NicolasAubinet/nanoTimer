@@ -1,5 +1,6 @@
 package com.cube.nanotimer.cube;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -596,6 +597,7 @@ public class SolveSolutionTest {
 
     assertEquals(1, cross.getStalls());
     assertEquals(700, cross.getStallMs());
+    assertArrayEquals(new long[] {200, 900}, cross.getStallSpans().get(0));
   }
 
   /** The wait before a step's turning is its recognition, AUF and all, and is counted there. */

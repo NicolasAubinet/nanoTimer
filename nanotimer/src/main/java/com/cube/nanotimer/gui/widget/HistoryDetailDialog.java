@@ -337,6 +337,7 @@ public class HistoryDetailDialog extends NanoTimerBottomSheetFragment {
     breakdownRows.clear();
     flaggedCases.clear();
     breakdownSteps = null;
+    breakdownPauses = null;
     breakdownMoves = null;
     blindHold = null; // or the solve swiped to keeps the last one's hold line
     pickedStep = -1;
@@ -649,7 +650,7 @@ public class HistoryDetailDialog extends NanoTimerBottomSheetFragment {
         String moves = blind && breakdownMoves != null ? breakdownMoves : solveTime.getSmartcubeMoves();
         DialogUtils.showFragment(getActivity(), SolveReplayDialog.newInstance(
             puzzleId, cubingScramble, moves, SolveBreakdown.solvingDurationMs(solveTime),
-            breakdownSteps, solveTime.getId(), blind));
+            breakdownSteps, breakdownPauses, solveTime.getId(), blind));
       }
     });
   }
@@ -804,7 +805,13 @@ public class HistoryDetailDialog extends NanoTimerBottomSheetFragment {
     // step; the colour is what says two of them are the same work.
     int[] slots = SolveStepBars.colorSlots(steps);
     int[][] partPositions = Utils.getSmartCubeSubStepPositions(steps);
-    ((SolveStepBarView) v.findViewById(R.id.breakdownBar)).setSteps(steps, colors);
+    SolveStepBarView bar = (SolveStepBarView) v.findViewById(R.id.breakdownBar);
+    bar.setSteps(steps, colors);
+    breakdownPauses = split && !solution.getSteps().isEmpty()
+        ? new ArrayList<long[]>(solution.getSteps().get(0).getStallSpans()) : null;
+    if (breakdownPauses != null) {
+      bar.setFirstStepPauses(breakdownPauses);
+    }
 
     BreakdownTable table = (BreakdownTable) v.findViewById(R.id.breakdownTable);
     table.addView(headerRow(split));
@@ -1151,6 +1158,7 @@ public class HistoryDetailDialog extends NanoTimerBottomSheetFragment {
 
   private final List<StepRows> breakdownRows = new ArrayList<StepRows>();
   private ArrayList<SolveStep> breakdownSteps; // what the bar in the sheet draws, and the replay scrubs
+  private ArrayList<long[]> breakdownPauses; // the stops in the bar's first step, for the replay's bar
   private String breakdownMoves; // the method breakdown's re-read stream, null under the user's steps
   private CubeRotation blindHold; // the hold this solve's names were read in, null unless blind
   private boolean showMoves;

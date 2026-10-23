@@ -70,6 +70,7 @@ public class SolveReplayDialog extends NanoTimerDialogFragment {
   private static final String ARG_STEPS = "steps";
   private static final String ARG_SOLVE_ID = "solveId";
   private static final String ARG_BLIND = "blind";
+  private static final String ARG_PAUSES = "pauses";
 
   private static final String BASE_URL =
       "https://appassets.androidplatform.net/assets/scramble/replay.html";
@@ -139,12 +140,14 @@ public class SolveReplayDialog extends NanoTimerDialogFragment {
    *                  this so it agrees with the time above it. 0 when there is none (a DNF), and
    *                  then the moves' own span stands in.
    * @param steps     the solve's steps, drawn as the scrubber; null or empty for no scrubber.
+   * @param pauses    the stops inside the first step, paled on the scrubber; null for none.
    * @param solveId   the solve's id, which the gyro track is fetched by. The track is not carried
    *                  in with the solve: it is kilobytes, and only a replay ever wants it.
    * @param blind     whether the solve type is blind, which plays the cube without any rotation.
    */
   public static SolveReplayDialog newInstance(String puzzleId, String scramble, String moves,
-      long timedMs, ArrayList<SolveStep> steps, int solveId, boolean blind) {
+      long timedMs, ArrayList<SolveStep> steps, ArrayList<long[]> pauses, int solveId,
+      boolean blind) {
     SolveReplayDialog frag = new SolveReplayDialog();
     Bundle args = new Bundle();
     args.putString(ARG_PUZZLE, puzzleId);
@@ -152,6 +155,7 @@ public class SolveReplayDialog extends NanoTimerDialogFragment {
     args.putString(ARG_MOVES, moves);
     args.putLong(ARG_TIMED_MS, timedMs);
     args.putSerializable(ARG_STEPS, steps);
+    args.putSerializable(ARG_PAUSES, pauses);
     args.putInt(ARG_SOLVE_ID, solveId);
     args.putBoolean(ARG_BLIND, blind);
     frag.setArguments(args);
@@ -255,6 +259,10 @@ public class SolveReplayDialog extends NanoTimerDialogFragment {
     palette.recycle();
 
     bar.setSteps(steps, colors);
+    ArrayList<long[]> pauses = (ArrayList<long[]>) getArguments().getSerializable(ARG_PAUSES);
+    if (pauses != null) {
+      bar.setFirstStepPauses(pauses);
+    }
     bar.setVisibility(View.VISIBLE);
     bar.setOnSeekListener(new SolveStepBarView.OnSeekListener() {
       @Override

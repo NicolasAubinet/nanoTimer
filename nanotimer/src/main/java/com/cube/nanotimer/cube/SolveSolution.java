@@ -177,11 +177,11 @@ public final class SolveSolution {
    * is already counted there, so only the gaps after it are read, which is where an unplanned cross
    * and a forgotten algorithm show up. Rotations are not turns, so a pause around one still counts.
    *
-   * @return how many, and the milliseconds they came to
+   * @return each stop as {from, to}, in milliseconds since the solve started
    */
-  private static long[] stallsOf(List<Move> moves, int from, int to, SolveStep step,
+  private static List<long[]> stallsOf(List<Move> moves, int from, int to, SolveStep step,
       long stepStartMs) {
-    long[] stalls = new long[2];
+    List<long[]> stalls = new ArrayList<long[]>();
     List<SolveStep> parts = step.getSubSteps();
     if (parts.isEmpty()) {
       addStalls(moves, from, to, stepStartMs + step.getRecognitionMs(), stalls);
@@ -200,7 +200,7 @@ public final class SolveSolution {
   }
 
   private static void addStalls(List<Move> moves, int from, int to, long executionStartMs,
-      long[] stalls) {
+      List<long[]> stalls) {
     Move previous = null;
     for (int i = from; i < to; i++) {
       Move move = moves.get(i);
@@ -210,8 +210,7 @@ public final class SolveSolution {
       }
       long gapMs = previous == null ? 0 : move.getOffsetMs() - previous.getOffsetMs();
       if (gapMs > SolveAnalyzer.LOOKAHEAD_PAUSE_MS) {
-        stalls[0]++;
-        stalls[1] += gapMs;
+        stalls.add(new long[] {previous.getOffsetMs(), move.getOffsetMs()});
       }
       previous = move;
     }
@@ -946,14 +945,18 @@ public final class SolveSolution {
     private final String name;
     private final List<List<Token>> groups;
     private final int moveCount;
-    private final int stalls;
+    private final List<long[]> stalls;
     private final long stallMs;
 
-    Step(int index, String name, List<List<Token>> groups, long[] stalls) {
+    Step(int index, String name, List<List<Token>> groups, List<long[]> stalls) {
       this.index = index;
       this.name = name;
-      this.stalls = (int) stalls[0];
-      this.stallMs = stalls[1];
+      this.stalls = Collections.unmodifiableList(stalls);
+      long stallMs = 0;
+      for (long[] stall : stalls) {
+        stallMs += stall[1] - stall[0];
+      }
+      this.stallMs = stallMs;
       List<List<Token>> parts = new ArrayList<List<Token>>(groups.size());
       for (List<Token> group : groups) {
         parts.add(Collections.unmodifiableList(group));
@@ -1019,6 +1022,11 @@ public final class SolveSolution {
      * {@link SolveAnalyzer#LOOKAHEAD_PAUSE_MS}. Recognition is not in it: see {@link #stallsOf}.
      */
     public int getStalls() {
+      return stalls.size();
+    }
+
+    /** Where those stops were: each one {from, to}, in milliseconds since the solve started. */
+    public List<long[]> getStallSpans() {
       return stalls;
     }
 

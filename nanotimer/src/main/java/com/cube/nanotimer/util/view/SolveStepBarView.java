@@ -52,6 +52,7 @@ public class SolveStepBarView extends View {
   private static final float PENDING = 0.35f;
 
   private List<SolveStep> steps = Collections.emptyList();
+  private List<long[]> firstStepPauses = Collections.emptyList();
   private int[] colors = new int[0];
   private int[] slots = new int[0]; // the palette slot each step draws from, grouped by name
   private int doneCount = Integer.MAX_VALUE; // steps past this are slots waiting for the solver
@@ -87,6 +88,18 @@ public class SolveStepBarView extends View {
     this.colors = colors;
     this.slots = SolveStepBars.colorSlots(this.steps);
     this.doneCount = doneCount;
+    this.firstStepPauses = Collections.emptyList();
+    invalidate();
+  }
+
+  /**
+   * Pales the stops inside the first step's turning, as its thinking. The first step was planned
+   * in inspection, so a stop in it is where the plan ran out: the cross's own recognition.
+   *
+   * @param pauses each stop as {from, to}, in milliseconds since the solve started, in order
+   */
+  public void setFirstStepPauses(List<long[]> pauses) {
+    this.firstStepPauses = pauses;
     invalidate();
   }
 
@@ -218,8 +231,8 @@ public class SolveStepBarView extends View {
       float stepWidth = width * step.getTotalMs() / totalMs;
       boolean pending = i >= doneCount;
       float alphaScale = pending ? PENDING : (highlighted < 0 || highlighted == i ? 1f : DIMMED);
-      drawStep(canvas, step, pending ? tailColor : colorOf(i),
-          left, stepWidth, height, corner, partGap, alphaScale);
+      drawStep(canvas, step, pending ? tailColor : colorOf(i), left, stepWidth, height, corner,
+          partGap, alphaScale, i == 0 ? firstStepPauses : Collections.<long[]>emptyList());
       left += stepWidth + stepGap;
     }
     canvas.restore(); // the playhead marks a moment in the solve, it is not part of the reveal
@@ -325,7 +338,7 @@ public class SolveStepBarView extends View {
   }
 
   private void drawStep(Canvas canvas, SolveStep step, int color, float left, float stepWidth,
-      float height, float corner, float partGap, float alphaScale) {
+      float height, float corner, float partGap, float alphaScale, List<long[]> pauses) {
     canvas.save();
     corners.reset();
     bounds.set(left, 0, left + stepWidth, height);
@@ -337,6 +350,7 @@ public class SolveStepBarView extends View {
         : step.getSubSteps();
 
     float partLeft = left;
+    long partStartMs = 0; // from the step's start, which is the solve's for the only step with pauses
     for (int i = 0; i < parts.size(); i++) {
       SolveStep part = parts.get(i);
       float partWidth = stepWidth * part.getTotalMs() / step.getTotalMs();
@@ -348,10 +362,23 @@ public class SolveStepBarView extends View {
           ? partLeft + partWidth * part.getRecognitionMs() / Math.max(1, part.getTotalMs())
           : partLeft;
 
-      fill(canvas, color, (int) (RECOGNITION_ALPHA * alphaScale),
-          partLeft, Math.min(split, partRight), height);
-      fill(canvas, color, (int) (Color.alpha(color) * alphaScale), split, partRight, height);
+      int pale = (int) (RECOGNITION_ALPHA * alphaScale);
+      fill(canvas, color, pale, partLeft, Math.min(split, partRight), height);
+      float turnedFrom = split;
+      for (long[] pause : pauses) {
+        float from = Math.max(turnedFrom,
+            partLeft + partWidth * (pause[0] - partStartMs) / Math.max(1, part.getTotalMs()));
+        float to = Math.min(partRight,
+            partLeft + partWidth * (pause[1] - partStartMs) / Math.max(1, part.getTotalMs()));
+        if (to > from) {
+          fill(canvas, color, (int) (Color.alpha(color) * alphaScale), turnedFrom, from, height);
+          fill(canvas, color, pale, from, to, height);
+          turnedFrom = to;
+        }
+      }
+      fill(canvas, color, (int) (Color.alpha(color) * alphaScale), turnedFrom, partRight, height);
       partLeft += partWidth;
+      partStartMs += part.getTotalMs();
     }
     canvas.restore();
   }
