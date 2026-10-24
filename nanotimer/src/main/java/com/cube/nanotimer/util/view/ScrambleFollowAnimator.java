@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat;
 import com.cube.nanotimer.R;
 import com.cube.nanotimer.util.ScrambleFormatterService;
 import com.cube.nanotimer.util.helper.GUIUtils;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,8 +18,9 @@ import java.util.List;
  *
  * <p>The caller hands over the already-coloured progress text (executed grey, current yellow) and
  * the number of moves done; this decorates the executed and current moves with {@link ScaledMoveSpan}
- * and, when exactly one move was just completed, tweens the hand-off. Scaled moves keep their normal
- * width, so nothing reflows.
+ * and, when the count moved forward, tweens the hand-off. Every move done by that step fades together:
+ * an algorithm's rotation is done with the turn before it, so one turn can finish two tokens. Scaled
+ * moves keep their normal width, so nothing reflows.
  */
 public class ScrambleFollowAnimator {
 
@@ -33,7 +35,7 @@ public class ScrambleFollowAnimator {
   private int lastDoneCount = -1;
   private ValueAnimator animator;
   private ScaledMoveSpan currentSpan;  // the move now expected (yellow, grown)
-  private ScaledMoveSpan executedSpan; // the move just turned (fading grey, shrinking)
+  private final List<ScaledMoveSpan> executedSpans = new ArrayList<>(); // just turned, fading grey
 
   public ScrambleFollowAnimator(TextView textView) {
     this.textView = textView;
@@ -54,17 +56,17 @@ public class ScrambleFollowAnimator {
   public void show(Spannable text, int doneCount) {
     cancel();
     List<int[]> tokens = ScrambleFormatterService.INSTANCE.moveTokenRanges(text);
-    boolean handOff = lastDoneCount >= 0 && doneCount == lastDoneCount + 1;
+    boolean handOff = lastDoneCount >= 0 && doneCount > lastDoneCount;
     currentSpan = null;
-    executedSpan = null;
+    executedSpans.clear();
 
     for (int i = 0; i < tokens.size(); i++) {
       if (i < doneCount) {
-        boolean justExecuted = handOff && i == doneCount - 1;
+        boolean justExecuted = handOff && i >= lastDoneCount;
         ScaledMoveSpan span = attach(text, tokens.get(i),
             justExecuted ? GROWN_SCALE : DONE_SCALE, justExecuted ? currentColor : doneColor);
         if (justExecuted) {
-          executedSpan = span;
+          executedSpans.add(span);
         }
       } else if (i == doneCount) {
         currentSpan = attach(text, tokens.get(i), handOff ? 1f : GROWN_SCALE, currentColor);
@@ -96,9 +98,9 @@ public class ScrambleFollowAnimator {
       if (currentSpan != null) {
         currentSpan.setScale(lerp(1f, GROWN_SCALE, p));
       }
-      if (executedSpan != null) {
-        executedSpan.setScale(lerp(GROWN_SCALE, DONE_SCALE, p));
-        executedSpan.setColor(GUIUtils.getColorCodeBetween(currentColor, doneColor, p));
+      for (ScaledMoveSpan executed : executedSpans) {
+        executed.setScale(lerp(GROWN_SCALE, DONE_SCALE, p));
+        executed.setColor(GUIUtils.getColorCodeBetween(currentColor, doneColor, p));
       }
       textView.invalidate();
     });
