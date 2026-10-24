@@ -42,9 +42,6 @@ public final class DrillSession {
 
   private static final long NOT_SHOWN = -1;
 
-  /** Clean reps a learning drill turns with the algorithm on screen before it fades. */
-  public static final int GUIDED_REPS = 3;
-
   /** Where the faces sit in a facelet string, which is the order {@link CubieCube} writes one in. */
   private static final String FACELET_ORDER = "URFDLB";
 
@@ -97,8 +94,6 @@ public final class DrillSession {
   private long clockSkewMs;
   private int resetCount;
   private boolean revealed;
-  /** Whether the case up is shown with its algorithm, decided when it is dealt. */
-  private boolean guided;
   /** The case being practised, dealt over and over outside the drill's reps. */
   private String practiceCase;
   /** An algorithm being tried for it, which deals it at that algorithm's angle; null for any. */
@@ -252,8 +247,6 @@ public final class DrillSession {
     caseShownAtMs = NOT_SHOWN;
     resetCount = 0;
     revealed = false;
-    guided = spec.isLearning() && practiceCase == null
-        && getTally().getGuided(code) < GUIDED_REPS;
   }
 
   /**
@@ -266,11 +259,6 @@ public final class DrillSession {
     } else {
       taught.put(code, algorithm);
     }
-  }
-
-  /** Whether the case up is a learning drill's rep turned with its algorithm on screen. */
-  public boolean isGuided() {
-    return guided && currentCase != null;
   }
 
   /**
@@ -661,6 +649,24 @@ public final class DrillSession {
   }
 
   /**
+   * Leaves the case in front of the user to look its algorithms up, spending the rep as a looked-up
+   * skip. Unlike a skip it comes round again later, as a case looked up mid-rep does. Null when
+   * there is none.
+   */
+  public DrillRep lookUp() {
+    String code = currentCase;
+    if (code == null || practiceCase != null) {
+      return null;
+    }
+    revealed = true;
+    DrillRep rep = complete(true);
+    if (!spec.retiresCases()) {
+      showAgain(code);
+    }
+    return rep;
+  }
+
+  /**
    * A turn of the layer's own face before the algorithm only squared the case up to be read, so it
    * is looking rather than solving; the one that closes an algorithm falls inside the execution by
    * construction. A rep of nothing but those has no algorithm to have started, and is split at its
@@ -675,12 +681,11 @@ public final class DrillSession {
     long execution = moves.isEmpty() ? 0 : Math.max(0, lastMoveMs - algStart);
     boolean practice = practiceCase != null;
     String taughtAlgorithm = taught.get(currentCase);
-    boolean offTaught = spec.isLearning() && !practice && !abandoned && !guided
-        && taughtAlgorithm != null
+    boolean offTaught = spec.isLearning() && !practice && !abandoned && taughtAlgorithm != null
         && !CaseAlgorithms.sameTurning(currentCase, DrillRep.notation(moves), taughtAlgorithm);
     DrillRep rep = new DrillRep(currentCase, currentScramble,
         new ArrayList<CubeMove>(moves), shownAt, recognition, execution, moves.size(),
-        resetCount, revealed, abandoned, practice, guided && !practice, offTaught);
+        resetCount, revealed, abandoned, practice, offTaught);
     // A practice rep is none of the drill's: it neither spends one nor counts towards retiring.
     if (!practice) {
       reps.add(rep);

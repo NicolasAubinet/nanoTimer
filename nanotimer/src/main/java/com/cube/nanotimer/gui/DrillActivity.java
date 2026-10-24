@@ -43,7 +43,6 @@ import com.cube.nanotimer.smartcube.drill.DrillSession;
 import com.cube.nanotimer.smartcube.drill.LayerRotation;
 import com.cube.nanotimer.smartcube.drill.PairWeights;
 import com.cube.nanotimer.smartcube.step.CaseAlgorithms;
-import com.cube.nanotimer.smartcube.step.LastLayerCaseAlgorithms;
 import com.cube.nanotimer.smartcube.step.LastLayerCaseNames;
 import com.cube.nanotimer.smartcube.step.LastLayerDiagram;
 import com.cube.nanotimer.smartcube.step.LastLayerScrambles;
@@ -159,7 +158,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   /** Whether the rep up had its algorithm brought back. */
   private boolean shownThisRep;
   /**
-   * A learning drill's cases with no starred algorithm, each chosen for before the first rep. The
+   * A learning drill's cases with no algorithm kept yet, each chosen for before the first rep. The
    * case is practised meanwhile, so whichever algorithm is tapped can be tried on the cube.
    */
   private final List<String> toChoose = new ArrayList<String>();
@@ -168,7 +167,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   private String choosing;
   private String firstAlgorithm;
   private String tryingAlgorithm;
-  /** Choosing what to practise, from the drill's offer, rather than at a learning drill's start. */
+  /** Choosing from the drill (Alg or the offer), rather than at a learning drill's start. */
   private boolean choosingToPractise;
   private LinearLayout chooseList;
   /** Greys the practised algorithm's moves as they are turned; null where there is none to follow. */
@@ -646,37 +645,40 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
    * refuses to say. Someone who has drawn a case they cannot place is not learning anything by
    * staring at it, and the alternative was leaving the drill to go and look it up.
    *
-   * <p>The rep is not stopped or forgiven. It goes on being timed and is marked as looked up, so a
-   * time reached this way is not later read as knowing the case. Between reps there is no case up
-   * and nothing to show.
+   * <p>They are tried on the cube in the choose step, the same one a coach's offer opens, with the
+   * case popup a row away. The rep up is spent, marked as looked up, so it is never read as knowing
+   * the case, and the case comes round again later; Back or "Use this one" returns to the drill on
+   * a new case. A case with nothing to try gets the popup, the rep going on being timed.
    */
   private void showAlgorithms() {
-    String currentCase = session == null ? null : session.getPracticeCase();
-    if (currentCase == null) {
-      currentCase = session == null ? null : session.getCurrentCase();
-      if (currentCase == null) {
-        return;
-      }
-      session.markRevealed();
+    String code = session == null || choosing != null ? null : session.getCurrentCase();
+    if (code == null || !cubeReady) {
+      return; // not yet on screen, so not yet looked at
     }
-    DialogUtils.showFragment(this, CaseAlgorithmsDialog.newInstance(currentCase));
+    session.markRevealed();
+    String first = firstToTry(code);
+    if (first == null) {
+      DialogUtils.showFragment(this, CaseAlgorithmsDialog.newInstance(code));
+      return;
+    }
+    recorder.record(session.lookUp());
+    if (session.getSpec().retiresCases()) {
+      refreshCaseProgress();
+    }
+    hidePracticeOffer();
+    choosingToPractise = true;
+    beginChoosing(code, first);
   }
 
   /**
-   * Offers to practise the case, for a coach drill's rep turned off the case's list: the bulb solve
-   * details lights, so never for an algorithm the user muted, picked or typed in.
+   * Offers to practise the case after a coach drill's rep: one turned off the case's list, as the
+   * bulb in solve details lights, so never for an algorithm the user muted, picked or typed in; or
+   * in a learning drill, a rep where the algorithm did not stick.
    */
   private void offerPractice(DrillRep rep) {
     hidePracticeOffer();
-    String turned = rep.getTurned();
-    if (!session.getSpec().isFromCoach() || rep.isPractice() || rep.isAbandoned()
-        || !CaseAlgorithms.isWorthPointingOut(rep.getCaseCode(), turned)
-        || CaseFlags.isTheirs(rep.getCaseCode(), turned)) {
-      return;
-    }
-    // A learning drill's own algorithm is what it asked for, even when off the usual list.
-    if (session.getSpec().isLearning() && CaseAlgorithms.sameTurning(rep.getCaseCode(), turned,
-        learningAlgorithm(rep.getCaseCode()))) {
+    if (!session.getSpec().isFromCoach() || rep.isPractice()
+        || !(isTurnedOffList(rep) || didNotStick(rep))) {
       return;
     }
     offeredCase = rep.getCaseCode();
@@ -684,19 +686,32 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     PracticeOfferPulse.play(practiceOffer);
   }
 
+  private boolean isTurnedOffList(DrillRep rep) {
+    String code = rep.getCaseCode();
+    String turned = rep.getTurned();
+    if (rep.isAbandoned() || !CaseAlgorithms.isWorthPointingOut(code, turned)
+        || CaseFlags.isTheirs(code, turned)) {
+      return false;
+    }
+    // A learning drill's own algorithm is what it asked for, even when off the usual list.
+    return !session.getSpec().isLearning()
+        || !CaseAlgorithms.sameTurning(code, turned, learningAlgorithm(code));
+  }
+
+  /** A learning rep looked up, reset, skipped or turned with another algorithm. */
+  private boolean didNotStick(DrillRep rep) {
+    return session.getSpec().isLearning() && (!CaseTally.isClean(rep) || rep.isOffTaught());
+  }
+
   /**
    * The offered case, over and over until they go back: first with its algorithms to try on the
-   * cube, starting on the starred one, then against the one kept.
+   * cube, then against the one kept.
    */
   private void enterPractice() {
     if (session == null || offeredCase == null) {
       return;
     }
-    String starred = Options.INSTANCE.getCaseAlgorithm(offeredCase);
-    String recommended = recommendedAlgorithm(offeredCase);
-    List<CaseAlgorithms.Listed> listed = CaseAlgorithms.shown(offeredCase);
-    String first = starred != null ? starred : recommended != null ? recommended
-        : listed.isEmpty() ? null : listed.get(0).getMoves();
+    String first = firstToTry(offeredCase);
     if (first == null) {
       return;
     }
@@ -707,17 +722,16 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
   }
 
   /**
-   * The last layer cases of a learning drill with no starred algorithm and more than one to choose
-   * from. A starred one is the user's answer already, so it is never asked again.
+   * The last layer cases of a learning drill whose algorithm was never kept on the cube, even with
+   * one to choose from: the choose step is where the algorithm is shown and repeated. A star from
+   * the case popup alone is only where it starts, since what is known is read from the solves.
    */
   private void collectCasesToChoose() {
     toChoose.clear();
     chooseIndex = 0;
     for (String code : session.getCases()) {
       if ((code.startsWith("oll_") || code.startsWith("pll_"))
-          && Options.INSTANCE.getCaseAlgorithm(code) == null
-          && (LastLayerCaseAlgorithms.listed(code).size() > 1
-              || Options.INSTANCE.getOwnCaseAlgorithm(code) != null)) {
+          && !Options.INSTANCE.isAlgorithmKept(code)) {
         toChoose.add(code);
       }
     }
@@ -731,10 +745,31 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       return;
     }
     String code = toChoose.get(chooseIndex);
-    // Starts on the one the case popup recommends, unless the drill names its own
+    beginChoosing(code, firstToTry(code));
+  }
+
+  /**
+   * The algorithm a case's choose step starts on: the starred one, else the one a learning drill
+   * names, else the one the case popup recommends, else the first listed. Null when there is none.
+   */
+  private String firstToTry(String code) {
+    String starred = Options.INSTANCE.getCaseAlgorithm(code);
+    if (starred != null) {
+      return starred;
+    }
+    boolean learning = session.getSpec().isLearning();
+    if (learning && session.getSpec().getCaseAlgorithm(code) != null) {
+      return learningAlgorithm(code);
+    }
     String recommended = recommendedAlgorithm(code);
-    beginChoosing(code, recommended != null && session.getSpec().getCaseAlgorithm(code) == null
-        ? recommended : learningAlgorithm(code));
+    if (recommended != null) {
+      return recommended;
+    }
+    List<CaseAlgorithms.Listed> listed = CaseAlgorithms.shown(code);
+    if (!listed.isEmpty()) {
+      return listed.get(0).getMoves();
+    }
+    return learning ? learningAlgorithm(code) : null;
   }
 
   /** The case dealt at the first algorithm's angle, with its algorithms in the card's place. */
@@ -777,6 +812,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
       return;
     }
     Options.INSTANCE.setCaseAlgorithm(choosing, tryingAlgorithm);
+    Options.INSTANCE.addAlgorithmKept(choosing);
     if (choosingToPractise) {
       if (session.getSpec().isLearning()) {
         teachAll();
@@ -1005,21 +1041,18 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     showAlgorithmProgress();
   }
 
-  /** A learning drill shows the case's algorithm for its first reps, then lets it fade. */
-  private void showLearningAlgorithm() {
+  /**
+   * A learning drill's case comes up with its algorithm hidden, since it was turned in the choose
+   * step, and Show alg in its place. One still up from the rep before fades out first.
+   */
+  private void hideLearningAlgorithm() {
     if (!session.getSpec().isLearning() || session.getPracticeCase() != null) {
       return;
     }
-    if (!session.isGuided()) {
-      algorithmFollower = null;
-      boolean fading = practiceAlgorithmRow.getVisibility() == View.VISIBLE;
-      LearningAlgorithmFade.hide(practiceAlgorithmRow);
-      LearningAlgorithmFade.appearAfter(showAlg, fading);
-      return;
-    }
-    showAlg.setVisibility(View.GONE);
-    followAlgorithm(session.getCurrentCase(), learningAlgorithm(session.getCurrentCase()));
-    LearningAlgorithmFade.show(practiceAlgorithmRow);
+    algorithmFollower = null;
+    boolean fading = practiceAlgorithmRow.getVisibility() == View.VISIBLE;
+    LearningAlgorithmFade.hide(practiceAlgorithmRow);
+    LearningAlgorithmFade.appearAfter(showAlg, fading);
   }
 
   /**
@@ -1057,9 +1090,9 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     return LastLayerAlgorithms.forCaseCode(code);
   }
 
-  /** Whether an algorithm is on screen for the case up: practice, a guided rep, or one shown again. */
+  /** Whether an algorithm is on screen for the case up: practice, or one shown again. */
   private boolean isAlgorithmUp() {
-    return session.getPracticeCase() != null || session.isGuided() || shownThisRep;
+    return session.getPracticeCase() != null || shownThisRep;
   }
 
   /**
@@ -1112,7 +1145,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     cube.setState(CubePatternFormat.format(session.getFacelets()));
     shownThisRep = false;
     restartAlgorithmProgress();
-    showLearningAlgorithm();
+    hideLearningAlgorithm();
     // ⚠️ The case now on screen is deliberately not named anywhere. Only the cube says what it
     // is. The line naming the rep that is over stays, since one beat is not long enough to read
     // it, but it stands back so that it cannot be taken for the name of this one.
@@ -1287,10 +1320,7 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     long target = session.getSpec().getTargetMs(rep.getCaseCode());
     String text;
     int colourRes;
-    if (session.getSpec().isLearning() && rep.isGuided() && !rep.isAbandoned()) {
-      text = getString(R.string.drill_rep_guided);
-      colourRes = R.color.secondary_text;
-    } else if (rep.isOffTaught()) {
+    if (rep.isOffTaught()) {
       text = getString(R.string.drill_rep_other_alg);
       colourRes = R.color.danger_text;
     } else if (session.getSpec().isLearning() && CaseTally.isClean(rep)) {

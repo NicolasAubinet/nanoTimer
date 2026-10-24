@@ -92,11 +92,10 @@ public class DrillRecorder {
     if (!rep.isPractice()) {
       drillRepPositions.add(position);
     }
-    // A guided rep is stored as revealed: either way the answer was on screen.
     store(new DrillCaseRep(position++, rep.getCaseCode(), rep.getScramble(),
         SolveMovesFormat.format(rep.getMoves(), rep.getShownAtMs()), rep.getRecognitionMs(),
         rep.getExecutionMs(), rep.getMoveCount(), rep.getResetCount(),
-        rep.wasRevealed() || rep.isGuided(), rep.isAbandoned(), rep.isPractice()));
+        rep.wasRevealed(), rep.isAbandoned(), rep.isPractice()));
   }
 
   public synchronized void record(CrossDrillRep rep) {

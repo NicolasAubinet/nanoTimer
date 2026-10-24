@@ -943,7 +943,6 @@
   <string name="drill_rep_under">%s abaixo</string>
   <string name="drill_rep_over">%s acima</string>
   <string name="drill_rep_not_counted">não conta</string>
-  <string name="drill_rep_guided">com o algoritmo</string>
   <string name="drill_rep_unaided">sem olhar</string>
   <string name="drill_practice_offer">Praticar este caso</string>
   <string name="drill_wrong_angle">Ângulo errado: desfaça isto e gire o cubo como na imagem</string>
@@ -951,7 +950,7 @@
   <string name="drill_choose_title">Algoritmo para %1$s</string>
   <string name="drill_choose_use">Usar este</string>
   <string name="drill_choose_yours">O seu</string>
-  <string name="drill_choose_more">Mais algoritmos…</string>
+  <string name="drill_choose_more">Todos os algoritmos e detalhes do caso…</string>
   <plurals name="drill_choose_last">
     <item quantity="one">o último</item>
     <item quantity="other">últimos %d</item>

@@ -18,7 +18,6 @@ public final class CaseTally {
   private final DrillSpec spec;
   private final Map<String, Integer> showings = new HashMap<String, Integer>();
   private final Map<String, Integer> wins = new HashMap<String, Integer>();
-  private final Map<String, Integer> guided = new HashMap<String, Integer>();
   private final Map<String, Boolean> cleared = new HashMap<String, Boolean>();
 
   private CaseTally(DrillSpec spec) {
@@ -29,12 +28,6 @@ public final class CaseTally {
     CaseTally tally = new CaseTally(spec);
     for (DrillRep rep : reps) {
       String code = rep.getCaseCode();
-      if (rep.isGuided()) {
-        if (!rep.isAbandoned() && rep.getResetCount() == 0) {
-          tally.guided.put(code, countOf(tally.guided, code) + 1);
-        }
-        continue;
-      }
       if (spec.isLearning()) {
         tally.countStreak(rep);
         continue;
@@ -71,12 +64,10 @@ public final class CaseTally {
   }
 
   /**
-   * A rep that measured the case: not skipped, not restarted, not solved with the answer shown,
-   * whether looked up or shown from the start.
+   * A rep that measured the case: not skipped, not restarted, not solved with the answer looked up.
    */
   public static boolean isClean(DrillRep rep) {
-    return !rep.isAbandoned() && rep.getResetCount() == 0 && !rep.wasRevealed()
-        && !rep.isGuided();
+    return !rep.isAbandoned() && rep.getResetCount() == 0 && !rep.wasRevealed();
   }
 
   /**
@@ -89,11 +80,6 @@ public final class CaseTally {
       return isClean(rep) && !rep.isOffTaught();
     }
     return isClean(rep) && rep.getTotalMs() <= spec.getTargetMs(rep.getCaseCode());
-  }
-
-  /** Reps of a case finished cleanly with the algorithm on screen. */
-  public int getGuided(String code) {
-    return countOf(guided, code);
   }
 
   public int getShowings(String code) {

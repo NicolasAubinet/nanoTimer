@@ -528,6 +528,29 @@ public class DrillSessionTest {
         Collections.frequency(seen, seen.get(0)));
   }
 
+  /** A case left to look its algorithms up spends the rep but comes round again, unlike a skip. */
+  @Test
+  public void aCaseLeftToLookUpComesRoundAgain() {
+    DrillSpec spec = new DrillSpec("look", DrillSpec.Type.CASE_EXECUTION,
+        DrillSpec.Delivery.VIRTUAL, Arrays.asList("pll_h", "pll_z", "pll_t", "pll_ua"),
+        DrillSpec.Selection.ROUND_ROBIN, 5, 0, null);
+    DrillSession session = new DrillSession(spec, new Random(7));
+    Hand hand = new Hand(session);
+    List<String> seen = new ArrayList<String>();
+    while (hand.next()) {
+      seen.add(session.getCurrentCase());
+      if (seen.size() == 1) {
+        DrillRep rep = session.lookUp();
+        assertTrue(rep.isAbandoned());
+        assertTrue(rep.wasRevealed());
+      } else {
+        assertNotNull(session.getCurrentCase(), hand.execute(inverse(session.getCurrentScramble())));
+      }
+    }
+    assertEquals(5, seen.size());
+    assertEquals(2, Collections.frequency(seen, seen.get(0)));
+  }
+
   /**
    * <b>A drill of one rep per case deals every one of them, redo or no redo.</b> Putting a botched
    * case back costs the drill a rep, and where there was no spare one that rep was taken off the
@@ -736,30 +759,20 @@ public class DrillSessionTest {
     assertEquals(0, session.getTally().getShowings("pll_h"));
   }
 
-  /** Each case is guided three times, then retires on three reps turned without the algorithm. */
+  /** Each case retires on three reps turned without the algorithm, from its very first rep. */
   @Test
-  public void aLearningDrillGuidesEachCaseThenRetiresItWithoutLooking() {
-    DrillSpec spec = learning();
-    DrillSession session = new DrillSession(spec, new Random(7));
-    Map<String, Integer> guided = new HashMap<String, Integer>();
+  public void aLearningDrillRetiresEachCaseWithoutLooking() {
+    DrillSession session = new DrillSession(learning(), new Random(7));
     Hand hand = new Hand(session);
     int reps = 0;
     while (hand.next()) {
-      String code = session.getCurrentCase();
-      reps += session.isRetired(code) ? 0 : 1;
-      boolean wasGuided = session.isGuided();
-      if (wasGuided) {
-        guided.put(code, guided.containsKey(code) ? guided.get(code) + 1 : 1);
-      }
+      reps += session.isRetired(session.getCurrentCase()) ? 0 : 1;
       hand.pause(300);
-      DrillRep rep = hand.execute(inverse(session.getCurrentScramble()));
-      assertEquals(wasGuided, rep.isGuided());
+      assertTrue(CaseTally.isClean(hand.execute(inverse(session.getCurrentScramble()))));
     }
-    assertEquals(DrillSession.GUIDED_REPS, guided.get("pll_h").intValue());
-    assertEquals(DrillSession.GUIDED_REPS, guided.get("pll_z").intValue());
     assertEquals("no time to beat, so every clean rep wins", 3,
         session.getTally().getWins("pll_h"));
-    assertEquals(12, reps);
+    assertEquals(6, reps);
     assertTrue(session.isFinished());
   }
 
@@ -771,9 +784,8 @@ public class DrillSessionTest {
     int reps = 0;
     while (hand.next()) {
       String code = session.getCurrentCase();
-      boolean unaided = !session.isGuided();
-      // The third rep without looking is looked up, once, for pll_h.
-      if (unaided && "pll_h".equals(code) && session.getTally().getWins(code) == 2
+      // The third rep is looked up, once, for pll_h.
+      if ("pll_h".equals(code) && session.getTally().getWins(code) == 2
           && session.getTally().getShowings(code) == 2) {
         session.markRevealed();
       }
@@ -781,8 +793,7 @@ public class DrillSessionTest {
       hand.pause(300);
       hand.execute(inverse(session.getCurrentScramble()));
     }
-    assertEquals("three guided and three unaided each, plus the lost run of two and its look-up",
-        15, reps);
+    assertEquals("three each, plus the lost run of two and its look-up", 9, reps);
     assertTrue(session.isRetired("pll_h"));
   }
 
@@ -795,25 +806,11 @@ public class DrillSessionTest {
     while (hand.next()) {
       hand.pause(300);
       DrillRep rep = hand.execute(inverse(session.getCurrentScramble()));
-      assertEquals(!rep.isGuided() && "pll_h".equals(rep.getCaseCode()), rep.isOffTaught());
+      assertEquals("pll_h".equals(rep.getCaseCode()), rep.isOffTaught());
     }
     assertFalse(session.isRetired("pll_h"));
     assertTrue(session.isRetired("pll_z"));
     assertEquals(0, session.getTally().getWins("pll_h"));
-  }
-
-  /** A guided rep that was skipped does not use up the guidance. */
-  @Test
-  public void aSkippedGuidedRepIsGuidedAgain() {
-    DrillSpec spec = learning();
-    DrillSession session = new DrillSession(spec, new Random(7));
-    Hand hand = new Hand(session);
-    for (int i = 0; i < 6; i++) {
-      assertTrue(hand.next());
-      assertTrue(session.isGuided());
-      assertTrue(session.abandon().isGuided());
-    }
-    assertEquals(0, session.getTally().getGuided("pll_h"));
   }
 
   /**

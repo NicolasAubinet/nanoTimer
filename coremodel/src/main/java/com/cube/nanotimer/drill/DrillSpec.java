@@ -170,7 +170,7 @@ public final class DrillSpec {
   }
 
   /**
-   * A learning drill: each case's algorithm is shown for its first reps and then fades, and a case
+   * A learning drill: each case's algorithm is chosen and practised on the cube first, and a case
    * retires after {@code winsToRetire} clean reps turned without it, whatever the time.
    * {@code algorithms} names the algorithm to show per case; a case it leaves out shows the usual one.
    */
@@ -492,8 +492,8 @@ public final class DrillSpec {
   }
 
   /**
-   * Whether this drill teaches its cases rather than speeding them up: the algorithm is shown before
-   * a case's first reps, and a case retires on reps turned without it rather than on a time.
+   * Whether this drill teaches its cases rather than speeding them up: the algorithm is practised
+   * before the drill, and a case retires on reps turned without it rather than on a time.
    */
   public boolean isLearning() {
     return learning;

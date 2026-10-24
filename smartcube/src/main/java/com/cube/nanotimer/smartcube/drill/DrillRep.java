@@ -30,7 +30,6 @@ public final class DrillRep {
   private final boolean revealed;
   private final boolean abandoned;
   private final boolean practice;
-  private final boolean guided;
   private final boolean offTaught;
 
   DrillRep(String caseCode, String scramble, List<CubeMove> moves, long shownAtMs,
@@ -49,14 +48,7 @@ public final class DrillRep {
 
   DrillRep(String caseCode, String scramble, List<CubeMove> moves, long shownAtMs,
       long recognitionMs, long executionMs, int moveCount, int resetCount, boolean revealed,
-      boolean abandoned, boolean practice, boolean guided) {
-    this(caseCode, scramble, moves, shownAtMs, recognitionMs, executionMs, moveCount, resetCount,
-        revealed, abandoned, practice, guided, false);
-  }
-
-  DrillRep(String caseCode, String scramble, List<CubeMove> moves, long shownAtMs,
-      long recognitionMs, long executionMs, int moveCount, int resetCount, boolean revealed,
-      boolean abandoned, boolean practice, boolean guided, boolean offTaught) {
+      boolean abandoned, boolean practice, boolean offTaught) {
     this.caseCode = caseCode;
     this.scramble = scramble;
     this.moves = Collections.unmodifiableList(moves);
@@ -68,7 +60,6 @@ public final class DrillRep {
     this.revealed = revealed;
     this.abandoned = abandoned;
     this.practice = practice;
-    this.guided = guided;
     this.offTaught = offTaught;
   }
 
@@ -155,14 +146,6 @@ public final class DrillRep {
     return practice;
   }
 
-  /**
-   * Turned in a learning drill with the algorithm on screen from the start: it says the case went in,
-   * not that it was known, so like a revealed rep it is no measure of the case.
-   */
-  public boolean isGuided() {
-    return guided;
-  }
-
   /** Solved in a learning drill, but not with the algorithm being learned. */
   public boolean isOffTaught() {
     return offTaught;
@@ -177,7 +160,7 @@ public final class DrillRep {
   public String toString() {
     return caseCode + "(" + recognitionMs + "ms + " + executionMs + "ms, " + moveCount
         + " moves" + (revealed ? ", revealed" : "") + (abandoned ? ", abandoned" : "")
-        + (practice ? ", practice" : "") + (guided ? ", guided" : "")
+        + (practice ? ", practice" : "")
         + (offTaught ? ", off the taught algorithm" : "") + ")";
   }
 }

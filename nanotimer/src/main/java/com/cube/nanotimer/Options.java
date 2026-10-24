@@ -103,6 +103,7 @@ public enum Options {
   private static final String LEARN_PICK_KEY_PREFIX = "learn_pick_";
   public static final String CASE_ALGORITHM_KEY_PREFIX = "case_alg_";
   private static final String LEARNED_CASES_KEY = "learned_cases";
+  private static final String KEPT_ALGORITHM_CASES_KEY = "kept_algorithm_cases";
   private static final String CELEBRATED_GROUPS_KEY = "celebrated_groups";
   public static final String DRILL_PRESETS_KEY_PREFIX = "drill_case_presets_";
   public static final String CASE_OWN_ALGORITHM_KEY_PREFIX = "case_own_alg_";
@@ -537,6 +538,23 @@ public enum Options {
     Set<String> learned = getLearnedCases();
     if (learned.add(caseCode)) {
       sharedPreferences.edit().putStringSet(LEARNED_CASES_KEY, learned).apply();
+    }
+  }
+
+  /**
+   * Whether the case's algorithm was kept after trying it on the cube, with "Use this one". A star
+   * set in the case popup alone does not count, so a learning drill still asks for that case.
+   */
+  public boolean isAlgorithmKept(String caseCode) {
+    return sharedPreferences.getStringSet(KEPT_ALGORITHM_CASES_KEY, new LinkedHashSet<String>())
+        .contains(caseCode);
+  }
+
+  public void addAlgorithmKept(String caseCode) {
+    Set<String> kept = new LinkedHashSet<String>(
+        sharedPreferences.getStringSet(KEPT_ALGORITHM_CASES_KEY, new LinkedHashSet<String>()));
+    if (kept.add(caseCode)) {
+      sharedPreferences.edit().putStringSet(KEPT_ALGORITHM_CASES_KEY, kept).apply();
     }
   }
 

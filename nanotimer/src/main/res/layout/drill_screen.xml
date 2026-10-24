@@ -63,7 +63,7 @@
       <include layout="@layout/drill_gyro_chip"/>
     </FrameLayout>
 
-    <!-- Practice mode, or a learning drill's guided reps: the algorithm, in the scramble's face,
+    <!-- Practice mode, or a learning drill's Show alg: the algorithm, in the scramble's face,
          beside the case drawn at the angle the algorithm starts from. -->
     <FrameLayout
        android:layout_width="match_parent"
