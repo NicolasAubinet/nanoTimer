@@ -295,7 +295,7 @@ public class DrillCasesDialog extends NanoTimerDialogFragment
       Options.INSTANCE.setDrillCases(family,
           picked.size() == cases.size() ? null : new LinkedHashSet<String>(picked));
     }
-    adapter.notifyDataSetChanged();
+    refreshShown(); // a known case shown only for being picked goes once it is not
     refreshCount();
   }
 
