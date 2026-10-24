@@ -229,6 +229,17 @@ public class CrossDrillActivity extends DrillScreenActivity {
     return session != null;
   }
 
+  /** A cross announced finished without being there is a rep, but not a solved one. */
+  @Override
+  protected boolean hasSolvedRep() {
+    for (CrossDrillRep rep : session.getReps()) {
+      if (rep.isBuilt()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /** The scramble is on screen, which is where the planning runs from. */
   @Override
   protected void onCaseVisible() {

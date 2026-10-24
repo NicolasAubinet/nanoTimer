@@ -156,6 +156,9 @@ public abstract class DrillScreenActivity extends NanoTimerActivity
   /** Whether there is a drill still to interrupt. */
   protected abstract boolean isDrillRunning();
 
+  /** Whether a rep has been solved; a drill stopped before one has nothing to sum up. */
+  protected abstract boolean hasSolvedRep();
+
   /**
    * Starts keeping the reps, for a drill the user chose to record. Call once the spec has been
    * read: a spec that could not be is a drill that never ran, and records nothing.
@@ -198,13 +201,20 @@ public abstract class DrillScreenActivity extends NanoTimerActivity
     runningLayout.setKeepScreenOn(true);
 
     // Back stops the drill rather than throwing it away: a drill ended at rep 6 of 20 is a result,
-    // and the reps up to there are what the user came for. A second press then leaves.
+    // and the reps up to there are what the user came for. A second press then leaves. With nothing
+    // solved there is no result, so it just leaves.
     getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
       @Override
       public void handleOnBackPressed() {
         if (!started || !isDrillRunning() || finished) {
           setEnabled(false);
           DrillScreenActivity.this.getOnBackPressedDispatcher().onBackPressed();
+        } else if (!hasSolvedRep()) {
+          finished = true;
+          if (recorder != null) {
+            recorder.end(DrillEnd.STOPPED);
+          }
+          finish();
         } else {
           endReason = DrillEnd.STOPPED;
           showSummary();

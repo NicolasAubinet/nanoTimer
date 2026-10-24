@@ -398,6 +398,17 @@ public class DrillActivity extends DrillScreenActivity implements DrillCaseTable
     return session != null;
   }
 
+  /** A skipped rep or a practice one solves nothing the summary could report. */
+  @Override
+  protected boolean hasSolvedRep() {
+    for (DrillRep rep : session.getReps()) {
+      if (!rep.isAbandoned()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /** The case is on screen, which is where the first rep's recognition runs from. */
   @Override
   protected void onCaseVisible() {
